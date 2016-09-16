@@ -105,7 +105,8 @@ $runningDaemons = $daemons->search([])->totalCount;
                         'jsonSelector' => 'runningDaemons',
                     ]),
                 'encode' => false,
-                'url' => ['/daemon/index']
+                'url' => ['/daemon/index'],
+                'visible' => Yii::$app->user->can('daemon/index'),
             ],
             [
                 'label' => 'Users',
@@ -140,13 +141,32 @@ $runningDaemons = $daemons->search([])->totalCount;
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">&copy; GLaDOS <?= date('Y') ?></p>
+        <p class="pull-left">&copy; GLaDOS <?= date('Y') ?>
+            <?= ActiveEventField::widget([
+                'options' => [
+                    'tag' => 'i',
+                    'class' => 'glyphicon glyphicon-stop',
+                ],
+                'event' => 'meta',
+                'jsonSelector' => 'state',
+                'jsHandler' => 'function(d, s){
+                    if(d == "event stream started" || d == "event stream resumed"){
+                        s.classList.remove("glyphicon-stop", "glyphicon-pause");
+                        s.classList.add("glyphicon-play");
+                    }else if(d == "event stream finished"){
+                        s.classList.remove("glyphicon-play");
+                        s.classList.add("glyphicon-pause");
+                    }
+                }'
+            ]); ?>
+        </p>
 
         <p class="pull-right"><?= Yii::powered() ?></p>
     </div>
 </footer>
 
-<?php echo $this->render('@app/views/_events'); ?>
+<?php //echo $this->render('@app/views/_events'); ?>
+
 <?php $this->endBody() ?>
 </body>
 </html>

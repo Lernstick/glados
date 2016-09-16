@@ -11,7 +11,7 @@ $this->title = 'My Yii Application';
     <div class="col-md-6">
         <div class="well">
             <h1 class="text-center">
-            <?= $running_exams ?>
+            <?= yii::$app->formatter->format($running_exams, 'shortNumber'); ?>
             <small>running exams</small></h1>
         </div>
     </div>
@@ -21,7 +21,7 @@ $this->title = 'My Yii Application';
             <h1 class="text-center">
             <?= ActiveEventField::widget([
                 'event' => 'newActivities',
-                'content' => $new_activities,
+                'content' => yii::$app->formatter->format($new_activities, 'shortNumber'),
                 'jsonSelector' => 'newActivities',
                 'jsHandler' => 'function(d, s){s.innerHTML = eval(s.innerHTML + d)}',
                 'options' => [ 'tag' => 'span' ],
@@ -33,7 +33,7 @@ $this->title = 'My Yii Application';
     <div class="col-md-6">
         <div class="well">
             <h1 class="text-center">
-            <?= $total_exams ?>
+            <?= yii::$app->formatter->format($total_exams, 'shortNumber'); ?>
             <small>exams created</small></h1>
         </div>
     </div>
@@ -41,11 +41,10 @@ $this->title = 'My Yii Application';
     <div class="col-md-6">
         <div class="well">
             <h1 class="text-center">
-            <?= $completed_exams ?>
+            <?= yii::$app->formatter->format($completed_exams, 'shortNumber'); ?>
             <small>exams completed</small></h1>
         </div>
     </div>
-
 
     <div class="jumbotron">
         <p><a class="btn btn-lg btn-success" href="index.php?r=exam/index">Show my Exams</a></p>

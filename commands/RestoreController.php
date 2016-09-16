@@ -37,7 +37,7 @@ class RestoreController extends DaemonController
     /**
      * @inheritdoc
      */
-    public function doJob($id, $file, $date)
+    public function doJob($id, $file, $date, $restorePath = '/overlay/home/user')
     {
         pcntl_signal_dispatch();
         $this->cleanup();
@@ -86,6 +86,7 @@ class RestoreController extends DaemonController
 
         if($fs->slash($file) === null){
             $this->ticket->restore_state = 'Restore failed: "' . $file . '": No such file or directory.';
+            $this->log($this->ticket->restore_state);
             $this->ticket->restore_lock = 0;
             $this->ticket->save(false);
             return;
@@ -103,12 +104,19 @@ class RestoreController extends DaemonController
         $this->ticket->restore_state = 'restore in progress...';
         $this->ticket->save(false);
 
-        $this->_cmd = "rdiff-backup --force --remote-schema 'ssh -i " . \Yii::$app->basePath . "/.ssh/rsa "
-             . "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -C %s rdiff-backup --server' "
-             . "--restore-as-of " . escapeshellarg($date) . ' '
-             . escapeshellarg(\Yii::$app->basePath . "/backups/" . $this->ticket->token . "/" . $file) . ' '
-             . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . "::" . $this->remotePath . '/' . $file) . ' '
-             . "2>&1";
+        /* first command */
+        $this->_cmd = "rdiff-backup --terminal-verbosity=5 --force --remote-schema "
+                . "'ssh -i " . \Yii::$app->basePath . "/.ssh/rsa "
+                . "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -C %s rdiff-backup --server' "
+             . "--restore-as-of " . escapeshellarg($date) . " "
+             . escapeshellarg(\Yii::$app->basePath . "/backups/" . $this->ticket->token . "/" . $file) . " "
+             . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . "::" . $restorePath . '/' . $file) . " "
+             . "2>&1;" . " "
+             /* second command */
+             . "ssh -i " . \Yii::$app->basePath . "/.ssh/rsa "
+             . "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "
+             . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip) . " "
+             . "mount -o remount,rw / ";
 
         $this->log('Executing rdiff-backup: ' . $this->_cmd);
 
@@ -129,7 +137,6 @@ class RestoreController extends DaemonController
 
         $this->ticket->restore_lock = 0;
         $this->ticket->save(false);
-
 
     }
 

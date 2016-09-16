@@ -290,6 +290,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'jsonSelector' => 'restore_state',
                 ]),
             ],
+            'bootup_lock',            
         ],
 
     ]) ?>

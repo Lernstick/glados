@@ -54,7 +54,13 @@ class TicketController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['download', 'notify', 'finish', 'ssh-key'],
+                        'actions' => [
+                            'download', //download/start the exam
+                            'md5', //to verify the exam file
+                            'ssh-key', //get the public server ssh key
+                            'notify', //notify a new client status
+                            'finish', //finish the exam
+                        ],
                         'roles' => ['?', '@'],
                     ],
                     [
@@ -469,6 +475,24 @@ class TicketController extends Controller
 
     }*/
 
+
+    /**
+     * Echoes the MD5 sum of the exam file for the client to verify.
+     * @param string $token
+     * @return The response object or an array with the error description
+     */
+    public function actionMd5($token)
+    {
+
+        $model = Ticket::findOne(['token' => $token]);
+        if (!$model) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        } else {
+            echo $model->exam->md5;
+            return;
+        }
+    }
+
     /**
      * Downloads an exam file after checking ticket validity.
      * @param string $token
@@ -478,7 +502,6 @@ class TicketController extends Controller
     {
 
         $model = Ticket::findOne(['token' => $token]);
-        $model->scenario = Ticket::SCENARIO_DOWNLOAD;
 
         if (!$model || !$model->valid){
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -496,7 +519,9 @@ class TicketController extends Controller
                                              'multiple downloads are not allowed.' ];
         }
 
-        //$model->start = new Expression('UTC_TIMESTAMP()');
+        $model->scenario = Ticket::SCENARIO_DOWNLOAD;
+
+        $model->bootup_lock = 1;
         $model->download_lock = 1;
         $model->start = $model->state == 0 ? new Expression('NOW()') : $model->start;
         $model->ip = Yii::$app->request->userIp;
@@ -505,7 +530,7 @@ class TicketController extends Controller
         ignore_user_abort(true);
         \Yii::$app->response->bandwidth = 20 * 1024 * 1024; //20MB per second
 
-        # log activity before the [[send()]] is called open the request.
+        # log activity before [[send()]] is called upon the request.
         \Yii::$app->response->on(\app\components\customResponse::EVENT_BEFORE_SEND, function($event) {
             $ticket = Ticket::findOne($event->data->id);
             $ticket->scenario = Ticket::SCENARIO_DOWNLOAD;
@@ -522,7 +547,7 @@ class TicketController extends Controller
             $act->save();
         }, $model);
        
-        # calculate the percentage, write it to the database and lof if the client side aborted the download 
+        # calculate the percentage, write it to the database and look if the client side aborted the download 
         \Yii::$app->response->on(\app\components\customResponse::EVENT_WHILE_SEND, function($event) {
             $ticket = Ticket::findOne($event->data->id);
             $ticket->scenario = Ticket::SCENARIO_DOWNLOAD;
@@ -564,12 +589,25 @@ class TicketController extends Controller
                 'Ticket with token ' . $event->data->token ) . '.'
             ]);
             $act->save();
+
+            /* if there is a backup available restore the latest */
+            $backupSearchModel = new BackupSearch();
+            $backupDataProvider = $backupSearchModel->search($ticket->token);
+            if ($backupDataProvider->totalCount > 0) {
+                $restoreDaemon = new Daemon();
+                /* run the restore daemon in the foreground */
+                $pid = $restoreDaemon->startRestore($ticket->id, '/', 'now', false, '/run/initramfs/backup/home/user');
+            }
+            $ticket->continueBootup();
+            //$ticket->bootup_lock = 0;
+            $ticket->save();
+
         }, $model);
 
         $searchModel = new DaemonSearch();
         if($searchModel->search([])->totalCount < 3){
-            $daemon = new Daemon();
-            $daemon->startBackup();
+            $backupDaemon = new Daemon();
+            $backupDaemon->startBackup();
         }
 
         return \Yii::$app->response->sendFile($model->exam->file);
@@ -588,6 +626,9 @@ class TicketController extends Controller
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         if($model !== null) {
             $model->client_state = $state;
+            if ($state == "bootup complete.") {
+                $model->bootup_lock = 0;
+            }
             if ($model->save()) {
                 return [ 'code' => 200, 'msg' => 'Client state changed.' ];
             }
@@ -645,7 +686,7 @@ class TicketController extends Controller
         if(Yii::$app->request->isAjax){
             return $this->runAction('view', ['id' => $id]);
         }else{
-            return $this->redirect(['view', 'id' => $id]);
+            return $this->redirect(['view', 'id' => $id, '#' => 'backups']);
         }
 
     }

@@ -54,6 +54,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ),
                     'format' => 'raw',
                 ],
+                'md5',
                 'fileSize:shortSize',
                 'fileInfo:html',
                 [
@@ -64,7 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
                 [
                     'attribute' => 'ticketCount',
-    		'format' => 'raw',
+    		        'format' => 'raw',
                     'value' => Html::a(
                         $model->ticketCount,
                         ['ticket/index', 'TicketSearch[examName]' => $model->name, 'TicketSearch[examSubject]' => $model->subject],

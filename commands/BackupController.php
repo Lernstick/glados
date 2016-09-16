@@ -19,8 +19,8 @@ class BackupController extends DaemonController
     public $ticket;
     private $_cmd;
     public $remoteUser = 'root';
-    public $remotePath = '/home/user';
-    //public $sshUserKnownHostsFile = ".ssh/known_hosts";
+    #public $remotePath = '/home/user';
+    public $remotePath = '/overlay/home/user';
 
     /**
      * @inheritdoc
@@ -42,7 +42,14 @@ class BackupController extends DaemonController
 
             if ($id != '') {
                 if (($this->ticket =  Ticket::findOne(['id' => $id, 'backup_lock' => 0, 'restore_lock' => 0])) == null){
-                    $this->log('Error: ticket with id ' . $id . ' not found or it is already in processing.');
+                    $this->log('Error: ticket with id ' . $id . ' not found, it is already in processing, or locked while booting.');
+                    return;
+                }
+                
+                if ($this->ticket->bootup_lock == 1) {
+                    $this->ticket->backup_state = 'backup is locked during bootup.';
+                    $this->ticket->save(false);
+                    $this->ticket = null;
                     return;
                 }
                 $this->ticket->backup_lock = 1;
@@ -169,19 +176,7 @@ class BackupController extends DaemonController
 
         $this->cleanup();
 
-        // first those tickets with force flag on
-        $query = Ticket::find()
-            ->where(['backup_force' => 1])
-            ->andWhere(['backup_lock' => 0])
-            ->orderBy(['backup_force' => SORT_DESC, 'backup_last_try' => SORT_ASC]);
 
-        if (($ticket = $query->one()) !== null) {
-            $ticket->backup_lock = 1;
-            $ticket->running_daemon_id = $this->daemon->id;
-            $ticket->backup_force = 0;
-            $ticket->save(false);
-            return $ticket;
-        }
 
         // now those which weren't tried in the last 5 minutes
         $query = Ticket::find()
@@ -195,6 +190,7 @@ class BackupController extends DaemonController
             ])
             ->andWhere(['backup_lock' => 0])
             ->andWhere(['restore_lock' => 0])
+            ->andWhere(['bootup_lock' => 0])
             ->orderBy(['backup_last_try' => SORT_ASC]);
 
 

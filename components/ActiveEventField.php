@@ -5,6 +5,9 @@ namespace app\components;
 use yii\widgets\Pjax;
 use yii\helpers\Html;
 use app\assets\EventAsset;
+use app\models\EventItem;
+use app\models\EventStream;
+use yii\helpers\Url;
 
 class ActiveEventField extends Pjax
 {
@@ -37,6 +40,13 @@ class ActiveEventField extends Pjax
      */
     public $jsHandler;
 
+     /**
+     * @var string marker
+     */
+    public $marker;
+
+    public $register;
+
     #TODO
     public $onStart;
     public $onStop;
@@ -62,7 +72,7 @@ class ActiveEventField extends Pjax
             }';
         }
 
-        $register = "
+        $this->register = "
             if (!!window.EventSource && event) {
                 var listener = function(e) {
                     var jsonSelector = JSON.parse('" . json_encode($this->jsonSelector) . "');
@@ -93,11 +103,28 @@ class ActiveEventField extends Pjax
 
             }
         ";
-        $this->view->params['listenEvents'][] = [$this->event, $register];
+        $this->view->params['listenEvents'][] = [$this->event, $this->register, $this->marker];
 
-        if(\Yii::$app->request->isAjax){
-            $this->view->registerJs($register);
+        //if(\Yii::$app->request->isAjax){
+            //$this->view->registerJs($this->register);
+        //}
+
+        if (!isset($this->view->params['uuid'])) {
+            $this->view->params['uuid'] = \Yii::$app->request->isAjax ? \Yii::$app->request->get('_') : generate_uuid();
         }
+
+        foreach (ActiveEventField::$stack as $widget) {
+            $widget->clientOptions = ['data' => ['_' => $this->view->params['uuid']]];
+        }
+
+        //var_dump($this->marker);
+        \Yii::$app->view->off(\yii\web\View::EVENT_END_PAGE, [__CLASS__, 'handleSend']);
+        \Yii::$app->view->on(
+            \yii\web\View::EVENT_END_PAGE,
+            [__CLASS__, 'handleSend'],
+            $this
+        );
+
     }
 
     /**
@@ -109,6 +136,90 @@ class ActiveEventField extends Pjax
         echo $this->content;
 
         return parent::run();
+    }
+
+    public function handleSend($yiiEvent)
+    {
+        $uuid = $yiiEvent->data->view->params['uuid'];
+        $listenEvents = $yiiEvent->data->view->params['listenEvents'];
+        $script = '';
+        $e = [];
+
+        if ($uuid == null) {
+            return;
+        }
+
+        if(\Yii::$app->request->isAjax){
+            if (($stream = EventStream::findOne(['uuid' => $uuid])) !== null) {
+                $e = explode(',', $stream->listenEvents);
+            }else{
+                $stream = new EventStream(['uuid' => $uuid]);
+                $yiiEvent->data->view->registerJs("uuid = '" . $uuid . "';" . PHP_EOL .
+                    "event = new EventStream('" . 
+                    Url::to([
+                        '/event/stream',
+                        'uuid' => $uuid,
+                    ]) . "');" . PHP_EOL . 
+                    "eventListeners = [];" . PHP_EOL
+                );
+            }
+
+            foreach($listenEvents as $event){
+                if ($event[2] !== null) {
+                    $e  = preg_grep('/:' . $event[2] . '$/', $e, PREG_GREP_INVERT);
+                }
+            }
+
+            foreach($listenEvents as $event){
+                $e[] = $event[2] !== null ? $event[0] . ':' . $event[2] : $event[0];
+                $script .= $event[1];
+            }
+            $e = array_unique($e);
+
+            $stream->listenEvents = implode(',', $e);
+            $stream->save();
+            $yiiEvent->data->view->registerJs($script);
+
+            //generate the event without db
+            //file_put_contents('/tmp/user/event/' . $uuid, 'bump');
+
+            $eventItem = new EventItem([
+                'event' => 'event/' . $uuid,
+                'data' => 'bump',
+            ]);
+            $eventItem->touchFile('/tmp/user/event/' . $uuid, 'bump');
+
+
+        }else{
+
+            if (extension_loaded('inotify') && isset($listenEvents) && isset($uuid)) {
+
+                foreach($listenEvents as $event){
+                    $e[] = $event[2] !== null ? $event[0] . ':' . $event[2] : $event[0];
+                    $script .= $event[1];
+                }
+                $e = implode(',', array_unique($e));
+
+                $stream = new EventStream([
+                    'uuid' => $uuid,
+                    'listenEvents' => $e,
+                ]);
+                $stream->save();
+
+                $yiiEvent->data->view->registerJs("uuid = '" . $uuid . "';" . PHP_EOL .
+                    "event = new EventStream('" . 
+                    Url::to([
+                        '/event/stream',
+                        'uuid' => $uuid,
+                    ]) . "');" . PHP_EOL . 
+                    "eventListeners = [];" . PHP_EOL
+                );
+
+                $yiiEvent->data->view->registerJs($script);
+
+            }
+
+        }
     }
 
 }

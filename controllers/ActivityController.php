@@ -51,7 +51,7 @@ class ActivityController extends Controller
     public function actionIndex()
     {
 
-        $this->on(self::EVENT_AFTER_ACTION, function($this){
+        $this->on(self::EVENT_AFTER_ACTION, function(){
             $model = new ActivitySearch();
             $model->lastvisited = 'now';
         });

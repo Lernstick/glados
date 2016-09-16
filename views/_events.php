@@ -2,41 +2,39 @@
 
 use app\assets\EventAsset;
 use yii\helpers\Url;
+use app\models\EventStream;
 
 /* @var $this yii\web\View */
 
 EventAsset::register($this);
 $script = '';
 
-if(extension_loaded('inotify') && isset($this->params['listenEvents'])){
+if (extension_loaded('inotify') && isset($this->params['listenEvents']) && isset($this->params['uuid'])) {
 
     foreach($this->params['listenEvents'] as $event){
         $e[] = $event[0];
         $script .= $event[1];
     }
-    $e = implode(',', array_unique($e));;
+    $e = implode(',', array_unique($e));
+
+    $stream = new EventStream([
+        'uuid' => $this->params['uuid'],
+        'listenEvents' => $e,
+    ]);
+    $stream->save();
+
+    $this->registerJs("uuid = '" . $stream->uuid . "';" . PHP_EOL .
+        "event = new EventStream('" . 
+        Url::to([
+            'event/stream',
+            'uuid' => $stream->uuid,
+    //        'listenEvents' => isset($e) ? $e : null,
+        ]) . "');" . PHP_EOL . 
+        "eventListeners = [];" . PHP_EOL
+    );
+
+    $this->registerJs($script);
 
 }
-
-if(isset($this->params['listenFifos'])){
-
-    foreach($this->params['listenFifos'] as $fifo){
-        $f[] = $fifo[0];
-        $script .= $fifo[1];
-    }
-    $f = implode(',', array_unique($f));
-
-}
-
-$this->registerJs("event = new EventStream('" . 
-    Url::to([
-        'event/stream',
-        'listenEvents' => isset($e) ? $e : null,
-        'listenFifos' => isset($f) ? $f : null,
-    ]) . 
-"');" . PHP_EOL . 
-"eventListeners = [];");
-
-$this->registerJs($script);
 
 ?>

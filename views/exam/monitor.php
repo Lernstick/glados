@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ListView;
+use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Exam */
@@ -10,6 +11,7 @@ use yii\widgets\ListView;
 $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'Exams', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
 ?>
 <div class="exam-view container">
 
@@ -20,18 +22,23 @@ $this->params['breadcrumbs'][] = $this->title;
     ]) ?>
 
     <p></p>
-    
-	<div class="exam-monitor tab-content">
 
-		<?php $_GET = array_merge($_GET, ['#' => 'tab_monitor']); ?>
-	    <?= ListView::widget( [
-	        'dataProvider' => $dataProvider,
-	        'itemView' => '_item',
-	        'itemOptions' => ['sort-value' => 'download_progress'],
-	        'emptyText' => 'No tickets found.',
-	    	'layout' => '{items} <div class="col-sm-12">{summary} {pager}</div>',
-	    ] ); ?>
+    <?php Pjax::begin([
+        'options' => [
+            'class' => 'exam-monitor tab-content',
+        ],
+        //'clientOptions' => ['data' => ['_' => 'notsetyet']],
+    ]) ?>
 
-	</div>
+        <?php $_GET = array_merge($_GET, ['#' => 'tab_monitor']); ?>
+        <?= ListView::widget( [
+            'dataProvider' => $dataProvider,
+            'itemView' => '_item',
+            'itemOptions' => ['sort-value' => 'download_progress'],
+            'emptyText' => 'No tickets found.',
+            'layout' => '{items} <div class="col-sm-12">{summary} {pager}</div>',
+        ] ); ?>
+
+    <?php Pjax::end() ?>
 
 </div>

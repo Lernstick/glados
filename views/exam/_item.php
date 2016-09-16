@@ -7,15 +7,16 @@ use app\components\ActiveEventField;
 
 ?>  
 
-<?php ActiveEventField::begin([
+<?php $f = ActiveEventField::begin([
     'event' => 'ticket/' . $model->id,
+    'marker' => 'monitor',
     'jsonSelector' => 'action',
-    'jsHandler' => 'function(d, s){if(d == "update"){$.pjax.reload({container: s});}}'
+    'jsHandler' => 'function(d, s){if(d == "update"){$.pjax.reload(s);}}'
 ]) ?>
 
 <a data-pjax="0" href="<?= Url::to(['ticket/view', 'id' => $model->id]); ?>">
 
-    <div class="col-sm-4 col-xs-8 list-group-item-<?= array_key_exists($model->state, $model->classMap) ? $model->classMap[$model->state] : 'default'; ?>" style="height:200px; padding-top: 10px;border: 1px solid #D8D8D8;">
+    <div class="col-sm-4 col-xs-8 list-group-item-<?= array_key_exists($model->state, $model->classMap) ? $model->classMap[$model->state] : 'default'; ?>" style="height:200px; padding:10px 0px 10px 0px; border: 1px solid #D8D8D8;">
 
         <div class="col-sm-4">State: </div>
         <div class="col-sm-8">
@@ -33,6 +34,7 @@ use app\components\ActiveEventField;
         <?= ActiveEventField::widget([
             'content' => yii::$app->formatter->format(StringHelper::truncate($model->client_state, 30), 'text'),
             'event' => 'ticket/' . $model->id,
+            'marker' => 'monitor',
             'jsonSelector' => 'client_state',
             'jsHandler' => 'function(d, s){
                 if (d.length > 30) {
@@ -44,6 +46,7 @@ use app\components\ActiveEventField;
             'options' => [ 'class' => 'col-sm-8' ],
         ]); ?>
 
+
         <div class="col-sm-4">IP Address: </div>
         <div class="col-sm-8">
             <?= yii::$app->formatter->format($model->ip, 'text'); ?>
@@ -54,11 +57,46 @@ use app\components\ActiveEventField;
             <?= yii::$app->formatter->format(StringHelper::truncate($model->test_taker, 30), 'text'); ?>&nbsp;
         </div>
 
+        <div class="col-sm-4">Backup:
+            <?= ActiveEventField::widget([
+                'event' => 'ticket/' . $model->id,
+                'marker' => 'monitor',
+                'jsonSelector' => 'backup_lock',
+                'jsHandler' => 'function(d, s){
+                    if(d == "1"){
+                        s.style.display = "";
+                    }else if(d == "0"){
+                        s.style.display = "none";
+                    }
+                }',           
+                'options' => [
+                    'class' => 'glyphicon glyphicon-cog gly-spin',
+                    'style' => ['display' => $model->backup_lock == 1 ? '' : 'none'],
+                    'tag' => 'i',
+                ],
+            ]); ?>
+        </div>
+        <?= ActiveEventField::widget([
+            'content' => yii::$app->formatter->format(StringHelper::truncate($model->backup_state, 30), 'text'),
+            'event' => 'ticket/' . $model->id,
+            'marker' => 'monitor',
+            'jsonSelector' => 'backup_state',
+            'jsHandler' => 'function(d, s){
+                if (d.length > 30) {
+                    s.innerHTML = d.substr(0, 30) + "...";
+                }else{
+                    s.innerHTML = d;
+                }
+            }',            
+            'options' => [ 'class' => 'col-sm-8' ],
+        ]); ?>
+
         <div class="col-sm-4">Download: </div>
         <div class="col-sm-8">
             <div class="progress">
                 <?php ActiveEventField::begin([
                     'event' => 'ticket/' . $model->id,
+                    'marker' => 'monitor',
                     'jsonSelector' => 'download_lock',
                     'jsHandler' => 'function(d, s){
                         if(d == "1"){
@@ -81,6 +119,7 @@ use app\components\ActiveEventField;
                         'options' => [ 'tag' => 'span' ],
                         'content' => yii::$app->formatter->format($model->download_progress, 'percent'),
                         'event' => 'ticket/' . $model->id,
+                        'marker' => 'monitor',
                         'jsonSelector' => 'download_progress',
                         'jsHandler' => 'function(d, s){
                             s.innerHTML = d;
@@ -92,21 +131,6 @@ use app\components\ActiveEventField;
 
             </div>
         </div>
-
-        <div class="col-sm-4">Backup: </div>
-        <?= ActiveEventField::widget([
-            'content' => yii::$app->formatter->format(StringHelper::truncate($model->backup_state, 30), 'text'),
-            'event' => 'ticket/' . $model->id,
-            'jsonSelector' => 'backup_state',
-            'jsHandler' => 'function(d, s){
-                if (d.length > 30) {
-                    s.innerHTML = d.substr(0, 30) + "...";
-                }else{
-                    s.innerHTML = d;
-                }
-            }',            
-            'options' => [ 'class' => 'col-sm-8' ],
-        ]); ?>
 
     </div>
 

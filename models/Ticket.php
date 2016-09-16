@@ -54,7 +54,8 @@ class Ticket extends \yii\db\ActiveRecord
      */
     public function init()
     {
-        $this->on(self::EVENT_BEFORE_UPDATE, function($this){
+        $instance = $this;
+        $this->on(self::EVENT_BEFORE_UPDATE, function($instance){
             $this->presaveAttributes = $this->getOldAttributes();
         });
         $this->on(self::EVENT_AFTER_UPDATE, [$this, 'updateEvent']);
@@ -383,6 +384,22 @@ class Ticket extends \yii\db\ActiveRecord
     public function getUserId()
     {
         return $this->exam->user_id;
+    }
+
+    public function continueBootup()
+    {
+        /*$cmd = "scp -i " . \Yii::$app->basePath . "/.ssh/rsa "
+             . "-o UserKnownHostsFile=/dev/null "
+             . "-o StrictHostKeyChecking=no "
+             . "/tmp/done root@" . $this->ip . ":/run/initramfs/continue";*/
+
+        $cmd = "ssh -i " . \Yii::$app->basePath . "/.ssh/rsa "
+             . "-o UserKnownHostsFile=/dev/null "
+             . "-o StrictHostKeyChecking=no "
+             . "root@" . $this->ip . " "
+             . "'touch /run/initramfs/continue'";
+        $retval = exec(sprintf("%s 2>&1; echo $?", $cmd));
+        return $retval;
     }
 
 /*

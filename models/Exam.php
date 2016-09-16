@@ -44,8 +44,15 @@ class Exam extends \yii\db\ActiveRecord
      */
     public function init()
     {
-        $this->on(self::EVENT_BEFORE_INSERT, function($this){
+        $instance = $this;
+        $this->on(self::EVENT_BEFORE_INSERT, function($instance){
             $this->user_id = \Yii::$app->user->id;
+        });
+
+        $this->on(self::EVENT_BEFORE_UPDATE, function($instance){
+            if ($this->getOldAttribute('file') != $this->file) {
+                $this->md5 = $this->file == null ? null : md5_file($this->file);
+            }
         });
     }
 
@@ -73,6 +80,7 @@ class Exam extends \yii\db\ActiveRecord
             'name' => 'Name',
             'subject' => 'Subject',
             'file' => 'File',
+            'md5' => 'MD5 Checksum',
             'file_list' => 'File List',
             'user_id' => 'User ID',
             'ticketCount' => 'Total Tickets',
@@ -101,6 +109,7 @@ class Exam extends \yii\db\ActiveRecord
     {
         $file = \Yii::$app->params['uploadDir'] . '/' . $this->file;
         $this->file = null;
+        $this->md5 = null;
 
         if (file_exists($file) && is_file($file) && $this->save()) {
             return @unlink($file);
@@ -202,7 +211,7 @@ class Exam extends \yii\db\ActiveRecord
 
     public function validateRunningTickets($attribute, $params)
     {
-        $this->runningTicketCount != 0 ? $this->addError($attribute, 'Exam update is disabled while there are ' . $this->runningTicketCount . ' tickets in "Running" state.'): null;
+        $this->runningTicketCount != 0 ? $this->addError($attribute, 'Exam update is disabled while there are ' . $this->runningTicketCount . ' tickets in "Running" state.') : null;
     }
 
     /**

@@ -8,6 +8,7 @@ use app\models\DaemonSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use app\components\AccessRule;
 
 /**
  * DaemonController implements the CRUD actions for Daemon model.
@@ -24,6 +25,18 @@ class DaemonController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                ],
+            ],
+            'access' => [
+                'class' => \yii\filters\AccessControl::className(),
+                'ruleConfig' => [
+                    'class' => AccessRule::className(),
+                ],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['rbac'],
+                    ],
                 ],
             ],
         ];
@@ -141,4 +154,5 @@ class DaemonController extends Controller
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
+
 }

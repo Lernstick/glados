@@ -36,5 +36,24 @@ class customFormatter extends \yii\i18n\Formatter
         }
     }
 
+    /**
+     * Shortens the number and append a "k" for thousands and an "m" for millions.
+     * @param integer $value the value to be formatted.
+     * @return string the formatted result.
+     */
+    public static function asShortNumber($value)
+    {
+        if ($value >= 9500000) {
+            return round($value / 1000000, 0) . "m";
+        } else if ($value >= 950000) {
+            return round($value / 1000000, 1) . "m";
+        } else if ($value >= 95000) {
+            return round($value / 1000, 0) . "k";
+        } else if ($value >= 950) {
+            return round($value / 1000, 1) . "k";
+        } else {
+            return $value;
+        }
+    }
 }
 

@@ -138,7 +138,7 @@ class EventItem extends \yii\db\ActiveRecord
 
     }
 
-    private function touchFile($file, $eventId)
+    public function touchFile($file, $eventId)
     {
 
         //create the directory (recursive)

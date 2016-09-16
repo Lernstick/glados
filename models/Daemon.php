@@ -69,7 +69,8 @@ class Daemon extends \yii\db\ActiveRecord
         parent::init();
         $this->uuid = generate_uuid();
 
-        $this->on(self::EVENT_BEFORE_UPDATE, function($this){
+        $instance = $this;
+        $this->on(self::EVENT_BEFORE_UPDATE, function($instance){
             $this->presaveAttributes = $this->getOldAttributes();
         });
         $this->on(self::EVENT_AFTER_UPDATE, [$this, 'updateEvent']);
@@ -86,24 +87,28 @@ class Daemon extends \yii\db\ActiveRecord
         return false;
     }
 
-    public function startBackup($id = '')
+    public function startBackup($id = '', $background = true)
     {
-        return $this->start('backup/run', [escapeshellarg($id)]);
+        return $this->start('backup/run', [escapeshellarg($id)], $background);
     }
 
-    public function startRestore($id, $file, $date = 'now')
+    public function startRestore($id, $file, $date = 'now', $background = true, $restorePath = null)
     {
-        return $this->start('restore/run', [escapeshellarg($id), escapeshellarg($file), escapeshellarg($date)]);
+        return $this->start('restore/run', [escapeshellarg($id), escapeshellarg($file), escapeshellarg($date), escapeshellarg($restorePath)], $background);
     }
 
-    public function start($command, $arguments = [])
+    public function start($command, $arguments = [], $background = true)
     {
 
         //TODO: validating $command!
         $cmd = \Yii::getAlias('@app') . '/' . 'yii ' . $command . ' ' . implode(' ', $arguments);
         //file_put_contents('/tmp/command', $cmd . PHP_EOL, FILE_APPEND);
-        $this->pid = exec(sprintf("%s > /dev/null 2>&1 & echo $!", $cmd));
-        //$this->save();
+        if ($background === true) {
+            $this->pid = exec(sprintf("%s > /dev/null 2>&1 & echo $!", $cmd));
+            //$this->save();
+        } else {
+            $this->pid = exec(sprintf("%s 2>&1; echo $?", $cmd));
+        }
         return $this->pid;
 
     }

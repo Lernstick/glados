@@ -162,7 +162,30 @@ class RbacController extends Controller
         $auth->addChild($resetPWAllUser, $resetPWUser);
         $auth->addChild($deleteAllUser, $deleteUser);
 
-        // add "author" role and give this role the "createPost" permission
+        //Daemons
+        $indexDaemon = $auth->createPermission('daemon/index');
+        $indexDaemon->description = 'Index all backup daemons';
+        $auth->add($indexDaemon);
+
+        $startDaemon = $auth->createPermission('daemon/create');
+        $startDaemon->description = 'Start a new backup daemon';
+        $auth->add($startDaemon);
+
+        $viewDaemon = $auth->createPermission('daemon/view');
+        $viewDaemon->description = 'View backup daemons';
+        $auth->add($viewDaemon);
+
+        $stopDaemon = $auth->createPermission('daemon/stop');
+        $stopDaemon->description = 'Stop backup daemons';
+        $auth->add($stopDaemon);
+
+        $killDaemon = $auth->createPermission('daemon/kill');
+        $killDaemon->description = 'Kill backup daemons';
+        $auth->add($killDaemon);
+
+        //inheritation
+
+        // add "author" role
         $teacher = $auth->createRole('teacher');
         $auth->add($teacher);
         $auth->addChild($teacher, $createExam);
@@ -183,6 +206,12 @@ class RbacController extends Controller
 
         $auth->addChild($teacher, $viewUser);
         $auth->addChild($teacher, $resetPWUser);
+
+        $auth->addChild($teacher, $indexDaemon);
+        $auth->addChild($teacher, $startDaemon);
+        $auth->addChild($teacher, $viewDaemon);
+        $auth->addChild($teacher, $stopDaemon);
+        $auth->addChild($teacher, $killDaemon);
 
         // add "admin" role and give this role the "updatePost" permission
         // as well as the permissions of the "author" role
@@ -214,7 +243,7 @@ class RbacController extends Controller
 
         // Assign roles to users. 1 and 2 are IDs returned by IdentityInterface::getId()
         // usually implemented in your User model.
-        $auth->assign($teacher, 30);
-        $auth->assign($admin, 1);
+        #$auth->assign($teacher, 2);
+        #$auth->assign($admin, 1);
     }
 }

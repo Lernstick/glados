@@ -18,17 +18,18 @@ class EventController extends Controller
      * Streams all Event models.
      * @return mixed
      */
-    public function actionStream($uuid = null, $listenEvents = null, $listenFifos = null)
+    public function actionStream($uuid)
     {
     
-        if(($stream = EventStream::findOne($uuid)) === null){
+        /*if(($stream = EventStream::findOne(['uuid' => $uuid])) === null){
             $stream = new EventStream([
                 'uuid' => $uuid !== null ? $uuid : generate_uuid(),
             ]);
-        }
-        $stream->timeLimit = 600;
-        isset($listenEvents) ? $stream->listenEvents = explode(',', $listenEvents) : null;
-        isset($listenFifos) ? $stream->listenFifos = explode(',', $listenFifos) : null;
+        }*/
+
+        $stream = $this->findModel($uuid);
+        $stream->timeLimit = 10;
+        //isset($listenEvents) ? $stream->listenEvents = explode(',', $listenEvents) : null;
 
         //$user_id = \Yii::$app->user->id;
         //$user_id = 1;
@@ -42,21 +43,21 @@ class EventController extends Controller
 
         if(YII_ENV_DEV){
             $stream->on(EventStream::EVENT_STREAM_STARTED, function() {
-                $event = new EventItem(['data' => 'event stream started']);
+                $event = new EventItem(['event' => 'meta', 'data' => json_encode(['state' => 'event stream started'])]);
                 $this->sendMessage($this->renderPartial('/event/message', [
                     'model' => $event,
                 ]));
             });
 
             $stream->on(EventStream::EVENT_STREAM_STOPPED, function() {
-                $event = new EventItem(['data' => 'event stream finished', 'retry' => 1000]);
+                $event = new EventItem(['event' => 'meta', 'data' => json_encode(['state' => 'event stream finished']), 'retry' => 1000]);
                 $this->sendMessage($this->renderPartial('/event/message', [
                     'model' => $event,
                 ]));
             });
 
             $stream->on(EventStream::EVENT_STREAM_RESUMED, function() {
-                $event = new EventItem(['data' => 'event stream resumed']);
+                $event = new EventItem(['event' => 'meta', 'data' => json_encode(['state' => 'event stream resumed'])]);
                 $this->sendMessage($this->renderPartial('/event/message', [
                     'model' => $event,
                 ]));
@@ -88,6 +89,21 @@ class EventController extends Controller
         echo $message;
         ob_flush();
         flush();
+    }
+
+    /**
+     * Finds the EventStream model based on its uuid value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $uuid
+     * @return EventStream the loaded model
+     * @throws NotFoundHttpException if the model cannot be found.
+     */
+    protected function findModel($uuid)
+    {
+        if (($model = EventStream::findOne(['uuid' => $uuid])) !== null) {
+            return $model;
+        }
+        throw new NotFoundHttpException('The requested page does not exist.');
     }
 
 }
