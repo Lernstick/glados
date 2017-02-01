@@ -27,6 +27,7 @@ use \mPDF;
 use app\components\customResponse;
 use app\components\AccessRule;
 use yii\data\ArrayDataProvider;
+use app\models\RdiffFileSystem;
 
 /**
  * TicketController implements the CRUD actions for Ticket model.
@@ -101,7 +102,7 @@ class TicketController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionView($id, $mode = 'default')
+    public function actionView($id, $mode = 'default', $online = -1, $path = '/', $date = 'all')
     {
 
         if ($mode == 'default') {
@@ -136,8 +137,40 @@ class TicketController extends Controller
             $restoreDataProvider->pagination->pageParam = 'rest-page';
             $restoreDataProvider->pagination->pageSize = 5;
 
+            $fs = new RdiffFileSystem([
+                'root' => '/home/user',
+                'location' => \Yii::getAlias('@app/backups/' . $model->token),
+                'restoreUser' => 'root',
+                'restoreHost' => $model->ip,
+            ]);
+
+            if (file_exists(\Yii::getAlias('@app/backups/' . $model->token))) {
+                $models = $fs->slash($path)->versionAt($date)->contents;
+                $versions = $fs->slash($path)->versions;
+                //array_unshift($versions , 'now');
+                array_unshift($versions , 'all');
+            } else {
+                $models = [];
+                $versions = [];
+            }
+
+            $ItemsDataProvider = new ArrayDataProvider([
+                'allModels' => $models,
+            ]);
+
+            $ItemsDataProvider->pagination->pageParam = 'browse-page';
+            $ItemsDataProvider->pagination->pageSize = 20;
+
+            $VersionsDataProvider = new ArrayDataProvider([
+                'allModels' => $versions,
+            ]);
+
+            $VersionsDataProvider->pagination->pageParam = 'vers-page';
+            $VersionsDataProvider->pagination->pageSize = 10;
+
             return $this->render('view', [
                 'model' => $model,
+                'online' => $online,
                 'session' => $session,
                 'activitySearchModel' => $activitySearchModel,
                 'activityDataProvider' => $activityDataProvider,
@@ -147,8 +180,19 @@ class TicketController extends Controller
                 'screenshotDataProvider' => $screenshotDataProvider,
                 'restoreSearchModel' => $restoreSearchModel,
                 'restoreDataProvider' => $restoreDataProvider,
+                'ItemsDataProvider' => $ItemsDataProvider,
+                'VersionsDataProvider' => $VersionsDataProvider,
+                'fs' => $fs,
+                'date' => $date,
             ]);
-        }else if ($mode == 'report') {
+        } else if ($mode == 'probe') {
+            $model = $this->findModel($id);
+            $online = $model->runCommand('source /info; ping -nq -W 10 -c 1 "${gladosIp}"', 'C', 10)[1];
+            return $this->redirect(['ticket/view',
+                'id' => $model->id,
+                'online' => $online,
+            ]);
+        } else if ($mode == 'report') {
             $model = $this->findModel($id);
 
             $content = $this->renderPartial('report', [
@@ -598,12 +642,14 @@ class TicketController extends Controller
                 /* run the restore daemon in the foreground */
                 $pid = $restoreDaemon->startRestore($ticket->id, '/', 'now', false, '/run/initramfs/backup/home/user');
             }
-            $ticket->continueBootup();
+            //$ticket->continueBootup();
+            $ticket->runCommand('echo 0 > /run/initramfs/restore');
             //$ticket->bootup_lock = 0;
             $ticket->save();
 
         }, $model);
 
+        /* Start a new backup Daemon on the background */
         $searchModel = new DaemonSearch();
         if($searchModel->search([])->totalCount < 3){
             $backupDaemon = new Daemon();
@@ -667,6 +713,13 @@ class TicketController extends Controller
         ]);
         $act->save();
 
+        /* Start a new backup Daemon on the background */
+        $searchModel = new DaemonSearch();
+        if($searchModel->search([])->totalCount < 3){
+            $backupDaemon = new Daemon();
+            $backupDaemon->startBackup();
+        }
+
         return [ 'code' => 200, 'msg' => 'Exam finished successfully' ];
 
     }
@@ -700,8 +753,8 @@ class TicketController extends Controller
      */
     public function actionRestore($id, $file, $date = 'now')
     {
-
         $model = $this->findModel($id);
+        $date = $date == 'all' ? 'now' : $date;
 
         $daemon = new Daemon();
         $pid = $daemon->startRestore($id, $file, $date);

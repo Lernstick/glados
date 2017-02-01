@@ -14,7 +14,7 @@ use yii\widgets\DetailView;
 <div class="panel-heading">
 	<h4 class="panel-title">
     	<a data-toggle="collapse" data-parent="#restores-accordion" href="#restores-collapse<?= $index + 1 ?>">
-        	Restore #<?= $widget->dataProvider->totalCount - $key . ' - ' . yii::$app->formatter->format($model->finishedAt, 'relativeTime')
+        	Restore #<?= $key . ' - ' . yii::$app->formatter->format($model->finishedAt, 'timeago')
         	 . ' @ ' . yii::$app->formatter->format($model->finishedAt, 'datetime'); ?>
 		</a>
     </h4>
@@ -26,8 +26,8 @@ use yii\widgets\DetailView;
         	'model' => $model,
         	'attributes' => [
         		'elapsedTime:duration',
-                'startedAt:relativeTime',
-                'finishedAt:relativeTime',
+                'startedAt:timeago',
+                'finishedAt:timeago',
                 'restoreDate:dateTime',
                 'file:text',
         	],

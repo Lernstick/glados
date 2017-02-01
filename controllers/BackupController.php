@@ -11,6 +11,7 @@ use app\models\Daemon;
 use app\models\DaemonSearch;
 use yii\filters\VerbFilter;
 use yii\web\NotFoundHttpException;
+use yii\data\ArrayDataProvider;
 
 class BackupController extends Controller
 {
@@ -40,44 +41,75 @@ class BackupController extends Controller
         ]);
     }
 
-    public function actionBrowse($ticket_id, $path = '/')
+    public function actionFile ($ticket_id, $path, $date = 'now')
+    {
+        $ticket = Ticket::findOne($ticket_id);
+
+        $fs = new RdiffFileSystem([
+            'root' => '/home/user',
+            'location' => \Yii::getAlias('@app/backups/' . $ticket->token),
+            'restoreUser' => 'root',
+            'restoreHost' => $ticket->ip,
+        ]);
+
+        $contents = $fs->slash($path)->versionAt($date)->restore(true);
+
+        return Yii::$app->response->sendContentAsFile($contents, $fs->slash($path)->basename, [
+            'inline' => false,
+        ]);
+    }
+
+    public function actionBrowse($ticket_id, $path = '/', $date = 'all')
     {
 
 		$ticket = Ticket::findOne($ticket_id);
 
-		$rootDir = \Yii::getAlias('@app/backups/' . $ticket->token);
+        if (!file_exists(\Yii::getAlias('@app/backups/' . $ticket->token))) {
+            return '<span>No Backup yet.</span>';
+        }
 
 		$fs = new RdiffFileSystem([
             'root' => '/home/user',
-            'location' => $rootDir,
-            'restoreUser' => 'root@',
+            'location' => \Yii::getAlias('@app/backups/' . $ticket->token),
+            'restoreUser' => 'root',
             'restoreHost' => $ticket->ip,
-            'ticket' => $ticket,
+            //'ticket' => $ticket,
         ]);
-        //$x = 2;
 
-		//return \Yii::$app->response->sendContentAsFile($fs->slash('Schreibtisch/file.txt')->versionAt('2016-06-01T12:44:33+02:00')->contents, basename('Schreibtisch/file.txt'));		
+        $models = $fs->slash($path)->versionAt($date)->contents;
+        $versions = $fs->slash($path)->versions;
+        array_unshift($versions , 'now');
+        array_unshift($versions , 'all');
 
-        $x = $fs->slash('Schreibtisch/file.txt')->versionAt('2016-06-01T12:44:33+02:00')->restore(true);
+        $ItemsDataProvider = new ArrayDataProvider([
+            'allModels' => $models,
+        ]);
 
-        //$model = new Daemon();
-        //$model->start('restore/run', $ticket->id, $fs->slash('/Schreibtisch/file.txt')->path);
+        $ItemsDataProvider->pagination->pageParam = 'browse-page';
+        $ItemsDataProvider->pagination->pageSize = 20;
 
-//    	$x = $fs->slash($path)->slash('Schreibtisch/file.txt')->versionAt('2016-06-01T12:44:33+02:00')->restore();
+        $VersionsDataProvider = new ArrayDataProvider([
+            'allModels' => $versions,
+        ]);
 
-    	//return \Yii::$app->response->sendContentAsFile("asdasd" . $x, basename($fs->slash($path)->slash('Schreibtisch/file.txt')->path));
-    	//echo '<br>';
-    	//$x = $fs->slash($path)->slash('Schreibtisch/file.txt.notexist')->path;
-    	//$x = $fs->slash($path)->slash('Schreibtisch/file.txt.notexist')->propertiesPopulated;
-    	//var_dump($fs->slash($path)->slash('Schreibtisch/file.txt.notexist')->versions);
-    	//echo '<br>';
+        $VersionsDataProvider->pagination->pageParam = 'vers-page';
+        $VersionsDataProvider->pagination->pageSize = 10;
 
         if (($ticket = Ticket::findOne($ticket_id)) !== null){
 	        if (Yii::$app->request->isAjax) {
-		        return $this->renderAjax('/ticket/_backup-errors', [
-	            	'errors' => [$x],
-	        	]);
+                return $this->renderAjax('/backup/browse', [
+                    'ItemsDataProvider' => $ItemsDataProvider,
+                    'VersionsDataProvider' => $VersionsDataProvider,
+                    'ticket' => $ticket,
+                    'fs' => $fs,
+                ]);
 	        }else{
+                return $this->render('/backup/browse', [
+                    'ItemsDataProvider' => $ItemsDataProvider,
+                    'VersionsDataProvider' => $VersionsDataProvider,
+                    'ticket' => $ticket,
+                    'fs' => $fs,
+                ]);
 	        	return $this->redirect(['ticket/view', 'id' => $ticket_id, '#' => 'tab_browse']);
 	        }
         }else{

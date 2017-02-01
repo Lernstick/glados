@@ -16,7 +16,7 @@ use app\components\ActiveEventField;
 
 <a data-pjax="0" href="<?= Url::to(['ticket/view', 'id' => $model->id]); ?>">
 
-    <div class="col-sm-4 col-xs-8 list-group-item-<?= array_key_exists($model->state, $model->classMap) ? $model->classMap[$model->state] : 'default'; ?>" style="height:200px; padding:10px 0px 10px 0px; border: 1px solid #D8D8D8;">
+    <div class="col-sm-4 col-xs-8 list-group-item-<?= array_key_exists($model->state, $model->classMap) ? $model->classMap[$model->state] : 'default'; ?>" style="height:170px; padding:10px 0px 10px 0px; border: 1px solid #D8D8D8;">
 
         <div class="col-sm-4">State: </div>
         <div class="col-sm-8">

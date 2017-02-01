@@ -5,12 +5,14 @@ namespace app\models;
 use Yii;
 use yii\base\Model;
 use yii\helpers\Url;
+use yii\imagine\Image;
 
 class Screenshot extends Model
 {
     public $date;
     public $token;
     public $path;
+    private $_thumbnail;
 
     /**
      * @return array the validation rules.
@@ -37,9 +39,15 @@ class Screenshot extends Model
         return Url::to(['screenshot/view', 'date' => $this->date, 'token' => $this->token]);
     }
 
+    public function getTsrc()
+    {
+        return Url::to(['screenshot/thumbnail', 'date' => $this->date, 'token' => $this->token]);
+    }
+
     public function findOne($token, $date)
     {
-        $dir = \Yii::$app->params['backupDir'] . '/' . $token . '/Screenshots/';
+        //$dir = \Yii::$app->params['backupDir'] . '/' . $token . '/Screenshots/';
+        $dir = \Yii::getAlias('@app') . '/backups/' . $token . '/Screenshots/';
         if (file_exists($dir)) {
             $files = scandir($dir, SCANDIR_SORT_DESCENDING);
             foreach ($files as $screenshot) {
@@ -60,7 +68,8 @@ class Screenshot extends Model
 
     public function findAll($token)
     {
-        $dir = \Yii::$app->params['backupDir'] . '/' . $token . '/Screenshots/';
+
+        $dir = \Yii::getAlias('@app') . '/backups/' . $token . '/Screenshots/';
         $models = [];
 
         if (file_exists($dir)) {
@@ -77,6 +86,25 @@ class Screenshot extends Model
             }
         }
         return $models;
+    }
+
+    /**
+     * Generates a thumbnail of the screenshot if not yet created.
+     * 
+     * @return string - the path to the generated thumbnail
+     */
+    public function getThumbnail()
+    {
+        $dir = Yii::getAlias('@runtime/thumbnails/' . $this->token);
+        $tpath = $dir . '/' . basename($this->path);
+        if (!file_exists($tpath)) {
+            if (!file_exists($dir)) {
+                mkdir($dir, 0755, true);
+            }            
+            Image::thumbnail($this->path, 250, null)
+                ->save($tpath, ['quality' => 50]);
+        }
+        return $tpath;
     }
 
 }

@@ -8,6 +8,8 @@ use app\commands\DaemonController;
 use app\models\Ticket;
 use app\models\Daemon;
 use app\models\Activity;
+use app\models\Screenshot;
+use app\models\ScreenshotSearch;
 
 /**
  * Backup Daemon (pull)
@@ -21,6 +23,7 @@ class BackupController extends DaemonController
     public $remoteUser = 'root';
     #public $remotePath = '/home/user';
     public $remotePath = '/overlay/home/user';
+    private $finishBackup;
 
     /**
      * @inheritdoc
@@ -64,6 +67,12 @@ class BackupController extends DaemonController
                 }
             }
 
+            if ($this->ticket->backup_last < $this->ticket->end) {
+                $this->finishBackup = true;
+            } else {
+                $this->finishBackup = false;
+            }
+
             $this->log('Processing ticket: ' .
                 ( empty($this->ticket->test_taker) ? $this->ticket->token : $this->ticket->test_taker) .
                 ' (' . $this->ticket->ip . ')', true);
@@ -77,6 +86,9 @@ class BackupController extends DaemonController
                 $this->ticket->save(false);
             }else{
                 $this->ticket->backup_state = 'backup in progress...';
+                if ($this->finishBackup == true) {
+                    $this->ticket->runCommand('echo "backup in progress..." > /home/user/shutdown');
+                }
                 $this->ticket->save(false);
 
                 $this->_cmd = "rdiff-backup --remote-schema 'ssh -i " . \Yii::$app->basePath . "/.ssh/rsa "
@@ -96,10 +108,23 @@ class BackupController extends DaemonController
                     $this->ticket->backup_state = 'rdiff-backup failed (retval: ' . $retval . '), output: '
                          . PHP_EOL . $output;
                     $this->log($this->ticket->backup_state);
+                    if ($this->finishBackup == true) {
+                        $this->ticket->runCommand('echo "backup failed, waiting for next try..." > /home/user/shutdown');
+                    }
                 }else{
                     $this->log($output);
                     $this->ticket->backup_last = new Expression('NOW()');
                     $this->ticket->backup_state = 'backup successful.';
+                    if ($this->finishBackup == true) {
+                        $this->ticket->runCommand('echo 0 > /home/user/shutdown');
+                    }
+
+                    $searchModel = new ScreenshotSearch();
+                    $dataProvider = $searchModel->search($this->ticket->token);
+                    $this->log("Generating thumbnails...");
+                    foreach ($dataProvider->models as $model) {
+                        $model->getThumbnail();
+                    }
                 }
 
                 $this->ticket->backup_last_try = new Expression('NOW()');
@@ -149,7 +174,7 @@ class BackupController extends DaemonController
     }
 
     // clean up abandoned tickets
-    private function cleanup()
+    private function cleanup ()
     {
 
         $query = Ticket::find()
@@ -171,12 +196,43 @@ class BackupController extends DaemonController
         }    
     }
 
-    private function getNextTicket()
+    private function finished ()
+    {
+        $query = Ticket::find()
+            ->where(['not', ['start' => null]])
+            ->andWhere(['not', ['end' => null]])
+            ->andWhere(['not', ['ip' => null]])
+            ->andWhere('`backup_last` < `end`')
+            ->andWhere([
+                'or',
+                ['<', 'backup_last_try', new Expression('NOW() - INTERVAL 1 MINUTE')],
+                ['backup_last_try' => null],
+                '`backup_last_try` <=> `backup_last`'
+            ])
+            ->andWhere(['backup_lock' => 0])
+            ->andWhere(['restore_lock' => 0])
+            ->andWhere(['bootup_lock' => 0])
+            ->orderBy(['backup_last_try' => SORT_ASC]);
+
+        //var_dump($query->createCommand()->rawSql);
+        //exit();
+
+        return $query->one();
+    }
+
+    private function getNextTicket ()
     {
 
+        // first do a cleanup
         $this->cleanup();
 
-
+        // then search for finished tickets for a last backup
+        if (($ticket = $this->finished()) !== null) {
+            $ticket->backup_lock = 1;
+            $ticket->running_daemon_id = $this->daemon->id;
+            $ticket->save(false);
+            return $ticket;
+        }
 
         // now those which weren't tried in the last 5 minutes
         $query = Ticket::find()

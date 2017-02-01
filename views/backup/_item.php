@@ -14,8 +14,8 @@ use yii\widgets\DetailView;
 <div class="panel-heading">
 	<h4 class="panel-title">
     	<a data-toggle="collapse" data-parent="#backups-accordion" href="#backups-collapse<?= $index + 1 ?>">
-        	Backup #<?= $widget->dataProvider->totalCount - $key . ' - ' . yii::$app->formatter->format($model->endTime, 'relativeTime')
-        	 . ' @ ' . yii::$app->formatter->format($model->endTime, 'datetime')
+        	Backup #<?= $widget->dataProvider->totalCount - $key . ' - ' . yii::$app->formatter->format(intval($model->endTime), 'timeago')
+        	 . ' @ ' . yii::$app->formatter->format(intval($model->endTime), 'datetime')
         	 . ' (' . yii::$app->formatter->format($model->totalDestinationSizeChange, 'shortSize') . ' / ' . yii::$app->formatter->format($model->errors, 'integer') . ' errors) '; ?>
 		</a>
     </h4>

@@ -23,8 +23,8 @@ use app\components\ActiveEventField;
                 'jsonSelector' => 'backup_lock',
             ]),
         ],
-        'backup_last:relativetime',
-        'backup_last_try:relativetime',
+        'backup_last:timeago',
+        'backup_last_try:timeago',
         [
             'attribute' => 'backup_state',
             'format' => 'raw',
@@ -45,4 +45,3 @@ use app\components\ActiveEventField;
     'emptyText' => 'No backups found.',
     'layout' => '{items} <br>{summary} {pager}',
 ]); ?>
-

@@ -42,6 +42,8 @@ class RestoreController extends DaemonController
         pcntl_signal_dispatch();
         $this->cleanup();
 
+        file_put_contents('/tmp/command', $id . " " . $file . " " . $date . " " . $restorePath . " " . PHP_EOL, FILE_APPEND);
+
         if (($this->ticket = Ticket::findOne(['id' => $id])) == null) {
             $this->log('Error: ticket with id ' . $id . ' not found.');
             return;
@@ -75,6 +77,15 @@ class RestoreController extends DaemonController
             ]);
             $act->save();
             return;
+        }
+
+        if ($file == '::Desktop::') {
+            $file = $this->ticket->runCommand('sudo -u user xdg-user-dir DESKTOP')[0];
+        } else if ($file == '::Documents::') {
+            $file = $this->ticket->runCommand('sudo -u user xdg-user-dir DOCUMENTS')[0];
+        }
+        if (substr($file, 0, strlen($this->remotePath)) == $this->remotePath) {
+            $file = substr($file, strlen($this->remotePath));
         }
 
         $fs = new RdiffFileSystem([
@@ -111,18 +122,19 @@ class RestoreController extends DaemonController
              . "--restore-as-of " . escapeshellarg($date) . " "
              . escapeshellarg(\Yii::$app->basePath . "/backups/" . $this->ticket->token . "/" . $file) . " "
              . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . "::" . $restorePath . '/' . $file) . " "
-             . "2>&1;" . " "
+             . "2>&1;" . " ";
              /* second command */
-             . "ssh -i " . \Yii::$app->basePath . "/.ssh/rsa "
-             . "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "
-             . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip) . " "
-             . "mount -o remount,rw / ";
+             //. "ssh -i " . \Yii::$app->basePath . "/.ssh/rsa "
+             //. "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "
+             //. escapeshellarg($this->remoteUser . "@" . $this->ticket->ip) . " "
+             //. "mount -o remount,rw / ";
 
         $this->log('Executing rdiff-backup: ' . $this->_cmd);
 
         $output = array();
         $lastLine = exec($this->_cmd, $output, $retval);
         $output = implode(PHP_EOL, $output);
+        $this->ticket->runCommand('mount -o remount,rw /');
 
         if($retval != 0){
             $this->ticket->restore_state = 'rdiff-backup failed (retval: ' . $retval . '), output: '

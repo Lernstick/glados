@@ -386,20 +386,48 @@ class Ticket extends \yii\db\ActiveRecord
         return $this->exam->user_id;
     }
 
+    /*
     public function continueBootup()
     {
-        /*$cmd = "scp -i " . \Yii::$app->basePath . "/.ssh/rsa "
-             . "-o UserKnownHostsFile=/dev/null "
-             . "-o StrictHostKeyChecking=no "
-             . "/tmp/done root@" . $this->ip . ":/run/initramfs/continue";*/
-
         $cmd = "ssh -i " . \Yii::$app->basePath . "/.ssh/rsa "
              . "-o UserKnownHostsFile=/dev/null "
              . "-o StrictHostKeyChecking=no "
              . "root@" . $this->ip . " "
-             . "'touch /run/initramfs/continue'";
+             . "'echo 0 > /run/initramfs/restore'";
         $retval = exec(sprintf("%s 2>&1; echo $?", $cmd));
         return $retval;
+    }*/
+
+    /**
+     * Runs a command in the shell of the system.
+     * 
+     * @param string $cmd - the command to run
+     * @param string $lc_all - the value of the LC_ALL environment variable
+     * @return array - the first element contains the output (stdout and stderr),
+     *                 the second element contains the exit code of the command
+     */
+    public function runCommand($cmd, $lc_all = "C", $timeout = 30)
+    {
+
+        $tmp = sys_get_temp_dir() . '/cmd.' . generate_uuid();
+        $cmd = "ssh -i " . \Yii::$app->basePath . "/.ssh/rsa "
+             . "-o UserKnownHostsFile=/dev/null "
+             . "-o StrictHostKeyChecking=no "
+             . "-o ConnectTimeout=" . $timeout . " "
+             . "root@" . $this->ip . " "
+             . escapeshellarg("LC_ALL=" . $lc_all . " " .  $cmd . " 2>&1") . " >" . $tmp;
+
+        $output = array();
+        $lastLine = exec($cmd, $output, $retval);
+
+        if (!file_exists($tmp)) {
+            $output = implode(PHP_EOL, $output);
+        } else {
+            $output = file_get_contents($tmp);
+            @unlink($tmp);            
+        }
+
+        return [ $output, $retval ];
     }
 
 /*

@@ -167,3 +167,11 @@ a.desc:after {
     transform: rotate(359deg);
   }
 }
+
+.backup-browse-options {
+  display: none;
+}
+
+.backup-browse-item:hover .backup-browse-options {
+  display: initial;
+}

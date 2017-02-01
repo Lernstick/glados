@@ -49,7 +49,8 @@ class m160623_095016_initial extends Migration
                 'username' => $this->string(40)->notNull()->unique(),
                 'password' => $this->string(60)->notNull(),
                 'last_visited' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP') . ' ON UPDATE CURRENT_TIMESTAMP',
-                'activities_last_visited' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP')
+                //'activities_last_visited' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP')
+                'activities_last_visited' => $this->timestamp()
             ], $this->tableOptions);
 
             $this->alterColumn($this->getAuthManager()->assignmentTable, 'user_id', $this->integer(11)->notNull());

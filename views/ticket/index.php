@@ -41,8 +41,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'examSubject',
                 'filter' => $searchModel->subjectList,
             ],
-            'start:relativetime',
-            'end:relativetime',
+            'start:timeago',
+            'end:timeago',
             'valid:boolean',
             'test_taker',
             [

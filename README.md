@@ -36,7 +36,8 @@ composer update
 
 Install PECL inotify:
 ```shell
-pecl install inotify
+pecl install inotify	   //for PHP7
+pecl install inotify-0.1.6 //for PHP5
 ```
 
 Create PHP ini file for inotify (`/etc/php/7.0/mods-available/inotify.ini`) with contents:
@@ -90,6 +91,12 @@ Alias /glados /usr/share/glados/web
 </Directory>
 ```
 
+Make sure mod rewrite is enabled and installed:
+
+```shell
+a2enmod rewrite
+```
+
 Enable apache config:
 ```shell
 a2enconf glados
@@ -101,3 +108,7 @@ service apache2 restart
 ```
 
 Hit `http://localhost/glados/requirements.php` to check if all requirements are met.
+
+```shell
+:wq
+```

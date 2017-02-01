@@ -94,7 +94,13 @@ class Daemon extends \yii\db\ActiveRecord
 
     public function startRestore($id, $file, $date = 'now', $background = true, $restorePath = null)
     {
-        return $this->start('restore/run', [escapeshellarg($id), escapeshellarg($file), escapeshellarg($date), escapeshellarg($restorePath)], $background);
+        $args = [
+            escapeshellarg($id),
+            escapeshellarg($file),
+            escapeshellarg($date),
+        ];
+        $restorePath == null ?: $args[] = escapeshellarg($restorePath);
+        return $this->start('restore/run', $args, $background);
     }
 
     public function start($command, $arguments = [], $background = true)
@@ -102,6 +108,7 @@ class Daemon extends \yii\db\ActiveRecord
 
         //TODO: validating $command!
         $cmd = \Yii::getAlias('@app') . '/' . 'yii ' . $command . ' ' . implode(' ', $arguments);
+        //var_dump($cmd); die();
         //file_put_contents('/tmp/command', $cmd . PHP_EOL, FILE_APPEND);
         if ($background === true) {
             $this->pid = exec(sprintf("%s > /dev/null 2>&1 & echo $!", $cmd));

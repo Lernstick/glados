@@ -28,7 +28,7 @@ class EventController extends Controller
         }*/
 
         $stream = $this->findModel($uuid);
-        $stream->timeLimit = 10;
+        $stream->timeLimit = 60;
         //isset($listenEvents) ? $stream->listenEvents = explode(',', $listenEvents) : null;
 
         //$user_id = \Yii::$app->user->id;

@@ -55,5 +55,35 @@ class customFormatter extends \yii\i18n\Formatter
             return $value;
         }
     }
+
+    /**
+     * Uses Timeago to format relativetime to automatically update fuzzy timestamps.
+     * @param integer $value the value to be formatted.
+     * @return string the formatted result.
+     */
+    public static function asTimeago($value)
+    {
+        if (empty($value)){
+            $value = '<span class="not-set">(not set)</span>';
+        } else {
+            $value = \yii\timeago\TimeAgo::widget(['timestamp' => $value]);
+        }
+        return $value;
+    }
+
+    public static function asBackupVersion($value)
+    {
+        if (empty($value)){
+            $value = '<span class="not-set">(not set)</span>';
+        } else if ($value == 'now') {
+            $value = 'current';
+        } else if ($value == 'all') {
+            $value = 'all';
+        } else {
+            $value = yii::$app->formatter->format($value, 'datetime');
+        }
+        return $value;
+    }
+
 }
 

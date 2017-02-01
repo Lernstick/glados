@@ -20,20 +20,17 @@ use app\components\ActiveEventField;
 /* @var $restoreSearchModel app\models\ScreenshotSearch */
 /* @var $restoreDataProvider yii\data\ActiveDataProvider */
 
+
 $active_tabs = <<<JS
-
-$.notify({"message":"Exam update is disabled while there are 4 tickets in \"Running\" state.","icon":"glyphicon glyphicon-exclamation-sign","title":"danger","url":"","target":"_blank"});
-$.notify("blub", {title: "blub", body: "mess", type: "success"}, {showProgressbar: true, showSeparator:true});
-
 // Change hash for page-reload
 $('.nav-tabs a').on('shown.bs.tab', function (e) {
     var prefix = "tab_";
     window.location.hash = e.target.hash.replace("#", "#" + prefix);
 });
 
-$('.nav-tabs a[id="browseButton"]').on('shown.bs.tab', function (e) {
-    $.pjax({url: this.href, container: '#browse', push: false});
-});
+//$('.nav-tabs a[id="browseButton"]').on('shown.bs.tab', function (e) {
+//    $.pjax({url: this.href, container: '#browse', push: false});
+//});
 
 // Javascript to enable link to tab
 $(window).bind('hashchange', function() {
@@ -133,13 +130,35 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <li>
                     <?= Html::a(
-                        '<span class="glyphicon glyphicon-hdd"></span> Restore Test', [
+                        '<span class="glyphicon glyphicon-tasks"></span> Restore Desktop', [
                             'restore',
                             'id' => $model->id,
-                            'date' => '2016-06-01T12:44:33+02:00',
-                            'file' => '/Schreibtisch/file.txt',
+                            //'date' => '2016-06-01T12:44:33+02:00',
+                            'date' => 'now',
+                            'file' => '::Desktop::',
                         ],
                         ['id' => 'restore-now']
+                    ) ?>
+                </li>
+
+                <li>
+                    <?= Html::a(
+                        '<span class="glyphicon glyphicon-tasks"></span> Restore Documents', [
+                            'restore',
+                            'id' => $model->id,
+                            'date' => 'now',
+                            'file' => '::Documents::',
+                        ],
+                        ['id' => 'restore-now']
+                    ) ?>
+                </li>
+
+                <li>
+                    <?= Html::a(
+                        '<span class="glyphicon glyphicon-picture"></span> Get Live Screenshot', [
+                            'screenshot/snap',
+                            'token' => $model->token,
+                        ]
                     ) ?>
                 </li>
 
@@ -164,12 +183,14 @@ $this->params['breadcrumbs'][] = $this->title;
     </ul>
 
     <?php Pjax::begin([
+        'id' => 'backup-now-container',
         'linkSelector' => '#backup-now',
         'enablePushState' => false,
     ]); ?>
     <?php Pjax::end(); ?>
 
     <?php Pjax::begin([
+        'id' => 'restore-now-container',
         'linkSelector' => '#restore-now',
         'enablePushState' => false,
     ]); ?>
@@ -191,7 +212,6 @@ $this->params['breadcrumbs'][] = $this->title;
         'options' => ['class' => 'tab-pane fade in active'],
     ]); ?>
 
-    
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
@@ -214,8 +234,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 )
             ],
 
-            'start:relativetime',
-            'end:relativetime',
+            'start:timeago',
+            'end:timeago',
             'duration:duration',
             [
                 'attribute' => 'valid',
@@ -226,7 +246,15 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'html',
             ],
             'test_taker',
-            'ip',
+            [
+                'attribute' => 'ip',
+                'format' => 'raw',
+                'value' => yii::$app->formatter->format($model->ip, 'text') . " " . 
+                    ( $online == 0 ?    '<span class="label label-success">Online</span>' :
+                    ( $online == -1 ?   '<span class="label label-warning">Unknown</span>' : 
+                                        '<span class="label label-danger">Offline</span>') ) . " " .
+                    Html::a('Probe', ['view', 'id' => $model->id, 'mode' => 'probe']),
+            ],
             [
                 'attribute' => 'client_state',
                 'format' => 'raw',
@@ -355,10 +383,13 @@ $this->params['breadcrumbs'][] = $this->title;
             'itemOptions' => ['class' => 'col-xs-6 col-md-3'],
             'itemView' => function ($model, $key, $index, $widget) {
                 return '<div class="thumbnail"><a data-pjax="0" href="' . $model->src . '">'
-                     . '<img src="' . $model->src . '" title="' . $model->date . '"></a>'
-                     . '<div class="caption">' . yii::$app->formatter->format($model->date, 'relativeTime') . '</div>'
+                     . '<img src="' . $model->tsrc . '" title="' . $model->date . '"></a>'
+                     . '<div class="caption">' . yii::$app->formatter->format($model->date, 'timeago') . '</div>'
                      . '</div>';
             },
+            'summaryOptions' => [
+                'class' => 'summary col-xs-12 col-md-12',
+            ],            
             'emptyText' => 'No screenshots found.',
             'layout' => '{items} <br>{summary} {pager}',
         ]); ?>
@@ -369,6 +400,16 @@ $this->params['breadcrumbs'][] = $this->title;
         'id' => 'browse',
         'options' => ['class' => 'tab-pane fade'],
     ]); ?>
+
+        <?php $_GET = array_merge($_GET, ['#' => 'tab_browse']); ?>
+        <?= $this->render('/backup/browse', [
+            'ItemsDataProvider' => $ItemsDataProvider,
+            'VersionsDataProvider' => $VersionsDataProvider,
+            'ticket' => $model,
+            'fs' => $fs,
+            'date' => $date,
+        ]); ?>
+
     <?php Pjax::end() ?>
 
     <?php Pjax::begin([
