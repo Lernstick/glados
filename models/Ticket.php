@@ -61,7 +61,7 @@ class Ticket extends \yii\db\ActiveRecord
         $this->on(self::EVENT_AFTER_UPDATE, [$this, 'updateEvent']);
         $this->on(self::EVENT_AFTER_DELETE, [$this, 'deleteEvent']);
 
-        $this->token = $this->isNewRecord ? bin2hex(openssl_random_pseudo_bytes(8)) : $this->token;
+        $this->token = $this->isNewRecord ? bin2hex(openssl_random_pseudo_bytes(\Yii::$app->params['tokenLength']/2)) : $this->token;
     }
 
 

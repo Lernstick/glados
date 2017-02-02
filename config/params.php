@@ -7,4 +7,5 @@ return [
     'ticketExpireTime' => 900,
     'uploadDir' => '../uploads/',
     'backupDir' => '../backups/',
+    'tokenLength' => 10,
 ];
