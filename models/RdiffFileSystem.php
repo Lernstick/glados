@@ -9,32 +9,98 @@ use yii\helpers\StringHelper;
 use yii\web\NotFoundHttpException;
 use app\models\Daemon;
 
+/**
+ * This is the model class for the rdiff filesystem.
+ *
+ * @property string $location The real path of the backups root dir (where the rdiff-backup-data directory is)
+ * @property string $path The parent directory's path
+ * @property string $basename Trailing name component of the path
+ * @property string $remotePath Real path of the file/dir at the remote system
+ * @property string $localPath Real path of the file/dir at the local system
+ * @property string $incrementsPath Real path of the file/dir in the increments direcory of rdiffbackup
+ * @property array $versions An array of all versions
+ * @property string $version Version of the current instance
+ * @property RdiffFileSystem|RdiffFileSystem[] $contents
+ * @property string $type The file type of the current path
+ * @property string $state
+ * @property string $displayName Trailing name component of the path to display in the webinterface
+ * @property string $realState
+ */
 class RdiffFileSystem extends Model
 {
 
+    /**
+     * @var string 
+     */
     public $root = '/';
+
+    /**
+     * @var string 
+     */
     public $restoreUser = 'root';
+
+    /**
+     * @var string 
+     */
     public $restoreHost = 'localhost';
-//    private static $instance;
-    private $_location = '.';
-    private $_versions = [];
-    private $_pwd = '.'; //evtl: this->_file
+
+    /**
+     * @var string The regular expression to match rdiffbackup dates
+     */
     public $dateRegex = '/[0-9]{4}\-[0-9]{2}\-[0-9]{2}T[0-9]{2}\:[0-9]{2}\:[0-9]{2}\+[0-9]{2}\:[0-9]{2}/';
-    public $propertiesPopulated = false;
+
+    /**
+     * @var string Whether the properties are already populated or not
+     */
+    public $propertiesPopulated = false;    
+
+    /**
+     * @var array A list of file or directory names to omit when reading a directory
+     */
+    public $excludeDirs = ['.', '..', 'rdiff-backup-data'];    
+//    private static $instance;
+
+    /**
+     * @var string The current location
+     */
+    private $_location = '.';
+
+    /**
+     * @var array A list of available versions
+     */    
+    private $_versions = [];
+
+    /**
+     * @var string
+     */
+    private $_pwd = '.'; //evtl: this->_file
+
+    /**
+     * @var string Holding the date of the current version
+     */
     private $_date = 'now';
-    public $excludeDirs = ['.', '..', 'rdiff-backup-data'];
-    //public $ticket;
 
     public function init()
     {
         parent::init();
     }
 
+    /**
+     * Getter for the location
+     *
+     * @return string
+     */
     public function getLocation()
     {
         return $this->_location;
     }
 
+    /**
+     * Setter for location
+     *
+     * @param string $value
+     * @return void
+     */
     public function setLocation($value)
     {
         if (($this->_location = realpath($value)) === false) {
@@ -67,6 +133,13 @@ class RdiffFileSystem extends Model
         return FileHelper::normalizePath($this->location . '/rdiff-backup-data/increments/' . dirname($this->_pwd));
     }    
 
+    /**
+     * Change the path of the current RdiffFileSystem instance
+     *
+     * @param string $path - the relative path to go
+     * @return null|RdiffFileSystem - null if the path does not exist in the backup dir
+     *                                RdiffFileSystem instance if it exists
+     */
     public function slash($path = '/')
     {
         $this->_pwd = $path;
@@ -78,9 +151,14 @@ class RdiffFileSystem extends Model
             return null;
             //throw new NotFoundHttpException($this->path . ': No such file or directory.');
         }
-
     }
 
+    /**
+     * Populates all properties of the current path if not already done
+     *
+     * @param bool $force - force the function to repopulate all properties
+     * @return void
+     */
     private function populateProperties($force = false)
     {
         if ($this->propertiesPopulated !== true || $force === true) {
@@ -117,17 +195,34 @@ class RdiffFileSystem extends Model
 
     }
 
+    /**
+     * Getter for the versions array
+     *
+     * @return array
+     */
     public function getVersions()
     {
         $this->populateProperties();
         return $this->_versions;
     }
 
+    /**
+     * Getter for the current version
+     *
+     * @return string
+     */
     public function getVersion()
     {
         return $this->_date;
     }
 
+    /**
+     * Switch the version of the current RdiffFileSystem instance
+     *
+     * @param string $date - the version to switch to
+     * @return null|RdiffFileSystem - null if the version does not exist in the backup directory
+     *                                RdiffFileSystem instance if it exists
+     */
     public function versionAt($date)
     {
         if ($date == 'now' || $date == 'all' || preg_match($this->dateRegex, $date, $matches) === 1) {
@@ -139,6 +234,13 @@ class RdiffFileSystem extends Model
         }
     }
 
+    /**
+     * Getter for contents
+     *
+     * @return RdiffFileSystem|RdiffFileSystem[]
+     *                      An array of RdiffFileSystem[] instances if the current path is a directory
+     *                      RdiffFileSystem instance if the current path is a file
+     */
     public function getContents()
     {
 
@@ -204,6 +306,12 @@ class RdiffFileSystem extends Model
         }
     }
 
+    /**
+     * Getter for the file type of the current path
+     *
+     * @return string 
+     * @see http://php.net/manual/de/function.filetype.php for the different types
+     */
     public function getType()
     {
         if (file_exists($this->localPath)) {
@@ -213,6 +321,12 @@ class RdiffFileSystem extends Model
         }
     }
 
+    /**
+     * Getter for the state the current path
+     *
+     * @return string - the two states are: 'normal' if it's a normal file
+     *                                      'missing' if the file is a removed file
+     */
     public function getState()
     {
         /* reverse state if it's a whiteout file */
@@ -224,6 +338,12 @@ class RdiffFileSystem extends Model
         }
     }
 
+    /**
+     * Getter for the file name to display in the webinterface
+     *
+     * @return string - the file name without the leading .wh. in case of a whiteout file
+     * @see http://aufs.sourceforge.net/aufs.html for whiteout files
+     */
     public function getDisplayName()
     {
         if (strpos($this->basename, '.wh.') === 0) {
@@ -233,6 +353,12 @@ class RdiffFileSystem extends Model
         }
     }
 
+    /**
+     * Determine the real state of a file/dir
+     *
+     * @return string - the paths real state
+     * @see getState()
+     */
     private function getRealState()
     {
         if ($this->version == 'now' && file_exists($this->localPath)) {
@@ -253,6 +379,13 @@ class RdiffFileSystem extends Model
         }
     }
 
+    /**
+     * Restores the current file to a temporary file and return its contents to the browser
+     *
+     * @param bool $inline - whether to return the contents inline or as a download dialog
+     * @return data - the contents of the restored file
+     * @throws yii\web\NotFoundHttpException if the file cannot be restored
+     */
     public function restore($inline = false)
     {
 
@@ -273,59 +406,6 @@ class RdiffFileSystem extends Model
             }
             throw new NotFoundHttpException('The file could not be restored. ' . PHP_EOL . $out);
         }
-    }
-
-    /* TODO weg */
-    public function browse($path = '/')
-    {
-
-        return true;
-
-        $rootDir = \Yii::getAlias('@app/' . \Yii::$app->params['backupDir'] . '/' . $token);
-        $absoltePath = $rootDir . '/' . $dir;  
-        $files = [];
-
-        if (substr($absoltePath, 0, strlen($rootDir)) === $rootDir) {
-            $files[] = scandir($absoltePath);
-        }
-        return $files;
-
-
-        //$backup->filesystem = new RdiffFileSystem(['location' => $rootDir]);
-
-        $backup->filesystem->slash('Desktop/file.txt')->current;
-
-        //restore file
-        $backup->filesystem->slash('Desktop')->slash('file.txt')->versionAt('2016-06-01T12:41:44+02:00')->restore();
-        //restore dir
-        $backup->filesystem->slash('Desktop')->versionAt('2016-06-01T12:41:44+02:00')->restore();
-        //restore all
-        $backup->filesystem->slash()->versionAt('2016-06-01T12:41:44+02:00')->restore();        
-
-        //Array of Objects of all increments of that file
-        $backup->filesystem->slash('Desktop')->slash('file.txt')->increments;
-        
-        $backup->filesystem->slash(); //Obj of dir /home/user
-        $backup->filesystem->slash('/'); //Obj of dir /home/user
-
-        $backup->filesystem->slash('Desktop/file.txt.not.exist'); // null
-
-        $backup->filesystem->slash('Desktop')->slash('file.txt')->path; // string "/Desktop/file.txt"
-        $backup->filesystem->slash('Desktop')->slash('file.txt')->remotePath; // string "/home/user/Desktop/file.txt"
-        $backup->filesystem->slash('Desktop')->slash('file.txt')->localPath; // string "/var/www/exam/basic/backups/[hash]/Desktop/file.txt"
-        $backup->filesystem->slash('Desktop')->slash('file.txt')->dirname; // /home/user/Desktop
-        $backup->filesystem->slash('Desktop')->slash('file.txt')->basename; // file.txt
-        $backup->filesystem->slash('Desktop')->slash('file.txt')->extenstion; // txt
-
-        $backup->filesystem->slash('Desktop')->type; // d:dir, f:file
-        $backup->filesystem->slash('Desktop')->contents; //Array of Objects of all files and dirs in that dir
-        $backup->filesystem->slash('Desktop/file.txt')->contents; //contents of the file
-        $backup->filesystem->slash('Desktop/file.txt')->increments[1]->contents; //content of file (second latest version)
-        $backup->filesystem->slash('Desktop/file.txt')->versionAt('2016-06-01T12:41:44+02:00')->contents;
-        $backup->filesystem->slash('Desktop/file.txt')->restore(); // current version restore
-        $backup->filesystem->slash('Desktop/file.txt')->current->restore(); // current version restore
-        //$backup->filesystem->slash('Desktop/file.txt')->versions; //array of dates with the versions;
-
     }
 
 }

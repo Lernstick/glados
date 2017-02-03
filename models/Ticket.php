@@ -32,7 +32,6 @@ class Ticket extends \yii\db\ActiveRecord
 {
 
     public $state;
-    public $status;
     private $presaveAttributes;
 
     /* scenario constants */
@@ -61,6 +60,7 @@ class Ticket extends \yii\db\ActiveRecord
         $this->on(self::EVENT_AFTER_UPDATE, [$this, 'updateEvent']);
         $this->on(self::EVENT_AFTER_DELETE, [$this, 'deleteEvent']);
 
+        /* generate the token if it's a new record */
         $this->token = $this->isNewRecord ? bin2hex(openssl_random_pseudo_bytes(\Yii::$app->params['tokenLength']/2)) : $this->token;
     }
 
@@ -120,6 +120,12 @@ class Ticket extends \yii\db\ActiveRecord
         ];
     }
 
+    /**
+     * Checks if attributes have changed
+     * 
+     * @param array $attributes - a list of attributes to check
+     * @return bool
+     */
     public function attributesChanged($attributes)
     {
         foreach($attributes as $attribute){
@@ -147,6 +153,11 @@ class Ticket extends \yii\db\ActiveRecord
         ];
     }
 
+    /**
+     * When the ticket is updated, this function emits the events
+     * 
+     * @return void
+     */
     public function updateEvent()
     {
         if($this->attributesChanged([ 'start', 'end', 'test_taker' ])){
@@ -247,6 +258,11 @@ class Ticket extends \yii\db\ActiveRecord
         return;
     }
 
+    /**
+     * When the ticket is deleted, this function emits the events
+     * 
+     * @return void
+     */
     public function deleteEvent()
     {
         $eventItem = new EventItem([
@@ -262,11 +278,22 @@ class Ticket extends \yii\db\ActiveRecord
         return;
     }
 
+    /**
+     * Getter for the start time
+     * 
+     * @return integer 
+     */
     public function getStartTime()
     {
         return $this->start;
     }
 
+    /**
+     * Setter for the start time
+     *
+     * @param integer $value - the start time
+     * @return void
+     */
     public function setStartTime($value)
     {
         if($this->start != $value){
@@ -285,7 +312,8 @@ class Ticket extends \yii\db\ActiveRecord
     }
 
     /**
-     * Mapping of the different statuses and the color classes
+     * Mapping of the different states and the color classes
+     *
      * @return array
      */
     public function getClassMap()
@@ -300,6 +328,7 @@ class Ticket extends \yii\db\ActiveRecord
 
     /**
      * Just returns validity of the ticket.
+     *
      * @return bool
      */
     public function getValid(){
@@ -309,11 +338,21 @@ class Ticket extends \yii\db\ActiveRecord
         return false;
     }
 
+    /**
+     * Returns if there is a backup
+     *
+     * @return bool
+     */
     public function getBackup(){
         $backupDir = \Yii::$app->params['backupDir'] . '/' . $this->token . '/' . 'rdiff-backup-data';
         return Yii::$app->file->set($backupDir)->exists;
     }
 
+    /**
+     * Returns all backups associated to the ticket
+     *
+     * @return Backup[]
+     */
     public function getBackups()
     {
         return Backup::findAll($this->token);
@@ -321,7 +360,8 @@ class Ticket extends \yii\db\ActiveRecord
 
     /**
      * Calulates the time the ticket will be valid as DateInterval.
-     * @return DateInterval object of false if not valid
+     *
+     * @return DateInterval|bool - Dateinterval object or false if not valid
      */
     public function getValidTime(){
         $a = new \DateTime($this->start);
@@ -334,9 +374,11 @@ class Ticket extends \yii\db\ActiveRecord
         return false;
     }
 
-    /** Returns the duration of the test
+    /**
+     * Returns the duration of the test
+     *
      * @return DateInterval object
-     */
+     */    
     public function getDuration(){
 
         $a = new \DateTime($this->start);
@@ -386,23 +428,12 @@ class Ticket extends \yii\db\ActiveRecord
         return $this->exam->user_id;
     }
 
-    /*
-    public function continueBootup()
-    {
-        $cmd = "ssh -i " . \Yii::$app->basePath . "/.ssh/rsa "
-             . "-o UserKnownHostsFile=/dev/null "
-             . "-o StrictHostKeyChecking=no "
-             . "root@" . $this->ip . " "
-             . "'echo 0 > /run/initramfs/restore'";
-        $retval = exec(sprintf("%s 2>&1; echo $?", $cmd));
-        return $retval;
-    }*/
-
     /**
      * Runs a command in the shell of the system.
      * 
      * @param string $cmd - the command to run
      * @param string $lc_all - the value of the LC_ALL environment variable
+     * @param integer $timeout - the SSH connection timeout
      * @return array - the first element contains the output (stdout and stderr),
      *                 the second element contains the exit code of the command
      */
@@ -430,23 +461,13 @@ class Ticket extends \yii\db\ActiveRecord
         return [ $output, $retval ];
     }
 
-/*
-    public function getExamList()
-    {
-        $exams = Exam::find()->asArray()->all();
-        return ArrayHelper::map($exams, 'id', function($exams){
-                return $exams['subject'] . ' - ' . $exams['name'];
-            }
-        );
-    }
-
-    public function getSubjectList()
-    {
-        $exams = Exam::find()->asArray()->all();
-        return ArrayHelper::map($exams, 'subject', 'subject');
-    }
-*/
-
+    /**
+     * Returns all backups associated to the ticket
+     *
+     * @param string $attribute - the attribute
+     * @param array $params
+     * @return void
+     */
     public function validateExam($attribute, $params)
     {
 
@@ -462,6 +483,13 @@ class Ticket extends \yii\db\ActiveRecord
 
     }
 
+    /**
+     * Generates an error message when the ticket is in closed state
+     *
+     * @param string $attribute - the attribute
+     * @param array $params
+     * @return void
+     */
     public function checkIfClosed($attribute, $params)
     {
         if ($this->state != self::STATE_CLOSED) {
@@ -473,6 +501,7 @@ class Ticket extends \yii\db\ActiveRecord
 
     /**
      * @inheritdoc
+     *
      * @return TicketQuery the active query used by this AR class.
      */
     public static function find()

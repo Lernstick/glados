@@ -7,6 +7,33 @@ use yii\base\Model;
 use app\models\Ticket;
 use app\models\RdiffFileSystem;
 
+/**
+ * This is the model class for the backup directory.
+ *
+ * @property string $date
+ * @property string $token
+ * @property integer $startTime
+ * @property integer $endTime
+ * @property integer $elapsedTime
+ * @property string $sourceFiles
+ * @property integer $sourceFileSize
+ * @property string $mirrorFiles
+ * @property integer $mirrorFileSize
+ * @property string $newFiles
+ * @property integer $newFileSize
+ * @property string $deletedFiles
+ * @property integer $deletedFileSize
+ * @property string $changedFiles
+ * @property integer $changedSourceSize
+ * @property integer $changedMirrorSize
+ * @property string $incrementFiles
+ * @property integer $incrementFileSize
+ * @property integer $totalDestinationSizeChange
+ * @property integer $errors
+ * @property array $errorLog
+ *
+ * @property Ticket $ticket
+ */
 class Backup extends Model
 {
     public $date;
@@ -30,7 +57,6 @@ class Backup extends Model
     public $totalDestinationSizeChange;
     public $errors;
 
-
     /**
      * @return array the validation rules.
      */
@@ -52,6 +78,9 @@ class Backup extends Model
         ];
     }
 
+    /**
+     * @return Ticket
+     */
     public function getTicket()
     {
         return Ticket::findOne(['token' => $this->token]);
@@ -62,6 +91,11 @@ class Backup extends Model
         return \Yii::$app->params['backupDir'] . '/' . $this->token . '/rdiff-backup-data/';
     }
 
+    /**
+     * Getter for the errorLog
+     *
+     * @return array
+     */
     public function getErrorLog()
     {
         $errorLogFiles = [
@@ -78,6 +112,12 @@ class Backup extends Model
         return [];
     }
 
+    /**
+     * Returns all Backup models related to the token
+     *
+     * @param string $token - the token
+     * @return Backup[]
+     */
     public function findAll($token)
     {
         $dir = \Yii::$app->params['backupDir'] . '/' . $token . '/rdiff-backup-data/';
@@ -97,6 +137,13 @@ class Backup extends Model
         return $models;
     }
 
+    /**
+     * Return the Backup model related to the token and the date
+     *
+     * @param string $token - token
+     * @param string $date - date
+     * @return Backup
+     */
     public function findOne($token, $date)
     {
         $file = \Yii::$app->params['backupDir'] . '/' . $token . '/'
@@ -117,53 +164,6 @@ class Backup extends Model
         $me->token = $token;
 
         return $me;
-    }
-
-    /*TODO: weg*/
-    public function browse($path)
-    {
-
-        $backup->filesystem = new RdiffFileSystem([
-            'root' => '/home/user',
-            'location' => $rootDir,
-        ]);
-
-        $backup->filesystem->slash('Desktop/file.txt')->current;
-
-/*
-
-        //restore file
-        $backup->filesystem->slash('Desktop')->slash('file.txt')->versionAt('2016-06-01T12:41:44+02:00')->restore();
-        //restore dir
-        $backup->filesystem->slash('Desktop')->versionAt('2016-06-01T12:41:44+02:00')->restore();
-        //restore all
-        $backup->filesystem->slash()->versionAt('2016-06-01T12:41:44+02:00')->restore();        
-
-        //Array of Objects of all increments of that file
-        $backup->filesystem->slash('Desktop')->slash('file.txt')->increments;
-        
-        $backup->filesystem->slash(); //Obj of dir /home/user
-        $backup->filesystem->slash('/'); //Obj of dir /home/user
-
-        $backup->filesystem->slash('Desktop')->slash('file.txt')->path; // string "/home/user/Desktop/file.txt"
-        $backup->filesystem->slash('Desktop')->slash('file.txt')->dirname; // /home/user/Desktop
-        $backup->filesystem->slash('Desktop')->slash('file.txt')->basename; // file.txt
-        $backup->filesystem->slash('Desktop')->slash('file.txt')->extenstion; //txt
-
-        $backup->filesystem->slash('Desktop')->contents; //Array of Objects of all files and dirs in that dir
-        $backup->filesystem->slash('Desktop/file.txt')->contents; //contents of the file
-        $backup->filesystem->slash('Desktop/file.txt')->increments[1]->contents; //content of file (second latest version)
-        $backup->filesystem->slash('Desktop/file.txt')->versionAt('2016-06-01T12:41:44+02:00')->contents;
-        $backup->filesystem->slash('Desktop/file.txt')->restore(); // current version restore, also Obj->current->restore()
-
-*/
-
-        return true;
-
-    }
-
-    public function findFile($path)
-    {
     }
 
 }

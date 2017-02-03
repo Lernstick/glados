@@ -21,6 +21,7 @@ use app\models\EventItem;
  * @property AuthAssignment[] $authAssignments
  * @property AuthItem[] $itemNames
  * @property Exam[] $exams
+ * @property Role $role
  */
 
 class User extends ActiveRecord implements IdentityInterface
@@ -116,6 +117,9 @@ class User extends ActiveRecord implements IdentityInterface
             ->viaTable('rel_event_user', ['user_id' => 'id']);
     }
 
+    /**
+     * @return \yii\rbac\Role
+     */
     public function getRole()
     {
         if(!isset($this->_role)){
@@ -126,9 +130,13 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->_role;
     }
 
-    public function setRole($value)
+    /**
+     * @param  string      $role role to set
+     * @return void
+     */
+    public function setRole($role)
     {
-        $this->_role = $value;
+        $this->_role = $role;
 /*        $auth = Yii::$app->authManager;
         $role = $auth->getRole($value);
         $auth->revokeAll($this->getOldAttribute('username'));
@@ -197,6 +205,9 @@ class User extends ActiveRecord implements IdentityInterface
         return Yii::$app->getSecurity()->validatePassword($password, $this->password);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function beforeSave($insert)
     {
         if (parent::beforeSave($insert)) {
@@ -212,6 +223,9 @@ class User extends ActiveRecord implements IdentityInterface
         return false;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave($insert, $changedAttributes);
