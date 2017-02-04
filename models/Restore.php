@@ -13,6 +13,7 @@ use Yii;
  * @property integer $ticket_id
  * @property string $file
  * @property string $restoreDate
+ * @property DateInterval $elapsedTime 
  *
  * @property Ticket $ticket
  */
@@ -55,6 +56,9 @@ class Restore extends \yii\db\ActiveRecord
         ];
     }
 
+    /**
+     * @return DateInterval
+     */
     public function getElapsedTime()
     {
         $a = new \DateTime($this->startedAt);

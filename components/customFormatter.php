@@ -19,6 +19,7 @@ class customFormatter extends \yii\i18n\Formatter
 
     /**
      * Formats the value as one of the 4 states or unknown if no state can be determined.
+     *
      * @param integer $value the value to be formatted.
      * @return string the formatted result.
      */
@@ -38,6 +39,7 @@ class customFormatter extends \yii\i18n\Formatter
 
     /**
      * Shortens the number and append a "k" for thousands and an "m" for millions.
+     *
      * @param integer $value the value to be formatted.
      * @return string the formatted result.
      */
@@ -58,6 +60,7 @@ class customFormatter extends \yii\i18n\Formatter
 
     /**
      * Uses Timeago to format relativetime to automatically update fuzzy timestamps.
+     *
      * @param integer $value the value to be formatted.
      * @return string the formatted result.
      */
@@ -71,6 +74,12 @@ class customFormatter extends \yii\i18n\Formatter
         return $value;
     }
 
+    /**
+     * Translates dates such as 'now' and 'all' correctly.
+     *
+     * @param integer $value the value to be formatted.
+     * @return string the formatted result.
+     */
     public static function asBackupVersion($value)
     {
         if (empty($value)){

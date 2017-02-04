@@ -6,12 +6,20 @@ use yii\console\Controller;
 
 class RbacController extends Controller
 {
+
+    /**
+     * @inheritdoc
+     */
     public function actionInit()
     {
         $auth = Yii::$app->authManager;
+
+        /* first revoke all permissions and assignments */
         $auth->removeAll();
 
-        //Exams
+        /**
+        * Exam permissions
+        */
         $createExam = $auth->createPermission('exam/create');
         $createExam->description = 'Create an exam';
         $auth->add($createExam);
@@ -44,13 +52,15 @@ class RbacController extends Controller
         $indexAllExam->description = 'Index all exams';
         $auth->add($indexAllExam);
 
-        //inheritation
+        /* Inheritation */
         $auth->addChild($indexAllExam, $indexExam);
         $auth->addChild($updateAllExam, $updateExam);
         $auth->addChild($viewAllExam, $viewExam);
         $auth->addChild($deleteAllExam, $deleteExam);
 
-        //Tickets
+        /**
+        * Ticket permissions
+        */
         $indexTicket = $auth->createPermission('ticket/index');
         $indexTicket->description = 'Index tickets of own exams';
         $auth->add($indexTicket);
@@ -100,7 +110,7 @@ class RbacController extends Controller
         $restoreAllTicket->description = 'Restore data to clients of tickets of all exams';
         $auth->add($restoreAllTicket);
 
-        //inheritation
+        /* Inheritation */
         $auth->addChild($indexAllTicket, $indexTicket);
         $auth->addChild($viewAllTicket, $viewTicket);
         $auth->addChild($updateAllTicket, $updateTicket);
@@ -108,7 +118,9 @@ class RbacController extends Controller
         $auth->addChild($backupAllTicket, $backupTicket);
         $auth->addChild($restoreAllTicket, $restoreTicket);
 
-        //Activities
+        /**
+        * Avtivity permissions
+        */
         $indexActivity = $auth->createPermission('activity/index');
         $indexActivity->description = 'Index own activities';
         $auth->add($indexActivity);
@@ -116,10 +128,12 @@ class RbacController extends Controller
         $indexAllActivity->description = 'Index all activities';
         $auth->add($indexAllActivity);
 
-        //inheritation
+        /* Inheritation */
         $auth->addChild($indexAllActivity, $indexActivity);
 
-        //User Management
+        /**
+        * User management permissions
+        */
         $indexUser = $auth->createPermission('user/index');
         $indexUser->description = 'Index all users';
         $auth->add($indexUser);
@@ -156,13 +170,15 @@ class RbacController extends Controller
         $deleteAllUser->description = 'Delete all users';
         $auth->add($deleteAllUser);
 
-        //inheritation
+        /* Inheritation */
         $auth->addChild($viewAllUser, $viewUser);
         $auth->addChild($updateAllUser, $updateUser);
         $auth->addChild($resetPWAllUser, $resetPWUser);
         $auth->addChild($deleteAllUser, $deleteUser);
 
-        //Daemons
+        /**
+        * Daemon permissions
+        */
         $indexDaemon = $auth->createPermission('daemon/index');
         $indexDaemon->description = 'Index all backup daemons';
         $auth->add($indexDaemon);
@@ -183,9 +199,7 @@ class RbacController extends Controller
         $killDaemon->description = 'Kill backup daemons';
         $auth->add($killDaemon);
 
-        //inheritation
-
-        // add "author" role
+        // Add "teacher" role
         $teacher = $auth->createRole('teacher');
         $auth->add($teacher);
         $auth->addChild($teacher, $createExam);
@@ -213,8 +227,7 @@ class RbacController extends Controller
         $auth->addChild($teacher, $stopDaemon);
         $auth->addChild($teacher, $killDaemon);
 
-        // add "admin" role and give this role the "updatePost" permission
-        // as well as the permissions of the "author" role
+        // Add "admin" role and give this role the */all permissions
         $admin = $auth->createRole('admin');
         $auth->add($admin);
         $auth->addChild($admin, $indexAllExam);
@@ -239,6 +252,7 @@ class RbacController extends Controller
         $auth->addChild($admin, $resetPWAllUser);
         $auth->addChild($admin, $deleteAllUser);
 
+        // The "admin" role should also inherit all "teacher" permissions
         $auth->addChild($admin, $teacher);
 
         // Assign roles to users. 1 and 2 are IDs returned by IdentityInterface::getId()

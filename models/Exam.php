@@ -105,6 +105,9 @@ class Exam extends \yii\db\ActiveRecord
         }
     }
 
+    /**
+     * @return boolean
+     */
     public function deleteFile()
     {
         $file = \Yii::$app->params['uploadDir'] . '/' . $this->file;

@@ -66,7 +66,9 @@ class DaemonController extends Controller
     }
 
     /**
-     * initiates the daemon
+     * Initiates the daemon
+     *
+     * @return void
      */
     public function start()
     {
@@ -108,7 +110,9 @@ class DaemonController extends Controller
     }
 
     /**
-     * stops the daemon and cleans up
+     * Stops the daemon, cleans up and finally exits the shell script
+     *
+     * @return void
      */
     public function stop()
     {
@@ -151,6 +155,13 @@ class DaemonController extends Controller
         
     }
 
+    /**
+     * Logs a message to the screen and (if set) to the database
+     *
+     * @param string $message The message to log
+     * @param bool $state If true log also to the database
+     * @return void
+     */
     public function log($message, $state = false)
     {
         echo $message . PHP_EOL;

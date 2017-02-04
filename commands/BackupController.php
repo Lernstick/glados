@@ -13,16 +13,35 @@ use app\models\ScreenshotSearch;
 
 /**
  * Backup Daemon (pull)
- * This is the Daemon which calls rdiff-backup to pull the data from the clients one by one.
+ * This is the daemon which calls rdiff-backup to pull the data from the clients one by one.
  */
 class BackupController extends DaemonController
 {
 
+    /**
+     * @var Ticket The ticket in processing at the moment 
+     */
     public $ticket;
+
+    /**
+     * @var string
+     */
     private $_cmd;
+
+    /**
+     * @var string The user to login at the target system
+     */
     public $remoteUser = 'root';
     #public $remotePath = '/home/user';
+
+    /**
+     * @var string The path at the target system to backup
+     */
     public $remotePath = '/overlay/home/user';
+
+    /**
+     * @var boolean Whether it is the last backup or not 
+     */
     private $finishBackup;
 
     /**
@@ -157,6 +176,13 @@ class BackupController extends DaemonController
         parent::stop();
     }
 
+    /**
+     * Determines if a given port on the target system is open or not
+     *
+     * @param integer $port The port to check
+     * @param integer $times The number to times to try (with 5 seconds delay inbetween every check)
+     * @return boolean Whether the port is open or not
+     */
     private function checkPort($port, $times = 1)
     {
         for($c=1;$c<=$times;$c++){
@@ -173,7 +199,12 @@ class BackupController extends DaemonController
         return false;
     }
 
-    // clean up abandoned tickets
+    /**
+     * Clean up abandoned tickets. If a ticket stays in backup_lock or restore_lock and
+     * its associated daemon is not running anymore, this function will unlock those tickets.
+     *
+     * @return void
+     */
     private function cleanup ()
     {
 
@@ -196,6 +227,13 @@ class BackupController extends DaemonController
         }    
     }
 
+    /**
+     * Returns a ticket model which has the finish process initiated.
+     * Those tickets only need one last backup, therefore they have higher 
+     * priority against the other ones.
+     *
+     * @return Ticket|null
+     */
     private function finished ()
     {
         $query = Ticket::find()
@@ -220,6 +258,11 @@ class BackupController extends DaemonController
         return $query->one();
     }
 
+    /**
+     * Determines the next ticket to process
+     *
+     * @return Ticket|null
+     */
     private function getNextTicket ()
     {
 

@@ -7,11 +7,35 @@ use yii\base\Model;
 use yii\helpers\Url;
 use yii\imagine\Image;
 
+/**
+ * This is the model class for screenshot.
+ *
+ * @property string $src
+ * @property string $tsrc
+ * @property string $thumbnail
+ *
+ */
 class Screenshot extends Model
 {
+
+    /**
+     * @var integer The date of the screenshot
+     */
     public $date;
+
+    /**
+     * @var string The token from the related ticket
+     */
     public $token;
+
+    /**
+     * @var string The filesystem path to the picture
+     */
     public $path;
+
+    /**
+     * @var string
+     */
     private $_thumbnail;
 
     /**
@@ -44,6 +68,13 @@ class Screenshot extends Model
         return Url::to(['screenshot/thumbnail', 'date' => $this->date, 'token' => $this->token]);
     }
 
+    /**
+     * Return the Screeshot model related to the token and the date
+     *
+     * @param string $token - token
+     * @param string $date - date
+     * @return Screenshot|null
+     */
     public function findOne($token, $date)
     {
         //$dir = \Yii::$app->params['backupDir'] . '/' . $token . '/Screenshots/';
@@ -66,6 +97,12 @@ class Screenshot extends Model
 
     }
 
+    /**
+     * Returns all Screenshot models related to the token
+     *
+     * @param string $token - the token
+     * @return Screenshot[]
+     */
     public function findAll($token)
     {
 

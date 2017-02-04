@@ -10,26 +10,7 @@ use app\models\RdiffFileSystem;
 /**
  * This is the model class for the backup directory.
  *
- * @property string $date
- * @property string $token
- * @property integer $startTime
- * @property integer $endTime
- * @property integer $elapsedTime
- * @property string $sourceFiles
- * @property integer $sourceFileSize
- * @property string $mirrorFiles
- * @property integer $mirrorFileSize
- * @property string $newFiles
- * @property integer $newFileSize
- * @property string $deletedFiles
- * @property integer $deletedFileSize
- * @property string $changedFiles
- * @property integer $changedSourceSize
- * @property integer $changedMirrorSize
- * @property string $incrementFiles
- * @property integer $incrementFileSize
- * @property integer $totalDestinationSizeChange
- * @property integer $errors
+ * @property string $dir
  * @property array $errorLog
  *
  * @property Ticket $ticket

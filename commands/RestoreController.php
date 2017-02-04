@@ -15,15 +15,34 @@ use yii\helpers\FileHelper;
 
 /**
  * Restore Daemon/Process (push)
- * This is the Process which calls rdiff-backup --restore-as-of to push the data to the client.
+ * This is the process which calls rdiff-backup --restore-as-of to push the data to the client.
  */
 class RestoreController extends DaemonController
 {
 
+    /**
+     * @var Ticket The ticket in processing at the moment 
+     */
     public $ticket;
+
+    /**
+     * @var string 
+     */
     public $restore;
+
+    /**
+     * @var string 
+     */
     private $_cmd;
+
+    /**
+     * @var string The user to login at the target system
+     */    
     public $remoteUser = 'root';
+
+    /**
+     * @var string The path at the target system to backup
+     */    
     public $remotePath = '/home/user';
 
     /**
@@ -160,6 +179,13 @@ class RestoreController extends DaemonController
         parent::stop();
     }
 
+    /**
+     * Determines if a given port on the target system is open or not
+     *
+     * @param integer $port The port to check
+     * @param integer $times The number to times to try (with 5 seconds delay inbetween every check)
+     * @return boolean Whether the port is open or not
+     */
     private function checkPort($port, $times = 1)
     {
         for($c=1;$c<=$times;$c++){
@@ -176,7 +202,12 @@ class RestoreController extends DaemonController
         return false;
     }
 
-    // clean up abandoned tickets
+    /**
+     * Clean up abandoned tickets. If a ticket stays in backup_lock or restore_lock and
+     * its associated daemon is not running anymore, this function will unlock those tickets.
+     *
+     * @return void
+     */
     private function cleanup()
     {
 

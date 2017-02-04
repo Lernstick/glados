@@ -15,23 +15,52 @@ use app\models\EventItem;
  *
  * @property integer $id
  * @property string $token
- * @property integer $state
  * @property integer $exam_id
- * @property string $start
- * @property string $end
- * @property integer $duration
+ * @property timestamp $start
+ * @property timestamp $end
+ * @property string $ip 
  * @property string $test_taker
- * @property string $ip
  * @property integer $download_progress
  * @property boolean $download_lock
- * @property integer $client_state
+ * @property string $client_state
+ * @property timestamp $backup_last
+ * @property timestamp $backup_last_try
+ * @property string $backup_state
+ * @property boolean $backup_lock 
+ * @property integer $running_daemon_id
+ * @property boolean $restore_lock
+ * @property string $restore_state
+ * @property boolean $bootup_lock
  *
+ * @property timestamp $startTime
+ * @property array $classMap
+ * @property boolean $valid
+ * @property boolean $backup
+ * @property Backup[] $backups
+ * @property integer $state
+ * @property DateInterval $duration 
+ * @property string $examName
+ * @property string $examSubject
+ * @property integer $userId
+ *
+ * @property Exam $exam
+ * @property Activity[] $activities
+ * @property Restore[] $restores
+ * @property Exam $exam
  * @property Exam $exam
  */
 class Ticket extends \yii\db\ActiveRecord
 {
 
+    /**
+     * @var integer A value from 0 to 4 representing the state of the ticket.
+     * @see ticket state constants below.
+     */
     public $state;
+
+    /**
+     * @var array An array holding the values of the record before changing
+     */
     private $presaveAttributes;
 
     /* scenario constants */
