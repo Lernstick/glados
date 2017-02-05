@@ -11,7 +11,9 @@ class ExamQuery extends \yii\db\ActiveQuery
 {
 
     /**
-     * @return Exam[]|array
+     * Additional condition to find only exams associated to the current user
+     *    
+     * @return Exam[]|array|null
      */
     public function own()
     {

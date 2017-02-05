@@ -4,7 +4,7 @@ use app\components\ActiveEventField;
 
 /* @var $this yii\web\View */
 
-$this->title = 'My Yii Application';
+$this->title = 'GLaDOS';
 ?>
 <div class="site-index">
 

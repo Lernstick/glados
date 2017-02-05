@@ -9,7 +9,7 @@ use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\TicketSearch;
-use app\models\ActivitySearch;
+use app\models\Activity;
 use app\models\ExamSearch;
 
 class SiteController extends Controller
@@ -52,8 +52,9 @@ class SiteController extends Controller
 
     public function actionIndex()
     {
-        $searchModel = new ActivitySearch();
-        $new_activities = $searchModel->getNewActivities()->count();
+        $activity = new Activity();
+        $new_activities = $activity->newActivities();
+        $new_activities = $new_activities == '' ? 0 : $new_activities;
 
         $searchModel = new TicketSearch();
         $running_exams = $searchModel->getRunningExams()->count();

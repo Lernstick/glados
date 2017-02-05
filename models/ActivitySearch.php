@@ -72,13 +72,16 @@ class ActivitySearch extends Activity
         return $dataProvider;
     }
 
+    /* TODO: not needed anymore */
     public function getNewActivities()
     {
         $cookies = Yii::$app->request->cookies;
         $lastvisited = $cookies->getValue('lastvisited');
+        $date = $lastvisited == null ? 0 : $lastvisited;
+        $activities = Activity::find()
+            ->where(['>', 'date', $date]);
 
-        return Activity::find()
-            ->where(['>', 'date', $lastvisited]);
+        return Yii::$app->user->can('activity/index/all') ? $activities : $activities->own();
     }
 
 }

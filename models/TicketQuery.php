@@ -15,15 +15,20 @@ class TicketQuery extends \yii\db\ActiveQuery
     }*/
 
     /**
-     * @return Ticket[]|array
+     * Joins the SQL query with the exam table, that only ticket models associated to
+     * the current user are returned
+     *
+     * @return Ticket[]|array|null
      */
     public function own()
     {
-        return $this->joinWith(['exam' => function ($q) {
-            $q->andFilterWhere([
-                'exam.user_id' => \Yii::$app->user->id,
-            ]);
-        }]);
+        return $this->joinWith([
+            'exam' => function (\yii\db\ActiveQuery $query) {
+                $query->where([
+                    'exam.user_id' => \Yii::$app->user->id,
+                ]);
+            }
+        ]);
     }
 
     /**
