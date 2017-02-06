@@ -58,6 +58,8 @@ class Ticket extends \yii\db\ActiveRecord
      */
     public $state;
 
+    public $tduration;
+
     /**
      * @var array An array holding the values of the record before changing
      */

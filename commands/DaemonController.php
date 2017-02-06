@@ -159,7 +159,7 @@ class DaemonController extends Controller
      * Logs a message to the screen and (if set) to the database
      *
      * @param string $message The message to log
-     * @param bool $state If true log also to the database
+     * @param bool $state If true log also to the database, defaults to false
      * @return void
      */
     public function log($message, $state = false)
@@ -201,32 +201,31 @@ class DaemonController extends Controller
      */
     function signalHandler($sig)
     {
-
-     switch ($sig) {
-        case SIGTERM:
-            $this->log('Caught SIGTERM, stopping...', true);
-            $this->stop();
-            die();
-        case SIGHUP:
-            #TODO
-            $this->log('Caught SIGHUP, does nothing, TODO...', true);
-            break;
-        case SIGINT:
-            echo "INT";
-            $this->log('Caught SIGINT, stopping...', true);
-            $this->stop();
-            die();
-        case SIGQUIT:
-            $this->log('Caught SIGQUIT, stopping...', true);
-            $this->stop();
-            die();
-        case SIGUSR1:
-            # TODO
-            echo "Caught SIGUSR1...\n";
-            break;
-        default:
-        // handle all other signals
+        switch ($sig) {
+            case SIGTERM:
+                $this->log('Caught SIGTERM, stopping...', true);
+                $this->stop();
+                die();
+            case SIGHUP:
+                #TODO
+                $this->log('Caught SIGHUP, does nothing, TODO...', true);
+                break;
+            case SIGINT:
+                echo "INT";
+                $this->log('Caught SIGINT, stopping...', true);
+                $this->stop();
+                die();
+            case SIGQUIT:
+                $this->log('Caught SIGQUIT, stopping...', true);
+                $this->stop();
+                die();
+            case SIGUSR1:
+                # TODO
+                echo "Caught SIGUSR1...\n";
+                break;
+            default:
+            // handle all other signals
+        }
     }
-}
 
 }

@@ -136,7 +136,6 @@ class Activity extends \yii\db\ActiveRecord
                 $user->activities_last_visited;
         }
         return null;
-
     }
 
     public function setLastvisited($value)

@@ -136,6 +136,26 @@ $requirements = array(
         'by' => 'Server-Sent Events',
         'memo' => 'Realtime events in views',
     ),
-
+    'phpFileUploads' => array(
+        'name' => 'PHP allow allow file uploads',
+        'mandatory' => true,
+        'condition' => $requirementsChecker->checkPhpIniOn("file_uploads"),
+        'by' => 'File upload',
+        'memo' => '"file_uploads" should be enabled at php.ini',
+    ),    
+    'phpUploadMaxFilesize' => array(
+        'name' => 'PHP upload max filesize',
+        'mandatory' => true,
+        'condition' => $requirementsChecker->checkUploadMaxFileSize("128M", null),
+        'by' => 'File upload',
+        'memo' => '"upload_max_filesize" should be set at least to 128M at php.ini (current value: ' . ini_get('upload_max_filesize') . ')',
+    ),
+    'phpPostMaxSize' => array(
+        'name' => 'PHP post max size',
+        'mandatory' => true,
+        'condition' => $requirementsChecker->compareByteSize(ini_get('post_max_size'), "128M"),
+        'by' => 'File upload',
+        'memo' => '"post_max_size" should be set at least to 128M at php.ini (current value: ' . ini_get('post_max_size') . ')',
+    ),     
 );
 $requirementsChecker->checkYii()->check($requirements)->render();

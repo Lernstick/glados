@@ -136,25 +136,49 @@ class TicketSearch extends Ticket
     }
 
 
-    public function getRunningExams()
+    public function getRunningTickets()
     {
 
-        $tickets = Ticket::find()
+        return $tickets = Ticket::find()
             ->where(['not', ['start' => null]])
             ->andWhere(['end' => null]);
 
-        return Yii::$app->user->can('ticket/index/all') ? $tickets : $tickets->own();
+        //return Yii::$app->user->can('ticket/index/all') ? $tickets : $tickets->own();
        
     }
 
-    public function getCompletedExams()
+    public function getCompletedTickets()
     {
-        $exams = Ticket::find()
+        return $tickets = Ticket::find()
             ->where(['not', ['start' => null]])
             ->andWhere(['not', ['end' => null]]);
 
-        return Yii::$app->user->can('ticket/index/all') ? $exams : $exams->own();
+        //return Yii::$app->user->can('ticket/index/all') ? $tickets : $tickets->own();
     }
 
+    public function getTotalTickets()
+    {
+        return Ticket::find();
+        //return Yii::$app->user->can('ticket/index/all') ? $tickets : $tickets->own();
+    }
+
+    public function getTotalDuration()
+    {
+
+        $query = Ticket::find();
+
+        return $query->sum(
+            new \yii\db\Expression(
+                'TIMESTAMPDIFF(
+                    SECOND,
+                    `start`,
+                    IF(`end` is null,
+                        CURRENT_TIMESTAMP(),
+                        `end`
+                    )
+                )'
+            )
+        );
+    }
 
 }

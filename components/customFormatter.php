@@ -54,8 +54,19 @@ class customFormatter extends \yii\i18n\Formatter
         } else if ($value >= 950) {
             return round($value / 1000, 1) . "k";
         } else {
-            return $value;
+            return round($value, 1);
         }
+    }
+
+    /**
+     * Returns the number of hours as shortNumber.
+     *
+     * @param integer $value the value to be formatted.
+     * @return string the formatted result.
+     */
+    public static function asHours($value)
+    {
+        return yii::$app->formatter->format($value/3600, 'shortNumber');
     }
 
     /**

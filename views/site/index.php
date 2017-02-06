@@ -12,7 +12,10 @@ $this->title = 'GLaDOS';
         <div class="well">
             <h1 class="text-center">
             <?= yii::$app->formatter->format($running_exams, 'shortNumber'); ?>
-            <small>running exams</small></h1>
+            <small><?= \Yii::t('app', 'running exam{n,plural,=0{s} =1{} other{s}}', [
+                'n' => $running_exams
+            ]); ?></small>
+            </h1>
         </div>
     </div>
 
@@ -26,7 +29,10 @@ $this->title = 'GLaDOS';
                 'jsHandler' => 'function(d, s){s.innerHTML = eval(s.innerHTML + d)}',
                 'options' => [ 'tag' => 'span' ],
             ]); ?>
-            <small>new activities</small></h1>
+            <small><?= \Yii::t('app', 'new activit{n,plural,=0{ies} =1{y} other{ies}}', [
+                'n' => $new_activities
+            ]); ?></small>
+            </h1>
         </div>
     </div>
 
@@ -34,56 +40,46 @@ $this->title = 'GLaDOS';
         <div class="well">
             <h1 class="text-center">
             <?= yii::$app->formatter->format($total_exams, 'shortNumber'); ?>
-            <small>exams created</small></h1>
+            <small><?= \Yii::t('app', 'exam{n,plural,=0{s} =1{} other{s}} created', [
+                'n' => $total_exams
+            ]); ?></small>
+            </h1>
         </div>
     </div>
 
     <div class="col-md-6">
         <div class="well">
             <h1 class="text-center">
-            <?= yii::$app->formatter->format($completed_exams, 'shortNumber'); ?>
-            <small>exams completed</small></h1>
+            <?= yii::$app->formatter->format($completed_exams, 'shortNumber'); ?> / <?= yii::$app->formatter->format($total_tickets, 'shortNumber'); ?>
+            <small><?= \Yii::t('app', 'exam{n,plural,=0{s} =1{} other{s}} completed', [
+                'n' => $total_tickets
+            ]); ?></small>
+            </h1>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="well">
+            <h1 class="text-center">
+            <?= yii::$app->formatter->format($total_duation, 'hours'); ?>
+            <small><?= \Yii::t('app', 'hour{n,plural,=0{s} =1{} other{s}} spent in exams', [
+                'n' => $total_duation
+            ]); ?></small>
+            </h1>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="well">
+            <h1 class="text-center">
+            Average: 
+            <small><?= yii::$app->formatter->format($average_duration, 'duration'); ?></small>
+            </h1>
         </div>
     </div>
 
     <div class="jumbotron">
-        <p><a class="btn btn-lg btn-success" href="index.php?r=exam/index">Show my Exams</a></p>
+        <p><a class="btn btn-lg btn-success" href="index.php?r=exam/index">Show my Exams &raquo;</a></p>
     </div>
 
-    <div class="body-content">
-
-        <div class="row">
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/doc/">Yii Documentation &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/forum/">Yii Forum &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/extensions/">Yii Extensions &raquo;</a></p>
-            </div>
-        </div>
-
-    </div>
 </div>
