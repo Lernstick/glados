@@ -72,7 +72,7 @@ $this->title = 'GLaDOS';
     <div class="col-md-6">
         <div class="well">
             <h1 class="text-center">
-            Average: 
+            Ø 
             <small><?= yii::$app->formatter->format($average_duration, 'duration'); ?></small>
             </h1>
         </div>

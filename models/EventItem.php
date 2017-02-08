@@ -16,12 +16,12 @@ use app\models\AuthItem;
  * @property string $event
  * @property float $generated_at
  * @property integer $priority
-
+ *
  */
 class EventItem extends \yii\db\ActiveRecord
 {
 
-    /*
+    /**
      * @var array Array containing the users id and role names of users who should get the event.
      * Format example: 
      *  [
@@ -74,7 +74,7 @@ class EventItem extends \yii\db\ActiveRecord
             ->viaTable('rel_event_role', ['event_id' => 'id']);
     }
 
-    /*
+    /**
      * @return void
      */
     public function generate()
@@ -153,6 +153,7 @@ class EventItem extends \yii\db\ActiveRecord
 
     /**
      * Returns all RBAC roles which have the specified permission
+     *
      * @param string $perm the name of the permission
      * @return array permissions/roles
      */
@@ -174,6 +175,7 @@ class EventItem extends \yii\db\ActiveRecord
 
     /**
      * Returns all RBAC permissions and roles which have the specified permission
+     *
      * @param string $perm the name of the permission
      * @return array permissions/roles
      */

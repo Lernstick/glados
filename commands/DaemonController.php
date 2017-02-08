@@ -31,7 +31,6 @@ class DaemonController extends Controller
     public $uid = 33;
     public $gid = 33;
 
-
     /**
      * @inheritdoc
      */

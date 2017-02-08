@@ -11,6 +11,8 @@ use app\models\Activity;
 use app\models\Restore;
 use app\models\RdiffFileSystem;
 use yii\helpers\FileHelper;
+use app\components\ShellCommand;
+use yii\helpers\Console;
 
 
 /**
@@ -150,9 +152,19 @@ class RestoreController extends DaemonController
 
         $this->log('Executing rdiff-backup: ' . $this->_cmd);
 
-        $output = array();
-        $lastLine = exec($this->_cmd, $output, $retval);
-        $output = implode(PHP_EOL, $output);
+        $cmd = new ShellCommand($this->_cmd);
+
+        $output = "";
+        $logFile = Yii::getAlias('@runtime/logs/restore.' . $this->ticket->token . '.' . date('c') . '.log');
+
+        $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use (&$output, $logFile) {
+            echo $this->ansiFormat($event->line, $event->channel == ShellCommand::STDOUT ? Console::NORMAL : Console::FG_RED);
+            $output .= $event->line;
+            file_put_contents($logFile, $event->line, FILE_APPEND);
+        });
+
+        $retval = $cmd->run();
+
         $this->ticket->runCommand('mount -o remount,rw /');
 
         if($retval != 0){

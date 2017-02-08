@@ -10,6 +10,8 @@ use app\models\Daemon;
 use app\models\Activity;
 use app\models\Screenshot;
 use app\models\ScreenshotSearch;
+use app\components\ShellCommand;
+use yii\helpers\Console;
 
 /**
  * Backup Daemon (pull)
@@ -115,13 +117,21 @@ class BackupController extends DaemonController
                      . "-v5 --print-statistics "
                      . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . "::" . $this->remotePath) . " "
                      . escapeshellarg(\Yii::$app->basePath . "/backups/" . $this->ticket->token . "/") . " "
-                     . "2>&1";
+                     . "";
 
                 $this->log('Executing rdiff-backup: ' . $this->_cmd);
 
-                $output = array();
-                $lastLine = exec($this->_cmd, $output, $retval);
-                $output = implode(PHP_EOL, $output);
+                $cmd = new ShellCommand($this->_cmd);
+                $output = "";
+                $logFile = Yii::getAlias('@runtime/logs/backup.' . $this->ticket->token . '.' . date('c') . '.log');
+
+                $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use (&$output, $logFile) {
+                    echo $this->ansiFormat($event->line, $event->channel == ShellCommand::STDOUT ? Console::NORMAL : Console::FG_RED);
+                    $output .= $event->line;
+                    file_put_contents($logFile, $event->line, FILE_APPEND);
+                });
+
+                $retval = $cmd->run();
 
                 if($retval != 0){
                     $this->ticket->backup_state = 'rdiff-backup failed (retval: ' . $retval . '), output: '
@@ -131,7 +141,7 @@ class BackupController extends DaemonController
                         $this->ticket->runCommand('echo "backup failed, waiting for next try..." > /home/user/shutdown');
                     }
                 }else{
-                    $this->log($output);
+                    //$this->log($output);
                     $this->ticket->backup_last = new Expression('NOW()');
                     $this->ticket->backup_state = 'backup successful.';
                     if ($this->finishBackup == true) {
