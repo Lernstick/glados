@@ -44,6 +44,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'jsonSelector' => 'state',
                 ]),
             ],
+            'alive:timeago',
         ],
     ]) ?>
 

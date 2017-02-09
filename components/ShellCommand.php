@@ -132,6 +132,8 @@ class ShellCommand extends Component
                                 $event = new OutputEvent;
                                 $event->line = $line;
                                 $event->channel = self::STDOUT;
+
+                                /* output event */
                                 $this->trigger(self::COMMAND_OUTPUT, $event);
                             }
                             // if pointer is at EOF remove the pipe from observation
@@ -146,6 +148,8 @@ class ShellCommand extends Component
                                 $event = new OutputEvent;
                                 $event->line = $line;
                                 $event->channel = self::STDERR;
+
+                                /* output event */
                                 $this->trigger(self::COMMAND_OUTPUT, $event);
                             }
                             // if pointer is at EOF remove the pipe from observation
@@ -164,7 +168,7 @@ class ShellCommand extends Component
             $exit_status = proc_close($this->_pd);
         }
 
-        /* trigger the start event */
+        /* trigger the stop event */
         $this->trigger(self::COMMAND_STOPPED);
         return $exit_status;
     }

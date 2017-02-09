@@ -34,7 +34,6 @@ class BackupController extends DaemonController
      * @var string The user to login at the target system
      */
     public $remoteUser = 'root';
-    #public $remotePath = '/home/user';
 
     /**
      * @var string The path at the target system to backup
@@ -124,12 +123,19 @@ class BackupController extends DaemonController
                 $cmd = new ShellCommand($this->_cmd);
                 $output = "";
                 $logFile = Yii::getAlias('@runtime/logs/backup.' . $this->ticket->token . '.' . date('c') . '.log');
+                //$targetFile = Yii::getAlias('@app/backups/' . $this->ticket->token . '/rdiff-backup-data/backup.' . date('c') . '.log');
 
                 $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use (&$output, $logFile) {
                     echo $this->ansiFormat($event->line, $event->channel == ShellCommand::STDOUT ? Console::NORMAL : Console::FG_RED);
                     $output .= $event->line;
                     file_put_contents($logFile, $event->line, FILE_APPEND);
                 });
+
+                /*$cmd->on(ShellCommand::COMMAND_STOPPED, function($event) use ($logFile, $targetFile) {
+                    if (file_exists(dirname($targetFile))) {
+                        rename($logFile, $targetFile);
+                    }
+                });*/
 
                 $retval = $cmd->run();
 
@@ -234,13 +240,61 @@ class BackupController extends DaemonController
                 $ticket->backup_lock = $ticket->restore_lock = 0;
                 $ticket->save(false);
             }
-        }    
+        }
+    }
+
+    private function pingOthers ()
+    {
+
+        /* search for daemons with alive date older than 2 minutes */
+        $query = Daemon::find()
+            ->where(['not', ['pid' => $this->daemon->pid]])
+            ->andWhere([
+                'or',
+                ['<', 'alive', new Expression('NOW() - INTERVAL 2 MINUTE')],
+                ['alive' => null]
+            ])
+            ->orderBy(['alive' => SORT_ASC]);
+
+        $models = $query->all();
+        foreach($models as $daemon) {
+            if ($daemon->running === true) {
+                $oldAlive = $daemon->alive;
+
+                /* send SIGHUP */
+                $daemon->hup();
+                sleep(5);
+                $daemon->refresh();
+                if ($oldAlive == $daemon->alive) {
+                    $this->log("daemon " . $daemon->pid . ": no reaction, sending SIGHUP again.", true);
+                    $oldAlive = $daemon->alive;
+                    $daemon->hup();
+                    sleep(30);
+                    $daemon->refresh();
+                    if ($oldAlive != $daemon->alive) {
+                       $this->log("daemon " . $daemon->pid . ": is alive now.", true);
+                    } else {
+                        $this->log("daemon " . $daemon->pid . ": no reaction, sending SIGTERM", true);
+
+                        /* send SIGTERM */
+                        $daemon->stop();
+                        sleep(10);
+                        if ($daemon->refresh() === true && $daemon->running === true) {
+                            $this->log("daemon " . $daemon->pid . ": no reaction, sending SIGKILL", true);
+
+                            /* send SIGKILL */
+                            $daemon->kill();
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
      * Returns a ticket model which has the finish process initiated.
      * Those tickets only need one last backup, therefore they have higher 
-     * priority against the other ones.
+     * priority against the others.
      *
      * @return Ticket|null
      */
@@ -262,9 +316,6 @@ class BackupController extends DaemonController
             ->andWhere(['bootup_lock' => 0])
             ->orderBy(['backup_last_try' => SORT_ASC]);
 
-        //var_dump($query->createCommand()->rawSql);
-        //exit();
-
         return $query->one();
     }
 
@@ -278,6 +329,8 @@ class BackupController extends DaemonController
 
         // first do a cleanup
         $this->cleanup();
+
+        $this->pingOthers();
 
         // then search for finished tickets for a last backup
         if (($ticket = $this->finished()) !== null) {
@@ -303,6 +356,7 @@ class BackupController extends DaemonController
             ->orderBy(['backup_last_try' => SORT_ASC]);
 
 
+        // finally lock the next ticket and return it
         if (($ticket = $query->one()) !== null) {
             $ticket->backup_lock = 1;
             $ticket->running_daemon_id = $this->daemon->id;

@@ -1,6 +1,6 @@
 <?php
 
-foreach ($errors as $logEntry) {
+foreach ($log as $logEntry) {
 	echo '<samp>' . $logEntry . '</samp><br>';
 }
 

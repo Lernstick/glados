@@ -63,8 +63,6 @@ class RestoreController extends DaemonController
         pcntl_signal_dispatch();
         $this->cleanup();
 
-        file_put_contents('/tmp/command', $id . " " . $file . " " . $date . " " . $restorePath . " " . PHP_EOL, FILE_APPEND);
-
         if (($this->ticket = Ticket::findOne(['id' => $id])) == null) {
             $this->log('Error: ticket with id ' . $id . ' not found.');
             return;

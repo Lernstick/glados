@@ -655,6 +655,10 @@ class TicketController extends Controller
             $backupDaemon = new Daemon();
             $backupDaemon->startBackup();
         }
+        if($searchModel->search([])->totalCount < 3){
+            $backupDaemon = new Daemon();
+            $backupDaemon->startBackup();
+        }
 
         return \Yii::$app->response->sendFile($model->exam->file);
     }

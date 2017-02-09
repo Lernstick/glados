@@ -26,18 +26,18 @@ class BackupController extends Controller
     }
 
     /**
-     * Displays a backup Errors by Backup model.
+     * Displays a backup log by Backup model.
      * @param integer $ticket_id id of the Ticket model.
      * @param string $date date string of the Backup model.
      * @return The response object
      */
-    public function actionViewErrors($ticket_id, $date)
+    public function actionLog($ticket_id, $date)
     {
         $ticket = Ticket::findOne($ticket_id);
         $backup = Backup::findOne($ticket->token, $date);
 
-        return $this->renderAjax('/backup/errors', [
-            'errors' => $backup->errorLog,
+        return $this->renderAjax('/backup/log', [
+            'log' => $backup->backupLog,
         ]);
     }
 
@@ -102,6 +102,7 @@ class BackupController extends Controller
                     'VersionsDataProvider' => $VersionsDataProvider,
                     'ticket' => $ticket,
                     'fs' => $fs,
+                    'date' => $date,
                 ]);
 	        }else{
                 return $this->render('/backup/browse', [
@@ -109,6 +110,7 @@ class BackupController extends Controller
                     'VersionsDataProvider' => $VersionsDataProvider,
                     'ticket' => $ticket,
                     'fs' => $fs,
+                    'date' => $date,
                 ]);
 	        	return $this->redirect(['ticket/view', 'id' => $ticket_id, '#' => 'tab_browse']);
 	        }

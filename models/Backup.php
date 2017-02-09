@@ -10,8 +10,9 @@ use app\models\RdiffFileSystem;
 /**
  * This is the model class for the backup directory.
  *
- * @property string $dir
- * @property array $errorLog
+ * @property string $dir location of the rdiff-backup-data directory
+ * @property array $errorLog contains the error log file line by line
+ * @property array $backupLog contains the backup log file line by line
  *
  * @property Ticket $ticket
  */
@@ -73,7 +74,7 @@ class Backup extends Model
     }
 
     /**
-     * Getter for the errorLog
+     * Getter for the error log
      *
      * @return array
      */
@@ -94,6 +95,48 @@ class Backup extends Model
     }
 
     /**
+     * Getter for the backup log
+     *
+     * @return array
+     */
+    public function getBackupLog()
+    {
+        $backupLogFiles = [
+            $this->dir . '/backup.log',
+        ];
+
+        $me = new \DateTime($this->date);
+        $current = false;
+        $log = [];
+
+        foreach ($backupLogFiles as $file){
+            if (file_exists($file)) {
+                $lines = array_reverse(gzfile($file));
+                foreach ($lines as $line) {
+                    if ($current) {
+                        if (preg_match('/^--------------------------------------------------/', $line)) {
+                            $current = false;
+                            break;
+                        }
+                        array_unshift($log, $line);
+                    }
+                    if (preg_match('/^StartTime ([0-9\.]*) .*/', $line, $matches)) {
+                        $d = new \DateTime();
+                        $d->setTimestamp($matches[1]);
+                        if ($d == $me) {
+                            $current = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return array_filter($log, function($v) {
+            return $v !== PHP_EOL && $v !== '--------------[ Session statistics ]--------------' . PHP_EOL;
+        });
+    }
+
+    /**
      * Returns all Backup models related to the token
      *
      * @param string $token - the token
@@ -107,7 +150,7 @@ class Backup extends Model
         if (file_exists($dir)) {
             $files = scandir($dir, SCANDIR_SORT_DESCENDING);
             foreach ($files as $file) {
-                if(preg_match('/^session_statistics\.(.*)\.data$/', $file, $matches)) {
+                if (preg_match('/^session_statistics\.(.*)\.data$/', $file, $matches)) {
                     if (isset($matches[1])) {
                         $models[] = Backup::findOne($token, $matches[1]);
                     }

@@ -11,6 +11,7 @@ return [
     'id' => 'basic-console',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log', 'gii'],
+    'timezone' => 'Europe/Zurich',
     'vendorPath' => '/usr/share/yii2',
     'controllerNamespace' => 'app\commands',
     'modules' => [

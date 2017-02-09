@@ -429,26 +429,14 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php
 
 Modal::begin([
-    'id' => 'errorsModal',
-    'header' => '<h4>Backup Errors</h4>',
+    'id' => 'logModal',
+    'header' => '<h4>Backup Log</h4>',
     'footer' => Html::Button('Close', ['data-dismiss' => 'modal', 'class' => 'btn btn-default']),
+    'size' => \yii\bootstrap\Modal::SIZE_LARGE
 ]);
 
     Pjax::begin([
-        'id' => 'errorsModalContent',
-    ]);
-    Pjax::end();
-
-Modal::end();
-
-Modal::begin([
-    'id' => 'browseModal',
-    'header' => '<h4>Browse Backup</h4>',
-    'footer' => Html::Button('Close', ['data-dismiss' => 'modal', 'class' => 'btn btn-default']),
-]);
-
-    Pjax::begin([
-        'id' => 'browseModalContent',
+        'id' => 'logModalContent',
     ]);
     Pjax::end();
 

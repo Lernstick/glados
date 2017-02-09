@@ -188,6 +188,7 @@ class m160623_095016_initial extends Migration
                 'state' => $this->string(255)->notNull(),
                 'description' => $this->string(255)->notNull(),
                 'started_at' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
+                'alive' => $this->timestamp() . ' NULL DEFAULT NULL',
             ], $this->tableOptions);
 
         }

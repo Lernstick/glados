@@ -7,6 +7,7 @@ use yii\console\Controller;
 use app\models\EventItem;
 use app\models\Daemon;
 use app\models\DaemonSearch;
+use yii\db\Expression;
 
 /**
  * Daemon base controller
@@ -206,8 +207,9 @@ class DaemonController extends Controller
                 $this->stop();
                 die();
             case SIGHUP:
-                #TODO
-                $this->log('Caught SIGHUP, does nothing, TODO...', true);
+                $this->log('Caught SIGHUP, I am alive.', true);
+                $this->daemon->alive = new Expression('NOW()');
+                $this->daemon->save();
                 break;
             case SIGINT:
                 echo "INT";
@@ -219,8 +221,7 @@ class DaemonController extends Controller
                 $this->stop();
                 die();
             case SIGUSR1:
-                # TODO
-                echo "Caught SIGUSR1...\n";
+                echo "Caught SIGUSR1, do nothing..." . PHP_EOL;
                 break;
             default:
             // handle all other signals

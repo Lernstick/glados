@@ -130,7 +130,7 @@ class RdiffFileSystem extends Model
 
     public function getIncrementsPath()
     {
-        return FileHelper::normalizePath($this->location . '/rdiff-backup-data/increments/' . dirname($this->_pwd));
+        return FileHelper::normalizePath($this->location . '/rdiff-backup-data/increments/' . $this->_pwd);
     }    
 
     /**
@@ -175,7 +175,8 @@ class RdiffFileSystem extends Model
                     }
                 }
             } else {
-                $list = array_diff(scandir($this->incrementsPath), $this->excludeDirs);
+                /* get all version in the increments path */
+                $list = array_diff(scandir(dirname($this->incrementsPath)), $this->excludeDirs);
                 foreach ($list as $item) {
                     if (@strpos($item, $this->basename) === 0) {
                         if (preg_match($this->dateRegex, $item, $matches) === 1) {
@@ -185,11 +186,15 @@ class RdiffFileSystem extends Model
                 }
             }
 
-            if (/*count($versions) == 0 && */file_exists($this->localPath)) {
+            /* add the current version, if available */
+            if (file_exists($this->localPath)) {
                 $versions[] = 'now';
+            } else {
+                $versions[] = 'now';                
             }
 
             $this->_versions = array_unique($versions);
+            rsort($this->_versions);
             $this->propertiesPopulated = true;
         }
 
@@ -213,6 +218,23 @@ class RdiffFileSystem extends Model
      */
     public function getVersion()
     {
+        if ($this->_date == 'all') {
+
+            $a = new RdiffFileSystem([
+                'root' => $this->root,
+                'location' => $this->location,
+                'restoreUser' => $this->restoreUser,
+                'restoreHost' => $this->restoreHost,
+            ]);
+
+            foreach ($this->versions as $version) {
+                if ($a->slash($this->path)->versionAt($version)->state == 'normal') {
+                    $this->_date = $version;
+                    return $version;
+                }
+            }
+        }
+
         return $this->_date;
     }
 
@@ -225,6 +247,7 @@ class RdiffFileSystem extends Model
      */
     public function versionAt($date)
     {
+
         if ($date == 'now' || $date == 'all' || preg_match($this->dateRegex, $date, $matches) === 1) {
             $this->_date = $date;
             return $this;
@@ -245,7 +268,6 @@ class RdiffFileSystem extends Model
     {
 
         if ($this->type == 'file') {
-            //return $this->restore(true);
             $contents = [];
             foreach ($this->versions as $version) {
                 $a = new RdiffFileSystem([
@@ -261,16 +283,18 @@ class RdiffFileSystem extends Model
         } else if ($this->type == 'dir') {
 
             $listLocal = [];
-            if ($this->_date == 'now' || $this->_date == 'all') {
-                // find current files
-                $listLocal = array_diff(scandir($this->localPath), $this->excludeDirs);
+            if (file_exists($this->localPath)) {
+                if ($this->_date == 'now' || $this->_date == 'all') {
+                    // find current files
+                    $listLocal = array_diff(scandir($this->localPath), $this->excludeDirs);
+                }
             }
 
             $listInc = [];
             if ($this->_date != 'now') {
                 // find files in the inrements dir
-                if (file_exists($this->incrementsPath . '/' . $this->basename)){
-                    $list = array_diff(scandir($this->incrementsPath . '/' . $this->basename), $this->excludeDirs);
+                if (file_exists($this->incrementsPath)){
+                    $list = array_diff(scandir($this->incrementsPath), $this->excludeDirs);
                 } else {
                     $list = [];
                 }
@@ -279,6 +303,8 @@ class RdiffFileSystem extends Model
                     if ($this->_date == 'all') {
                         if (preg_match($this->dateRegex, $item, $matches) === 1) {
                             $listInc[] = current(explode("." . $matches[0], $item));
+                        } else {
+                            $listInc[] = $item;
                         }
                     } else {
                         if (strpos($item, $this->_date) !== false) {
@@ -309,15 +335,17 @@ class RdiffFileSystem extends Model
     /**
      * Getter for the file type of the current path
      *
-     * @return string 
+     * @return string|false
      * @see http://php.net/manual/de/function.filetype.php for the different types
      */
     public function getType()
     {
         if (file_exists($this->localPath)) {
             return filetype($this->localPath);
+        } else if (file_exists($this->incrementsPath)) {
+            return filetype($this->incrementsPath);
         } else {
-            return 'file'; //TODO get filetype via increments
+            return 'file';
         }
     }
 
@@ -356,27 +384,34 @@ class RdiffFileSystem extends Model
     /**
      * Determine the real state of a file/dir
      *
-     * @return string - the paths real state
+     * @return string - the real state
      * @see getState()
      */
     private function getRealState()
     {
-        if ($this->version == 'now' && file_exists($this->localPath)) {
+        if ($this->path == '/' || $this->path == ''){
             return 'normal';
+        }
+        if ($this->_date == 'now' && file_exists($this->localPath)) {
+            return 'normal';
+        } else if ($this->_date == 'now' && !file_exists($this->localPath)) {
+            return 'missing';
         } else {
-            foreach (array_diff(scandir($this->incrementsPath), $this->excludeDirs) as $item) {
+            foreach (array_diff(scandir(dirname($this->incrementsPath)), $this->excludeDirs) as $item) {
                 if (strpos($item, $this->basename) === 0) {
                     if (preg_match($this->dateRegex, $item, $matches) === 1) {
                         if ($matches[0] == $this->_date) {
                             if (substr_compare($item, 'missing', strlen($item)-7, 7) === 0) {
                                 return 'missing';
+                            } else {
+                                return 'normal';
                             }
                         }
                     }
                 }
             }
-            return 'normal';
         }
+        return 'unknown';
     }
 
     /**

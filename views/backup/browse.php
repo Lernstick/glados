@@ -4,12 +4,14 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ListView;
 use yii\widgets\Pjax;
+use yii\bootstrap\Modal;
 
 /* @var $this yii\web\View */
 /* @var $ItemsDataProvider yii\data\ArrayDataProvider */
 /* @var $VersionsDataProvider yii\data\ArrayDataProvider */
 /* @var $ticket app\models\Ticket the ticket data model */
 /* @var $fs app\models\RdiffFileSystem the Rdiff data model */
+/* @var $date string the date */
 
 $js = <<< 'SCRIPT'
 /* To initialize BS3 tooltips set this below */
@@ -24,6 +26,17 @@ $(function () {
 $(document).on('click', '.special-dropdown .dropdown-menu .pagination a', function (e) {
   e.stopPropagation();
 });
+
+$('#confirmRestore').on('show.bs.modal', function(e) {
+    $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+    $('#confirmRestoreItem').html($(e.relatedTarget).data('path') + ' (' + $(e.relatedTarget).data('version') + ')');
+});
+
+$(document).on('click', '#confirmRestore a#restore-now', function (e) {
+  $('#confirmRestore').modal('hide');
+  $('.nav-tabs a[href*="restores"]').tab('show');
+});
+
 
 //$(document).on('click', '.special-dropdown .dropdown-menu #versionLinks', function (e) {
 //  $.pjax({url: this.href, container: '#browse', push: false});
@@ -42,16 +55,17 @@ $this->registerJs($js);
 <div class="panel panel-default">
   <div class="panel-heading">
     <div class="row">
-      <div class="col-sm-6">
+      <div class="col-sm-8 backup-browse-item">
 
 <?php
+
         echo "<span>Path</span>: " . Html::a(
             '<span class="glyphicon glyphicon-folder-open"></span> ' . $fs->root,
             Url::to([
                 false,
                 'id' => $ticket->id,
                 'path' => '/',
-                'date' => $fs->version,
+                'date' => $date,
                 '#' => 'browse',
             ])
         );
@@ -65,19 +79,47 @@ $this->registerJs($js);
                     false,
                     'id' => $ticket->id,
                     'path' => $i,
-                    'date' => $fs->version,
+                    'date' => $date,
                     '#' => 'browse',
                 ])
             );
         }
 
+        if ($date != "all") {
+          echo "&nbsp;&nbsp;&nbsp;";
+          echo "<span class='backup-browse-options'>";
+          echo Html::a(
+              '<span class="glyphicon glyphicon-tasks"></span> Restore this state of the directory',
+              Url::to([
+                  'ticket/restore',
+                  'id' => $ticket->id,
+                  'file' => $fs->path,
+                  'date' => $fs->version
+              ]),
+              [
+                  'data-href' => Url::to([
+                      'ticket/restore',
+                      'id' => $ticket->id,
+                      'file' => $fs->path,
+                      'date' => $fs->version,
+                      '#' => 'tab_restores',
+                  ]),
+                  'data-toggle' => 'modal',
+                  'data-target' => '#confirmRestore',
+                  'data-path' => $fs->path,
+                  'data-version' => yii::$app->formatter->format($fs->version, 'backupVersion'),
+              ]
+          );    
+          echo ")</span>";
+        }
+
 ?>
 
       </div>
-      <div class="col-sm-6">
+      <div class="col-sm-4">
         <div class="pull-right special-dropdown">
           Version: 
-          <button class="btn toggle-dropdown" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-describedby="btnGroupAddon"> <span class="glyphicon glyphicon-cog"></span> <?= $fs->version == 'all' ? 'All versions overlapping' : ($fs->version == 'now' ? 'Current version' : yii::$app->formatter->format($fs->version, 'datetime')); ?></button>
+          <button class="btn toggle-dropdown" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-describedby="btnGroupAddon"> <span class="glyphicon glyphicon-cog"></span> <?= $date == 'all' ? 'All versions overlapping' : ($date == 'now' ? 'Current version' : yii::$app->formatter->format($fs->version, 'datetime')); ?></button>
 
           <?php Pjax::begin([
               'id' => 'w101',
@@ -137,7 +179,7 @@ $this->registerJs($js);
             'class' => 'list-group-item backup-browse-item',
         ],
         'itemView' => '_browse_item',
-        'viewParams' => ['ticket' => $ticket],
+        'viewParams' => ['ticket' => $ticket, 'date' => $date],
         'emptyText' => 'No files or directories.',
         'emptyTextOptions' => [
             'tag' => 'div',
@@ -156,3 +198,18 @@ $this->registerJs($js);
     ]); ?>
   </div>
 </div>
+
+<?php
+
+Modal::begin([
+    'id' => 'confirmRestore',
+    'header' => '<h4>Confirm Restore</h4>',
+    'footer' => Html::Button('Cancel', ['data-dismiss' => 'modal', 'class' => 'btn btn-default']) . '<a id="restore-now" class="btn btn-danger btn-ok">Restore</a>',
+    //'size' => \yii\bootstrap\Modal::SIZE_SMALL
+]);
+
+echo "<span>You are about to restore:<br><b><samp id='confirmRestoreItem'>/path/to/file (date)</samp></b></span><br><hr><ul><li>Please notice, that if the <b>file</b> exists on the target machine, it will be permanently <b>OVERWRITTEN</b> by this version!</li><li>If you restore a <b>directory</b>, notice that the target directory will be restored to the exact same state of this version. Newer files will be <b>REMOVED</b>!</li></ul>";
+
+Modal::end();
+
+?>

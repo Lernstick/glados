@@ -130,7 +130,12 @@ class Daemon extends \yii\db\ActiveRecord
         posix_kill($this->pid, self::SIGKILL);
     }
 
-    public function reload()
+    /*public function reload()
+    {
+        posix_kill($this->pid, self::SIGHUP);
+    }*/
+
+    public function hup()
     {
         posix_kill($this->pid, self::SIGHUP);
     }

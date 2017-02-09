@@ -9,6 +9,8 @@ use yii\widgets\DetailView;
 /* @var $index integer integer, the zero-based index of the data item in the items array returned by $dataProvider. */
 /* @var $widget yii\widgets\ListView this widget instance */
 
+$a = $model->backupLog;
+
 ?>
 
 <div class="panel-heading">
@@ -18,6 +20,20 @@ use yii\widgets\DetailView;
         	 . ' @ ' . yii::$app->formatter->format(intval($model->endTime), 'datetime')
         	 . ' (' . yii::$app->formatter->format($model->totalDestinationSizeChange, 'shortSize') . ' / ' . yii::$app->formatter->format($model->errors, 'integer') . ' errors) '; ?>
 		</a>
+        <div class="pull-right">
+            <?= Html::a(
+                '<span class="glyphicon glyphicon-paperclip"></span>',
+                Url::to([
+                    'backup/log',
+                    'ticket_id' => $model->ticket->id,
+                    'date' => $model->date
+                ]),
+                [
+                    'id' => 'log-show' . $key,
+                    'title' => 'Show backup log'
+                ]
+            ); ?>
+        </div>
     </h4>
 </div>
 
@@ -59,15 +75,7 @@ use yii\widgets\DetailView;
 	                'format' => 'html',
             	],
             	'totalDestinationSizeChange:shortSize',
-        	    [
-                	'attribute' => 'errors',
-                	'value' => $model->errors == 0 ? '0' : $model->errors . ', ' . Html::a(
-    					'<span class="glyphicon glyphicon-modal-window"></span> Show Errors',
-    					Url::to(['backup/view-errors', 'ticket_id' => $model->ticket->id, 'date' => $model->date]),
-    					['id' => 'errors-show' . $key]
-					),
-	                'format' => 'raw',
-            	],
+                'errors:integer',
         	],
     	]) ?>
 	</div>
@@ -75,15 +83,13 @@ use yii\widgets\DetailView;
 
 <?php
 
-if ($model->errors != 0) {
-	$backupErrorsButton = "
-    	$('#errors-show" . $key . "').click(function(event) {
-    		event.preventDefault();
-        	$('#errorsModal').modal('show');
-        	$.pjax({url: this.href, container: '#errorsModalContent', push: false, async:false})
-    	});
-	";
-	$this->registerJs($backupErrorsButton);
-}
+$backupLogButton = "
+	$('#log-show" . $key . "').click(function(event) {
+		event.preventDefault();
+    	$('#logModal').modal('show');
+    	$.pjax({url: this.href, container: '#logModalContent', push: false, async:false})
+	});
+";
+$this->registerJs($backupLogButton);
 
 ?>

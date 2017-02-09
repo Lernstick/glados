@@ -175,3 +175,11 @@ a.desc:after {
 .backup-browse-item:hover .backup-browse-options {
   display: initial;
 }
+
+#logModal .modal-dialog{
+    overflow-y: initial !important
+}
+#logModal .modal-body{
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
