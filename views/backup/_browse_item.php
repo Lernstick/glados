@@ -28,7 +28,7 @@ if ($model->type == 'dir') {
 } else {
     if ($model->state != 'missing') {
         echo Html::a(
-            '<span><span class="glyphicon glyphicon-file"></span> ' . $model->displayName . ' (' . yii::$app->formatter->format($model->version, 'backupVersion') . ', ' . $model->state . ')</span>',
+            '<span><span class="glyphicon glyphicon-file"></span> ' . $model->displayName . ' (' . yii::$app->formatter->format($model->version, 'backupVersion') . ($model->version == $model->newestBackupVersion ? ' (current)' : null) . ', ' . $model->state . ', ' . $model->mode . ', ' . yii::$app->formatter->format($model->size, 'shortSize') . ')</span>',
             Url::to([
                 'backup/file',
                 'ticket_id' => $ticket->id,
@@ -36,8 +36,17 @@ if ($model->type == 'dir') {
                 'date' => $model->version,
                 '#' => 'browse',
             ]),
-            ['data-pjax' => 0]
+            [
+                'data-pjax' => 0,
+                'tabindex' => 0,
+                'role' => 'button',
+                'data-toggle' => 'popover',
+                'data-trigger' => 'focus',
+                'title' => 'Dismissible popover',
+                'data-content' => 'And here is some amazing content. It is very engaging. Right?',                
+            ]
         );
+
     } else {
         echo '<span><span class="glyphicon glyphicon-file"></span> <del>' . $model->displayName . '</del> (' . yii::$app->formatter->format($model->version, 'backupVersion') . ', <abbr title="This file does not exist in that version. Restoring it in this state will REMOVE the file from the target machine.">' . $model->state . '</abbr>)</span>';
     }

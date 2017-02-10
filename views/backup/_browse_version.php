@@ -10,7 +10,7 @@ use yii\helpers\Url;
 /* @var $date string the date */
 
 echo Html::a(
-    ($model == 'all' ? 'All versions overlapping' : ($model == 'now' ? 'Current version' : yii::$app->formatter->format($model, 'datetime'))) . ' <span class="glyphicon glyphicon-ok" style="visibility:' . ($date == $model ? 'visible' : 'hidden') . ';"></span>',
+    ($model == 'all' ? 'All versions overlapping' : yii::$app->formatter->format($model, 'datetime') . ($model == $fs->newestBackupVersion ? ' (current)' : null)) . ' <span class="glyphicon glyphicon-ok" style="visibility:' . ($date == $model ? 'visible' : 'hidden') . ';"></span>',
     Url::to([
         false,
         'id' => $ticket->id,

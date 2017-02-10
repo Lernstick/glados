@@ -29,7 +29,8 @@ $(document).on('click', '.special-dropdown .dropdown-menu .pagination a', functi
 
 $('#confirmRestore').on('show.bs.modal', function(e) {
     $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
-    $('#confirmRestoreItem').html($(e.relatedTarget).data('path') + ' (' + $(e.relatedTarget).data('version') + ')');
+    $('#confirmRestoreItemPath').html($(e.relatedTarget).data('path'));
+    $('#confirmRestoreItemDate').html($(e.relatedTarget).data('version'));
 });
 
 $(document).on('click', '#confirmRestore a#restore-now', function (e) {
@@ -119,7 +120,7 @@ $this->registerJs($js);
       <div class="col-sm-4">
         <div class="pull-right special-dropdown">
           Version: 
-          <button class="btn toggle-dropdown" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-describedby="btnGroupAddon"> <span class="glyphicon glyphicon-cog"></span> <?= $date == 'all' ? 'All versions overlapping' : ($date == 'now' ? 'Current version' : yii::$app->formatter->format($fs->version, 'datetime')); ?></button>
+          <button class="btn toggle-dropdown" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-describedby="btnGroupAddon"> <span class="glyphicon glyphicon-cog"></span> <?= $date == 'all' ? 'All versions overlapping' : (yii::$app->formatter->format($fs->version, 'datetime') . ($fs->version == $fs->newestBackupVersion ? ' (current)' : null)); ?></button>
 
           <?php Pjax::begin([
               'id' => 'w101',
@@ -199,17 +200,29 @@ $this->registerJs($js);
   </div>
 </div>
 
-<?php
-
-Modal::begin([
+<?php Modal::begin([
     'id' => 'confirmRestore',
     'header' => '<h4>Confirm Restore</h4>',
     'footer' => Html::Button('Cancel', ['data-dismiss' => 'modal', 'class' => 'btn btn-default']) . '<a id="restore-now" class="btn btn-danger btn-ok">Restore</a>',
     //'size' => \yii\bootstrap\Modal::SIZE_SMALL
-]);
+]); ?>
 
-echo "<span>You are about to restore:<br><b><samp id='confirmRestoreItem'>/path/to/file (date)</samp></b></span><br><hr><ul><li>Please notice, that if the <b>file</b> exists on the target machine, it will be permanently <b>OVERWRITTEN</b> by this version!</li><li>If you restore a <b>directory</b>, notice that the target directory will be restored to the exact same state of this version. Newer files will be <b>REMOVED</b>!</li></ul>";
+<p>You're about to restore:</p>
+<div class="list-group">
+  <li class="list-group-item">
+    <h4 id='confirmRestoreItemPath' class="list-group-item-heading">/path/to/file</h4>
+    <p class="list-group-item-text">to the state as it was at <b id='confirmRestoreItemDate'>date</b></p>
+  </li>
+</div>
 
-Modal::end();
+<div class="alert alert-danger" role="alert">
+  <h4>Important!</h4>
 
-?>
+  <p>Please notice, that if the <b>file</b> exists on the target machine, it will be permanently <b>OVERWRITTEN</b> by this version!</p>
+  <p>If you restore a <b>directory</b>, notice that the target directory will be restored to the exact same state of this version. Newer files will be <b>REMOVED</b>!</p>
+</div>
+
+
+
+
+<?php Modal::end(); ?>

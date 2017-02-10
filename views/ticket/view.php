@@ -5,7 +5,6 @@ use yii\widgets\DetailView;
 use yii\widgets\ListView;
 use yii\widgets\Pjax;
 use yii\helpers\Url;
-use yii\bootstrap\Modal;
 use app\components\ActiveEventField;
 
 /* @var $this yii\web\View */
@@ -318,7 +317,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     'jsonSelector' => 'restore_state',
                 ]),
             ],
-            'bootup_lock',            
         ],
 
     ]) ?>
@@ -425,19 +423,3 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php Pjax::end() ?>
 
 </div>
-
-<?php
-
-Modal::begin([
-    'id' => 'logModal',
-    'header' => '<h4>Backup Log</h4>',
-    'footer' => Html::Button('Close', ['data-dismiss' => 'modal', 'class' => 'btn btn-default']),
-    'size' => \yii\bootstrap\Modal::SIZE_LARGE
-]);
-
-    Pjax::begin([
-        'id' => 'logModalContent',
-    ]);
-    Pjax::end();
-
-Modal::end();

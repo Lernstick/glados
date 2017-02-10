@@ -26,7 +26,7 @@ class BackupController extends Controller
     }
 
     /**
-     * Displays a backup log by Backup model.
+     * Displays the backup log by Backup model.
      * @param integer $ticket_id id of the Ticket model.
      * @param string $date date string of the Backup model.
      * @return The response object

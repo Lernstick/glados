@@ -17,6 +17,19 @@ use yii\widgets\DetailView;
         	Restore #<?= $key . ' - ' . yii::$app->formatter->format($model->finishedAt, 'timeago')
         	 . ' @ ' . yii::$app->formatter->format($model->finishedAt, 'datetime'); ?>
 		</a>
+        <div class="pull-right">
+            <?= Html::a(
+                '<span class="glyphicon glyphicon-paperclip"></span>',
+                Url::to([
+                    'restore/log',
+                    'id' => $model->id,
+                ]),
+                [
+                    'id' => 'restore-log-show' . $key,
+                    'title' => 'Show restore log'
+                ]
+            ); ?>
+        </div>
     </h4>
 </div>
 
@@ -34,3 +47,16 @@ use yii\widgets\DetailView;
     	]) ?>
 	</div>
 </div>
+
+<?php
+
+$restoreLogButton = "
+    $('#restore-log-show" . $key . "').click(function(event) {
+        event.preventDefault();
+        $('#restoreLogModal').modal('show');
+        $.pjax({url: this.href, container: '#restoreLogModalContent', push: false, async:false})
+    });
+";
+$this->registerJs($restoreLogButton);
+
+?>

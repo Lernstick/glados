@@ -23,6 +23,12 @@ use app\models\Daemon;
  * @property RdiffFileSystem|RdiffFileSystem[] $contents
  * @property string $type The file type of the current path
  * @property string $state
+ * @property string $mode
+ * @property string $size 
+ * @property string $uid 
+ * @property string $gid 
+ * @property string $user 
+ * @property string $group 
  * @property string $displayName Trailing name component of the path to display in the webinterface
  * @property string $realState
  */
@@ -52,7 +58,12 @@ class RdiffFileSystem extends Model
     /**
      * @var string Whether the properties are already populated or not
      */
-    public $propertiesPopulated = false;    
+    private $_propertiesPopulated = false;    
+
+    /**
+     * @var string Whether the file infos are already populated or not
+     */
+    private $_fileInfoPopulated = false;    
 
     /**
      * @var array A list of file or directory names to omit when reading a directory
@@ -79,6 +90,12 @@ class RdiffFileSystem extends Model
      * @var string Holding the date of the current version
      */
     private $_date = 'now';
+
+    private $_version;
+
+    private $_fileInfo;
+
+    private $_newestBackupVersion;
 
     public function init()
     {
@@ -133,6 +150,11 @@ class RdiffFileSystem extends Model
         return FileHelper::normalizePath($this->location . '/rdiff-backup-data/increments/' . $this->_pwd);
     }    
 
+    public function getRdiffBackupDataDir()
+    {
+        return FileHelper::normalizePath($this->location . '/rdiff-backup-data/');
+    }    
+
     /**
      * Change the path of the current RdiffFileSystem instance
      *
@@ -143,7 +165,7 @@ class RdiffFileSystem extends Model
     public function slash($path = '/')
     {
         $this->_pwd = $path;
-        $this->propertiesPopulated = false;
+        $this->_propertiesPopulated = false;
 
         if (count($this->versions) != 0) {
             return $this;
@@ -161,7 +183,7 @@ class RdiffFileSystem extends Model
      */
     private function populateProperties($force = false)
     {
-        if ($this->propertiesPopulated !== true || $force === true) {
+        if ($this->_propertiesPopulated !== true || $force === true) {
 
             $versions = [];
 
@@ -188,14 +210,14 @@ class RdiffFileSystem extends Model
 
             /* add the current version, if available */
             if (file_exists($this->localPath)) {
-                $versions[] = 'now';
-            } else {
+                $versions[] = $this->newestBackupVersion;
+            }/* else {
                 $versions[] = 'now';                
-            }
+            }*/
 
             $this->_versions = array_unique($versions);
             rsort($this->_versions);
-            $this->propertiesPopulated = true;
+            $this->_propertiesPopulated = true;
         }
 
     }
@@ -229,13 +251,30 @@ class RdiffFileSystem extends Model
 
             foreach ($this->versions as $version) {
                 if ($a->slash($this->path)->versionAt($version)->state == 'normal') {
-                    $this->_date = $version;
+                    $this->_version = $version;
                     return $version;
                 }
             }
+        } else if ($this->_date == "now") {
+            $this->_version = $this->newestBackupVersion;
+            //var_dump(end(glob($this->rdiffBackupDataDir . "/file_statistics.*.*")));
+        } else {
+            $this->_version = $this->_date;
         }
 
-        return $this->_date;
+        return $this->_version;
+    }
+
+    /**
+     * @return string|false the newest backup version as RFC date
+     */
+    public function getNewestBackupVersion()
+    {
+        $file = end(glob($this->rdiffBackupDataDir . "/session_statistics.*.data"));
+        if (preg_match($this->dateRegex, $file, $matches)) {
+            return $matches[0];
+        }
+        return false;
     }
 
     /**
@@ -284,7 +323,7 @@ class RdiffFileSystem extends Model
 
             $listLocal = [];
             if (file_exists($this->localPath)) {
-                if ($this->_date == 'now' || $this->_date == 'all') {
+                if ($this->version == $this->newestBackupVersion || $this->_date == 'all') {
                     // find current files
                     $listLocal = array_diff(scandir($this->localPath), $this->excludeDirs);
                 }
@@ -307,9 +346,9 @@ class RdiffFileSystem extends Model
                             $listInc[] = $item;
                         }
                     } else {
-                        if (strpos($item, $this->_date) !== false) {
+                        if (strpos($item, $this->version) !== false) {
                         //if (preg_match($this->_date, $item, $matches) === 1) {
-                            $listInc[] = current(explode("." . $this->_date, $item));
+                            $listInc[] = current(explode("." . $this->version, $item));
                         }
                     }
                 }
@@ -367,6 +406,97 @@ class RdiffFileSystem extends Model
     }
 
     /**
+     * Populates all file info of the current path if not already done
+     *
+     * @param bool $force - force the function to repopulate
+     * @return void
+     */
+    private function populateFileInfo($force = false)
+    {
+
+        if ($this->_fileInfoPopulated === false || $force === true) {
+            $path = ltrim($this->path, '/');
+            if (($file = current(glob($this->rdiffBackupDataDir . '/mirror_metadata.' . $this->version . ".*"))) !== false) {
+                $lines = gzfile($file);
+                for ($i=0; $i < count($lines); $i++) {
+                    if ("File " . $path == trim($lines[$i])) {
+                        $start = $i;
+                        $end = count($lines);
+                        for ($e=$i+1; $e < count($lines); $e++) {
+                            if (strpos(trim($lines[$e]), 'File ') === 0) {
+                                $end = $e;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+                if (isset($start) && isset($end)) {
+                    foreach (array_slice($lines, $start, $end-$start) as $line) {
+                        $stat = explode(" ", trim($line));
+                        $this->_fileInfo[$stat[0]] = $stat[1];
+                    }
+                }
+                $this->_fileInfoPopulated = true;
+            }
+        }
+    }
+
+    /**
+     * @return integer|null uid
+     */
+    public function getUid()
+    {
+        $this->populateFileInfo();
+        return isset($this->_fileInfo["Uid"]) ? $this->_fileInfo["Uid"] : null;
+    }
+
+    /**
+     * @return integer|null gid
+     */
+    public function getGid()
+    {
+        $this->populateFileInfo();
+        return isset($this->_fileInfo["Gid"]) ? $this->_fileInfo["Gid"] : null;
+    }
+
+    /**
+     * @return string|null permissions of the file in octal notation
+     */
+    public function getUser()
+    {
+        $this->populateFileInfo();
+        return isset($this->_fileInfo["Uname"]) ? $this->_fileInfo["Uname"] : null;
+    }
+
+    /**
+     * @return string|null permissions of the file in octal notation
+     */
+    public function getGroup()
+    {
+        $this->populateFileInfo();
+        return isset($this->_fileInfo["Gname"]) ? $this->_fileInfo["Gname"] : null;
+    }
+
+    /**
+     * @return integer|null permissions of the file in octal notation
+     */
+    public function getMode()
+    {
+        $this->populateFileInfo();
+        return isset($this->_fileInfo["Permissions"]) ? decoct($this->_fileInfo["Permissions"]) : null;
+    }
+
+    /**
+     * @return integer|null the size of the file in bytes or null it ot cannot be determined
+     */
+    public function getSize()
+    {
+        $this->populateFileInfo();
+        return isset($this->_fileInfo["Size"]) ? $this->_fileInfo["Size"] : null;
+    }
+
+    /**
      * Getter for the file name to display in the webinterface
      *
      * @return string - the file name without the leading .wh. in case of a whiteout file
@@ -389,18 +519,25 @@ class RdiffFileSystem extends Model
      */
     private function getRealState()
     {
+
+        $this->populateFileInfo();
+
         if ($this->path == '/' || $this->path == ''){
             return 'normal';
         }
-        if ($this->_date == 'now' && file_exists($this->localPath)) {
-            return 'normal';
-        } else if ($this->_date == 'now' && !file_exists($this->localPath)) {
-            return 'missing';
+
+        if (isset($this->_fileInfo["Type"])) {
+            if ($this->_fileInfo["Type"] == "None") {
+                return 'missing';
+            } else {
+                return 'normal';
+            }
         } else {
+
             foreach (array_diff(scandir(dirname($this->incrementsPath)), $this->excludeDirs) as $item) {
                 if (strpos($item, $this->basename) === 0) {
                     if (preg_match($this->dateRegex, $item, $matches) === 1) {
-                        if ($matches[0] == $this->_date) {
+                        if ($matches[0] == $this->version) {
                             if (substr_compare($item, 'missing', strlen($item)-7, 7) === 0) {
                                 return 'missing';
                             } else {

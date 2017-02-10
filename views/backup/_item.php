@@ -9,8 +9,6 @@ use yii\widgets\DetailView;
 /* @var $index integer integer, the zero-based index of the data item in the items array returned by $dataProvider. */
 /* @var $widget yii\widgets\ListView this widget instance */
 
-$a = $model->backupLog;
-
 ?>
 
 <div class="panel-heading">
@@ -29,7 +27,7 @@ $a = $model->backupLog;
                     'date' => $model->date
                 ]),
                 [
-                    'id' => 'log-show' . $key,
+                    'id' => 'backup-log-show' . $key,
                     'title' => 'Show backup log'
                 ]
             ); ?>
@@ -84,10 +82,10 @@ $a = $model->backupLog;
 <?php
 
 $backupLogButton = "
-	$('#log-show" . $key . "').click(function(event) {
+	$('#backup-log-show" . $key . "').click(function(event) {
 		event.preventDefault();
-    	$('#logModal').modal('show');
-    	$.pjax({url: this.href, container: '#logModalContent', push: false, async:false})
+    	$('#backupLogModal').modal('show');
+    	$.pjax({url: this.href, container: '#backupLogModalContent', push: false, async:false})
 	});
 ";
 $this->registerJs($backupLogButton);

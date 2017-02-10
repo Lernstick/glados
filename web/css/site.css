@@ -176,10 +176,18 @@ a.desc:after {
   display: initial;
 }
 
-#logModal .modal-dialog{
+#backupLogModal .modal-dialog{
     overflow-y: initial !important
 }
-#logModal .modal-body{
+#backupLogModal .modal-body{
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+#restoreLogModal .modal-dialog{
+    overflow-y: initial !important
+}
+#restoreLogModal .modal-body{
     max-height: calc(100vh - 200px);
     overflow-y: auto;
 }

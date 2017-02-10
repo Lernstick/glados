@@ -14,6 +14,7 @@ use Yii;
  * @property string $file
  * @property string $restoreDate
  * @property DateInterval $elapsedTime 
+ * @property array $restoreLog contains the restore log file line by line
  *
  * @property Ticket $ticket
  */
@@ -54,6 +55,20 @@ class Restore extends \yii\db\ActiveRecord
             'file' => 'File',
             'restoreDate' => 'Restore Date',
         ];
+    }
+
+    /**
+     * Getter for the restore log
+     *
+     * @return array
+     */
+    public function getRestoreLog()
+    {
+        $logFile = Yii::getAlias('@runtime/logs/restore.' . $this->ticket->token . '.' . date('c', strtotime($this->startedAt)) . '.log');
+        if (file_exists($logFile)) {
+            return file($logFile);
+        }
+        return [];
     }
 
     /**

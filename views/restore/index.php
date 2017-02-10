@@ -4,6 +4,8 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\widgets\ListView;
 use app\components\ActiveEventField;
+use yii\bootstrap\Modal;
+use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\RestoreSearch */
@@ -44,3 +46,20 @@ use app\components\ActiveEventField;
     'layout' => '{items} <br>{summary} {pager}',
 ]); ?>
 
+<?php
+
+Modal::begin([
+    'id' => 'restoreLogModal',
+    'header' => '<h4>Backup Log</h4>',
+    'footer' => Html::Button('Close', ['data-dismiss' => 'modal', 'class' => 'btn btn-default']),
+    'size' => \yii\bootstrap\Modal::SIZE_LARGE
+]);
+
+    Pjax::begin([
+        'id' => 'restoreLogModalContent',
+    ]);
+    Pjax::end();
+
+Modal::end();
+
+?>
