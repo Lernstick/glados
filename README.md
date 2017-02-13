@@ -5,7 +5,7 @@
 Package dependencies
 
 ```shell
-apt-get install apache2 php5 mysql-server php5-dev avahi-daemon squashfs-tools curl php5-cli
+apt-get install apache2 php5 mysql-server php5-dev avahi-daemon squashfs-tools curl php5-cli rdiff-backup
 ```
 
 Install composer:

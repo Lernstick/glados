@@ -121,8 +121,11 @@ class ShellCommand extends Component
             while (!(empty($read) && empty($write) && empty($except)) && is_resource($this->_pd)){
 
                 $r = $read;
-                // wait for data
-                if ($n = stream_select($r, $write, $except, 10)) {
+                /**
+                 * Wait for data. The @ is because stream_select() can fail, if another process sends
+                 * SIGHUP. The function will then be interrupted, which ends in a false of stream_select().
+                 */
+                if ($n = @stream_select($r, $write, $except, 10)) {
 
                     foreach ($r as $pipe) {
 

@@ -86,7 +86,15 @@ class SiteController extends Controller
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
+
+            // redirect to reset password form
+            if (Yii::$app->user->identity->change_password == 1) {
+                return $this->redirect(['user/reset-password',
+                    'id' => Yii::$app->user->identity->id,
+                ]);
+            } else {
+                return $this->goBack();
+            }
         }
         return $this->render('login', [
             'model' => $model,

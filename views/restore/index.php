@@ -24,6 +24,8 @@ use yii\widgets\Pjax;
                 'event' => 'ticket/' . $ticketModel->id,
                 'jsonSelector' => 'restore_lock',
             ]),
+            'visible' => YII_ENV_DEV,
+            'captionOptions' => ['class' => 'dev_item']
         ],
         [
             'attribute' => 'restore_state',

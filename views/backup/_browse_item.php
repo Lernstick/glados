@@ -39,11 +39,6 @@ if ($model->type == 'dir') {
             [
                 'data-pjax' => 0,
                 'tabindex' => 0,
-                'role' => 'button',
-                'data-toggle' => 'popover',
-                'data-trigger' => 'focus',
-                'title' => 'Dismissible popover',
-                'data-content' => 'And here is some amazing content. It is very engaging. Right?',                
             ]
         );
 

@@ -89,7 +89,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                 <i class="glyphicon glyphicon-list-alt"></i>
-                Actions<span class="caret"></span>
+                Actions&nbsp;<span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
                 <li>
@@ -167,14 +167,14 @@ $this->params['breadcrumbs'][] = $this->title;
                         echo Html::a(
                             '<span class="glyphicon glyphicon-file"></span> Download Exam',
                             ['download', 'token' => $model->token],
-                            ['data-pjax' => 0]
+                            ['data-pjax' => 0, 'class' => 'dev_item']
                         );
                     echo '</li>';
                     echo '<li>';
                         echo Html::a(
                             '<span class="glyphicon glyphicon-step-forward"></span> Finish Exam',
                             ['finish', 'token' => $model->token],
-                            ['data-pjax' => 0]
+                            ['data-pjax' => 0, 'class' => 'dev_item']
                         );
                     echo '</li>';
                 } ?>
@@ -320,6 +320,17 @@ $this->params['breadcrumbs'][] = $this->title;
                     'jsonSelector' => 'restore_state',
                 ]),
             ],
+            [
+                'attribute' => 'bootup_lock',
+                'format' => 'raw',
+                'value' =>  ActiveEventField::widget([
+                    'content' => yii::$app->formatter->format($model->bootup_lock, 'ntext'),
+                    'event' => 'ticket/' . $model->id,
+                    'jsonSelector' => 'bootup_lock',
+                ]),
+                'visible' => YII_ENV_DEV,
+                'captionOptions' => ['class' => 'dev_item']
+            ],            
         ],
 
     ]) ?>

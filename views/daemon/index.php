@@ -21,9 +21,20 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php Pjax::begin([
         'enablePushState' => false,
     ]); ?>
-    <p>
-        <?= Html::a('Start Backup Daemon', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+
+    <div class="dropdown">
+      <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+        <i class="glyphicon glyphicon-list-alt"></i>
+        Actions&nbsp;<span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+        <li>
+            <?= Html::a('<span class="glyphicon glyphicon-plus"></span> Start Backup Daemon', ['create']) ?>
+        </li>
+      </ul>
+    </div>
+    <br>
+
     <?php Pjax::end(); ?>
 
     <?php ActiveEventField::begin([
@@ -39,7 +50,8 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= ListView::widget( [
                 'dataProvider' => $dataProvider,
                 'itemView' => '_item',
-                'itemOptions' => ['sort-value' => 'started_at']
+                'itemOptions' => ['sort-value' => 'started_at'],
+                'layout' => '{items} {summary} {pager}',
             ] ); ?>
 
         </div>

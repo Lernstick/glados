@@ -62,6 +62,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'label' => 'Owner',
                     'value' => ( $model->user_id == null ? '<span class="not-set">(user removed)</span>' : '<span>' . $model->user->username . '</span>' ),
                     'format' => 'html',
+                    'visible' => Yii::$app->user->can('exam/view/all'),
                 ],
                 [
                     'attribute' => 'ticketCount',

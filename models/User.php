@@ -17,6 +17,8 @@ use app\models\EventItem;
  * @property string $password
  * @property string $role
  * @property string $last_visited
+ * @property string $activities_last_visited
+ * @property string $change_password
  *
  * @property AuthAssignment[] $authAssignments
  * @property AuthItem[] $itemNames
@@ -34,6 +36,22 @@ class User extends ActiveRecord implements IdentityInterface
     private $_role;
 
     /**
+     * @var array An array holding the values of the record before changing
+     */
+    private $presaveAttributes;
+
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        $instance = $this;
+        $this->on(self::EVENT_BEFORE_UPDATE, function($instance){
+            $this->presaveAttributes = $this->getOldAttributes();
+        });
+    }
+
+    /**
      * @inheritdoc
      */
     public static function tableName()
@@ -47,9 +65,9 @@ class User extends ActiveRecord implements IdentityInterface
     public function scenarios()
     {
         return [
-            self::SCENARIO_CREATE => ['username', 'password', 'password_repeat', 'role'],
-            self::SCENARIO_UPDATE => ['username', 'role'],
-            self::SCENARIO_PASSWORD_RESET => ['password', 'password_repeat'],
+            self::SCENARIO_CREATE => ['username', 'password', 'password_repeat', 'role', 'change_password'],
+            self::SCENARIO_UPDATE => ['username', 'role', 'change_password'],
+            self::SCENARIO_PASSWORD_RESET => ['password', 'password_repeat', 'change_password'],
         ];
     }
 
@@ -63,7 +81,6 @@ class User extends ActiveRecord implements IdentityInterface
             [['username', 'password', 'password_repeat', 'role'], 'required', 'on' => self::SCENARIO_CREATE],
             [['username', 'role'], 'required', 'on' => self::SCENARIO_UPDATE],
             [['password', 'password_repeat'], 'required', 'on' => self::SCENARIO_PASSWORD_RESET],
-            
             [['username'], 'unique'], 
             [['username', 'password'], 'string', 'max' => 40],
             ['password_repeat', 'compare', 'compareAttribute' => 'password', 'message' => "Passwords don't match" ],
@@ -82,6 +99,7 @@ class User extends ActiveRecord implements IdentityInterface
             'password_repeat' => 'Repeat Password',
             'last_visited' => 'Last Visited', 
             'role' => 'Role',
+            'change_password' => 'User has to change password at next login',
         ];
     }
 
@@ -217,6 +235,9 @@ class User extends ActiveRecord implements IdentityInterface
             }
             if ($this->scenario == self::SCENARIO_PASSWORD_RESET) {
                 $this->password = Yii::$app->getSecurity()->generatePasswordHash($this->password);
+            }
+            if ($this->scenario == self::SCENARIO_PASSWORD_RESET && $this->id == Yii::$app->user->identity->id) {
+                $this->change_password = 0;
             }
             return true;
         }

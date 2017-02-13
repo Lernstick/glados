@@ -17,15 +17,25 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
-    <p>
-        <?= Html::a('Create Exam', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+    <div class="dropdown">
+      <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+        <i class="glyphicon glyphicon-list-alt"></i>
+        Actions&nbsp;<span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+        <li>
+            <?= Html::a('<span class="glyphicon glyphicon-plus"></span> Create Exam', ['create']) ?>
+        </li>
+      </ul>
+    </div>
+    <br>
 
     <?php Pjax::begin(); ?>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'tableOptions' => ['class' => 'table table-bordered table-hover'],
+        'layout' => '{items} {summary} {pager}',
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 

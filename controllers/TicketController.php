@@ -304,78 +304,6 @@ class TicketController extends Controller
 
 
     /**
-     * Creates a number of Ticket for an existing Exam model.
-     * If creation is successful, the browser will be redirected to the 'index' page.
-     * @param integer $count
-     * @return mixed
-     */
-    /*public function actionCreateMany($exam_id = null, $count = 0, $type = 'anonymous', $step = 1)
-    {
-
-        //$exam = Exam::findOne($exam_id);
-
-        if($type == 'anonymous'){
-
-            $c = 0;
-            for ($i = 1; $i <= $count; $i++) {
-                $model = new Ticket();
-                $model->exam_id = $exam_id;
-                $model->save() ? $c++ : null;
-            }
-
-            if ($count == $c) {
-                Yii::$app->session->addFlash('success', 'You have successfully created ' . $count . ' new Tickets.');
-                return $this->redirect(['exam/view', 'id' => $exam_id]);
-            } else {
-                foreach ($model->getErrors() as $attribute => $value){
-                    Yii::$app->session->addFlash('danger', $value);
-                }
-
-                return $this->redirect(['exam/view', 'id' => $exam_id]);
-            }
-        }
-
-        if($type == 'assigned'){
-
-            $model = new \yii\base\DynamicModel(['names', 'class']);
-            $model->addRule(['names'], 'required')
-                  ->addRule('names', 'string')
-                  ->addRule('class', 'string');
-
-            $model->load(Yii::$app->request->post());
-            $names = array_unique(array_filter(array_map('trim', preg_split('/\n|\r/', $model->names, -1, PREG_SPLIT_NO_EMPTY))));
-
-            $c = 0;
-            foreach($names as $key => $value){
-                $ticket = new Ticket();
-                $ticket->exam_id = $exam_id;
-                $ticket->test_taker = $value;
-                $ticket->save() ? $c++ : null;
-            }
-
-            if($names){
-                if ($c == count($names)) {
-                    Yii::$app->session->addFlash('success', 'You have successfully created ' . $c . ' new Tickets.');
-                    return $this->redirect(['exam/view', 'id' => $exam_id]);
-                }else{
-                    foreach ($ticket->getErrors() as $attribute => $value){
-                        Yii::$app->session->addFlash('danger', $value);
-                    }
-                    return $this->redirect(['exam/view', 'id' => $exam_id]);
-                }
-            }
-
-            return $this->render('create-many', [
-                'model' => $model,
-                'names' => $names,
-            ]);
-
-        }
-
-    }*/
-
-
-    /**
      * Updates an existing Ticket model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
@@ -431,29 +359,6 @@ class TicketController extends Controller
         }
     }
 
-    /*public function actionSubmit($token = null)
-    {
-
-        //TODO: rbac here
-        $model = Ticket::findOne(['token' => $token]);
-        if(!$model){
-            $model = new Ticket();
-            return $this->render('submit', [
-                'model' => $model,
-            ]);
-
-        }
-        if ($model->load(Yii::$app->request->get()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        return $this->render('submit', [
-            'model' => $model,
-        ]);
-
-    }*/
-
-
     /**
      * Deletes an existing Ticket model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
@@ -489,36 +394,6 @@ class TicketController extends Controller
             return $this->redirect(['exam/view', 'id' => $exam_id]);
         }
     }
-
-    /**
-     * Deletes all open Ticket models associated to an existing Exam model.
-     * If deletion is successful, the browser will be redirected to the exam 'view' page.
-     * @param integer $exam_id
-     * @return mixed
-     */
-    /*public function actionDeleteAllOpen($exam_id)
-    {
-
-        $models = Ticket::find()->where(['exam_id' => $exam_id])->all();
-
-        $c = 0;
-        foreach ($models as $key => $model){
-            if($model->state == 0){
-                $model->delete() ? $c++ : null;
-            }
-        }
-
-        #TODO: errors?
-        if($c == 0){
-            Yii::$app->session->addFlash('danger', 'There are no Open Tickets to delete.');
-            return $this->redirect(['exam/view', 'id' => $exam_id]);
-        }
-
-        Yii::$app->session->addFlash('danger', $c . ' Open Tickets have been deleted successfully.');
-        return $this->redirect(['exam/view', 'id' => $exam_id]);
-
-    }*/
-
 
     /**
      * Echoes the MD5 sum of the exam file for the client to verify.
@@ -797,79 +672,6 @@ class TicketController extends Controller
             return;
         }
     }
-
-    /**
-     * Generates a PDF file for the ticket
-     * @param integer $id
-     */
-    /*public function actionReport($id)
-    {
-        $model = $this->findModel($id);
-
-        $content = $this->renderPartial('report', [
-            'model' => $model,
-        ]);
-
-        $title = 'Ticket für Prüfung "' . $model->exam->subject . ' - ' . $model->exam->name . '"';
-
-        $pdf = new Pdf([
-            'mode' => Pdf::MODE_UTF8, 
-            'format' => Pdf::FORMAT_A4, 
-            'orientation' => Pdf::ORIENT_PORTRAIT, 
-            'filename' => 'Ticket-' . $model->token . '.pdf',
-            'destination' => Pdf::DEST_BROWSER, 
-            'content' => $content,  
-            'options' => ['title' => $title],
-            'methods' => [ 
-                'SetHeader' => [$title], 
-                'SetFooter' => ['{PAGENO}'],
-            ]
-        ]);
-
-        // return the pdf output as per the destination setting
-        return $pdf->render(); 
-    }*/
-
-    /**
-     * Generates a PDF file multieple tickets
-     * @param integer $id
-     */
-    /*public function actionReportMany($exam_id)
-    {
-
-        $models = Ticket::findAll(['exam_id' => $exam_id, 'start' => null, 'end' => null]);
-        if(!$models){
-            Yii::$app->session->addFlash('danger', 'There are no Tickets to generate PDFs.');
-            return $this->redirect(['exam/view', 'id' => $exam_id]); 
-        }
-
-        $contents = [];
-
-        foreach($models as $model){
-            array_push($contents, $this->renderPartial('report', [
-                'model' => $model,
-            ]));
-        }
-
-        $content = implode('<pagebreak />', $contents);
-        $title = 'Ticket für Prüfung "' . $model->exam->subject . ' - ' . $model->exam->name . '"';
-
-        $pdf = new Pdf([
-            'mode' => Pdf::MODE_UTF8,
-            'format' => Pdf::FORMAT_A4,
-            'orientation' => Pdf::ORIENT_PORTRAIT,
-            'filename' => 'Tickets.pdf',
-            'destination' => Pdf::DEST_BROWSER,
-            'content' => $content,
-            'options' => ['title' => $title],
-            'methods' => [
-                'SetHeader' => [$title],
-                'SetFooter' => ['{PAGENO}'],
-            ]
-        ]);
-
-        return $pdf->render();
-    }*/
 
     /**
      * Finds the Ticket model based on its primary key value.

@@ -15,6 +15,10 @@ $this->params['breadcrumbs'][] = 'Reset Password';
 
     <h1><?= Html::encode($this->title) ?></h1>
 
+	<?php if (Yii::$app->user->identity->change_password == 1) {
+		echo '<div class="alert alert-warning" role="alert">Please change your password.</div>';
+	} ?>
+
 	<div class="user-form">
 
 	    <?php $form = ActiveForm::begin(); ?>

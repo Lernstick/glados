@@ -15,24 +15,41 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>
-
-        <?= Html::a('Stop', ['stop', 'id' => $model->id], ['class' => 'btn btn-danger']) ?>
-        <?= Html::a('Kill', ['kill', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to kill this process?',
-            ],
-        ]) ?>
-
-    </p>
+    <div class="dropdown">
+      <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+        <i class="glyphicon glyphicon-list-alt"></i>
+        Actions&nbsp;<span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+        <li>
+            <?= Html::a('<span class="glyphicon glyphicon-stop"></span> Stop', ['stop', 'id' => $model->id]) ?>
+        </li>
+        <li>
+            <?= Html::a('<span class="glyphicon glyphicon-flash"></span> Kill', ['kill', 'id' => $model->id], [
+                'data' => [
+                    'confirm' => 'Are you sure you want to kill this process?',
+                ],
+            ]) ?>
+        </li>        
+      </ul>
+    </div>
+    <br>
 
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'id',
+            [
+                'attribute' => 'id',
+                'visible' => YII_ENV_DEV,
+                'captionOptions' => ['class' => 'dev_item'],
+            ],
             'pid',
-            'uuid',
+            'running:boolean',
+            [
+                'attribute' => 'uuid',
+                'visible' => YII_ENV_DEV,
+                'captionOptions' => ['class' => 'dev_item'],
+            ],
             'description',
             'started_at',
             [

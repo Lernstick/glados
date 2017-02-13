@@ -56,13 +56,13 @@ $requirements = array(
         'condition' => extension_loaded('pdo'),
         'by' => 'All DB-related classes',
     ),
-    array(
+    /*array(
         'name' => 'PDO SQLite extension',
         'mandatory' => false,
         'condition' => extension_loaded('pdo_sqlite'),
         'by' => 'All DB-related classes',
         'memo' => 'Required for SQLite database.',
-    ),
+    ),*/
     array(
         'name' => 'PDO MySQL extension',
         'mandatory' => false,
@@ -70,13 +70,13 @@ $requirements = array(
         'by' => 'All DB-related classes',
         'memo' => 'Required for MySQL database.',
     ),
-    array(
+    /*array(
         'name' => 'PDO PostgreSQL extension',
         'mandatory' => false,
         'condition' => extension_loaded('pdo_pgsql'),
         'by' => 'All DB-related classes',
         'memo' => 'Required for PostgreSQL database.',
-    ),
+    ),*/
     // Cache :
     array(
         'name' => 'Memcache extension',
@@ -112,14 +112,14 @@ $requirements = array(
         'mandatory' => false,
         'condition' => $requirementsChecker->checkPhpIniOff("expose_php"),
         'by' => 'Security reasons',
-        'memo' => '"expose_php" should be disabled at php.ini',
+        'memo' => '<code>expose_php</code> should be disabled at <code>php.ini</code>',
     ),
     'phpAllowUrlInclude' => array(
         'name' => 'PHP allow url include',
         'mandatory' => false,
         'condition' => $requirementsChecker->checkPhpIniOff("allow_url_include"),
         'by' => 'Security reasons',
-        'memo' => '"allow_url_include" should be disabled at php.ini',
+        'memo' => '<code>allow_url_include</code> should be disabled at <code>php.ini</code>',
     ),
     'phpSmtp' => array(
         'name' => 'PHP mail SMTP',
@@ -141,21 +141,35 @@ $requirements = array(
         'mandatory' => true,
         'condition' => $requirementsChecker->checkPhpIniOn("file_uploads"),
         'by' => 'File upload',
-        'memo' => '"file_uploads" should be enabled at php.ini',
+        'memo' => '<code>file_uploads</code> should be enabled at <code>php.ini</code>',
     ),    
     'phpUploadMaxFilesize' => array(
         'name' => 'PHP upload max filesize',
         'mandatory' => true,
         'condition' => $requirementsChecker->checkUploadMaxFileSize("128M", null),
         'by' => 'File upload',
-        'memo' => '"upload_max_filesize" should be set at least to 128M at php.ini (current value: ' . ini_get('upload_max_filesize') . ')',
+        'memo' => '<code>upload_max_filesize</code> should be set at least to 128M at <code>php.ini</code> (current value: ' . ini_get('upload_max_filesize') . ')',
     ),
     'phpPostMaxSize' => array(
         'name' => 'PHP post max size',
         'mandatory' => true,
         'condition' => $requirementsChecker->compareByteSize(ini_get('post_max_size'), "128M"),
         'by' => 'File upload',
-        'memo' => '"post_max_size" should be set at least to 128M at php.ini (current value: ' . ini_get('post_max_size') . ')',
-    ),     
+        'memo' => '<code>post_max_size</code> should be set at least to 128M at <code>php.ini</code> (current value: ' . ini_get('post_max_size') . ')',
+    ),
+    'rdiffBackup' => array(
+        'name' => 'Rdiff-backup',
+        'mandatory' => true,
+        'condition' => is_executable('/usr/bin/rdiff-backup'),
+        'by' => 'Backup and Restore daemon',
+        'memo' => 'Please install the <a href="http://rdiff-backup.nongnu.org/">rdiff-backup</a> package.'
+    ),
+    'squashfsTools' => array(
+        'name' => 'Squashfs',
+        'mandatory' => true,
+        'condition' => is_executable('/usr/bin/unsquashfs'),
+        'by' => 'Squashfs',
+        'memo' => 'Please install the <a href="http://squashfs.sourceforge.net/">squashfs-tools</a> package.'
+    ),
 );
 $requirementsChecker->checkYii()->check($requirements)->render();
