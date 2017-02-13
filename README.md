@@ -5,7 +5,7 @@
 Package dependencies
 
 ```shell
-apt-get install apache2 php mysql-server php-dev composer
+apt-get install apache2 php mysql-server php-dev composer avahi-daemon
 ```
 
 Go to directory `/usr/share/glados`.

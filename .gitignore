@@ -20,4 +20,4 @@ phpunit.phar
 /uploads
 /runtime
 /pwsafe.sublime-workspace
-/web/assets
+#/web/assets
