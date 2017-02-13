@@ -161,21 +161,24 @@ $this->params['breadcrumbs'][] = $this->title;
                     ) ?>
                 </li>
 
-                <li class="divider"></li> 
-                <li>
-                    <?= Html::a(
-                        '<span class="glyphicon glyphicon-file"></span> Download Exam',
-                        ['download', 'token' => $model->token],
-                        ['data-pjax' => 0]
-                    ) ?>
-                </li>
-                <li>
-                    <?= Html::a(
-                        '<span class="glyphicon glyphicon-step-forward"></span> Finish Exam',
-                        ['finish', 'token' => $model->token],
-                        ['data-pjax' => 0]
-                    ) ?>
-                </li>
+                <?php if (YII_ENV_DEV) {
+                    echo '<li class="divider"></li>';
+                    echo '<li>';
+                        echo Html::a(
+                            '<span class="glyphicon glyphicon-file"></span> Download Exam',
+                            ['download', 'token' => $model->token],
+                            ['data-pjax' => 0]
+                        );
+                    echo '</li>';
+                    echo '<li>';
+                        echo Html::a(
+                            '<span class="glyphicon glyphicon-step-forward"></span> Finish Exam',
+                            ['finish', 'token' => $model->token],
+                            ['data-pjax' => 0]
+                        );
+                    echo '</li>';
+                } ?>
+
             </ul>            
         </li>
 

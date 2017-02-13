@@ -5,7 +5,37 @@
 Package dependencies
 
 ```shell
-apt-get install apache2 php mysql-server php-dev composer avahi-daemon
+apt-get install apache2 php5 mysql-server php5-dev avahi-daemon squashfs-tools curl php5-cli
+```
+
+Install composer:
+
+```shell
+cd /usr/src
+curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+```
+
+Create a database and a user
+
+```shell
+mysql -u root -p
+Enter password:
+mysql> create database exam;
+mysql> grant usage on *.* to exam@localhost indetified by 'exampassword';
+mysql> grant all privileges on exam.* to exam@localhost;
+mysql> quit
+```
+
+Edit `/usr/share/glados/config/db.php` and provide the databasename, the username and the password. This is an example with databasename 'exam', username 'exam' and password 'mysqlpassword':
+
+```php
+return [
+    'class' => 'yii\db\Connection',
+    'dsn' => 'mysql:host=localhost;dbname=exam',
+    'username' => 'exam',
+    'password' => 'mysqlpassword',
+    'charset' => 'utf8',
+];
 ```
 
 Go to directory `/usr/share/glados`.
@@ -107,7 +137,9 @@ Restart apache:
 service apache2 restart
 ```
 
-Hit `http://localhost/glados/requirements.php` to check if all requirements are met.
+Hit `http://localhost/glados/requirements.php` to check if all requirements are met. Make sure you have set `upload_max_filesize` and `post_max_size` to a proper value in `php.ini`.
+
+After checking all requirements, you can remove the `requirements.php` file.
 
 ```shell
 :wq
