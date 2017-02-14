@@ -20,6 +20,10 @@ $newActivities = $activity->newActivities();
 $daemons = new DaemonSearch();
 $runningDaemons = $daemons->search([])->totalCount;
 
+/* register the global YII_ENV variables */
+$this->registerJs('var YII_ENV_DEV = ' . (YII_ENV_DEV ? 'true' : 'false') . ';', \yii\web\View::POS_HEAD);
+$this->registerJs('var YII_DEBUG = ' . (YII_DEBUG ? 'true' : 'false') . ';', \yii\web\View::POS_HEAD);
+
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -116,7 +120,13 @@ $runningDaemons = $daemons->search([])->totalCount;
             [
                 'label' => 'Profile',
                 'url' => ['/user/view', 'id' => Yii::$app->user->id],
-                'visible' => !Yii::$app->user->isGuest,
+                'visible' => !Yii::$app->user->isGuest && Yii::$app->user->can('user/view'),
+            ],
+
+            [
+                'label' => 'Config',
+                'url' => ['/config/system'],
+                'visible' => Yii::$app->user->can('config/system'),
             ],
 
             Yii::$app->user->isGuest ?

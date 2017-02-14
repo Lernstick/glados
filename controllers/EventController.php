@@ -21,15 +21,9 @@ class EventController extends Controller
     public function actionStream($uuid)
     {
     
-        /*if(($stream = EventStream::findOne(['uuid' => $uuid])) === null){
-            $stream = new EventStream([
-                'uuid' => $uuid !== null ? $uuid : generate_uuid(),
-            ]);
-        }*/
-
         $stream = $this->findModel($uuid);
-        $stream->timeLimit = 60;
-        //isset($listenEvents) ? $stream->listenEvents = explode(',', $listenEvents) : null;
+
+        $stream->timeLimit = YII_ENV_DEV ? 300 : 60;
 
         //$user_id = \Yii::$app->user->id;
         //$user_id = 1;
@@ -40,29 +34,26 @@ class EventController extends Controller
         );
         $stream->pathPrefixes = $pathPrefixes;
 
+        $stream->on(EventStream::EVENT_STREAM_STARTED, function() {
+            $event = new EventItem(['event' => 'meta', 'data' => json_encode(['state' => 'event stream started'])]);
+            $this->sendMessage($this->renderPartial('/event/message', [
+                'model' => $event,
+            ]));
+        });
 
-        if(YII_ENV_DEV){
-            $stream->on(EventStream::EVENT_STREAM_STARTED, function() {
-                $event = new EventItem(['event' => 'meta', 'data' => json_encode(['state' => 'event stream started'])]);
-                $this->sendMessage($this->renderPartial('/event/message', [
-                    'model' => $event,
-                ]));
-            });
+        $stream->on(EventStream::EVENT_STREAM_STOPPED, function() {
+            $event = new EventItem(['event' => 'meta', 'data' => json_encode(['state' => 'event stream finished']), 'retry' => 1000]);
+            $this->sendMessage($this->renderPartial('/event/message', [
+                'model' => $event,
+            ]));
+        });
 
-            $stream->on(EventStream::EVENT_STREAM_STOPPED, function() {
-                $event = new EventItem(['event' => 'meta', 'data' => json_encode(['state' => 'event stream finished']), 'retry' => 1000]);
-                $this->sendMessage($this->renderPartial('/event/message', [
-                    'model' => $event,
-                ]));
-            });
-
-            $stream->on(EventStream::EVENT_STREAM_RESUMED, function() {
-                $event = new EventItem(['event' => 'meta', 'data' => json_encode(['state' => 'event stream resumed'])]);
-                $this->sendMessage($this->renderPartial('/event/message', [
-                    'model' => $event,
-                ]));
-            });
-        }
+        $stream->on(EventStream::EVENT_STREAM_RESUMED, function() {
+            $event = new EventItem(['event' => 'meta', 'data' => json_encode(['state' => 'event stream resumed'])]);
+            $this->sendMessage($this->renderPartial('/event/message', [
+                'model' => $event,
+            ]));
+        });
 
         $stream->start();
 

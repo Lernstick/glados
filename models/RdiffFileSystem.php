@@ -188,21 +188,27 @@ class RdiffFileSystem extends Model
             $versions = [];
 
             if ($this->path == "") {
-                $list = array_diff(scandir($this->location . '/rdiff-backup-data'), $this->excludeDirs);
-                foreach ($list as $item) {
-                    if (@strpos($item, 'increments') === 0) {
-                        if (preg_match($this->dateRegex, $item, $matches) === 1) {
-                            $versions[] = $matches[0];
+                /* only scan rdiff-backup-data dir if it exists */
+                if (is_dir($this->location . '/rdiff-backup-data')) {
+                    $list = array_diff(scandir($this->location . '/rdiff-backup-data'), $this->excludeDirs);
+                    foreach ($list as $item) {
+                        if (@strpos($item, 'increments') === 0) {
+                            if (preg_match($this->dateRegex, $item, $matches) === 1) {
+                                $versions[] = $matches[0];
+                            }
                         }
                     }
                 }
             } else {
-                /* get all version in the increments path */
-                $list = array_diff(scandir(dirname($this->incrementsPath)), $this->excludeDirs);
-                foreach ($list as $item) {
-                    if (@strpos($item, $this->basename) === 0) {
-                        if (preg_match($this->dateRegex, $item, $matches) === 1) {
-                            $versions[] = $matches[0];
+                /* only scan increments dir if it exists */
+                if (is_dir(dirname($this->incrementsPath))) {
+                    /* get all version in the increments path */
+                    $list = array_diff(scandir(dirname($this->incrementsPath)), $this->excludeDirs);
+                    foreach ($list as $item) {
+                        if (@strpos($item, $this->basename) === 0) {
+                            if (preg_match($this->dateRegex, $item, $matches) === 1) {
+                                $versions[] = $matches[0];
+                            }
                         }
                     }
                 }

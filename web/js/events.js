@@ -8,15 +8,16 @@ function EventStream(url){
             this.source = new EventSource(this.url);
         }
 
-        this.source.addEventListener('open', this.openHandler, false);
-        this.source.addEventListener('error', this.errorHandler, false);
-        this.source.addEventListener('message', this.messageHandler, false);
+        if (YII_DEBUG) {
+            this.source.addEventListener('open', this.openHandler, false);
+            this.source.addEventListener('error', this.errorHandler, false);
+            this.source.addEventListener('message', this.messageHandler, false);
+        }
 
     }
 }
 
 EventStream.prototype.openHandler = function(e) {
-//    console.log("debug | Connection was opened.");
     console.log('debug | ', {
         id: e.id,
         type: 'none',
@@ -32,7 +33,6 @@ EventStream.prototype.errorHandler = function(e) {
         data: 'Error - connection was lost.',
         handler: EventStream.prototype.errorHandler
     });
-//    console.log("debug | Error - connection was lost.");
 }
 
 EventStream.prototype.messageHandler = function(e) {
@@ -45,19 +45,13 @@ EventStream.prototype.messageHandler = function(e) {
 }
 
 function debugHandler(e, me){
-    var data = JSON.parse(e.data);
-//    if(data.debug){
-//        console.log('debug | raw event    : ', e);
-//        console.log('debug | debug data   : ', data.debug)
-//        console.log('debug | event data   : ', data.data);
-//        console.log('debug | generated at : ', data.generated_at);
-//        console.log('debug | sent at      : ', data.sent_at);
+    if (YII_DEBUG) {
+        var data = JSON.parse(e.data);
         console.log('debug | ', {
             id: e.id,
             type: e.type,
             data: e.data,
             handler: me
         });
-//    }
-
+    }
 }

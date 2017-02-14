@@ -486,7 +486,7 @@ class Ticket extends \yii\db\ActiveRecord
             $output = implode(PHP_EOL, $output);
         } else {
             $output = file_get_contents($tmp);
-            @unlink($tmp);            
+            @unlink($tmp);
         }
 
         return [ $output, $retval ];

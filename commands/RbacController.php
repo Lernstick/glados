@@ -199,6 +199,13 @@ class RbacController extends Controller
         $killDaemon->description = 'Kill backup daemons';
         $auth->add($killDaemon);
 
+        /**
+        * Configuation permissions
+        */
+        $viewSystemConfig = $auth->createPermission('config/system');
+        $viewSystemConfig->description = 'View the system configuration';
+        $auth->add($viewSystemConfig);
+
         // Add "teacher" role
         $teacher = $auth->createRole('teacher');
         $auth->add($teacher);
@@ -252,12 +259,14 @@ class RbacController extends Controller
         $auth->addChild($admin, $resetPWAllUser);
         $auth->addChild($admin, $deleteAllUser);
 
+        $auth->addChild($admin, $viewSystemConfig);
+
         // The "admin" role should also inherit all "teacher" permissions
         $auth->addChild($admin, $teacher);
 
         // Assign roles to users. 1 and 2 are IDs returned by IdentityInterface::getId()
         // usually implemented in your User model.
         #$auth->assign($teacher, 2);
-        #$auth->assign($admin, 1);
+        @$auth->assign($admin, 1);
     }
 }

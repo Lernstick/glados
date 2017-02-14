@@ -107,15 +107,23 @@ class RestoreController extends DaemonController
             $file = substr($file, strlen($this->remotePath));
         }
 
-        $fs = new RdiffFileSystem([
-            'root' => $this->remotePath,
-            'location' => FileHelper::normalizePath(\Yii::$app->basePath . "/backups/" . $this->ticket->token),
-            'restoreUser' => $this->remoteUser,
-            'restoreHost' => $this->ticket->ip,
-        ]);
+        if (is_dir(FileHelper::normalizePath(\Yii::$app->basePath . "/backups/" . $this->ticket->token))) {
+            $fs = new RdiffFileSystem([
+                'root' => $this->remotePath,
+                'location' => FileHelper::normalizePath(\Yii::$app->basePath . "/backups/" . $this->ticket->token),
+                'restoreUser' => $this->remoteUser,
+                'restoreHost' => $this->ticket->ip,
+            ]);
 
-        if($fs->slash($file) === null){
-            $this->ticket->restore_state = 'Restore failed: "' . $file . '": No such file or directory.';
+            if($fs->slash($file) === null){
+                $this->ticket->restore_state = 'Restore failed: "' . $file . '": No such file or directory.';
+                $this->log($this->ticket->restore_state);
+                $this->ticket->restore_lock = 0;
+                $this->ticket->save(false);
+                return;
+            }
+        } else {
+            $this->ticket->restore_state = 'Nothing to restore.';
             $this->log($this->ticket->restore_state);
             $this->ticket->restore_lock = 0;
             $this->ticket->save(false);

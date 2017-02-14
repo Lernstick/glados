@@ -97,7 +97,9 @@ class ActiveEventField extends Pjax
                 var string = listener + '" . $this->event . "';
                 if (typeof eventListeners[string] == 'undefined') {
                     event.source.addEventListener('" . $this->event . "', listener);
-                    console.log('Listener added for event " . ((empty($this->jsonSelector) || $this->event == $this->jsonSelector) ? $this->event : $this->event . '/' . $this->jsonSelector) . ", listener: ', listener);
+                    if (YII_DEBUG) {
+                        console.log('Listener added for event " . ((empty($this->jsonSelector) || $this->event == $this->jsonSelector) ? $this->event : $this->event . '/' . $this->jsonSelector) . ", listener: ', listener);
+                    }
                     eventListeners[string] = true;
                 }
 

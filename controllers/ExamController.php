@@ -230,7 +230,27 @@ class ExamController extends Controller
                 8 => 'A PHP extension stopped the file upload.',
             ];
 
-            $fileError = $phpErrors[$model->file->error] ? $phpErrors[$model->file->error] : 'Unknown PHP File Upload Error: ' . $model->file->error;
+            if ($model->file !== null) {
+                $fileError = $phpErrors[$model->file->error] ? $phpErrors[$model->file->error] : 'Unknown PHP File Upload Error: ' . $model->file->error;
+            } else {
+                $fileError = 'Unknown File Upload Error';
+            }
+
+            if (!is_dir(\Yii::$app->params['uploadDir'])) {
+                $fileError = 'The upload directory does not exist.';
+                @unlink($model->file);
+                return [ 'files' => [[
+                    'name' => basename($model->file),
+                    'error' => $fileError,
+                ]]];                
+            } else if (!is_writable(\Yii::$app->params['uploadDir'])) {
+                $fileError = 'The upload directory is not writable.';
+                @unlink($model->file);
+                return [ 'files' => [[
+                    'name' => basename($model->file),
+                    'error' => $fileError,
+                ]]]; 
+            }
 
             if ($model->file != null && $model->upload()) {
                 $model->file = $model->filePath;
