@@ -73,7 +73,6 @@ class BackupController extends Controller
             'location' => \Yii::getAlias('@app/backups/' . $ticket->token),
             'restoreUser' => 'root',
             'restoreHost' => $ticket->ip,
-            //'ticket' => $ticket,
         ]);
 
         $models = $fs->slash($path)->versionAt($date)->contents;
@@ -105,13 +104,13 @@ class BackupController extends Controller
                     'date' => $date,
                 ]);
 	        }else{
-                return $this->render('/backup/browse', [
+                /*return $this->render('/backup/browse', [
                     'ItemsDataProvider' => $ItemsDataProvider,
                     'VersionsDataProvider' => $VersionsDataProvider,
                     'ticket' => $ticket,
                     'fs' => $fs,
                     'date' => $date,
-                ]);
+                ]);*/
 	        	return $this->redirect(['ticket/view', 'id' => $ticket_id, '#' => 'tab_browse']);
 	        }
         }else{

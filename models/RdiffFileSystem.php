@@ -68,8 +68,10 @@ class RdiffFileSystem extends Model
     /**
      * @var array A list of file or directory names to omit when reading a directory
      */
-    public $excludeDirs = ['.', '..', 'rdiff-backup-data'];    
-//    private static $instance;
+    public $excludeList = [
+        '/^\./',                    // exclude all dotfiles
+        '/^rdiff-backup-data$/'     // exclude the rdiff-backup-data directory
+    ];
 
     /**
      * @var string The current location
@@ -190,7 +192,7 @@ class RdiffFileSystem extends Model
             if ($this->path == "") {
                 /* only scan rdiff-backup-data dir if it exists */
                 if (is_dir($this->location . '/rdiff-backup-data')) {
-                    $list = array_diff(scandir($this->location . '/rdiff-backup-data'), $this->excludeDirs);
+                    $list = array_filter(scandir($this->location . '/rdiff-backup-data'), array($this, 'filterExclude'));
                     foreach ($list as $item) {
                         if (@strpos($item, 'increments') === 0) {
                             if (preg_match($this->dateRegex, $item, $matches) === 1) {
@@ -203,7 +205,7 @@ class RdiffFileSystem extends Model
                 /* only scan increments dir if it exists */
                 if (is_dir(dirname($this->incrementsPath))) {
                     /* get all version in the increments path */
-                    $list = array_diff(scandir(dirname($this->incrementsPath)), $this->excludeDirs);
+                    $list = array_filter(scandir(dirname($this->incrementsPath)), array($this, 'filterExclude'));
                     foreach ($list as $item) {
                         if (@strpos($item, $this->basename) === 0) {
                             if (preg_match($this->dateRegex, $item, $matches) === 1) {
@@ -302,6 +304,16 @@ class RdiffFileSystem extends Model
         }
     }
 
+    private function filterExclude($element)
+    {
+        foreach ($this->excludeList as $pattern) {
+            if (preg_match($pattern, $element) === 1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * Getter for contents
      *
@@ -331,7 +343,7 @@ class RdiffFileSystem extends Model
             if (file_exists($this->localPath)) {
                 if ($this->version == $this->newestBackupVersion || $this->_date == 'all') {
                     // find current files
-                    $listLocal = array_diff(scandir($this->localPath), $this->excludeDirs);
+                    $listLocal = array_filter(scandir($this->localPath), array($this, 'filterExclude'));
                 }
             }
 
@@ -339,7 +351,7 @@ class RdiffFileSystem extends Model
             if ($this->_date != 'now') {
                 // find files in the inrements dir
                 if (file_exists($this->incrementsPath)){
-                    $list = array_diff(scandir($this->incrementsPath), $this->excludeDirs);
+                    $list = array_filter(scandir($this->incrementsPath), array($this, 'filterExclude'));
                 } else {
                     $list = [];
                 }
@@ -540,7 +552,8 @@ class RdiffFileSystem extends Model
             }
         } else {
 
-            foreach (array_diff(scandir(dirname($this->incrementsPath)), $this->excludeDirs) as $item) {
+            foreach (array_filter(scandir(dirname($this->incrementsPath)), array($this, 'filterExclude')) as $item) {
+
                 if (strpos($item, $this->basename) === 0) {
                     if (preg_match($this->dateRegex, $item, $matches) === 1) {
                         if ($matches[0] == $this->version) {
