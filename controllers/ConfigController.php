@@ -9,9 +9,15 @@ use app\models\Config;
 use app\components\AccessRule;
 use yii\web\NotFoundHttpException;
 
+/**
+ * ConfigController implements the CRUD actions for Config model.
+ */
 class ConfigController extends Controller
 {
 
+    /**
+     * @inheritdoc
+     */
     public function behaviors()
     {
         return [
@@ -30,6 +36,12 @@ class ConfigController extends Controller
         ];
     }
 
+    /**
+     * Displays a single Screenshot thumbnail.
+     *
+     * @return mixed
+     * @throws NotFoundHttpException if the config file cannot be found/parsed
+     */
     public function actionSystem()
     {
         $model = Config::findOne([

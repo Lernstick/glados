@@ -28,7 +28,7 @@ if ($model->type == 'dir') {
 } else {
     if ($model->state != 'missing') {
         echo Html::a(
-            '<span><span class="glyphicon glyphicon-file"></span> ' . $model->displayName . ' (' . yii::$app->formatter->format($model->version, 'backupVersion') . ($model->version == $model->newestBackupVersion ? ' (current)' : null) . ', ' . $model->state . ', ' . $model->mode . ', ' . yii::$app->formatter->format($model->size, 'shortSize') . ')</span>',
+            '<span><span class="glyphicon glyphicon-file"></span> ' . $model->displayName . ' (' . yii::$app->formatter->format($model->version, 'backupVersion') . ($model->version == $model->newestBackupVersion ? ' (current)' : null) . ', ' . $model->state . ', ' . yii::$app->formatter->format($model->mode, 'text') . ', ' . yii::$app->formatter->format($model->size, 'shortSize') . ')</span>',
             Url::to([
                 'backup/file',
                 'ticket_id' => $ticket->id,

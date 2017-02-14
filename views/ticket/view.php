@@ -75,10 +75,18 @@ $this->params['breadcrumbs'][] = $this->title;
                 ['data-toggle' => 'tab', 'id' => 'browseButton']
             ); ?>
         </li>
-        <li><a data-toggle="tab" href="#screenshots">
-            <i class="glyphicon glyphicon-picture"></i>
-            Screenshots
-        </a></li>
+
+        <?php if (Yii::$app->user->can('screenshot/view')) { ?>
+            <li><a data-toggle="tab" href="#screenshots">
+                <i class="glyphicon glyphicon-picture"></i>
+                Screenshots
+            </a></li>
+        <?php } else { ?>
+            <li class="disabled"><a class="disabled" data-toggle="" href="#">
+                <i class="glyphicon glyphicon-picture"></i>
+                Screenshots
+            </a></li>
+        <?php } ?>
         <li>
             <?= Html::a(
                 '<i class="glyphicon glyphicon-tasks"></i> Restores',
@@ -152,14 +160,16 @@ $this->params['breadcrumbs'][] = $this->title;
                     ) ?>
                 </li>
 
-                <li>
-                    <?= Html::a(
-                        '<span class="glyphicon glyphicon-picture"></span> Get Live Screenshot', [
-                            'screenshot/snap',
-                            'token' => $model->token,
-                        ]
-                    ) ?>
-                </li>
+                <?php if (Yii::$app->user->can('screenshot/snap')) { ?>
+                    <li>
+                        <?= Html::a(
+                            '<span class="glyphicon glyphicon-picture"></span> Get Live Screenshot', [
+                                'screenshot/snap',
+                                'token' => $model->token,
+                            ]
+                        ) ?>
+                    </li>
+                <?php } ?>
 
                 <?php if (YII_ENV_DEV) {
                     echo '<li class="divider"></li>';
@@ -388,6 +398,8 @@ $this->params['breadcrumbs'][] = $this->title;
         'options' => ['class' => 'tab-pane fade'],
     ]); ?>
 
+    <?php if (Yii::$app->user->can('screenshot/view')) { ?>
+
         <?php $_GET = array_merge($_GET, ['#' => 'tab_screenshots']); ?>
         <?= ListView::widget([
             'dataProvider' => $screenshotDataProvider,
@@ -407,6 +419,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ]); ?>
 
     <?php Pjax::end() ?>
+    <?php } ?>
 
     <?php Pjax::begin([
         'id' => 'browse',

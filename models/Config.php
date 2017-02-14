@@ -10,6 +10,8 @@ use yii\base\Model;
  *
  * @property integer $port
  * @property string $type
+ * @property string $avahiServiceFile
+ * @property array $txtRecords
  */
 class Config extends Model
 {
@@ -36,7 +38,7 @@ class Config extends Model
     /**
      * Return the Config model
      *
-     * @return Config
+     * @return Config|null
      */
     public function findOne($config)
     {

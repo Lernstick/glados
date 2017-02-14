@@ -60,12 +60,21 @@ class Screenshot extends Model
 
     public function getSrc()
     {
-        return Url::to(['screenshot/view', 'date' => $this->date, 'token' => $this->token]);
+        return Url::to([
+            'screenshot/view',
+            'date' => $this->date,
+            'token' => $this->token,
+        ]);
     }
 
     public function getTsrc()
     {
-        return Url::to(['screenshot/thumbnail', 'date' => $this->date, 'token' => $this->token]);
+        return Url::to([
+            'screenshot/view',
+            'date' => $this->date,
+            'token' => $this->token,
+            'type' => 'thumb',
+        ]);
     }
 
     /**

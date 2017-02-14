@@ -119,6 +119,16 @@ class RbacController extends Controller
         $auth->addChild($restoreAllTicket, $restoreTicket);
 
         /**
+        * Screeshot permissions
+        */
+        $viewScreenshots = $auth->createPermission('screenshot/view');
+        $viewScreenshots->description = 'View screenshots from a ticket';
+        $auth->add($viewScreenshots);
+        $snapScreenshots = $auth->createPermission('screenshot/snap');
+        $snapScreenshots->description = 'Create a live screenshot';
+        $auth->add($snapScreenshots);
+
+        /**
         * Avtivity permissions
         */
         $indexActivity = $auth->createPermission('activity/index');
@@ -222,6 +232,9 @@ class RbacController extends Controller
         $auth->addChild($teacher, $deleteTicket);
         $auth->addChild($teacher, $backupTicket);
         $auth->addChild($teacher, $restoreTicket);
+
+        $auth->addChild($teacher, $viewScreenshots);
+        $auth->addChild($teacher, $snapScreenshots);
 
         $auth->addChild($teacher, $indexActivity);
 

@@ -8,6 +8,7 @@ use app\models\ScreenshotSearch;
 use app\models\Ticket;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use app\components\AccessRule;
 
 /**
  * ScreenshotController implements the CRUD actions for Screenshot model.
@@ -15,19 +16,46 @@ use yii\web\NotFoundHttpException;
 class ScreenshotController extends Controller
 {
 
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => \yii\filters\AccessControl::className(),
+                'ruleConfig' => [
+                    'class' => AccessRule::className(),
+                ],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['rbac'],
+                    ],
+                ],
+            ],
+        ];
+    }
 
     /**
      * Displays a single Screenshot model.
      * @param string $token
      * @param integer $date
+     * @param string $type this can be normal or thumb
      * @return mixed
      */
-    public function actionView($token, $date)
+    public function actionView($token, $date, $type = 'normal')
     {
         if (($model = Screenshot::findOne($token, $date)) !== null){
-            return \Yii::$app->response->sendFile($model->path, null, ['inline' => true]);
-        }else{
-            throw new NotFoundHttpException('The requested page does not exist.');
+            if ($type = 'normal') {
+                return \Yii::$app->response->sendFile($model->path, null, ['inline' => true]);
+            } else if ($type = 'thumb') {
+                return \Yii::$app->response->sendFile($model->thumbnail, null, ['inline' => true]);
+            } else {
+                throw new NotFoundHttpException('The requested page does not exist.');
+            }
+        } else {
+            throw new NotFoundHttpException('The screenshot does not exist.');
         }
     }
 
@@ -37,14 +65,14 @@ class ScreenshotController extends Controller
      * @param integer $date
      * @return mixed
      */
-    public function actionThumbnail($token, $date)
+    /*public function actionThumbnail($token, $date)
     {
         if (($model = Screenshot::findOne($token, $date)) !== null){
             return \Yii::$app->response->sendFile($model->thumbnail, null, ['inline' => true]);
         }else{
             throw new NotFoundHttpException('The requested page does not exist.');
         }
-    }
+    }*/
 
     /**
      * Displays a single Screenshot model.

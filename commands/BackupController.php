@@ -93,6 +93,16 @@ class BackupController extends DaemonController
                 $this->finishBackup = false;
             }
 
+            if (!is_writable(\Yii::$app->basePath . "/backups/")) {
+                $this->ticket->backup_state = \Yii::$app->basePath . '/backups/: No such file or directory or not writable.';
+                $this->ticket->backup_last_try = new Expression('NOW()');
+                $this->ticket->backup_lock = 0;
+                $this->ticket->save(false);
+                $this->log($this->ticket->backup_state);
+                $this->ticket = null;
+                return;
+            }
+
             $this->log('Processing ticket: ' .
                 ( empty($this->ticket->test_taker) ? $this->ticket->token : $this->ticket->test_taker) .
                 ' (' . $this->ticket->ip . ')', true);
