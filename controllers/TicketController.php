@@ -437,6 +437,8 @@ class TicketController extends Controller
                 'config' => [
                     'grp_netdev' => boolval($model->exam->{"grp_netdev"}),
                     'allow_sudo' => boolval($model->exam->{"allow_sudo"}),
+                    'allow_mount' => boolval($model->exam->{"allow_mount"}),
+                    'firewall_off' => boolval($model->exam->{"firewall_off"}),
                 ]
             ];
         }

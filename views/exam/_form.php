@@ -39,6 +39,10 @@ if($model->file && Yii::$app->file->set($model->file)->exists) {
 
     <?= $form->field($model, 'allow_sudo')->checkbox() ?>
 
+    <?= $form->field($model, 'allow_mount')->checkbox() ?>
+
+    <?= $form->field($model, 'firewall_off')->checkbox() ?>
+
     <?php /* echo $form->field($model, 'file')->widget(FileInput::classname(), [
         'options' => ['accept' => '.squashfs'],
         'pluginOptions' => [

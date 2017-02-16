@@ -95,9 +95,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= DetailView::widget([
         'model' => $model,
+        'template' => '<tr><th{captionOptions}>{value}</th><td{contentOptions}>{label}</td></tr>',
         'attributes' => [
             'grp_netdev:boolean',
             'allow_sudo:boolean',
+            'allow_mount:boolean',
+            'firewall_off:boolean',
         ],
     ]) ?>
 

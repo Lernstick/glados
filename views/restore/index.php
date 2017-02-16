@@ -52,7 +52,7 @@ use yii\widgets\Pjax;
 
 Modal::begin([
     'id' => 'restoreLogModal',
-    'header' => '<h4>Backup Log</h4>',
+    'header' => '<h4>Restore Log</h4>',
     'footer' => Html::Button('Close', ['data-dismiss' => 'modal', 'class' => 'btn btn-default']),
     'size' => \yii\bootstrap\Modal::SIZE_LARGE
 ]);

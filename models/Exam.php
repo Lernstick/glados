@@ -63,7 +63,7 @@ class Exam extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'name', 'subject', 'examFile', 'user_id', 'grp_netdev', 'allow_sudo'], 'validateRunningTickets'],
+            [['id', 'name', 'subject', 'examFile', 'user_id', 'grp_netdev', 'allow_sudo', 'allow_mount', 'firewall_off'], 'validateRunningTickets'],
             [['name', 'subject'], 'required'],
             [['user_id'], 'integer'],
             [['name', 'subject'], 'string', 'max' => 52],
@@ -86,6 +86,8 @@ class Exam extends \yii\db\ActiveRecord
             'user_id' => 'User ID',
             'grp_netdev' => 'User can edit network connections',
             'allow_sudo' => 'User can gain root privileges by sudo',
+            'allow_mount' => 'User has access to external filesystems such as USB Sticks',
+            'firewall_off' => 'Firewall off',
             'ticketCount' => 'Total Tickets',
             'openTicketCount' => 'Open Tickets',
             'runningTicketCount' => 'Running Tickets',
