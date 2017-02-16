@@ -242,12 +242,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 ) . '">' . yii::$app->formatter->format($model->state, 'state') . '</span>',
                 'format' => 'html',
             ],
-            'exam.subject',
             [
                 'attribute' => 'exam.name',
                 'format' => 'raw',
+                'label' => 'Exam',
                 'value' => Html::a(
-                    $model->exam->name,
+                    $model->exam->subject  . ' - ' . $model->exam->name,
                     ['exam/view', 'id' => $model->exam->id],
                     ['data-pjax' => 0]
                 )

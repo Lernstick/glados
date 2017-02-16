@@ -444,7 +444,6 @@ class TicketController extends Controller
         }
     }
 
-
     /**
      * Downloads an exam file after checking ticket validity.
      *
