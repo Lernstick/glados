@@ -23,7 +23,7 @@ class EventController extends Controller
     
         $stream = $this->findModel($uuid);
 
-        $stream->timeLimit = YII_ENV_DEV ? 300 : 60;
+        $stream->timeLimit = YII_ENV_DEV ? 60 : 300;
 
         //$user_id = \Yii::$app->user->id;
         //$user_id = 1;

@@ -38,6 +38,13 @@ $this->registerJs($active_tabs);
     </li>
     <li>
         <?= Html::a(
+            '<i class="glyphicon glyphicon-cog"></i> Settings',
+            Url::to(['exam/view', 'id' => $model->id, '#' => 'settings']),
+            ['data-toggle' => '']
+        ); ?>
+    </li>
+    <li>
+        <?= Html::a(
             '<i class="glyphicon glyphicon-th"></i> Monitor',
             Url::to(['exam/view', 'id' => $model->id, 'mode' => 'monitor', '#' => 'monitor']),
             ['data-toggle' => '']

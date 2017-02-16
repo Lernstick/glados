@@ -187,6 +187,13 @@ $this->params['breadcrumbs'][] = $this->title;
                             ['data-pjax' => 0, 'class' => 'dev_item']
                         );
                     echo '</li>';
+                    echo '<li>';
+                        echo Html::a(
+                            '<span class="glyphicon glyphicon-list-alt"></span> Get Exam Config',
+                            ['config', 'token' => $model->token],
+                            ['data-pjax' => 0, 'class' => 'dev_item']
+                        );
+                    echo '</li>';                    
                 } ?>
 
             </ul>            
@@ -254,7 +261,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => '<span class="label label-'
                      . ( $model->valid ? 'success' : 'danger' )
                      . '">' . ($model->valid ? 'Yes' : 'No') . '</span> '
-                     . ( $model->validTime ? 'for ' . yii::$app->formatter->format($model->validTime, 'duration') : '<span class="not-set">(expired)</span>' ),
+                     . ( $model->validTime ? 'for ' . yii::$app->formatter->format($model->validTime, 'duration') . ' after start' : '<span class="not-set">(expired)</span>' ),
                 'format' => 'html',
             ],
             'test_taker',

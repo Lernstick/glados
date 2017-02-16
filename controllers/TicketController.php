@@ -56,11 +56,12 @@ class TicketController extends Controller
                     [
                         'allow' => true,
                         'actions' => [
-                            'download', //download/start the exam
-                            'md5', //to verify the exam file
-                            'ssh-key', //get the public server ssh key
-                            'notify', //notify a new client status
-                            'finish', //finish the exam
+                            'download', // download/start exam
+                            'md5',      // verify exam file
+                            'config',   // retrieve exam config
+                            'ssh-key',  // get public server ssh key
+                            'notify',   // notify a new client status
+                            'finish',   // finish exam
                         ],
                         'roles' => ['?', '@'],
                     ],
@@ -99,6 +100,7 @@ class TicketController extends Controller
     //TODO: rbac
     /**
      * Displays a single Ticket model.
+     *
      * @param integer $id
      * @return mixed
      */
@@ -187,7 +189,8 @@ class TicketController extends Controller
             ]);
         } else if ($mode == 'probe') {
             $model = $this->findModel($id);
-            $online = $model->runCommand('source /info; ping -nq -W 10 -c 1 "${gladosIp}"', 'C', 10)[1];
+            //$online = $model->runCommand('source /info; ping -nq -W 10 -c 1 "${gladosIp}"', 'C', 10)[1];
+            $online = $model->runCommand('true', 'C', 10)[1];
             return $this->redirect(['ticket/view',
                 'id' => $model->id,
                 'online' => $online,
@@ -223,6 +226,7 @@ class TicketController extends Controller
     /**
      * Creates a new Ticket model.
      * If creation is successful, the browser will be redirected to the 'view' page.
+     *
      * @param string $mode
      * @param integer $exam_id
      * @param integer $count
@@ -306,6 +310,7 @@ class TicketController extends Controller
     /**
      * Updates an existing Ticket model.
      * If update is successful, the browser will be redirected to the 'view' page.
+     *
      * @param integer $id
      * @return mixed
      */
@@ -362,6 +367,7 @@ class TicketController extends Controller
     /**
      * Deletes an existing Ticket model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
+     *
      * @param integer $id
      * @return mixed
      */
@@ -397,6 +403,7 @@ class TicketController extends Controller
 
     /**
      * Echoes the MD5 sum of the exam file for the client to verify.
+     *
      * @param string $token
      * @return The response object or an array with the error description
      */
@@ -413,7 +420,32 @@ class TicketController extends Controller
     }
 
     /**
+     * Returns the exam config in JSON.
+     *
+     * @param string $token
+     * @return The JSON response
+     */
+    public function actionConfig($token)
+    {
+
+        $model = Ticket::findOne(['token' => $token]);
+        if (!$model) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        } else {
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            return [
+                'config' => [
+                    'grp_netdev' => boolval($model->exam->{"grp_netdev"}),
+                    'allow_sudo' => boolval($model->exam->{"allow_sudo"}),
+                ]
+            ];
+        }
+    }
+
+
+    /**
      * Downloads an exam file after checking ticket validity.
+     *
      * @param string $token
      * @return The response object or an array with the error description
      */
@@ -540,6 +572,7 @@ class TicketController extends Controller
 
     /**
      * Changes the state of a client.
+     *
      * @param string $token
      * @param string $state
      */
@@ -565,6 +598,7 @@ class TicketController extends Controller
 
     /**
      * Finishes an exam.
+     *
      * @param string $token
      * @return The response object or an array with the error description
      */
@@ -605,6 +639,7 @@ class TicketController extends Controller
 
     /**
      * Starts a background daemon to backup the ticket.
+     *
      * @param integer $id
      * @return The response object
      */
@@ -625,6 +660,7 @@ class TicketController extends Controller
 
     /**
      * Starts a background daemon to restore a specific file by date.
+     *
      * @param integer $id id of the Ticket model.
      * @param string $date date string of the Backup model.
      * @param string $file the file to restore
@@ -676,6 +712,7 @@ class TicketController extends Controller
     /**
      * Finds the Ticket model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
+     *
      * @param integer $id
      * @return Ticket the loaded model
      * @throws NotFoundHttpException if the model cannot be found
@@ -691,6 +728,13 @@ class TicketController extends Controller
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
+    /**
+     * Finds the Ticket model based on its primary key value.
+     *
+     * @param Ticket $model the Ticket model
+     * @return boolean whether acces is allowed or not
+     * @throws ForbiddenHttpException if the access control failed.
+     */
     protected function checkRbac($model)
     {
         $r = \Yii::$app->controller->id . '/' . \Yii::$app->controller->action->id;

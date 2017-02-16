@@ -60,14 +60,14 @@ class File extends Component
         return $instance;
     }
 
-    /*
+    /**
      * @return boolean 'True' if file exists, otherwise 'False'
      */
     public function getExists(){
        return file_exists($this->path);
     }
 
-    /*
+    /**
      * @return int file size in bytes or formatted size or null
      */
     public function getSize ( $format = false )
@@ -79,7 +79,7 @@ class File extends Component
         return $format ? $this->formatSize($size) : $size;
     } 
 
-    /*
+    /**
      * @return string file size formatted
      */
     public function formatSize($bytes){

@@ -151,7 +151,7 @@ $this->registerJs('var YII_DEBUG = ' . (YII_DEBUG ? 'true' : 'false') . ';', \yi
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">&copy; GLaDOS <?= date('Y') ?>
+        <p class="pull-left">&copy; GLaDOS <?= ' ' . \Yii::$app->params['version'] . ' - ' . date('Y') ?>
             <?= ActiveEventField::widget([
                 'options' => [
                     'tag' => 'i',

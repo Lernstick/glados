@@ -35,6 +35,10 @@ if($model->file && Yii::$app->file->set($model->file)->exists) {
 
     <?= $form->field($model, 'subject')->textInput(['maxlength' => true]) ?>
 
+    <?= $form->field($model, 'grp_netdev')->checkbox() ?>
+
+    <?= $form->field($model, 'allow_sudo')->checkbox() ?>
+
     <?php /* echo $form->field($model, 'file')->widget(FileInput::classname(), [
         'options' => ['accept' => '.squashfs'],
         'pluginOptions' => [

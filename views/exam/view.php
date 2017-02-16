@@ -84,6 +84,22 @@ $this->params['breadcrumbs'][] = $this->title;
             'session' => $session,
         ]) ?>
 
+    <?php Pjax::end(); ?>
+
+    <?php Pjax::begin([
+        'id' => 'settings',
+        'options' => ['class' => 'tab-pane fade'],
+    ]); ?>
+
+    <div class="alert alert-warning" role="alert"><i class="glyphicon glyphicon-warning-sign"></i> Please notice, all these settings will <b>override</b> the settings configured in the exam file!</div>
+
+    <?= DetailView::widget([
+        'model' => $model,
+        'attributes' => [
+            'grp_netdev:boolean',
+            'allow_sudo:boolean',
+        ],
+    ]) ?>
 
     <?php Pjax::end(); ?>
 

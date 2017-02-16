@@ -10,6 +10,7 @@ use Yii;
  * @property integer $id
  * @property string $name
  * @property string $subject
+ * @property boolean $grp_netdev
  * @property string $file
  * @property integer $user_id
  * @property string $file_list
@@ -62,7 +63,7 @@ class Exam extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'name', 'subject', 'examFile', 'user_id'], 'validateRunningTickets'],
+            [['id', 'name', 'subject', 'examFile', 'user_id', 'grp_netdev', 'allow_sudo'], 'validateRunningTickets'],
             [['name', 'subject'], 'required'],
             [['user_id'], 'integer'],
             [['name', 'subject'], 'string', 'max' => 52],
@@ -83,6 +84,8 @@ class Exam extends \yii\db\ActiveRecord
             'md5' => 'MD5 Checksum',
             'file_list' => 'File List',
             'user_id' => 'User ID',
+            'grp_netdev' => 'User can edit network connections',
+            'allow_sudo' => 'User can gain root privileges by sudo',
             'ticketCount' => 'Total Tickets',
             'openTicketCount' => 'Open Tickets',
             'runningTicketCount' => 'Running Tickets',
@@ -209,7 +212,18 @@ class Exam extends \yii\db\ActiveRecord
      */
     public function getFileConsistency()
     {
-        return strpos($this->fileInfo, 'Squashfs') === false ? false : true;
+        return (strpos($this->fileInfo, 'Squashfs') === false ? false : true);
+    }
+
+    /**
+     * @return string
+     */
+    public function getInfo()
+    {
+        //var_dump(Yii::$app->squashfs->set($this->file));die();
+        $x = '';
+        //$x .= 'root passwoord ' . (Yii::$app->squashfs->set($this->file)->file_exists('/etc/passwd') ? 'not ' : '') . 'set.';
+        return $x;
     }
 
     public function validateRunningTickets($attribute, $params)
