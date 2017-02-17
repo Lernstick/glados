@@ -14,6 +14,7 @@ use yii\web\JsExpression;
 $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'Exams', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
 ?>
 <div class="exam-view container">
 

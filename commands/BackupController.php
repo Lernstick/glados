@@ -82,9 +82,9 @@ class BackupController extends DaemonController
 
             if ($this->ticket == null) {
                 $this->log('idle', true);
-                while (($this->ticket = $this->getNextTicket()) === null) {
-                    sleep(5);
-                }
+                do {
+                    sleep(rand(5, 10));
+                } while (($this->ticket = $this->getNextTicket()) === null);
             }
 
             if ($this->ticket->backup_last < $this->ticket->end) {
@@ -114,6 +114,13 @@ class BackupController extends DaemonController
                 $this->ticket->backup_last_try = new Expression('NOW()');
                 $this->ticket->backup_lock = 0;
                 $this->ticket->save(false);
+
+                $act = new Activity([
+                        'ticket_id' => $this->ticket->id,
+                        'description' => 'Backup failed: ' . $this->ticket->backup_state,
+                ]);
+                $act->save();
+
             }else{
                 $this->ticket->backup_state = 'backup in progress...';
                 if ($this->finishBackup == true) {
@@ -153,6 +160,13 @@ class BackupController extends DaemonController
                     $this->ticket->backup_state = 'rdiff-backup failed (retval: ' . $retval . '), output: '
                          . PHP_EOL . $output;
                     $this->log($this->ticket->backup_state);
+
+                    $act = new Activity([
+                            'ticket_id' => $this->ticket->id,
+                            'description' => 'Backup failed: rdiff-backup failed (retval: ' . $retval . ')',
+                    ]);
+                    $act->save();
+
                     if ($this->finishBackup == true) {
                         $this->ticket->runCommand('echo "backup failed, waiting for next try..." > /home/user/shutdown');
                     }
@@ -197,6 +211,13 @@ class BackupController extends DaemonController
         if ($this->ticket != null) {
             $this->ticket->backup_state = 'backup aborted.';
             $this->ticket->save(false, ['backup_state']);
+
+            $act = new Activity([
+                    'ticket_id' => $this->ticket->id,
+                    'description' => 'Backup failed: ' . $this->ticket->backup_state,
+            ]);
+            $act->save();
+
         }
 
         parent::stop();
@@ -275,7 +296,7 @@ class BackupController extends DaemonController
                 $daemon->hup();
                 sleep(5);
                 $daemon->refresh();
-                if ($oldAlive == $daemon->alive) {
+                if ($oldAlive == $daemon->alive && $daemon->running === true) {
                     $this->log("daemon " . $daemon->pid . ": no reaction, sending SIGHUP again.", true);
                     $oldAlive = $daemon->alive;
                     $daemon->hup();

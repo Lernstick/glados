@@ -99,9 +99,9 @@ class RestoreController extends DaemonController
         }
 
         if ($file == '::Desktop::') {
-            $file = $this->ticket->runCommand('sudo -u user xdg-user-dir DESKTOP')[0];
+            $file = trim($this->ticket->runCommand('sudo -u user xdg-user-dir DESKTOP')[0]);
         } else if ($file == '::Documents::') {
-            $file = $this->ticket->runCommand('sudo -u user xdg-user-dir DOCUMENTS')[0];
+            $file = trim($this->ticket->runCommand('sudo -u user xdg-user-dir DOCUMENTS')[0]);
         }
         if (substr($file, 0, strlen($this->remotePath)) == $this->remotePath) {
             $file = substr($file, strlen($this->remotePath));
@@ -120,6 +120,13 @@ class RestoreController extends DaemonController
                 $this->log($this->ticket->restore_state);
                 $this->ticket->restore_lock = 0;
                 $this->ticket->save(false);
+
+                $act = new Activity([
+                        'ticket_id' => $this->ticket->id,
+                        'description' => 'Restore failed: ' . $this->ticket->restore_state,
+                ]);
+                $act->save();
+
                 return;
             }
         } else {
@@ -136,7 +143,7 @@ class RestoreController extends DaemonController
             'startedAt' => $datetime->format('Y-m-d H:i:s'),
             'ticket_id' => $this->ticket->id,
             'file' => FileHelper::normalizePath($this->remotePath . '/' . $file),
-            'restoreDate' => $date,
+            'restoreDate' => $date == 'now' ? date('c') : $date,
         ]);
 
         $this->ticket->restore_state = 'restore in progress...';
@@ -177,11 +184,24 @@ class RestoreController extends DaemonController
             $this->ticket->restore_state = 'rdiff-backup failed (retval: ' . $retval . '), output: '
                  . PHP_EOL . $output;
             $this->log($this->ticket->restore_state);
+
+            $act = new Activity([
+                    'ticket_id' => $this->ticket->id,
+                    'description' => 'Restore failed: rdiff-backup failed (retval: ' . $retval . ')',
+            ]);
+            $act->save();
+
         }else{
             $this->log($output);
             $this->ticket->restore_state = 'restore successful.';
             $this->restore->finishedAt = new Expression('NOW()');
             $this->restore->save();
+            $act = new Activity([
+                    'ticket_id' => $this->ticket->id,
+                    'description' => 'Restore of ' . $this->restore->file . ' as it was as of ' . yii::$app->formatter->format($this->restore->restoreDate, 'datetime') . ' was successful.',
+            ]);
+            $act->save();
+
         }
 
         $this->ticket->restore_lock = 0;

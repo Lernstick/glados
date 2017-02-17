@@ -118,6 +118,7 @@ class Ticket extends \yii\db\ActiveRecord
             [['exam_id'], 'integer'],
             [['exam_id'], 'validateExam', 'skipOnEmpty' => false, 'skipOnError' => false, 'on' => self::SCENARIO_DEFAULT],
             [['start', 'end', 'test_taker', 'ip', 'state'], 'safe'],
+            [['token'], 'unique'],
             [['token'], 'string', 'max' => 32],
             [['token'], 'checkIfClosed', 'on' => self::SCENARIO_SUBMIT],
         ];

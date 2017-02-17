@@ -17,9 +17,11 @@ use app\models\Exam;
 use app\models\EventItem;
 use app\models\Daemon;
 use app\models\DaemonSearch;
+use app\models\RdiffFileSystem;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
+use yii\web\ServerErrorHttpException;
 use yii\filters\VerbFilter;
 use yii\db\Expression;
 use kartik\mpdf\Pdf;
@@ -27,7 +29,7 @@ use \mPDF;
 use app\components\customResponse;
 use app\components\AccessRule;
 use yii\data\ArrayDataProvider;
-use app\models\RdiffFileSystem;
+
 
 /**
  * TicketController implements the CRUD actions for Ticket model.
@@ -686,12 +688,17 @@ class TicketController extends Controller
     }
 
 
-
-    //TODO
+    /**
+     * Generates the needed ssh keys and populates the public key.
+     * If the key could not be generated, a 500 HTTP exception will be thrown.
+     *
+     * @return string the public key
+     * @throws ServerErrorHttpException if the key cannot be generated
+     */
     public function actionSshKey()
     {
 
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
 
         $dotSSH = \Yii::$app->basePath . '/' . '.ssh';
         $pubKeyFile = $dotSSH . '/' . 'rsa.pub';
@@ -705,8 +712,9 @@ class TicketController extends Controller
         }
 
         if (file_exists($pubKeyFile)) {
-            echo file_get_contents($pubKeyFile);
-            return;
+            return file_get_contents($pubKeyFile);
+        } else {
+            throw new ServerErrorHttpException('The public key could not be generated.');
         }
     }
 
@@ -717,7 +725,6 @@ class TicketController extends Controller
      * @param integer $id
      * @return Ticket the loaded model
      * @throws NotFoundHttpException if the model cannot be found
-     * @throws ForbiddenHttpException if the access control failed.
      */
     protected function findModel($id)
     {

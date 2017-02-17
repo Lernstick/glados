@@ -27,8 +27,13 @@ use yii\widgets\Pjax;
             'visible' => YII_ENV_DEV,
             'captionOptions' => ['class' => 'dev_item']
         ],
-        'backup_last:timeago',
-        'backup_last_try:timeago',
+        [
+            'attribute' => 'backup_last',
+            'format' => 'raw',
+            'value' => yii::$app->formatter->format($ticketModel->backup_last, 'timeago') . ' (<b>last try</b>: ' . yii::$app->formatter->format($ticketModel->backup_last_try, 'timeago') . ')',
+        ],        
+        //'backup_last:timeago',
+        //'backup_last_try:timeago',
         [
             'attribute' => 'backup_state',
             'format' => 'raw',

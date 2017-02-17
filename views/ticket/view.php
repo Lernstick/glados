@@ -5,6 +5,7 @@ use yii\widgets\DetailView;
 use yii\widgets\ListView;
 use yii\widgets\Pjax;
 use yii\helpers\Url;
+use yii\bootstrap\Modal;
 use app\components\ActiveEventField;
 
 /* @var $this yii\web\View */
@@ -18,7 +19,6 @@ use app\components\ActiveEventField;
 /* @var $screenshotDataProvider yii\data\ArrayDataProvider */
 /* @var $restoreSearchModel app\models\ScreenshotSearch */
 /* @var $restoreDataProvider yii\data\ActiveDataProvider */
-
 
 $active_tabs = <<<JS
 // Change hash for page-reload
@@ -130,33 +130,58 @@ $this->params['breadcrumbs'][] = $this->title;
                 <li>
                     <?= Html::a(
                         '<span class="glyphicon glyphicon-hdd"></span> Backup Now',
-                        ['backup', 'id' => $model->id],
+                        ['backup', 'id' => $model->id, '#' => 'backups'],
                         ['id' => 'backup-now']
                     ) ?>
                 </li>
 
                 <li>
                     <?= Html::a(
-                        '<span class="glyphicon glyphicon-tasks"></span> Restore Desktop', [
-                            'restore',
+                        '<span class="glyphicon glyphicon-tasks"></span> Restore Desktop',
+                        Url::to([
+                            'ticket/restore',
                             'id' => $model->id,
-                            //'date' => '2016-06-01T12:44:33+02:00',
-                            'date' => 'now',
                             'file' => '::Desktop::',
-                        ],
-                        ['id' => 'restore-now']
+                            'date' => 'now',
+                        ]),
+                        [
+                            'data-href' => Url::to([
+                                'ticket/restore',
+                                'id' => $model->id,
+                                'file' => '::Desktop::',
+                                'date' => 'now',
+                                '#' => 'tab_restores',
+                            ]),
+                            'data-toggle' => 'modal',
+                            'data-target' => '#confirmRestore',
+                            'data-path' => 'Desktop',
+                            'data-version' => 'last backup',
+                        ]
                     ) ?>
                 </li>
 
                 <li>
                     <?= Html::a(
-                        '<span class="glyphicon glyphicon-tasks"></span> Restore Documents', [
-                            'restore',
+                        '<span class="glyphicon glyphicon-tasks"></span> Restore Documents',
+                        Url::to([
+                            'ticket/restore',
                             'id' => $model->id,
-                            'date' => 'now',
                             'file' => '::Documents::',
-                        ],
-                        ['id' => 'restore-now']
+                            'date' => 'now',
+                        ]),
+                        [
+                            'data-href' => Url::to([
+                                'ticket/restore',
+                                'id' => $model->id,
+                                'file' => '::Documents::',
+                                'date' => 'now',
+                                '#' => 'tab_restores',
+                            ]),
+                            'data-toggle' => 'modal',
+                            'data-target' => '#confirmRestore',
+                            'data-path' => 'Documents',
+                            'data-version' => 'last backup',
+                        ]
                     ) ?>
                 </li>
 
@@ -457,3 +482,27 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php Pjax::end() ?>
 
 </div>
+
+<?php Modal::begin([
+    'id' => 'confirmRestore',
+    'header' => '<h4>Confirm Restore</h4>',
+    'footer' => Html::Button('Cancel', ['data-dismiss' => 'modal', 'class' => 'btn btn-default']) . '<a id="restore-now" class="btn btn-danger btn-ok">Restore</a>',
+    //'size' => \yii\bootstrap\Modal::SIZE_SMALL
+]); ?>
+
+<p>You're about to restore:</p>
+<div class="list-group">
+  <li class="list-group-item">
+    <h4 id='confirmRestoreItemPath' class="list-group-item-heading">/path/to/file</h4>
+    <p class="list-group-item-text">to the state as it was at <b id='confirmRestoreItemDate'>date</b></p>
+  </li>
+</div>
+
+<div class="alert alert-danger" role="alert">
+  <h4>Important!</h4>
+
+  <p>Please notice, that if the <b>file</b> exists on the target machine, it will be permanently <b>OVERWRITTEN</b> by this version!</p>
+  <p>If you restore a <b>directory</b>, notice that the target directory will be restored to the exact same state of this version. Newer files will be <b>REMOVED</b>!</p>
+</div>
+
+<?php Modal::end(); ?>

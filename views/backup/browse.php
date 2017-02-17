@@ -4,7 +4,6 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ListView;
 use yii\widgets\Pjax;
-use yii\bootstrap\Modal;
 
 /* @var $this yii\web\View */
 /* @var $ItemsDataProvider yii\data\ArrayDataProvider */
@@ -199,30 +198,3 @@ $this->registerJs($js);
     ]); ?>
   </div>
 </div>
-
-<?php Modal::begin([
-    'id' => 'confirmRestore',
-    'header' => '<h4>Confirm Restore</h4>',
-    'footer' => Html::Button('Cancel', ['data-dismiss' => 'modal', 'class' => 'btn btn-default']) . '<a id="restore-now" class="btn btn-danger btn-ok">Restore</a>',
-    //'size' => \yii\bootstrap\Modal::SIZE_SMALL
-]); ?>
-
-<p>You're about to restore:</p>
-<div class="list-group">
-  <li class="list-group-item">
-    <h4 id='confirmRestoreItemPath' class="list-group-item-heading">/path/to/file</h4>
-    <p class="list-group-item-text">to the state as it was at <b id='confirmRestoreItemDate'>date</b></p>
-  </li>
-</div>
-
-<div class="alert alert-danger" role="alert">
-  <h4>Important!</h4>
-
-  <p>Please notice, that if the <b>file</b> exists on the target machine, it will be permanently <b>OVERWRITTEN</b> by this version!</p>
-  <p>If you restore a <b>directory</b>, notice that the target directory will be restored to the exact same state of this version. Newer files will be <b>REMOVED</b>!</p>
-</div>
-
-
-
-
-<?php Modal::end(); ?>
