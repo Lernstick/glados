@@ -15,6 +15,8 @@ class m170216_090248_config extends Migration
         $this->addColumn($this->examTable, 'allow_sudo', $this->boolean()->notNull()->defaultValue(0));
         $this->addColumn($this->examTable, 'allow_mount', $this->boolean()->notNull()->defaultValue(0));
         $this->addColumn($this->examTable, 'firewall_off', $this->boolean()->notNull()->defaultValue(0));
+        $this->addColumn($this->examTable, 'screenshots', $this->boolean()->notNull()->defaultValue(0));
+        $this->addColumn($this->examTable, 'url_whitelist', $this->string(10240)->Null()->defaultValue(Null));
     }
 
     public function safeDown()
@@ -23,6 +25,8 @@ class m170216_090248_config extends Migration
         $this->dropColumn($this->examTable, 'allow_sudo');
         $this->dropColumn($this->examTable, 'allow_mount');
         $this->dropColumn($this->examTable, 'firewall_off');
+        $this->dropColumn($this->examTable, 'screenshots');
+        $this->dropColumn($this->examTable, 'url_whitelist');
     }
 
 }

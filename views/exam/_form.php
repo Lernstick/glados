@@ -43,6 +43,10 @@ if($model->file && Yii::$app->file->set($model->file)->exists) {
 
     <?= $form->field($model, 'firewall_off')->checkbox() ?>
 
+    <?= $form->field($model, 'screenshots')->checkbox() ?>
+
+    <?= $form->field($model, 'url_whitelist')->textarea() ?>
+
     <?php /* echo $form->field($model, 'file')->widget(FileInput::classname(), [
         'options' => ['accept' => '.squashfs'],
         'pluginOptions' => [

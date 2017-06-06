@@ -2,6 +2,8 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use yii\widgets\ListView;
+use yii\grid\GridView;
 use yii\helpers\ArrayHelper;
 use yii\widgets\Pjax;
 use yii\helpers\Url;
@@ -102,8 +104,20 @@ $this->params['breadcrumbs'][] = $this->title;
             'allow_sudo:boolean',
             'allow_mount:boolean',
             'firewall_off:boolean',
+            'screenshots:boolean',
         ],
     ]) ?>
+
+    <?= ListView::widget([
+        'dataProvider' => $urlWhitelistDataProvider,
+        #'options' => [ 'tag' => 'table', 'class' => 'table table-bordered table-hover'],
+        'itemOptions' => [ 'tag' => 'tr' ],
+        'itemView' => function ($model, $key, $index, $widget) {
+            return '<td>' . $model . '</td>';
+        },
+        'emptyText' => '<table class="table table-bordered table-hover"><tr><th>HTTP URL Whitelist</th></tr><tr><td>No URLs found.</td></tr></table>',
+        'layout' => '<table class="table table-bordered table-hover"><tr><th>HTTP URL Whitelist</th></tr>{items}</table> {pager} {summary}',
+    ]); ?>
 
     <?php Pjax::end(); ?>
 

@@ -441,6 +441,8 @@ class TicketController extends Controller
                     'allow_sudo' => boolval($model->exam->{"allow_sudo"}),
                     'allow_mount' => boolval($model->exam->{"allow_mount"}),
                     'firewall_off' => boolval($model->exam->{"firewall_off"}),
+                    'screenshots' => boolval($model->exam->{"screenshots"}),
+                    'url_whitelist' => implode(PHP_EOL, preg_split("/\r\n|\n|\r/", $model->exam->{"url_whitelist"}, null, PREG_SPLIT_NO_EMPTY)),
                 ]
             ];
         }

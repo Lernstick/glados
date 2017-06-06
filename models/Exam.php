@@ -11,6 +11,10 @@ use Yii;
  * @property string $name
  * @property string $subject
  * @property boolean $grp_netdev
+ * @property boolean $allow_sudo
+ * @property boolean $allow_mount
+ * @property boolean $firewall_off
+ * @property boolean $screenshots
  * @property string $file
  * @property integer $user_id
  * @property string $file_list
@@ -63,7 +67,7 @@ class Exam extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'name', 'subject', 'examFile', 'user_id', 'grp_netdev', 'allow_sudo', 'allow_mount', 'firewall_off'], 'validateRunningTickets'],
+            [['id', 'name', 'subject', 'examFile', 'user_id', 'grp_netdev', 'allow_sudo', 'allow_mount', 'firewall_off', 'screenshots', 'url_whitelist'], 'validateRunningTickets'],
             [['name', 'subject'], 'required'],
             [['user_id'], 'integer'],
             [['name', 'subject'], 'string', 'max' => 52],
@@ -87,7 +91,9 @@ class Exam extends \yii\db\ActiveRecord
             'grp_netdev' => 'User can edit network connections',
             'allow_sudo' => 'User can gain root privileges by sudo',
             'allow_mount' => 'User has access to external filesystems such as USB Sticks',
-            'firewall_off' => 'Firewall off',
+            'firewall_off' => 'Disable Firewall',
+            'screenshots' => 'Take Screenshots',
+            'url_whitelist' => 'HTTP URL Whitelist',
             'ticketCount' => 'Total Tickets',
             'openTicketCount' => 'Open Tickets',
             'runningTicketCount' => 'Running Tickets',

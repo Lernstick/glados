@@ -43,7 +43,7 @@ class m160623_095016_initial extends Migration
 
             //the user table
             $this->createTable($this->userTable, [
-            'id' => $this->primaryKey(),
+                'id' => $this->primaryKey(),
                 'access_token' => $this->string(254)->defaultValue(null),
                 'auth_key' => $this->string(254)->defaultValue(null),
                 'username' => $this->string(40)->notNull()->unique(),

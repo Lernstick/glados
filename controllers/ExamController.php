@@ -79,8 +79,16 @@ class ExamController extends Controller
         $session = Yii::$app->session;
 
         if ($mode === 'default') {
+
+            $urlWhitelistDataProvider = new ArrayDataProvider([
+                'allModels' => preg_split("/\r\n|\n|\r/", $model->{"url_whitelist"}, null, PREG_SPLIT_NO_EMPTY),
+            ]);
+            $urlWhitelistDataProvider->pagination->pageParam = 'url-page';
+            $urlWhitelistDataProvider->pagination->pageSize = 10;            
+
             return $this->render('view', [
                 'model' => $model,
+                'urlWhitelistDataProvider' => $urlWhitelistDataProvider,
                 'session' => $session,
             ]);
         }else if ($mode == "squashfs"){
