@@ -80,8 +80,10 @@ class ExamController extends Controller
 
         if ($mode === 'default') {
 
+            $models = preg_split("/\r\n|\n|\r/", $model->{"url_whitelist"}, null, PREG_SPLIT_NO_EMPTY);
+            $models = array_merge($models, preg_split("/\r\n|\n|\r/", $model->{"sq_url_whitelist"}, null, PREG_SPLIT_NO_EMPTY));
             $urlWhitelistDataProvider = new ArrayDataProvider([
-                'allModels' => preg_split("/\r\n|\n|\r/", $model->{"url_whitelist"}, null, PREG_SPLIT_NO_EMPTY),
+                'allModels' => $models,
             ]);
             $urlWhitelistDataProvider->pagination->pageParam = 'url-page';
             $urlWhitelistDataProvider->pagination->pageSize = 10;            

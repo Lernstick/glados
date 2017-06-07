@@ -57,6 +57,7 @@ class Exam extends \yii\db\ActiveRecord
         $this->on(self::EVENT_BEFORE_UPDATE, function($instance){
             if ($this->getOldAttribute('file') != $this->file) {
                 $this->md5 = $this->file == null ? null : md5_file($this->file);
+                $this->{"file_analyzed"} = 0;
             }
         });
     }
@@ -124,6 +125,7 @@ class Exam extends \yii\db\ActiveRecord
         $file = \Yii::$app->params['uploadDir'] . '/' . $this->file;
         $this->file = null;
         $this->md5 = null;
+        $this->{"file_analyzed"} = 0;
 
         if (file_exists($file) && is_file($file) && $this->save()) {
             return @unlink($file);

@@ -17,6 +17,8 @@ class m170216_090248_config extends Migration
         $this->addColumn($this->examTable, 'firewall_off', $this->boolean()->notNull()->defaultValue(0));
         $this->addColumn($this->examTable, 'screenshots', $this->boolean()->notNull()->defaultValue(0));
         $this->addColumn($this->examTable, 'url_whitelist', $this->string(10240)->Null()->defaultValue(Null));
+        $this->addColumn($this->examTable, 'file_analyzed', $this->boolean()->notNull()->defaultValue(0));
+        $this->addColumn($this->examTable, 'sq_url_whitelist', $this->string(10240)->Null()->defaultValue(Null));
     }
 
     public function safeDown()
@@ -27,6 +29,8 @@ class m170216_090248_config extends Migration
         $this->dropColumn($this->examTable, 'firewall_off');
         $this->dropColumn($this->examTable, 'screenshots');
         $this->dropColumn($this->examTable, 'url_whitelist');
+        $this->dropColumn($this->examTable, 'file_analyzed');
+        $this->dropColumn($this->examTable, 'sq_url_whitelist');
     }
 
 }
