@@ -28,6 +28,11 @@ use yii\widgets\Pjax;
             'captionOptions' => ['class' => 'dev_item']
         ],
         [
+            'attribute' => 'backup_interval',
+            'format' => 'raw',
+            'value' =>  $ticketModel->backup_interval == 0 ? 'No Backup' : yii::$app->formatter->format($ticketModel->backup_interval, 'duration'),
+        ],        
+        [
             'attribute' => 'backup_last',
             'format' => 'raw',
             'value' => yii::$app->formatter->format($ticketModel->backup_last, 'timeago') . ' (<b>last try</b>: ' . yii::$app->formatter->format($ticketModel->backup_last_try, 'timeago') . ')',

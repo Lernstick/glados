@@ -39,6 +39,10 @@ use kartik\datetime\DateTimePicker;
         ]
     ]); ?>
 
+    <?= $form->field($model, 'backup_interval', [
+        'template' => '{label}<div class="input-group">{input}<span class="input-group-addon" id="basic-addon2"># seconds (set "0" to disable automatic backup)</span></div>{hint}{error}'
+    ])->textInput(['type' => 'number']); ?>
+
     <?= $form->field($model, 'test_taker')->textInput(); ?>
 
     <div class="form-group">

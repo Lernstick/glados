@@ -93,6 +93,8 @@ class Ticket extends \yii\db\ActiveRecord
 
         /* generate the token if it's a new record */
         $this->token = $this->isNewRecord ? bin2hex(openssl_random_pseudo_bytes(\Yii::$app->params['tokenLength']/2)) : $this->token;
+
+        $this->backup_interval = $this->isNewRecord ? 300 : $this->backup_interval;
     }
 
 
@@ -110,12 +112,13 @@ class Ticket extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['exam_id'], 'required', 'on' => self::SCENARIO_DEFAULT],
+            [['exam_id', 'backup_interval'], 'required', 'on' => self::SCENARIO_DEFAULT],
             [['token', 'test_taker'], 'required', 'on' => self::SCENARIO_SUBMIT],
             [['start', 'ip'], 'required', 'on' => self::SCENARIO_DOWNLOAD],
             [['end'], 'required', 'on' => self::SCENARIO_FINISH],
             [['client_state'], 'required', 'on' => self::SCENARIO_NOTIFY],
             [['exam_id'], 'integer'],
+            [['backup_interval'], 'integer', 'min' => 0],
             [['exam_id'], 'validateExam', 'skipOnEmpty' => false, 'skipOnError' => false, 'on' => self::SCENARIO_DEFAULT],
             [['start', 'end', 'test_taker', 'ip', 'state'], 'safe'],
             [['token'], 'unique'],
@@ -149,6 +152,7 @@ class Ticket extends \yii\db\ActiveRecord
             'backup_last' => 'Last Backup',
             'backup_last_try' => 'Last Backup Try',
             'backup_state' => 'Backup State',
+            'backup_interval' => 'Backup Interval',
         ];
     }
 

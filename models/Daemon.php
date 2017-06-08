@@ -92,6 +92,11 @@ class Daemon extends \yii\db\ActiveRecord
         return $this->start('backup/run', [escapeshellarg($id)], $background);
     }
 
+    public function startAnalyzer($id = '', $background = true)
+    {
+        return $this->start('analyze/run', [escapeshellarg($id)], $background);
+    }
+
     public function startRestore($id, $file, $date = 'now', $background = true, $restorePath = null)
     {
         $args = [
@@ -108,8 +113,6 @@ class Daemon extends \yii\db\ActiveRecord
 
         //TODO: validating $command!
         $cmd = \Yii::getAlias('@app') . '/' . 'yii ' . $command . ' ' . implode(' ', $arguments);
-        //var_dump($cmd); die();
-        //file_put_contents('/tmp/command', $cmd . PHP_EOL, FILE_APPEND);
         if ($background === true) {
             $this->pid = exec(sprintf("%s > /dev/null 2>&1 & echo $!", $cmd));
             //$this->save();

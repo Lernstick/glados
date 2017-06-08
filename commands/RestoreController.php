@@ -50,7 +50,7 @@ class RestoreController extends DaemonController
     /**
      * @inheritdoc
      */
-    public function start()
+    public function start ()
     {
         parent::start();
     }
@@ -58,7 +58,7 @@ class RestoreController extends DaemonController
     /**
      * @inheritdoc
      */
-    public function doJob($id, $file, $date, $restorePath = '/overlay/home/user')
+    public function doJob ($id, $file, $date, $restorePath = '/overlay/home/user')
     {
         pcntl_signal_dispatch();
         $this->cleanup();

@@ -56,7 +56,7 @@ class BackupController extends DaemonController
     /**
      * @inheritdoc
      */
-    public function doJob($id = '')
+    public function doJob ($id = '')
     {
 
         while (true) {
@@ -274,54 +274,6 @@ class BackupController extends DaemonController
         }
     }
 
-    private function pingOthers ()
-    {
-
-        /* search for daemons with alive date older than 2 minutes */
-        $query = Daemon::find()
-            ->where(['not', ['pid' => $this->daemon->pid]])
-            ->andWhere([
-                'or',
-                ['<', 'alive', new Expression('NOW() - INTERVAL 2 MINUTE')],
-                ['alive' => null]
-            ])
-            ->orderBy(['alive' => SORT_ASC]);
-
-        $models = $query->all();
-        foreach($models as $daemon) {
-            if ($daemon->running === true) {
-                $oldAlive = $daemon->alive;
-
-                /* send SIGHUP */
-                $daemon->hup();
-                sleep(5);
-                $daemon->refresh();
-                if ($oldAlive == $daemon->alive && $daemon->running === true) {
-                    $this->log("daemon " . $daemon->pid . ": no reaction, sending SIGHUP again.", true);
-                    $oldAlive = $daemon->alive;
-                    $daemon->hup();
-                    sleep(30);
-                    $daemon->refresh();
-                    if ($oldAlive != $daemon->alive) {
-                       $this->log("daemon " . $daemon->pid . ": is alive now.", true);
-                    } else {
-                        $this->log("daemon " . $daemon->pid . ": no reaction, sending SIGTERM", true);
-
-                        /* send SIGTERM */
-                        $daemon->stop();
-                        sleep(10);
-                        if ($daemon->refresh() === true && $daemon->running === true) {
-                            $this->log("daemon " . $daemon->pid . ": no reaction, sending SIGKILL", true);
-
-                            /* send SIGKILL */
-                            $daemon->kill();
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     /**
      * Returns a ticket model which has the finish process initiated.
      * Those tickets only need one last backup, therefore they have higher 
@@ -371,20 +323,25 @@ class BackupController extends DaemonController
             return $ticket;
         }
 
-        // now those which weren't tried in the last 5 minutes
+        // now those which weren't tried in the last n seconds (n=backup_interval)
         $query = Ticket::find()
             ->where(['not', ['start' => null]])
             ->andWhere(['end' => null])
             ->andWhere(['not', ['ip' => null]])
+            ->andWhere(['not', ['backup_interval' => 0]])
             ->andWhere([
                 'or',
-                ['<', 'backup_last_try', new Expression('NOW() - INTERVAL 5 MINUTE')],
+                [
+                    '<',
+                    new Expression('unix_timestamp(`backup_last_try`) + `backup_interval`'),
+                    new Expression('unix_timestamp(NOW())')
+                ],
                 ['backup_last_try' => null]
             ])
             ->andWhere(['backup_lock' => 0])
             ->andWhere(['restore_lock' => 0])
             ->andWhere(['bootup_lock' => 0])
-            ->orderBy(['backup_last_try' => SORT_ASC]);
+            ->orderBy(new Expression('unix_timestamp(`backup_last_try`) + `backup_interval` ASC'));            
 
 
         // finally lock the next ticket and return it

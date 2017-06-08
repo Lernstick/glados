@@ -82,11 +82,17 @@ class DaemonController extends Controller
      * If request is not Ajax, the browser will be redirected to the 'index' page.
      * @return mixed
      */
-    public function actionCreate()
+    public function actionCreate($type = 'backup')
     {
 
         $model = new Daemon();
-        $model->startBackup();
+        switch ($type) {
+            case 'backup':
+                $model->startBackup();
+                break;
+            case 'analyze':
+                $model->startAnalyzer();
+        }
 
         if(Yii::$app->request->isAjax){
             return $this->runAction('index');

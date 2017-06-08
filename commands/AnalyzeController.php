@@ -15,12 +15,18 @@ use app\components\ShellCommand;
 class AnalyzeController extends DaemonController
 {
 
-    public $fileList = [
+    /**
+     * @var array A list of paths to extract
+     */    
+    public $extractList = [
         '/etc/lernstick-firewall/url_whitelist',
     ];
 
-    public $return = false;
+    /**
+     * @var Exam The exam in processing at the moment 
+     */    
     public $exam = null;
+
 
     /**
      * @inheritdoc
@@ -33,22 +39,21 @@ class AnalyzeController extends DaemonController
     /**
      * @inheritdoc
      */
-    public function doJob($id = '')
+    public function doJob ($id = '')
     {
         while (true) {
             $this->exam = null;
 
             if ($id != ''){
                 $this->exam =  Exam::findOne(['id' => $id]);
-                $this->return = true;
             } else {
                 $this->exam = $this->getNextExam();
             }
 
             if($this->exam  !== null) {
                 $tmpdir = $this->unpack();
-                if (file_exists($tmpdir . "/" . $this->fileList[0])) {
-                    $this->exam->{"sq_url_whitelist"} = file_get_contents($tmpdir . "/" . $this->fileList[0]);
+                if (file_exists($tmpdir . "/" . $this->extractList[0])) {
+                    $this->exam->{"sq_url_whitelist"} = file_get_contents($tmpdir . "/" . $this->extractList[0]);
                 }
 
                 $this->exam->{"file_analyzed"} = 1;
@@ -59,16 +64,20 @@ class AnalyzeController extends DaemonController
                 }
             }
 
-            if ($this->return == true) {
+            if ($id != '') {
                 return;
             }
 
             pcntl_signal_dispatch();
             sleep(rand(5, 10));
         }
-
     }
 
+    /**
+     * Extracts files from the associated squash filesystem
+     *
+     * @return string the path to the unpacked files
+     */
     private function unpack ()
     {
         chdir(dirname(__FILE__));
@@ -77,8 +86,7 @@ class AnalyzeController extends DaemonController
         }
 
         $cmd = "unsquashfs -d /tmp/" . escapeshellarg($this->exam->md5) . " " . escapeshellarg($this->exam->file)
-             . " " . implode(" ", $this->fileList);
-        echo $cmd . PHP_EOL;
+             . " " . implode(" ", $this->extractList);
         $cmd = new ShellCommand($cmd);
 
         $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use (&$output) {
@@ -89,13 +97,18 @@ class AnalyzeController extends DaemonController
         return "/tmp/" . $this->exam->md5;
     }
 
+    /**
+     * Removes a directory recusively
+     *
+     * @param string path to directory
+     * @return bool success or failure
+     */
     private function removeDirectory ($path) {
         $files = glob($path . '/*');
         foreach ($files as $file) {
             is_dir($file) ? $this->removeDirectory($file) : unlink($file);
         }
-        rmdir($path);
-        return;
+        return file_exists($path) ? rmdir($path) : false;
     }
 
 
@@ -107,18 +120,17 @@ class AnalyzeController extends DaemonController
     private function getNextExam ()
     {
 
+        $this->pingOthers();
+
         $query = Exam::find()
             ->where(['not', ['file' => null]])
             ->andWhere(['file_analyzed' => 0]);
 
-
-        // finally lock the next ticket and return it
         if (($exam = $query->one()) !== null) {
             return $exam;
         }
 
         return null;
-
     }
 
 

@@ -189,6 +189,60 @@ class DaemonController extends Controller
 
     }
 
+    /**
+     * Checks whether the other running daemons are still alive and if not, 
+     * kills them.
+     *
+     * @return void
+     */
+    public function pingOthers ()
+    {
+
+        /* search for daemons with alive date older than 2 minutes */
+        $query = Daemon::find()
+            ->where(['not', ['pid' => $this->daemon->pid]])
+            ->andWhere([
+                'or',
+                ['<', 'alive', new Expression('NOW() - INTERVAL 2 MINUTE')],
+                ['alive' => null]
+            ])
+            ->orderBy(['alive' => SORT_ASC]);
+
+        $models = $query->all();
+        foreach($models as $daemon) {
+            if ($daemon->running === true) {
+                $oldAlive = $daemon->alive;
+
+                /* send SIGHUP */
+                $daemon->hup();
+                sleep(5);
+                $daemon->refresh();
+                if ($oldAlive == $daemon->alive && $daemon->running === true) {
+                    $this->log("daemon " . $daemon->pid . ": no reaction, sending SIGHUP again.", true);
+                    $oldAlive = $daemon->alive;
+                    $daemon->hup();
+                    sleep(30);
+                    $daemon->refresh();
+                    if ($oldAlive != $daemon->alive) {
+                       $this->log("daemon " . $daemon->pid . ": is alive now.", true);
+                    } else {
+                        $this->log("daemon " . $daemon->pid . ": no reaction, sending SIGTERM", true);
+
+                        /* send SIGTERM */
+                        $daemon->stop();
+                        sleep(10);
+                        if ($daemon->refresh() === true && $daemon->running === true) {
+                            $this->log("daemon " . $daemon->pid . ": no reaction, sending SIGKILL", true);
+
+                            /* send SIGKILL */
+                            $daemon->kill();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     /*
      * This is the actual job of the daemon
      */

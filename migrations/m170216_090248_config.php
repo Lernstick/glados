@@ -6,6 +6,7 @@ class m170216_090248_config extends Migration
 {
 
     public $examTable = 'exam';
+    public $ticketTable = 'ticket';
 
     public function safeUp()
     {
@@ -19,6 +20,8 @@ class m170216_090248_config extends Migration
         $this->addColumn($this->examTable, 'url_whitelist', $this->string(10240)->Null()->defaultValue(Null));
         $this->addColumn($this->examTable, 'file_analyzed', $this->boolean()->notNull()->defaultValue(0));
         $this->addColumn($this->examTable, 'sq_url_whitelist', $this->string(10240)->Null()->defaultValue(Null));
+
+        $this->addColumn($this->ticketTable, 'backup_interval', $this->integer(11)->notNull()->defaultValue(300));
     }
 
     public function safeDown()
@@ -31,6 +34,8 @@ class m170216_090248_config extends Migration
         $this->dropColumn($this->examTable, 'url_whitelist');
         $this->dropColumn($this->examTable, 'file_analyzed');
         $this->dropColumn($this->examTable, 'sq_url_whitelist');
+
+        $this->dropColumn($this->ticketTable, 'backup_interval');
     }
 
 }
