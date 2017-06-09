@@ -12,15 +12,30 @@ use yii\widgets\ActiveForm;
 <div class="user-form">
 
     <?php $form = ActiveForm::begin(); ?>
+    <div class="row">
+        <div class="col-md-6">
+            <?= $form->field($model, 'username')->textInput(['maxlength' => true]) ?>
+        </div>
 
-    <?= $form->field($model, 'username')->textInput(['maxlength' => true]) ?>
+        <div class="col-md-6">
+            <?php echo $form->field($model, 'role')->dropDownList($searchModel->roleList, [ 'prompt' => 'Choose a Role ...' ]) ?>
+        </div>
+    </div>
 
-    <?php echo $model->isNewRecord ? $form->field($model, 'password')->passwordInput(['maxlength' => true]) : null; ?>
-    <?php echo $model->isNewRecord ? $form->field($model, 'password_repeat')->passwordInput(['maxlength' => true]) : null; ?>
+    <div class="row">
+        <div class="col-md-6">
+            <?php echo $model->isNewRecord ? $form->field($model, 'password')->passwordInput(['maxlength' => true]) : null; ?>
+        </div>
+        <div class="col-md-6">        
+            <?php echo $model->isNewRecord ? $form->field($model, 'password_repeat')->passwordInput(['maxlength' => true]) : null; ?>
+        </div>
+    </div>
 
-    <?php echo $form->field($model, 'role')->dropDownList($searchModel->roleList, [ 'prompt' => 'Choose a Role ...' ]) ?>
-
-	<?= $form->field($model, 'change_password')->checkbox() ?>
+    <div class="row">
+        <div class="col-md-6">
+	       <?= $form->field($model, 'change_password')->checkbox() ?>
+        </div>
+    </div>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

@@ -31,77 +31,84 @@ if($model->file && Yii::$app->file->set($model->file)->exists) {
 
     <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 
-    <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+    <div class="row">
+        <div class="col-md-6">
+            <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+        </div>
 
-    <?= $form->field($model, 'subject')->textInput(['maxlength' => true]) ?>
+        <div class="col-md-6">
+            <?= $form->field($model, 'subject')->textInput(['maxlength' => true]) ?>
+        </div>
+    </div>
 
-    <?= $form->field($model, 'grp_netdev')->checkbox() ?>
+    <div class="row">
+        <div class="col-md-6">
+            <?= $form->field($model, 'grp_netdev')->checkbox() ?>
+            <?= $form->field($model, 'allow_sudo')->checkbox() ?>
+            <?= $form->field($model, 'allow_mount')->checkbox() ?>
+            <?= $form->field($model, 'firewall_off')->checkbox() ?>
+            <?= $form->field($model, 'screenshots')->checkbox() ?>
+        </div>
+        <div class="col-md-6">
+            <?= $form->field($model, 'url_whitelist')->textarea([
+                'rows' => '6',
+            ]) ?>
+        </div>
+    </div>
 
-    <?= $form->field($model, 'allow_sudo')->checkbox() ?>
+    <div class="row">
+        <div class="col-md-6">
+            <?= $form->field($model, 'time_limit', [
+                'template' => '{label}<div class="input-group">{input}<span class="input-group-addon" id="basic-addon2">minutes</span></div>{hint}{error}'
+            ])->textInput(['type' => 'number'])->
+            hint('Set "0" or leave empty for no time limit.'); ?>
+        </div>
+    </div>
 
-    <?= $form->field($model, 'allow_mount')->checkbox() ?>
+    <div class="row">
+        <div class="col-md-12">
+            <?php
+            if(!$model->isNewRecord) {
 
-    <?= $form->field($model, 'firewall_off')->checkbox() ?>
+                echo Html::label('File');
+                echo JQueryFileUpload::widget([
+                    'model' => $model,
+                    'name' => 'file',
+                    'url' => ['update', 'id' => $model->id, 'mode' => 'upload'],
+                    'appearance' => 'ui', // available values: 'ui','plus' or 'basic'
+                    'formId' => $form->id,
+                    'options' => [
+                        'multiple' => false
+                    ],
+                    'clientOptions' => [
+                        'maxFileSize' => 4000000000,
+                        'dataType' => 'json',
+                        'acceptFileTypes' => new yii\web\JsExpression('/(\.|\/)(squashfs)$/i'),
+                        'maxNumberOfFiles' => 1,
+                        'autoUpload' => false
+                    ],
+                ]);
+            }
+            ?>
 
-    <?= $form->field($model, 'screenshots')->checkbox() ?>
-
-    <?= $form->field($model, 'url_whitelist')->textarea() ?>
-
-    <?php /* echo $form->field($model, 'file')->widget(FileInput::classname(), [
-        'options' => ['accept' => '.squashfs'],
-        'pluginOptions' => [
-            'initialCaption' => $model->isNewRecord ? null: basename($model->file),
-            'initialPreview' => $model->isNewRecord ? [] : [ '<span class="glyphicon glyphicon-file kv-caption-icon"></span>' ],
-            'overwriteInitial' => true,
-            'showPreview' => false,
-            'showCaption' => true,
-            'showUpload' => false,
-            'showRemove' => false,
-        ],
-    ]);*/ ?>
-
-    <?php
-    if(!$model->isNewRecord) {
-
-        echo Html::label('File');
-        echo JQueryFileUpload::widget([
-            'model' => $model,
-            'name' => 'file',
-            'url' => ['update', 'id' => $model->id, 'mode' => 'upload'],
-            'appearance' => 'ui', // available values: 'ui','plus' or 'basic'
-            'formId' => $form->id,
-            'options' => [
-                'multiple' => false
-            ],
-            'clientOptions' => [
-                'maxFileSize' => 4000000000,
-                'dataType' => 'json',
-                'acceptFileTypes' => new yii\web\JsExpression('/(\.|\/)(squashfs)$/i'),
-                'maxNumberOfFiles' => 1,
-                'autoUpload' => false
-            ],
-        ]);
-    }
-    ?>
-
-    <?php
-    if($model->file && Yii::$app->file->set($model->file)->exists) {
-        $js = new JsExpression("var fupload = jQuery('#w0').fileupload({
-            'maxFileSize':4000000000,
-            'dataType':'json',
-            'acceptFileTypes':/(\.|\/)(squashfs)$/i,
-            'maxNumberOfFiles':1,
-            'autoUpload':false,
-            'url':'\/index.php?r=exam%2Fupdate\u0026id=" . $model->id . "\u0026mode=upload',
-            progressServerRate: 0.5,
-            progressServerDecayExp: 3.5
-        });
-        jQuery('#w0').fileupload('option', 'done').call(fupload, $.Event('done'), {result: {files: files}});");
-        $this->registerJs($js);
-    }
-    ?>
-
-
+            <?php
+            if($model->file && Yii::$app->file->set($model->file)->exists) {
+                $js = new JsExpression("var fupload = jQuery('#w0').fileupload({
+                    'maxFileSize':4000000000,
+                    'dataType':'json',
+                    'acceptFileTypes':/(\.|\/)(squashfs)$/i,
+                    'maxNumberOfFiles':1,
+                    'autoUpload':false,
+                    'url':'\/index.php?r=exam%2Fupdate\u0026id=" . $model->id . "\u0026mode=upload',
+                    progressServerRate: 0.5,
+                    progressServerDecayExp: 3.5
+                });
+                jQuery('#w0').fileupload('option', 'done').call(fupload, $.Event('done'), {result: {files: files}});");
+                $this->registerJs($js);
+            }
+            ?>
+        </div>
+    </div>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Next Step' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

@@ -43,6 +43,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 'name',
                 'subject',
                 [
+                    'attribute' => 'time_limit',
+                    'format' => 'raw',
+                    'value' => $model->time_limit == Null ? 'No Time Limit' : yii::$app->formatter->format($model->{'time_limit'}*60, 'duration'),
+                ],
+                [
                     'attribute' => 'file',
                     'value' => basename($model->file, '.squashfs') . ' ' . (
                         $model->fileConsistency ? 

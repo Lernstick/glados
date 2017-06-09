@@ -105,5 +105,21 @@ class customFormatter extends \yii\i18n\Formatter
         return $value;
     }
 
+    /**
+     * Formats the time limit as duration or a custom string.
+     *
+     * @param integer $value the value to be formatted in minutes.
+     * @return string the formatted result.
+     */
+    public static function asTimeLimit($value)
+    {
+        if (is_int($value) && $value > 0) {
+            $value = yii::$app->formatter->format($value*60, 'duration');
+        } else {
+            $value = "No Time Limit";
+        }
+        return $value;
+    }
+
 }
 

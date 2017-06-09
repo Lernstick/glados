@@ -137,7 +137,7 @@ $requirements = array(
         'memo' => 'Realtime events in views',
     ),
     'phpFileUploads' => array(
-        'name' => 'PHP allow allow file uploads',
+        'name' => 'PHP allow file uploads',
         'mandatory' => true,
         'condition' => $requirementsChecker->checkPhpIniOn("file_uploads"),
         'by' => 'File upload',

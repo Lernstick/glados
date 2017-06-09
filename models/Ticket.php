@@ -112,13 +112,14 @@ class Ticket extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['exam_id', 'backup_interval'], 'required', 'on' => self::SCENARIO_DEFAULT],
+            [['exam_id', 'token', 'backup_interval'], 'required', 'on' => self::SCENARIO_DEFAULT],
             [['token', 'test_taker'], 'required', 'on' => self::SCENARIO_SUBMIT],
             [['start', 'ip'], 'required', 'on' => self::SCENARIO_DOWNLOAD],
             [['end'], 'required', 'on' => self::SCENARIO_FINISH],
             [['client_state'], 'required', 'on' => self::SCENARIO_NOTIFY],
             [['exam_id'], 'integer'],
             [['backup_interval'], 'integer', 'min' => 0],
+            [['time_limit'], 'integer', 'min' => 0],
             [['exam_id'], 'validateExam', 'skipOnEmpty' => false, 'skipOnError' => false, 'on' => self::SCENARIO_DEFAULT],
             [['start', 'end', 'test_taker', 'ip', 'state'], 'safe'],
             [['token'], 'unique'],
@@ -144,6 +145,7 @@ class Ticket extends \yii\db\ActiveRecord
             'start' => 'Started',
             'end' => 'Finished',
             'duration' => 'Duration',
+            'time_limit' => 'Time Limit',
             'download_progress' => 'Exam Download Progress',
             'client_state' => 'Client State',
             'ip' => 'IP Address',
@@ -369,7 +371,7 @@ class Ticket extends \yii\db\ActiveRecord
      */
     public function getValid(){
         if($this->state == self::STATE_OPEN || $this->state == self::STATE_RUNNING){
-            return $this->validTime ? true : false;
+            return $this->validTime !== false ? true : false;
         }
         return false;
     }
@@ -397,17 +399,30 @@ class Ticket extends \yii\db\ActiveRecord
     /**
      * Calulates the time the ticket will be valid as DateInterval.
      *
-     * @return DateInterval|bool - Dateinterval object or false if not valid
+     * @return DateInterval|bool - Dateinterval object,
+                                   false, if not valid,
+                                   true, if it cannot expire
      */
     public function getValidTime(){
-        $a = new \DateTime($this->start);
-        $a->add(new \DateInterval('PT2H'));
-        $b = new \DateTime('now');
-
         if($this->state == self::STATE_OPEN || $this->state == self::STATE_RUNNING){
+            $a = new \DateTime($this->start);
+            #$a->add(new \DateInterval('PT2H'));
+            if (is_int($this->time_limit) && $this->time_limit == 0) {
+                return true;
+            } else if (is_int($this->time_limit) && $this->time_limit > 0) {
+                $a->add(new \DateInterval('PT' . intval($this->time_limit) . 'M'));
+            } else if (is_int($this->exam->time_limit) && $this->exam->time_limit == 0) {
+                return true;
+            } else if (is_int($this->exam->time_limit) && $this->exam->time_limit > 0) {
+                $a->add(new \DateInterval('PT' . intval($this->exam->time_limit) . 'M'));            
+            } else {
+                return true;
+            }
+            $b = new \DateTime('now');
             return $b > $a ? false : $b->diff($a);
+        } else {
+            return false;
         }
-        return false;
     }
 
     /**

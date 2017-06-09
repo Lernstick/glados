@@ -68,8 +68,9 @@ class Exam extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'name', 'subject', 'examFile', 'user_id', 'grp_netdev', 'allow_sudo', 'allow_mount', 'firewall_off', 'screenshots', 'url_whitelist'], 'validateRunningTickets'],
+            [['id', 'name', 'subject', 'examFile', 'user_id', 'grp_netdev', 'allow_sudo', 'allow_mount', 'firewall_off', 'screenshots', 'url_whitelist', 'time_limit'], 'validateRunningTickets'],
             [['name', 'subject'], 'required'],
+            [['time_limit'], 'integer', 'min' => 0],
             [['user_id'], 'integer'],
             [['name', 'subject'], 'string', 'max' => 52],
             [['file'], 'file', 'skipOnEmpty' => true, 'extensions' => 'squashfs', 'checkExtensionByMimeType' => false],
@@ -95,6 +96,7 @@ class Exam extends \yii\db\ActiveRecord
             'firewall_off' => 'Disable Firewall',
             'screenshots' => 'Take Screenshots',
             'url_whitelist' => 'HTTP URL Whitelist',
+            'time_limit' => 'Time Limit',
             'ticketCount' => 'Total Tickets',
             'openTicketCount' => 'Open Tickets',
             'runningTicketCount' => 'Running Tickets',

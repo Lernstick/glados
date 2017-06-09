@@ -286,7 +286,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => '<span class="label label-'
                      . ( $model->valid ? 'success' : 'danger' )
                      . '">' . ($model->valid ? 'Yes' : 'No') . '</span> '
-                     . ( $model->validTime ? 'for ' . yii::$app->formatter->format($model->validTime, 'duration') . ' after start' : '<span class="not-set">(expired)</span>' ),
+                     . ( $model->validTime !== false ? ($model->validTime === true ? 'No Time Limit' : 'for ' . yii::$app->formatter->format($model->validTime, 'duration') . ' after start') : '<span class="not-set">(expired)</span>' ),
                 'format' => 'html',
             ],
             'test_taker',
