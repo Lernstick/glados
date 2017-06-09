@@ -400,8 +400,8 @@ class Ticket extends \yii\db\ActiveRecord
      * Calulates the time the ticket will be valid as DateInterval.
      *
      * @return DateInterval|bool - Dateinterval object,
-                                   false, if not valid,
-                                   true, if it cannot expire
+     *                             false, if not valid,
+     *                             true, if it cannot expire
      */
     public function getValidTime(){
         if($this->state == self::STATE_OPEN || $this->state == self::STATE_RUNNING){
