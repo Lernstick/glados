@@ -70,7 +70,16 @@ class RdiffFileSystem extends Model
      */
     public $excludeList = [
         '/^\./',                    // exclude all dotfiles
-        '/^rdiff-backup-data$/'     // exclude the rdiff-backup-data directory
+    ];
+
+    /**
+     * @var array A list of file or directory paths to omit when reading a directory
+     */
+    public $excludePaths = [
+        '/^\/rdiff-backup-data$/',      // exclude the rdiff-backup-data directory    
+        '/^\/Screenshots$/',
+        '/^\/shutdown$/',
+        '/^\/Schreibtisch\/finish_exam.desktop$/',        
     ];
 
     /**
@@ -304,10 +313,26 @@ class RdiffFileSystem extends Model
         }
     }
 
-    private function filterExclude($element)
+    /**
+     * Filter for array_filter() to exclude specific file names and paths
+     *
+     * @param string $name - the file name
+     * @return bool        - whether to keep the name or not
+     */
+    private function filterExclude($name)
     {
+        if (preg_match($this->dateRegex, $name, $matches) === 1) {
+            $name = current(explode("." . $matches[0], $name));
+        }
+        $path = FileHelper::normalizePath($this->_pwd . '/' . $name);
+
         foreach ($this->excludeList as $pattern) {
-            if (preg_match($pattern, $element) === 1) {
+            if (preg_match($pattern, $name) === 1) {
+                return false;
+            }
+        }
+        foreach ($this->excludePaths as $pattern) {
+            if (preg_match($pattern, $path) === 1) {
                 return false;
             }
         }
@@ -550,7 +575,7 @@ class RdiffFileSystem extends Model
             } else {
                 return 'normal';
             }
-        } else {
+        } else if (is_dir(dirname($this->incrementsPath))) {
 
             foreach (array_filter(scandir(dirname($this->incrementsPath)), array($this, 'filterExclude')) as $item) {
 

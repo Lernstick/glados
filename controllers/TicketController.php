@@ -475,6 +475,20 @@ class TicketController extends Controller
                                              'multiple downloads are not allowed.' ];
         }
 
+        $query = Ticket::find()
+            ->where(['not', ['start' => null]])
+            ->andWhere(['end' => null])
+            ->andWhere(['download_lock' => 0]);
+
+        if(intval($query->count()) >= 10){
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            return [
+                'code' => 509,
+                'msg' => 'The server is busy, please wait. Retry in {i} seconds.',
+                'wait' => 20,
+            ];
+        }
+
         $model->scenario = Ticket::SCENARIO_DOWNLOAD;
 
         $model->bootup_lock = 1;
