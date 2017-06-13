@@ -58,7 +58,7 @@ $this->registerJs('var YII_DEBUG = ' . (YII_DEBUG ? 'true' : 'false') . ';', \yi
 <div class="wrap">
     <?php
     NavBar::begin([
-        'brandLabel' => 'GLaDOS',
+        'brandLabel' => 'GLaDOS' . (YII_ENV_DEV ? ' ENV_DEV' : null),
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',

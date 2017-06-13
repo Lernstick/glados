@@ -45,6 +45,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
 ?>
 
+
+
 <div class="ticket-view container">
 
     <h1><?= Html::encode($this->title) ?></h1>
@@ -294,9 +296,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'ip',
                 'format' => 'raw',
                 'value' => yii::$app->formatter->format($model->ip, 'text') . " " . 
-                    ( $online == 0 ?    '<span class="label label-success">Online</span>' :
-                    ( $online == -1 ?   '<span class="label label-warning">Unknown</span>' : 
-                                        '<span class="label label-danger">Offline</span>') ) . " " .
+                    ( $model->online === 1 ?    '<span class="label label-success">Online</span>' :
+                    ( $model->online === 0 ?   '<span class="label label-danger">Offline</span>' : 
+                                        '<span class="label label-warning">Unknown</span>') ) . " " .
                     Html::a('Probe', ['view', 'id' => $model->id, 'mode' => 'probe']),
             ],
             [
@@ -308,7 +310,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     'jsonSelector' => 'client_state',
                 ]),
             ],
-
             [
                 'attribute' => 'download_progress', 
                 'format' => 'raw',
@@ -348,6 +349,23 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'backup_state',
                 'format' => 'raw',
                 'value' =>  ActiveEventField::widget([
+                    'options' => [
+                        'tag' => 'i',
+                        'class' => 'glyphicon glyphicon-cog ' . ($model->backup_lock == 1 ? 'gly-spin' : 'hidden'),
+                        'style' => 'float: left;',
+                    ],
+                    'event' => 'ticket/' . $model->id,
+                    'jsonSelector' => 'backup_lock',
+                    'jsHandler' => 'function(d, s){
+                        if(d == "1"){
+                            s.classList.add("gly-spin");
+                            s.classList.remove("hidden");
+                        }else if(d == "0"){
+                            s.classList.remove("gly-spin");
+                            s.classList.add("hidden");
+                        }
+                    }',
+                ]) . ActiveEventField::widget([
                     'content' => yii::$app->formatter->format($model->backup_state, 'ntext'),
                     'event' => 'ticket/' . $model->id,
                     'jsonSelector' => 'backup_state',
@@ -357,11 +375,28 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'restore_state',
                 'format' => 'raw',
                 'value' =>  ActiveEventField::widget([
+                    'options' => [
+                        'tag' => 'i',
+                        'class' => 'glyphicon glyphicon-cog ' . ($model->restore_lock == 1 ? 'gly-spin' : 'hidden'),
+                        'style' => 'float: left;',
+                    ],
+                    'event' => 'ticket/' . $model->id,
+                    'jsonSelector' => 'restore_lock',
+                    'jsHandler' => 'function(d, s){
+                        if(d == "1"){
+                            s.classList.add("gly-spin");
+                            s.classList.remove("hidden");
+                        }else if(d == "0"){
+                            s.classList.remove("gly-spin");
+                            s.classList.add("hidden");
+                        }
+                    }',
+                ]) . ActiveEventField::widget([
                     'content' => yii::$app->formatter->format($model->restore_state, 'ntext'),
                     'event' => 'ticket/' . $model->id,
                     'jsonSelector' => 'restore_state',
                 ]),
-            ],
+            ],         
             [
                 'attribute' => 'bootup_lock',
                 'format' => 'raw',
@@ -383,15 +418,17 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php Pjax::end(); ?>
 
-    <div id="activities" class="tab-pane fade">
-
+    <?php Pjax::begin([
+        'id' => 'activities',
+        'options' => ['class' => 'tab-pane fade'],
+    ]); ?>
         <?php $_GET = array_merge($_GET, ['#' => 'tab_activities']); ?>
         <?= $this->render('/activity/_item', [
             'searchModel' => $activitySearchModel,
             'dataProvider' => $activityDataProvider,
+            'ticket' => $model,
         ]); ?>
-
-    </div>
+    <?php Pjax::end(); ?>
 
     <?php ActiveEventField::begin([
         'event' => 'ticket/' . $model->id,

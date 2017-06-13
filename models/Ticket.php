@@ -71,6 +71,7 @@ class Ticket extends \yii\db\ActiveRecord
     const SCENARIO_DOWNLOAD = 'download';
     const SCENARIO_FINISH = 'finish';
     const SCENARIO_NOTIFY = 'notify';
+    const SCENARIO_DEV = 'dev';
 
     /* ticket state constants */
     const STATE_OPEN = 0;
@@ -121,7 +122,8 @@ class Ticket extends \yii\db\ActiveRecord
             [['backup_interval'], 'integer', 'min' => 0],
             [['time_limit'], 'integer', 'min' => 0],
             [['exam_id'], 'validateExam', 'skipOnEmpty' => false, 'skipOnError' => false, 'on' => self::SCENARIO_DEFAULT],
-            [['start', 'end', 'test_taker', 'ip', 'state'], 'safe'],
+            [['start', 'end', 'test_taker', 'ip', 'state', 'download_lock'], 'safe'],
+            [['start', 'end', 'test_taker', 'ip', 'state', 'download_lock', 'backup_lock', 'restore_lock', 'bootup_lock'], 'safe', 'on' => self::SCENARIO_DEV],
             [['token'], 'unique'],
             [['token'], 'string', 'max' => 32],
             [['token'], 'checkIfClosed', 'on' => self::SCENARIO_SUBMIT],

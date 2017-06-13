@@ -109,6 +109,8 @@ class BackupController extends DaemonController
             $this->ticket->backup_state = 'connecting to client...';
             $this->ticket->save(false);
 
+            $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? 1 : 0;
+            $this->ticket->save(false);
             if ($this->checkPort(22, 3) === false) {
                 $this->ticket->backup_state = 'network error.';
                 $this->ticket->backup_last_try = new Expression('NOW()');

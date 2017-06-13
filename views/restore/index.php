@@ -31,6 +31,23 @@ use yii\widgets\Pjax;
             'attribute' => 'restore_state',
             'format' => 'raw',
             'value' =>  ActiveEventField::widget([
+                    'options' => [
+                        'tag' => 'i',
+                        'class' => 'glyphicon glyphicon-cog ' . ($ticketModel->restore_lock == 1 ? 'gly-spin' : 'hidden'),
+                        'style' => 'float: left;',
+                    ],
+                    'event' => 'ticket/' . $ticketModel->id,
+                    'jsonSelector' => 'restore_lock',
+                    'jsHandler' => 'function(d, s){
+                        if(d == "1"){
+                            s.classList.add("gly-spin");
+                            s.classList.remove("hidden");
+                        }else if(d == "0"){
+                            s.classList.remove("gly-spin");
+                            s.classList.add("hidden");
+                        }
+                    }',
+                ]) . ActiveEventField::widget([
                 'content' => yii::$app->formatter->format($ticketModel->restore_state, 'ntext'),
                 'event' => 'ticket/' . $ticketModel->id,
                 'jsonSelector' => 'restore_state',

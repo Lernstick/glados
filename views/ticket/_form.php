@@ -72,6 +72,12 @@ use kartik\datetime\DateTimePicker;
         </div>
     </div>
 
+    <?= YII_ENV_DEV ? $this->render('_form_dev', [
+        'model' => $model,
+        'form' => $form,
+    ]) : null; ?>
+
+
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>

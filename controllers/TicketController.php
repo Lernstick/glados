@@ -106,11 +106,12 @@ class TicketController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionView($id, $mode = 'default', $online = -1, $path = '/', $date = 'all')
+    public function actionView($id, $mode = 'default', $online = -1, $path = '/', $date = null)
     {
 
+        $model = $this->findModel($id);
         if ($mode == 'default') {
-            $model = $this->findModel($id);
+            //$model = $this->findModel($id);
             $session = Yii::$app->session;
 
             $lastState = $session['ticketLastState' . $model->id];
@@ -147,6 +148,10 @@ class TicketController extends Controller
                 'restoreUser' => 'root',
                 'restoreHost' => $model->ip,
             ]);
+
+            if ($date == null) {
+                $date = ($model->state == Ticket::STATE_CLOSED || $model->state == Ticket::STATE_SUBMITTED) ? $fs->newestBackupVersion : 'all';
+            }
 
             if (file_exists(\Yii::getAlias('@app/backups/' . $model->token))) {
                 $models = $fs->slash($path)->versionAt($date)->contents;
@@ -190,15 +195,16 @@ class TicketController extends Controller
                 'date' => $date,
             ]);
         } else if ($mode == 'probe') {
-            $model = $this->findModel($id);
+            //$model = $this->findModel($id);
             //$online = $model->runCommand('source /info; ping -nq -W 10 -c 1 "${gladosIp}"', 'C', 10)[1];
-            $online = $model->runCommand('true', 'C', 10)[1];
+            $model->online = $model->runCommand('true', 'C', 10)[1] == 0 ? 1 : 0;
+            $model->save(false);
             return $this->redirect(['ticket/view',
                 'id' => $model->id,
-                'online' => $online,
+                #'online' => $online,
             ]);
         } else if ($mode == 'report') {
-            $model = $this->findModel($id);
+            //$model = $this->findModel($id);
 
             $content = $this->renderPartial('report', [
                 'model' => $model,
@@ -322,6 +328,8 @@ class TicketController extends Controller
             $model = $this->findModel($id);
             $searchModel = new TicketSearch();
 
+            $model->scenario = YII_ENV_DEV ? Ticket::SCENARIO_DEV : Ticket::SCENARIO_DEFAULT;
+            $model->download_lock = 0; #unlock the download
             if ($model->load(Yii::$app->request->post()) && $model->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
             } else {
@@ -538,6 +546,7 @@ class TicketController extends Controller
             }
 
             $ticket->download_progress = $event->sender->progress/filesize($event->data->exam->file);
+            $ticket->download_lock = 1;
             $ticket->client_state = "download in progress";
             $ticket->save();
 

@@ -22,9 +22,11 @@ class m170216_090248_config extends Migration
         $this->addColumn($this->examTable, 'sq_url_whitelist', $this->string(10240)->Null()->defaultValue(Null));
 
         $this->addColumn($this->ticketTable, 'backup_interval', $this->integer(11)->notNull()->defaultValue(300));
+        $this->addColumn($this->ticketTable, 'online', $this->boolean()->Null()->defaultValue(Null));
 
         $this->addColumn($this->examTable, 'time_limit', $this->integer(11)->Null()->defaultValue(Null));
         $this->addColumn($this->ticketTable, 'time_limit', $this->integer(11)->Null()->defaultValue(Null));
+
     }
 
     public function safeDown()
@@ -39,6 +41,7 @@ class m170216_090248_config extends Migration
         $this->dropColumn($this->examTable, 'sq_url_whitelist');
 
         $this->dropColumn($this->ticketTable, 'backup_interval');
+        $this->dropColumn($this->ticketTable, 'online');
 
         $this->dropColumn($this->examTable, 'time_limit');
         $this->dropColumn($this->ticketTable, 'time_limit');

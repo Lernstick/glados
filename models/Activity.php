@@ -79,30 +79,24 @@ class Activity extends \yii\db\ActiveRecord
 
     public function eventNewActivities()
     {
-//        $cookies = Yii::$app->request->cookies;
-//        $lastvisited = $cookies->getValue('lastvisited');
-
-//        $new = $this->find()
-//            ->where(['>', 'date', $lastvisited])
-//            ->count();
 
         $event = new EventItem([
             'event' => 'newActivities',
             'priority' => 1,
             'data' => [
-//                'newActivities' => "*0+" . $this->newActivities(),
                 'newActivities' => '+1'
             ],
         ]);
         $event->generate();
 
-//        $event = new EventItem([
-//            'event' => 'ticket/990',
-//            'data' => [
-//                'newActivities' => $this->newActivities(990),
-//            ],
-//        ]);
-//        $event->generate();
+        $event = new EventItem([
+            'event' => 'ticket/' . $this->ticket->id,
+            'priority' => 1,
+            'data' => [
+                'newActivities' => '+1',
+            ],
+        ]);
+        $event->generate();
 
     }
 
