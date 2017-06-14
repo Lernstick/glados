@@ -30,7 +30,7 @@ use yii\web\JsExpression;
             'time:time',
             'owner',
             'group',
-            'compressed_size:shortSize',
+            'size:shortSize',
             'path',
         ],
     ]) ?>

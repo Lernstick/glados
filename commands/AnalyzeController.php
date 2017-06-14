@@ -54,6 +54,8 @@ class AnalyzeController extends DaemonController
                 $tmpdir = $this->unpack();
                 if (file_exists($tmpdir . "/" . $this->extractList[0])) {
                     $this->exam->{"sq_url_whitelist"} = file_get_contents($tmpdir . "/" . $this->extractList[0]);
+                } else {
+                    $this->exam->{"sq_url_whitelist"} = null;
                 }
 
                 $this->exam->{"file_analyzed"} = 1;

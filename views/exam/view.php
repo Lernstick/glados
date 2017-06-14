@@ -85,6 +85,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 'runningTicketCount',
                 'closedTicketCount',
                 'submittedTicketCount',
+                [
+                    'attribute' => 'file_analyzed',
+                    'format' => 'raw',
+                    'value' => yii::$app->formatter->format($model->file_analyzed, 'ntext'),
+                    'visible' => YII_ENV_DEV,
+                    'captionOptions' => ['class' => 'dev_item']
+                ],
             ],
         ]) ?>
 

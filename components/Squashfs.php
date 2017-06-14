@@ -42,7 +42,7 @@ class Squashfs extends File
      *              'mode' => '-rwxr-wr-x',
      *              'owner' => 'root',
      *              'group' => 'root',
-     *              'compressed_size' => 27,
+     *              'size' => 27,
      *              'date' => '2015-03-13',
      *              'time' => '16:56',
      *              'path' => 'squashfs-root/home/user/file'
@@ -61,7 +61,7 @@ class Squashfs extends File
                 $a['mode'],
                 $a['owner'],
                 $a['group'],
-                $a['compressed_size'],
+                $a['size'],
                 $a['date'],
                 $a['time'],
                 $a['path'],

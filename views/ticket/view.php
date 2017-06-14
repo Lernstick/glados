@@ -407,7 +407,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 ]),
                 'visible' => YII_ENV_DEV,
                 'captionOptions' => ['class' => 'dev_item']
-            ],            
+            ],           
         ],
 
     ]) ?>

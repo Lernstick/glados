@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 //use kartik\file\FileInput;
 use yii\web\JsExpression;
@@ -23,7 +24,6 @@ if($model->file && Yii::$app->file->set($model->file)->exists) {
     ");
     $this->registerJs($js);
 }
-
 
 ?>
 
@@ -93,17 +93,17 @@ if($model->file && Yii::$app->file->set($model->file)->exists) {
 
             <?php
             if($model->file && Yii::$app->file->set($model->file)->exists) {
-                $js = new JsExpression("var fupload = jQuery('#w0').fileupload({
-                    'maxFileSize':4000000000,
-                    'dataType':'json',
-                    'acceptFileTypes':/(\.|\/)(squashfs)$/i,
-                    'maxNumberOfFiles':1,
-                    'autoUpload':false,
-                    'url':'\/index.php?r=exam%2Fupdate\u0026id=" . $model->id . "\u0026mode=upload',
+                $js = new JsExpression('var fupload = jQuery("#w0").fileupload({
+                    "maxFileSize":4000000000,
+                    "dataType":"json",
+                    "acceptFileTypes":/(\.|\/)(squashfs)$/i,
+                    "maxNumberOfFiles":1,
+                    "autoUpload":false,
+                    "url":' . json_encode(Url::to(['update', 'id' => $model->id, 'mode' => 'upload']), JSON_HEX_AMP) . ',
                     progressServerRate: 0.5,
                     progressServerDecayExp: 3.5
                 });
-                jQuery('#w0').fileupload('option', 'done').call(fupload, $.Event('done'), {result: {files: files}});");
+                jQuery("#w0").fileupload("option", "done").call(fupload, $.Event("done"), {result: {files: files}});');
                 $this->registerJs($js);
             }
             ?>
