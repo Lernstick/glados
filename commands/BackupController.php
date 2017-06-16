@@ -180,12 +180,17 @@ class BackupController extends DaemonController
                         $this->ticket->runCommand('echo 0 > /home/user/shutdown');
                     }
 
+                    # Generate Thumbnails
                     $searchModel = new ScreenshotSearch();
                     $dataProvider = $searchModel->search($this->ticket->token);
                     $this->log("Generating thumbnails...");
                     foreach ($dataProvider->models as $model) {
                         $model->getThumbnail();
                     }
+
+                    # Calculate the size
+                    $this->log("Calculate backup size...");
+                    $this->ticket->backup_size = $this->directorySize(\Yii::$app->basePath . "/backups/" . $this->ticket->token);
                 }
 
                 $this->ticket->backup_last_try = new Expression('NOW()');
@@ -356,6 +361,32 @@ class BackupController extends DaemonController
 
         return null;
 
+    }
+
+    /**
+     * Get directory size recursively
+     *
+     * @param string $dir Path to the directoy
+     * @return int Total size in bytes
+     */
+    private function directorySize ($dir)
+    {
+        $size = 0;
+        foreach (scandir($dir) as $item) {
+            if ($item == '.' || $item == '..') { continue; }
+            $item = $dir . '/' . $item;
+
+            unset($stat);
+            $stat = @lstat($item);
+            if (isset($stat['size']) && is_int($stat['size'])) {
+                $size += $stat['size'];
+            }
+
+            if (is_dir($item)) {
+                $size += $this->directorySize($item);
+            }
+        }
+        return $size;
     }
 
 }

@@ -23,6 +23,7 @@ class m170216_090248_config extends Migration
 
         $this->addColumn($this->ticketTable, 'backup_interval', $this->integer(11)->notNull()->defaultValue(300));
         $this->addColumn($this->ticketTable, 'online', $this->boolean()->Null()->defaultValue(Null));
+        $this->addColumn($this->ticketTable, 'backup_size', $this->integer(11)->notNull()->defaultValue(0));
 
         $this->addColumn($this->examTable, 'time_limit', $this->integer(11)->Null()->defaultValue(Null));
         $this->addColumn($this->ticketTable, 'time_limit', $this->integer(11)->Null()->defaultValue(Null));
@@ -42,6 +43,7 @@ class m170216_090248_config extends Migration
 
         $this->dropColumn($this->ticketTable, 'backup_interval');
         $this->dropColumn($this->ticketTable, 'online');
+        $this->dropColumn($this->ticketTable, 'backup_size');
 
         $this->dropColumn($this->examTable, 'time_limit');
         $this->dropColumn($this->ticketTable, 'time_limit');

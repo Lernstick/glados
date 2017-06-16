@@ -31,7 +31,7 @@ use yii\widgets\Pjax;
             'attribute' => 'backup_interval',
             'format' => 'raw',
             'value' =>  $ticketModel->backup_interval == 0 ? 'No Backup' : yii::$app->formatter->format($ticketModel->backup_interval, 'duration'),
-        ],        
+        ],
         [
             'attribute' => 'backup_last',
             'format' => 'raw',
@@ -39,6 +39,7 @@ use yii\widgets\Pjax;
         ],        
         //'backup_last:timeago',
         //'backup_last_try:timeago',
+        'backup_size:shortSize',        
         [
             'attribute' => 'backup_state',
             'format' => 'raw',

@@ -157,6 +157,7 @@ class Ticket extends \yii\db\ActiveRecord
             'backup_last_try' => 'Last Backup Try',
             'backup_state' => 'Backup State',
             'backup_interval' => 'Backup Interval',
+            'backup_size' => 'Overall Backup Size',
         ];
     }
 
