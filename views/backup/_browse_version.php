@@ -8,6 +8,7 @@ use yii\helpers\Url;
 /* @var $ticket app\models\Ticket the ticket data model */
 /* @var $fs app\models\RdiffFileSystem the Rdiff data model */
 /* @var $date string the date */
+/* @var $options array RdiffbackupFilesystem options array */
 
 echo Html::a(
     ($model == 'all' ? 'All versions overlapping' : yii::$app->formatter->format($model, 'datetime') . ($model == $fs->newestBackupVersion ? ' (current)' : null)) . ' <span class="glyphicon glyphicon-ok" style="visibility:' . ($date == $model ? 'visible' : 'hidden') . ';"></span>',
@@ -16,6 +17,7 @@ echo Html::a(
         'id' => $ticket->id,
         'path' => $fs->path,
         'date' => $model,
+        'showDotFiles' => $options['showDotFiles'],
         '#' => 'browse'
     ]),
     ['data-pjax' => 0]

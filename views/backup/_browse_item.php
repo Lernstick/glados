@@ -6,6 +6,7 @@ use yii\helpers\Url;
 /* @var $model app\models\Backup the data model */
 /* @var $widget yii\widgets\ListView this widget instance */
 /* @var $ticket app\models\Ticket the ticket data model */
+/* @var $options array RdiffbackupFilesystem options array */
 
 if ($model->type == 'dir') {
 
@@ -17,6 +18,7 @@ if ($model->type == 'dir') {
                 'id' => $ticket->id,
                 'path' => $model->path,
                 'date' => $date,
+                'showDotFiles' => $options['showDotFiles'],
                 '#' => 'browse',
             ]),
             []
@@ -34,6 +36,7 @@ if ($model->type == 'dir') {
                 'ticket_id' => $ticket->id,
                 'path' => $model->path,
                 'date' => $model->version,
+                'showDotFiles' => $options['showDotFiles'],
                 '#' => 'browse',
             ]),
             [
@@ -53,6 +56,7 @@ if ($model->type == 'dir') {
             false,
             'id' => $ticket->id,
             'path' => $model->path,
+            'showDotFiles' => $options['showDotFiles'],
             '#' => 'browse',
         ])
     );
@@ -63,7 +67,8 @@ if ($model->type == 'dir') {
             'ticket/restore',
             'id' => $ticket->id,
             'file' => $model->path,
-            'date' => $model->version
+            'date' => $model->version,
+            'showDotFiles' => $options['showDotFiles'],
         ]),
         [
             'data-href' => Url::to([
@@ -71,6 +76,7 @@ if ($model->type == 'dir') {
                 'id' => $ticket->id,
                 'file' => $model->path,
                 'date' => $model->version,
+                'showDotFiles' => $options['showDotFiles'],
                 '#' => 'tab_restores',
             ]),
             'data-toggle' => 'modal',

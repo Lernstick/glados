@@ -278,6 +278,18 @@ class Ticket extends \yii\db\ActiveRecord
             $eventItem->generate();
         }
 
+        if($this->attributesChanged([ 'online' ])){
+            $eventItem = new EventItem([
+                'event' => 'ticket/' . $this->id,
+                'priority' => 2,
+                'data' => [
+                    'online' => $this->online,
+                ],
+            ]);
+            $eventItem->generate();
+        }
+
+
         if($this->attributesChanged([ 'client_state' ])){
             $eventItem = new EventItem([
                 'event' => 'ticket/' . $this->id,

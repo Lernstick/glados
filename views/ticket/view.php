@@ -19,6 +19,8 @@ use app\components\ActiveEventField;
 /* @var $screenshotDataProvider yii\data\ArrayDataProvider */
 /* @var $restoreSearchModel app\models\ScreenshotSearch */
 /* @var $restoreDataProvider yii\data\ActiveDataProvider */
+/* @var $date string the date */
+/* @var $options array RdiffbackupFilesystem options array */
 
 $active_tabs = <<<JS
 // Change hash for page-reload
@@ -295,25 +297,44 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'ip',
                 'format' => 'raw',
-                'value' => yii::$app->formatter->format($model->ip, 'text') . " " . 
-                    ( $model->online === 1 ?    '<span class="label label-success">Online</span>' :
-                    ( $model->online === 0 ?   '<span class="label label-danger">Offline</span>' : 
-                                        '<span class="label label-warning">Unknown</span>') ) . " " .
+                'value' => yii::$app->formatter->format($model->ip, 'text') . ' ' . 
+                    ActiveEventField::widget([
+                        'options' => [
+                            'tag' => 'span',
+                            'class' => 'label label-' . ( $model->online === 1 ? 'success' :
+                                                       ( $model->online === 0 ? 'danger' : 
+                                                                                'warning') )
+                        ],
+                        'content' => ( $model->online === 1 ? 'Online' :
+                                     ( $model->online === 0 ? 'Offline' : 
+                                                              'Unknown') ),
+                        'event' => 'ticket/' . $model->id,
+                        'jsonSelector' => 'online',
+                        'jsHandler' => 'function(d, s){
+                            if(d == "1"){
+                                s.innerHTML = "Online";
+                                s.classList.add("label-success");
+                                s.classList.remove("label-danger");
+                                s.classList.remove("label-warning");
+                            }else if(d == "0"){
+                                s.innerHTML = "Offline";
+                                s.classList.add("label-danger");
+                                s.classList.remove("label-success");
+                                s.classList.remove("label-warning");
+                            }
+                        }',
+                    ]) . ' ' .
                     Html::a('Probe', ['view', 'id' => $model->id, 'mode' => 'probe']),
             ],
             [
                 'attribute' => 'client_state',
                 'format' => 'raw',
                 'value' =>  ActiveEventField::widget([
+                    'options' => [ 'tag' => 'span' ],
                     'content' => $model->client_state,
                     'event' => 'ticket/' . $model->id,
                     'jsonSelector' => 'client_state',
-                ]),
-            ],
-            [
-                'attribute' => 'download_progress', 
-                'format' => 'raw',
-                'value' => '<div class="progress">' . 
+                ]) . ' <div class="progress fade" style="display: inline-table; width:33.33%;">' . 
                     ActiveEventField::widget([
                         'content' => ActiveEventField::widget([
                             'options' => [ 'tag' => 'span' ],
@@ -330,8 +351,10 @@ $this->params['breadcrumbs'][] = $this->title;
                         'jsHandler' => 'function(d, s){
                             if(d == "1"){
                                 s.classList.add("active");
+                                s.parentNode.classList.add("in");
                             }else if(d == "0"){
                                 s.classList.remove("active");
+                                s.parentNode.classList.remove("in");
                             }
                         }',
                         'options' => [
@@ -502,6 +525,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'ticket' => $model,
             'fs' => $fs,
             'date' => $date,
+            'options' => $options,
         ]); ?>
 
     <?php Pjax::end() ?>

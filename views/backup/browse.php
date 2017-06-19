@@ -11,6 +11,7 @@ use yii\widgets\Pjax;
 /* @var $ticket app\models\Ticket the ticket data model */
 /* @var $fs app\models\RdiffFileSystem the Rdiff data model */
 /* @var $date string the date */
+/* @var $options array RdiffbackupFilesystem options array */
 
 $js = <<< 'SCRIPT'
 /* To initialize BS3 tooltips set this below */
@@ -57,6 +58,20 @@ $this->registerJs($js);
     <div class="row">
       <div class="col-sm-8 backup-browse-item">
 
+        <div class="">
+        <?= Html::a(
+            '<span class="glyphicon glyphicon-' . ($options['showDotFiles'] ? 'check' : 'unchecked') . '"></span> Show hidden files',
+            Url::to([
+                false,
+                'id' => $ticket->id,
+                'path' => $fs->path,
+                'date' => $date,
+                'showDotFiles' => !$options['showDotFiles'],
+                '#' => 'browse'
+            ])
+        ); ?>
+        </div>
+
 <?php
 
         echo "<span>Path</span>: " . Html::a(
@@ -66,6 +81,7 @@ $this->registerJs($js);
                 'id' => $ticket->id,
                 'path' => '/',
                 'date' => $date,
+                'showDotFiles' => $options['showDotFiles'],
                 '#' => 'browse',
             ])
         );
@@ -80,6 +96,7 @@ $this->registerJs($js);
                     'id' => $ticket->id,
                     'path' => $i,
                     'date' => $date,
+                    'showDotFiles' => $options['showDotFiles'],
                     '#' => 'browse',
                 ])
             );
@@ -94,7 +111,8 @@ $this->registerJs($js);
                   'ticket/restore',
                   'id' => $ticket->id,
                   'file' => $fs->path,
-                  'date' => $fs->version
+                  'date' => $fs->version,
+                  'showDotFiles' => $options['showDotFiles'],
               ]),
               [
                   'data-href' => Url::to([
@@ -102,6 +120,7 @@ $this->registerJs($js);
                       'id' => $ticket->id,
                       'file' => $fs->path,
                       'date' => $fs->version,
+                      'showDotFiles' => $options['showDotFiles'],
                       '#' => 'tab_restores',
                   ]),
                   'data-toggle' => 'modal',
@@ -140,7 +159,7 @@ $this->registerJs($js);
               'itemOptions' => [
                   'tag' => 'li',
               ],
-              'viewParams' => ['ticket' => $ticket, 'fs' => $fs, 'date' => $date],
+              'viewParams' => ['ticket' => $ticket, 'fs' => $fs, 'date' => $date, 'options' => $options],
               'itemView' => '_browse_version',
               'emptyText' => 'No versions.',
               'emptyTextOptions' => [
@@ -179,7 +198,7 @@ $this->registerJs($js);
             'class' => 'list-group-item backup-browse-item',
         ],
         'itemView' => '_browse_item',
-        'viewParams' => ['ticket' => $ticket, 'date' => $date],
+        'viewParams' => ['ticket' => $ticket, 'date' => $date, 'options' => $options],
         'emptyText' => 'No files or directories.',
         'emptyTextOptions' => [
             'tag' => 'div',

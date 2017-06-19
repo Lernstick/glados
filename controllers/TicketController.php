@@ -106,7 +106,7 @@ class TicketController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionView($id, $mode = 'default', $online = -1, $path = '/', $date = null)
+    public function actionView($id, $mode = 'default', $online = -1, $path = '/', $showDotFiles = false, $date = null)
     {
 
         $model = $this->findModel($id);
@@ -142,11 +142,16 @@ class TicketController extends Controller
             $restoreDataProvider->pagination->pageParam = 'rest-page';
             $restoreDataProvider->pagination->pageSize = 5;
 
+            $options = [
+                'showDotFiles' => boolval($showDotFiles),
+            ];
+
             $fs = new RdiffFileSystem([
                 'root' => '/home/user',
                 'location' => \Yii::getAlias('@app/backups/' . $model->token),
                 'restoreUser' => 'root',
                 'restoreHost' => $model->ip,
+                'options' => $options,
             ]);
 
             if ($date == null) {
@@ -193,6 +198,7 @@ class TicketController extends Controller
                 'VersionsDataProvider' => $VersionsDataProvider,
                 'fs' => $fs,
                 'date' => $date,
+                'options' => $options,
             ]);
         } else if ($mode == 'probe') {
             //$model = $this->findModel($id);

@@ -58,12 +58,15 @@ $this->registerJs('var YII_DEBUG = ' . (YII_DEBUG ? 'true' : 'false') . ';', \yi
 <div class="wrap">
     <?php
     NavBar::begin([
-        'brandLabel' => 'GLaDOS' . (YII_ENV_DEV ? ' ENV_DEV' : null),
+        'brandLabel' => 'GLaDOS',
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
+    if (YII_ENV_DEV) {
+        echo "<p class='navbar-text'>YII_ENV_DEV=true YII_DEBUG=" . (YII_DEBUG ? 'true' : 'false') . "</p>";
+    }
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [

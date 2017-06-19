@@ -65,11 +65,17 @@ class RdiffFileSystem extends Model
      */
     private $_fileInfoPopulated = false;    
 
+    public $options = [
+        'showDotFiles' => false,
+    ];
+
     /**
      * @var array A list of file or directory names to omit when reading a directory
      */
     public $excludeList = [
-        '/^\./',                    // exclude all dotfiles
+        #'/^\./',                    // exclude all dotfiles
+        '/^\.$/',
+        '/^\.\.$/',        
     ];
 
     /**
@@ -79,7 +85,7 @@ class RdiffFileSystem extends Model
         '/^\/rdiff-backup-data$/',      // exclude the rdiff-backup-data directory    
         '/^\/Screenshots$/',
         '/^\/shutdown$/',
-        '/^\/Schreibtisch\/finish_exam.desktop$/',        
+        '/^\/Schreibtisch\/finish_exam.desktop$/',
     ];
 
     /**
@@ -110,6 +116,10 @@ class RdiffFileSystem extends Model
 
     public function init()
     {
+        if (boolval($this->options['showDotFiles']) === false) {
+            array_unshift($this->excludeList, '/^\./');
+        }
+
         parent::init();
     }
 
@@ -181,8 +191,8 @@ class RdiffFileSystem extends Model
         if (count($this->versions) != 0) {
             return $this;
         }else{
-            return null;
             //throw new NotFoundHttpException($this->path . ': No such file or directory.');
+            return null;
         }
     }
 
@@ -264,6 +274,7 @@ class RdiffFileSystem extends Model
                 'location' => $this->location,
                 'restoreUser' => $this->restoreUser,
                 'restoreHost' => $this->restoreHost,
+                'options' => $this->options,
             ]);
 
             foreach ($this->versions as $version) {
@@ -357,6 +368,7 @@ class RdiffFileSystem extends Model
                     'location' => $this->location,
                     'restoreUser' => $this->restoreUser,
                     'restoreHost' => $this->restoreHost,
+                    'options' => $this->options,
                 ]);
                 $a->slash($this->path)->versionAt($version);
                 $contents[] = $a;
@@ -406,7 +418,9 @@ class RdiffFileSystem extends Model
                     'location' => $this->location,
                     'restoreUser' => $this->restoreUser,
                     'restoreHost' => $this->restoreHost,
+                    'options' => $this->options,
                 ]);
+                #var_dump($this->path . '/' . $item);die();
                 $fs->slash($this->path . '/' . $item)->versionAt($this->_date);
                 $contents[] = $fs;
             }
