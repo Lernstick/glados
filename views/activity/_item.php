@@ -43,7 +43,7 @@ use app\components\ActiveEventField;
     },
     'columns' => [
 
-        'date',
+        'date:timeago',
         [
             'attribute' => 'description',
             'format' => 'raw',

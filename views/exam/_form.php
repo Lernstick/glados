@@ -63,6 +63,9 @@ if($model->file && Yii::$app->file->set($model->file)->exists) {
             ])->textInput(['type' => 'number'])->
             hint('Set "0" or leave empty for no time limit.'); ?>
         </div>
+        <div class="col-md-6">
+            <?= $form->field($model, 'backup_path')->textInput(['maxlength' => true]) ?>
+        </div>        
     </div>
 
     <div class="row">

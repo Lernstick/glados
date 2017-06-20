@@ -11,6 +11,7 @@ use app\models\Activity;
 use app\models\Screenshot;
 use app\models\ScreenshotSearch;
 use app\components\ShellCommand;
+use yii\helpers\FileHelper;
 use yii\helpers\Console;
 
 /**
@@ -38,12 +39,29 @@ class BackupController extends DaemonController
     /**
      * @var string The path at the target system to backup
      */
-    public $remotePath = '/overlay/home/user';
+    public $remotePath = '/overlay';
 
     /**
      * @var boolean Whether it is the last backup or not 
      */
     private $finishBackup;
+
+    /**
+     * @var array 
+     */
+    public $excludeList = [
+        '/overlay/tmp',
+        '/overlay/eth0',
+        '/overlay/wlan0',
+        '/overlay/booted',
+        '/overlay/info',
+        '/overlay/overlay',
+        '/overlay/init',
+        '/overlay/var',
+        '/overlay/media',
+        '/overlay/home/user/shutdown',
+        '/overlay/home/user/Schreibtisch/finish_exam.desktop'
+    ];
 
     /**
      * @inheritdoc
@@ -130,9 +148,12 @@ class BackupController extends DaemonController
                 }
                 $this->ticket->save(false);
 
+                $this->remotePath = FileHelper::normalizePath($this->remotePath . '/' . $this->ticket->exam->backup_path);
+
                 $this->_cmd = "rdiff-backup --remote-schema 'ssh -i " . \Yii::$app->basePath . "/.ssh/rsa "
                      . "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -C %s rdiff-backup --server' "
                      . "-v5 --print-statistics "
+                     . ' --exclude ' . implode($this->excludeList, ' --exclude ') . " "                     
                      . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . "::" . $this->remotePath) . " "
                      . escapeshellarg(\Yii::$app->basePath . "/backups/" . $this->ticket->token . "/") . " "
                      . "";

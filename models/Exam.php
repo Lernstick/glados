@@ -60,6 +60,8 @@ class Exam extends \yii\db\ActiveRecord
                 $this->{"file_analyzed"} = 0;
             }
         });
+
+        $this->backup_path = $this->isNewRecord ? '/home/user' : $this->backup_path;
     }
 
     /**
@@ -69,7 +71,7 @@ class Exam extends \yii\db\ActiveRecord
     {
         return [
             [['id', 'name', 'subject', 'examFile', 'user_id', 'grp_netdev', 'allow_sudo', 'allow_mount', 'firewall_off', 'screenshots', 'url_whitelist', 'time_limit'], 'validateRunningTickets'],
-            [['name', 'subject'], 'required'],
+            [['name', 'subject', 'backup_path'], 'required'],
             [['time_limit'], 'integer', 'min' => 0],
             [['user_id'], 'integer'],
             [['name', 'subject'], 'string', 'max' => 52],
@@ -97,6 +99,7 @@ class Exam extends \yii\db\ActiveRecord
             'screenshots' => 'Take Screenshots',
             'url_whitelist' => 'HTTP URL Whitelist',
             'time_limit' => 'Time Limit',
+            'backup_path' => 'Remote Backup Path',
             'ticketCount' => 'Total Tickets',
             'openTicketCount' => 'Open Tickets',
             'runningTicketCount' => 'Running Tickets',

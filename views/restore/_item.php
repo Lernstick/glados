@@ -14,8 +14,7 @@ use yii\widgets\DetailView;
 <div class="panel-heading">
 	<h4 class="panel-title">
     	<a data-toggle="collapse" data-parent="#restores-accordion" href="#restores-collapse<?= $index + 1 ?>">
-        	Restore #<?= $key . ' - ' . yii::$app->formatter->format($model->finishedAt, 'timeago')
-        	 . ' @ ' . yii::$app->formatter->format($model->finishedAt, 'datetime'); ?>
+        	Restore #<?= $key . ' - ' . yii::$app->formatter->format($model->finishedAt, 'timeago') ?>
 		</a>
         <div class="pull-right">
             <?= Html::a(

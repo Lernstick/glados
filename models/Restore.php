@@ -53,7 +53,7 @@ class Restore extends \yii\db\ActiveRecord
             'finishedAt' => 'Finished At',
             'ticket_id' => 'Ticket ID',
             'file' => 'File',
-            'restoreDate' => 'Restore Date',
+            'restoreDate' => 'Restore Version',
         ];
     }
 

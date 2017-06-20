@@ -24,13 +24,13 @@ if ($model->type == 'dir') {
             []
         );
     } else {
-        echo '<span><span class="glyphicon glyphicon-folder-open"></span> <del>' . $model->displayName . '</del> (' . yii::$app->formatter->format($model->version, 'backupVersion') . ', <abbr title="This directory does not exist in that version. Restoring it in this state will REMOVE the directory from the target machine.">' . $model->state . '</abbr>)</span>';
+        echo '<span><span class="glyphicon glyphicon-folder-open"></span> <del>' . $model->displayName . '</del></span>';
     }
 
 } else {
     if ($model->state != 'missing') {
         echo Html::a(
-            '<span><span class="glyphicon glyphicon-file"></span> ' . $model->displayName . ' (' . yii::$app->formatter->format($model->version, 'backupVersion') . ($model->version == $model->newestBackupVersion ? ' (current)' : null) . ', ' . $model->state . ', ' . yii::$app->formatter->format($model->mode, 'text') . ', ' . yii::$app->formatter->format($model->size, 'shortSize') . ')</span>',
+            '<span><span class="glyphicon glyphicon-file"></span> ' . $model->displayName . '</span>',
             Url::to([
                 'backup/file',
                 'ticket_id' => $ticket->id,
@@ -46,7 +46,7 @@ if ($model->type == 'dir') {
         );
 
     } else {
-        echo '<span><span class="glyphicon glyphicon-file"></span> <del>' . $model->displayName . '</del> (' . yii::$app->formatter->format($model->version, 'backupVersion') . ', <abbr title="This file does not exist in that version. Restoring it in this state will REMOVE the file from the target machine.">' . $model->state . '</abbr>)</span>';
+        echo '<span><span class="glyphicon glyphicon-file"></span> <del>' . $model->displayName . '</del></span>';
     }
     echo "&nbsp;&nbsp;&nbsp;";
     echo "<span class='backup-browse-options'>";
@@ -85,7 +85,21 @@ if ($model->type == 'dir') {
             'data-version' => yii::$app->formatter->format($model->version, 'backupVersion'),
         ]
     );    
-    echo "</span>";
+    echo '</span>';
 }
+
+echo '<div class="pull-right">';
+if ($model->type == 'dir') {
+    if ($model->state == 'missing') {
+        echo '<span class="text-muted">' . yii::$app->formatter->format($model->version, 'backupVersion') . ', <abbr title="This directory does not exist in that version. Restoring it in this state will REMOVE the directory from the target machine.">' . $model->state . '</abbr></span>';
+    }
+} else {
+    if ($model->state != 'missing') {
+        echo '<span class="text-muted">' . ($model->version == $model->newestBackupVersion ? '(current) ' : null) . yii::$app->formatter->format($model->version, 'backupVersion') . ', ' . yii::$app->formatter->format($model->mode, 'text') . ', ' . yii::$app->formatter->format($model->size, 'shortSize') . '</span>';
+    } else {
+        echo '<span class="text-muted">' . yii::$app->formatter->format($model->version, 'backupVersion') . ', <abbr title="This file does not exist in that version. Restoring it in this state will REMOVE the file from the target machine.">' . $model->state . '</abbr></span>';
+    }
+}
+echo '</div>'
 
 ?>

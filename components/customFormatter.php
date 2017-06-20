@@ -100,7 +100,7 @@ class customFormatter extends \yii\i18n\Formatter
         } else if ($value == 'all') {
             $value = 'all';
         } else {
-            $value = yii::$app->formatter->format($value, 'datetime');
+            $value = \yii\timeago\TimeAgo::widget(['timestamp' => $value]);
         }
         return $value;
     }

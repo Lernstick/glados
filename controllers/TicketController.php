@@ -147,7 +147,7 @@ class TicketController extends Controller
             ];
 
             $fs = new RdiffFileSystem([
-                'root' => '/home/user',
+                'root' => $model->exam->backup_path,
                 'location' => \Yii::getAlias('@app/backups/' . $model->token),
                 'restoreUser' => 'root',
                 'restoreHost' => $model->ip,
@@ -581,7 +581,7 @@ class TicketController extends Controller
             if ($backupDataProvider->totalCount > 0) {
                 $restoreDaemon = new Daemon();
                 /* run the restore daemon in the foreground */
-                $pid = $restoreDaemon->startRestore($ticket->id, '/', 'now', false, '/run/initramfs/backup/home/user');
+                $pid = $restoreDaemon->startRestore($ticket->id, '/', 'now', false, '/run/initramfs/backup/' . $ticket->exam->backup_path);
             }
             //$ticket->continueBootup();
             $ticket->runCommand('echo 0 > /run/initramfs/restore');

@@ -195,7 +195,7 @@ $this->registerJs($js);
         ],
         'itemOptions' => [
             'tag' => 'div',
-            'class' => 'list-group-item backup-browse-item',
+            'class' => 'list-group-item backup-browse-item div-hover',
         ],
         'itemView' => '_browse_item',
         'viewParams' => ['ticket' => $ticket, 'date' => $date, 'options' => $options],

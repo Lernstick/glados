@@ -45,7 +45,7 @@ class RestoreController extends DaemonController
     /**
      * @var string The path at the target system to backup
      */    
-    public $remotePath = '/home/user';
+    private $remotePath = '/overlay';
 
     /**
      * @inheritdoc
@@ -58,7 +58,7 @@ class RestoreController extends DaemonController
     /**
      * @inheritdoc
      */
-    public function doJob ($id, $file, $date, $restorePath = '/overlay/home/user')
+    public function doJob ($id, $file, $date, $restorePath = null)
     {
         pcntl_signal_dispatch();
         $this->cleanup();
@@ -98,15 +98,17 @@ class RestoreController extends DaemonController
             return;
         }
 
+        $this->remotePath = FileHelper::normalizePath($this->remotePath . '/' . $this->ticket->exam->backup_path);
+
         if ($file == '::Desktop::') {
             $file = trim($this->ticket->runCommand('sudo -u user xdg-user-dir DESKTOP')[0]);
         } else if ($file == '::Documents::') {
             $file = trim($this->ticket->runCommand('sudo -u user xdg-user-dir DOCUMENTS')[0]);
         }
         if (substr($file, 0, strlen($this->remotePath)) == $this->remotePath) {
-            $file = substr($file, strlen($this->remotePath));
+            $file = FileHelper::normalizePath('/' . substr($file, strlen($this->remotePath)));
         }
-
+        
         if (is_dir(FileHelper::normalizePath(\Yii::$app->basePath . "/backups/" . $this->ticket->token))) {
             $fs = new RdiffFileSystem([
                 'root' => $this->remotePath,
@@ -139,23 +141,28 @@ class RestoreController extends DaemonController
 
         $datetime = new \DateTime('now', new \DateTimeZone(\Yii::$app->formatter->defaultTimeZone));
 
+        #$file = FileHelper::normalizePath($this->remotePath . '/' . $file);
+        $file = empty($file) ? '/' : $file;
+
         $this->restore = new Restore([
             'startedAt' => $datetime->format('Y-m-d H:i:s'),
             'ticket_id' => $this->ticket->id,
-            'file' => FileHelper::normalizePath($this->remotePath . '/' . $file),
+            'file' => $file,
             'restoreDate' => $date == 'now' ? date('c') : $date,
         ]);
 
         $this->ticket->restore_state = 'restore in progress...';
         $this->ticket->save(false);
 
+        $restorePath = $restorePath !== null ? $restorePath : '/overlay/' . $this->ticket->exam->backup_path;
+
         /* first command */
         $this->_cmd = "rdiff-backup --terminal-verbosity=5 --force --remote-schema "
                 . "'ssh -i " . \Yii::$app->basePath . "/.ssh/rsa "
                 . "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -C %s rdiff-backup --server' "
              . "--restore-as-of " . escapeshellarg($date) . " "
-             . escapeshellarg(\Yii::$app->basePath . "/backups/" . $this->ticket->token . "/" . $file) . " "
-             . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . "::" . $restorePath . '/' . $file) . " "
+             . escapeshellarg(FileHelper::normalizePath(\Yii::$app->basePath . "/backups/" . $this->ticket->token . "/" . $file)) . " "
+             . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . "::" . FileHelper::normalizePath($restorePath . '/' . $file)) . " "
              . "2>&1;" . " ";
              /* second command */
              //. "ssh -i " . \Yii::$app->basePath . "/.ssh/rsa "

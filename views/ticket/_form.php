@@ -55,7 +55,7 @@ use kartik\datetime\DateTimePicker;
             <?= $form->field($model, 'backup_interval', [
                 'template' => '{label}<div class="input-group">{input}<span class="input-group-addon" id="basic-addon2">seconds</span></div>{hint}{error}'
             ])->textInput(['type' => 'number'])
-            ->hint('Set "0" or leave empty to disable automatic backup'); ?>
+            ->hint('Set "0" to disable automatic backup'); ?>
         </div>
 
         <div class="col-md-6">

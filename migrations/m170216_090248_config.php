@@ -17,9 +17,10 @@ class m170216_090248_config extends Migration
         $this->addColumn($this->examTable, 'allow_mount', $this->boolean()->notNull()->defaultValue(0));
         $this->addColumn($this->examTable, 'firewall_off', $this->boolean()->notNull()->defaultValue(0));
         $this->addColumn($this->examTable, 'screenshots', $this->boolean()->notNull()->defaultValue(0));
-        $this->addColumn($this->examTable, 'url_whitelist', $this->string(10240)->Null()->defaultValue(Null));
+        $this->addColumn($this->examTable, 'url_whitelist', $this->string(512)->Null()->defaultValue(Null));
         $this->addColumn($this->examTable, 'file_analyzed', $this->boolean()->notNull()->defaultValue(0));
-        $this->addColumn($this->examTable, 'sq_url_whitelist', $this->string(10240)->Null()->defaultValue(Null));
+        $this->addColumn($this->examTable, 'sq_url_whitelist', $this->string(5120)->Null()->defaultValue(Null));
+        $this->addColumn($this->examTable, 'backup_path', $this->string(1024)->notNull()->defaultValue('/home/user'));
 
         $this->addColumn($this->ticketTable, 'backup_interval', $this->integer(11)->notNull()->defaultValue(300));
         $this->addColumn($this->ticketTable, 'online', $this->boolean()->Null()->defaultValue(Null));
@@ -40,6 +41,7 @@ class m170216_090248_config extends Migration
         $this->dropColumn($this->examTable, 'url_whitelist');
         $this->dropColumn($this->examTable, 'file_analyzed');
         $this->dropColumn($this->examTable, 'sq_url_whitelist');
+        $this->dropColumn($this->examTable, 'backup_path');
 
         $this->dropColumn($this->ticketTable, 'backup_interval');
         $this->dropColumn($this->ticketTable, 'online');

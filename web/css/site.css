@@ -203,3 +203,7 @@ table.detail-view th {
 table.detail-view td {
         width: 75%;
 }
+
+.div-hover:hover {
+  background: #f5f5f5;
+}
