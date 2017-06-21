@@ -80,6 +80,7 @@ class BackupController extends DaemonController
         while (true) {
             pcntl_signal_dispatch();
             $this->cleanup();
+            $this->remotePath = '/overlay';
 
             if ($id != '') {
                 if (($this->ticket =  Ticket::findOne(['id' => $id, 'backup_lock' => 0, 'restore_lock' => 0])) == null){
@@ -127,12 +128,11 @@ class BackupController extends DaemonController
             $this->ticket->backup_state = 'connecting to client...';
             $this->ticket->save(false);
 
-            $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? 1 : 0;
-            $this->ticket->save(false);
             if ($this->checkPort(22, 3) === false) {
                 $this->ticket->backup_state = 'network error.';
                 $this->ticket->backup_last_try = new Expression('NOW()');
                 $this->ticket->backup_lock = 0;
+                $this->ticket->online = 1;                
                 $this->ticket->save(false);
 
                 $act = new Activity([
@@ -142,6 +142,7 @@ class BackupController extends DaemonController
                 $act->save();
 
             }else{
+                $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? 1 : 0;
                 $this->ticket->backup_state = 'backup in progress...';
                 if ($this->finishBackup == true) {
                     $this->ticket->runCommand('echo "backup in progress..." > /home/user/shutdown');
@@ -150,10 +151,15 @@ class BackupController extends DaemonController
 
                 $this->remotePath = FileHelper::normalizePath($this->remotePath . '/' . $this->ticket->exam->backup_path);
 
+                /* Generate exclude list based on remotePath */
+                $exclude = array_filter($this->excludeList, function($v){
+                    return (strpos($v, $this->remotePath) === 0);
+                });
+
                 $this->_cmd = "rdiff-backup --remote-schema 'ssh -i " . \Yii::$app->basePath . "/.ssh/rsa "
                      . "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -C %s rdiff-backup --server' "
                      . "-v5 --print-statistics "
-                     . ' --exclude ' . implode($this->excludeList, ' --exclude ') . " "                     
+                     . ' --exclude ' . implode($exclude, ' --exclude ') . " "                     
                      . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . "::" . $this->remotePath) . " "
                      . escapeshellarg(\Yii::$app->basePath . "/backups/" . $this->ticket->token . "/") . " "
                      . "";
@@ -364,13 +370,21 @@ class BackupController extends DaemonController
                     new Expression('unix_timestamp(`backup_last_try`) + `backup_interval`'),
                     new Expression('unix_timestamp(NOW())')
                 ],
-                ['backup_last_try' => null]
+                ['backup_last_try' => null],
+                [
+                    'and',
+                    [
+                        '<',
+                        new Expression('unix_timestamp(`backup_last`)'),
+                        new Expression('unix_timestamp(`backup_last_try`) - 5')
+                    ],
+                    ['<', 'backup_last_try', new Expression('NOW() - INTERVAL 1 MINUTE')],
+                ]
             ])
             ->andWhere(['backup_lock' => 0])
             ->andWhere(['restore_lock' => 0])
             ->andWhere(['bootup_lock' => 0])
             ->orderBy(new Expression('unix_timestamp(`backup_last_try`) + `backup_interval` ASC'));            
-
 
         // finally lock the next ticket and return it
         if (($ticket = $query->one()) !== null) {
