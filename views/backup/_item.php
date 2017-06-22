@@ -18,18 +18,34 @@ use yii\widgets\DetailView;
         	 . ' (' . yii::$app->formatter->format($model->totalDestinationSizeChange, 'shortSize') . ' / ' . yii::$app->formatter->format($model->errors, 'integer') . ' errors) '; ?>
 		</a>
         <div class="pull-right">
-            <?= Html::a(
-                '<span class="glyphicon glyphicon-paperclip"></span>',
-                Url::to([
-                    'backup/log',
-                    'ticket_id' => $model->ticket->id,
-                    'date' => $model->date
-                ]),
-                [
-                    'id' => 'backup-log-show' . $key,
-                    'title' => 'Show backup log'
-                ]
-            ); ?>
+            <div class="btn-group">
+              <a href="#" class="dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="glyphicon glyphicon-list-alt"></span> Actions<span class="caret"></span>
+              </a>            
+              <ul class="dropdown-menu dropdown-menu-right">
+                <li>
+                    <?= Html::a(
+                        '<span class="glyphicon glyphicon-paperclip"></span> Show Log File',
+                        Url::to([
+                            'backup/log',
+                            'ticket_id' => $model->ticket->id,
+                            'date' => $model->date
+                        ]),
+                        [
+                            'id' => 'backup-log-show' . $key,
+                            'title' => 'Show backup log'
+                        ]
+                    ); ?>
+                </li>
+                <li class="divider"></li>
+                <li>
+                    <a class="dropdown-item" href="#"><span class="glyphicon glyphicon-file"></span> Create ZIP File (TODO)</a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="#"><span class="glyphicon glyphicon-file"></span> Create Squash Filesystem (TODO)</a>
+                </li>
+              </ul>
+            </div>
         </div>
     </h4>
 </div>

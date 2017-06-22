@@ -142,7 +142,7 @@ $this->registerJs($js);
 
           <?php Pjax::begin([
               'id' => 'w101',
-              'options' => ['tag' => 'ul', 'class' => 'dropdown-menu dropdown-menu-left'],
+              'options' => ['tag' => 'ul', 'class' => 'dropdown-menu dropdown-menu-right'],
           ]); ?>
           <?= ListView::widget([
               'dataProvider' => $VersionsDataProvider,

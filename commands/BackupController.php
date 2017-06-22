@@ -47,6 +47,11 @@ class BackupController extends DaemonController
     private $finishBackup;
 
     /**
+     * @var boolean Whether the backup is manually or automatic started
+     */
+    private $manualBackup = false;
+
+    /**
      * @var array 
      */
     public $excludeList = [
@@ -60,7 +65,9 @@ class BackupController extends DaemonController
         '/overlay/var',
         '/overlay/media',
         '/overlay/home/user/shutdown',
-        '/overlay/home/user/Schreibtisch/finish_exam.desktop'
+        '/overlay/home/user/Schreibtisch/finish_exam.desktop',
+        '/overlay/usr/bin/finishExam',
+        '/overlay/etc/NetworkManager/dispatcher.d/02searchExamServer'
     ];
 
     /**
@@ -97,6 +104,7 @@ class BackupController extends DaemonController
                 $this->ticket->backup_lock = 1;
                 $this->ticket->running_daemon_id = $this->daemon->id;
                 $this->ticket->save(false);
+                $this->manualBackup = true;
             }
 
             if ($this->ticket == null) {
@@ -217,7 +225,7 @@ class BackupController extends DaemonController
 
                     # Calculate the size
                     $this->log("Calculate backup size...");
-                    $this->ticket->backup_size = $this->directorySize(\Yii::$app->basePath . "/backups/" . $this->ticket->token);
+                    $this->ticket->backup_size = $this->directorySize(\Yii::$app->basePath . "/backups/" . $this->ticket->token) - $this->directorySize(\Yii::$app->basePath . "/backups/" . $this->ticket->token . '/rdiff-backup-data');
                 }
 
                 $this->ticket->backup_last_try = new Expression('NOW()');
