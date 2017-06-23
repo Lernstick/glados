@@ -43,6 +43,18 @@ if($model->file && Yii::$app->file->set($model->file)->exists) {
 
     <div class="row">
         <div class="col-md-6">
+            <?= $form->field($model, 'time_limit', [
+                'template' => '{label}<div class="input-group">{input}<span class="input-group-addon" id="basic-addon2">minutes</span></div>{hint}{error}'
+            ])->textInput(['type' => 'number'])->
+            hint('Set "0" or leave empty for no time limit.'); ?>
+        </div>
+        <div class="col-md-6">
+            <?= $form->field($model, 'backup_path')->textInput(['maxlength' => true]) ?>
+        </div>        
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
             <?= $form->field($model, 'grp_netdev')->checkbox() ?>
             <?= $form->field($model, 'allow_sudo')->checkbox() ?>
             <?= $form->field($model, 'allow_mount')->checkbox() ?>
@@ -55,18 +67,7 @@ if($model->file && Yii::$app->file->set($model->file)->exists) {
             ]) ?>
         </div>
     </div>
-
-    <div class="row">
-        <div class="col-md-6">
-            <?= $form->field($model, 'time_limit', [
-                'template' => '{label}<div class="input-group">{input}<span class="input-group-addon" id="basic-addon2">minutes</span></div>{hint}{error}'
-            ])->textInput(['type' => 'number'])->
-            hint('Set "0" or leave empty for no time limit.'); ?>
-        </div>
-        <div class="col-md-6">
-            <?= $form->field($model, 'backup_path')->textInput(['maxlength' => true]) ?>
-        </div>        
-    </div>
+    <hr />
 
     <div class="row">
         <div class="col-md-12">

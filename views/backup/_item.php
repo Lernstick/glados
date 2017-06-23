@@ -39,6 +39,9 @@ use yii\widgets\DetailView;
                 </li>
                 <li class="divider"></li>
                 <li>
+                    <a class="dropdown-item" href="#"><span class="glyphicon glyphicon-file"></span> Create Exam from this backup (TODO)</a>
+                </li>                
+                <li>
                     <a class="dropdown-item" href="#"><span class="glyphicon glyphicon-file"></span> Create ZIP File (TODO)</a>
                 </li>
                 <li>
