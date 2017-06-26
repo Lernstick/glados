@@ -45,6 +45,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             'pid',
             'running:boolean',
+            'load:percent',
             [
                 'attribute' => 'uuid',
                 'visible' => YII_ENV_DEV,

@@ -51,6 +51,10 @@ class BackupController extends DaemonController
      */
     private $manualBackup = false;
 
+    private $load;
+    private $loadarr = [];
+    private $time;
+
     /**
      * @var array 
      */
@@ -76,6 +80,7 @@ class BackupController extends DaemonController
     public function start()
     {
         parent::start();
+        $this->time = round(time());
     }
 
     /**
@@ -85,6 +90,7 @@ class BackupController extends DaemonController
     {
 
         while (true) {
+            $this->calcLoad(0);
             pcntl_signal_dispatch();
             $this->cleanup();
             $this->remotePath = '/overlay';
@@ -111,6 +117,7 @@ class BackupController extends DaemonController
                 $this->log('idle', true);
                 do {
                     sleep(rand(5, 10));
+                    $this->calcLoad(0);
                 } while (($this->ticket = $this->getNextTicket()) === null);
             }
 
@@ -235,6 +242,7 @@ class BackupController extends DaemonController
             }
 
             $this->ticket = null;
+            $this->calcLoad(1);
 
             if ($id != '') {
                 return;
@@ -430,6 +438,45 @@ class BackupController extends DaemonController
             }
         }
         return $size;
+    }
+
+    private function calcLoad ($value)
+    {
+        $amount = round(time() - $this->time);
+        $this->loadarr = array_merge(array_fill(0, $amount, $value), $this->loadarr);
+        $this->time += $amount;
+        $this->loadarr = array_slice($this->loadarr, 0, 300);
+
+        if (count($this->loadarr) != 0) {
+            $this->daemon->load = array_sum($this->loadarr)/count($this->loadarr);
+        } else {
+            $this->daemon->load = 0;
+        }
+        $this->daemon->save();
+        $this->judgement();
+    }
+
+    private function judgement ()
+    {
+        $upperBound = 80;
+        $lowerBound = 20;
+        $maxDaemons = 10;
+        $minDaemons = 3;
+
+        $sum = Daemon::find()->sum('`load`');
+        $count = Daemon::find()->count();
+        $workload = round(100*$sum/$count);
+
+        if ($workload > $upperBound && $count < $maxDaemons) {
+            # start a new daemon
+            $backupDaemon = new Daemon();
+            $backupDaemon->startBackup();
+        } else if ($workload < $lowerBound && $count > $minDaemons) {
+            # stop after 5 minutes
+            if (time() - strtotime($this->daemon->started_at) > 300) {
+                $this->stop();
+            }
+        }
     }
 
 }

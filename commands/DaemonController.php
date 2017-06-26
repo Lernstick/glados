@@ -45,8 +45,8 @@ class DaemonController extends Controller
          * the parser within the declare block. The value for N is specified using ticks=N within
          * the declare block's directive section.
          * 
-         * Not all statements are tickable. Typically, condition expressions and argument expressions
-         * are not tickable. 
+         * Not all statements are tickable. Typically, condition expressions and argument
+         * expressions are not tickable. 
          */
         declare(ticks=1);
 
@@ -78,6 +78,7 @@ class DaemonController extends Controller
         $this->daemon->state = 'initializing';
         $this->daemon->pid = getmypid();
         $this->daemon->save();
+        $this->daemon->refresh();
 
         $daemons = new DaemonSearch();
         $runningDaemons = $daemons->search([])->totalCount;
