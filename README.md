@@ -5,7 +5,7 @@
 Package dependencies
 
 ```shell
-apt-get install apache2 php5 mysql-server php5-dev avahi-daemon squashfs-tools curl php5-cli rdiff-backup
+apt-get install apache2 php5 mysql-server php5-dev avahi-daemon squashfs-tools curl php5-cli rdiff-backup openssh-client
 ```
 
 Install composer:
@@ -21,7 +21,7 @@ Create a database and a user
 mysql -u root -p
 Enter password:
 mysql> create database exam;
-mysql> grant usage on *.* to exam@localhost indetified by 'exampassword';
+mysql> grant usage on *.* to exam@localhost identified by 'exampassword';
 mysql> grant all privileges on exam.* to exam@localhost;
 mysql> quit
 ```
@@ -59,7 +59,7 @@ Composer asset plugin:
 composer global require "fxp/composer-asset-plugin:^1.2.0"
 ```
 
-Install the packages from `coMposer.json`:
+Install the packages from `composer.json`:
 ```shell
 composer update
 ```
@@ -97,6 +97,7 @@ Create an Avahi service file (`/etc/avahi/services/glados.service`) with content
    <txt-record>actionNotify='glados/index.php?r=ticket/notify&amp;token={token}&amp;state={state}'</txt-record>
    <txt-record>actionSSHKey='glados/index.php?r=ticket/ssh-key'</txt-record>
    <txt-record>actionMd5='glados/index.php?r=ticket/md5&amp;token={token}'</txt-record>
+   <txt-record>actionConfig='glados/index.php?r=ticket/config&amp;token={token}'</txt-record>
   </service>
 </service-group>
 ```
