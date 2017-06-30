@@ -41,7 +41,7 @@ class Daemon extends \yii\db\ActiveRecord
             [['pid'], 'integer'],
             [['running'], 'boolean'],
             [['state'], 'string', 'max' => 60],
-            [['started_at'], 'safe'], 
+            [['started_at', 'load'], 'safe'], 
             [['description'], 'string', 'max' => 254], 
         ];
     }
@@ -56,6 +56,7 @@ class Daemon extends \yii\db\ActiveRecord
             'pid' => 'Process ID',
             'uuid' => 'Process UUID',
             'state' => 'State',
+            'load' => 'Load',
             'description' => 'Description',
             'started_at' => 'Started At',
         ];
@@ -162,6 +163,17 @@ class Daemon extends \yii\db\ActiveRecord
                 'concerns' => ['users' => ['ALL']],
                 'data' => [
                     'state' => yii::$app->formatter->format($this->state, 'text')
+                ],
+            ]);
+            $eventItem->generate();
+        }
+
+        if($this->attributesChanged([ 'load' ])){
+            $eventItem = new EventItem([
+                'event' => 'daemon/' . $this->pid,
+                'priority' => 0,
+                'data' => [
+                    'load' => yii::$app->formatter->format($this->load, 'percent')
                 ],
             ]);
             $eventItem->generate();

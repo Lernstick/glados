@@ -45,7 +45,15 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             'pid',
             'running:boolean',
-            'load:percent',
+            [
+                'attribute' => 'load',
+                'format' => 'raw',
+                'value' =>  ActiveEventField::widget([
+                    'content' => yii::$app->formatter->format($model->load, 'percent'),
+                    'event' => 'daemon/' . $model->pid,
+                    'jsonSelector' => 'load',
+                ]),
+            ],            
             [
                 'attribute' => 'uuid',
                 'visible' => YII_ENV_DEV,

@@ -13,6 +13,16 @@ use app\components\ActiveEventField;
             <?= yii::$app->formatter->format($model->started_at, 'relativetime'); ?>
         </span><br>
         <span>
+            Load: 
+            <?php echo ActiveEventField::widget([
+                'id' => 'wdl' . $model->id,
+                'options' => [ 'tag' => 'span' ],
+                'content' => yii::$app->formatter->format($model->load, 'percent'),
+                'event' => 'daemon/' . $model->pid,
+                'jsonSelector' => 'load',
+            ]); ?>
+        </span>, 
+        <span>
             State: 
             <?php echo ActiveEventField::widget([
                 'id' => 'wd' . $model->id,
