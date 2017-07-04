@@ -56,7 +56,7 @@ class Daemon extends \yii\db\ActiveRecord
             'pid' => 'Process ID',
             'uuid' => 'Process UUID',
             'state' => 'State',
-            'load' => 'Load',
+            'load' => 'Load (Last 5 minutes)',
             'description' => 'Description',
             'started_at' => 'Started At',
         ];

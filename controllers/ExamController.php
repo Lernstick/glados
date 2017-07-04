@@ -175,6 +175,67 @@ class ExamController extends Controller
             ]);
 
             return $pdf->render();
+        }else if ($mode == 'zip'){
+
+
+            $tickets = Ticket::find()->where([ 'and', ['exam_id' => $id], [ 'not', [ "start" => null ] ], [ 'not', [ "end" => null ] ] ])->all();
+            if(!$tickets){
+                Yii::$app->session->addFlash('danger', 'There are no closed or submitted Tickets to generate a ZIP-File.');
+                return $this->redirect(['view', 'id' => $id]); 
+            } else {
+
+                $zip = new \ZipArchive;
+                $zipFile = tempnam(sys_get_temp_dir(), 'ZIP');
+                $res = $zip->open($zipFile, \ZIPARCHIVE::CREATE | \ZIPARCHIVE::OVERWRITE);
+                $comment = $model->name . ' - ' . $model->subject . PHP_EOL . PHP_EOL;
+
+                if ($res === TRUE) {
+
+                    foreach($tickets as $ticket) {
+                        $options = array('add_path' => $ticket->name . '/', 'remove_all_path' => TRUE);
+
+                        $zip->addEmptyDir($ticket->name);
+                        $comment .= $ticket->token . ': ' . ($ticket->test_taker ? $ticket->test_taker : '(not set)') . PHP_EOL;
+
+                        $source = realpath(\Yii::$app->basePath . '/backups/' . $ticket->token . '/');
+                        if (is_dir($source)) {
+                            $files = new \RecursiveIteratorIterator(
+                                new \RecursiveDirectoryIterator(
+                                    $source,
+                                    \FilesystemIterator::SKIP_DOTS
+                                ),
+                                \RecursiveIteratorIterator::SELF_FIRST
+                            );
+                            foreach ($files as $file) {
+                                $file = realpath($file);
+
+                                // exclude rdiff-backup-data directory and dotfiles
+                                if (strpos($file, realpath($source . '/rdiff-backup-data')) !== false) { continue; }
+                                if (strpos($file, '/.') !== false) { continue; }
+
+                                if (is_dir($file) === true) {
+                                    $zip->addEmptyDir($ticket->name . '/' . str_replace($source . '/', '', $file . '/'));
+                                }else if (is_file($file) === true) {
+                                    $zip->addFile($file, $ticket->name . '/' . str_replace($source . '/', '', $file));
+                                }
+                            }
+                        }
+                    }
+                    //$zip->setArchiveComment($model->name . ' - ' . $model->subject);
+                    $zip->setArchiveComment($comment);
+                    $zip->close();
+
+                    ignore_user_abort(true);
+                    \Yii::$app->response->on(\app\components\customResponse::EVENT_AFTER_SEND, function($event) use ($zipFile) {
+                        unlink($zipFile);
+                    }, $model);
+
+                    return \Yii::$app->response->sendFile($zipFile, 'result.zip');
+                } else {
+                    @unlink($zipFile);
+                    throw new NotFoundHttpException('The ZIP-file could not be generated.');
+                }
+            }
         }
     }
 
@@ -318,6 +379,7 @@ class ExamController extends Controller
         }
 
     }
+
 
     /**
      * Finds the Exam model based on its primary key value.

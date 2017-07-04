@@ -194,6 +194,11 @@ class Ticket extends \yii\db\ActiveRecord
         ];
     }
 
+    public function getName()
+    {
+        return $this->test_taker ? $this->test_taker . ' - ' . $this->token : '_NoName - ' . $this->token;
+    }
+
     /**
      * When the ticket is updated, this function emits the events
      * 

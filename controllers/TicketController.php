@@ -492,7 +492,7 @@ class TicketController extends Controller
         $query = Ticket::find()
             ->where(['not', ['start' => null]])
             ->andWhere(['end' => null])
-            ->andWhere(['download_lock' => 0]);
+            ->andWhere(['download_lock' => 1]);
 
         if(intval($query->count()) >= 10){
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
