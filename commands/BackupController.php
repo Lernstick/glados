@@ -127,8 +127,8 @@ class BackupController extends DaemonController
                 $this->finishBackup = false;
             }
 
-            if (!is_writable(\Yii::$app->basePath . "/backups/")) {
-                $this->ticket->backup_state = \Yii::$app->basePath . '/backups/: No such file or directory or not writable.';
+            if (!is_writable(\Yii::$app->params['backupPath'])) {
+                $this->ticket->backup_state = \Yii::$app->params['backupPath'] . ': No such file or directory or not writable.';
                 $this->ticket->backup_last_try = new Expression('NOW()');
                 $this->ticket->backup_lock = 0;
                 $this->ticket->save(false);
@@ -176,7 +176,7 @@ class BackupController extends DaemonController
                      . "-v5 --print-statistics "
                      . ' --exclude ' . implode($exclude, ' --exclude ') . " "                     
                      . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . "::" . $this->remotePath) . " "
-                     . escapeshellarg(\Yii::$app->basePath . "/backups/" . $this->ticket->token . "/") . " "
+                     . escapeshellarg(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token . "/") . " "
                      . "";
 
                 $this->log('Executing rdiff-backup: ' . $this->_cmd);
@@ -184,19 +184,12 @@ class BackupController extends DaemonController
                 $cmd = new ShellCommand($this->_cmd);
                 $output = "";
                 $logFile = Yii::getAlias('@runtime/logs/backup.' . $this->ticket->token . '.' . date('c') . '.log');
-                //$targetFile = Yii::getAlias('@app/backups/' . $this->ticket->token . '/rdiff-backup-data/backup.' . date('c') . '.log');
 
                 $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use (&$output, $logFile) {
                     echo $this->ansiFormat($event->line, $event->channel == ShellCommand::STDOUT ? Console::NORMAL : Console::FG_RED);
                     $output .= $event->line;
                     file_put_contents($logFile, $event->line, FILE_APPEND);
                 });
-
-                /*$cmd->on(ShellCommand::COMMAND_STOPPED, function($event) use ($logFile, $targetFile) {
-                    if (file_exists(dirname($targetFile))) {
-                        rename($logFile, $targetFile);
-                    }
-                });*/
 
                 $retval = $cmd->run();
 
@@ -232,7 +225,7 @@ class BackupController extends DaemonController
 
                     # Calculate the size
                     $this->log("Calculate backup size...");
-                    $this->ticket->backup_size = $this->directorySize(\Yii::$app->basePath . "/backups/" . $this->ticket->token) - $this->directorySize(\Yii::$app->basePath . "/backups/" . $this->ticket->token . '/rdiff-backup-data');
+                    $this->ticket->backup_size = $this->directorySize(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token) - $this->directorySize(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token . '/rdiff-backup-data');
                 }
 
                 $this->ticket->backup_last_try = new Expression('NOW()');

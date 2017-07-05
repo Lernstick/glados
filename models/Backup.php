@@ -70,7 +70,7 @@ class Backup extends Model
 
     public function getDir()
     {
-        return \Yii::$app->params['backupDir'] . '/' . $this->token . '/rdiff-backup-data/';
+        return \Yii::$app->params['backupPath'] . '/' . $this->token . '/rdiff-backup-data/';
     }
 
     /**
@@ -144,7 +144,7 @@ class Backup extends Model
      */
     public function findAll($token)
     {
-        $dir = \Yii::$app->params['backupDir'] . '/' . $token . '/rdiff-backup-data/';
+        $dir = \Yii::$app->params['backupPath'] . '/' . $token . '/rdiff-backup-data/';
         $models = [];
 
         if (file_exists($dir)) {
@@ -170,7 +170,7 @@ class Backup extends Model
      */
     public function findOne($token, $date)
     {
-        $file = \Yii::$app->params['backupDir'] . '/' . $token . '/'
+        $file = \Yii::$app->params['backupPath'] . '/' . $token . '/'
              . 'rdiff-backup-data/session_statistics.' . $date . '.data';
 
         if(Yii::$app->file->set($file)->exists === false){

@@ -47,7 +47,7 @@ class BackupController extends Controller
 
         $fs = new RdiffFileSystem([
             'root' => '/home/user',
-            'location' => \Yii::getAlias('@app/backups/' . $ticket->token),
+            'location' => \Yii::$app->params['backupPath'] . '/' . $ticket->token,
             'restoreUser' => 'root',
             'restoreHost' => $ticket->ip,
         ]);
@@ -64,13 +64,13 @@ class BackupController extends Controller
 
 		$ticket = Ticket::findOne($ticket_id);
 
-        if (!file_exists(\Yii::getAlias('@app/backups/' . $ticket->token))) {
+        if (!file_exists(\Yii::$app->params['backupPath'] . '/' . $ticket->token)) {
             return '<span>No Backup yet.</span>';
         }
 
 		$fs = new RdiffFileSystem([
             'root' => '/home/user',
-            'location' => \Yii::getAlias('@app/backups/' . $ticket->token),
+            'location' => \Yii::$app->params['backupPath'] . '/' . $ticket->token,
             'restoreUser' => 'root',
             'restoreHost' => $ticket->ip,
         ]);

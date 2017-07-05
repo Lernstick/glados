@@ -86,8 +86,7 @@ class Screenshot extends Model
      */
     public function findOne($token, $date)
     {
-        //$dir = \Yii::$app->params['backupDir'] . '/' . $token . '/Screenshots/';
-        $dir = \Yii::getAlias('@app') . '/backups/' . $token . '/Screenshots/';
+        $dir = \Yii::$app->params['backupPath'] . '/' . $token . '/Screenshots/';
         if (file_exists($dir)) {
             $files = scandir($dir, SCANDIR_SORT_DESCENDING);
             foreach ($files as $screenshot) {
@@ -114,8 +113,7 @@ class Screenshot extends Model
      */
     public function findAll($token)
     {
-
-        $dir = \Yii::getAlias('@app') . '/backups/' . $token . '/Screenshots/';
+        $dir = \Yii::$app->params['backupPath'] . '/' . $token . '/Screenshots/';
         $models = [];
 
         if (file_exists($dir)) {

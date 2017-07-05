@@ -402,8 +402,8 @@ class Ticket extends \yii\db\ActiveRecord
      * @return bool
      */
     public function getBackup(){
-        $backupDir = \Yii::$app->params['backupDir'] . '/' . $this->token . '/' . 'rdiff-backup-data';
-        return Yii::$app->file->set($backupDir)->exists;
+        $backupPath = \Yii::$app->params['backupPath'] . '/' . $this->token . '/' . 'rdiff-backup-data';        
+        return Yii::$app->file->set($backupPath)->exists;
     }
 
     /**

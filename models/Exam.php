@@ -113,7 +113,7 @@ class Exam extends \yii\db\ActiveRecord
      */
     public function upload()
     {
-        $this->filePath = \Yii::$app->params['uploadDir'] . '/' . generate_uuid() . '.' . $this->file->extension;
+        $this->filePath = \Yii::$app->params['uploadPath'] . '/' . generate_uuid() . '.' . $this->file->extension;
 
         if ($this->validate(['file'])) {
             return $this->file->saveAs($this->filePath, true);
@@ -127,7 +127,7 @@ class Exam extends \yii\db\ActiveRecord
      */
     public function deleteFile()
     {
-        $file = \Yii::$app->params['uploadDir'] . '/' . $this->file;
+        $file = $this->file;
         $this->file = null;
         $this->md5 = null;
         $this->{"file_analyzed"} = 0;

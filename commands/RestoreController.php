@@ -109,10 +109,10 @@ class RestoreController extends DaemonController
             $file = FileHelper::normalizePath('/' . substr($file, strlen($this->remotePath)));
         }
         
-        if (is_dir(FileHelper::normalizePath(\Yii::$app->basePath . "/backups/" . $this->ticket->token))) {
+        if (is_dir(FileHelper::normalizePath(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token))) {
             $fs = new RdiffFileSystem([
                 'root' => $this->remotePath,
-                'location' => FileHelper::normalizePath(\Yii::$app->basePath . "/backups/" . $this->ticket->token),
+                'location' => FileHelper::normalizePath(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token),
                 'restoreUser' => $this->remoteUser,
                 'restoreHost' => $this->ticket->ip,
             ]);
@@ -161,7 +161,7 @@ class RestoreController extends DaemonController
                 . "'ssh -i " . \Yii::$app->basePath . "/.ssh/rsa "
                 . "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -C %s rdiff-backup --server' "
              . "--restore-as-of " . escapeshellarg($date) . " "
-             . escapeshellarg(FileHelper::normalizePath(\Yii::$app->basePath . "/backups/" . $this->ticket->token . "/" . $file)) . " "
+             . escapeshellarg(FileHelper::normalizePath(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token . "/" . $file)) . " "
              . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . "::" . FileHelper::normalizePath($restorePath . '/' . $file)) . " "
              . "2>&1;" . " ";
              /* second command */

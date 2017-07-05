@@ -148,7 +148,7 @@ class TicketController extends Controller
 
             $fs = new RdiffFileSystem([
                 'root' => $model->exam->backup_path,
-                'location' => \Yii::getAlias('@app/backups/' . $model->token),
+                'location' => realpath(\Yii::$app->params['backupPath'] . '/' . $model->token),
                 'restoreUser' => 'root',
                 'restoreHost' => $model->ip,
                 'options' => $options,
@@ -158,7 +158,7 @@ class TicketController extends Controller
                 $date = ($model->state == Ticket::STATE_CLOSED || $model->state == Ticket::STATE_SUBMITTED) ? $fs->newestBackupVersion : 'all';
             }
 
-            if (file_exists(\Yii::getAlias('@app/backups/' . $model->token))) {
+            if (file_exists(\Yii::$app->params['backupPath'] . '/' . $model->token)) {
                 $models = $fs->slash($path)->versionAt($date)->contents;
                 $versions = $fs->slash($path)->versions;
                 //array_unshift($versions , 'now');

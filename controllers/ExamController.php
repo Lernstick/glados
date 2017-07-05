@@ -197,7 +197,7 @@ class ExamController extends Controller
                         $zip->addEmptyDir($ticket->name);
                         $comment .= $ticket->token . ': ' . ($ticket->test_taker ? $ticket->test_taker : '(not set)') . PHP_EOL;
 
-                        $source = realpath(\Yii::$app->basePath . '/backups/' . $ticket->token . '/');
+                        $source = realpath(\Yii::$app->params['backupPath'] . '/' . $ticket->token . '/');
                         if (is_dir($source)) {
                             $files = new \RecursiveIteratorIterator(
                                 new \RecursiveDirectoryIterator(
@@ -221,7 +221,6 @@ class ExamController extends Controller
                             }
                         }
                     }
-                    //$zip->setArchiveComment($model->name . ' - ' . $model->subject);
                     $zip->setArchiveComment($comment);
                     $zip->close();
 
@@ -307,15 +306,15 @@ class ExamController extends Controller
                 $fileError = 'Unknown File Upload Error';
             }
 
-            if (!is_dir(\Yii::$app->params['uploadDir'])) {
-                $fileError = 'The upload directory does not exist.';
+            if (!is_dir(\Yii::$app->params['uploadPath'])) {
+                $fileError = 'The upload directory (' . \Yii::$app->params['uploadPath'] . ') does not exist.';
                 @unlink($model->file);
                 return [ 'files' => [[
                     'name' => basename($model->file),
                     'error' => $fileError,
                 ]]];                
-            } else if (!is_writable(\Yii::$app->params['uploadDir'])) {
-                $fileError = 'The upload directory is not writable.';
+            } else if (!is_writable(\Yii::$app->params['uploadPath'])) {
+                $fileError = 'The upload directory (' . \Yii::$app->params['uploadPath'] . ') is not writable.';
                 @unlink($model->file);
                 return [ 'files' => [[
                     'name' => basename($model->file),
