@@ -494,13 +494,15 @@ class TicketController extends Controller
             ->andWhere(['end' => null])
             ->andWhere(['download_lock' => 1]);
 
-        if(intval($query->count()) >= 10){
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            return [
-                'code' => 509,
-                'msg' => 'The server is busy, please wait. Retry in {i} seconds.',
-                'wait' => 20,
-            ];
+        if (\Yii::$app->params['concurrentExamDownloads'] != 0) {
+            if(intval($query->count()) >= \Yii::$app->params['concurrentExamDownloads']){
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                return [
+                    'code' => 509,
+                    'msg' => 'The server is busy, please wait. Retry in {i} seconds.',
+                    'wait' => 20,
+                ];
+            }
         }
 
         $model->scenario = Ticket::SCENARIO_DOWNLOAD;
@@ -512,7 +514,7 @@ class TicketController extends Controller
         $model->save();
 
         ignore_user_abort(true);
-        \Yii::$app->response->bandwidth = 20 * 1024 * 1024; //20MB per second
+        \Yii::$app->response->bandwidth = \Yii::$app->params['examDownloadBandwith'];
 
         # log activity before [[send()]] is called upon the request.
         \Yii::$app->response->on(\app\components\customResponse::EVENT_BEFORE_SEND, function($event) {
