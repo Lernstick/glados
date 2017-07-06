@@ -451,20 +451,15 @@ class BackupController extends DaemonController
 
     private function judgement ()
     {
-        $upperBound = 80;
-        $lowerBound = 20;
-        $maxDaemons = 10;
-        $minDaemons = 3;
-
         $sum = Daemon::find()->sum('`load`');
         $count = Daemon::find()->count();
         $workload = round(100*$sum/$count);
 
-        if ($workload > $upperBound && $count < $maxDaemons) {
+        if ($workload > \Yii::$app->params['upperBound'] && $count < \Yii::$app->params['maxDaemons']) {
             # start a new daemon
             $backupDaemon = new Daemon();
             $backupDaemon->startBackup();
-        } else if ($workload < $lowerBound && $count > $minDaemons) {
+        } else if ($workload < \Yii::$app->params['lowerBound'] && $count > \Yii::$app->params['minDaemons']) {
             # stop after 5 minutes
             if (time() - strtotime($this->daemon->started_at) > 300) {
                 $this->stop();

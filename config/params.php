@@ -11,4 +11,8 @@ return [
     'resultPath' => '/var/lib/glados/results/',
     'examDownloadBandwith' => 20 * 1024 * 1024, // 20MB per second, set 0 for no limit
     'concurrentExamDownloads' => 10, // set 0 for no limit
+    'minDaemons' => 3,
+    'maxDaemons' => 10,
+    'upperBound' => 80,
+    'lowerBound' => 20,
 ];

@@ -138,18 +138,14 @@ $this->registerJs($active_tabs);
                     ]
                 ) ?>
             </li>
-
-            <?php if (YII_ENV_DEV) {
-                echo '<li class="divider"></li>';
-                echo '<li>';
-                    echo Html::a(
-                        '<span class="glyphicon glyphicon-compressed"></span> Download ZIP-File with results',
-                        Url::to(['exam/view', 'id' => $model->id, 'mode' => 'zip']),
-                        ['data-pjax' => 0, 'class' => 'dev_item']
-                    );
-                echo '</li>';
-            } ?>
-
+            <li class="divider"></li>
+            <li>
+                <?= Html::a(
+                    '<span class="glyphicon glyphicon-compressed"></span> Download ZIP-File with results',
+                    Url::to(['exam/view', 'id' => $model->id, 'mode' => 'zip']),
+                    ['data-pjax' => 0]
+                ); ?>
+            </li>
         </ul>
     </li>
 

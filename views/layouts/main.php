@@ -67,12 +67,47 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
         ],
     ]);
     if (YII_ENV_DEV) {
-        echo "<p class='navbar-text'>YII_ENV_DEV=true YII_DEBUG=" . (YII_DEBUG ? 'true' : 'false') . "</p>";
+        echo "<p class='navbar-text' style='color:red; font-size:10px; margin:10px;'>YII_ENV_DEV=true<br>YII_DEBUG=" . (YII_DEBUG ? 'true' : 'false') . "</p>";
     }
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
             ['label' => 'Home', 'url' => ['/site/index']],
+            [
+                'label' => 'Actions',
+                'items' => [
+                    [
+                        'label' => 'Create Exam',
+                        'url' => ['/exam/create'],
+                        'visible' => Yii::$app->user->can('exam/create'),
+                    ],
+                    [
+                        'label' => 'Create Ticket',
+                        'url' => ['/ticket/create'],
+                        'visible' => Yii::$app->user->can('ticket/create'),
+                    ],
+                    [
+                        'label' => 'Start Backup Daemon',
+                        'url' => ['/daemon/create', ['type' => 'backup']],
+                        'visible' => Yii::$app->user->can('daemon/create'),
+                    ],
+                    [
+                        'label' => 'Start Analyzer Daemon',
+                        'url' => ['/daemon/create', ['type' => 'analyze']],
+                        'visible' => Yii::$app->user->can('daemon/create'),
+                    ],
+                    [
+                        'label' => 'Create User',
+                        'url' => ['/user/create'],
+                        'visible' => Yii::$app->user->can('user/create'),
+                    ],                    
+                    [
+                        'label' => 'Submit results',
+                        'url' => ['/result/submit'],
+                        'visible' => Yii::$app->user->can('result/submit'),
+                    ],                     
+                ],
+            ],            
             [
                 'label' => 'Activities ' . 
                     ActiveEventField::widget([
