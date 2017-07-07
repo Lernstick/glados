@@ -10,16 +10,17 @@ use limion\jqueryfileupload\JQueryFileUpload;
 /* @var $this yii\web\View */
 
 $this->title = 'Submit Results';
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['result/submit']];
+$this->params['breadcrumbs'][] = 'Step 1';
 ?>
 <div class="result-create">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1><?= Html::encode($this->title . ' - Step 1') ?></h1>
 
     <?php $form = ActiveForm::begin([
     	'options' => ['enctype' => 'multipart/form-data'],
     	'method' => 'get',
-        'action' => ['result/submit', ['mode' => 'step2']],    
+        'action' => ['result/submit', 'mode' => 'step2'],
     ]); ?>
 
     <div class="row">

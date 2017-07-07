@@ -8,6 +8,9 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use app\components\AccessRule;
 use yii\web\UploadedFile;
+use app\models\Ticket;
+use app\models\TicketSearch;
+
 
 /**
  * ResultController implements the CRUD actions for Result model.
@@ -51,14 +54,28 @@ class ResultController extends Controller
             $model = Result::findOne($hash);
         }
         if ($mode === 'step1') {
-            return $this->render('submit', [
+            return $this->render('submit_s1', [
                 'model' => $model,
             ]);
 
         } else if ($mode === 'step2'){
-            if ($model->load(Yii::$app->request->post()) && $model->validate()){
-                return $this->redirect(['submit', 'hash' => $model->hash]);
-            }
+
+            $searchModel = new TicketSearch();
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+            $dataProvider->query = $dataProvider->query->andFilterWhere(['token' => $model->tokens]);
+
+            return $this->render('submit_s2', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+                'model' => $model,
+            ]);
+
+        } else if ($mode === 'step3'){
+
+            $model->unzip();
+            return $this->render('submit_s3', [
+                'model' => $model,
+            ]);
 
         } else if ($mode === 'upload') {
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;

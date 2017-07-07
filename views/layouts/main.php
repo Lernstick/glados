@@ -88,12 +88,12 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
                     ],
                     [
                         'label' => 'Start Backup Daemon',
-                        'url' => ['/daemon/create', ['type' => 'backup']],
+                        'url' => ['/daemon/create', 'type' => 'backup'],
                         'visible' => Yii::$app->user->can('daemon/create'),
                     ],
                     [
                         'label' => 'Start Analyzer Daemon',
-                        'url' => ['/daemon/create', ['type' => 'analyze']],
+                        'url' => ['/daemon/create', 'type' => 'analyze'],
                         'visible' => Yii::$app->user->can('daemon/create'),
                     ],
                     [
