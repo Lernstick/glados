@@ -59,7 +59,7 @@ class Result extends Model
     /**
      * @return boolean
      */
-    public function unzip()
+    public function submit()
     {
         $zip = new \ZipArchive(); 
         $tmp = tempnam(sys_get_temp_dir(), '');
@@ -73,7 +73,7 @@ class Result extends Model
 
         foreach($this->dirs as $token => $dir) {
 
-            $zipFile = $tmp . '/' . $token . '.zip';
+            $zipFile = \Yii::$app->params['resultPath'] . '/' . $token . '.zip';
             $source = $tmp . '/' . $dir;
 
             print_r($zipFile .  PHP_EOL);
@@ -95,10 +95,8 @@ class Result extends Model
                         $file = realpath($file);
 
                         if (is_dir($file) === true) {
-                            print_r('dir: ' . str_replace($source . '/', '', $file . '/') .  PHP_EOL);
                             $tzip->addEmptyDir(str_replace($source . '/', '', $file . '/'));
                         }else if (is_file($file) === true) {
-                            print_r('fil: ' . str_replace($source . '/', '', $file). PHP_EOL);
                             $tzip->addFile($file, str_replace($source . '/', '', $file));
                         }
                     }
@@ -106,6 +104,14 @@ class Result extends Model
                 $tzip->close();
             } else {
                 @unlink($zipFile);
+            }
+        }
+
+        foreach($this->tickets as $ticket) {
+            $result = realpath(\Yii::$app->params['resultPath'] . '/' . $ticket->token . '.zip');
+            if (file_exists($result)) {
+                $ticket->result = $result;
+                $ticket->save();
             }
         }
 

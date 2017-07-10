@@ -78,7 +78,7 @@ $this->title = 'GLaDOS';
         </div>
     </div>
 
-    <div class="jumbotron">
+    <div class="jumbotron" style="background-color: transparent;">
         <p><a class="btn btn-lg btn-success" href="index.php?r=exam/index">Show my Exams &raquo;</a></p>
     </div>
 

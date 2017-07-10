@@ -91,6 +91,13 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php } ?>
         <li>
             <?= Html::a(
+                '<i class="glyphicon glyphicon-sunglasses"></i> Result',
+                Url::to(['result/view', 'token' => $model->token, '#' => 'result']),
+                ['data-toggle' => 'tab']
+            ); ?>
+        </li>        
+        <li>
+            <?= Html::a(
                 '<i class="glyphicon glyphicon-tasks"></i> Restores',
                 Url::to(['restore/index', 'ticket_id' => $model->id, '#' => 'restores']),
                 ['data-toggle' => 'tab']
@@ -537,6 +544,16 @@ $this->params['breadcrumbs'][] = $this->title;
             'ticketModel' => $model,
             'searchModel' => $restoreSearchModel,
             'dataProvider' => $restoreDataProvider,
+        ]); ?>
+    <?php Pjax::end() ?>
+
+    <?php Pjax::begin([
+        'id' => 'result',
+        'options' => ['class' => 'tab-pane fade'],
+    ]); ?>
+        <?php $_GET = array_merge($_GET, ['#' => 'tab_result']); ?>
+        <?= $this->render('/result/_view', [
+            'model' => $model,
         ]); ?>
     <?php Pjax::end() ?>
 

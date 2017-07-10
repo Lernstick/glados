@@ -147,6 +147,7 @@ class Ticket extends \yii\db\ActiveRecord
             'start' => 'Started',
             'end' => 'Finished',
             'duration' => 'Duration',
+            'result' => 'Result',
             'time_limit' => 'Time Limit',
             'download_progress' => 'Exam Download Progress',
             'client_state' => 'Client State',

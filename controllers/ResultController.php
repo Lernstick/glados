@@ -34,11 +34,58 @@ class ResultController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
+                        'actions' => [
+                            'view', // view the result
+                            'download', // download the result
+
+                        ],
+                        'roles' => ['?', '@'],
+                    ],
+                    [
+                        'allow' => true,
                         'roles' => ['rbac'],
                     ],
                 ],
             ],
         ];
+    }
+
+    /**
+     * Displays a single Result model.
+     * @param integer $token
+     * @throws NotFoundHttpException if the model cannot be found
+     * @return mixed
+     */
+    public function actionView($token)
+    {
+
+        $model = Ticket::findOne(['token' => $token]);
+        if (!$model) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        } else {
+            return $this->render('view', [
+                'model' => $model,
+            ]);
+        }
+
+    }
+
+    /**
+     * Downloads a single Result model.
+     * @param integer $token
+     * @throws NotFoundHttpException if the model cannot be found
+     * @return mixed
+     */
+    public function actionDownload($token)
+    {
+
+        $model = Ticket::findOne(['token' => $token]);
+        if (!$model) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        } else {
+            return \Yii::$app->response->sendFile($model->result);
+        }
+
     }
 
     /**
@@ -72,7 +119,7 @@ class ResultController extends Controller
 
         } else if ($mode === 'step3'){
 
-            $model->unzip();
+            $model->submit();
             return $this->render('submit_s3', [
                 'model' => $model,
             ]);
