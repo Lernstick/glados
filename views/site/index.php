@@ -1,6 +1,9 @@
 <?php
 
+use yii\helpers\Html;
+use yii\helpers\Url;
 use app\components\ActiveEventField;
+use app\models\Ticket;
 
 /* @var $this yii\web\View */
 
@@ -78,8 +81,14 @@ $this->title = 'GLaDOS';
         </div>
     </div>
 
-    <div class="jumbotron" style="background-color: transparent;">
-        <p><a class="btn btn-lg btn-success" href="index.php?r=exam/index">Show my Exams &raquo;</a></p>
+    <div class="col-md-12">
+        <div class="jumbotron">
+            <p>Check your exam result!</p>
+            <?= $this->render('/result/_form', [
+                'model' => new Ticket(),
+            ]);
+            ?>
+        </div>
     </div>
 
 </div>

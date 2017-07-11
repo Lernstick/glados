@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\base\Model;
+use app\models\Activity;
 
 /**
  * This is the model class for the result directory.
@@ -76,9 +77,10 @@ class Result extends Model
             $zipFile = \Yii::$app->params['resultPath'] . '/' . $token . '.zip';
             $source = $tmp . '/' . $dir;
 
-            print_r($zipFile .  PHP_EOL);
-            print_r($source .  PHP_EOL);
             $tzip = new \ZipArchive;
+            if (file_exists($zipFile)) {
+                unlink($zipFile);
+            }
             $res = $tzip->open($zipFile, \ZIPARCHIVE::CREATE);
 
             if ($res === TRUE) {
@@ -112,6 +114,12 @@ class Result extends Model
             if (file_exists($result)) {
                 $ticket->result = $result;
                 $ticket->save();
+
+                $act = new Activity([
+                    'ticket_id' => $ticket->id,
+                    'description' => 'Exam result handed in.'
+                ]);
+                $act->save();
             }
         }
 

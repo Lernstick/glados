@@ -10,7 +10,7 @@ use app\components\AccessRule;
 use yii\web\UploadedFile;
 use app\models\Ticket;
 use app\models\TicketSearch;
-
+use yii\web\NotFoundHttpException;
 
 /**
  * ResultController implements the CRUD actions for Result model.
@@ -56,9 +56,17 @@ class ResultController extends Controller
      * @throws NotFoundHttpException if the model cannot be found
      * @return mixed
      */
-    public function actionView($token)
+    public function actionView($token = null)
     {
 
+        if ($token === null){
+
+            $model = new Ticket();
+            $model->token = $token;
+            return $this->render('_form', [
+                'model' => $model,
+            ]);
+        }
         $model = Ticket::findOne(['token' => $token]);
         if (!$model) {
             throw new NotFoundHttpException('The requested page does not exist.');
@@ -109,7 +117,7 @@ class ResultController extends Controller
 
             $searchModel = new TicketSearch();
             $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-            $dataProvider->query = $dataProvider->query->andFilterWhere(['token' => $model->tokens]);
+            $dataProvider->query = $dataProvider->query->andWhere(['token' => $model->tokens]);
 
             return $this->render('submit_s2', [
                 'searchModel' => $searchModel,
@@ -120,7 +128,21 @@ class ResultController extends Controller
         } else if ($mode === 'step3'){
 
             $model->submit();
-            return $this->render('submit_s3', [
+
+            return $this->redirect(['result/submit',
+                'mode' => 'done',
+                'hash' => $hash,
+            ]);
+
+        } else if ($mode === 'done'){
+
+            $searchModel = new TicketSearch();
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+            $dataProvider->query = $dataProvider->query->andWhere(['token' => $model->tokens]);
+
+            return $this->render('submit_done', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,                
                 'model' => $model,
             ]);
 
