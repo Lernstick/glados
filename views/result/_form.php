@@ -20,9 +20,14 @@ $model->token = null;
 <div class="row">
     <div class="col-md-3"></div>
     <div class="col-md-6">
-        <?= $form->field($model, 'token')->textInput([
+        <?= $form->field(
+            $model,
+            'token',
+            ['inputOptions' => ['autofocus' => 'autofocus']
+        ])->textInput([
             'name' => 'token',
             'class' => 'form-control input-lg',
+            'style' => 'text-align:center',
             'placeholder' => 'Insert your token here!',
         ])->label(false); ?>
     </div>

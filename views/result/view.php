@@ -6,7 +6,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model app\models\Ticket */
 
-$this->title = 'Result';
+$this->title = 'Status';
 $this->params['breadcrumbs'][] = ['label' => $model->token];
 $this->params['breadcrumbs'][] = $this->title;
 

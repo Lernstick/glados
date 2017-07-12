@@ -207,7 +207,7 @@ class Ticket extends \yii\db\ActiveRecord
      */
     public function updateEvent()
     {
-        if($this->attributesChanged([ 'start', 'end', 'test_taker' ])){
+        if($this->attributesChanged([ 'start', 'end', 'test_taker', 'result' ])){
             $eventItem = new EventItem([
                 'event' => 'ticket/' . $this->id,
                 'priority' => 0,
@@ -415,6 +415,24 @@ class Ticket extends \yii\db\ActiveRecord
     public function getBackups()
     {
         return Backup::findAll($this->token);
+    }
+
+    public function getLimit()
+    {
+        if($this->state == self::STATE_OPEN || $this->state == self::STATE_RUNNING){
+            if (is_int($this->time_limit) && $this->time_limit == 0) {
+                return true;
+            } else if (is_int($this->time_limit) && $this->time_limit > 0) {
+                return $this->time_limit;
+            } else if (is_int($this->exam->time_limit) && $this->exam->time_limit == 0) {
+                return true;
+            } else if (is_int($this->exam->time_limit) && $this->exam->time_limit > 0) {
+                return $this->exam->time_limit;            
+            } else {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

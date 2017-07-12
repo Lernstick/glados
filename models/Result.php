@@ -72,6 +72,11 @@ class Result extends Model
             $zip->close();
         }
 
+        foreach($this->tickets as $ticket) {
+            $ticket->result = null;
+            $ticket->save();
+        }
+
         foreach($this->dirs as $token => $dir) {
 
             $zipFile = \Yii::$app->params['resultPath'] . '/' . $token . '.zip';

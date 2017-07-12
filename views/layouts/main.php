@@ -75,6 +75,7 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
             ['label' => 'Home', 'url' => ['/site/index']],
             [
                 'label' => 'Actions',
+                'visible' => !Yii::$app->user->isGuest,
                 'items' => [
                     [
                         'label' => 'Create Exam',
