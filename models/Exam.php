@@ -241,68 +241,6 @@ class Exam extends \yii\db\ActiveRecord
         return $x;
     }
 
-    /**
-     * Generates a ZIP File from all closed or submitted Tickets.
-     * 
-     * @return null|false|string    null if there is no closed or submitted ticket
-     *                              false if an error occurred during generation
-     *                              string the ZIP File path
-     */
-    public function generateZip()
-    {
-        $tickets = Ticket::find()->where([ 'and', ['exam_id' => $this->id], [ 'not', [ "start" => null ] ], [ 'not', [ "end" => null ] ] ])->all();
-        if(!$tickets){
-            return null;
-        } else {
-
-            $zip = new \ZipArchive;
-            $zipFile = tempnam(sys_get_temp_dir(), 'ZIP');
-            $res = $zip->open($zipFile, \ZIPARCHIVE::CREATE | \ZIPARCHIVE::OVERWRITE);
-            $comment = $this->name . ' - ' . $this->subject . PHP_EOL . PHP_EOL;
-
-            if ($res === TRUE) {
-
-                foreach($tickets as $ticket) {
-                    $options = array('add_path' => $ticket->name . '/', 'remove_all_path' => TRUE);
-
-                    $zip->addEmptyDir($ticket->name);
-                    $comment .= $ticket->token . ': ' . ($ticket->test_taker ? $ticket->test_taker : '(not set)') . PHP_EOL;
-
-                    $source = realpath(\Yii::$app->params['backupPath'] . '/' . $ticket->token . '/');
-                    if (is_dir($source)) {
-                        $files = new \RecursiveIteratorIterator(
-                            new \RecursiveDirectoryIterator(
-                                $source,
-                                \FilesystemIterator::SKIP_DOTS
-                            ),
-                            \RecursiveIteratorIterator::SELF_FIRST
-                        );
-                        foreach ($files as $file) {
-                            $file = realpath($file);
-
-                            // exclude rdiff-backup-data directory and dotfiles
-                            if (strpos($file, realpath($source . '/rdiff-backup-data')) !== false) { continue; }
-                            if (strpos($file, '/.') !== false) { continue; }
-
-                            if (is_dir($file) === true) {
-                                $zip->addEmptyDir($ticket->name . '/' . str_replace($source . '/', '', $file . '/'));
-                            }else if (is_file($file) === true) {
-                                $zip->addFile($file, $ticket->name . '/' . str_replace($source . '/', '', $file));
-                            }
-                        }
-                    }
-                }
-                $zip->setArchiveComment($comment);
-                $zip->close();
-
-                return $zipFile;
-            } else {
-                @unlink($zipFile);
-                return false;
-            }
-        }
-    }
-
     public function validateRunningTickets($attribute, $params)
     {
         $this->runningTicketCount != 0 ? $this->addError($attribute, 'Exam update is disabled while there are ' . $this->runningTicketCount . ' tickets in "Running" state.') : null;

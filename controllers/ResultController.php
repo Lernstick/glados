@@ -60,9 +60,9 @@ class ResultController extends Controller
     {
 
         if ($token === null){
-
             $model = new Ticket();
             $model->token = $token;
+
             return $this->render('_form', [
                 'model' => $model,
             ]);
@@ -75,7 +75,43 @@ class ResultController extends Controller
                 'model' => $model,
             ]);
         }
+    }
 
+    /**
+     * Creates a new Result model.
+     * If creation is successful, the browser will be redirected to the 'exam/view' page.
+     * @return mixed
+     */
+    public function actionGenerate($exam_id)
+    {
+        $model = new Result([
+            'scenario' => 'generate',
+            'exam_id' => $exam_id,
+        ]);
+
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+
+            $zipFile = $model->generateZip();
+
+            if ($zipFile === null) {
+                Yii::$app->session->addFlash('danger', 'There are no closed or submitted Tickets to generate a ZIP-File.');
+                return $this->redirect(['exam/view', 'id' => $exam_id]); 
+            } else if ($zipFile === false) {
+                throw new NotFoundHttpException('The ZIP-file could not be generated.');
+            } else {
+                ignore_user_abort(true);
+                \Yii::$app->response->on(\app\components\customResponse::EVENT_AFTER_SEND, function($event) use ($zipFile) {
+                    @unlink($zipFile);
+                }, $model);
+
+                return \Yii::$app->response->sendFile($zipFile, 'result.zip');                
+            }
+
+        } else {
+            return $this->render('generate', [
+                'model' => $model,
+            ]);
+        }
     }
 
     /**
@@ -108,6 +144,8 @@ class ResultController extends Controller
         } else {
             $model = Result::findOne($hash);
         }
+        $model->scenario = Result::SCENARIO_SUBMIT;
+
         if ($mode === 'step1') {
             return $this->render('submit_s1', [
                 'model' => $model,
@@ -208,7 +246,7 @@ class ResultController extends Controller
             return [ 'files' => [[
                 'name' => basename($model->file),
                 'size' => filesize($model->file),
-                'deleteUrl' => 'index.php?r=result/delete&mode=zip&file=' . basename($model->file),
+                'deleteUrl' => 'index.php?r=result/delete&mode=zip&file=' . basename($model->file), #TODO
                 'deleteType' => 'POST'
             ]]];
         }

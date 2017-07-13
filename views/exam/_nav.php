@@ -142,10 +142,10 @@ $this->registerJs($active_tabs);
             <li>
                 <?= Html::a(
                     '<span class="glyphicon glyphicon-compressed"></span> Download ZIP-File with results',
-                    Url::to(['exam/view', 'id' => $model->id, 'mode' => 'zip']),
+                    Url::to(['result/generate', 'exam_id' => $model->id]),
                     ['data-pjax' => 0]
                 ); ?>
-            </li>
+            </li>            
         </ul>
     </li>
 

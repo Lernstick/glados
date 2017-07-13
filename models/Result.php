@@ -5,6 +5,7 @@ namespace app\models;
 use Yii;
 use yii\base\Model;
 use app\models\Activity;
+use app\models\Ticket;
 
 /**
  * This is the model class for the result directory.
@@ -20,10 +21,26 @@ class Result extends Model
     public $filePath;
     public $file;
     public $hash;
+    public $exam_id;
+
+    /* generation options */
+    public $inc_dotfiles = false;
+    public $inc_screenshots = true;
+    public $path = '/';
+    public $inc_pattern = [];
 
     private $_tickets = [];
     private $_tokens = [];
     private $_dirs = [];
+    private $_exam;
+    private $_types = [
+        'word_documents' => '/.*\.odt$|.*\.txt$|.*\.doc$|.*\.docx$/i',
+        'images' => '/.*\.jpg$|.*\.png$|.*\.gif$|.*\.jpeg$/i',
+    ];
+
+    /* scenario constants */
+    const SCENARIO_GENERATE = 'generate';
+    const SCENARIO_SUBMIT = 'submit';
 
     /**
      * @return array the validation rules.
@@ -31,7 +48,11 @@ class Result extends Model
     public function rules()
     {
         return [
-            [['file'], 'file', 'skipOnEmpty' => true, 'extensions' => 'zip', 'checkExtensionByMimeType' => true],        
+            [['file'], 'file', 'skipOnEmpty' => true, 'extensions' => 'zip', 'checkExtensionByMimeType' => true, 'on' => self::SCENARIO_SUBMIT],        
+            [['exam_id'], 'required', 'on' => self::SCENARIO_GENERATE],                    
+            [['path'], 'required', 'on' => self::SCENARIO_GENERATE],
+            [['inc_dotfiles', 'inc_screenshots'], 'boolean', 'on' => self::SCENARIO_GENERATE],
+            [['inc_pattern'], 'each', 'rule' => ['string'], 'on' => self::SCENARIO_GENERATE],
         ];
     }
 
@@ -40,7 +61,124 @@ class Result extends Model
      */
     public function attributeLabels()
     {
-        return [];
+        return [
+            'inc_dotfiles' => 'Include hidden files (dot-files)',
+            'inc_screenshots' => 'Include screenshots',
+            'inc_pattern' => 'Include only files of type',
+            'path' => 'Path',
+        ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getExam()
+    {
+        if (is_object($this->_exam)) {
+            return $this->_exam;
+        } else {
+            return Exam::findOne(['id' => $this->exam_id]);
+        }
+    }
+
+    /**
+     * Generates a ZIP File from all closed or submitted Tickets.
+     * 
+     * @return null|false|string    null: if there is no closed or submitted ticket
+     *                              false: if an error occurred during generation
+     *                              string: the zip File path
+     */
+    public function generateZip()
+    {
+        $tickets = Ticket::find()->where([ 'and', ['exam_id' => $this->exam->id], [ 'not', [ "start" => null ] ], [ 'not', [ "end" => null ] ] ])->all();
+        if(!$tickets){
+            return null;
+        } else {
+
+            $zip = new \ZipArchive;
+            $zipFile = tempnam(sys_get_temp_dir(), 'ZIP');
+            $res = $zip->open($zipFile, \ZIPARCHIVE::CREATE | \ZIPARCHIVE::OVERWRITE);
+            $comment = $this->exam->name . ' - ' . $this->exam->subject . PHP_EOL . PHP_EOL;
+
+            if ($res === TRUE) {
+
+                foreach($tickets as $ticket) {
+                    $options = array('add_path' => $ticket->name . '/', 'remove_all_path' => TRUE);
+
+                    $zip->addEmptyDir($ticket->name);
+                    $comment .= $ticket->token . ': ' . ($ticket->test_taker ? $ticket->test_taker : '(not set)') . PHP_EOL;
+
+                    $origSource = realpath(\Yii::$app->params['backupPath'] . '/' . $ticket->token);
+                    $source = realpath($origSource . '/' . $this->path . '/');
+                    if (is_dir($origSource)) {
+                        $files = new \RecursiveIteratorIterator(
+                            new \RecursiveDirectoryIterator(
+                                $origSource,
+                                \FilesystemIterator::SKIP_DOTS
+                            ),
+                            \RecursiveIteratorIterator::SELF_FIRST
+                        );
+
+                        foreach ($files as $file) {
+                            if ($file->isDir()) continue;
+                            $file = realpath($file);
+
+                            // exclude rdiff-backup-data directory
+                            if (strpos($file, realpath($origSource . '/rdiff-backup-data')) === 0) { continue; }
+
+                            // exclude dotfiles if set
+                            if (!boolval($this->inc_dotfiles)) {
+                                if (strpos($file, '/.') !== false) { continue; }
+                            }
+
+                            // exclude Screenshots if set
+                            if (strpos($file, realpath($origSource . '/Screenshots')) === 0) {
+                                if (boolval($this->inc_screenshots)) {
+                                    $this->zipInclude($file, $ticket->name . '/' . str_replace($origSource . '/', '', $file), $zip);
+                                    continue;
+                                } else {
+                                    continue;
+                                }
+                            }
+
+                            if (strpos($file, realpath($source)) !== 0) { continue; }
+
+                            if (!empty($this->inc_pattern)) {
+                                foreach ($this->inc_pattern as $pattern) {
+                                    if (isset($this->_types[$pattern])) {
+                                        $p = $this->_types[$pattern];
+                                        $bn = basename($file);
+                                        if (preg_match($p, $bn) === 1) {
+                                            $this->zipInclude($file, $ticket->name . '/' . str_replace($origSource . '/', '', $file), $zip);
+                                            continue;
+                                        }
+                                    }
+                                }
+                                continue;
+                            }
+
+                            $this->zipInclude($file, $ticket->name . '/' . str_replace($source . '/', '', $file), $zip);
+                        }
+                    }
+                }
+                $zip->setArchiveComment($comment);
+                $zip->close();
+                return $zipFile;
+            } else {
+                @unlink($zipFile);
+                return false;
+            }
+        }
+    }
+
+    /**
+     * @return boolean
+     */
+    private function zipInclude ($source, $target, $zip)
+    {
+        if (is_dir($source) === false) {
+            return $zip->addFile($source, $target);
+        }
     }
 
     /**

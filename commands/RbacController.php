@@ -263,7 +263,7 @@ class RbacController extends Controller
         $auth->addChild($admin, $viewAllExam);
         $auth->addChild($admin, $updateAllExam);
         $auth->addChild($admin, $deleteAllExam);
-        $auth->addChild($teacher, $submitAllResult);
+        $auth->addChild($admin, $submitAllResult);
 
         $auth->addChild($admin, $createAllTicket);
         $auth->addChild($admin, $indexAllTicket);

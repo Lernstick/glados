@@ -770,10 +770,10 @@ class TicketController extends Controller
     }
 
     /**
-     * Finds the Ticket model based on its primary key value.
+     * Checks RBAC permission on a Ticket
      *
      * @param Ticket $model the Ticket model
-     * @return boolean whether acces is allowed or not
+     * @return boolean whether access is allowed or not
      * @throws ForbiddenHttpException if the access control failed.
      */
     protected function checkRbac($model)

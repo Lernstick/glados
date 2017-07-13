@@ -180,22 +180,6 @@ class ExamController extends Controller
 
             return $pdf->render();
 
-        } else if ($mode == 'zip'){
-            $zipFile = $model->generateZip();
-
-            if ($zipFile === null) {
-                Yii::$app->session->addFlash('danger', 'There are no closed or submitted Tickets to generate a ZIP-File.');
-                return $this->redirect(['view', 'id' => $id]); 
-            } else if ($zipFile === false) {
-                throw new NotFoundHttpException('The ZIP-file could not be generated.');
-            } else {
-                ignore_user_abort(true);
-                \Yii::$app->response->on(\app\components\customResponse::EVENT_AFTER_SEND, function($event) use ($zipFile) {
-                    unlink($zipFile);
-                }, $model);
-
-                return \Yii::$app->response->sendFile($zipFile, 'result.zip');                
-            }
         }
     }
 
@@ -346,7 +330,7 @@ class ExamController extends Controller
      * @param integer $id
      * @return Exam the loaded model
      * @throws NotFoundHttpException if the model cannot be found.
-     * @throws ForbiddenHttpException if the access control failed.
+     * @throws ForbiddenHttpException if access control failed.
      */
     protected function findModel($id)
     {
