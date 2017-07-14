@@ -11,6 +11,7 @@ use yii\web\UploadedFile;
 use app\models\Ticket;
 use app\models\TicketSearch;
 use yii\web\NotFoundHttpException;
+use yii\helpers\ArrayHelper;
 
 /**
  * ResultController implements the CRUD actions for Result model.
@@ -89,6 +90,11 @@ class ResultController extends Controller
             'exam_id' => $exam_id,
         ]);
 
+        $tickets = Ticket::find()->where([ 'and', ['exam_id' => $exam_id], [ 'not', [ "start" => null ] ], [ 'not', [ "end" => null ] ] ])->all();
+
+        $tickets = ArrayHelper::map($tickets, 'id', 'name');
+        asort($tickets);
+
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
 
             $zipFile = $model->generateZip();
@@ -110,6 +116,7 @@ class ResultController extends Controller
         } else {
             return $this->render('generate', [
                 'model' => $model,
+                'tickets' => $tickets,
             ]);
         }
     }

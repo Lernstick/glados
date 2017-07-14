@@ -88,6 +88,11 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
                         'visible' => Yii::$app->user->can('ticket/create'),
                     ],
                     [
+                        'label' => 'Submit Ticket',
+                        'url' => ['/ticket/update', 'mode' => 'submit'],
+                        'visible' => Yii::$app->user->can('ticket/update'),                    
+                    ],
+                    [
                         'label' => 'Start Backup Daemon',
                         'url' => ['/daemon/create', 'type' => 'backup'],
                         'visible' => Yii::$app->user->can('daemon/create'),

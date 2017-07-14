@@ -28,13 +28,18 @@ class Result extends Model
     public $inc_screenshots = true;
     public $path = '/';
     public $inc_pattern = [];
+    public $inc_ids = [];
 
     private $_tickets = [];
     private $_tokens = [];
     private $_dirs = [];
     private $_exam;
     private $_types = [
-        'word_documents' => '/.*\.odt$|.*\.txt$|.*\.doc$|.*\.docx$/i',
+        'word' => '/.*\.odt$|.*\.doc$|.*\.docx$|.*\.rtf$/i',
+        'excel' => '/.*\.xl.*|.*\.ods$/i',
+        'pp' => '/.*\.ppt$|.*\.pptm$|.*\.pps$|.*\.ppsx$|.*\.ppsm$|.*\.potx$|.*\.pot$|.*\.potm$|.*\.odp$/i',
+        'text' => '/.*\.txt$|.*\.cond$|.*\.cfg$|.*\.ini$/i',
+        'pdf' => '/.*\.pdf$/i',
         'images' => '/.*\.jpg$|.*\.png$|.*\.gif$|.*\.jpeg$/i',
     ];
 
@@ -53,6 +58,8 @@ class Result extends Model
             [['path'], 'required', 'on' => self::SCENARIO_GENERATE],
             [['inc_dotfiles', 'inc_screenshots'], 'boolean', 'on' => self::SCENARIO_GENERATE],
             [['inc_pattern'], 'each', 'rule' => ['string'], 'on' => self::SCENARIO_GENERATE],
+            [['inc_ids'], 'each', 'rule' => ['integer'], 'on' => self::SCENARIO_GENERATE],
+            [['inc_ids'], 'required', 'on' => self::SCENARIO_GENERATE],
         ];
     }
 
@@ -64,7 +71,8 @@ class Result extends Model
         return [
             'inc_dotfiles' => 'Include hidden files (dot-files)',
             'inc_screenshots' => 'Include screenshots',
-            'inc_pattern' => 'Include only files of type',
+            'inc_pattern' => 'Include only files of type (will include all files if nothing is selected)',
+            'inc_ids' => 'Tickets',
             'path' => 'Path',
         ];
     }
@@ -90,7 +98,10 @@ class Result extends Model
      */
     public function generateZip()
     {
-        $tickets = Ticket::find()->where([ 'and', ['exam_id' => $this->exam->id], [ 'not', [ "start" => null ] ], [ 'not', [ "end" => null ] ] ])->all();
+
+        #$tickets = Ticket::find()->where([ 'and', ['exam_id' => $this->exam->id], [ 'not', [ "start" => null ] ], [ 'not', [ "end" => null ] ] ])->all();
+        $tickets = Ticket::findAll($this->inc_ids);
+
         if(!$tickets){
             return null;
         } else {
@@ -98,7 +109,15 @@ class Result extends Model
             $zip = new \ZipArchive;
             $zipFile = tempnam(sys_get_temp_dir(), 'ZIP');
             $res = $zip->open($zipFile, \ZIPARCHIVE::CREATE | \ZIPARCHIVE::OVERWRITE);
+
             $comment = $this->exam->name . ' - ' . $this->exam->subject . PHP_EOL . PHP_EOL;
+            $comment .= 'Generated at: ' . date('c') . PHP_EOL;
+            $comment .= 'Options:' . PHP_EOL;
+            $comment .= '  Path: ' . $this->path . PHP_EOL;
+            $comment .= '  Include dotfiles: ' . ($this->inc_dotfiles ? 'true' : 'false') . PHP_EOL;
+            $comment .= '  Include screenshots: ' . ($this->inc_screenshots ? 'true' : 'false') . PHP_EOL;
+            $comment .= '  Include file types: ' . (is_array($this->inc_pattern) ? implode(', ', $this->inc_pattern) : '') . PHP_EOL;
+            $comment .= PHP_EOL;
 
             if ($res === TRUE) {
 
@@ -149,7 +168,7 @@ class Result extends Model
                                         $p = $this->_types[$pattern];
                                         $bn = basename($file);
                                         if (preg_match($p, $bn) === 1) {
-                                            $this->zipInclude($file, $ticket->name . '/' . str_replace($origSource . '/', '', $file), $zip);
+                                            $this->zipInclude($file, $ticket->name . '/' . str_replace($source . '/', '', $file), $zip);
                                             continue;
                                         }
                                     }
