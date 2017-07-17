@@ -11,11 +11,17 @@ use yii\widgets\Pjax;
 $this->title = 'Submit Results';
 $this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['result/submit']];
 $this->params['breadcrumbs'][] = 'Step 2';
+$this->title .= ' - Step 2';
 
 ?>
 <div class="result-create">
 
-    <h1><?= Html::encode($this->title . ' - Step 2') ?></h1>
+    <h1><?= Html::encode($this->title) ?></h1>
+
+    <div class="media-body">
+        <span>The list further down contains all results found in the uploaded Results ZIP-file. Please check if all results are present. In this list you see whether the ticket has already a result associated to it or not. Please notice, that when proceeding with the button further down, already existing results will be <b>overwritten permanently</b>. If you want to remove results from being processed, please edit the ZIP-file and reupload the file in Step 1.</span>
+    </div>
+    <hr>
 
     <?php Pjax::begin(); ?>
     <?= GridView::widget([
@@ -23,10 +29,9 @@ $this->params['breadcrumbs'][] = 'Step 2';
         'filterModel' => $searchModel,
         'tableOptions' => ['class' => 'table table-bordered table-hover'],
         'layout' => '{items} {summary} {pager}',
-        'emptyText' => 'No results found in zip file. Please upload a zip file with the same directory structure as the result.zip file.',
         'rowOptions' => function($model) {
-            return ['class' => !empty($model->result) && file_exists($model->result) ? 'warning' : 'success'];
-        },        
+            return ['class' => !empty($model->result) && file_exists($model->result) ? 'alert alert-danger danger' : 'alert alert-success success'];
+        },
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
             'test_taker',
@@ -35,7 +40,7 @@ $this->params['breadcrumbs'][] = 'Step 2';
             [
                 'attribute' => 'result',
                 'value' => function ($model) {
-                    return !empty($model->result) && file_exists($model->result) ? '<i class="glyphicon glyphicon-alert"></i> There is already a submitted result. The existing one will be overwritten!' : '';
+                    return !empty($model->result) && file_exists($model->result) ? '<i class="glyphicon glyphicon-alert"></i> There is already a submitted result. The existing one will be overwritten!' : '<i class="glyphicon glyphicon-ok"></i> This Ticket has no submitted result yet.';
                 },
                 'format' => 'raw',
                 'label' => 'Notice'

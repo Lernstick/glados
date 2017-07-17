@@ -200,6 +200,11 @@ class Ticket extends \yii\db\ActiveRecord
         return $this->test_taker ? $this->test_taker . ' - ' . $this->token : '_NoName - ' . $this->token;
     }
 
+    public function getResultName()
+    {
+        return ($this->test_taker ? $this->test_taker . ' - ' . $this->token : '_NoName - ' . $this->token) . ($this->result != null ? ' - Result already generated.' : ' - No result yet.');
+    }
+
     /**
      * When the ticket is updated, this function emits the events
      * 

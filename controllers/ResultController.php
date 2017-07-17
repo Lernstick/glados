@@ -92,7 +92,16 @@ class ResultController extends Controller
 
         $tickets = Ticket::find()->where([ 'and', ['exam_id' => $exam_id], [ 'not', [ "start" => null ] ], [ 'not', [ "end" => null ] ] ])->all();
 
-        $tickets = ArrayHelper::map($tickets, 'id', 'name');
+        $selectedTickets = Ticket::find()->where([
+            'and',
+            ['exam_id' => $exam_id],
+            [ 'not', [ "start" => null ] ],
+            [ 'not', [ "end" => null ] ],
+            ['result' => null]
+        ])->all();
+
+        $tickets = ArrayHelper::map($tickets, 'id', 'resultName');
+        $selectedTickets = ArrayHelper::map($selectedTickets, 'id', 'resultName');
         asort($tickets);
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
@@ -117,6 +126,7 @@ class ResultController extends Controller
             return $this->render('generate', [
                 'model' => $model,
                 'tickets' => $tickets,
+                'selectedTickets' => $selectedTickets,
             ]);
         }
     }
@@ -162,7 +172,7 @@ class ResultController extends Controller
 
             $searchModel = new TicketSearch();
             $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-            $dataProvider->query = $dataProvider->query->andWhere(['token' => $model->tokens]);
+            $dataProvider->query = $dataProvider->query->andWhere(['token' => $model->tokens])->orderBy('test_taker');
 
             return $this->render('submit_s2', [
                 'searchModel' => $searchModel,
@@ -183,7 +193,7 @@ class ResultController extends Controller
 
             $searchModel = new TicketSearch();
             $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-            $dataProvider->query = $dataProvider->query->andWhere(['token' => $model->tokens]);
+            $dataProvider->query = $dataProvider->query->andWhere(['token' => $model->tokens])->orderBy('test_taker');
 
             return $this->render('submit_done', [
                 'searchModel' => $searchModel,

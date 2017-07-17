@@ -18,14 +18,14 @@ $this->params['breadcrumbs'][] = ['label' => $model->exam->name, 'url' => [
 ]];
 $this->params['breadcrumbs'][] = $this->title;
 
-$format_ft = <<< SCRIPT
-function format_ft(state) {
+$format_pt = <<< SCRIPT
+function format_pt(state) {
     var map = {
         word: "*.doc, *.docx, *.rtf, *.odt",
         excel: "*.xl*, *.ods",
         pp: "*.ppt[m,s], *.pps[x,m], *.pot[x,m], *.odp",
         text: "*.txt, *.cfg, *.conf, *.ini",
-        images: "*.jpg, *.jpeg, *.png, *.gif",
+        images: "*.jp[e]g, *.png, *.gif",
         pdf: "*.pdf",
     };
 
@@ -35,7 +35,20 @@ function format_ft(state) {
 }
 SCRIPT;
 
-$this->registerJs($format_ft, yii\web\View::POS_HEAD);
+$format_tk = <<< SCRIPT
+function format_tk(state) {
+    a = state.text.split(' - ');
+    return a[0] == '_NoName' ? a[1] : a[0];
+}
+
+function format_rtk(state) {
+    a = state.text.split(' - ')
+    return $('<div class="row" style="margin-left:0px; margin-right:0px;"><div class="col-md-4">' + a[0] + '</div><div class="col-md-4">' + a[1] + '</div><div class="col-md-4">' + a[2] + '</div></div>');
+}
+SCRIPT;
+
+$this->registerJs($format_pt, yii\web\View::POS_HEAD);
+$this->registerJs($format_tk, yii\web\View::POS_HEAD);
 
 ?>
 <div class="ticket-create">
@@ -52,10 +65,6 @@ $this->registerJs($format_ft, yii\web\View::POS_HEAD);
                 <?= $form->field($model, 'inc_screenshots')->checkbox() ?>                
             </div>
             <div class="col-md-6">
-                <!--<?= $form->field($model, 'inc_pattern')->dropDownList([
-                    'word_documents' => 'Word Documents',
-                    'images' => 'Images',
-                ], [ 'multiple'=>'multiple']) ?>-->
                 <?= $form->field($model, 'inc_pattern')->widget(Select2::classname(), [
                     'data' => [
                         'word' => 'Word Documents',
@@ -70,7 +79,7 @@ $this->registerJs($format_ft, yii\web\View::POS_HEAD);
                         'multiple' => true,
                     ],
                     'pluginOptions' => [
-                        'templateResult' => new JsExpression('format_ft'),                    
+                        'templateResult' => new JsExpression('format_pt'),
                         'allowClear' => true
                     ],
                 ]); ?>                
@@ -79,16 +88,16 @@ $this->registerJs($format_ft, yii\web\View::POS_HEAD);
 
         <div class="row">
             <div class="col-md-12">
-
-                <!--<?= $form->field($model, 'inc_ids')->dropDownList($tickets, [ 'multiple'=>'multiple']) ?>-->
                 <?= $form->field($model, 'inc_ids')->widget(Select2::classname(), [
                     'data' => $tickets,
                     'options' => [
-                        'value' => array_keys($tickets),
+                        'value' => array_keys($selectedTickets),
                         'placeholder' => 'Select Tickets ...',
                         'multiple' => true,
                     ],
                     'pluginOptions' => [
+                        'templateResult' => new JsExpression('format_rtk'),
+                        'templateSelection' => new JsExpression('format_tk'),                    
                         'allowClear' => true
                     ],
                 ]); ?>
