@@ -92,13 +92,9 @@ class ResultController extends Controller
 
         $tickets = Ticket::find()->where([ 'and', ['exam_id' => $exam_id], [ 'not', [ "start" => null ] ], [ 'not', [ "end" => null ] ] ])->all();
 
-        $selectedTickets = Ticket::find()->where([
-            'and',
-            ['exam_id' => $exam_id],
-            [ 'not', [ "start" => null ] ],
-            [ 'not', [ "end" => null ] ],
-            ['result' => null]
-        ])->all();
+        $selectedTickets = array_filter($tickets, function($t){
+            return $t->result == null || !file_exists($t->result);
+        });
 
         $tickets = ArrayHelper::map($tickets, 'id', 'resultName');
         $selectedTickets = ArrayHelper::map($selectedTickets, 'id', 'resultName');

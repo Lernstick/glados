@@ -232,11 +232,10 @@ class Result extends Model
         foreach($this->tickets as $ticket) {
             $ticket->result = null;
             $ticket->save();
-        }
 
-        foreach($this->dirs as $token => $dir) {
+            $dir = $this->dirs[$ticket->token];
 
-            $zipFile = \Yii::$app->params['resultPath'] . '/' . $token . '.zip';
+            $zipFile = \Yii::$app->params['resultPath'] . '/' . $ticket->token . '.zip';
             $source = $tmp . '/' . $dir;
 
             $tzip = new \ZipArchive;
@@ -269,12 +268,9 @@ class Result extends Model
             } else {
                 @unlink($zipFile);
             }
-        }
 
-        foreach($this->tickets as $ticket) {
-            $result = realpath(\Yii::$app->params['resultPath'] . '/' . $ticket->token . '.zip');
-            if (file_exists($result)) {
-                $ticket->result = $result;
+            if (file_exists($zipFile)) {
+                $ticket->result = $zipFile;
                 $ticket->save();
 
                 $act = new Activity([
@@ -283,7 +279,10 @@ class Result extends Model
                 ]);
                 $act->save();
             }
+
         }
+
+        $this->removeDirectory($tmp);
 
         return null;
     }
@@ -324,6 +323,20 @@ class Result extends Model
             }
         }
         return $this->_tickets;
+    }
+
+    /**
+     * Removes a directory recusively
+     *
+     * @param string path to directory
+     * @return bool success or failure
+     */
+    private function removeDirectory ($path) {
+        $files = glob($path . '/*');
+        foreach ($files as $file) {
+            is_dir($file) ? $this->removeDirectory($file) : unlink($file);
+        }
+        return file_exists($path) ? rmdir($path) : false;
     }
 
     /**

@@ -44,6 +44,7 @@ class ConfigController extends Controller
      */
     public function actionSystem()
     {
+
         $model = Config::findOne([
             'avahiServiceFile' => '/etc/avahi/services/glados.service'
         ]);

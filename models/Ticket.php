@@ -202,7 +202,7 @@ class Ticket extends \yii\db\ActiveRecord
 
     public function getResultName()
     {
-        return ($this->test_taker ? $this->test_taker . ' - ' . $this->token : '_NoName - ' . $this->token) . ($this->result != null ? ' - Result already generated.' : ' - No result yet.');
+        return ($this->test_taker ? $this->test_taker . ' - ' . $this->token : '_NoName - ' . $this->token) . ($this->result != null && file_exists($this->result) ? ' - Result already generated.' : ' - No result yet.');
     }
 
     /**

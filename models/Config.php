@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\base\Model;
+use yii\helpers\Url;
 
 /**
  * This is the model class for the config.
@@ -16,10 +17,13 @@ use yii\base\Model;
 class Config extends Model
 {
 
+    public $host;
+    public $ip;
     public $port;
-    public $type;
+    public $avahiPort;
+    public $avahiType;
     public $avahiServiceFile;
-    public $txtRecords = [];
+    public $avahiTxtRecords = [];
 
     /**
      * @return array customized attribute labels
@@ -27,10 +31,10 @@ class Config extends Model
     public function attributeLabels()
     {
         return [
-            'port' => 'Port',
-            'type' => 'Protocol',
+            'avahiPort' => 'Avahi Port',
+            'avahiType' => 'Avahi Protocol',
             'avahiServiceFile' => 'Avahi Service File',
-            'txtRecords' => 'TXT Records',
+            'avahiTxtRecords' => 'Avahi TXT Records',
         ];
     }
 
@@ -48,9 +52,12 @@ class Config extends Model
 
             $me = new Config;
             $me->avahiServiceFile = $config["avahiServiceFile"];
-            $me->port = (int) $xml->service->port;
-            $me->type = (string) $xml->service->type;
-            $me->txtRecords = (array) $xml->{'service'}->{'txt-record'};
+            $me->avahiPort = (int) $xml->service->port;
+            $me->avahiType = (string) $xml->service->type;
+            $me->avahiTxtRecords = (array) $xml->{'service'}->{'txt-record'};
+            $me->host = Yii::$app->request->serverName;
+            $me->ip = gethostbyname(gethostname());
+            $me->port = Yii::$app->request->serverPort;
             return $me;
         }
         return null;

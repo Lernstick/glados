@@ -8,6 +8,7 @@ use yii\widgets\DetailView;
 
 $this->title = 'System Configuation';
 $this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['system']];
+
 ?>
 <div class="config-view">
 
@@ -17,13 +18,16 @@ $this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['system']];
         'model' => $model,
         'attributes' => [
             'avahiServiceFile',
-            'port',
-            'type',
+            'avahiPort',
+            'avahiType',
             [
-                'attribute' => 'txtRecords',
+                'attribute' => 'avahiTxtRecords',
                 'format' => 'raw',
-                'value' =>  implode('<br>', $model->txtRecords)
+                'value' =>  implode('<br>', $model->avahiTxtRecords)
             ],
+            'host',
+            'ip',
+            'port',
         ],
     ]) ?>
 
