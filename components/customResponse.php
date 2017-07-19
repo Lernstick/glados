@@ -26,6 +26,16 @@ class customResponse extends \yii\web\Response
     public $progress;
 
     /**
+     * @var float Amount of time (in seconds) sent since the last EVENT_WHILE_SEND
+     */
+    public $time;
+
+    /**
+     * @var integer Amount of data (in Bytes) sent since the last EVENT_WHILE_SEND
+     */
+    public $data;
+
+    /**
      * @var integer bandwidth limitation, value 0 for no limit.
      */
     public $bandwidth = 0;
@@ -48,6 +58,7 @@ class customResponse extends \yii\web\Response
             return;
         }
         set_time_limit(0); // Reset time limit for big files
+        $this->time =  microtime(true);
 
 #        $chunkSize = 1 * 1024 * 1024; // 1MB per chunk, should be a factor of $triggerSize
         $triggerSize = 8 * 1024 * 1024; //trigger EVENT_WHILE_SEND every 8MB
@@ -67,9 +78,13 @@ class customResponse extends \yii\web\Response
                 usleep(1000);
                 $read += $chunkSize;
                 if($read >= $triggerSize){
+                    $this->data = $read;
                     $read = 0;
                     $this->progress = $pos;
+                    $now = microtime(true);
+                    $this->time =  $now - $this->time;
                     $this->trigger(self::EVENT_WHILE_SEND);
+                    $this->time = $now;
                 }
             }
             fclose($handle);
@@ -80,8 +95,13 @@ class customResponse extends \yii\web\Response
                 usleep(1000);
                 $read += $chunkSize;
                 if($read >= $triggerSize){
+                    $this->data = $read;
                     $read = 0;
+                    $this->progress = $pos;
+                    $now = microtime(true);
+                    $this->time =  $now - $this->time;
                     $this->trigger(self::EVENT_WHILE_SEND);
+                    $this->time = $now;
                 }
             }
             fclose($this->stream);

@@ -466,25 +466,29 @@ class TicketController extends Controller
      * Downloads an exam file after checking ticket validity.
      *
      * @param string $token
-     * @return The response object or an array with the error description
+     * @return mixed The response object or an array with the error description
      */
-    public function actionDownload($token)
+    public function actionDownload($token, $type='lan')
     {
 
         $model = Ticket::findOne(['token' => $token]);
 
         if (!$model || !$model->valid){
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            #throw new \yii\web\HttpException(403, 'The provided ticket is invalid.');
             return [ 'code' => 403, 'msg' => 'The provided ticket is invalid.' ];
         }
 
         if (!Yii::$app->file->set($model->exam->file)->exists){
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            #throw new \yii\web\HttpException(404, 'The exam file cannot be found.');
             return [ 'code' => 404, 'msg' => 'The exam file cannot be found.' ];
         }
 
         if($model->download_lock != 0) {
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            #throw new \yii\web\HttpException(404, 'Another instance is already running; ' .
+            #                                      'multiple downloads are not allowed.');
             return [ 'code' => 403, 'msg' => 'Another instance is already running; ' .
                                              'multiple downloads are not allowed.' ];
         }
@@ -497,6 +501,9 @@ class TicketController extends Controller
         if (\Yii::$app->params['concurrentExamDownloads'] != 0) {
             if(intval($query->count()) >= \Yii::$app->params['concurrentExamDownloads']){
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                #$headers = Yii::$app->response->headers;
+                #$headers->add('Retry-After', 20);                
+                #throw new \yii\web\HttpException(509, 'The server is busy, please wait. Retry in {i} seconds.');
                 return [
                     'code' => 509,
                     'msg' => 'The server is busy, please wait. Retry in {i} seconds.',
@@ -554,6 +561,12 @@ class TicketController extends Controller
             }
 
             $ticket->download_progress = $event->sender->progress/filesize($event->data->exam->file);
+
+            /*if ($ticket->download_progress > 0.5) {
+                $ticket->download_lock = 0;
+                $ticket->save();
+                die();
+            }*/
             $ticket->download_lock = 1;
             $ticket->client_state = "download in progress";
             $ticket->save();
