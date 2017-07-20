@@ -173,7 +173,7 @@ class Backup extends Model
         $file = \Yii::$app->params['backupPath'] . '/' . $token . '/'
              . 'rdiff-backup-data/session_statistics.' . $date . '.data';
 
-        if(Yii::$app->file->set($file)->exists === false){
+        if(file_exists($file) === false){            
             return null;
         }
 

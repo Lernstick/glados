@@ -59,6 +59,7 @@ class TicketController extends Controller
                         'allow' => true,
                         'actions' => [
                             'download', // download/start exam
+                            'download2',    // TODO: placeholder
                             'md5',      // verify exam file
                             'config',   // retrieve exam config
                             'ssh-key',  // get public server ssh key
@@ -463,12 +464,57 @@ class TicketController extends Controller
     }
 
     /**
+     * TODO.
+     *
+     * @param string $token
+     * @return mixed TODO
+     */
+    public function actionDownload2($token = null)
+    {
+        $this->layout = 'client';
+        $model = Ticket::findOne(['token' => $token]);
+
+        if (!$model || !$model->valid){
+            throw new \yii\web\HttpException(403, 'The provided ticket is invalid.');
+        }
+
+        if (!Yii::$app->file->set($model->exam->file)->exists){
+            throw new \yii\web\HttpException(404, 'The exam file cannot be found.');
+        }
+
+        if($model->download_lock != 0) {
+            throw new \yii\web\HttpException(404, 'Another instance is already running; ' .
+                                                  'multiple downloads are not allowed.');
+        }
+
+        $act = new Activity([
+            'ticket_id' => $model->id,
+            'description' => 'Exam download successfully requested by ' . 
+            $model->ip . ' from ' . ( $model->test_taker ? $model->test_taker :
+            'Ticket with token ' . $model->token ) . '.'
+        ]);
+        $act->save();
+
+        $model->scenario = Ticket::SCENARIO_DOWNLOAD;
+        $model->bootup_lock = 1;
+        $model->download_request = new Expression('NOW()');
+        $model->start = $model->state == 0 ? new Expression('NOW()') : $model->start;
+        $model->ip = Yii::$app->request->userIp;
+        $model->save();
+
+        //$model->startDownload();
+        return $this->render('download', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
      * Downloads an exam file after checking ticket validity.
      *
      * @param string $token
      * @return mixed The response object or an array with the error description
      */
-    public function actionDownload($token, $type='lan')
+    public function actionDownload($token)
     {
 
         $model = Ticket::findOne(['token' => $token]);
@@ -590,7 +636,7 @@ class TicketController extends Controller
             ]);
             $act->save();
 
-            /* if there is a backup available restore the latest */
+            /* if there is a backup available, restore the latest */
             $backupSearchModel = new BackupSearch();
             $backupDataProvider = $backupSearchModel->search($ticket->token);
             if ($backupDataProvider->totalCount > 0) {
