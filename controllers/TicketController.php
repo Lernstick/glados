@@ -474,7 +474,16 @@ class TicketController extends Controller
         $this->layout = 'client';
         $model = Ticket::findOne(['token' => $token]);
 
-        if (!$model || !$model->valid){
+        if ($model === null) {
+            $model = new Ticket(['scenario' => Ticket::SCENARIO_DEFAULT]);
+            $token !== null ? $model->addError('token', 'Ticket not found.') : null;
+            $model->token = $token;
+            return $this->render('token-request', [
+                'model' => $model,
+            ]);
+        } else 
+
+        if (!$model->valid){
             throw new \yii\web\HttpException(403, 'The provided ticket is invalid.');
         }
 

@@ -12,6 +12,7 @@ use app\components\ShellCommand;
 use yii\helpers\FileHelper;
 use yii\helpers\Console;
 use app\models\BackupSearch;
+use app\models\EventItem;
 
 /**
  * Download Daemon (push)
@@ -99,8 +100,9 @@ class DownloadController extends DaemonController
                 $this->ticket->runCommand('echo "download in progress" > ' . $this->remotePath . '/state');
                 $this->ticket->save(false);
 
-                $cmd = "rsync --partial --progress --rsh='ssh -i " . \Yii::$app->basePath
-                     . "/.ssh/rsa -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' "
+                $cmd = "rsync --checksum --partial --progress "
+                     . "--rsh='ssh -i " . \Yii::$app->basePath . "/.ssh/rsa "
+                     . " -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' "
                      . escapeshellarg($this->ticket->exam->file) . " "
                      . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . ":" . $this->remotePath . '/squashfs/exam.squashfs') . " "
                      . "| stdbuf -oL tr '\\r' '\\n' ";
@@ -161,7 +163,7 @@ class DownloadController extends DaemonController
                     $cmd = "ssh -i " . \Yii::$app->basePath . "/.ssh/rsa -o "
                          . "UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "
                          . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip) . " "
-                         . "'bash -s' < /tmp/script";
+                         . "'bash -s' < " . \Yii::$app->basePath . "/scripts/prepare.sh " . escapeshellarg($this->ticket->token);
 
                     $this->log('Executing ssh: ' . $cmd);
 
@@ -173,6 +175,28 @@ class DownloadController extends DaemonController
 
                     $retval = $cmd->run();
                     var_dump($retval);
+
+/*$infoFile = <<<EOF
+    gladosIp="${gladosIp}"
+    gladosHost="${gladosHost}"
+    gladosPort="${gladosPort}"
+    partitionSystem="$(blkid -l -L system)"
+
+    urlDownload="${urlDownload}"
+    urlFinish="${urlFinish}"
+    urlNotify="${urlNotify}"
+    urlMd5="${urlMd5}"
+    urlConfig="${urlConfig}"
+EOF;*/
+
+                    $eventItem = new EventItem([
+                        'event' => 'ticket/' . $this->ticket->id,
+                        'priority' => 0,
+                        'data' => [
+                            'setup_complete' => true,
+                        ],
+                    ]);
+                    $eventItem->generate();
 
                 }
 

@@ -226,7 +226,7 @@ class Ticket extends \yii\db\ActiveRecord
         if($this->attributesChanged([ 'download_progress' ])){
             $eventItem = new EventItem([
                 'event' => 'ticket/' . $this->id,
-                'priority' => round($this->download_progress*100) == 100 ? 2 : 0,
+                'priority' => round($this->download_progress*100) == 100 ? 0 : 2,
                 'data' => [
                     'download_progress' => yii::$app->formatter->format($this->download_progress, 'percent')
                 ],
@@ -237,7 +237,7 @@ class Ticket extends \yii\db\ActiveRecord
         if($this->attributesChanged([ 'download_lock' ])){
             $eventItem = new EventItem([
                 'event' => 'ticket/' . $this->id,
-                'priority' => 2,
+                'priority' => 0,
                 'data' => [
                     'download_lock' => $this->download_lock,
                 ],

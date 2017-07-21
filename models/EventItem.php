@@ -15,7 +15,10 @@ use app\models\AuthItem;
  * @property string $data
  * @property string $event
  * @property float $generated_at
- * @property integer $priority
+ * @property integer $priority A value representing the importance of the event. A value of 0
+ * is the highest priority, thus the event will be sent, no matter what happens. A value >0 
+ * indicates that the event has lower priority, and therefore will only be sent if 
+ * [EventStream::maxEventsPerSecond] is not exceeded.
  *
  */
 class EventItem extends \yii\db\ActiveRecord

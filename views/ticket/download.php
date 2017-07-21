@@ -99,4 +99,31 @@ $this->params['breadcrumbs'] = [
         }'        
     ]); ?>
 
+    <?= ActiveEventField::widget([
+        'event' => 'ticket/' . $model->id,
+        'jsonSelector' => 'setup_complete',
+        'jsHandler' => 'function(d, s){
+            if (d == true && YII_DEBUG) {
+                $("#dialog").modal("show");
+            }
+        }'        
+    ]); ?>
+
+    <div id="dialog" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4>Continue</h4>
+                </div>
+
+                <div class="modal-body">
+                    <p>The system setup is done. You can close the window.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
 </div>

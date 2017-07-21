@@ -6,9 +6,12 @@
 use yii\helpers\Html;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
+use yii\bootstrap\BootstrapPluginAsset;
 use app\components\ActiveEventField;
 
+
 AppAsset::register($this);
+BootstrapPluginAsset::register($this);
 
 /* register the global YII_ENV variables */
 $this->registerJs('var YII_ENV_DEV = ' . (YII_ENV_DEV ? 'true' : 'false') . ';', \yii\web\View::POS_HEAD);

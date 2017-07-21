@@ -79,8 +79,8 @@ class EventStream extends EventItem
      */
     public $sentEvents;
     /**
-     * @var integer maximum number of low priority events which should be sent in one seconds. Events exceeding 
-     * this value will not be sent.
+     * @var integer maximum number of low priority events which should be sent in one seconds.
+     * Events exceeding this value, will not be sent.
      */
     public $maxEventsPerSecond = 1;
 
