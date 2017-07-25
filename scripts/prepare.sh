@@ -1,3 +1,5 @@
+#!/bin/bash
+
 DEBUG=true
 wget="/usr/bin/wget"
 wgetOptions="--dns-timeout=30"
@@ -192,19 +194,36 @@ echo "${gladosProto}://${gladosIp}:${gladosPort}" >>/run/initramfs/backup/etc/le
 echo "tcp ${gladosIp} ${gladosPort}" >>/run/initramfs/backup/etc/lernstick-firewall/net_whitelist
 sort -u -o /run/initramfs/backup/etc/lernstick-firewall/url_whitelist /run/initramfs/backup/etc/lernstick-firewall/url_whitelist
 
-if $DEBUG; then
-  if ${zenity} --question --title="Continue" --text="The system setup is done. Continue?"; then
+screen -d -m bash -c '
+  zenity="/usr/bin/zenity"
+  DEBUG=true
+  export DISPLAY=:0
+
+  # transmit state to server
+  function clientState()
+  {
+    $DEBUG && \
+      ${wget} ${wgetOptions} -qO- "${urlNotify//\{state\}/$1}" 1>&2 || \
+      ${wget} ${wgetOptions} -qO- "${urlNotify//\{state\}/$1}" 2>&1 >/dev/null
+    $DEBUG && >&2 echo "New client state: $1"
+  }
+
+  if $DEBUG; then
+    if ${zenity} --question --title="Continue" --text="The system setup is done. Continue?"; then
+      clientState "continue bootup"
+      halt
+    fi
+  else
+    # timeout for 10 seconds
+    for i in {1..10}; do
+      echo "${i}0"
+      #echo "#The system will continue in $((10 - $i)) seconds"
+      sleep 1
+    done | ${zenity} --progress --no-cancel --title="Continue" --text="The system will continue in 10 seconds" --percentage=0 --auto-close
     clientState "continue bootup"
     halt
   fi
-else
-  # timeout for 10 seconds
-  for i in {1..10}; do
-    echo "${i}0"
-    echo "#The system will continue in $((10 - $i)) seconds"
-    sleep 1
-  done | ${zenity} --progress --no-cancel --title="Continue" --text="The system will continue in 10 seconds" --percentage=0 --auto-close
-  clientState "continue bootup"
-  halt
-fi
+'
 
+>&2 echo "done"
+exit

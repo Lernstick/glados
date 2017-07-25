@@ -15,15 +15,14 @@ $this->params['breadcrumbs'] = [
 ?>
 <div class="download-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
     <div class="col-md-12">
         <p>Please enter the token given on your exam sheet.</p>
 
         <?php $form = ActiveForm::begin([
             'enableClientValidation' => false,
             'action' => Url::to([
-                'download2'
+                'download2',
+                'step' => 2,
             ]),
             'method' => 'get'
         ]); ?>

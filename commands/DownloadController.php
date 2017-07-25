@@ -197,6 +197,8 @@ EOF;*/
                         ],
                     ]);
                     $eventItem->generate();
+                    $this->ticket->client_state = "setup complete";
+                    $this->ticket->save();                    
 
                 }
 

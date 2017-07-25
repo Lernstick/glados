@@ -7,16 +7,36 @@ use app\components\ActiveEventField;
 /* @var $this yii\web\View */
 /* @var $model app\models\Ticket */
 
-$this->title = 'Download';
-$this->params['breadcrumbs'] = [
-    ['label' => $model->token],
-    $this->title
-];
-
 ?>
 <div class="download-view">
-
-    <h1><?= Html::encode($this->title) ?></h1>
+    <div class="row">
+        <div class="col-xs-8">
+            <span>Please wait, while your system is prepared.</span>
+        </div>
+        <div class="col-xs-4">
+            <div class="dropdown pull-right">
+                <a class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" href="#">
+                    <i class="glyphicon glyphicon-option-horizontal"></i>
+                </a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <?= Html::a(
+                            '<span class="glyphicon glyphicon-hdd"></span> Token Submission',
+                            ['download2', 'token' => $model->token, 'step' => 1],
+                            ['id' => 'backup-now']
+                        ) ?>
+                    </li>            
+                    <li>
+                        <?= Html::a(
+                            '<span class="glyphicon glyphicon-hdd"></span> Request Download',
+                            ['download2', 'token' => $model->token, 'step' => 2],
+                            ['id' => 'backup-now']
+                        ) ?>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-md-6">
@@ -31,6 +51,7 @@ $this->params['breadcrumbs'] = [
                     'jsHandler' => 'function(d, s){
                         s.innerHTML = d;
                         s.parentNode.style = "width:" + d;
+                        s.parentNode.classList.add("active");
                     }',
                 ]),
                 'event' => 'ticket/' . $model->id,
@@ -77,7 +98,7 @@ $this->params['breadcrumbs'] = [
                     }
                 }',
             ]); ?>
-            <div id="info"></div>
+            <div id="info"><?= yii::$app->formatter->format($model->client_state, 'raw'); ?></div>
         </div>
     </div>
 

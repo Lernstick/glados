@@ -469,21 +469,76 @@ class TicketController extends Controller
      * @param string $token
      * @return mixed TODO
      */
-    public function actionDownload2($token = null)
+    public function actionDownload2($token = null, $step = 1)
     {
         $this->layout = 'client';
         $model = Ticket::findOne(['token' => $token]);
 
-        if ($model === null) {
-            $model = new Ticket(['scenario' => Ticket::SCENARIO_DEFAULT]);
-            $token !== null ? $model->addError('token', 'Ticket not found.') : null;
-            $model->token = $token;
+        if ($step == 1) {
+            if ($model === null) {
+                $model = new Ticket(['scenario' => Ticket::SCENARIO_DEFAULT]);
+                !empty($token) ? $model->addError('token', 'Ticket not found.') : null;
+                $model->token = $token;
+            }
+            return $this->render('token-request', [
+                'model' => $model,
+            ]);            
+        } else if ($step == 2) {
+            if ($model === null) {
+                $model = new Ticket(['scenario' => Ticket::SCENARIO_DEFAULT]);
+                $token !== null ? $model->addError('token', 'Ticket not found.') : null;
+                $model->token = $token;
+                return $this->render('token-request', [
+                    'model' => $model,
+                ]);                
+            } else {
+                if (!$model->valid){
+                    throw new \yii\web\HttpException(403, 'The provided ticket is invalid.');
+                }
+
+                if (!Yii::$app->file->set($model->exam->file)->exists){
+                    throw new \yii\web\HttpException(404, 'The exam file cannot be found.');
+                }
+
+                if($model->download_lock != 0) {
+                    throw new \yii\web\HttpException(404, 'Another instance is already running; ' .
+                                                          'multiple downloads are not allowed.');
+                }
+
+                $act = new Activity([
+                    'ticket_id' => $model->id,
+                    'description' => 'Exam download successfully requested by ' . 
+                    $model->ip . ' from ' . ( $model->test_taker ? $model->test_taker :
+                    'Ticket with token ' . $model->token ) . '.'
+                ]);
+                $act->save();
+
+                $model->scenario = Ticket::SCENARIO_DOWNLOAD;
+                $model->bootup_lock = 1;
+                $model->download_request = new Expression('NOW()');
+                $model->start = $model->state == 0 ? new Expression('NOW()') : $model->start;
+                $model->ip = Yii::$app->request->userIp;
+                $model->client_state = 'exam requested sccessfully';
+                $model->download_progress = 0;
+                $model->save();
+
+                //$model->startDownload();
+                return $this->redirect(['download2', 'token' => $model->token, 'step' => 3]);
+            }
+        } else {
+            return $this->render('download', [
+                'model' => $model,
+            ]);
+        }
+
+
+        /*if ($step == 1) {
             return $this->render('token-request', [
                 'model' => $model,
             ]);
-        } else 
+        }*/
 
-        if (!$model->valid){
+        /*if (!$model->valid){
             throw new \yii\web\HttpException(403, 'The provided ticket is invalid.');
         }
 
@@ -496,25 +551,29 @@ class TicketController extends Controller
                                                   'multiple downloads are not allowed.');
         }
 
-        $act = new Activity([
-            'ticket_id' => $model->id,
-            'description' => 'Exam download successfully requested by ' . 
-            $model->ip . ' from ' . ( $model->test_taker ? $model->test_taker :
-            'Ticket with token ' . $model->token ) . '.'
-        ]);
-        $act->save();
+        if ($step == 2) {
+            $act = new Activity([
+                'ticket_id' => $model->id,
+                'description' => 'Exam download successfully requested by ' . 
+                $model->ip . ' from ' . ( $model->test_taker ? $model->test_taker :
+                'Ticket with token ' . $model->token ) . '.'
+            ]);
+            $act->save();
 
-        $model->scenario = Ticket::SCENARIO_DOWNLOAD;
-        $model->bootup_lock = 1;
-        $model->download_request = new Expression('NOW()');
-        $model->start = $model->state == 0 ? new Expression('NOW()') : $model->start;
-        $model->ip = Yii::$app->request->userIp;
-        $model->save();
+            $model->scenario = Ticket::SCENARIO_DOWNLOAD;
+            $model->bootup_lock = 1;
+            $model->download_request = new Expression('NOW()');
+            $model->start = $model->state == 0 ? new Expression('NOW()') : $model->start;
+            $model->ip = Yii::$app->request->userIp;
+            $model->save();
 
-        //$model->startDownload();
-        return $this->render('download', [
-            'model' => $model,
-        ]);
+            //$model->startDownload();
+            return $this->redirect(['download2', 'token' => $model->token, 'step' => 3]);
+        } else {
+            return $this->render('download', [
+                'model' => $model,
+            ]);
+        }*/
     }
 
     /**
