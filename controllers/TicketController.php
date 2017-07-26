@@ -336,7 +336,7 @@ class TicketController extends Controller
             $searchModel = new TicketSearch();
 
             $model->scenario = YII_ENV_DEV ? Ticket::SCENARIO_DEV : Ticket::SCENARIO_DEFAULT;
-            $model->download_lock = 0; #unlock the download
+            #$model->download_lock = 0; #unlock the download
             if ($model->load(Yii::$app->request->post()) && $model->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
             } else {
@@ -501,8 +501,7 @@ class TicketController extends Controller
                 }
 
                 if($model->download_lock != 0) {
-                    throw new \yii\web\HttpException(404, 'Another instance is already running; ' .
-                                                          'multiple downloads are not allowed.');
+                    throw new \yii\web\HttpException(404, 'Another instance is already running; ' . 'multiple downloads are not allowed.');
                 }
 
                 $act = new Activity([

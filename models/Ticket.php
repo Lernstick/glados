@@ -245,6 +245,17 @@ class Ticket extends \yii\db\ActiveRecord
             $eventItem->generate();
         }
 
+        if($this->attributesChanged([ 'download_state' ])){
+            $eventItem = new EventItem([
+                'event' => 'ticket/' . $this->id,
+                'priority' => 2,
+                'data' => [
+                    'download_state' => yii::$app->formatter->format($this->download_state, 'ntext'),
+                ],
+            ]);
+            $eventItem->generate();
+        }
+
         if($this->attributesChanged([ 'backup_state' ])){
             $eventItem = new EventItem([
                 'event' => 'ticket/' . $this->id,

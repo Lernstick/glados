@@ -75,14 +75,13 @@ class DownloadController extends DaemonController
             $this->log('Processing ticket: ' .
                 ( empty($this->ticket->test_taker) ? $this->ticket->token : $this->ticket->test_taker) .
                 ' (' . $this->ticket->ip . ')', true);
-            //$this->ticket->backup_state = 'connecting to client...';
+            $this->ticket->download_state = 'connecting to client';
             $this->ticket->save(false);
 
             if ($this->checkPort(22, 3) === false) {
-                //$this->ticket->backup_state = 'network error.';
-                //$this->ticket->backup_last_try = new Expression('NOW()');
-                //$this->ticket->backup_lock = 0;
-                $this->ticket->online = 1;                
+                $this->ticket->online = 1;
+                $this->ticket->download_state = 'download failed: network error';
+                $this->ticket->download_lock = 0;
                 $this->ticket->save(false);
 
                 $act = new Activity([
@@ -95,7 +94,6 @@ class DownloadController extends DaemonController
                 $this->ticket->scenario = Ticket::SCENARIO_DOWNLOAD;
                 $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? 1 : 0;
 
-                //$this->ticket->backup_state = 'backup in progress...';
                 $this->ticket->client_state = "download in progress";
                 $this->ticket->runCommand('echo "download in progress" > ' . $this->remotePath . '/state');
                 $this->ticket->save(false);
@@ -134,6 +132,10 @@ class DownloadController extends DaemonController
                             'description' => 'Download failed: rsync failed (retval: ' . $retval . ')',
                     ]);
                     $act->save();
+
+                    $this->ticket->download_state = "download failed: rsync failed";
+                    $this->ticket->download_lock = 0;
+                    $this->ticket->save();
                 }else{
                     $act = new Activity([
                         'ticket_id' => $this->ticket->id,

@@ -433,6 +433,14 @@ class BackupController extends DaemonController
         return $size;
     }
 
+    /**
+     * Update the load calculation in the last [0,5] minutes
+     *
+     * @param int $value can be 0 or 1:
+     *                    - 0 means to count no load since last invokation
+     *                    - 1 means to count full load since last invokation
+     * @return void
+     */
     private function calcLoad ($value)
     {
         $amount = round(time() - $this->time);
@@ -449,6 +457,11 @@ class BackupController extends DaemonController
         $this->judgement();
     }
 
+    /**
+     * Start new daemons based on thresholds
+     *
+     * @return void
+     */
     private function judgement ()
     {
         $sum = Daemon::find()->sum('`load`');

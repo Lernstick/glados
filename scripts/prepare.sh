@@ -34,6 +34,20 @@ function config_value()
   echo "$v"
 }
 
+function do_exit()
+{
+  $DEBUG && >&2 echo "exiting cleanly"
+
+  # revert all changes to iptables
+  #iptables-save | grep -v "searchExamServer" | iptables-restore
+
+  # unmount the filesystem
+  umount /run/initramfs/newroot
+  umount -l /run/initramfs/{base,exam}
+  exit
+}
+trap do_exit EXIT
+
 export DISPLAY=:0
 
 echo 0 > /run/initramfs/restore
