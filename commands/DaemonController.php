@@ -8,6 +8,7 @@ use app\models\EventItem;
 use app\models\Daemon;
 use app\models\DaemonSearch;
 use yii\db\Expression;
+use app\commands\DownloadController;
 
 /**
  * Daemon base controller
@@ -31,6 +32,21 @@ class DaemonController extends Controller
      */
     public $uid = 33;
     public $gid = 33;
+
+    /**
+     * @inheritdoc
+     */
+    public $defaultAction = 'run';
+
+    /**
+     * TODO
+     */
+    public $joblist = [
+        0 => ['download', 'run-once'],
+        1 => ['backup', 'run-once'],
+        #2 => ['restore', 'run-once'],
+        3 => ['analyze', 'run-once'],
+    ];
 
     /**
      * @inheritdoc
@@ -152,7 +168,7 @@ class DaemonController extends Controller
         ]);
         $eventItem->generate();
 
-        exit;
+        #exit;
         
     }
 
@@ -187,6 +203,22 @@ class DaemonController extends Controller
         //$this->doJob($option);
 
         $this->stop();
+
+    }
+
+    public function actionRunOnce()
+    {
+
+        $args = func_get_args();
+
+        #$this->start();
+
+        $this->daemon->state = 'idle';
+        $this->daemon->save();
+
+        call_user_func_array(array($this, 'doJobOnce'), $args);
+
+        #$this->stop();
 
     }
 
@@ -247,9 +279,21 @@ class DaemonController extends Controller
     /*
      * This is the actual job of the daemon
      */
-    //public function doJob()
-    //{
-    //}
+    public function doJob()
+    {
+        while (true) {
+            foreach ($this->joblist as $priority => $task) {
+                echo $task[0] . '/' . $task[1] . PHP_EOL;
+                #Yii::$app->runAction($task);
+                $controller = Yii::$app->createControllerByID($task[0]);
+                $controller->daemon = $this->daemon;
+                $controller->runAction($task[1]);
+                $controller = null;
+                #file_put_contents('/tmp/test', print_r($this, true), FILE_APPEND);
+                sleep(5);
+            }
+        }
+    }
 
     /*
      * The signal handler function

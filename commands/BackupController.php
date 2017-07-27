@@ -86,6 +86,16 @@ class BackupController extends DaemonController
     /**
      * @inheritdoc
      */
+    public function doJobOnce ($id = '')
+    {
+        if (($this->ticket = $this->getNextTicket()) !== null) {
+            $this->processTicket($this->ticket);
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function doJob ($id = '')
     {
 
@@ -121,121 +131,7 @@ class BackupController extends DaemonController
                 } while (($this->ticket = $this->getNextTicket()) === null);
             }
 
-            if ($this->ticket->backup_last < $this->ticket->end) {
-                $this->finishBackup = true;
-            } else {
-                $this->finishBackup = false;
-            }
-
-            if (!is_writable(\Yii::$app->params['backupPath'])) {
-                $this->ticket->backup_state = \Yii::$app->params['backupPath'] . ': No such file or directory or not writable.';
-                $this->ticket->backup_last_try = new Expression('NOW()');
-                $this->ticket->backup_lock = 0;
-                $this->ticket->save(false);
-                $this->log($this->ticket->backup_state);
-                $this->ticket = null;
-                return;
-            }
-
-            $this->log('Processing ticket: ' .
-                ( empty($this->ticket->test_taker) ? $this->ticket->token : $this->ticket->test_taker) .
-                ' (' . $this->ticket->ip . ')', true);
-            $this->ticket->backup_state = 'connecting to client...';
-            $this->ticket->save(false);
-
-            if ($this->checkPort(22, 3) === false) {
-                $this->ticket->backup_state = 'network error.';
-                $this->ticket->backup_last_try = new Expression('NOW()');
-                $this->ticket->backup_lock = 0;
-                $this->ticket->online = 1;                
-                $this->ticket->save(false);
-
-                $act = new Activity([
-                        'ticket_id' => $this->ticket->id,
-                        'description' => 'Backup failed: ' . $this->ticket->backup_state,
-                ]);
-                $act->save();
-
-            }else{
-                $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? 1 : 0;
-                $this->ticket->backup_state = 'backup in progress...';
-                if ($this->finishBackup == true) {
-                    $this->ticket->runCommand('echo "backup in progress..." > /home/user/shutdown');
-                }
-                $this->ticket->save(false);
-
-                $this->remotePath = FileHelper::normalizePath($this->remotePath . '/' . $this->ticket->exam->backup_path);
-
-                /* Generate exclude list based on remotePath */
-                $exclude = array_filter($this->excludeList, function($v){
-                    return (strpos($v, $this->remotePath) === 0);
-                });
-
-                $this->_cmd = "rdiff-backup --remote-schema 'ssh -i " . \Yii::$app->basePath . "/.ssh/rsa "
-                     . "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -C %s rdiff-backup --server' "
-                     . "-v5 --print-statistics "
-                     . ' --exclude ' . implode($exclude, ' --exclude ') . " "                     
-                     . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . "::" . $this->remotePath) . " "
-                     . escapeshellarg(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token . "/") . " "
-                     . "";
-
-                $this->log('Executing rdiff-backup: ' . $this->_cmd);
-
-                $cmd = new ShellCommand($this->_cmd);
-                $output = "";
-                $logFile = Yii::getAlias('@runtime/logs/backup.' . $this->ticket->token . '.' . date('c') . '.log');
-
-                $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use (&$output, $logFile) {
-                    echo $this->ansiFormat($event->line, $event->channel == ShellCommand::STDOUT ? Console::NORMAL : Console::FG_RED);
-                    $output .= $event->line;
-                    file_put_contents($logFile, $event->line, FILE_APPEND);
-                });
-
-                $retval = $cmd->run();
-
-                if($retval != 0){
-                    $this->ticket->backup_state = 'rdiff-backup failed (retval: ' . $retval . '), output: '
-                         . PHP_EOL . $output;
-                    $this->log($this->ticket->backup_state);
-
-                    $act = new Activity([
-                            'ticket_id' => $this->ticket->id,
-                            'description' => 'Backup failed: rdiff-backup failed (retval: ' . $retval . ')',
-                    ]);
-                    $act->save();
-
-                    if ($this->finishBackup == true) {
-                        $this->ticket->runCommand('echo "backup failed, waiting for next try..." > /home/user/shutdown');
-                    }
-                }else{
-                    //$this->log($output);
-                    $this->ticket->backup_last = new Expression('NOW()');
-                    $this->ticket->backup_state = 'backup successful.';
-                    if ($this->finishBackup == true) {
-                        $this->ticket->runCommand('echo 0 > /home/user/shutdown');
-                    }
-
-                    # Generate Thumbnails
-                    $searchModel = new ScreenshotSearch();
-                    $dataProvider = $searchModel->search($this->ticket->token);
-                    $this->log("Generating thumbnails...");
-                    foreach ($dataProvider->models as $model) {
-                        $model->getThumbnail();
-                    }
-
-                    # Calculate the size
-                    $this->log("Calculate backup size...");
-                    $this->ticket->backup_size = $this->directorySize(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token) - $this->directorySize(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token . '/rdiff-backup-data');
-                }
-
-                $this->ticket->backup_last_try = new Expression('NOW()');
-                $this->ticket->backup_lock = 0;
-                $this->ticket->save(false);
-
-            }
-
-            $this->ticket = null;
-            $this->calcLoad(1);
+            $this->processTicket($this->ticket);
 
             if ($id != '') {
                 return;
@@ -243,6 +139,126 @@ class BackupController extends DaemonController
 
         }
 
+    }
+
+    public function processTicket ($ticket)
+    {
+        $this->ticket = $ticket;
+        if ($this->ticket->backup_last < $this->ticket->end) {
+            $this->finishBackup = true;
+        } else {
+            $this->finishBackup = false;
+        }
+
+        if (!is_writable(\Yii::$app->params['backupPath'])) {
+            $this->ticket->backup_state = \Yii::$app->params['backupPath'] . ': No such file or directory or not writable.';
+            $this->ticket->backup_last_try = new Expression('NOW()');
+            $this->ticket->backup_lock = 0;
+            $this->ticket->save(false);
+            $this->log($this->ticket->backup_state);
+            $this->ticket = null;
+            return;
+        }
+
+        $this->log('Processing ticket: ' .
+            ( empty($this->ticket->test_taker) ? $this->ticket->token : $this->ticket->test_taker) .
+            ' (' . $this->ticket->ip . ')', true);
+        $this->ticket->backup_state = 'connecting to client...';
+        $this->ticket->save(false);
+
+        if ($this->checkPort(22, 3) === false) {
+            $this->ticket->backup_state = 'network error.';
+            $this->ticket->backup_last_try = new Expression('NOW()');
+            $this->ticket->backup_lock = 0;
+            $this->ticket->online = 1;                
+            $this->ticket->save(false);
+
+            $act = new Activity([
+                    'ticket_id' => $this->ticket->id,
+                    'description' => 'Backup failed: ' . $this->ticket->backup_state,
+            ]);
+            $act->save();
+
+        }else{
+            $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? 1 : 0;
+            $this->ticket->backup_state = 'backup in progress...';
+            if ($this->finishBackup == true) {
+                $this->ticket->runCommand('echo "backup in progress..." > /home/user/shutdown');
+            }
+            $this->ticket->save(false);
+
+            $this->remotePath = FileHelper::normalizePath($this->remotePath . '/' . $this->ticket->exam->backup_path);
+
+            /* Generate exclude list based on remotePath */
+            $exclude = array_filter($this->excludeList, function($v){
+                return (strpos($v, $this->remotePath) === 0);
+            });
+
+            $this->_cmd = "rdiff-backup --remote-schema 'ssh -i " . \Yii::$app->basePath . "/.ssh/rsa "
+                 . "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -C %s rdiff-backup --server' "
+                 . "-v5 --print-statistics "
+                 . ' --exclude ' . implode($exclude, ' --exclude ') . " "                     
+                 . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . "::" . $this->remotePath) . " "
+                 . escapeshellarg(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token . "/") . " "
+                 . "";
+
+            $this->log('Executing rdiff-backup: ' . $this->_cmd);
+
+            $cmd = new ShellCommand($this->_cmd);
+            $output = "";
+            $logFile = Yii::getAlias('@runtime/logs/backup.' . $this->ticket->token . '.' . date('c') . '.log');
+
+            $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use (&$output, $logFile) {
+                echo $this->ansiFormat($event->line, $event->channel == ShellCommand::STDOUT ? Console::NORMAL : Console::FG_RED);
+                $output .= $event->line;
+                file_put_contents($logFile, $event->line, FILE_APPEND);
+            });
+
+            $retval = $cmd->run();
+
+            if($retval != 0){
+                $this->ticket->backup_state = 'rdiff-backup failed (retval: ' . $retval . '), output: '
+                     . PHP_EOL . $output;
+                $this->log($this->ticket->backup_state);
+
+                $act = new Activity([
+                        'ticket_id' => $this->ticket->id,
+                        'description' => 'Backup failed: rdiff-backup failed (retval: ' . $retval . ')',
+                ]);
+                $act->save();
+
+                if ($this->finishBackup == true) {
+                    $this->ticket->runCommand('echo "backup failed, waiting for next try..." > /home/user/shutdown');
+                }
+            }else{
+                //$this->log($output);
+                $this->ticket->backup_last = new Expression('NOW()');
+                $this->ticket->backup_state = 'backup successful.';
+                if ($this->finishBackup == true) {
+                    $this->ticket->runCommand('echo 0 > /home/user/shutdown');
+                }
+
+                # Generate Thumbnails
+                $searchModel = new ScreenshotSearch();
+                $dataProvider = $searchModel->search($this->ticket->token);
+                $this->log("Generating thumbnails...");
+                foreach ($dataProvider->models as $model) {
+                    $model->getThumbnail();
+                }
+
+                # Calculate the size
+                $this->log("Calculate backup size...");
+                $this->ticket->backup_size = $this->directorySize(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token) - $this->directorySize(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token . '/rdiff-backup-data');
+            }
+
+            $this->ticket->backup_last_try = new Expression('NOW()');
+            $this->ticket->backup_lock = 0;
+            $this->ticket->save(false);
+
+        }
+
+        $this->ticket = null;
+        $this->calcLoad(1);
     }
 
     /**

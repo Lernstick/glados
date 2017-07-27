@@ -491,19 +491,23 @@ class TicketController extends Controller
                 return $this->render('token-request', [
                     'model' => $model,
                 ]);                
+            } else if (!$model->valid) {
+                $model->addError('token', 'The ticket has expired.');
+                return $this->render('token-request', [
+                    'model' => $model,
+                ]);                
+            } else if (!Yii::$app->file->set($model->exam->file)->exists) {
+                $model->addError('token', 'The exam file cannot be found.');
+                return $this->render('token-request', [
+                    'model' => $model,
+                ]);                
+            } else if ($model->download_lock != 0) {
+                $model->addError('token', 'Another instance is already running, '
+                                        . 'multiple downloads are not allowed.');
+                return $this->render('token-request', [
+                    'model' => $model,
+                ]);                
             } else {
-                if (!$model->valid){
-                    throw new \yii\web\HttpException(403, 'The provided ticket is invalid.');
-                }
-
-                if (!Yii::$app->file->set($model->exam->file)->exists){
-                    throw new \yii\web\HttpException(404, 'The exam file cannot be found.');
-                }
-
-                if($model->download_lock != 0) {
-                    throw new \yii\web\HttpException(404, 'Another instance is already running; ' . 'multiple downloads are not allowed.');
-                }
-
                 $act = new Activity([
                     'ticket_id' => $model->id,
                     'description' => 'Exam download successfully requested by ' . 

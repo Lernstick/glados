@@ -39,6 +39,16 @@ class AnalyzeController extends DaemonController
     /**
      * @inheritdoc
      */
+    public function doJobOnce ($id = '')
+    {
+        if (($this->exam = $this->getNextExam()) !== null) {
+            $this->processExam($this->exam);
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function doJob ($id = '')
     {
         while (true) {
@@ -51,19 +61,7 @@ class AnalyzeController extends DaemonController
             }
 
             if($this->exam  !== null) {
-                $tmpdir = $this->unpack();
-                if (file_exists($tmpdir . "/" . $this->extractList[0])) {
-                    $this->exam->{"sq_url_whitelist"} = file_get_contents($tmpdir . "/" . $this->extractList[0]);
-                } else {
-                    $this->exam->{"sq_url_whitelist"} = null;
-                }
-
-                $this->exam->{"file_analyzed"} = 1;
-                $this->exam->save(false);
-
-                if (!empty($this->exam->md5)) {
-                    $this->removeDirectory("/tmp/" . $this->exam->md5);
-                }
+                $this->processExam($this->exam);
             }
 
             if ($id != '') {
@@ -72,6 +70,24 @@ class AnalyzeController extends DaemonController
 
             pcntl_signal_dispatch();
             sleep(rand(5, 10));
+        }
+    }
+
+    public function processExam ($exam)
+    {
+        $this->exam = $exam;
+        $tmpdir = $this->unpack();
+        if (file_exists($tmpdir . "/" . $this->extractList[0])) {
+            $this->exam->{"sq_url_whitelist"} = file_get_contents($tmpdir . "/" . $this->extractList[0]);
+        } else {
+            $this->exam->{"sq_url_whitelist"} = null;
+        }
+
+        $this->exam->{"file_analyzed"} = 1;
+        $this->exam->save(false);
+
+        if (!empty($this->exam->md5)) {
+            $this->removeDirectory("/tmp/" . $this->exam->md5);
         }
     }
 

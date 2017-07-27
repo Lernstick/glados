@@ -47,6 +47,16 @@ class DownloadController extends DaemonController
     /**
      * @inheritdoc
      */
+    public function doJobOnce ($id = '')
+    {
+        if (($this->ticket = $this->getNextTicket()) !== null) {
+            $this->processTicket($this->ticket);
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function doJob ($id = '')
     {
 
@@ -72,144 +82,7 @@ class DownloadController extends DaemonController
                 } while (($this->ticket = $this->getNextTicket()) === null);
             }
 
-            $this->log('Processing ticket: ' .
-                ( empty($this->ticket->test_taker) ? $this->ticket->token : $this->ticket->test_taker) .
-                ' (' . $this->ticket->ip . ')', true);
-            $this->ticket->download_state = 'connecting to client';
-            $this->ticket->save(false);
-
-            if ($this->checkPort(22, 3) === false) {
-                $this->ticket->online = 1;
-                $this->ticket->download_state = 'download failed: network error';
-                $this->ticket->download_lock = 0;
-                $this->ticket->save(false);
-
-                $act = new Activity([
-                        'ticket_id' => $this->ticket->id,
-                        'description' => 'Download failed: network error',
-                ]);
-                $act->save();
-
-            }else{
-                $this->ticket->scenario = Ticket::SCENARIO_DOWNLOAD;
-                $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? 1 : 0;
-
-                $this->ticket->client_state = "download in progress";
-                $this->ticket->runCommand('echo "download in progress" > ' . $this->remotePath . '/state');
-                $this->ticket->save(false);
-
-                $cmd = "rsync --checksum --partial --progress "
-                     . "--rsh='ssh -i " . \Yii::$app->basePath . "/.ssh/rsa "
-                     . " -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' "
-                     . escapeshellarg($this->ticket->exam->file) . " "
-                     . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . ":" . $this->remotePath . '/squashfs/exam.squashfs') . " "
-                     . "| stdbuf -oL tr '\\r' '\\n' ";
-
-                $this->log('Executing rsync: ' . $cmd);
-
-                $cmd = new ShellCommand($cmd);
-                $output = "";
-                $logFile = Yii::getAlias('@runtime/logs/download.' . $this->ticket->token . '.' . date('c') . '.log');
-
-                $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use (&$output, $logFile) {
-                    echo $this->ansiFormat($event->line, $event->channel == ShellCommand::STDOUT ? Console::NORMAL : Console::FG_RED);
-                    $output .= $event->line;
-                    preg_match('/\s([0-9]+)\%/', $event->line, $match);
-                    if (isset($match[1])) {
-                        $this->ticket->download_progress = intval($match[1])/100;
-                        $this->ticket->save();
-                    }
-                    file_put_contents($logFile, $event->line, FILE_APPEND);
-                });
-
-                $retval = $cmd->run();
-
-                if($retval != 0){
-                    $this->log('rsync failed (retval: ' . $retval . '), output: ' . PHP_EOL . $output);
-
-                    $act = new Activity([
-                            'ticket_id' => $this->ticket->id,
-                            'description' => 'Download failed: rsync failed (retval: ' . $retval . ')',
-                    ]);
-                    $act->save();
-
-                    $this->ticket->download_state = "download failed: rsync failed";
-                    $this->ticket->download_lock = 0;
-                    $this->ticket->save();
-                }else{
-                    $act = new Activity([
-                        'ticket_id' => $this->ticket->id,
-                        'description' => 'Exam download finished by ' . $this->ticket->ip .
-                        ' from ' . ( $this->ticket->test_taker ? $this->ticket->test_taker :
-                        'Ticket with token ' . $this->ticket->token ) . '.'
-                    ]);
-                    $act->save();
-                    $this->ticket->download_progress = 1;
-                    $this->ticket->client_state = "download finished";
-                    $this->ticket->download_finished = new Expression('NOW()');
-                    $this->ticket->download_lock = 0;
-                    $this->ticket->save();
-
-                    /* if there is a backup available, restore the latest */
-                    $backupSearchModel = new BackupSearch();
-                    $backupDataProvider = $backupSearchModel->search($this->ticket->token);
-                    if ($backupDataProvider->totalCount > 0) {
-                        $restoreDaemon = new Daemon();
-                        /* run the restore daemon in the foreground */
-                        $pid = $restoreDaemon->startRestore($this->ticket->id, '/', 'now', false, '/run/initramfs/backup/' . $this->ticket->exam->backup_path);
-                    }
-
-                    $this->ticket->client_state = "preparing system";
-                    $this->ticket->save();
-
-                    $cmd = "ssh -i " . \Yii::$app->basePath . "/.ssh/rsa -o "
-                         . "UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "
-                         . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip) . " "
-                         . "'bash -s' < " . \Yii::$app->basePath . "/scripts/prepare.sh " . escapeshellarg($this->ticket->token);
-
-                    $this->log('Executing ssh: ' . $cmd);
-
-                    $cmd = new ShellCommand($cmd);
-
-                    $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use (&$output, $logFile) {
-                        echo $this->ansiFormat($event->line, $event->channel == ShellCommand::STDOUT ? Console::NORMAL : Console::FG_RED);
-                    });
-
-                    $retval = $cmd->run();
-                    var_dump($retval);
-
-/*$infoFile = <<<EOF
-    gladosIp="${gladosIp}"
-    gladosHost="${gladosHost}"
-    gladosPort="${gladosPort}"
-    partitionSystem="$(blkid -l -L system)"
-
-    urlDownload="${urlDownload}"
-    urlFinish="${urlFinish}"
-    urlNotify="${urlNotify}"
-    urlMd5="${urlMd5}"
-    urlConfig="${urlConfig}"
-EOF;*/
-
-                    $eventItem = new EventItem([
-                        'event' => 'ticket/' . $this->ticket->id,
-                        'priority' => 0,
-                        'data' => [
-                            'setup_complete' => true,
-                        ],
-                    ]);
-                    $eventItem->generate();
-                    $this->ticket->client_state = "setup complete";
-                    $this->ticket->save();                    
-
-                }
-
-                $this->ticket->download_lock = 0;
-                $this->ticket->save(false);
-
-            }
-
-            $this->ticket = null;
+            $this->processTicket($this->ticket);
 
             if ($id != '') {
                 return;
@@ -217,6 +90,150 @@ EOF;*/
 
         }
 
+    }
+
+    public function processTicket ($ticket)
+    {
+
+        $this->ticket = $ticket;
+        $this->log('Processing ticket: ' .
+            ( empty($this->ticket->test_taker) ? $this->ticket->token : $this->ticket->test_taker) .
+            ' (' . $this->ticket->ip . ')', true);
+        $this->ticket->download_state = 'connecting to client';
+        $this->ticket->save(false);
+
+        if ($this->checkPort(22, 3) === false) {
+            $this->ticket->online = 1;
+            $this->ticket->download_state = 'download failed: network error';
+            $this->ticket->download_lock = 0;
+            $this->ticket->save(false);
+
+            $act = new Activity([
+                    'ticket_id' => $this->ticket->id,
+                    'description' => 'Download failed: network error',
+            ]);
+            $act->save();
+
+        }else{
+            $this->ticket->scenario = Ticket::SCENARIO_DOWNLOAD;
+            $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? 1 : 0;
+
+            $this->ticket->client_state = "download in progress";
+            $this->ticket->runCommand('echo "download in progress" > ' . $this->remotePath . '/state');
+            $this->ticket->save(false);
+
+            $cmd = "rsync --checksum --partial --progress "
+                 . "--rsh='ssh -i " . \Yii::$app->basePath . "/.ssh/rsa "
+                 . " -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' "
+                 . escapeshellarg($this->ticket->exam->file) . " "
+                 . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . ":" . $this->remotePath . '/squashfs/exam.squashfs') . " "
+                 . "| stdbuf -oL tr '\\r' '\\n' ";
+
+            $this->log('Executing rsync: ' . $cmd);
+
+            $cmd = new ShellCommand($cmd);
+            $output = "";
+            $logFile = Yii::getAlias('@runtime/logs/download.' . $this->ticket->token . '.' . date('c') . '.log');
+
+            $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use (&$output, $logFile) {
+                echo $this->ansiFormat($event->line, $event->channel == ShellCommand::STDOUT ? Console::NORMAL : Console::FG_RED);
+                $output .= $event->line;
+                preg_match('/\s([0-9]+)\%/', $event->line, $match);
+                if (isset($match[1])) {
+                    $this->ticket->download_progress = intval($match[1])/100;
+                    $this->ticket->save();
+                }
+                file_put_contents($logFile, $event->line, FILE_APPEND);
+            });
+
+            $retval = $cmd->run();
+
+            if($retval != 0){
+                $this->log('rsync failed (retval: ' . $retval . '), output: ' . PHP_EOL . $output);
+
+                $act = new Activity([
+                        'ticket_id' => $this->ticket->id,
+                        'description' => 'Download failed: rsync failed (retval: ' . $retval . ')',
+                ]);
+                $act->save();
+
+                $this->ticket->download_state = "download failed: rsync failed";
+                $this->ticket->download_lock = 0;
+                $this->ticket->save();
+            }else{
+                $act = new Activity([
+                    'ticket_id' => $this->ticket->id,
+                    'description' => 'Exam download finished by ' . $this->ticket->ip .
+                    ' from ' . ( $this->ticket->test_taker ? $this->ticket->test_taker :
+                    'Ticket with token ' . $this->ticket->token ) . '.'
+                ]);
+                $act->save();
+                $this->ticket->download_progress = 1;
+                $this->ticket->client_state = "download finished";
+                $this->ticket->download_finished = new Expression('NOW()');
+                $this->ticket->download_lock = 0;
+                $this->ticket->save();
+
+                /* if there is a backup available, restore the latest */
+                $backupSearchModel = new BackupSearch();
+                $backupDataProvider = $backupSearchModel->search($this->ticket->token);
+                if ($backupDataProvider->totalCount > 0) {
+                    $restoreDaemon = new Daemon();
+                    /* run the restore daemon in the foreground */
+                    $pid = $restoreDaemon->startRestore($this->ticket->id, '/', 'now', false, '/run/initramfs/backup/' . $this->ticket->exam->backup_path);
+                }
+
+                $this->ticket->client_state = "preparing system";
+                $this->ticket->save();
+
+                $cmd = "ssh -i " . \Yii::$app->basePath . "/.ssh/rsa -o "
+                     . "UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "
+                     . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip) . " "
+                     . "'bash -s' < " . \Yii::$app->basePath . "/scripts/prepare.sh " . escapeshellarg($this->ticket->token);
+
+                $this->log('Executing ssh: ' . $cmd);
+
+                $cmd = new ShellCommand($cmd);
+
+                $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use (&$output, $logFile) {
+                    echo $this->ansiFormat($event->line, $event->channel == ShellCommand::STDOUT ? Console::NORMAL : Console::FG_RED);
+                });
+
+                $retval = $cmd->run();
+                var_dump($retval);
+
+/*$infoFile = <<<EOF
+gladosIp="${gladosIp}"
+gladosHost="${gladosHost}"
+gladosPort="${gladosPort}"
+partitionSystem="$(blkid -l -L system)"
+
+urlDownload="${urlDownload}"
+urlFinish="${urlFinish}"
+urlNotify="${urlNotify}"
+urlMd5="${urlMd5}"
+urlConfig="${urlConfig}"
+EOF;*/
+
+                $eventItem = new EventItem([
+                    'event' => 'ticket/' . $this->ticket->id,
+                    'priority' => 0,
+                    'data' => [
+                        'setup_complete' => true,
+                    ],
+                ]);
+                $eventItem->generate();
+                $this->ticket->client_state = "setup complete";
+                $this->ticket->save();                    
+
+            }
+
+            $this->ticket->download_lock = 0;
+            $this->ticket->save(false);
+
+        }
+
+        $this->ticket = null;
     }
 
     /**
