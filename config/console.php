@@ -32,6 +32,7 @@ return [
             'targets' => [
                 [
                     'class' => 'yii\log\FileTarget',
+                    'logFile' => '@runtime/logs/profile.log',                    
                     'levels' => ['error', 'warning'],
                 ],
             ],

@@ -29,6 +29,9 @@ $this->params['breadcrumbs'][] = $this->title;
       </button>
       <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
         <li>
+            <?= Html::a('<span class="glyphicon glyphicon-plus"></span> Start Daemon', ['create', 'type' => 'daemon']) ?>
+        </li>      
+        <li>
             <?= Html::a('<span class="glyphicon glyphicon-plus"></span> Start Backup Daemon', ['create', 'type' => 'backup']) ?>
         </li>
         <li>

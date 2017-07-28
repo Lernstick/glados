@@ -17,14 +17,21 @@ class DaemonController extends Controller
 {
 
     /**
-     * @var string path to the file which is used to determine that the process stopped/started
+     * TODO
      */
-    private $_pidfile;
+    protected $time;
+    protected $load;
+    protected $loadarr = [];
 
     /**
      * @var app\models\Daemon the daemon instance for db updates
      */
     public $daemon;
+
+    /**
+     * @var string path to the file which is used to determine that the process stopped/started
+     */
+    public $_pidfile;
 
     /**
      * @var integer the uid and gid under which the script should be executed.
@@ -44,8 +51,7 @@ class DaemonController extends Controller
     public $joblist = [
         0 => ['download', 'run-once'],
         1 => ['backup', 'run-once'],
-        #2 => ['restore', 'run-once'],
-        3 => ['analyze', 'run-once'],
+        2 => ['analyze', 'run-once'],
     ];
 
     /**
@@ -70,6 +76,11 @@ class DaemonController extends Controller
         posix_setgid($this->gid);
         posix_setuid($this->uid);
 
+        # change process group id to its own one, so SIGINT will not be sent to all processes
+        # in the process group (this would happen, when the daemon starts new daemons)
+        posix_setpgid(getmypid(), getmypid());
+
+        $this->time = round(time());
 
         # setup signal handlers
         pcntl_signal(SIGTERM, array(&$this, "signalHandler"));
@@ -123,7 +134,6 @@ class DaemonController extends Controller
 
 
         $this->_pidfile = fopen('/tmp/user/daemon/' . $this->daemon->pid, 'w');
-
     }
 
     /**
@@ -131,10 +141,10 @@ class DaemonController extends Controller
      *
      * @return void
      */
-    public function stop()
+    public function stop($cause = null)
     {
 
-        $this->daemon->state = 'stopping';
+        $this->daemon->state = 'stopping, Cause: ' . $cause;
         $this->daemon->save();
 
         $daemons = new DaemonSearch();
@@ -150,7 +160,7 @@ class DaemonController extends Controller
         ]);
         $eventItem->generate();
 
-        fclose($this->_pidfile);
+        @fclose($this->_pidfile);
         @unlink('/tmp/user/daemon/' . $this->daemon->pid);
 
         $pid = $this->daemon->pid;
@@ -202,7 +212,7 @@ class DaemonController extends Controller
         call_user_func_array(array($this, 'doJob'), $args);
         //$this->doJob($option);
 
-        $this->stop();
+        $this->stop('natural');
 
     }
 
@@ -216,7 +226,7 @@ class DaemonController extends Controller
         $this->daemon->state = 'idle';
         $this->daemon->save();
 
-        call_user_func_array(array($this, 'doJobOnce'), $args);
+        return call_user_func_array(array($this, 'doJobOnce'), $args);
 
         #$this->stop();
 
@@ -282,15 +292,72 @@ class DaemonController extends Controller
     public function doJob()
     {
         while (true) {
+            $tot = false;
             foreach ($this->joblist as $priority => $task) {
-                echo $task[0] . '/' . $task[1] . PHP_EOL;
-                #Yii::$app->runAction($task);
                 $controller = Yii::$app->createControllerByID($task[0]);
                 $controller->daemon = $this->daemon;
-                $controller->runAction($task[1]);
+                $ret = $controller->runAction($task[1]);
                 $controller = null;
-                #file_put_contents('/tmp/test', print_r($this, true), FILE_APPEND);
+                if ($ret === true) {
+                    $this->calcLoad(1);
+                    $tot = true;
+                } else {
+                    #$this->calcLoad(0);
+                }
+
+            }
+            if ($tot === false) {
                 sleep(5);
+                $this->calcLoad(0);
+            }
+        }
+    }
+
+    /**
+     * Update the load calculation in the last [0,5] minutes
+     *
+     * @param int $value can be 0 or 1:
+     *                    - 0 means to count no load since last invokation
+     *                    - 1 means to count full load since last invokation
+     * @return void
+     */
+    protected function calcLoad ($value)
+    {   
+        $amount = round(time() - $this->time);
+        $this->loadarr = array_merge(array_fill(0, $amount, $value), $this->loadarr);
+        $this->time += $amount;
+        $this->loadarr = array_slice($this->loadarr, 0, 300);
+
+        if (count($this->loadarr) != 0) {
+            $this->daemon->load = array_sum($this->loadarr)/count($this->loadarr);
+        } else {
+            $this->daemon->load = 0;
+        }
+        $this->daemon->save();
+        if ($this->daemon->description == 'Daemon base controller') {
+            $this->judgement();
+        }
+    }
+
+    /**
+     * Start new daemons based on thresholds
+     *
+     * @return void
+     */
+    private function judgement ()
+    {
+        $sum = Daemon::find()->where(['description' => 'Daemon base controller'])->sum('`load`');
+        $count = Daemon::find()->where(['description' => 'Daemon base controller'])->count();
+        $workload = $count != 0 ? round(100*$sum/$count) : 0;
+
+        if ($workload > \Yii::$app->params['upperBound'] && $count < \Yii::$app->params['maxDaemons']) {
+            # start a new daemon
+            $backupDaemon = new Daemon();
+            $backupDaemon->startDaemon();
+        } else if ($workload < \Yii::$app->params['lowerBound'] && $count > \Yii::$app->params['minDaemons']) {
+            # stop after 5 minutes
+            if (time() - strtotime($this->daemon->started_at) > 300) {
+                $this->stop('Load threshold');
             }
         }
     }
@@ -298,12 +365,12 @@ class DaemonController extends Controller
     /*
      * The signal handler function
      */
-    function signalHandler($sig)
+    public function signalHandler($sig)
     {
         switch ($sig) {
             case SIGTERM:
                 $this->log('Caught SIGTERM, stopping...', true);
-                $this->stop();
+                $this->stop('SIGTERM');
                 die();
             case SIGHUP:
                 $this->log('Caught SIGHUP, I am alive.', true);
@@ -311,13 +378,12 @@ class DaemonController extends Controller
                 $this->daemon->save();
                 break;
             case SIGINT:
-                echo "INT";
                 $this->log('Caught SIGINT, stopping...', true);
-                $this->stop();
+                $this->stop('SIGINT');
                 die();
             case SIGQUIT:
                 $this->log('Caught SIGQUIT, stopping...', true);
-                $this->stop();
+                $this->stop('SIGINT');
                 die();
             case SIGUSR1:
                 echo "Caught SIGUSR1, do nothing..." . PHP_EOL;

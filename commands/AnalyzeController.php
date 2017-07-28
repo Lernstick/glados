@@ -43,6 +43,9 @@ class AnalyzeController extends DaemonController
     {
         if (($this->exam = $this->getNextExam()) !== null) {
             $this->processExam($this->exam);
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -155,12 +158,12 @@ class AnalyzeController extends DaemonController
     /**
      * @inheritdoc
      */
-    public function stop()
+    public function stop($cause = null)
     {
         if ($this->exam !== null && !empty($this->exam->md5)) {
             $this->removeDirectory("/tmp/" . $this->exam->md5);
         }
-        parent::stop();
+        parent::stop($cause);
     }
 
 }

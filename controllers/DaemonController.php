@@ -92,6 +92,8 @@ class DaemonController extends Controller
                 break;
             case 'analyze':
                 $model->startAnalyzer();
+            case 'daemon':
+                $model->startDaemon();                
         }
 
         if(Yii::$app->request->isAjax){

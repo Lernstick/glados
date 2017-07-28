@@ -219,9 +219,9 @@ class RestoreController extends DaemonController
     /**
      * @inheritdoc
      */
-    public function stop()
+    public function stop($cause = null)
     {
-        parent::stop();
+        parent::stop($cause);
     }
 
     /**

@@ -51,10 +51,6 @@ class BackupController extends DaemonController
      */
     private $manualBackup = false;
 
-    private $load;
-    private $loadarr = [];
-    private $time;
-
     /**
      * @var array 
      */
@@ -80,7 +76,6 @@ class BackupController extends DaemonController
     public function start()
     {
         parent::start();
-        $this->time = round(time());
     }
 
     /**
@@ -90,6 +85,9 @@ class BackupController extends DaemonController
     {
         if (($this->ticket = $this->getNextTicket()) !== null) {
             $this->processTicket($this->ticket);
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -264,7 +262,7 @@ class BackupController extends DaemonController
     /**
      * @inheritdoc
      */
-    public function stop()
+    public function stop($cause = null)
     {
 
         if ($this->ticket != null) {
@@ -279,7 +277,7 @@ class BackupController extends DaemonController
 
         }
 
-        parent::stop();
+        parent::stop($cause);
     }
 
     /**
@@ -326,7 +324,7 @@ class BackupController extends DaemonController
                     $ticket->save(false);
                     $daemon->delete();
                 }
-            }else{
+            } else {
                 $ticket->backup_lock = $ticket->restore_lock = 0;
                 $ticket->save(false);
             }
@@ -447,53 +445,6 @@ class BackupController extends DaemonController
             }
         }
         return $size;
-    }
-
-    /**
-     * Update the load calculation in the last [0,5] minutes
-     *
-     * @param int $value can be 0 or 1:
-     *                    - 0 means to count no load since last invokation
-     *                    - 1 means to count full load since last invokation
-     * @return void
-     */
-    private function calcLoad ($value)
-    {
-        $amount = round(time() - $this->time);
-        $this->loadarr = array_merge(array_fill(0, $amount, $value), $this->loadarr);
-        $this->time += $amount;
-        $this->loadarr = array_slice($this->loadarr, 0, 300);
-
-        if (count($this->loadarr) != 0) {
-            $this->daemon->load = array_sum($this->loadarr)/count($this->loadarr);
-        } else {
-            $this->daemon->load = 0;
-        }
-        $this->daemon->save();
-        $this->judgement();
-    }
-
-    /**
-     * Start new daemons based on thresholds
-     *
-     * @return void
-     */
-    private function judgement ()
-    {
-        $sum = Daemon::find()->sum('`load`');
-        $count = Daemon::find()->count();
-        $workload = round(100*$sum/$count);
-
-        if ($workload > \Yii::$app->params['upperBound'] && $count < \Yii::$app->params['maxDaemons']) {
-            # start a new daemon
-            $backupDaemon = new Daemon();
-            $backupDaemon->startBackup();
-        } else if ($workload < \Yii::$app->params['lowerBound'] && $count > \Yii::$app->params['minDaemons']) {
-            # stop after 5 minutes
-            if (time() - strtotime($this->daemon->started_at) > 300) {
-                $this->stop();
-            }
-        }
     }
 
 }

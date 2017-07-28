@@ -88,6 +88,11 @@ class Daemon extends \yii\db\ActiveRecord
         return false;
     }
 
+    public function startDaemon()
+    {
+        return $this->start('daemon/run', [], true);
+    }
+
     public function startBackup($id = '', $background = true)
     {
         return $this->start('backup/run', [escapeshellarg($id)], $background);

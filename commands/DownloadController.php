@@ -51,6 +51,9 @@ class DownloadController extends DaemonController
     {
         if (($this->ticket = $this->getNextTicket()) !== null) {
             $this->processTicket($this->ticket);
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -239,7 +242,7 @@ EOF;*/
     /**
      * @inheritdoc
      */
-    public function stop()
+    public function stop($cause = null)
     {
 
         if ($this->ticket != null) {
@@ -255,7 +258,7 @@ EOF;*/
             $act->save();
         }
 
-        parent::stop();
+        parent::stop($cause);
     }
 
     /**

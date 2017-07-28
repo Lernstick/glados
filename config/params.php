@@ -9,6 +9,7 @@ return [
     'uploadPath' => '/var/lib/glados/uploads/',
     'backupPath' => '/var/lib/glados/backups/',
     'resultPath' => '/var/lib/glados/results/',
+    'tmpPath' => '/var/lib/glados/tmp/',
     'examDownloadBandwith' => 10 * 1024 * 1024, // 10MB per second, set 0 for no limit
     'concurrentExamDownloads' => 10, // set 0 for no limit
     'minDaemons' => 3,
