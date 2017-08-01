@@ -8,7 +8,6 @@ use app\models\EventItem;
 use app\models\Daemon;
 use app\models\DaemonSearch;
 use yii\db\Expression;
-use app\commands\DownloadController;
 
 /**
  * Daemon base controller
@@ -46,7 +45,15 @@ class DaemonController extends Controller
     public $defaultAction = 'run';
 
     /**
-     * TODO
+     * @var array list of controllers and actions to work trough in one iteration.
+     * The list has the following pattern:
+     * [
+     *     0 => ['controller1', 'action1'],
+     *     1 => ['controller1', 'action2'],
+     *     2 => ['controller2', 'action2'],
+     *     ...
+     *     N => ['controllerN', 'actionN']
+     * ]
      */
     public $joblist = [
         0 => ['download', 'run-once'],
@@ -76,8 +83,9 @@ class DaemonController extends Controller
         posix_setgid($this->gid);
         posix_setuid($this->uid);
 
-        # change process group id to its own one, so SIGINT will not be sent to all processes
-        # in the process group (this would happen, when the daemon starts new daemons)
+        # Change process group id to its own one, so SIGINT will not be sent to all processes
+        # in the process group (this would happen, when the daemon starts new daemons, even if
+        # the new daemons have another parent pid, such as 1)
         posix_setpgid(getmypid(), getmypid());
 
         $this->time = round(time());
@@ -132,7 +140,6 @@ class DaemonController extends Controller
         ]);
         $eventItem->generate();
 
-
         $this->_pidfile = fopen('/tmp/user/daemon/' . $this->daemon->pid, 'w');
     }
 
@@ -179,7 +186,6 @@ class DaemonController extends Controller
         $eventItem->generate();
 
         #exit;
-        
     }
 
     /**
@@ -306,6 +312,8 @@ class DaemonController extends Controller
                 }
 
             }
+
+            # If no controller has a job to do
             if ($tot === false) {
                 sleep(5);
                 $this->calcLoad(0);
@@ -340,7 +348,7 @@ class DaemonController extends Controller
     }
 
     /**
-     * Start new daemons based on thresholds
+     * Start/stop daemons based on thresholds
      *
      * @return void
      */
@@ -350,10 +358,10 @@ class DaemonController extends Controller
         $count = Daemon::find()->where(['description' => 'Daemon base controller'])->count();
         $workload = $count != 0 ? round(100*$sum/$count) : 0;
 
-        if ($workload > \Yii::$app->params['upperBound'] && $count < \Yii::$app->params['maxDaemons']) {
+        if (($workload > \Yii::$app->params['upperBound'] && $count < \Yii::$app->params['maxDaemons']) || $count < \Yii::$app->params['minDaemons']) {
             # start a new daemon
-            $backupDaemon = new Daemon();
-            $backupDaemon->startDaemon();
+            $daemon = new Daemon();
+            $daemon->startDaemon();
         } else if ($workload < \Yii::$app->params['lowerBound'] && $count > \Yii::$app->params['minDaemons']) {
             # stop after 5 minutes
             if (time() - strtotime($this->daemon->started_at) > 300) {

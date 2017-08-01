@@ -13,12 +13,13 @@ use yii\helpers\FileHelper;
 use yii\helpers\Console;
 use app\models\BackupSearch;
 use app\models\EventItem;
+use app\models\DaemonInterface;
 
 /**
  * Download Daemon (push)
  * This is the daemon which calls rsync to push the exam to the clients one by one.
  */
-class DownloadController extends DaemonController
+class DownloadController extends DaemonController implements DaemonInterface
 {
 
     /**
@@ -49,8 +50,8 @@ class DownloadController extends DaemonController
      */
     public function doJobOnce ($id = '')
     {
-        if (($this->ticket = $this->getNextTicket()) !== null) {
-            $this->processTicket($this->ticket);
+        if (($this->ticket = $this->getNextItem()) !== null) {
+            $this->processItem($this->ticket);
             return true;
         } else {
             return false;
@@ -73,19 +74,17 @@ class DownloadController extends DaemonController
                     return;
                 }
                 
-                $this->ticket->download_lock = 1;
-                $this->ticket->running_daemon_id = $this->daemon->id;
-                $this->ticket->save(false);
+                $this->lockItem($this->ticket);
             }
 
             if ($this->ticket == null) {
                 $this->log('idle', true);
                 do {
                     sleep(rand(5, 10));
-                } while (($this->ticket = $this->getNextTicket()) === null);
+                } while (($this->ticket = $this->getNextItem()) === null);
             }
 
-            $this->processTicket($this->ticket);
+            $this->processItem($this->ticket);
 
             if ($id != '') {
                 return;
@@ -95,11 +94,14 @@ class DownloadController extends DaemonController
 
     }
 
-    public function processTicket ($ticket)
+    /**
+     * @inheritdoc
+     */
+    public function processItem ($ticket)
     {
 
         $this->ticket = $ticket;
-        $this->log('Processing ticket: ' .
+        $this->log('Processing ticket (download): ' .
             ( empty($this->ticket->test_taker) ? $this->ticket->token : $this->ticket->test_taker) .
             ' (' . $this->ticket->ip . ')', true);
         $this->ticket->download_state = 'connecting to client';
@@ -108,8 +110,7 @@ class DownloadController extends DaemonController
         if ($this->checkPort(22, 3) === false) {
             $this->ticket->online = 1;
             $this->ticket->download_state = 'download failed: network error';
-            $this->ticket->download_lock = 0;
-            $this->ticket->save(false);
+            $this->unlockItem($this->ticket);
 
             $act = new Activity([
                     'ticket_id' => $this->ticket->id,
@@ -161,8 +162,7 @@ class DownloadController extends DaemonController
                 $act->save();
 
                 $this->ticket->download_state = "download failed: rsync failed";
-                $this->ticket->download_lock = 0;
-                $this->ticket->save();
+                $this->unlockItem($this->ticket);
             }else{
                 $act = new Activity([
                     'ticket_id' => $this->ticket->id,
@@ -174,8 +174,7 @@ class DownloadController extends DaemonController
                 $this->ticket->download_progress = 1;
                 $this->ticket->client_state = "download finished";
                 $this->ticket->download_finished = new Expression('NOW()');
-                $this->ticket->download_lock = 0;
-                $this->ticket->save();
+                $this->unlockItem($this->ticket);
 
                 /* if there is a backup available, restore the latest */
                 $backupSearchModel = new BackupSearch();
@@ -231,8 +230,7 @@ EOF;*/
 
             }
 
-            $this->ticket->download_lock = 0;
-            $this->ticket->save(false);
+            $this->unlockItem($this->ticket);
 
         }
 
@@ -312,11 +310,32 @@ EOF;*/
     }
 
     /**
+     * @inheritdoc
+     */
+    public function lockItem ($ticket)
+    {
+        $ticket->download_lock = 1;
+        $ticket->running_daemon_id = $this->daemon->id;
+        return $ticket->save(false);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function unlockItem ($ticket)
+    {
+        $ticket->download_lock = 0;
+        return $ticket->save(false);
+    }
+
+    /**
+     * @inheritdoc
+     *
      * Determines the next ticket to process
      *
      * @return Ticket|null
      */
-    private function getNextTicket ()
+    public function getNextItem ()
     {
 
         // first do a cleanup
@@ -345,9 +364,7 @@ EOF;*/
 
         // finally lock the next ticket and return it
         if (($ticket = $query->one()) !== null) {
-            $ticket->download_lock = 1;
-            $ticket->running_daemon_id = $this->daemon->id;
-            $ticket->save(false);
+            $this->lockItem($ticket);
             return $ticket;
         }
 

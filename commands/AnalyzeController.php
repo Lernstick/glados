@@ -7,12 +7,13 @@ use app\commands\DaemonController;
 use app\models\Exam;
 use yii\helpers\Console;
 use app\components\ShellCommand;
+use app\models\DaemonInterface;
 
 /**
  * Analyzer Daemon
  * Desc: TODO
  */
-class AnalyzeController extends DaemonController
+class AnalyzeController extends DaemonController implements DaemonInterface
 {
 
     /**
@@ -41,8 +42,8 @@ class AnalyzeController extends DaemonController
      */
     public function doJobOnce ($id = '')
     {
-        if (($this->exam = $this->getNextExam()) !== null) {
-            $this->processExam($this->exam);
+        if (($this->exam = $this->getNextItem()) !== null) {
+            $this->processItem($this->exam);
             return true;
         } else {
             return false;
@@ -60,11 +61,11 @@ class AnalyzeController extends DaemonController
             if ($id != ''){
                 $this->exam =  Exam::findOne(['id' => $id]);
             } else {
-                $this->exam = $this->getNextExam();
+                $this->exam = $this->getNextItem();
             }
 
             if($this->exam  !== null) {
-                $this->processExam($this->exam);
+                $this->processItem($this->exam);
             }
 
             if ($id != '') {
@@ -76,7 +77,10 @@ class AnalyzeController extends DaemonController
         }
     }
 
-    public function processExam ($exam)
+    /**
+     * @inheritdoc
+     */
+    public function processItem ($exam)
     {
         $this->exam = $exam;
         $tmpdir = $this->unpack();
@@ -132,13 +136,30 @@ class AnalyzeController extends DaemonController
         return file_exists($path) ? rmdir($path) : false;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function lockItem ($exam)
+    {
+        return true;
+    }
 
     /**
+     * @inheritdoc
+     */
+    public function unlockItem ($exam)
+    {
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     *
      * Determines the next exam file to process
      *
      * @return Exam|null
      */
-    private function getNextExam ()
+    public function getNextItem ()
     {
 
         $this->pingOthers();
@@ -153,7 +174,6 @@ class AnalyzeController extends DaemonController
 
         return null;
     }
-
 
     /**
      * @inheritdoc

@@ -87,13 +87,18 @@ class DaemonController extends Controller
 
         $model = new Daemon();
         switch ($type) {
+            case 'daemon':
+                $model->startDaemon();
+                break;
             case 'backup':
                 $model->startBackup();
                 break;
             case 'analyze':
                 $model->startAnalyzer();
-            case 'daemon':
-                $model->startDaemon();                
+                break;
+            case 'download':
+                $model->startDownload();
+                break;                
         }
 
         if(Yii::$app->request->isAjax){

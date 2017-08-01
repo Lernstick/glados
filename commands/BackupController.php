@@ -13,12 +13,13 @@ use app\models\ScreenshotSearch;
 use app\components\ShellCommand;
 use yii\helpers\FileHelper;
 use yii\helpers\Console;
+use app\models\DaemonInterface;
 
 /**
  * Backup Daemon (pull)
  * This is the daemon which calls rdiff-backup to pull the data from the clients one by one.
  */
-class BackupController extends DaemonController
+class BackupController extends DaemonController implements DaemonInterface
 {
 
     /**
@@ -83,8 +84,8 @@ class BackupController extends DaemonController
      */
     public function doJobOnce ($id = '')
     {
-        if (($this->ticket = $this->getNextTicket()) !== null) {
-            $this->processTicket($this->ticket);
+        if (($this->ticket = $this->getNextItem()) !== null) {
+            $this->processItem($this->ticket);
             return true;
         } else {
             return false;
@@ -115,9 +116,7 @@ class BackupController extends DaemonController
                     $this->ticket = null;
                     return;
                 }
-                $this->ticket->backup_lock = 1;
-                $this->ticket->running_daemon_id = $this->daemon->id;
-                $this->ticket->save(false);
+                $this->lockItem($this->ticket);
                 $this->manualBackup = true;
             }
 
@@ -126,10 +125,10 @@ class BackupController extends DaemonController
                 do {
                     sleep(rand(5, 10));
                     $this->calcLoad(0);
-                } while (($this->ticket = $this->getNextTicket()) === null);
+                } while (($this->ticket = $this->getNextItem()) === null);
             }
 
-            $this->processTicket($this->ticket);
+            $this->processItem($this->ticket);
 
             if ($id != '') {
                 return;
@@ -139,7 +138,10 @@ class BackupController extends DaemonController
 
     }
 
-    public function processTicket ($ticket)
+    /**
+     * @inheritdoc
+     */
+    public function processItem ($ticket)
     {
         $this->ticket = $ticket;
         if ($this->ticket->backup_last < $this->ticket->end) {
@@ -151,14 +153,15 @@ class BackupController extends DaemonController
         if (!is_writable(\Yii::$app->params['backupPath'])) {
             $this->ticket->backup_state = \Yii::$app->params['backupPath'] . ': No such file or directory or not writable.';
             $this->ticket->backup_last_try = new Expression('NOW()');
-            $this->ticket->backup_lock = 0;
-            $this->ticket->save(false);
+            #$this->ticket->backup_lock = 0;
+            #$this->ticket->save(false);
+            $this->unlockItem($this->ticket);
             $this->log($this->ticket->backup_state);
             $this->ticket = null;
             return;
         }
 
-        $this->log('Processing ticket: ' .
+        $this->log('Processing ticket (backup): ' .
             ( empty($this->ticket->test_taker) ? $this->ticket->token : $this->ticket->test_taker) .
             ' (' . $this->ticket->ip . ')', true);
         $this->ticket->backup_state = 'connecting to client...';
@@ -167,10 +170,11 @@ class BackupController extends DaemonController
         if ($this->checkPort(22, 3) === false) {
             $this->ticket->backup_state = 'network error.';
             $this->ticket->backup_last_try = new Expression('NOW()');
-            $this->ticket->backup_lock = 0;
-            $this->ticket->online = 1;                
-            $this->ticket->save(false);
-
+            $this->ticket->online = 1;
+            #$this->ticket->backup_lock = 0;
+            #$this->ticket->save(false);
+            $this->unlockItem($this->ticket);
+            
             $act = new Activity([
                     'ticket_id' => $this->ticket->id,
                     'description' => 'Backup failed: ' . $this->ticket->backup_state,
@@ -250,8 +254,9 @@ class BackupController extends DaemonController
             }
 
             $this->ticket->backup_last_try = new Expression('NOW()');
-            $this->ticket->backup_lock = 0;
-            $this->ticket->save(false);
+            #$this->ticket->backup_lock = 0;
+            #$this->ticket->save(false);
+            $this->unlockItem($this->ticket);
 
         }
 
@@ -360,11 +365,13 @@ class BackupController extends DaemonController
     }
 
     /**
+     * @inheritdoc
+     *
      * Determines the next ticket to process
      *
      * @return Ticket|null
      */
-    private function getNextTicket ()
+    public function getNextItem ()
     {
 
         // first do a cleanup
@@ -374,9 +381,7 @@ class BackupController extends DaemonController
 
         // then search for finished tickets for a last backup
         if (($ticket = $this->finished()) !== null) {
-            $ticket->backup_lock = 1;
-            $ticket->running_daemon_id = $this->daemon->id;
-            $ticket->save(false);
+            $this->lockItem($ticket);
             return $ticket;
         }
 
@@ -411,14 +416,31 @@ class BackupController extends DaemonController
 
         // finally lock the next ticket and return it
         if (($ticket = $query->one()) !== null) {
-            $ticket->backup_lock = 1;
-            $ticket->running_daemon_id = $this->daemon->id;
-            $ticket->save(false);
+            $this->lockItem($ticket);
             return $ticket;
         }
 
         return null;
 
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function lockItem ($ticket)
+    {
+        $ticket->backup_lock = 1;
+        $ticket->running_daemon_id = $this->daemon->id;
+        return $ticket->save(false);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function unlockItem ($ticket)
+    {
+        $ticket->backup_lock = 0;
+        return $ticket->save(false);
     }
 
     /**

@@ -29,13 +29,16 @@ $this->params['breadcrumbs'][] = $this->title;
       </button>
       <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
         <li>
-            <?= Html::a('<span class="glyphicon glyphicon-plus"></span> Start Daemon', ['create', 'type' => 'daemon']) ?>
+            <?= Html::a('<span class="glyphicon glyphicon-th-list"></span> Start Daemon', ['create', 'type' => 'daemon']) ?>
         </li>      
         <li>
-            <?= Html::a('<span class="glyphicon glyphicon-plus"></span> Start Backup Daemon', ['create', 'type' => 'backup']) ?>
+            <?= Html::a('<span class="glyphicon glyphicon-hdd"></span> Start Backup Daemon', ['create', 'type' => 'backup']) ?>
         </li>
         <li>
-            <?= Html::a('<span class="glyphicon glyphicon-plus"></span> Start Analyzer Daemon', ['create', 'type' => 'analyze']) ?>
+            <?= Html::a('<span class="glyphicon glyphicon-globe"></span> Start Download Daemon', ['create', 'type' => 'download']) ?>
+        </li>        
+        <li>
+            <?= Html::a('<span class="glyphicon glyphicon-search"></span> Start Analyzer Daemon', ['create', 'type' => 'analyze']) ?>
         </li>        
       </ul>
     </div>
