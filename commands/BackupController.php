@@ -98,8 +98,8 @@ class BackupController extends DaemonController implements DaemonInterface
     public function doJob ($id = '')
     {
 
+        $this->calcLoad(0);
         while (true) {
-            $this->calcLoad(0);
             pcntl_signal_dispatch();
             $this->cleanup();
             $this->remotePath = '/overlay';
@@ -129,6 +129,7 @@ class BackupController extends DaemonController implements DaemonInterface
             }
 
             $this->processItem($this->ticket);
+            $this->calcLoad(1);
 
             if ($id != '') {
                 return;
@@ -261,7 +262,6 @@ class BackupController extends DaemonController implements DaemonInterface
         }
 
         $this->ticket = null;
-        $this->calcLoad(1);
     }
 
     /**

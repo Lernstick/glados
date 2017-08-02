@@ -16,10 +16,15 @@ class DaemonController extends Controller
 {
 
     /**
-     * TODO
+     * @var int holds the timestamp since last invocation of [[calcLoad()]].
      */
     protected $time;
-    protected $load;
+
+    /**
+     * @var array holds 300 values 0 or 1, one value or each second in the last
+     * 300 seconds. 0 means "no load", 1 means "full load" in that second. This is 
+     * to calculate the load/business of the daemon in the last 5 minutes.
+     */
     protected $loadarr = [];
 
     /**
@@ -61,6 +66,7 @@ class DaemonController extends Controller
         2 => ['analyze', 'run-once'],
     ];
 
+
     /**
      * @inheritdoc
      */
@@ -101,7 +107,7 @@ class DaemonController extends Controller
     }
 
     /**
-     * Initiates the daemon
+     * Initiates the daemon.
      *
      * @return void
      */
@@ -189,10 +195,18 @@ class DaemonController extends Controller
     }
 
     /**
+     * TODO
+     */
+    public function reloadConfig()
+    {
+        #$this->params = require(\Yii::$app->basePath . '/config/params.php');
+    }
+
+    /**
      * Logs a message to the screen and (if set) to the database
      *
-     * @param string $message The message to log
-     * @param bool $state If true log also to the database, defaults to false
+     * @param string $message the message to log
+     * @param bool $state if true log also to the database, defaults to false
      * @return void
      */
     public function log($message, $state = false)
@@ -204,7 +218,13 @@ class DaemonController extends Controller
         }
     }
 
-    //public function actionRun($option = false)
+    /**
+     * Default action to run the daemon.
+     *
+     * @param mixed $args all sorts of arguments can be given to that function.
+     * All arguments will be passed to [[doJob()]] as they are. 
+     * @return void
+     */
     public function actionRun()
     {
 
@@ -216,31 +236,33 @@ class DaemonController extends Controller
         $this->daemon->save();
 
         call_user_func_array(array($this, 'doJob'), $args);
-        //$this->doJob($option);
 
         $this->stop('natural');
 
     }
 
+    /**
+     * Default action to run just one iteration of the daemon.
+     *
+     * @param mixed $args all sorts of arguments can be given to that function.
+     * All arguments will be passed to [[doJobOnce()]] as they are. 
+     * @return mixed returns the return value of [[doJobOnce()]].
+     */
     public function actionRunOnce()
     {
 
         $args = func_get_args();
-
-        #$this->start();
 
         $this->daemon->state = 'idle';
         $this->daemon->save();
 
         return call_user_func_array(array($this, 'doJobOnce'), $args);
 
-        #$this->stop();
-
     }
 
     /**
      * Checks whether the other running daemons are still alive and if not, 
-     * kills them.
+     * tries to stop and the kills them.
      *
      * @return void
      */
@@ -292,8 +314,8 @@ class DaemonController extends Controller
         }
     }
 
-    /*
-     * This is the actual job of the daemon
+    /**
+     * @inheritdoc
      */
     public function doJob()
     {
@@ -310,7 +332,6 @@ class DaemonController extends Controller
                 } else {
                     #$this->calcLoad(0);
                 }
-
             }
 
             # If no controller has a job to do
@@ -360,12 +381,14 @@ class DaemonController extends Controller
 
         if (($workload > \Yii::$app->params['upperBound'] && $count < \Yii::$app->params['maxDaemons']) || $count < \Yii::$app->params['minDaemons']) {
             # start a new daemon
+            $this->log('start new daemon, workload: ' . $workload . '%, count: ' . $count . '.', true);
             $daemon = new Daemon();
             $daemon->startDaemon();
         } else if ($workload < \Yii::$app->params['lowerBound'] && $count > \Yii::$app->params['minDaemons']) {
             # stop after 5 minutes
             if (time() - strtotime($this->daemon->started_at) > 300) {
                 $this->stop('Load threshold');
+                die();
             }
         }
     }
@@ -394,10 +417,11 @@ class DaemonController extends Controller
                 $this->stop('SIGINT');
                 die();
             case SIGUSR1:
-                echo "Caught SIGUSR1, do nothing..." . PHP_EOL;
+                $this->log('Caught SIGUSR1, reloading configuration...', true);
+                $this->reloadConfig();
                 break;
             default:
-            // handle all other signals
+                // handle all other signals
         }
     }
 

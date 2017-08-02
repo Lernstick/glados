@@ -64,6 +64,7 @@ class DownloadController extends DaemonController implements DaemonInterface
     public function doJob ($id = '')
     {
 
+        $this->calcLoad(0);
         while (true) {
             pcntl_signal_dispatch();
             $this->cleanup();
@@ -81,10 +82,12 @@ class DownloadController extends DaemonController implements DaemonInterface
                 $this->log('idle', true);
                 do {
                     sleep(rand(5, 10));
+                    $this->calcLoad(0);
                 } while (($this->ticket = $this->getNextItem()) === null);
             }
 
             $this->processItem($this->ticket);
+            $this->calcLoad(1);
 
             if ($id != '') {
                 return;

@@ -55,6 +55,7 @@ class AnalyzeController extends DaemonController implements DaemonInterface
      */
     public function doJob ($id = '')
     {
+        $this->calcLoad(0);
         while (true) {
             $this->exam = null;
 
@@ -66,6 +67,7 @@ class AnalyzeController extends DaemonController implements DaemonInterface
 
             if($this->exam  !== null) {
                 $this->processItem($this->exam);
+                $this->calcLoad(1);
             }
 
             if ($id != '') {
@@ -74,6 +76,7 @@ class AnalyzeController extends DaemonController implements DaemonInterface
 
             pcntl_signal_dispatch();
             sleep(rand(5, 10));
+            $this->calcLoad(0);
         }
     }
 
