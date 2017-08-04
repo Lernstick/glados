@@ -24,7 +24,7 @@ use yii\widgets\ActiveForm;
                     <?php $form = ActiveForm::begin([
                         'enableClientValidation' => false,
                         'action' => Url::to([
-                            'download2',
+                            'download',
                             'step' => 2,
                         ]),
                         'method' => 'get'

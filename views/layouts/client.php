@@ -17,6 +17,8 @@ BootstrapPluginAsset::register($this);
 $this->registerJs('var YII_ENV_DEV = ' . (YII_ENV_DEV ? 'true' : 'false') . ';', \yii\web\View::POS_HEAD);
 $this->registerJs('var YII_DEBUG = ' . (YII_DEBUG ? 'true' : 'false') . ';', \yii\web\View::POS_HEAD);
 
+$this->registerJs('window.resizeTo(100, 100);', \yii\web\View::POS_HEAD);
+
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>

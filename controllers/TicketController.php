@@ -58,13 +58,13 @@ class TicketController extends Controller
                     [
                         'allow' => true,
                         'actions' => [
-                            'download', // download/start exam
-                            'download2',    // TODO: placeholder
-                            'md5',      // verify exam file
-                            'config',   // retrieve exam config
-                            'ssh-key',  // get public server ssh key
-                            'notify',   // notify a new client status
-                            'finish',   // finish exam
+                            'download2', // download/start exam (old)
+                            'download',  // request download of exam
+                            'md5',       // verify exam file (old)
+                            'config',    // retrieve exam config
+                            'ssh-key',   // get public server ssh key
+                            'notify',    // notify a new client status
+                            'finish',    // finish exam
                         ],
                         'roles' => ['?', '@'],
                     ],
@@ -469,7 +469,7 @@ class TicketController extends Controller
      * @param string $token
      * @return mixed TODO
      */
-    public function actionDownload2($token = null, $step = 1)
+    public function actionDownload($token = null, $step = 1)
     {
         $this->layout = 'client';
         $model = Ticket::findOne(['token' => $token]);
@@ -525,8 +525,13 @@ class TicketController extends Controller
                 $model->download_progress = 0;
                 $model->save();
 
-                //$model->startDownload();
-                return $this->redirect(['download2', 'token' => $model->token, 'step' => 3]);
+                $count = Daemon::find()->where(['description' => 'Daemon base controller'])->count();
+                if($count == 0){
+                    $daemon = new Daemon();
+                    $daemon->startDaemon();
+                }
+
+                return $this->redirect(['download', 'token' => $model->token, 'step' => 3]);
             }
         } else {
             return $this->render('download', [
@@ -534,58 +539,15 @@ class TicketController extends Controller
             ]);
         }
 
-
-        /*if ($step == 1) {
-            return $this->render('token-request', [
-                'model' => $model,
-            ]);
-        }*/
-
-        /*if (!$model->valid){
-            throw new \yii\web\HttpException(403, 'The provided ticket is invalid.');
-        }
-
-        if (!Yii::$app->file->set($model->exam->file)->exists){
-            throw new \yii\web\HttpException(404, 'The exam file cannot be found.');
-        }
-
-        if($model->download_lock != 0) {
-            throw new \yii\web\HttpException(404, 'Another instance is already running; ' .
-                                                  'multiple downloads are not allowed.');
-        }
-
-        if ($step == 2) {
-            $act = new Activity([
-                'ticket_id' => $model->id,
-                'description' => 'Exam download successfully requested by ' . 
-                $model->ip . ' from ' . ( $model->test_taker ? $model->test_taker :
-                'Ticket with token ' . $model->token ) . '.'
-            ]);
-            $act->save();
-
-            $model->scenario = Ticket::SCENARIO_DOWNLOAD;
-            $model->bootup_lock = 1;
-            $model->download_request = new Expression('NOW()');
-            $model->start = $model->state == 0 ? new Expression('NOW()') : $model->start;
-            $model->ip = Yii::$app->request->userIp;
-            $model->save();
-
-            //$model->startDownload();
-            return $this->redirect(['download2', 'token' => $model->token, 'step' => 3]);
-        } else {
-            return $this->render('download', [
-                'model' => $model,
-            ]);
-        }*/
     }
 
     /**
-     * Downloads an exam file after checking ticket validity.
+     * Downloads an exam file after checking ticket validity. (Old version)
      *
      * @param string $token
      * @return mixed The response object or an array with the error description
      */
-    public function actionDownload($token)
+    public function actionDownload2($token)
     {
 
         $model = Ticket::findOne(['token' => $token]);

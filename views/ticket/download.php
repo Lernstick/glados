@@ -31,14 +31,14 @@ if ($model->client_state == 'setup complete') {
                             <li>
                                 <?= Html::a(
                                     '<span class="glyphicon glyphicon-backward"></span> Back to token submission',
-                                    ['download2', 'token' => $model->token, 'step' => 1],
+                                    ['download', 'token' => $model->token, 'step' => 1],
                                     ['id' => 'backup-now']
                                 ) ?>
                             </li>            
                             <li>
                                 <?= Html::a(
                                     '<span class="glyphicon glyphicon-retweet"></span> Request download again',
-                                    ['download2', 'token' => $model->token, 'step' => 2],
+                                    ['download', 'token' => $model->token, 'step' => 2],
                                     ['id' => 'backup-now']
                                 ) ?>
                             </li>

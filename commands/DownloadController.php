@@ -130,6 +130,7 @@ class DownloadController extends DaemonController implements DaemonInterface
             $this->ticket->save(false);
 
             $cmd = "rsync --checksum --partial --progress "
+                 . "--bwlimit=" . escapeshellarg(\Yii::$app->params['examDownloadBandwith2']) . " "
                  . "--rsh='ssh -i " . \Yii::$app->basePath . "/.ssh/rsa "
                  . " -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' "
                  . escapeshellarg($this->ticket->exam->file) . " "
