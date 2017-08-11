@@ -8,6 +8,7 @@ use app\models\EventItem;
 use app\models\Daemon;
 use app\models\DaemonSearch;
 use yii\db\Expression;
+use yii\helpers\Console;
 
 /**
  * Daemon base controller
@@ -66,6 +67,10 @@ class DaemonController extends Controller
         2 => ['analyze', 'run-once'],
     ];
 
+    public $daemonInfo = 'daemon:0';
+    public $logFile;
+    public $errorLogFile;
+    public $logFileIsWritable = true;
 
     /**
      * @inheritdoc
@@ -104,6 +109,10 @@ class DaemonController extends Controller
         pcntl_signal(SIGHUP,  array(&$this, "signalHandler"));
         pcntl_signal(SIGUSR1, array(&$this, "signalHandler"));
 
+        # determine daemon info, e.g: [daemon:1234], where "daemon" is the prefix of the
+        # controller and 1234 is the pid of the daemon, used to identify lines in the logfile.
+        $this->daemonInfo = end(explode('\\', str_replace('controller', '', strtolower(get_called_class())))) . ':' . getmypid();
+
     }
 
     /**
@@ -113,6 +122,17 @@ class DaemonController extends Controller
      */
     public function start()
     {
+
+        posix_getpwuid($this->uid);
+        if (!is_writable(\Yii::$app->params['daemonLogFilePath'])) {
+            $this->logFileIsWritable = false;
+            $this->logError('Warning: ' . \Yii::$app->params['daemonLogFilePath'] . '/ is '
+                . 'not writable. '
+                . 'Please make sure the directory is writable for the user under which '
+                . 'the web-server is running (' . posix_getpwuid($this->uid)['name'] . '). '
+                . 'This process will continue without logging to the filesystem.',
+                false, false);
+        }   
 
         $this->daemon = new Daemon();
         $this->daemon->description = empty($this->helpSummary) ? basename(get_class($this)) : $this->helpSummary;
@@ -147,6 +167,7 @@ class DaemonController extends Controller
         $eventItem->generate();
 
         $this->_pidfile = fopen('/tmp/user/daemon/' . $this->daemon->pid, 'w');
+        $this->logInfo('Started with pid: ' . $this->daemon->pid);
     }
 
     /**
@@ -191,6 +212,7 @@ class DaemonController extends Controller
         ]);
         $eventItem->generate();
 
+        $this->logInfo('Stopped, cause: ' . $cause);
         #exit;
     }
 
@@ -206,16 +228,51 @@ class DaemonController extends Controller
      * Logs a message to the screen and (if set) to the database
      *
      * @param string $message the message to log
-     * @param bool $state if true log also to the database, defaults to false
+     * @param bool $error if true the line will be printed red, and stored in the 
+     * error log file, defaults to false.
+     * @param bool $toDB if true, log the message to the database, defaults to false
+     * @param bool $toFile if true, log the message to the log file, defaults to true
+     * @param bool $toScreen if true, log the message to the standard output, defaults to true
      * @return void
      */
-    public function log($message, $state = false)
+    public function log($message, $error = false, $toDB = false, $toFile = true, $toScreen = true)
     {
-        echo $message . PHP_EOL;
-        if ($state === true){
+        if ($toScreen === true) {
+            echo $this->ansiFormat($message . PHP_EOL, $error == false ? Console::NORMAL : Console::FG_RED);
+        }
+
+        if ($toDB === true){
             $this->daemon->state = $message;
             $this->daemon->save();
         }
+
+        if ($toFile === true && $this->logFileIsWritable === true) {
+
+            if ($this->logFile === null || $this->errorLogFile === null) {
+                $this->logFile = \Yii::$app->params['daemonLogFilePath'] . '/glados.' . date('Y-m-dO') . '.log';
+                $this->errorLogFile = \Yii::$app->params['daemonLogFilePath'] . '/error.' . date('Y-m-dO') . '.log';
+            }
+
+            $logFile = $error == false ? $this->logFile : $this->errorLogFile;
+            $line = date('r') . ' [' . $this->daemonInfo . ']' . ' - ' . $message . PHP_EOL;
+            file_put_contents($logFile, $line, FILE_APPEND);
+        }
+    }
+
+    /**
+     * @see [[log]]
+     */
+    public function logError($message, $toDB = false, $toFile = true, $toScreen = true)
+    {
+        $this->log($message, true, $toDB, $toFile, $toScreen);
+    }
+
+    /**
+     * @see [[log]]
+     */
+    public function logInfo($message, $toDB = false, $toFile = true, $toScreen = true)
+    {
+        $this->log($message, false, $toDB, $toFile, $toScreen);
     }
 
     /**
@@ -289,21 +346,21 @@ class DaemonController extends Controller
                 sleep(5);
                 $daemon->refresh();
                 if ($oldAlive == $daemon->alive && $daemon->running === true) {
-                    $this->log("daemon " . $daemon->pid . ": no reaction, sending SIGHUP again.", true);
+                    $this->logInfo("daemon " . $daemon->pid . ": no reaction, sending SIGHUP again.", true);
                     $oldAlive = $daemon->alive;
                     $daemon->hup();
                     sleep(30);
                     $daemon->refresh();
                     if ($oldAlive != $daemon->alive) {
-                       $this->log("daemon " . $daemon->pid . ": is alive now.", true);
+                       $this->logInfo("daemon " . $daemon->pid . ": is alive now.", true);
                     } else {
-                        $this->log("daemon " . $daemon->pid . ": no reaction, sending SIGTERM", true);
+                        $this->logError("daemon " . $daemon->pid . ": no reaction, sending SIGTERM", true);
 
                         /* send SIGTERM */
                         $daemon->stop();
                         sleep(10);
                         if ($daemon->refresh() === true && $daemon->running === true) {
-                            $this->log("daemon " . $daemon->pid . ": no reaction, sending SIGKILL", true);
+                            $this->logError("daemon " . $daemon->pid . ": no reaction, sending SIGKILL", true);
 
                             /* send SIGKILL */
                             $daemon->kill();
@@ -381,7 +438,7 @@ class DaemonController extends Controller
 
         if (($workload > \Yii::$app->params['upperBound'] && $count < \Yii::$app->params['maxDaemons']) || $count < \Yii::$app->params['minDaemons']) {
             # start a new daemon
-            $this->log('start new daemon, workload: ' . $workload . '%, count: ' . $count . '.', true);
+            $this->logInfo('Start new daemon, workload: ' . $workload . '%, count: ' . $count . '.', true);
             $daemon = new Daemon();
             $daemon->startDaemon();
         } else if ($workload < \Yii::$app->params['lowerBound'] && $count > \Yii::$app->params['minDaemons']) {
@@ -400,24 +457,24 @@ class DaemonController extends Controller
     {
         switch ($sig) {
             case SIGTERM:
-                $this->log('Caught SIGTERM, stopping...', true);
+                $this->logInfo('Caught SIGTERM, stopping...', true);
                 $this->stop('SIGTERM');
                 die();
             case SIGHUP:
-                $this->log('Caught SIGHUP, I am alive.', true);
+                $this->logInfo('Caught SIGHUP, I am alive.', true, false);
                 $this->daemon->alive = new Expression('NOW()');
                 $this->daemon->save();
                 break;
             case SIGINT:
-                $this->log('Caught SIGINT, stopping...', true);
+                $this->logInfo('Caught SIGINT, stopping...', true);
                 $this->stop('SIGINT');
                 die();
             case SIGQUIT:
-                $this->log('Caught SIGQUIT, stopping...', true);
+                $this->logInfo('Caught SIGQUIT, stopping...', true);
                 $this->stop('SIGINT');
                 die();
             case SIGUSR1:
-                $this->log('Caught SIGUSR1, reloading configuration...', true);
+                $this->logInfo('Caught SIGUSR1, reloading configuration...', true);
                 $this->reloadConfig();
                 break;
             default:

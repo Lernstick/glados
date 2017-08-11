@@ -71,7 +71,7 @@ class DownloadController extends DaemonController implements DaemonInterface
 
             if ($id != '') {
                 if (($this->ticket =  Ticket::findOne(['id' => $id, 'download_lock' => 0, 'bootup_lock' => 1])) == null){
-                    $this->log('Error: ticket with id ' . $id . ' not found, it is already in processing.');
+                    $this->logError('Error: ticket with id ' . $id . ' not found, it is already in processing.');
                     return;
                 }
                 
@@ -79,7 +79,7 @@ class DownloadController extends DaemonController implements DaemonInterface
             }
 
             if ($this->ticket == null) {
-                $this->log('idle', true);
+                $this->logInfo('idle', true, false);
                 do {
                     sleep(rand(5, 10));
                     $this->calcLoad(0);
@@ -104,7 +104,7 @@ class DownloadController extends DaemonController implements DaemonInterface
     {
 
         $this->ticket = $ticket;
-        $this->log('Processing ticket (download): ' .
+        $this->logInfo('Processing ticket (download): ' .
             ( empty($this->ticket->test_taker) ? $this->ticket->token : $this->ticket->test_taker) .
             ' (' . $this->ticket->ip . ')', true);
         $this->ticket->download_state = 'connecting to client';
@@ -137,7 +137,7 @@ class DownloadController extends DaemonController implements DaemonInterface
                  . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . ":" . $this->remotePath . '/squashfs/exam.squashfs') . " "
                  . "| stdbuf -oL tr '\\r' '\\n' ";
 
-            $this->log('Executing rsync: ' . $cmd);
+            $this->logInfo('Executing rsync: ' . $cmd);
 
             $cmd = new ShellCommand($cmd);
             $output = "";
@@ -157,7 +157,7 @@ class DownloadController extends DaemonController implements DaemonInterface
             $retval = $cmd->run();
 
             if($retval != 0){
-                $this->log('rsync failed (retval: ' . $retval . '), output: ' . PHP_EOL . $output);
+                $this->logError('rsync failed (retval: ' . $retval . '), output: ' . PHP_EOL . $output);
 
                 $act = new Activity([
                         'ticket_id' => $this->ticket->id,
@@ -197,7 +197,7 @@ class DownloadController extends DaemonController implements DaemonInterface
                      . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip) . " "
                      . "'bash -s' < " . \Yii::$app->basePath . "/scripts/prepare.sh " . escapeshellarg($this->ticket->token);
 
-                $this->log('Executing ssh: ' . $cmd);
+                $this->logInfo('Executing ssh: ' . $cmd);
 
                 $cmd = new ShellCommand($cmd);
 
@@ -275,7 +275,7 @@ EOF;*/
         for($c=1;$c<=$times;$c++){
             $fp = @fsockopen($this->ticket->ip, $port, $errno, $errstr, 10);
             if (!$fp) {
-                $this->log('Port ' . $port . ' is closed or blocked. (try ' . $c . '/' . $times . ')');
+                $this->logError('Port ' . $port . ' is closed or blocked. (try ' . $c . '/' . $times . ')');
                 sleep(5);
             } else {
                 // port is open and available

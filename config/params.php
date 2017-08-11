@@ -13,8 +13,9 @@ return [
     'examDownloadBandwith' => 10 * 1024 * 1024, // 10MB per second, set 0 for no limit
     'examDownloadBandwith2' => '10m', // 10MB per second, set 0 for no limit
     'concurrentExamDownloads' => 10, // set 0 for no limit
-    'minDaemons' => 3,
+    'minDaemons' => 1,
     'maxDaemons' => 10,
     'upperBound' => 80,
     'lowerBound' => 20,
+    'daemonLogFilePath' => '/var/log/glados',
 ];

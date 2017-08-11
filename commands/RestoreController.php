@@ -64,12 +64,12 @@ class RestoreController extends DaemonController
         $this->cleanup();
 
         if (($this->ticket = Ticket::findOne(['id' => $id])) == null) {
-            $this->log('Error: ticket with id ' . $id . ' not found.');
+            $this->logError('Error: ticket with id ' . $id . ' not found.');
             return;
         }        
 
         if ($this->ticket->restore_lock != 0 || $this->ticket->backup_lock != 0) {
-            $this->log('Error: ticket with id ' . $id . ' is already in processing.');
+            $this->logError('Error: ticket with id ' . $id . ' is already in processing.');
             return;
         }
 
@@ -79,7 +79,7 @@ class RestoreController extends DaemonController
         }*/
         $this->ticket->restore_lock = 1;
         $this->ticket->running_daemon_id = $this->daemon->id;
-        $this->log('Processing ticket: ' .
+        $this->logInfo('Processing ticket: ' .
             ( empty($this->ticket->test_taker) ? $this->ticket->token : $this->ticket->test_taker) .
             ' (' . $this->ticket->ip . ')', true);
         $this->ticket->restore_state = 'connecting to client...';
@@ -119,7 +119,7 @@ class RestoreController extends DaemonController
 
             if($fs->slash($file) === null){
                 $this->ticket->restore_state = 'Restore failed: "' . $file . '": No such file or directory.';
-                $this->log($this->ticket->restore_state);
+                $this->logError($this->ticket->restore_state);
                 $this->ticket->restore_lock = 0;
                 $this->ticket->save(false);
 
@@ -133,7 +133,7 @@ class RestoreController extends DaemonController
             }
         } else {
             $this->ticket->restore_state = 'Nothing to restore.';
-            $this->log($this->ticket->restore_state);
+            $this->logInfo($this->ticket->restore_state);
             $this->ticket->restore_lock = 0;
             $this->ticket->save(false);
             return;
@@ -170,7 +170,7 @@ class RestoreController extends DaemonController
              //. escapeshellarg($this->remoteUser . "@" . $this->ticket->ip) . " "
              //. "mount -o remount,rw / ";
 
-        $this->log('Executing rdiff-backup: ' . $this->_cmd);
+        $this->logInfo('Executing rdiff-backup: ' . $this->_cmd);
 
         $cmd = new ShellCommand($this->_cmd);
 
@@ -190,7 +190,7 @@ class RestoreController extends DaemonController
         if($retval != 0){
             $this->ticket->restore_state = 'rdiff-backup failed (retval: ' . $retval . '), output: '
                  . PHP_EOL . $output;
-            $this->log($this->ticket->restore_state);
+            $this->logError($this->ticket->restore_state);
 
             $act = new Activity([
                     'ticket_id' => $this->ticket->id,
@@ -199,7 +199,7 @@ class RestoreController extends DaemonController
             $act->save();
 
         }else{
-            $this->log($output);
+            $this->logInfo($output);
             $this->ticket->restore_state = 'restore successful.';
             $this->restore->finishedAt = new Expression('NOW()');
             $this->restore->save();
@@ -236,7 +236,7 @@ class RestoreController extends DaemonController
         for($c=1;$c<=$times;$c++){
             $fp = @fsockopen($this->ticket->ip, $port, $errno, $errstr, 10);
             if (!$fp) {
-                $this->log('Port ' . $port . ' is closed or blocked. (try ' . $c . '/' . $times . ')');
+                $this->logError('Port ' . $port . ' is closed or blocked. (try ' . $c . '/' . $times . ')');
                 sleep(5);
             } else {
                 // port is open and available

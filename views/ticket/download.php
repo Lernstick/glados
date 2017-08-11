@@ -160,7 +160,7 @@ if ($model->client_state == 'setup complete') {
                 </div>
 
                 <div class="modal-body">
-                    <p>The system setup is done. You can close the window.</p>
+                    <p>The system setup is done. You can close this window now.</p>
                 </div>
 
             </div>

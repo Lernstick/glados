@@ -106,7 +106,7 @@ class BackupController extends DaemonController implements DaemonInterface
 
             if ($id != '') {
                 if (($this->ticket =  Ticket::findOne(['id' => $id, 'backup_lock' => 0, 'restore_lock' => 0])) == null){
-                    $this->log('Error: ticket with id ' . $id . ' not found, it is already in processing, or locked while booting.');
+                    $this->logError('Error: ticket with id ' . $id . ' not found, it is already in processing, or locked while booting.');
                     return;
                 }
                 
@@ -121,7 +121,7 @@ class BackupController extends DaemonController implements DaemonInterface
             }
 
             if ($this->ticket == null) {
-                $this->log('idle', true);
+                $this->logInfo('idle', true, false);
                 do {
                     sleep(rand(5, 10));
                     $this->calcLoad(0);
@@ -157,12 +157,12 @@ class BackupController extends DaemonController implements DaemonInterface
             #$this->ticket->backup_lock = 0;
             #$this->ticket->save(false);
             $this->unlockItem($this->ticket);
-            $this->log($this->ticket->backup_state);
+            $this->logError($this->ticket->backup_state);
             $this->ticket = null;
             return;
         }
 
-        $this->log('Processing ticket (backup): ' .
+        $this->logInfo('Processing ticket (backup): ' .
             ( empty($this->ticket->test_taker) ? $this->ticket->token : $this->ticket->test_taker) .
             ' (' . $this->ticket->ip . ')', true);
         $this->ticket->backup_state = 'connecting to client...';
@@ -205,7 +205,7 @@ class BackupController extends DaemonController implements DaemonInterface
                  . escapeshellarg(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token . "/") . " "
                  . "";
 
-            $this->log('Executing rdiff-backup: ' . $this->_cmd);
+            $this->logInfo('Executing rdiff-backup: ' . $this->_cmd);
 
             $cmd = new ShellCommand($this->_cmd);
             $output = "";
@@ -222,7 +222,7 @@ class BackupController extends DaemonController implements DaemonInterface
             if($retval != 0){
                 $this->ticket->backup_state = 'rdiff-backup failed (retval: ' . $retval . '), output: '
                      . PHP_EOL . $output;
-                $this->log($this->ticket->backup_state);
+                $this->logError($this->ticket->backup_state);
 
                 $act = new Activity([
                         'ticket_id' => $this->ticket->id,
@@ -234,7 +234,6 @@ class BackupController extends DaemonController implements DaemonInterface
                     $this->ticket->runCommand('echo "backup failed, waiting for next try..." > /home/user/shutdown');
                 }
             }else{
-                //$this->log($output);
                 $this->ticket->backup_last = new Expression('NOW()');
                 $this->ticket->backup_state = 'backup successful.';
                 if ($this->finishBackup == true) {
@@ -244,13 +243,13 @@ class BackupController extends DaemonController implements DaemonInterface
                 # Generate Thumbnails
                 $searchModel = new ScreenshotSearch();
                 $dataProvider = $searchModel->search($this->ticket->token);
-                $this->log("Generating thumbnails...");
+                $this->logInfo("Generating thumbnails...");
                 foreach ($dataProvider->models as $model) {
                     $model->getThumbnail();
                 }
 
                 # Calculate the size
-                $this->log("Calculate backup size...");
+                $this->logInfo("Calculate backup size...");
                 $this->ticket->backup_size = $this->directorySize(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token) - $this->directorySize(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token . '/rdiff-backup-data');
             }
 
@@ -297,7 +296,7 @@ class BackupController extends DaemonController implements DaemonInterface
         for($c=1;$c<=$times;$c++){
             $fp = @fsockopen($this->ticket->ip, $port, $errno, $errstr, 10);
             if (!$fp) {
-                $this->log('Port ' . $port . ' is closed or blocked. (try ' . $c . '/' . $times . ')');
+                $this->logError('Port ' . $port . ' is closed or blocked. (try ' . $c . '/' . $times . ')');
                 sleep(5);
             } else {
                 // port is open and available
