@@ -25,11 +25,48 @@ if($model->file && Yii::$app->file->set($model->file)->exists) {
     $this->registerJs($js);
 }
 
+$js = <<< 'SCRIPT'
+/* To initialize BS3 popovers set this below */
+$(function () { 
+    $("[data-toggle='popover']").popover(); 
+});
+
+$('.hint-block').each(function () {
+    var $hint = $(this);
+    $hint.parent().find('label').addClass('help').popover({
+        html: true,
+        trigger: 'hover',
+        placement: 'right',
+        toggle: 'popover',
+        role: 'button',
+        tabindex: '0',
+        content: $hint.html()
+    });
+});
+
+SCRIPT;
+// Register tooltip/popover initialization javascript
+$this->registerJs($js);
+
 ?>
 
 <div class="exam-form">
 
-    <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
+    <?php $form = ActiveForm::begin([
+        'options' => ['enctype' => 'multipart/form-data'],
+        /*'fieldConfig' => [
+            'template' => "{label}&nbsp;<a tabindex='0' role='button' data-toggle='popover' data-trigger='focus' data-html='true' title='{label}' data-content='{hint}'><span class='glyphicon glyphicon-question-sign'></span></a>\n\n{input}\n{hint}\n{error}",
+            'hintOptions' => [
+                'tag' => 'a',
+                'role' => 'button',
+                'tabindex' => '0',
+                'data-toggle' => 'popover',
+                'data-trigger' => 'focus',
+                'title' => 'title',
+                'data-content' => "And here's some amazing content. It's very engaging. Right",
+            ],
+        ],*/
+    ]); ?>
 
     <div class="row">
         <div class="col-md-6">

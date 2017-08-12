@@ -109,6 +109,16 @@ class Exam extends \yii\db\ActiveRecord
     }
 
     /**
+     * @inheritdoc
+     */
+    public function attributeHints()
+    {
+        return [
+            'name' => 'The name of the exam',
+        ];
+    }
+
+    /**
      * @return boolean
      */
     public function upload()
