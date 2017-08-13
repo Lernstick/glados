@@ -114,7 +114,17 @@ class Exam extends \yii\db\ActiveRecord
     public function attributeHints()
     {
         return [
-            'name' => 'The name of the exam',
+            'name' => 'The name of the exam. This value may not be unique, but it should be used to identify the exam.',
+            'subject' => 'TODO',
+            'time_limit' => 'If this value is set, the exam status view of the student will show time left. This has <b>NO indication</b> elsewhere. It is just of informative purpose. Set to <code>0</code> or leave empty for no time limit.',
+            'grp_netdev' => 'If set, the exam student will be in the network group <code>netdev</code>. Members of this group can manage network interfaces through the network manager and wicd. Notice, that the student will be able to leave the exam network. <b>This should not be set, unless you know what you are doing.</b>',
+            'allow_sudo' => 'If set, the exam student will be able to switch to the root user <b>without password</b>. <b>This should not be set, unless you know what you are doing.</b>',
+            'allow_mount' => 'If set, the exam student will be able to mount external filesystems such as USB Sticks, Harddrives or Smartcard. <b>This should not be set, unless you know what you are doing.</b>',
+            'firewall_off' => 'If set, disables the Firewall and access to all network resourses is given. <b>This should not be set, unless you know what you are doing.</b>',
+            'screenshots' => 'It set, the system will create screenshots every 5 minutes. Those screenshots will appear in the Ticket view under the register "Screenshots". When generating exam results, they can also be included.',
+            'url_whitelist' => 'URLs given in this list will be allowed to visit by the exam student. Notice, due to this date, only URLs starting with <code>http://</code> are supported, therefore <code>https://</code> URLs will be ignored. The URLs should be provided newline separated. Those URLs are allowed even if the Firewall is enabled.',
+            'file' => 'The exam file. TODO',
+            'backup_path' => 'TODO',
         ];
     }
 

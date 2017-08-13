@@ -33,16 +33,24 @@ $(function () {
 
 $('.hint-block').each(function () {
     var $hint = $(this);
-    $hint.parent().find('label').addClass('help').popover({
+
+    $hint.parent().find('label').after('&nbsp<span class="hint glyphicon glyphicon-question-sign"></span>');
+
+    $hint.parent().find('span.hint').popover({
         html: true,
         trigger: 'hover',
         placement: 'right',
+        //title:  $hint.parent().find('label').html(),
+        title:  'Description',
         toggle: 'popover',
-        role: 'button',
-        tabindex: '0',
+        container: 'body',
         content: $hint.html()
     });
+
+    $hint.remove()
 });
+
+
 
 SCRIPT;
 // Register tooltip/popover initialization javascript
@@ -82,8 +90,7 @@ $this->registerJs($js);
         <div class="col-md-6">
             <?= $form->field($model, 'time_limit', [
                 'template' => '{label}<div class="input-group">{input}<span class="input-group-addon" id="basic-addon2">minutes</span></div>{hint}{error}'
-            ])->textInput(['type' => 'number'])->
-            hint('Set "0" or leave empty for no time limit.'); ?>
+            ])->textInput(['type' => 'number']); ?>
         </div>
         <div class="col-md-6">
             <?= $form->field($model, 'backup_path')->textInput(['maxlength' => true]) ?>
@@ -129,6 +136,7 @@ $this->registerJs($js);
                         'autoUpload' => false
                     ],
                 ]);
+                echo Html::activeHint($model, 'file', ['class' => 'hint-block']);
             }
             ?>
 
