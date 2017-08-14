@@ -9,6 +9,34 @@ use kartik\datetime\DateTimePicker;
 /* @var $form yii\widgets\ActiveForm */
 /* @var $searchModel app\models\TicketSearch */
 
+$js = <<< 'SCRIPT'
+/* To initialize BS3 popovers set this below */
+$(function () { 
+    $("[data-toggle='popover']").popover(); 
+});
+
+$('.hint-block').each(function () {
+    var $hint = $(this);
+
+    $hint.parent().find('label').after('&nbsp<a tabindex="0" role="button" class="hint glyphicon glyphicon-question-sign"></a>');
+
+    $hint.parent().find('a.hint').popover({
+        html: true,
+        trigger: 'focus',
+        placement: 'right',
+        //title:  $hint.parent().find('label').html(),
+        title:  'Description',
+        toggle: 'popover',
+        container: 'body',
+        content: $hint.html()
+    });
+
+    $hint.remove()
+});
+SCRIPT;
+// Register tooltip/popover initialization javascript
+$this->registerJs($js);
+
 ?>
 
 <div class="ticket-form">
@@ -54,15 +82,13 @@ use kartik\datetime\DateTimePicker;
         <div class="col-md-6">
             <?= $form->field($model, 'backup_interval', [
                 'template' => '{label}<div class="input-group">{input}<span class="input-group-addon" id="basic-addon2">seconds</span></div>{hint}{error}'
-            ])->textInput(['type' => 'number'])
-            ->hint('Set "0" to disable automatic backup'); ?>
+            ])->textInput(['type' => 'number']); ?>
         </div>
 
         <div class="col-md-6">
             <?= $form->field($model, 'time_limit', [
                 'template' => '{label}<div class="input-group">{input}<span class="input-group-addon" id="basic-addon2">minutes</span></div>{hint}{error}'
-            ])->textInput(['type' => 'number'])
-            ->hint('Leave empty to inherit the value configured in the exam' . (isset($model->exam) ? ' (' . yii::$app->formatter->format($model->exam->time_limit, 'timeLimit') . ')' : '') . '. Set to "0" for no time limit. Notice, this will override the setting in the exam.'); ?>
+            ])->textInput(['type' => 'number']); ?>
         </div>
     </div>
 

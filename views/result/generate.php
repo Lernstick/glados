@@ -10,13 +10,41 @@ use yii\web\JsExpression;
 /* @var $tickets array */
 /* @var $form yii\widgets\ActiveForm */
 
-$this->title = 'Generate Result';
+$this->title = 'Generate Result - ' . $model->exam->name;
 $this->params['breadcrumbs'][] = ['label' => 'Exams', 'url' => ['exam/index']];
+$this->params['breadcrumbs'][] = ['label' => 'Generate Result', 'url' => ['result/generate']];
 $this->params['breadcrumbs'][] = ['label' => $model->exam->name, 'url' => [
     'exam/view',
     'id' => $model->exam->id,
 ]];
-$this->params['breadcrumbs'][] = $this->title;
+
+$js = <<< 'SCRIPT'
+/* To initialize BS3 popovers set this below */
+$(function () { 
+    $("[data-toggle='popover']").popover(); 
+});
+
+$('.hint-block').each(function () {
+    var $hint = $(this);
+
+    $hint.parent().find('label').after('&nbsp<a tabindex="0" role="button" class="hint glyphicon glyphicon-question-sign"></a>');
+
+    $hint.parent().find('a.hint').popover({
+        html: true,
+        trigger: 'focus',
+        placement: 'right',
+        //title:  $hint.parent().find('label').html(),
+        title:  'Description',
+        toggle: 'popover',
+        container: 'body',
+        content: $hint.html()
+    });
+
+    $hint.remove()
+});
+SCRIPT;
+// Register tooltip/popover initialization javascript
+$this->registerJs($js);
 
 $format_pt = <<< SCRIPT
 function format_pt(state) {
@@ -58,6 +86,23 @@ $this->registerJs($format_tk, yii\web\View::POS_HEAD);
     <div class="result-form">
 
         <?php $form = ActiveForm::begin(); ?>
+        <div class="row">
+            <div class="col-md-12">
+                <?= $form->field($ticket, 'exam_id')->dropDownList([
+                    $ticket->exam_id => $ticket->exam->subject . ' - ' . $ticket->exam->name
+                ], [
+                    'prompt' => 'Choose an Exam ...',
+                    'readOnly' => true,
+                    'disabled' => true,
+                ])->hint('Choose the exam to generate results.') ?>
+            </div>
+        </div>
+        <?php ActiveForm::end(); ?>
+
+        <hr>
+
+        <?php $form = ActiveForm::begin(); ?>
+
         <div class="row">
             <div class="col-md-6">
                 <?= $form->field($model, 'path')->textInput() ?>

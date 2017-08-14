@@ -14,6 +14,34 @@ $("form input:text, form textarea").first().focus();
 JS;
 //$this->registerJs($script);
 
+$js = <<< 'SCRIPT'
+/* To initialize BS3 popovers set this below */
+$(function () { 
+    $("[data-toggle='popover']").popover(); 
+});
+
+$('.hint-block').each(function () {
+    var $hint = $(this);
+
+    $hint.parent().find('label').after('&nbsp<a tabindex="0" role="button" class="hint glyphicon glyphicon-question-sign"></a>');
+
+    $hint.parent().find('a.hint').popover({
+        html: true,
+        trigger: 'focus',
+        placement: 'right',
+        //title:  $hint.parent().find('label').html(),
+        title:  'Description',
+        toggle: 'popover',
+        container: 'body',
+        content: $hint.html()
+    });
+
+    $hint.remove()
+});
+SCRIPT;
+// Register tooltip/popover initialization javascript
+$this->registerJs($js);
+
 $this->title = 'Submit Ticket';
 $this->params['breadcrumbs'][] = ['label' => 'Tickets', 'url' => ['index']];
 $this->params['breadcrumbs'][] = 'Submit';
@@ -24,7 +52,7 @@ $this->params['breadcrumbs'][] = 'Submit';
 
     <?php Pjax::begin(); ?>
 
-    <?php $form = ActiveForm::begin(['options' => ['data-pjax' => true], 'action' => Url::to([
+    <?php $form = ActiveForm::begin(['options' => ['data-pjax' => false], 'action' => Url::to([
         'update',
         'mode' => 'submit',
     ])]); ?>

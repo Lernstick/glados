@@ -29,7 +29,7 @@ $model->token = null;
             'class' => 'form-control input-lg',
             'style' => 'text-align:center',
             'placeholder' => 'Insert your token here!',
-        ])->label(false); ?>
+        ])->label(false)->hint(false); ?>
     </div>
     <div class="col-md-3"></div>
 </div>

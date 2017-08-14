@@ -83,47 +83,65 @@ class ResultController extends Controller
      * If creation is successful, the browser will be redirected to the 'exam/view' page.
      * @return mixed
      */
-    public function actionGenerate($exam_id)
+    public function actionGenerate($exam_id = null)
     {
-        $model = new Result([
-            'scenario' => 'generate',
-            'exam_id' => $exam_id,
-        ]);
 
-        $tickets = Ticket::find()->where([ 'and', ['exam_id' => $exam_id], [ 'not', [ "start" => null ] ], [ 'not', [ "end" => null ] ] ])->all();
+        if ($exam_id === null) {
+            $params = Yii::$app->request->get('Ticket');
+            $exam_id = (isset($params['exam_id']) && !empty($params['exam_id'])) ? $params['exam_id'] : null;
 
-        $selectedTickets = array_filter($tickets, function($t){
-            return $t->result == null || !file_exists($t->result);
-        });
+            $model = new Ticket();
+            $searchModel = new TicketSearch();
 
-        $tickets = ArrayHelper::map($tickets, 'id', 'resultName');
-        $selectedTickets = ArrayHelper::map($selectedTickets, 'id', 'resultName');
-        asort($tickets);
-
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-
-            $zipFile = $model->generateZip();
-
-            if ($zipFile === null) {
-                Yii::$app->session->addFlash('danger', 'There are no closed or submitted Tickets to generate a ZIP-File.');
-                return $this->redirect(['exam/view', 'id' => $exam_id]); 
-            } else if ($zipFile === false) {
-                throw new NotFoundHttpException('The ZIP-file could not be generated.');
-            } else {
-                ignore_user_abort(true);
-                \Yii::$app->response->on(\app\components\customResponse::EVENT_AFTER_SEND, function($event) use ($zipFile) {
-                    @unlink($zipFile);
-                }, $model);
-
-                return \Yii::$app->response->sendFile($zipFile, 'result.zip');                
-            }
-
-        } else {
-            return $this->render('generate', [
+            return $this->render('generate_s1', [
                 'model' => $model,
-                'tickets' => $tickets,
-                'selectedTickets' => $selectedTickets,
+                'searchModel' => $searchModel,
             ]);
+        } else {
+            $model = new Result([
+                'scenario' => 'generate',
+                'exam_id' => $exam_id,
+            ]);
+
+            $tickets = Ticket::find()->where([ 'and', ['exam_id' => $exam_id], [ 'not', [ "start" => null ] ], [ 'not', [ "end" => null ] ] ])->all();
+
+            $selectedTickets = array_filter($tickets, function($t){
+                return $t->result == null || !file_exists($t->result);
+            });
+
+            $tickets = ArrayHelper::map($tickets, 'id', 'resultName');
+            $selectedTickets = ArrayHelper::map($selectedTickets, 'id', 'resultName');
+            asort($tickets);
+
+            if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+
+                $zipFile = $model->generateZip();
+
+                if ($zipFile === null) {
+                    Yii::$app->session->addFlash('danger', 'There are no closed or submitted Tickets to generate a ZIP-File.');
+                    return $this->redirect(['exam/view', 'id' => $exam_id]); 
+                } else if ($zipFile === false) {
+                    throw new NotFoundHttpException('The ZIP-file could not be generated.');
+                } else {
+                    ignore_user_abort(true);
+                    \Yii::$app->response->on(\app\components\customResponse::EVENT_AFTER_SEND, function($event) use ($zipFile) {
+                        @unlink($zipFile);
+                    }, $model);
+
+                    return \Yii::$app->response->sendFile($zipFile, 'result.zip');                
+                }
+
+            } else {
+                $ticket = new Ticket();
+                $ticket->exam_id = $exam_id;
+
+                return $this->render('generate', [
+                    'model' => $model,
+                    'tickets' => $tickets,
+                    'selectedTickets' => $selectedTickets,
+                    'ticket' => $ticket,
+                ]);
+            }
         }
     }
 

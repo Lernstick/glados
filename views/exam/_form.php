@@ -34,11 +34,11 @@ $(function () {
 $('.hint-block').each(function () {
     var $hint = $(this);
 
-    $hint.parent().find('label').after('&nbsp<span class="hint glyphicon glyphicon-question-sign"></span>');
+    $hint.parent().find('label').after('&nbsp<a tabindex="0" role="button" class="hint glyphicon glyphicon-question-sign"></a>');
 
-    $hint.parent().find('span.hint').popover({
+    $hint.parent().find('a.hint').popover({
         html: true,
-        trigger: 'hover',
+        trigger: 'focus',
         placement: 'right',
         //title:  $hint.parent().find('label').html(),
         title:  'Description',
@@ -49,9 +49,6 @@ $('.hint-block').each(function () {
 
     $hint.remove()
 });
-
-
-
 SCRIPT;
 // Register tooltip/popover initialization javascript
 $this->registerJs($js);
@@ -62,18 +59,6 @@ $this->registerJs($js);
 
     <?php $form = ActiveForm::begin([
         'options' => ['enctype' => 'multipart/form-data'],
-        /*'fieldConfig' => [
-            'template' => "{label}&nbsp;<a tabindex='0' role='button' data-toggle='popover' data-trigger='focus' data-html='true' title='{label}' data-content='{hint}'><span class='glyphicon glyphicon-question-sign'></span></a>\n\n{input}\n{hint}\n{error}",
-            'hintOptions' => [
-                'tag' => 'a',
-                'role' => 'button',
-                'tabindex' => '0',
-                'data-toggle' => 'popover',
-                'data-trigger' => 'focus',
-                'title' => 'title',
-                'data-content' => "And here's some amazing content. It's very engaging. Right",
-            ],
-        ],*/
     ]); ?>
 
     <div class="row">

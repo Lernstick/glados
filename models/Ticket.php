@@ -141,7 +141,7 @@ class Ticket extends \yii\db\ActiveRecord
             'token' => 'Token',
             'exam.name' => 'Exam Name',
             'exam.subject' => 'Exam Subject',
-            'exam_id' => 'Exam ID',
+            'exam_id' => 'Exam',
             'valid' => 'Valid',
             'validTime' => 'Valid for',
             'start' => 'Started',
@@ -159,6 +159,22 @@ class Ticket extends \yii\db\ActiveRecord
             'backup_state' => 'Backup State',
             'backup_interval' => 'Backup Interval',
             'backup_size' => 'Current Backup Size',
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeHints()
+    {
+        return [
+            'token' => 'This is a randomly generated, unique token to <b>identify the ticket</b>. The test taker has to provide this token to gain access to his exam.',
+            'backup_interval' => 'This value (in seconds) sets the <b>interval to create automatic backups</b> of the exam system. Set to <code>0</code> to disable automatic backup.',
+            'time_limit' => 'This has the same effect as the value in the exam. Leave empty to inherit the value configured in the exam' . (isset($this->exam) ? ' (' . yii::$app->formatter->format($this->exam->time_limit, 'timeLimit') . ')' : '') . '. Set to <code>0</code> for no time limit. Notice, this will <b>override the setting in the exam</b>.',
+            'exam_id' => 'Choose the exam this ticket has to be assigned to in the list below. Notice, only exams assigned to you will be shown underneath.',
+            'test_taker' => 'Here you can <b>assign the ticket to a student</b>. If left empty, this can also be done later (even when the exam has finished), but it is recommended to set this value as soon as possible, to keep track of the tickets. If not set the ticket will be unassigned/anonymous.',
+            'start' => 'The start time of the exam. This should not be manually edited.',
+            'end' => 'The finish time of the exam. This should not be manually edited.',
         ];
     }
 

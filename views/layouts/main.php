@@ -78,6 +78,11 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
                 'visible' => !Yii::$app->user->isGuest,
                 'items' => [
                     [
+                        'label' => 'Create User',
+                        'url' => ['/user/create'],
+                        'visible' => Yii::$app->user->can('user/create'),
+                    ],                
+                    [
                         'label' => 'Create Exam',
                         'url' => ['/exam/create'],
                         'visible' => Yii::$app->user->can('exam/create'),
@@ -93,27 +98,23 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
                         'visible' => Yii::$app->user->can('ticket/update'),                    
                     ],
                     [
-                        'label' => 'Start Backup Daemon',
-                        'url' => ['/daemon/create', 'type' => 'backup'],
+                        'label' => 'Start Daemon',
+                        'url' => ['/daemon/create', 'type' => 'daemon'],
                         'visible' => Yii::$app->user->can('daemon/create'),
                     ],
+
                     [
-                        'label' => 'Start Analyzer Daemon',
-                        'url' => ['/daemon/create', 'type' => 'analyze'],
-                        'visible' => Yii::$app->user->can('daemon/create'),
+                        'label' => 'Generate results',
+                        'url' => ['/result/generate'],
+                        'visible' => Yii::$app->user->can('exam/view'),
                     ],
-                    [
-                        'label' => 'Create User',
-                        'url' => ['/user/create'],
-                        'visible' => Yii::$app->user->can('user/create'),
-                    ],                    
                     [
                         'label' => 'Submit results',
                         'url' => ['/result/submit'],
                         'visible' => Yii::$app->user->can('result/submit'),
-                    ],                     
+                    ],
                 ],
-            ],            
+            ],
             [
                 'label' => 'Activities ' . 
                     ActiveEventField::widget([
