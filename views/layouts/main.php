@@ -88,10 +88,15 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
                         'visible' => Yii::$app->user->can('exam/create'),
                     ],
                     [
-                        'label' => 'Create Ticket',
-                        'url' => ['/ticket/create'],
+                        'label' => 'Create single Ticket',
+                        'url' => ['/ticket/create', 'mode' => 'single'],
                         'visible' => Yii::$app->user->can('ticket/create'),
                     ],
+                    [
+                        'label' => 'Create multiple Tickets',
+                        'url' => ['/ticket/create', 'mode' => 'many', 'type' => 'assigned'],
+                        'visible' => Yii::$app->user->can('ticket/create'),
+                    ],                    
                     [
                         'label' => 'Submit Ticket',
                         'url' => ['/ticket/update', 'mode' => 'submit'],

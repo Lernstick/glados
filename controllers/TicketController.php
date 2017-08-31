@@ -284,38 +284,44 @@ class TicketController extends Controller
                 }
             }else if($type == 'assigned'){
 
-                $model = new \yii\base\DynamicModel(['names', 'class']);
-                $model->addRule(['names'], 'required')
+                $model = new \yii\base\DynamicModel(['names', 'exam_id', 'class']);
+                $model->addRule(['names', 'exam_id'], 'required')
                       ->addRule('names', 'string')
+                      ->addRule('exam_id', 'integer')
                       ->addRule('class', 'string');
+                $model->exam_id = $exam_id;
 
+                if ($model->load(Yii::$app->request->post()) && $model->validate()){
                 
-                $model->load(Yii::$app->request->post());
-                $names = array_unique(array_filter(array_map('trim', preg_split('/\n|\r/', $model->names, -1, PREG_SPLIT_NO_EMPTY))));
+                    $names = array_unique(array_filter(array_map('trim', preg_split('/\n|\r/', $model->names, -1, PREG_SPLIT_NO_EMPTY))));
 
-                $c = 0;
-                foreach($names as $key => $value){
-                    $ticket = new Ticket();
-                    $ticket->exam_id = $exam_id;
-                    $ticket->test_taker = $value;
-                    $ticket->save() ? $c++ : null;
-                }
+                    $c = 0;
+                    foreach($names as $key => $value){
+                        $ticket = new Ticket();
+                        $ticket->exam_id = $model->exam_id;
+                        $ticket->test_taker = $value;
+                        $ticket->save() ? $c++ : null;
+                    }
 
-                if(count($names) != 0) {
-                    if ($c == count($names)) {
-                        Yii::$app->session->addFlash('success', 'You have successfully created ' . $c . ' new Tickets.');
-                        return $this->redirect(['exam/view', 'id' => $exam_id]);
-                    }else{
-                        foreach ($ticket->getErrors() as $attribute => $value){
-                            Yii::$app->session->addFlash('danger', $value);
+                    if(count($names) != 0) {
+                        if ($c == count($names)) {
+                            Yii::$app->session->addFlash('success', 'You have successfully created ' . $c . ' new Tickets.');
+                            return $this->redirect(['exam/view', 'id' => $model->exam_id]);
+                        }else{
+                            foreach ($ticket->getErrors() as $attribute => $value){
+                                Yii::$app->session->addFlash('danger', $value);
+                            }
+                            return $this->redirect(['exam/view', 'id' => $model->exam_id]);
                         }
-                        return $this->redirect(['exam/view', 'id' => $exam_id]);
                     }
                 }
 
+                $searchModel = new TicketSearch();
+
                 return $this->render('create-many', [
                     'model' => $model,
-                    'names' => $names,
+                    #'names' => $names,
+                    'searchModel' => $searchModel,
                 ]);
             }
         }
@@ -457,6 +463,7 @@ class TicketController extends Controller
                     'allow_mount' => boolval($model->exam->{"allow_mount"}),
                     'firewall_off' => boolval($model->exam->{"firewall_off"}),
                     'screenshots' => boolval($model->exam->{"screenshots"}),
+                    'screenshots_interval' => intval($model->exam->{"screenshots_interval"}),
                     'url_whitelist' => implode(PHP_EOL, preg_split("/\r\n|\n|\r/", $model->exam->{"url_whitelist"}, null, PREG_SPLIT_NO_EMPTY)),
                 ]
             ];

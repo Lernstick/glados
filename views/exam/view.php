@@ -117,6 +117,11 @@ $this->params['breadcrumbs'][] = $this->title;
             'allow_mount:boolean',
             'firewall_off:boolean',
             'screenshots:boolean',
+            [
+                'label' => 'Screenshot Interval',
+                'value' => $model->screenshots_interval*60, # in seconds
+                'format' => 'duration'
+            ],
         ],
     ]) ?>
 

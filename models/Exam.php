@@ -61,7 +61,9 @@ class Exam extends \yii\db\ActiveRecord
             }
         });
 
+        # default values
         $this->backup_path = $this->isNewRecord ? '/home/user' : $this->backup_path;
+        $this->screenshots_interval = $this->isNewRecord ? 5 : $this->screenshots_interval;
     }
 
     /**
@@ -70,9 +72,10 @@ class Exam extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'name', 'subject', 'examFile', 'user_id', 'grp_netdev', 'allow_sudo', 'allow_mount', 'firewall_off', 'screenshots', 'url_whitelist', 'time_limit'], 'validateRunningTickets'],
-            [['name', 'subject', 'backup_path'], 'required'],
+            [['id', 'name', 'subject', 'examFile', 'user_id', 'grp_netdev', 'allow_sudo', 'allow_mount', 'firewall_off', 'screenshots', 'screenshots_interval', 'url_whitelist', 'time_limit'], 'validateRunningTickets'],
+            [['name', 'subject', 'backup_path', 'screenshots_interval'], 'required'],
             [['time_limit'], 'integer', 'min' => 0],
+            [['screenshots_interval'], 'integer', 'min' => 1],
             [['user_id'], 'integer'],
             [['name', 'subject'], 'string', 'max' => 52],
             [['file'], 'file', 'skipOnEmpty' => true, 'extensions' => 'squashfs', 'checkExtensionByMimeType' => false],
@@ -121,7 +124,7 @@ class Exam extends \yii\db\ActiveRecord
             'allow_sudo' => 'If set, the exam student will be able to switch to the root user <b>without password</b>. <b>This should not be set, unless you know what you are doing.</b>',
             'allow_mount' => 'If set, the exam student will be able to mount external filesystems such as USB Sticks, Harddrives or Smartcard. <b>This should not be set, unless you know what you are doing.</b>',
             'firewall_off' => 'If set, disables the Firewall and access to all network resourses is given. <b>This should not be set, unless you know what you are doing.</b>',
-            'screenshots' => 'If set, the system will create screenshots every 5 minutes. Those screenshots will appear in the Ticket view under the register "Screenshots". When generating exam results, they can also be included.',
+            'screenshots' => 'If set, the system will <b>create screenshots every x minutes</b>. The Interval can be set in minutes. Those screenshots will appear in the Ticket view under the register "Screenshots". When generating exam results, they can also be included.',
             'url_whitelist' => 'URLs given in this list will be allowed to visit by the exam student during the exam. Notice, due to this date, only URLs starting with <code>http://</code> are supported, therefore <code>https://</code> URLs will be ignored. The URLs should be provided newline separated. Those URLs are allowed even if the Firewall is enabled.',
             'backup_path' => 'Specifies the <b>directory to backup</b> at the target machine. This should be an absolute path. Mostly this is set to <code>/home/user</code>, which is the home directory of the user under which the exam is taken. The exam server will then backup the ALL files in <code>/home/user</code> that have changed since the exam started.',
             'file' => 'The exam is a squashfs file. Squashfs is a highly compressed read-only filesystem for Linux. This file contains all changes made on the original machine to setup the exam. These changes are applied to the exam system as soon as the exam starts.',

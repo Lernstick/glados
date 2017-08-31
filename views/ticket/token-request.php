@@ -39,7 +39,7 @@ use yii\widgets\ActiveForm;
                         'class' => 'form-control',
                         'style' => 'text-align:center',
                         'placeholder' => 'Insert your token here!',
-                    ])->label(false); ?><div class="help-block"></div>
+                    ])->label(false)->hint(false); ?><div class="help-block"></div>
 
                     <?php ActiveForm::end(); ?>
                 </div>       

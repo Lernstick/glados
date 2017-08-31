@@ -88,7 +88,16 @@ $this->registerJs($js);
             <?= $form->field($model, 'allow_sudo')->checkbox() ?>
             <?= $form->field($model, 'allow_mount')->checkbox() ?>
             <?= $form->field($model, 'firewall_off')->checkbox() ?>
-            <?= $form->field($model, 'screenshots')->checkbox() ?>
+            <div class="row">
+                <div class="col-md-6" style="width:auto;">
+                    <?= $form->field($model, 'screenshots')->checkbox() ?>
+                </div>
+                <div class="col-md-6">
+                    <?= $form->field($model, 'screenshots_interval', [
+                        'template' => '{label}<div class="input-group"><div class="input-group-addon">with Interval of</div>{input}<span class="input-group-addon" id="basic-addon2">minutes</span></div>{hint}{error}'
+                    ])->textInput(['type' => 'number'])->label(false); ?>
+                </div>                
+            </div>
         </div>
         <div class="col-md-6">
             <?= $form->field($model, 'url_whitelist')->textarea([

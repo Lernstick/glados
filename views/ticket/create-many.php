@@ -9,6 +9,29 @@ use yii\web\JsExpression;
 /* @var $model app\models\Ticket */
 /* @var $form yii\widgets\ActiveForm */
 
+$js = <<< 'SCRIPT'
+$('.hint-block').each(function () {
+    var $hint = $(this);
+
+    $hint.parent().find('label').after('&nbsp<a tabindex="0" role="button" class="hint glyphicon glyphicon-question-sign"></a>');
+
+    $hint.parent().find('a.hint').popover({
+        html: true,
+        trigger: 'focus',
+        placement: 'right',
+        //title:  $hint.parent().find('label').html(),
+        title:  'Description',
+        toggle: 'popover',
+        container: 'body',
+        content: $hint.html()
+    });
+
+    $hint.remove()
+});
+SCRIPT;
+// Register tooltip/popover initialization javascript
+$this->registerJs($js);
+
 $js = new JsExpression("
     $('textarea').on('input',function () {
         var fullnames = [];
@@ -144,22 +167,31 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div class="ticket-form">
 
-        <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin(); ?>
 
-        <?= $form->field($model, 'class')->textInput([
-            'placeholder' => 'Not yet used...',
-        ]); ?>
+    <div class="row">
+        <div class="col-md-6">
+            <?= $form->field($model, 'exam_id')->dropDownList($searchModel->getExamList(), [ 'prompt' => 'Choose an Exam ...' ])->hint('Choose the exam those tickets has to be assigned to in the list below. Notice, only exams assigned to you will be shown underneath.') ?>
+        </div>
+        <div class="col-md-6">
+            <?= $form->field($model, 'class')->textInput([
+               'placeholder' => 'Not yet used...',
+            ])->hint('This has no function yet.'); ?>
+        </div>
+    </div>
 
     <div class="row">
     <div class="col-sm-6">
 
-
-        <?= Html::label('Names'); ?>
-        <?= Html::textarea('name', '', [
-            'placeholder' => 'Please insert a list of names separated by tab, comma, semicolon, newline or all of them combined...',
-            'class' => 'form-control',
-            'rows' => '18',
-        ]); ?>
+        <div class="form-group">
+            <?= Html::label('Names'); ?>
+            <?= Html::textarea('name', '', [
+                'placeholder' => 'Please insert a list of names separated by tab, comma, semicolon, newline or all of them combined...',
+                'class' => 'form-control',
+                'rows' => '18',
+            ]); ?>
+            <div class="hint-block">Student names can be inserted in various different formats. Blocks from an Excel list can just be copied in this field. If you want to combine different formats, use two newlines inbetween them. The preview proposal to the right shows how the names are parsed.</div>
+        </div>
 
         <?= $form->field($model, 'names')->input([
             'placeholder' => 'Please insert a list of names separated by tab, comma, semicolon, newline or all of them combined...',

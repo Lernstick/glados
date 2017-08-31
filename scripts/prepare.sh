@@ -168,14 +168,15 @@ if [ -n "${actionConfig}" ]; then
   if [ "$(config_value "screenshots")" = "False" ]; then
     chroot /run/initramfs/newroot sed -i 's/BackupScreenshot=.*/BackupScreenshot=false/' /etc/lernstickWelcome 
   else
-    chroot /run/initramfs/newroot sed -i 's/BackupScreenshot=.*/BackupScreenshot=true/' /etc/lernstickWelcome
-    chroot /run/initramfs/newroot sed -i 's/Backup=.*/Backup=true/' /etc/lernstickWelcome
+    # write/append config options
+    bf=$(config_value "screenshots_interval")
+    chroot /run/initramfs/newroot sed -i '/^BackupScreenshot=/{h;s/=.*/=true/};${x;/^$/{s//BackupScreenshot=true/;H};x}' /etc/lernstickWelcome
+    chroot /run/initramfs/newroot sed -i '/^Backup=/{h;s/=.*/=true/};${x;/^$/{s//Backup=true/;H};x}' /etc/lernstickWelcome
+    chroot /run/initramfs/newroot sed -i '/^BackupFrequency=/{h;s/=.*/='$bf'/};${x;/^$/{s//BackupFrequency='$bf'/;H};x}' /etc/lernstickWelcome
   fi
 
   # config->url_whitelist
   if [ "$(config_value "url_whitelist")" != "" ]; then
-    #wh="$(config_value "url_whitelist")"
-    #echo "${wh}" | tee -a /run/initramfs/newroot/etc/lernstick-firewall/url_whitelist
     config_value "url_whitelist" | tee -a /run/initramfs/newroot/etc/lernstick-firewall/url_whitelist
   fi
 
