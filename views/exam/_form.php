@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
+use yii\widgets\Pjax;
 //use kartik\file\FileInput;
 use yii\web\JsExpression;
 use limion\jqueryfileupload\JQueryFileUpload;
@@ -53,6 +54,21 @@ SCRIPT;
 // Register tooltip/popover initialization javascript
 $this->registerJs($js);
 
+$active_tabs = <<<JS
+// Change hash for page-reload
+$('.nav-tabs a').on('shown.bs.tab', function (e) {
+    var prefix = "tab_";
+    window.location.hash = e.target.hash.replace("#", "#" + prefix);
+});
+
+// Javascript to enable link to tab
+$(window).bind('hashchange', function() {
+    var prefix = "tab_";
+    $('.nav-tabs a[href*="' + document.location.hash.replace(prefix, "") + '"]').tab('show');
+}).trigger('hashchange');
+JS;
+$this->registerJs($active_tabs);
+
 ?>
 
 <div class="exam-form">
@@ -81,7 +97,41 @@ $this->registerJs($js);
             <?= $form->field($model, 'backup_path')->textInput(['maxlength' => true]) ?>
         </div>        
     </div>
-    <hr />
+
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#general">
+            <i class="glyphicon glyphicon-home"></i>
+            General
+        </a></li>
+        <li>
+            <?= Html::a(
+                '<i class="glyphicon glyphicon-book"></i> Essay',
+                '#essay',
+                ['data-toggle' => 'tab']
+            ) ?>
+        </li>
+        <?php
+        if(!$model->isNewRecord) {
+            echo "<li>"
+                 . Html::a(
+                    '<i class="glyphicon glyphicon-file"></i> Exam File',
+                    '#file',
+                    ['data-toggle' => 'tab']
+                )
+                . "</li>";
+        }
+        ?>
+    </ul>
+
+    <div class="tab-content">
+
+    <?php Pjax::begin([
+        'id' => 'general',
+        'options' => ['class' => 'tab-pane fade in active'],
+    ]); ?>
+
+    <br>
+    <div class="alert alert-warning" role="alert"><i class="glyphicon glyphicon-warning-sign"></i> Please notice, all these settings will <b>override</b> the settings configured in the <b>exam file</b>!</div>
     <div class="row">
         <div class="col-md-6">
             <?= $form->field($model, 'grp_netdev')->checkbox() ?>
@@ -105,9 +155,26 @@ $this->registerJs($js);
             ]) ?>
         </div>
     </div>
-    <hr />
+    
+    <?php Pjax::end(); ?>
+
+    <?php Pjax::begin([
+        'id' => 'essay',
+        'options' => ['class' => 'tab-pane fade'],
+    ]); ?>
+
+    <br>
+    TODO
+
+    <?php Pjax::end(); ?>
+
+    <?php Pjax::begin([
+        'id' => 'file',
+        'options' => ['class' => 'tab-pane fade'],
+    ]); ?>
 
     <div class="row">
+        <br>
         <div class="col-md-12">
             <?php
             if(!$model->isNewRecord) {
@@ -152,6 +219,11 @@ $this->registerJs($js);
             ?>
         </div>
     </div>
+
+    <?php Pjax::end(); ?>
+
+    </div>
+    <hr>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Next Step' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

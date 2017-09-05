@@ -24,6 +24,15 @@ class Config extends Model
     public $avahiType;
     public $avahiServiceFile;
     public $avahiTxtRecords = [];
+    public $params;
+
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        $this->params = \Yii::$app->params;
+    }
 
     /**
      * @return array customized attribute labels
@@ -35,6 +44,7 @@ class Config extends Model
             'avahiType' => 'Avahi Protocol',
             'avahiServiceFile' => 'Avahi Service File',
             'avahiTxtRecords' => 'Avahi TXT Records',
+            'params' => 'Options',
         ];
     }
 

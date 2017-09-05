@@ -28,6 +28,11 @@ $this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['system']];
             'host',
             'ip',
             'port',
+            [
+                'attribute' => 'params',
+                'format' => 'html',
+                'value' => urldecode(http_build_query($model->params,'','<br>')),
+            ],
         ],
     ]) ?>
 

@@ -181,6 +181,12 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
                 'visible' => Yii::$app->user->can('config/system'),
             ],
 
+            [
+                'label' => 'Help',
+                'url' => ['/howto/index'],
+                'visible' => !Yii::$app->user->isGuest,
+            ],
+
             Yii::$app->user->isGuest ?
                 ['label' => 'Login', 'url' => ['/site/login']] :
                 [
