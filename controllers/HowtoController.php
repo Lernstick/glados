@@ -50,9 +50,13 @@ class HowtoController extends Controller
 
         $model = $this->findModel($id);
 
-        return $this->render('view', [
-            'model' => $model,
-        ]);
+        if (filter_var($model->content, FILTER_VALIDATE_URL)) {
+            return $this->redirect($model->content);
+        } else {
+            return $this->render('view', [
+                'model' => $model,
+            ]);
+        }
     }
 
     /**

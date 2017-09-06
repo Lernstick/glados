@@ -464,6 +464,9 @@ class TicketController extends Controller
                     'firewall_off' => boolval($model->exam->{"firewall_off"}),
                     'screenshots' => boolval($model->exam->{"screenshots"}),
                     'screenshots_interval' => intval($model->exam->{"screenshots_interval"}),
+                    'libre_autosave' => boolval($model->exam->{"libre_autosave"}),
+                    'libre_autosave_interval' => intval($model->exam->{"libre_autosave_interval"}),
+                    'libre_createbackup' => boolval($model->exam->{"libre_createbackup"}),                    
                     'url_whitelist' => implode(PHP_EOL, preg_split("/\r\n|\n|\r/", $model->exam->{"url_whitelist"}, null, PREG_SPLIT_NO_EMPTY)),
                 ]
             ];

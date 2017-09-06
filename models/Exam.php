@@ -64,6 +64,7 @@ class Exam extends \yii\db\ActiveRecord
         # default values
         $this->backup_path = $this->isNewRecord ? '/home/user' : $this->backup_path;
         $this->screenshots_interval = $this->isNewRecord ? 5 : $this->screenshots_interval;
+        $this->libre_autosave_interval = $this->isNewRecord ? 10 : $this->libre_autosave_interval;
     }
 
     /**
@@ -72,10 +73,10 @@ class Exam extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'name', 'subject', 'examFile', 'user_id', 'grp_netdev', 'allow_sudo', 'allow_mount', 'firewall_off', 'screenshots', 'screenshots_interval', 'url_whitelist', 'time_limit'], 'validateRunningTickets'],
-            [['name', 'subject', 'backup_path', 'screenshots_interval'], 'required'],
+            [['id', 'name', 'subject', 'examFile', 'user_id', 'grp_netdev', 'allow_sudo', 'allow_mount', 'firewall_off', 'screenshots', 'screenshots_interval', 'url_whitelist', 'time_limit', 'libre_autosave', 'libre_autosave_interval', 'libre_createbackup'], 'validateRunningTickets'],
+            [['name', 'subject', 'backup_path', 'screenshots_interval', 'libre_autosave_interval'], 'required'],
             [['time_limit'], 'integer', 'min' => 0],
-            [['screenshots_interval'], 'integer', 'min' => 1],
+            [['screenshots_interval', 'libre_autosave_interval'], 'integer', 'min' => 1],
             [['user_id'], 'integer'],
             [['name', 'subject'], 'string', 'max' => 52],
             [['file'], 'file', 'skipOnEmpty' => true, 'extensions' => 'squashfs', 'checkExtensionByMimeType' => false],
@@ -108,6 +109,9 @@ class Exam extends \yii\db\ActiveRecord
             'runningTicketCount' => 'Running Tickets',
             'closedTicketCount' => 'Closed Tickets',
             'submittedTicketCount' => 'Submitted Tickets',
+            'libre_autosave' => 'Libreoffice: Save AutoRecovery information',
+            'libre_autosave_interval' => 'Libreoffice: Save AutoRecovery information interval',
+            'libre_createbackup' => 'Libreoffice: Always create backup copy'
         ];
     }
 

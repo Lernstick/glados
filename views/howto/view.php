@@ -5,8 +5,8 @@
 use yii\helpers\Html;
 use yii\helpers\Markdown;
 
-$this->title = 'Howto';
-$this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['index']];
+$this->title = 'Howto: ' . $model->title;
+$this->params['breadcrumbs'][] = ['label' => 'Howtos', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->title, 'url' => ['view', 'id' => $model->id]];
 ?>
 <div class="howto-view">

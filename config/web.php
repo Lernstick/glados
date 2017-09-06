@@ -30,6 +30,15 @@ $config = [
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
         ],
+        /*'urlManager' => [
+            'enablePrettyUrl' => false,
+            'rules' => [
+                'howtos' => 'howto/index',
+                'howto/<id>' => 'howto/view',
+                'exams' => 'exam/index',
+                'exam/<id:\d+>' => 'exam/view',
+            ]
+        ],*/
         'file' => [
             'class' => 'app\components\File',
         ],

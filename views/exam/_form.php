@@ -105,8 +105,8 @@ $this->registerJs($active_tabs);
         </a></li>
         <li>
             <?= Html::a(
-                '<i class="glyphicon glyphicon-book"></i> Essay',
-                '#essay',
+                '<i class="glyphicon glyphicon-book"></i> Libreoffice',
+                '#libreoffice',
                 ['data-toggle' => 'tab']
             ) ?>
         </li>
@@ -159,12 +159,25 @@ $this->registerJs($active_tabs);
     <?php Pjax::end(); ?>
 
     <?php Pjax::begin([
-        'id' => 'essay',
+        'id' => 'libreoffice',
         'options' => ['class' => 'tab-pane fade'],
     ]); ?>
 
     <br>
-    TODO
+    <div class="alert alert-warning" role="alert"><i class="glyphicon glyphicon-warning-sign"></i> Please notice, all these settings will <b>override</b> the settings configured in the <b>exam file</b>!</div>
+    <div class="row">
+        <div class="col-md-6" style="width:auto;">
+            <?= $form->field($model, 'libre_autosave')->checkbox() ?>
+        </div>
+        <div class="col-md-3">
+            <?= $form->field($model, 'libre_autosave_interval', [
+                'template' => '{label}<div class="input-group"><div class="input-group-addon">with Interval of</div>{input}<span class="input-group-addon" id="basic-addon2">minutes</span></div>{hint}{error}'
+            ])->textInput(['type' => 'number'])->label(false); ?>
+        </div>
+        <div class="col-md-6">
+            <?= $form->field($model, 'libre_createbackup')->checkbox() ?>
+        </div>
+    </div>
 
     <?php Pjax::end(); ?>
 

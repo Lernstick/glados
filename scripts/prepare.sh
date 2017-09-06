@@ -180,6 +180,52 @@ if [ -n "${actionConfig}" ]; then
     config_value "url_whitelist" | tee -a /run/initramfs/newroot/etc/lernstick-firewall/url_whitelist
   fi
 
+  # config->libre_autosave
+  if [ "$(config_value "libre_autosave")" = "True" ]; then
+    libre_autosave="true"
+  else
+    libre_autosave="false"
+  fi
+
+  # config->libre_createbackup
+  if [ "$(config_value "libre_createbackup")" = "True" ]; then
+    libre_createbackup="true"
+  else
+    libre_createbackup="false"
+  fi
+
+  # config->libre_autosave_interval
+  if [ "$(config_value "libre_autosave_interval")" = "" ]; then
+    libre_autosave_interval="10"
+  else
+    libre_autosave_interval="$(config_value "libre_autosave_interval")"
+  fi
+
+  registry='<item oor:path="/org.openoffice.Office.Recovery/AutoSave"><prop oor:name="TimeIntervall" oor:op="fuse"><value>'${libre_autosave_interval}'</value></prop></item>
+<item oor:path="/org.openoffice.Office.Recovery/AutoSave"><prop oor:name="Enabled" oor:op="fuse"><value>'${libre_autosave}'</value></prop></item>
+<item oor:path="/org.openoffice.Office.Common/Save/Document"><prop oor:name="CreateBackup" oor:op="fuse"><value>'${libre_createbackup}'</value></prop></item>
+</oor:items>'
+
+  # if the file exists, remove the xml entries
+  if [ -e '/run/initramfs/newroot/home/user/.config/libreoffice/4/user/registrymodifications.xcu' ]; then
+    sed -i -e '\#org.openoffice.Office.Recovery/AutoSave.*TimeIntervall#d' \
+      -e '\#org.openoffice.Office.Recovery/AutoSave.*Enabled#d' \
+      -e '\#org.openoffice.Office.Common/Save/Document.*CreateBackup#d' \
+      -e '\#</oor:items>#d' \
+      /run/initramfs/newroot/home/user/.config/libreoffice/4/user/registrymodifications.xcu
+  else
+    # else create the needed config directory
+    mkdir -p /run/initramfs/newroot/home/user/.config/libreoffice/4/user
+    registry='<?xml version="1.0" encoding="UTF-8"?>
+<oor:items xmlns:oor="http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+'${registry}
+  fi
+
+  # append the xml entries to the file
+  echo "${registry}" >> /run/initramfs/newroot/home/user/.config/libreoffice/4/user/registrymodifications.xcu
+
+  # fix the permissions
+  chown -R user:user /run/initramfs/newroot/home/user/.config
 
 else
   # these are the default values, if the exam server does not provide a config file and the exam file has not configured them

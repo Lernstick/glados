@@ -125,6 +125,20 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]) ?>
 
+    <?= DetailView::widget([
+        'model' => $model,
+        'template' => '<tr><th{captionOptions}>{value}</th><td{contentOptions}>{label}</td></tr>',
+        'attributes' => [
+            'libre_autosave:boolean',
+            [
+                'label' => 'Libreoffice Autosave Interval',
+                'value' => $model->libre_autosave_interval*60, # in seconds
+                'format' => 'duration'
+            ],
+            'libre_createbackup:boolean',
+        ],
+    ]) ?>
+
     <?= ListView::widget([
         'dataProvider' => $urlWhitelistDataProvider,
         #'options' => [ 'tag' => 'table', 'class' => 'table table-bordered table-hover'],

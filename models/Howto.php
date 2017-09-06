@@ -27,7 +27,7 @@ class Howto extends Model
         $models = [];
 
         if (file_exists($dir)) {
-            $files = scandir($dir, SCANDIR_SORT_DESCENDING);
+            $files = scandir($dir, SCANDIR_SORT_ASCENDING);
             foreach ($files as $file) {
                 if (preg_match('/^(.*)\.md$/', $file, $matches)) {
                     if (isset($matches[1])) {
