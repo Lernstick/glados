@@ -69,6 +69,18 @@ $(window).bind('hashchange', function() {
 JS;
 $this->registerJs($active_tabs);
 
+
+$js = <<< 'SCRIPT'
+$("input[name='Exam[libre_autosave]']").click(function(){
+    if ($(this).is(':checked')) {                    
+        $('#exam-libre_autosave_interval').attr("disabled", false);               
+    } else if ($(this).not(':checked')) {                          
+        $('#exam-libre_autosave_interval').attr("disabled", true);                            
+    }
+});
+SCRIPT;
+$this->registerJs($js);
+
 ?>
 
 <div class="exam-form">
@@ -110,17 +122,6 @@ $this->registerJs($active_tabs);
                 ['data-toggle' => 'tab']
             ) ?>
         </li>
-        <?php
-        if(!$model->isNewRecord) {
-            echo "<li>"
-                 . Html::a(
-                    '<i class="glyphicon glyphicon-file"></i> Exam File',
-                    '#file',
-                    ['data-toggle' => 'tab']
-                )
-                . "</li>";
-        }
-        ?>
     </ul>
 
     <div class="tab-content">
@@ -172,7 +173,7 @@ $this->registerJs($active_tabs);
         <div class="col-md-3">
             <?= $form->field($model, 'libre_autosave_interval', [
                 'template' => '{label}<div class="input-group"><div class="input-group-addon">with Interval of</div>{input}<span class="input-group-addon" id="basic-addon2">minutes</span></div>{hint}{error}'
-            ])->textInput(['type' => 'number'])->label(false); ?>
+            ])->textInput(['type' => 'number', 'disabled' => !$model->libre_autosave])->label(false); ?>
         </div>
         <div class="col-md-6">
             <?= $form->field($model, 'libre_createbackup')->checkbox() ?>
@@ -181,18 +182,13 @@ $this->registerJs($active_tabs);
 
     <?php Pjax::end(); ?>
 
-    <?php Pjax::begin([
-        'id' => 'file',
-        'options' => ['class' => 'tab-pane fade'],
-    ]); ?>
-
+    <hr>
     <div class="row">
-        <br>
         <div class="col-md-12">
             <?php
             if(!$model->isNewRecord) {
 
-                echo Html::label('File');
+                echo Html::activeLabel($model, 'file');
                 echo JQueryFileUpload::widget([
                     'model' => $model,
                     'name' => 'file',
@@ -205,7 +201,7 @@ $this->registerJs($active_tabs);
                     'clientOptions' => [
                         'maxFileSize' => 4000000000,
                         'dataType' => 'json',
-                        'acceptFileTypes' => new yii\web\JsExpression('/(\.|\/)(squashfs)$/i'),
+                        'acceptFileTypes' => new yii\web\JsExpression('/(\.|\/)(squashfs|zip)$/i'),
                         'maxNumberOfFiles' => 1,
                         'autoUpload' => false
                     ],
@@ -232,8 +228,6 @@ $this->registerJs($active_tabs);
             ?>
         </div>
     </div>
-
-    <?php Pjax::end(); ?>
 
     </div>
     <hr>

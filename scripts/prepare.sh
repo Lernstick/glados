@@ -117,14 +117,22 @@ chown user:user "/run/initramfs/backup/home/user/Schreibtisch/finish_exam.deskto
 # login delays of up to 20 seconds. Changing it to .alocal is a workaround. Better is not to use mDNS in an exam.
 sed 's/#domain-name=local/domain-name=.alocal/' /etc/avahi/avahi-daemon.conf >/run/initramfs/backup/etc/avahi/avahi-daemon.conf
 
-# apply specific config if available
+# mount/prepare the root filesystem
 mount /lib/live/mount/medium/live/filesystem.squashfs /run/initramfs/base
-mount /run/initramfs/squashfs/exam.squashfs /run/initramfs/exam
+if [ -e /run/initramfs/squashfs/exam.squashfs ]; then
+  mount /run/initramfs/squashfs/exam.squashfs /run/initramfs/exam
+fi
+if [ -e /run/initramfs/squashfs/exam.zip ]; then
+  unzip -o /run/initramfs/squashfs/exam.zip -d /run/initramfs/exam
+  chown -R 1000:1000 /run/initramfs/exam/home/user 2>/dev/null
+  chown -R 0:0 /run/initramfs/exam/home/user/Screenshots 2>/dev/null
+fi
 mount -t aufs -o br=/run/initramfs/backup=rw:/run/initramfs/exam=ro:/run/initramfs/base=ro none "/run/initramfs/newroot"
 
 # remove policykit action for lernstick welcome application
 rm -f /run/initramfs/newroot/usr/share/polkit-1/actions/ch.lernstick.welcome.policy
 
+# apply specific config if available
 if [ -n "${actionConfig}" ]; then
   # get the config
   config="$(${wget} ${wgetOptions} -qO- "${urlConfig}")"

@@ -129,12 +129,13 @@ class DownloadController extends DaemonController implements DaemonInterface
             $this->ticket->runCommand('echo "download in progress" > ' . $this->remotePath . '/state');
             $this->ticket->save(false);
 
+            $ext = pathinfo($this->ticket->exam->file)['extension'];
             $cmd = "rsync --checksum --partial --progress "
                  . "--bwlimit=" . escapeshellarg(\Yii::$app->params['examDownloadBandwith2']) . " "
                  . "--rsh='ssh -i " . \Yii::$app->basePath . "/.ssh/rsa "
                  . " -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' "
                  . escapeshellarg($this->ticket->exam->file) . " "
-                 . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . ":" . $this->remotePath . '/squashfs/exam.squashfs') . " "
+                 . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . ":" . $this->remotePath . '/squashfs/exam.' . $ext) . " "
                  . "| stdbuf -oL tr '\\r' '\\n' ";
 
             $this->logInfo('Executing rsync: ' . $cmd);

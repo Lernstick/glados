@@ -79,7 +79,7 @@ class Exam extends \yii\db\ActiveRecord
             [['screenshots_interval', 'libre_autosave_interval'], 'integer', 'min' => 1],
             [['user_id'], 'integer'],
             [['name', 'subject'], 'string', 'max' => 52],
-            [['file'], 'file', 'skipOnEmpty' => true, 'extensions' => 'squashfs', 'checkExtensionByMimeType' => false],
+            [['file'], 'file', 'skipOnEmpty' => true, 'extensions' => ['squashfs', 'zip'], 'checkExtensionByMimeType' => false],
         ];
     }
 
@@ -92,7 +92,7 @@ class Exam extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Name',
             'subject' => 'Subject',
-            'file' => 'File',
+            'file' => 'Image File',
             'md5' => 'MD5 Checksum',
             'file_list' => 'File List',
             'user_id' => 'User ID',
@@ -131,7 +131,7 @@ class Exam extends \yii\db\ActiveRecord
             'screenshots' => 'If set, the system will <b>create screenshots every x minutes</b>. The Interval can be set in minutes. Those screenshots will appear in the Ticket view under the register "Screenshots". When generating exam results, they can also be included.',
             'url_whitelist' => 'URLs given in this list will be allowed to visit by the exam student during the exam. Notice, due to this date, only URLs starting with <code>http://</code> are supported, therefore <code>https://</code> URLs will be ignored. The URLs should be provided newline separated. The provided URLs are allowed even if the Firewall is enabled.',
             'backup_path' => 'Specifies the <b>directory to backup</b> at the target machine. This should be an absolute path. Mostly this is set to <code>/home/user</code>, which is the home directory of the user under which the exam is taken. The exam server will then backup the ALL files in <code>/home/user</code> that have changed since the exam started.',
-            'file' => 'The exam is a squashfs file. Squashfs is a highly compressed read-only filesystem for Linux. This file contains all changes made on the original machine to setup the exam. These changes are applied to the exam system as soon as the exam starts.',
+            'file' => 'Use a squashfs Filesystem for the exam. Squashfs is a highly compressed read-only filesystem for Linux. This file contains all files, settings and applications for the exam (all changes made on the original machine). These changes are applied to the exam system as soon as the exam starts.',
         ];
     }
 
@@ -254,7 +254,7 @@ class Exam extends \yii\db\ActiveRecord
      */
     public function getFileConsistency()
     {
-        return (strpos($this->fileInfo, 'Squashfs') === false ? false : true);
+        return (strpos($this->fileInfo, 'Squashfs') !== false || strpos($this->fileInfo, 'Zip') !== false ? true : false);
     }
 
     /**
