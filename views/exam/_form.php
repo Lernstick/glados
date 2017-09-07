@@ -78,6 +78,13 @@ $("input[name='Exam[libre_autosave]']").click(function(){
         $('#exam-libre_autosave_interval').attr("disabled", true);                            
     }
 });
+$("input[name='Exam[screenshots]']").click(function(){
+    if ($(this).is(':checked')) {                    
+        $('#exam-screenshots_interval').attr("disabled", false);               
+    } else if ($(this).not(':checked')) {                          
+        $('#exam-screenshots_interval').attr("disabled", true);                            
+    }
+});
 SCRIPT;
 $this->registerJs($js);
 
@@ -146,7 +153,7 @@ $this->registerJs($js);
                 <div class="col-md-6">
                     <?= $form->field($model, 'screenshots_interval', [
                         'template' => '{label}<div class="input-group"><div class="input-group-addon">with Interval of</div>{input}<span class="input-group-addon" id="basic-addon2">minutes</span></div>{hint}{error}'
-                    ])->textInput(['type' => 'number'])->label(false); ?>
+                    ])->textInput(['type' => 'number', 'disabled' => !$model->screenshots])->label(false); ?>
                 </div>                
             </div>
         </div>
@@ -207,6 +214,7 @@ $this->registerJs($js);
                     ],
                 ]);
                 echo Html::activeHint($model, 'file', ['class' => 'hint-block']);
+                echo "<hr>";
             }
             ?>
 
@@ -230,7 +238,6 @@ $this->registerJs($js);
     </div>
 
     </div>
-    <hr>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Next Step' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
