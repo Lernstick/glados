@@ -144,7 +144,7 @@ if ($model->client_state == 'setup complete') {
         'event' => 'ticket/' . $model->id,
         'jsonSelector' => 'setup_complete',
         'jsHandler' => 'function(d, s){
-            if (d == true && YII_DEBUG) {
+            if (d == true) {
                 $("#dialog").modal("show");
             }
         }'        
