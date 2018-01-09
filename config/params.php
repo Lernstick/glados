@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'version' => '1.0.2',
+    'version' => '1.0.3',
     'adminEmail' => 'admin@example.com',
     'itemsPerPage' => 10,
     'ticketExpireTime' => 900,
