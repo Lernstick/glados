@@ -90,12 +90,12 @@ Create an Avahi service file (`/etc/avahi/services/glados.service`) with content
   <service>
    <type>_http._tcp</type>
    <port>80</port>
-   <txt-record>actionDownload='glados/index.php?r=ticket/download&amp;token={token}'</txt-record>
-   <txt-record>actionFinish='glados/index.php?r=ticket/finish&amp;token={token}'</txt-record>
-   <txt-record>actionNotify='glados/index.php?r=ticket/notify&amp;token={token}&amp;state={state}'</txt-record>
-   <txt-record>actionSSHKey='glados/index.php?r=ticket/ssh-key'</txt-record>
-   <txt-record>actionMd5='glados/index.php?r=ticket/md5&amp;token={token}'</txt-record>
-   <txt-record>actionConfig='glados/index.php?r=ticket/config&amp;token={token}'</txt-record>
+   <txt-record>actionDownload='glados/index.php/ticket/download/{token}'</txt-record>
+   <txt-record>actionFinish='glados/index.php/ticket/finish/{token}'</txt-record>
+   <txt-record>actionNotify='glados/index.php/ticket/notify/{token}?state={state}'</txt-record>
+   <txt-record>actionSSHKey='glados/index.php/ticket/ssh-key'</txt-record>
+   <txt-record>actionMd5='glados/index.php/ticket/md5/{token}'</txt-record>
+   <txt-record>actionConfig='glados/index.php/ticket/config/{token}'</txt-record>
   </service>
 </service-group>
 ```

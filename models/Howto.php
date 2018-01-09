@@ -31,7 +31,7 @@ class Howto extends Model
             foreach ($files as $file) {
                 if (preg_match('/^(.*)\.md$/', $file, $matches)) {
                     if (isset($matches[1])) {
-                        $models[] = Howto::findOne($matches[1]);
+                        $models[] = Howto::findOne($matches[1] . '.md');
                     }
                 }
             }
@@ -48,7 +48,7 @@ class Howto extends Model
      */
     public function findOne($id)
     {
-        $file = Yii::getAlias('@app') . '/howtos/' . str_replace('/', '', $id) . '.md';
+        $file = Yii::getAlias('@app') . '/howtos/' . str_replace('/', '', $id);
 
         if(file_exists($file) === false){
             return null;
