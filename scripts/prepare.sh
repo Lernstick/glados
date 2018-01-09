@@ -263,11 +263,22 @@ echo "${gladosProto}://${gladosIp}:${gladosPort}" >>/run/initramfs/backup/etc/le
 echo "tcp ${gladosIp} ${gladosPort}" >>/run/initramfs/backup/etc/lernstick-firewall/net_whitelist
 sort -u -o /run/initramfs/backup/etc/lernstick-firewall/url_whitelist /run/initramfs/backup/etc/lernstick-firewall/url_whitelist
 
-screen -d -m bash -c '
-  zenity="/usr/bin/zenity"
-  DEBUG=true
-  export DISPLAY=:0
+# grab all UUIDs from physical ethernet connection to bring them down before rebooting the
+# system. This forces network-manager to reconnect each of them. This solves a problem when
+# the system recieves an IP-address at bootup (by ipconfig) and NM handles it as "manual" IP.
+# We don't loose DNS servers and the DHCP lease will be renewed.
+eths=$(LC_ALL=C nmcli -t -f state,type,con-uuid d status | awk -F: '$1=="connected"&&$2=="ethernet"{print $3}')
 
+# export variables needed in the screen underneath
+export eths
+export zenity
+export wget
+export wgetOptions
+export DEBUG
+export DISPLAY
+export urlNotify
+
+screen -d -m bash -c '
   # transmit state to server
   function clientState()
   {
@@ -280,6 +291,7 @@ screen -d -m bash -c '
   if $DEBUG; then
     if ${zenity} --question --title="Continue" --text="The system setup is done. Continue?"; then
       clientState "continue bootup"
+      echo "${eths}" | LC_ALL=C xargs -t -I{} nmcli connection down uuid "{}"
       halt
     fi
   else
@@ -290,6 +302,7 @@ screen -d -m bash -c '
       sleep 1
     done | ${zenity} --progress --no-cancel --title="Continue" --text="The system will continue in 10 seconds" --percentage=0 --auto-close
     clientState "continue bootup"
+    echo "${eths}" | LC_ALL=C xargs -t -I{} nmcli connection down uuid "{}"
     halt
   fi
 '
