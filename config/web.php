@@ -39,7 +39,7 @@ $config = [
                 '<controller>/<id:\d+>' => '<controller>/view',
                 '<controller>/<action:(update|delete|backup|restore|stop|kill)>/<id:\d+>' => '<controller>/<action>',
                 'howto/<id>' => 'howto/view',
-                'ticket/<action:(config|download|finish|notify|md5)>/<token:\w+\d+>' => 'ticket/<action>',
+                'ticket/<action:(config|download|finish|notify|md5)>/<token:.*>' => 'ticket/<action>',
             ]
         ],
         'file' => [
@@ -74,6 +74,7 @@ $config = [
         'db' => require(__DIR__ . '/db.php'),
     ],
     'params' => $params,
+    'runtimePath' => '/var/lib/glados/runtime',
 ];
 
 if (YII_ENV_DEV) {

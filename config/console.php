@@ -40,4 +40,5 @@ return [
         'db' => $db,
     ],
     'params' => $params,
+    'runtimePath' => '/var/lib/glados/runtime',
 ];
