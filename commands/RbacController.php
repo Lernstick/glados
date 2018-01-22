@@ -52,19 +52,19 @@ class RbacController extends Controller
         $indexAllExam->description = 'Index all exams';
         $auth->add($indexAllExam);
 
-        $submitResult = $auth->createPermission('result/submit');
+        /*$submitResult = $auth->createPermission('result/submit');
         $submitResult->description = 'Submit results of own exams';
         $auth->add($submitResult);
         $submitAllResult = $auth->createPermission('result/submit/all');
         $submitAllResult->description = 'Submit results of all exams';
-        $auth->add($submitAllResult);
+        $auth->add($submitAllResult);*/
 
         /* Inheritation */
         $auth->addChild($indexAllExam, $indexExam);
         $auth->addChild($updateAllExam, $updateExam);
         $auth->addChild($viewAllExam, $viewExam);
         $auth->addChild($deleteAllExam, $deleteExam);
-        $auth->addChild($submitAllResult, $submitResult);
+        //$auth->addChild($submitAllResult, $submitResult);
 
         /**
         * Ticket permissions
@@ -232,7 +232,7 @@ class RbacController extends Controller
         $auth->addChild($teacher, $viewExam);
         $auth->addChild($teacher, $updateExam);
         $auth->addChild($teacher, $deleteExam);
-        $auth->addChild($teacher, $submitResult);
+        //$auth->addChild($teacher, $submitResult);
 
         $auth->addChild($teacher, $createTicket);
         $auth->addChild($teacher, $indexTicket);
@@ -263,7 +263,7 @@ class RbacController extends Controller
         $auth->addChild($admin, $viewAllExam);
         $auth->addChild($admin, $updateAllExam);
         $auth->addChild($admin, $deleteAllExam);
-        $auth->addChild($admin, $submitAllResult);
+        //$auth->addChild($admin, $submitAllResult);
 
         $auth->addChild($admin, $createAllTicket);
         $auth->addChild($admin, $indexAllTicket);

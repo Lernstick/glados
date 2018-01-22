@@ -49,8 +49,8 @@ class m160623_095016_initial extends Migration
                 'username' => $this->string(40)->notNull()->unique(),
                 'password' => $this->string(60)->notNull(),
                 'last_visited' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP') . ' ON UPDATE CURRENT_TIMESTAMP',
-                'activities_last_visited' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
-                //'activities_last_visited' => $this->timestamp(),
+                //'activities_last_visited' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
+                'activities_last_visited' => $this->timestamp(),
                 'change_password' => $this->boolean()->notNull()->defaultValue(0)
             ], $this->tableOptions);
 
