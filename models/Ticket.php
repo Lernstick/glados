@@ -563,7 +563,7 @@ class Ticket extends \yii\db\ActiveRecord
     {
 
         $tmp = sys_get_temp_dir() . '/cmd.' . generate_uuid();
-        $cmd = "ssh -i " . \Yii::$app->basePath . "/.ssh/rsa "
+        $cmd = "ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
              . "-o UserKnownHostsFile=/dev/null "
              . "-o StrictHostKeyChecking=no "
              . "-o ConnectTimeout=" . $timeout . " "

@@ -132,7 +132,7 @@ class DownloadController extends DaemonController implements DaemonInterface
             $ext = pathinfo($this->ticket->exam->file)['extension'];
             $cmd = "rsync --checksum --partial --progress "
                  . "--bwlimit=" . escapeshellarg(\Yii::$app->params['examDownloadBandwith2']) . " "
-                 . "--rsh='ssh -i " . \Yii::$app->basePath . "/.ssh/rsa "
+                 . "--rsh='ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
                  . " -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' "
                  . escapeshellarg($this->ticket->exam->file) . " "
                  . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . ":" . $this->remotePath . '/squashfs/exam.' . $ext) . " "
@@ -193,7 +193,7 @@ class DownloadController extends DaemonController implements DaemonInterface
                 $this->ticket->client_state = "preparing system";
                 $this->ticket->save();
 
-                $cmd = "ssh -i " . \Yii::$app->basePath . "/.ssh/rsa -o "
+                $cmd = "ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa -o "
                      . "UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "
                      . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip) . " "
                      . "'bash -s' < " . \Yii::$app->basePath . "/scripts/prepare.sh " . escapeshellarg($this->ticket->token);

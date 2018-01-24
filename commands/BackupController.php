@@ -197,7 +197,7 @@ class BackupController extends DaemonController implements DaemonInterface
                 return (strpos($v, $this->remotePath) === 0);
             });
 
-            $this->_cmd = "rdiff-backup --remote-schema 'ssh -i " . \Yii::$app->basePath . "/.ssh/rsa "
+            $this->_cmd = "rdiff-backup --remote-schema 'ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
                  . "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -C %s rdiff-backup --server' "
                  . "-v5 --print-statistics "
                  . ' --exclude ' . implode($exclude, ' --exclude ') . " "                     

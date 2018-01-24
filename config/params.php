@@ -10,6 +10,7 @@ return [
     'backupPath' => '/var/lib/glados/backups/',
     'resultPath' => '/var/lib/glados/results/',
     'tmpPath' => '/var/lib/glados/tmp/',
+    'dotSSH' => '/var/lib/glados/.ssh/',
     'examDownloadBandwith' => 10 * 1024 * 1024, // 10MB per second, set 0 for no limit
     'examDownloadBandwith2' => '10m', // 10MB per second, set 0 for no limit
     'concurrentExamDownloads' => 10, // set 0 for no limit

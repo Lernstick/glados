@@ -835,7 +835,7 @@ class TicketController extends Controller
 
         \Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
 
-        $dotSSH = \Yii::$app->basePath . '/' . '.ssh';
+        $dotSSH = \Yii::$app->params['dotSSH'];
         $pubKeyFile = $dotSSH . '/' . 'rsa.pub';
         $privKeyFile = $dotSSH . '/' . 'rsa';
         if (!file_exists($dotSSH)) {
