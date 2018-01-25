@@ -41,13 +41,26 @@ class HowtoController extends Controller
     }
 
     /**
+     * Displays a single image.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionImg($id)
+    {
+        if (strpos($id, '/') === false) {
+            return \Yii::$app->response->sendFile(\Yii::$app->basePath . '/howtos/img/' . $id);
+        } else {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+    }
+
+    /**
      * Displays a single Howto model.
      * @param integer $id
      * @return mixed
      */
     public function actionView($id)
     {
-
         $model = $this->findModel($id);
 
         if (filter_var($model->content, FILTER_VALIDATE_URL)) {
