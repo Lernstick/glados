@@ -94,7 +94,7 @@ $this->registerJs($format_tk, yii\web\View::POS_HEAD);
                     'prompt' => 'Choose an Exam ...',
                     'readOnly' => true,
                     'disabled' => true,
-                ])->hint('Choose the exam to generate results.') ?>
+                ])->hint('Choose the exam to generate results from.') ?>
             </div>
         </div>
         <?php ActiveForm::end(); ?>

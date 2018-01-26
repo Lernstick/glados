@@ -21,6 +21,7 @@ The corresponding zip-file would look like this:
 If your want to put a file at the Desktop, then drop the file in your zip file to the location `/home/user/Schreibtisch/`. The testee will see all files in his/her exam under the directory where it was dropped in the zip-file. The above zip-file will look as the pictures below in an exam.
 
 ![Example Desktop 1](img/desktop.jpg)
+
 ![Example Desktop 2](img/desktop2.jpg)
 
 It is highly recommended to create a directory like `Hand-in` at the Desktop and advice the testee to put all results in this directory. Even though it might not be necessary, it will be easier to collect the results after the exam is done.

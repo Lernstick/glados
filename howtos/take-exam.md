@@ -10,7 +10,7 @@ As soon as the system has started and you have a working network connection, you
 
 ![Search Exam Server](img/search_exam_server.jpg)
 
-If the search was successful, you will be prompted for approval. If you approve, you will be prompted for a token. This is the token from the exam sheet (See [Create a ticket](create-ticket.md)).
+If the search was successful, you will be prompted for approval. If you approve, you will be prompted for a token. This is the token from the exam sheet (See [Create a single ticket](create-single-ticket.md)).
 
 ![Insert token](img/token.png)
 
@@ -28,4 +28,6 @@ To finish the exam double-click the `Finish exam` icon on the desktop. You shoul
 
 ![Finish exam](img/finish_exam.jpg)
 
-This will initiate the last backup of the exam files and marks your exam as finished. Changes of the exam result from now on will not be saved. You can shut the system down now.
+This will initiate the last backup of the exam files and marks your exam as finished (See [Ticket states](ticket-states.md)). You will get a notice when the last backup is done. Changes of the exam result from then on, will not be saved.
+
+You can shutdown the system now.

@@ -59,7 +59,7 @@ $this->registerJs($js);
                 <?= $form->field($model, 'exam_id')->dropDownList($searchModel->getExamList(), [
                     'name' => 'exam_id',
                     'prompt' => 'Choose an Exam ...'
-                ])->hint('Choose the exam to generate results.') ?>
+                ])->hint('Choose the exam to generate results from.') ?>
             </div>
         </div>
         <div class="form-group">

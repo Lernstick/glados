@@ -17,17 +17,26 @@ use yii\widgets\DetailView;
         	Restore #<?= $key . ' - ' . yii::$app->formatter->format($model->finishedAt, 'timeago') ?>
 		</a>
         <div class="pull-right">
-            <?= Html::a(
-                '<span class="glyphicon glyphicon-paperclip"></span>',
-                Url::to([
-                    'restore/log',
-                    'id' => $model->id,
-                ]),
-                [
-                    'id' => 'restore-log-show' . $key,
-                    'title' => 'Show restore log'
-                ]
-            ); ?>
+            <div class="btn-group">
+              <a href="#" class="dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="glyphicon glyphicon-list-alt"></span> Actions<span class="caret"></span>
+              </a>            
+              <ul class="dropdown-menu dropdown-menu-right">
+                <li>
+                     <?= Html::a(
+                        '<span class="glyphicon glyphicon-paperclip"></span> Show Log File',
+                        Url::to([
+                            'restore/log',
+                            'id' => $model->id,
+                        ]),
+                        [
+                            'id' => 'restore-log-show' . $key,
+                            'title' => 'Show restore log'
+                        ]
+                    ); ?>
+                </li>
+              </ul>
+            </div>
         </div>
     </h4>
 </div>

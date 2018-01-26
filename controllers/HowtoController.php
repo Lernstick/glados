@@ -63,11 +63,17 @@ class HowtoController extends Controller
     {
         $model = $this->findModel($id);
 
+        $params = Yii::$app->request->queryParams;
+        $searchModel = new HowtoSearch();
+        $dataProvider = $searchModel->search($params);
+
         if (filter_var($model->content, FILTER_VALIDATE_URL)) {
             return $this->redirect($model->content);
         } else {
             return $this->render('view', [
                 'model' => $model,
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
             ]);
         }
     }

@@ -1,3 +1,0 @@
-## Create a ticket
-
-TODO
