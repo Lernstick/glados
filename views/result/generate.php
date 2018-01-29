@@ -105,7 +105,9 @@ $this->registerJs($format_tk, yii\web\View::POS_HEAD);
 
         <div class="row">
             <div class="col-md-6">
-                <?= $form->field($model, 'path')->textInput() ?>
+                <?= $form->field($model, 'path', [
+                'template' => '{label}<div class="input-group"><span class="input-group-addon" id="basic-addon2">' . $ticket->exam->backup_path . '</span>{input}</div>{hint}{error}'
+            ])->textInput() ?>
                 <?= $form->field($model, 'inc_dotfiles')->checkbox() ?>
                 <?= $form->field($model, 'inc_screenshots')->checkbox() ?>                
             </div>

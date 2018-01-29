@@ -1,6 +1,6 @@
 ## The ticket view
 
-All data assigned to a particular ticket are visible in the ticket view. This view is divided in different parts. In this view, it is possible to manage the exam before, during and after. Backups can be browsed and specific version of files can be restored during the exam.
+All data assigned to a particular ticket are visible in the ticket view. It is divided in different tabs. In this view, it is possible to manage the exam before, during and after. Backups can be browsed and specific versions of files can be restored during the exam.
 
 ### General
 

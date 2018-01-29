@@ -83,11 +83,11 @@ class Result extends Model
     public function attributeHints()
     {
         return [
-            'path' => 'This specifies the <b>path in the backup to include</b>. In most cases this may not be changed. If all students placed their result in a specific directory - say <code>/Desktop</code> under the backup path - you can provide this path here to just include the relevant part of the results.',
-            'inc_dotfiles' => 'If set, files with names starting with a dot (dot-files, Ex. <code>.bashrc</code>) will be included in the generated result. These files are mostly related to the <b>system configuration or user profile settings</b>. In most cases this is not needed unless the student itself creates dot-files which are part of his result. If set, this can massively increase the size if the result ZIP-file.',
+            'path' => 'This specifies the <b>path in the backup to include</b>. In most cases this may not be changed. If all students placed their result in a specific directory - say <code>/Desktop/Hand-in</code> under the backup path - you can provide this path here to just include the relevant parts of the result.',
+            'inc_dotfiles' => 'If set, files with names starting with a dot (dot-files, Ex. <code>.bashrc</code>) will be included in the generated result. These files are mostly related to the <b>system configuration or user profile settings</b>. In most cases this is not needed, unless the student itself creates dot-files which are part of his exam result. Notice that, if enabled, this can massively increase the size if the resulting ZIP-file.',
             'inc_screenshots' => 'If screenshots are enabled (see exam configuration), this will <b>include all screenshots</b> taken in a separate directory to the exam result. Notice screenshots can also be viewed in the ticket view under "Screenshots".',
-            'inc_pattern' => 'This is to <b>include only several types of files</b> to the exam result. The file name is then tested against the endings listed underneath. Multiple items can be selected. If no item is selected, all types of files will be included (except dot-files, if configured).',
-            'inc_ids' => 'Select a list of <b>tickets to include</b> in the result file. The more tickets selected, the bigger the size of the ZIP-file. By default, all tickets with no result handed back are preselected.',
+            'inc_pattern' => 'This is to <b>include only several types of files</b> to the exam result. The file name is then tested against the endings listed underneath. Multiple items can be selected. If no item is selected, all types of files will be included (except hidden files, if set).',
+            'inc_ids' => 'Select a list of <b>tickets to include</b> in the result file. The more tickets selected, the bigger the size of the ZIP-file. By default, all closed or submitted tickets with no result handed back are preselected.',
         ];
     }
 

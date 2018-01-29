@@ -8,8 +8,8 @@ The ticket token (used to indentify the exam, see [Taking an Exam](take-exam.md)
 
 Set the backup intervall and the time limit if needed and create the ticket by pressing `Create` at the bottom of the page. Now you will be redirected to the view page of the created ticket (See [The ticket view](ticket-view.md)).
 
-Under `Actions->Genrate PDF` you can generate a PDF file for this ticket. See below for an example ticket.
+Under `Actions->Genrate PDF` you can generate a printable PDF file for this ticket. See the image below for an example ticket.
 
 ![PDF of ticket](img/ticket-pdf.png)
 
-This PDF can be printed out and given to the student, when taking the exam (See [Taking an Exam](take-exam.md)).
+This PDF should be printed out and given to the student, when taking the exam (See [Taking an Exam](take-exam.md)).
