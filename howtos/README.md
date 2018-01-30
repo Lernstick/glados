@@ -17,9 +17,13 @@ See [Howtos](https://github.com/imedias/glados/tree/master/howtos) on Github.
 * [The ticket view ](ticket-view.md)
 * [Ticket states](ticket-states.md)
 * [Taking an Exam](take-exam.md)
-* [Client crashes during exam](client-crash.md)
-* [Restore a specific file](restore-specific-file.md)
 * [Generate results](generate-results.md)
 * [Correct the exams](correct-exams.md)
 * [Submit results back to the student](submit-results.md)
 * [Get the exam result as a student](get-exam-result.md)
+
+Troubleshooting
+
+* [Client crashes during exam](client-crash.md)
+* [Restore a specific file](restore-specific-file.md)
+
