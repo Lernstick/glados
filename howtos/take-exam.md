@@ -12,13 +12,13 @@ As soon as the system has started and you have a working network connection, you
 
 If the search was successful, you will be prompted for approval. If you approve, you will be prompted for a token. This is the token from the exam sheet (See [Create a single ticket](create-single-ticket.md)).
 
-![Insert token](img/token.png)
+![Insert token](img/token.gif)
 
 If your provided a valid token, the download of the exam is initialized and after a while (depending on the size of the exam files) you will see this:
 
 ![Setup done](img/setup_done.png)
 
-Press `Yes` and the system will restart into the exam (this will take a few minutes). Finally you will see the message below.
+Press `Yes` and the system will restart into the exam (this will take a moment). Finally you will see a desktop and the message below.
 
 ![Welcome to exam](img/welcome_to_exam.png)
 
@@ -30,4 +30,4 @@ To finish the exam double-click the `Finish exam` icon on the desktop. You shoul
 
 This will initiate the last backup of the exam files and marks your exam as finished (See [Ticket states](ticket-states.md)). You will get a notice when the last backup is done. Changes of the exam result from then on, will not be saved.
 
-You can shutdown the system now.
+The exam is done, you can shutdown the system now.

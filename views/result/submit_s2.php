@@ -30,12 +30,12 @@ $this->title .= ' - Step 2';
         'tableOptions' => ['class' => 'table table-bordered table-hover'],
         'layout' => '{items} {summary} {pager}',
         'rowOptions' => function($model) {
-            return ['class' => !empty($model->result) && file_exists($model->result) ? 'alert alert-danger danger' : 'alert alert-success success'];
+            return ['class' => !empty($model->result) && file_exists($model->result) ? 'alert alert-warning warning' : 'alert alert-success success'];
         },
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
             'test_taker',
-            'token',            
+            'token',
             'examName',
             [
                 'attribute' => 'result',
