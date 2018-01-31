@@ -16,6 +16,8 @@ use yii\web\UploadedFile;
 use yii\data\ArrayDataProvider;
 use kartik\mpdf\Pdf;
 use \mPDF;
+use yii\helpers\Url;
+
 
 /**
  * ExamController implements the CRUD actions for Exam model.
@@ -287,7 +289,7 @@ class ExamController extends Controller
             return [ 'files' => [[
                 'name' => basename($model->file),
                 'size' => filesize($model->file),
-                'deleteUrl' => 'index.php?r=exam/delete&id=' . $model->id . '&mode=squashfs&file=' . basename($model->file),
+                'deleteUrl' => Url::to(['delete', 'id' => $model->id, 'mode' => 'squashfs', 'file' => basename($model->file)]),
                 'deleteType' => 'POST'
             ]]];
 

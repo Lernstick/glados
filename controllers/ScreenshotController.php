@@ -83,7 +83,7 @@ class ScreenshotController extends Controller
     {
         $model = new Screenshot();
         $ticket = Ticket::findOne(['token' => $token]);
-        $cmd = "DISPLAY=:0 sudo -u user import -window root - | " .
+        $cmd = "DISPLAY=:0 sudo -u user import -silent -window root - | " .
             "convert - " .
             "-filter Triangle " .
             "-define filter:support=2 " .

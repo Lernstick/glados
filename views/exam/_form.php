@@ -18,7 +18,7 @@ if($model->file && Yii::$app->file->set($model->file)->exists) {
             {
                 'name':'" . basename($model->file) . "',
                 'size':" . filesize($model->file) . ",
-                'deleteUrl':'index.php?r=exam/delete&id=" . $model->id . "&mode=squashfs&file=" . basename($model->file) . "',
+                'deleteUrl':'" . Url::to(['delete', 'id' => $model->id, 'mode' => 'squashfs', 'file' => basename($model->file)]) . "',
                 'deleteType':'POST'
             }
         ];
@@ -223,7 +223,7 @@ $this->registerJs($js);
                 $js = new JsExpression('var fupload = jQuery("#w0").fileupload({
                     "maxFileSize":4000000000,
                     "dataType":"json",
-                    "acceptFileTypes":/(\.|\/)(squashfs)$/i,
+                    "acceptFileTypes":/(\.|\/)(squashfs|zip)$/i,
                     "maxNumberOfFiles":1,
                     "autoUpload":false,
                     "url":' . json_encode(Url::to(['update', 'id' => $model->id, 'mode' => 'upload']), JSON_HEX_AMP) . ',
@@ -244,5 +244,7 @@ $this->registerJs($js);
     </div>
 
     <?php ActiveForm::end(); ?>
+
+<div style="height:1000px;"></div>
 
 </div>

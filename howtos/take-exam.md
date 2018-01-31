@@ -26,8 +26,10 @@ Now, the exam has started.
 
 To finish the exam double-click the `Finish exam` icon on the desktop. You should **save all your work** before doing this. **This is not reversible!**
 
-![Finish exam](img/finish_exam.jpg)
+![Finish exam 1](img/finish_exam.jpg)
 
 This will initiate the last backup of the exam files and marks your exam as finished (See [Ticket states](ticket-states.md)). You will get a notice when the last backup is done. Changes of the exam result from then on, will not be saved.
+
+![Finish exam 2](img/finish-exam.gif)
 
 The exam is done, you can shutdown the system now.

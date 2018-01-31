@@ -26,4 +26,4 @@ If your want to put a file at the Desktop, then drop the file in your zip file t
 
 It is highly recommended to create a directory like `Hand-in` at the Desktop and advice the testee to put all results in this directory. Even though it might not be necessary, it will be easier to [collect the results](generate-results.md) after the exam is done.
 
-This's it! You exam is ready to be taken. If your exam needs more complex configuration, then please have a look at [Create an exam with a squashfs-filesystem](create-squashfs-exam-file.md).
+That's it! Your exam is ready to be taken. If your exam needs more complex configuration, then please have a look at [Create an exam with a squashfs-filesystem](create-squashfs-exam-file.md).

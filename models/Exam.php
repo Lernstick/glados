@@ -92,7 +92,7 @@ class Exam extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Name',
             'subject' => 'Subject',
-            'file' => 'Image File',
+            'file' => 'Exam File',
             'md5' => 'MD5 Checksum',
             'file_list' => 'File List',
             'user_id' => 'User ID',

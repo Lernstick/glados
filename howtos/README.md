@@ -2,7 +2,7 @@
 
 ## Installation
 
-* [Using the source package](manual-install.md)
+* [Using the Source package](manual-install.md)
 * [Using the Debian package](deb-install.md) (TODO)
 
 ## Documentation

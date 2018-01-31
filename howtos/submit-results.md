@@ -13,11 +13,11 @@ Assuming you [corrected the exams](correct-exams.md) and created a directory str
     Richard Phillips Feynman - a20a5eb03f
     Wolfgang Ernst Pauli - 79997928d1
 
-Note that each directory has the form `Surname Lastname - Token`, this needs to be satisfied *exactly*. Assuming that in each directory is the corrected exam of the corresponding student. Make sure that the directories contain only the parts of the corrected exam, you want the student to see. Remove all other data from the directories.
+Note that each directory has the form `Name - Token`, this needs to be satisfied *exactly*. Assuming that in each directory is the corrected exam of the corresponding student. Make sure that the directories contain only the parts of the corrected exam, you want the student to see. Remove all other data from the directories.
 
 Once you are done, create a new zip-file with the above contents. It then should look like the [generated zip-file](generate-results.md), just with corrected exams in it.
 
-Start the [Submit results](../result/submit) process now. Click `Actions->Submit results`.
+Start the [Submit results](../result/submit) process now. Click `Actions->Submit results` in the navigation.
 
 ## Step 1
 
