@@ -245,6 +245,4 @@ $this->registerJs($js);
 
     <?php ActiveForm::end(); ?>
 
-<div style="height:1000px;"></div>
-
 </div>
