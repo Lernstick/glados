@@ -24,6 +24,8 @@ Press `Yes` and the system will restart into the exam (this will take a moment).
 
 Now, the exam has started.
 
+----
+
 To finish the exam double-click the `Finish exam` icon on the desktop. You should **save all your work** before doing this. **This is not reversible!**
 
 ![Finish exam 1](img/finish_exam.jpg)

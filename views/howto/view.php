@@ -13,7 +13,7 @@ $this->params['breadcrumbs'][] = ['label' => $model->title, 'url' => ['view', 'i
 $title = $model->title;
 ?>
 
-<div class="howto-view container">
+<div class="howto-view">
 
 <div class="row">
 

@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Exams', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
-<div class="exam-view container">
+<div class="exam-view">
 
     <h1><?= Html::encode($this->title) ?></h1>
 

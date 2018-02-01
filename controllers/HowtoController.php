@@ -48,7 +48,10 @@ class HowtoController extends Controller
     public function actionImg($id)
     {
         if (strpos($id, '/') === false) {
-            return \Yii::$app->response->sendFile(\Yii::$app->basePath . '/howtos/img/' . $id);
+            return \Yii::$app->response->sendFile(\Yii::$app->basePath . '/howtos/img/' . $id,
+                basename($id),
+                ['inline' => true]
+            );
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }

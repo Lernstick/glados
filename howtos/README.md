@@ -27,3 +27,6 @@ Troubleshooting
 * [Client crashes during exam](client-crash.md)
 * [Restore a specific file](restore-specific-file.md)
 
+Examples:
+
+* [Example exam: Essay](example-exam-essay.md)

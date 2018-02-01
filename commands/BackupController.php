@@ -53,7 +53,7 @@ class BackupController extends DaemonController implements DaemonInterface
     private $manualBackup = false;
 
     /**
-     * @var array 
+     * @var array files and directories to exclude in the backup
      */
     public $excludeList = [
         '/overlay/tmp',
@@ -200,7 +200,7 @@ class BackupController extends DaemonController implements DaemonInterface
             $this->_cmd = "rdiff-backup --remote-schema 'ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
                  . "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -C %s rdiff-backup --server' "
                  . "-v5 --print-statistics "
-                 . ' --exclude ' . implode($exclude, ' --exclude ') . " "                     
+                 . (empty($exclude) ? '' : (' --exclude ' . implode($exclude, ' --exclude '))) . " "
                  . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . "::" . $this->remotePath) . " "
                  . escapeshellarg(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token . "/") . " "
                  . "";

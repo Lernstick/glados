@@ -47,7 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 ?>
 
-<div class="ticket-view container">
+<div class="ticket-view">
 
     <h1><?= Html::encode($this->title) ?></h1>
 

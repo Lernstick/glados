@@ -29,7 +29,7 @@ JS;
 $this->registerJs($active_tabs);
 
 ?>
-<div class="user-view container">
+<div class="user-view">
 
     <h1><?= Html::encode($this->title) ?></h1>
 

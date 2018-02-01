@@ -1,6 +1,6 @@
 ## Ticket states
 
-Currently there are 4 states a ticket can occupy. This is incicated in the ticket view as one of the following batches:
+Currently there are 4 states a ticket can occupy. This is incicated in the [ticket view](ticket-view.md) as one of the following batches:
 
 ![Open](img/ticket-open.png)
 ![Running](img/ticket-running.png)
@@ -9,7 +9,7 @@ Currently there are 4 states a ticket can occupy. This is incicated in the ticke
 
 ### The open state
 
-This incicates that a ticket has not been used until now. It's an exam ready to be started. Newly created ticket are usually in the open state.
+This incicates that a ticket has not been used and there was no activity until now. It is an exam ready to be started. Newly created tickets are usually in the open state.
 
 ### The running state
 
