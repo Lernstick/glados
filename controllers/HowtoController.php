@@ -34,6 +34,10 @@ class HowtoController extends Controller
         $searchModel = new HowtoSearch();
         $dataProvider = $searchModel->search($params);
 
+        $dataProvider->pagination = array(
+            'pageSize' => 10,
+        );
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -69,6 +73,9 @@ class HowtoController extends Controller
         $params = Yii::$app->request->queryParams;
         $searchModel = new HowtoSearch();
         $dataProvider = $searchModel->search($params);
+        $dataProvider->pagination = array(
+            'pageSize' => 15,
+        );
 
         if (filter_var($model->content, FILTER_VALIDATE_URL)) {
             return $this->redirect($model->content);

@@ -32,7 +32,7 @@ $title = $model->title;
             'tableOptions' => [
                 'class' => 'table table-bordered table-hover',
             ],
-            'layout' => '{items}',
+            'layout' => '{items} {pager}',
             'columns' => [
                 [
                     'label' => 'Navigation',

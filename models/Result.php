@@ -6,6 +6,7 @@ use Yii;
 use yii\base\Model;
 use app\models\Activity;
 use app\models\Ticket;
+use yii\helpers\FileHelper;
 
 /**
  * This is the model class for the result directory.
@@ -26,7 +27,8 @@ class Result extends Model
     /* generation options */
     public $inc_dotfiles = false;
     public $inc_screenshots = true;
-    public $path = '/';
+    public $inc_emptydirs = false;
+    public $path;
     public $inc_pattern = [];
     public $inc_ids = [];
 
@@ -55,8 +57,9 @@ class Result extends Model
         return [
             [['file'], 'file', 'skipOnEmpty' => true, 'extensions' => 'zip', 'checkExtensionByMimeType' => true, 'on' => self::SCENARIO_SUBMIT],        
             [['exam_id'], 'required', 'on' => self::SCENARIO_GENERATE],                    
-            [['path'], 'required', 'on' => self::SCENARIO_GENERATE],
-            [['inc_dotfiles', 'inc_screenshots'], 'boolean', 'on' => self::SCENARIO_GENERATE],
+            [['path'], 'default', 'value' => '/', 'on' => self::SCENARIO_GENERATE],
+            [['path'], 'validatePath', 'on' => self::SCENARIO_GENERATE],
+            [['inc_dotfiles', 'inc_screenshots', 'inc_emptydirs'], 'boolean', 'on' => self::SCENARIO_GENERATE],
             [['inc_pattern'], 'each', 'rule' => ['string'], 'on' => self::SCENARIO_GENERATE],
             [['inc_ids'], 'each', 'rule' => ['integer'], 'on' => self::SCENARIO_GENERATE],
             [['inc_ids'], 'required', 'on' => self::SCENARIO_GENERATE],
@@ -70,9 +73,10 @@ class Result extends Model
     {
         return [
             'inc_dotfiles' => 'Include hidden files (dot-files)',
-            'inc_screenshots' => 'Include screenshots',
+            'inc_screenshots' => 'Include Screenshots',
             'inc_pattern' => 'Include only files of type (will include all files if nothing is selected)',
             'inc_ids' => 'Tickets',
+            'inc_emptydirs' => 'Include empty directories',
             'path' => 'Path',
         ];
     }
@@ -83,11 +87,12 @@ class Result extends Model
     public function attributeHints()
     {
         return [
-            'path' => 'This specifies the <b>path in the backup to include</b>. In most cases this may not be changed. If all students placed their result in a specific directory - say <code>/Desktop/Hand-in</code> under the backup path - you can provide this path here to just include the relevant parts of the result.',
+            'path' => 'This specifies the <b>path in the backup to include</b>. In most cases this may not be filled out, thus leave it empty to include all files.<br>If all students placed their result in a specific directory - say <code>Desktop/Hand-in</code> relative to the <i>Remote Backup Path</i> - you can provide this path here, to just include the relevant parts of the result.',
             'inc_dotfiles' => 'If set, files with names starting with a dot (dot-files, Ex. <code>.bashrc</code>) will be included in the generated result. These files are mostly related to the <b>system configuration or user profile settings</b>. In most cases this is not needed, unless the student itself creates dot-files which are part of his exam result. Notice that, if enabled, this can massively increase the size if the resulting ZIP-file.',
-            'inc_screenshots' => 'If screenshots are enabled (see exam configuration), this will <b>include all screenshots</b> taken in a separate directory to the exam result. Notice screenshots can also be viewed in the ticket view under "Screenshots".',
+            'inc_screenshots' => 'If <i>Screenshots</i> are enabled (see exam configuration), this will <b>include all screenshots</b> taken in a separate directory to the exam result. Notice screenshots can also be viewed in the ticket view under "Screenshots".',
             'inc_pattern' => 'This is to <b>include only several types of files</b> to the exam result. The file name is then tested against the endings listed underneath. Multiple items can be selected. If no item is selected, all types of files will be included (except hidden files, if set).',
             'inc_ids' => 'Select a list of <b>tickets to include</b> in the result file. The more tickets selected, the bigger the size of the ZIP-file. By default, all closed or submitted tickets with no result handed back are preselected.',
+            'inc_emptydirs' => 'Directories are included, even if they are empty.',
         ];
     }
 
@@ -130,6 +135,7 @@ class Result extends Model
             $comment .= '  Path: ' . $this->path . PHP_EOL;
             $comment .= '  Include dotfiles: ' . ($this->inc_dotfiles ? 'true' : 'false') . PHP_EOL;
             $comment .= '  Include screenshots: ' . ($this->inc_screenshots ? 'true' : 'false') . PHP_EOL;
+            $comment .= '  Include empty directories: ' . ($this->inc_emptydirs ? 'true' : 'false') . PHP_EOL;
             $comment .= '  Include file types: ' . (is_array($this->inc_pattern) ? implode(', ', $this->inc_pattern) : '') . PHP_EOL;
             $comment .= PHP_EOL;
 
@@ -153,7 +159,10 @@ class Result extends Model
                         );
 
                         foreach ($files as $file) {
-                            if ($file->isDir()) continue;
+                            if ($file->isDir() &&  boolval($this->inc_emptydirs) === false) {
+                                continue;
+                            }
+
                             $file = realpath($file);
 
                             // exclude rdiff-backup-data directory
@@ -176,7 +185,8 @@ class Result extends Model
 
                             if (strpos($file, realpath($source)) !== 0) { continue; }
 
-                            if (!empty($this->inc_pattern)) {
+                            // validate against file endings
+                            if (!empty($this->inc_pattern) && !is_dir($file)) {
                                 foreach ($this->inc_pattern as $pattern) {
                                     if (isset($this->_types[$pattern])) {
                                         $p = $this->_types[$pattern];
@@ -190,6 +200,7 @@ class Result extends Model
                                 continue;
                             }
 
+                            // if all tests passed, include the file/dir
                             $this->zipInclude($file, $ticket->name . '/' . str_replace($source . '/', '', $file), $zip);
                         }
                     }
@@ -211,6 +222,8 @@ class Result extends Model
     {
         if (is_dir($source) === false) {
             return $zip->addFile($source, $target);
+        } else {
+            return $zip->addEmptyDir($target);
         }
     }
 
@@ -351,6 +364,22 @@ class Result extends Model
             is_dir($file) ? $this->removeDirectory($file) : unlink($file);
         }
         return file_exists($path) ? rmdir($path) : false;
+    }
+
+    /**
+     * Generates an error message when the path is invalid
+     *
+     * @param string $attribute - the attribute
+     * @param array $params
+     * @return void
+     */
+    public function validatePath($attribute, $params, $validator)
+    {
+        $path = FileHelper::normalizePath($this->exam->backup_path . '/' . $this->$attribute);
+        $backup_path = FileHelper::normalizePath($this->exam->backup_path);
+        if (strpos($path, $backup_path) !== 0) {
+            $this->addError($attribute, 'This path is invalid. You can only include files within the Remote Backup Path.');
+        }
     }
 
     /**

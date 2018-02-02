@@ -83,7 +83,7 @@ class ResultController extends Controller
      * If creation is successful, the browser will be redirected to the 'exam/view' page.
      * @return mixed
      */
-    public function actionGenerate($exam_id = null)
+    public function actionGenerate($exam_id = null, $path = '/')
     {
 
         if ($exam_id === null) {

@@ -160,6 +160,7 @@ class RestoreController extends DaemonController
         $this->_cmd = "rdiff-backup --terminal-verbosity=5 --force --remote-schema "
                 . "'ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
                 . "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -C %s rdiff-backup --server' "
+             . "--create-full-path "
              . "--restore-as-of " . escapeshellarg($date) . " "
              . escapeshellarg(FileHelper::normalizePath(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token . "/" . $file)) . " "
              . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . "::" . FileHelper::normalizePath($restorePath . '/' . $file)) . " "

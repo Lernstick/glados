@@ -619,8 +619,6 @@ class Ticket extends \yii\db\ActiveRecord
         }
     }
 
-
-
     /**
      * @inheritdoc
      *

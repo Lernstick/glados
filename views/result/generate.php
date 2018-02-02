@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use kartik\select2\Select2;
 use yii\web\JsExpression;
+use yii\helpers\FileHelper;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Result */
@@ -106,10 +107,11 @@ $this->registerJs($format_tk, yii\web\View::POS_HEAD);
         <div class="row">
             <div class="col-md-6">
                 <?= $form->field($model, 'path', [
-                'template' => '{label}<div class="input-group"><span class="input-group-addon" id="basic-addon2">' . $ticket->exam->backup_path . '</span>{input}</div>{hint}{error}'
+                'template' => '{label}<div class="input-group"><span title="Remote Backup Path" class="input-group-addon" id="basic-addon2">' . FileHelper::normalizePath($ticket->exam->backup_path) . '/</span>{input}</div>{hint}{error}'
             ])->textInput() ?>
                 <?= $form->field($model, 'inc_dotfiles')->checkbox() ?>
-                <?= $form->field($model, 'inc_screenshots')->checkbox() ?>                
+                <?= $form->field($model, 'inc_screenshots')->checkbox() ?>
+                <?= $form->field($model, 'inc_emptydirs')->checkbox() ?>                
             </div>
             <div class="col-md-6">
                 <?= $form->field($model, 'inc_pattern')->widget(Select2::classname(), [
@@ -144,7 +146,7 @@ $this->registerJs($format_tk, yii\web\View::POS_HEAD);
                     ],
                     'pluginOptions' => [
                         'templateResult' => new JsExpression('format_rtk'),
-                        'templateSelection' => new JsExpression('format_tk'),                    
+                        'templateSelection' => new JsExpression('format_tk'),
                         'allowClear' => true
                     ],
                 ]); ?>
