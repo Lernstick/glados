@@ -28,7 +28,7 @@ Currently only MySQL databases are supported. You need MySQL 5.5 or newer.
 * [OpenSSH](https://www.openssh.com/) client and key generator are needed to create a connection for rdiff-backup.
 * To analyze squashfs files, [Squashfs](http://squashfs.sourceforge.net/) is needed.
 * To support auto discovery of the exam server, [avahi](http://avahi.org/) is needed.
-* For the manual installation, [Composer](https://getcomposer.org/download/) is needed. It can be removed subsequently.
+* For the manual installation [Composer](https://getcomposer.org/download/) is needed. It can be removed subsequently.
 
 #### Debian
 
@@ -50,6 +50,8 @@ curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin
 Browse to the Github [release page](https://github.com/imedias/glados/releases) and download the latest version of Glados.
 
     curl -L -O https://github.com/imedias/glados/archive/$version.tar.gz
+
+Where `$version` is the latest version number.
 
 Unpack the source package:
 
