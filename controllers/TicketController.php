@@ -587,8 +587,9 @@ class TicketController extends Controller
             ->andWhere(['end' => null])
             ->andWhere(['download_lock' => 1]);
 
-        if (\Yii::$app->params['concurrentExamDownloads'] != 0) {
-            if(intval($query->count()) >= \Yii::$app->params['concurrentExamDownloads']){
+        $concurrentExamDownloads = 10;
+        if ($concurrentExamDownloads != 0) {
+            if(intval($query->count()) >= $concurrentExamDownloads){
                 \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                 #$headers = Yii::$app->response->headers;
                 #$headers->add('Retry-After', 20);                
@@ -610,7 +611,7 @@ class TicketController extends Controller
         $model->save();
 
         ignore_user_abort(true);
-        \Yii::$app->response->bandwidth = \Yii::$app->params['examDownloadBandwith'];
+        \Yii::$app->response->bandwidth = 10 * 1024 * 1024; // 10MB per second, set 0 for no limit
 
         # log activity before [[send()]] is called upon the request.
         \Yii::$app->response->on(\app\components\customResponse::EVENT_BEFORE_SEND, function($event) {

@@ -171,7 +171,7 @@ $requirements = array(
         'by' => 'Squashfs',
         'memo' => 'Please install the <a href="http://squashfs.sourceforge.net/">squashfs-tools</a> package.'
     ),
-    'squashfsTools' => array(
+    'openssh' => array(
         'name' => 'OpenSSH client and key generator',
         'mandatory' => true,
         'condition' => is_executable('/usr/bin/ssh') && is_executable('/usr/bin/ssh-keygen'),

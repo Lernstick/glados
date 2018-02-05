@@ -1,13 +1,10 @@
 # Overview
 
-## Installation
-
-* [Using the Source package](manual-install.md)
-* [Using the Debian package](deb-install.md) (TODO)
-
 ## Documentation
 
 See [Howtos](https://github.com/imedias/glados/tree/master/howtos) on Github.
+
+**Howtos**
 
 * [Create an exam with a zip-file](create-zip-exam-file.md)
 * [Create an exam with a squashfs-filesystem](create-squashfs-exam-file.md)
@@ -22,11 +19,22 @@ See [Howtos](https://github.com/imedias/glados/tree/master/howtos) on Github.
 * [Submit results back to the student](submit-results.md)
 * [Get the exam result as a student](get-exam-result.md)
 
-Troubleshooting
+**Troubleshooting**
 
 * [Client crashes during exam](client-crash.md)
 * [Restore a specific file](restore-specific-file.md)
 
-Examples:
+**Examples**
 
 * [Example exam: Essay](example-exam-essay.md)
+
+**Installation**
+
+* [Using the Source package](manual-install.md)
+* [Using the Debian package](deb-install.md)
+
+**Configuration**
+
+* [Glados config files](config-files.md)
+* [Exam client configuration](client-config.md)
+* [Network configuration](network-config.md)

@@ -48,6 +48,9 @@ class UserSearch extends User
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => array(
+                'pageSize' => \Yii::$app->params['itemsPerPage'],
+            ),            
         ]);
 
         $dataProvider->setSort([
@@ -56,7 +59,6 @@ class UserSearch extends User
                 'last_visited',
             ]
         ]);
-
 
         $this->load($params);
 
