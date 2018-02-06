@@ -162,6 +162,7 @@ Create an Avahi service file (`/etc/avahi/services/glados.service`) with content
   <service>
    <type>_http._tcp</type>
    <port>80</port>
+   <txt-record>type=Glados</txt-record>
    <txt-record>actionDownload='glados/index.php/ticket/download/{token}'</txt-record>
    <txt-record>actionFinish='glados/index.php/ticket/finish/{token}'</txt-record>
    <txt-record>actionNotify='glados/index.php/ticket/notify/{token}?state={state}'</txt-record>

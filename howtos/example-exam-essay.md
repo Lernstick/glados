@@ -34,7 +34,7 @@ All fields are filled, thus press `Next step`.
 
 ----
 
-Now we need to provide an `Exam File`. Since this is a simple exam (we don't need complex system configuration, such as new applications and special settings), we can use a zip file as exam file, as described in [Create an exam with a zip-file](create-zip-exam-file.md).
+Now we need to provide an `Exam File`. Since this is a simple exam (we don't need complex system configuration, such as new applications and special settings), we can use a zip file as exam file, as described in [Create a zip-file as exam file](create-zip-exam-file.md).
 
 So we create a zip file on our local computer with the following directory structure:
 

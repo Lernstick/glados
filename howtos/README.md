@@ -1,13 +1,15 @@
 # Overview
 
-## Documentation
+See the [Manual](https://github.com/imedias/glados/tree/master/howtos/README.md) on Github.
 
-See [Howtos](https://github.com/imedias/glados/tree/master/howtos) on Github.
+## User Manual
 
-**Howtos**
+**Howtos and Manuals**
 
-* [Create an exam with a zip-file](create-zip-exam-file.md)
-* [Create an exam with a squashfs-filesystem](create-squashfs-exam-file.md)
+* [Create an exam](create-exam.md)
+* [Remote Backup Path](remote-backup-path.md)
+* [Create a zip-file as exam file](create-zip-exam-file.md)
+* [Create a squashfs-filesystem as exam file](create-squashfs-exam-file.md)
 * [The exam view](exam-view.md)
 * [Create a single ticket](create-single-ticket.md)
 * [Create multiple tickets](create-multiple-tickets.md)
@@ -27,6 +29,8 @@ See [Howtos](https://github.com/imedias/glados/tree/master/howtos) on Github.
 **Examples**
 
 * [Example exam: Essay](example-exam-essay.md)
+
+## Admin Manual
 
 **Installation**
 

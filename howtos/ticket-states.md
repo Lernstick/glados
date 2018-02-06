@@ -1,6 +1,6 @@
 ## Ticket states
 
-Currently there are 4 states a ticket can occupy. This is incicated in the [ticket view](ticket-view.md) as one of the following batches:
+Currently there are 4 different states a ticket can occupy. This is incicated in the [ticket view](ticket-view.md) as one of the following batches:
 
 ![Open](img/ticket-open.png)
 ![Running](img/ticket-running.png)
@@ -9,7 +9,7 @@ Currently there are 4 states a ticket can occupy. This is incicated in the [tick
 
 ### The open state
 
-This incicates that a ticket has not been used and there was no activity until now. It is an exam ready to be started. Newly created tickets are usually in the open state.
+This incicates that a ticket has not been used yet and there was no activity until now. It is an exam ready to be taken. Newly created tickets are usually in the open state.
 
 ### The running state
 
@@ -17,8 +17,8 @@ This ticket is in use right now. It indicates an exam being taken by a student a
 
 ### The closed state
 
-A ticket in the closed state means that the exam has finished and the student has pressed `Finish exam` (See [Taking an Exam](take-exam.md)). It might be possible that the last backup must still be performed in this state, but usually this brands an exam as finished.
+A ticket in the closed state means that the exam has finished and the student has pressed `Finish exam` (See [Taking an Exam](take-exam.md)). It might be possible that the last backup must still be performed in this state, but usually this brands an exam as done.
 
 ### The submitted state
 
-If the ticket is anonymous (hence no `Test taker` is set) and the exam has finished, the ticket will be in the closed state, see above. On the other hand, when a ticket is assigned to a student by providing a name in the `Test taker` field and the student finshed the exam, the ticket will be in the submitted state.
+If the ticket is anonymous (hence no *Test Taker* set) and the exam has finished, the ticket will be in the closed state (see above). On the other hand, if a ticket is assigned to a student by providing a name in the *Test Taker* field and the student finshed the exam, the ticket will be in the submitted state. This is just to distinguish between an anonymous and a assigned ticket.

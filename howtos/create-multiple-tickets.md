@@ -1,10 +1,10 @@
 ## Create multiple tickets
 
-A ticket is the access authorization for the testee to the exam. You can create a single ticket or multiple ones for an exam. Create a single ticket by the [Create single ticket](../ticket/create?mode=single) wizard and multiple tickets by the [Create multiple tickets](../ticket/create?mode=many&type=assigned) wizard.
+A ticket is the access authorization for the student to his/her exam. If you have 20 students to take the exam, you have to generate 20 tickets. You can create a single ticket or multiple at once for a given exam. Create a single ticket by the `Actions->Create single ticket` wizard and multiple tickets by the `Actions->Create multiple tickets` wizard.
 
 -----
 
-In the wizard you can put names of the students in the `Names` field. You can just copy the names from an external source such as an Excel file or another Office application. The names must be separated by a tab, comma, semicolon, newline or all of them combined. The field tries to read the names as you provide them. How the names are parsed, can be seen in the `Preview Proposal` on the right of the `Names` field. You can adjust the names, until the preview is as desired.
+In this wizard, you can put the names of students in the `Names` field. You can just copy the names from an external source such as an Excel file or another Office application. The names must be separated by a tab, comma, semicolon, newline or all of them combined. The field tries to read the names as you provide them. How the names are parsed, can be seen in the `Preview Proposal` on the right of the `Names` field. You can adjust the names, until the preview is as desired.
 
 ![Multiple tickets](img/multiple_tickets.gif)
 

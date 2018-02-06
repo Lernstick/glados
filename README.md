@@ -20,5 +20,5 @@ Glados is a fully configurable webinterface to take, manage and create exams usi
 
 ## Documentation
 
-* See [Howtos](https://github.com/imedias/glados/tree/master/howtos) on Github.
-* See the [Howtos](https://github.com/imedias/glados/tree/master/howtos/README.md) overview page.
+* See [Manual](https://github.com/imedias/glados/tree/master/howtos) on Github.
+* See the [Manual](https://github.com/imedias/glados/tree/master/howtos/README.md) overview page.

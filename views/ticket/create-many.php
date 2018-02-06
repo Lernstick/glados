@@ -157,7 +157,7 @@ $js = new JsExpression("
 
 $this->registerJs($js);
 
-$this->title = 'Create Tickets';
+$this->title = 'Create multiple Tickets';
 $this->params['breadcrumbs'][] = ['label' => 'Tickets', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>

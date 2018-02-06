@@ -217,7 +217,7 @@ class TicketController extends Controller
                 'model' => $model,
             ]);
 
-            $title = 'Ticket für Prüfung "' . $model->exam->subject . ' - ' . $model->exam->name . '"';
+            $title = 'Ticket for "' . $model->exam->subject . ' - ' . $model->exam->name . '"';
 
             $pdf = new Pdf([
                 'mode' => Pdf::MODE_UTF8, 

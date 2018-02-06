@@ -22,6 +22,7 @@ Create a config file `/etc/lernstick-exam-client.conf` with contents:
     gladosHost="glados"
     gladosPort=80
     gladosProto="http"
+    gladosDesc="Description"
 
     actionDownload='glados/index.php?r=ticket/download&token={token}'
     actionFinish='glados/index.php?r=ticket/finish&token={token}'
@@ -38,6 +39,7 @@ Config Item     | Description
 `gladosHost`    | The DNS name of the exam server.
 `gladosPort`    | The port, under which the webserver is running. (Don't use double quotes `"` here)
 `gladosProto`   | The protocol to use. Can either be `http` or `https`.
+`gladosDesc`    | A short description of the host (for example `Exam Server School A`)
 `action*`       | Those variables should mostly be left as in the config above. They describe the URL for the different actions a client can take. Adjust them to the corresponding configuration of your webserver.
 
 If you start the `Search Exam Server` utility now, it will only search for your given IP-address, thus other exam servers in the network will be ignored.
