@@ -66,7 +66,7 @@ cp -rpv glados-1.0.3/* /usr/share/glados/
 cd /usr/share/glados
 ```
 
-Install compser asset plugin (accordin to the [Yii2 installation guide](https://github.com/yiisoft/yii2/blob/master/framework/README.md)):
+Install composer asset plugin (according to the [Yii2 installation guide](https://github.com/yiisoft/yii2/blob/master/framework/README.md)):
 
     composer global require "fxp/composer-asset-plugin:^1.4.1"
 
