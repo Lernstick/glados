@@ -66,6 +66,10 @@ cp -rpv glados-1.0.3/* /usr/share/glados/
 cd /usr/share/glados
 ```
 
+Install compser asset plugin (accordin to the [Yii2 installation guide](https://github.com/yiisoft/yii2/blob/master/framework/README.md)):
+
+    composer global require "fxp/composer-asset-plugin:^1.4.1"
+
 Run composer (this will take a while, you also may need to create a [Github OAuth token](https://github.com/blog/1509-personal-api-tokens) to go over the [API rate limit](https://getcomposer.org/doc/articles/troubleshooting.md#api-rate-limit-and-oauth-tokens)):
 
     composer update
