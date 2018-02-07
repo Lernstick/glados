@@ -1,8 +1,10 @@
 ## Exam client configuration
 
-To setup an exam client, you can install the package `lernstick-exam-client`:
+To setup an exam client, you can install the package `lernstick-exam-client` on a Lernstick:
 
     apt-get install lernstick-exam-client
+
+You can also download the Debian Package from the [Github releases page](https://github.com/imedias/glados/releases).
 
 The exam client can be configured in 2 ways.
 
