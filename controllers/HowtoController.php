@@ -66,7 +66,7 @@ class HowtoController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionView($id)
+    public function actionView($id, $mode = null)
     {
         $model = $this->findModel($id);
 
@@ -77,10 +77,18 @@ class HowtoController extends Controller
             'pageSize' => 15,
         );
 
+        if ($mode == 'inline') {
+            $this->layout = 'client';
+            $view = 'client-view';
+        } else {
+            $view = 'view';
+        }
+
         if (filter_var($model->content, FILTER_VALIDATE_URL)) {
             return $this->redirect($model->content);
         } else {
-            return $this->render('view', [
+            return $this->render($view, [
+                'mode' => $mode,
                 'model' => $model,
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,

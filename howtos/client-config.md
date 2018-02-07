@@ -16,10 +16,10 @@ To configure the exam client for this behavior, nothing has to be done. After in
 
 If you want a more secure installation and the exam server has a fixed IP-address, you can configure the exam client to only access your fixed exam server.
 
-Create a config file `/etc/lernstick-exam-client.conf` with contents:
+Create a config file `/etc/lernstick-exam-client.conf` with the following contents:
 
     gladosIp="1.2.3.4"
-    gladosHost="glados"
+    gladosHost="examsrv"
     gladosPort=80
     gladosProto="http"
     gladosDesc="Description"
@@ -40,6 +40,8 @@ Config Item     | Description
 `gladosPort`    | The port, under which the webserver is running. (Don't use double quotes `"` here)
 `gladosProto`   | The protocol to use. Can either be `http` or `https`.
 `gladosDesc`    | A short description of the host (for example `Exam Server School A`)
-`action*`       | Those variables should mostly be left as in the config above. They describe the URL for the different actions a client can take. Adjust them to the corresponding configuration of your webserver.
+`action*`       | Those variables should mostly be left as in the config above. They describe the URL for the different actions a client can take. Adjust them to the corresponding configuration of your webserver. For example the download URL `actionDownload` will be made up of the hosts IP-address, the port, the protocol and the given relative path. `${gladosProto}://${gladosIp}:${gladosPort}/${actionDownload}` will then be translated to `http://1.2.3.4:80/glados/index.php/ticket/download/{token}` in the example configuration above. That URL must point to the exam server token prompt.
+
+----
 
 If you start the `Search Exam Server` utility now, it will only search for your given IP-address, thus other exam servers in the network will be ignored.

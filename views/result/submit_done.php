@@ -19,7 +19,12 @@ $this->title .= ' - Summary';
     <div class="media-body">
         <span>The results are submitted! The list further down gives an overview of the submitted results.</span>
     </div>
+
     <hr>
+    <div class="alert alert-info" role="alert">
+        <span class="glyphicon glyphicon-alert"></span>
+        <span>Please visit <?= Html::a('Manual / Get the exam result as a student', ['/howto/view', 'id' => 'get-exam-result.md'], ['class' => 'alert-link']) ?> to learn how the student can receive his/her exam result.</span>
+    </div>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,

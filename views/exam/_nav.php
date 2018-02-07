@@ -145,7 +145,14 @@ $this->registerJs($active_tabs);
                     Url::to(['result/generate', 'exam_id' => $model->id]),
                     ['data-pjax' => 0]
                 ); ?>
-            </li>            
+            </li>
+           <li>
+                <?= Html::a(
+                    '<span class="glyphicon glyphicon-question-sign"></span> Visit the Manual',
+                    Url::to(['howto/view', 'id' => 'exam-view.md']),
+                    ['data-pjax' => 0]
+                ); ?>
+            </li>
         </ul>
     </li>
 

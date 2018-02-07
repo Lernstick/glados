@@ -1,6 +1,6 @@
 ## Installation Guide (Debian package)
 
-This guide describes how to install Glados from the Debian package.
+This guide describes how to install GLaDOS from the Debian package.
 
 -----
 
@@ -25,3 +25,6 @@ Install the packages:
     dpkg -i glados-1.0.3.deb
 
 You can now access the webinterface by the URL [http://localhost/glados](http://localhost/glados).
+
+You may login with **admin/admin** or **teacher/teacher**.
+To modify the users, please login as **admin**.

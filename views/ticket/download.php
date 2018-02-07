@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use app\models\Ticket;
 use app\components\ActiveEventField;
 
@@ -40,6 +41,13 @@ if ($model->client_state == 'setup complete') {
                                     '<span class="glyphicon glyphicon-retweet"></span> Request download again',
                                     ['download', 'token' => $model->token, 'step' => 2],
                                     ['id' => 'backup-now']
+                                ) ?>
+                            </li>
+                            <li>
+                                <?= Html::a(
+                                    '<span class="glyphicon glyphicon-question-sign"></span> Help',
+                                    ['howto/view', 'id' => 'token-request-help.md', 'mode' => 'inline'],
+                                    ['onclick' => 'window.open("' . Url::to(['howto/view', 'id' => 'token-request-help.md', 'mode' => 'inline']) . '", "Help", "titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,width=800,height=800"); return false;']
                                 ) ?>
                             </li>
                         </ul>

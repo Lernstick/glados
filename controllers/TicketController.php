@@ -552,7 +552,7 @@ class TicketController extends Controller
     }
 
     /**
-     * Downloads an exam file after checking ticket validity. (Old version)
+     * Downloads an exam file after checking ticket validity. (deprecated)
      *
      * @param string $token
      * @return mixed The response object or an array with the error description

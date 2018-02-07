@@ -1,22 +1,22 @@
 ## Glados config files
 
-Glados can be configured in the file `config/params.php`. This is a list of the config settings and what they mean:
+The main configuration can be found in the file `config/params.php`. This is a list of the config settings and what they mean:
 
 Config Item             | Default Value              | Description
 ------------            | -------------              | -------------
 `itemsPerPage`          | `10`                       | Defines the number of rows displayed in the ticket, exam and user index view.
 `tokenLength`           | `10`                       | The number of characters in a generated token.
-`uploadPath`            | `/var/lib/glados/uploads/` | The directory path in the server's filesystem, where the uploaded exam image files should be stored. This directory must be writable for the webserver user.
-`backupPath`            | `/var/lib/glados/backups/` | The directory path in the server's filesystem, where the ticket backups should be stored. This directory must be writable for the webserver user.
-`resultPath`            | `/var/lib/glados/results/` | The directory path in the server's filesystem, where the handed back results should be stored. This directory must be writable for the webserver user.
-`tmpPath`               | `/var/lib/glados/tmp/`     | The directory path in the server's filesystem, wherein temporary files can be stored. This directory must be writable for the webserver user.
-`dotSSH`                | `/var/lib/glados/.ssh/`    | The directory path in the server's filesystem, where the generated public and private SSH key are stored. This directory must be writable for the webserver user.
-`daemonLogFilePath`     | `/var/log/glados`          | The directory path in the server's filesystem, where the log files should be stored. This directory must be writable for the webserver user.
-`examDownloadBandwith`  | `10m`                      | Given in MBytes per second. The bandwith per client, by which the server should transmit the exam files to the client. (set `0` for no limit)
+`uploadPath`            | `/var/lib/glados/uploads/` | The full directory path in the filesystem of the server, where the uploaded exam image files should be stored. This directory must be writable for the webserver user.
+`backupPath`            | `/var/lib/glados/backups/` | The full directory path in the filesystem of the server, where the backups should be stored. This directory must be writable for the webserver user.
+`resultPath`            | `/var/lib/glados/results/` | The full directory path in the filesystem of the server, where the handed back results should be stored. This directory must be writable for the webserver user.
+`tmpPath`               | `/var/lib/glados/tmp/`     | The full directory path in the filesystem of the server, wherein temporary files can be stored. This directory must be writable for the webserver user.
+`dotSSH`                | `/var/lib/glados/.ssh/`    | The full directory path in the filesystem of the server, where the generated public and private SSH key are stored. This directory must be writable for the webserver user.
+`daemonLogFilePath`     | `/var/log/glados`          | The full directory path in the filesystem of the server, where the log files should be stored. This directory must be writable for the webserver user.
+`examDownloadBandwith`  | `10m`                      | Given in MB/s (megabytes per second). The bandwith per client, by which the server should transmit the exam files to the client. Set `0` for no limit.
 `minDaemons`            | `3`                        | The minimum number of running daemons. If you start one daemon, that daemon will start 2 more after a few seconds to match the minimum number of daemons running.
-`maxDaemons`            | `10`                       | The maximum number of running daemons.
-`lowerBound`            | `20`                       | The load limit in percent, where one of the running daemons should be stopped (will not go below `minDaemons`).
-`upperBound`            | `80`                       | The load limit in percent, where a new daemons should be started (will not go beyond `maxDaemons`).
+`maxDaemons`            | `10`                       | The maximum number of running daemons. If you start one more, after some time, one of the daemons will stop probably itself, depending on the bound values (see below).
+`lowerBound`            | `20`                       | The average load limit over all running daemons in percent, where one of the running daemons should be stopped (will not go below `minDaemons`).
+`upperBound`            | `80`                       | The average load limit over all running daemons in percent, where a new daemons should be started (will not go beyond `maxDaemons`).
 
 ----
 

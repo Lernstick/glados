@@ -205,6 +205,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     </li>
                 <?php } ?>
 
+               <li>
+                    <?= Html::a(
+                        '<span class="glyphicon glyphicon-question-sign"></span> Visit the Manual',
+                        Url::to(['howto/view', 'id' => 'ticket-view.md']),
+                        ['data-pjax' => 0]
+                    ); ?>
+                </li>
+
                 <?php if (YII_ENV_DEV) {
                     echo '<li class="divider"></li>';
                     echo '<li>';

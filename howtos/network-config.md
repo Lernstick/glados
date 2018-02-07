@@ -1,6 +1,6 @@
 ## Network configuration
 
-There are 2 possible ways you can configure your setup. You can either configure the network, that the client can autodiscover the exam server, or configure the clients to access a fixed IP-address. The client setup can be found [here](client-config.md).
+There are 2 possible ways you can configure your setup. You can either configure the network in the way that the client can autodiscover the exam server, or configure the clients to access a fixed IP-address. The client setup can be found [here](client-config.md).
 
 ### Autodiscovery of the exam server
 
@@ -10,7 +10,7 @@ Avahi includes several utilities which help you discover the services running on
 
     avahi-browse -r --no-db-lookup _http._tcp
 
-to discover services in your network. If your network is configured appropriately, you should discover the exam server.
+to discover services in your network. If your network and server are configured appropriately, you should discover the exam server with the above command.
 
 ### Exam server with fixed IP-address
 
@@ -24,4 +24,4 @@ Client to Server  | http/https  | `80` for http, `443` for https (by default)
 Server to Client  | ssh         | `22` (by default)
 
 <br>
-If your exam server sits in another subnet than your exam clients, make sure to disable [NAT](https://en.wikipedia.org/wiki/Network_address_translation) in the routing configuration. This is necessary because the server determines the clients IP-address (which is then used in remote backup) via the HTTP header. With NAT enabled the header would hold the IP-address of the router instead.
+If your exam server sits in another subnet than your exam clients, make sure to disable [Network address translation](https://en.wikipedia.org/wiki/Network_address_translation) in the configuration of the router. This is necessary because the server detects the clients IP-address (which is then used in remote backup) over the HTTP headers and/or `$_SERVER` environment variables provided by the webserver. With NAT enabled the header would contain the IP-address of the routing device instead.

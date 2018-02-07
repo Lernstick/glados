@@ -1,6 +1,6 @@
 ## Installation Guide (From the sources)
 
-This guide describes how to install Glados from the sources.
+This guide describes how to install GLaDOS from the source package.
 
 -----
 
@@ -8,9 +8,10 @@ This guide describes how to install Glados from the sources.
 
 #### Webserver
 
-Since Glados's interface is based entirely in your browser, you’ll need a web server (such as Apache, nginx) to install the files into.
+Since GLaDOS's interface is based entirely in your browser, you’ll need a web server (such as Apache, nginx) to install the files into.
 
 * Apache needs [mod_rewrite](http://httpd.apache.org/docs/current/mod/mod_rewrite.html) to be installed and enabled.
+* Nginx needs PHP as an [FPM SAPI](http://php.net/install.fpm).
 
 #### PHP
 
@@ -25,8 +26,8 @@ Currently only MySQL databases are supported. You need MySQL 5.5 or newer.
 #### Miscellaneous
 
 * To fetch the exam backups, [rdiff-backup](http://rdiff-backup.nongnu.org/) 1.2.8 or newer is needed.
-* [OpenSSH](https://www.openssh.com/) client and key generator are needed to create a connection for rdiff-backup.
-* To analyze squashfs files, [Squashfs](http://squashfs.sourceforge.net/) is needed.
+* [OpenSSH](https://www.openssh.com/) client and its key generator `ssh-keygen` are needed to create a connection for rdiff-backup.
+* To support squashfs files, [Squashfs](http://squashfs.sourceforge.net/) is needed.
 * To support auto discovery of the exam server, [avahi](http://avahi.org/) is needed.
 * For the manual installation [Composer](https://getcomposer.org/download/) is needed. It can be removed subsequently.
 
@@ -47,7 +48,7 @@ curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin
 
 #### Download the latest source package
 
-Browse to the Github [release page](https://github.com/imedias/glados/releases) and download the latest version of Glados.
+Browse to the Github [release page](https://github.com/imedias/glados/releases) and download the latest version of GLaDOS.
 
     curl -L -O https://github.com/imedias/glados/archive/$version.tar.gz
 
@@ -82,7 +83,7 @@ Create the following directories:
     mkdir -p /var/lib/glados/.ssh
     mkdir -p /var/log/glados
 
-Some directories need to be writable by the user of the webserver. Assuming the user is called `www-data`, adjust the following permissions:
+Some directories need to be writable by the user under which your webserver runs. Assuming the user is called `www-data`, adjust the following permissions:
 
     chown www-data /var/log/glados
     chown www-data:www-data /usr/share/glados/web/assets/
@@ -107,7 +108,7 @@ mysql> grant all privileges on glados.* to glados@localhost;
 mysql> quit
 ```
 
-Open the config file `/usr/share/glados/config/db.php` and provide the database name, the username and the password from above:
+Open the config file `/usr/share/glados/config/db.php` and provide the database name, the username and the password from above (see [Config Files](config-files.md) for more information):
 
 ```php
 return [
@@ -173,7 +174,20 @@ Create an Avahi service file (`/etc/avahi/services/glados.service`) with content
 </service-group>
 ```
 
-Restart the avahi-daemon:
+Make sure that the file above contains the correct URLs (this depends on your webserver setup, see below). For example the download URL `actionDownload` will be made up of the hosts IP-address, the port, the protocol and the given relative path from the txt-record `actionDownload`, discovered by `avahi-browse`. The protocol is determined by the port number, `80` gives `http` and `443` gives `https`.
+
+```shell
+${gladosProto}://${gladosIp}:${gladosPort}/${actionDownload}
+```
+
+will then be
+
+```shell
+http://1.2.3.4:80/glados/index.php/ticket/download/{token}
+```
+If you use the Apache setup from below, you don't have to change the service file.
+
+Finally restart the avahi-daemon:
 
     /etc/init.d/avahi-daemon restart
 
@@ -268,9 +282,12 @@ Hit [http://localhost/glados/requirements.php](http://localhost/glados/requireme
 
 Make sure you have set `upload_max_filesize` and `post_max_size` to a proper value in `php.ini`.
 
-> After checking all requirements, you can remove the `requirements.php` file.
+> After checking all requirements, you can remove the `requirements.php` file located at `/usr/share/glados/web/requirements.php`.
 
 You can now access the webinterface by the URL [http://localhost/glados](http://localhost/glados).
+
+You may login with **admin/admin** or **teacher/teacher**.
+To modify the users, please login as **admin**.
 
 ```shell
 :wq

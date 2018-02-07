@@ -165,6 +165,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
+    <div class="alert alert-success" role="alert">
+        <span class="glyphicon glyphicon-alert"></span>
+        <span>For more information, please visit <?= Html::a('Manual / Create multiple tickets', ['/howto/view', 'id' => 'create-multiple-tickets.md'], ['class' => 'alert-link']) ?>.</span>
+    </div>
+
     <div class="ticket-form">
 
     <?php $form = ActiveForm::begin(); ?>

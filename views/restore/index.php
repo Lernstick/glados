@@ -13,6 +13,11 @@ use yii\widgets\Pjax;
 
 ?>
 
+<div class="alert alert-info" role="alert">
+    <span class="glyphicon glyphicon-alert"></span>
+    <span>Do you want to restore a file? Then please visit <?= Html::a('Manual / Restore a specific file', ['/howto/view', 'id' => 'restore-specific-file.md'], ['class' => 'alert-link']) ?>.</span>
+</div>
+
 <?= DetailView::widget([
     'model' => $ticketModel,
     'attributes' => [

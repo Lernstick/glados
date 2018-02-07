@@ -6,11 +6,11 @@ A ticket is the access authorization for the student to his exam. If you have 20
 
 The ticket *Token* (used to indentify the exam, see [Taking an Exam](take-exam.md)) is automatically generated. You can change it to a value of your desire, but notice that this value must be unique among all other ticket tokens (otherwise an error will occur).
 
-The *Backup Interval* describes a value (in seconds) how often the system will be backed up. 5 minutes is a moderate value for this.
+*Backup Interval* describes the value (in seconds) for the backup schedule. It's the interval after which backup processes will run again on the ticket. 5 minutes is a moderate value for this.
 
 > Notice, this will increase network traffic, if set to a very low value.
 
-You can set a *Time Limit* for your exam, but this will have no indication (nothing will happen tough, if the time is up).
+You can set a *Time Limit* for your exam, but this will have no indication (nothing will happen tough, if the time is up). In the [Ticket-view](ticket-view.md) can be seen whether the ticket is valid or not (time has expired).
 
 > This will override the setting [configured in the exam](create-exam.md).
 
