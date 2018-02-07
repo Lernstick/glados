@@ -18,6 +18,7 @@ Since GLaDOS's interface is based entirely in your browser, you’ll need a web 
 * You should have PHP 5.4 or above. Ideally latest PHP 7. You should also install the [PDO PHP Extension](http://www.php.net/manual/en/pdo.installation.php) and the corresponding database driver `pdo_mysql`.
 * To support generating of ZIP files, you need the PHP `zip` extension.
 * To support live data, you need the [PECL inotify](https://pecl.php.net/package/inotify/0.1.6) extension version 0.1.6.
+* To support creating thumbnails, you need the PHP `gd` extension.
 
 #### Database
 
@@ -35,7 +36,7 @@ Currently only MySQL databases are supported. You need MySQL 5.5 or newer.
 
 In Debian, the packages needed from above can be installed by:
 
-    apt-get install apache2 mysql-server php5 php5-mysql squashfs-tools rdiff-backup avahi-daemon openssh-client
+    apt-get install apache2 mysql-server php5 php5-mysql php5-gd squashfs-tools rdiff-backup avahi-daemon openssh-client
 
 ### Installation
 
