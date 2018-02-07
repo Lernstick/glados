@@ -392,7 +392,7 @@ class EventStream extends EventItem
                             if($this->events[0] !== null){
                                 $this->events[0]->sent_at = microtime(true);
                                 $this->events[0]->debug = YII_ENV_DEV ? json_encode($events[0]) : null;
-                                if($this->events[0]->priority != 0 || ($this->sentEvents/(microtime(true) - $this->_startTime)) < $this->maxEventsPerSecond){
+                                if($this->events[0]->priority == 0 || ($this->sentEvents/(microtime(true) - $this->_startTime)) < $this->maxEventsPerSecond){
                                     $this->sentEvents++;
                                     $this->_lastEvent = $this->events[0];
                                     return true;
