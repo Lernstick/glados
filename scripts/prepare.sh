@@ -48,7 +48,10 @@ function do_exit()
 }
 trap do_exit EXIT
 
-export DISPLAY=:0
+# get DISPLAY and XAUTHORITY env vars to display the zenity window
+set -o allexport
+. <(strings /proc/$(pgrep firefox)/environ | awk -F= '$1=="DISPLAY"||$1=="XAUTHORITY"') 
+set +o allexport
 
 echo 0 > /run/initramfs/restore
 
@@ -276,6 +279,7 @@ export wget
 export wgetOptions
 export DEBUG
 export DISPLAY
+export XAUTHORITY
 export urlNotify
 
 screen -d -m bash -c '
