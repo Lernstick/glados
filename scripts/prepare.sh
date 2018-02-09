@@ -292,6 +292,12 @@ screen -d -m bash -c '
     $DEBUG && >&2 echo "New client state: $1"
   }
 
+  # export DISPLAY and XAUTHORITY env vars
+  set -o allexport
+  eval $(strings /proc/$(pgrep -n firefox)/environ | grep "DISPLAY=")
+  eval $(strings /proc/$(pgrep -n firefox)/environ | grep "XAUTHORITY=")
+  set +o allexport
+
   if $DEBUG; then
     if ${zenity} --question --title="Continue" --text="The system setup is done. Continue?"; then
       clientState "continue bootup"
