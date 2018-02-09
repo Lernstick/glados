@@ -111,7 +111,8 @@ class DaemonController extends Controller
 
         # determine daemon info, e.g: [daemon:1234], where "daemon" is the prefix of the
         # controller and 1234 is the pid of the daemon, used to identify lines in the logfile.
-        $this->daemonInfo = end(explode('\\', str_replace('controller', '', strtolower(get_called_class())))) . ':' . getmypid();
+        $tmp = explode('\\', str_replace('controller', '', strtolower(get_called_class())));
+        $this->daemonInfo = end($tmp) . ':' . getmypid();
 
     }
 
