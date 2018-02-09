@@ -19,6 +19,7 @@ Since GLaDOS's interface is based entirely in your browser, you’ll need a web 
 * To support generating of ZIP files, you need the PHP `zip` extension.
 * To support live data, you need the [PECL inotify](https://pecl.php.net/package/inotify/0.1.6) extension version 0.1.6.
 * To support creating thumbnails, you need the PHP `gd` extension.
+* Yii2 need the Multibyte-Strings [mbstring](http://php.net/manual/de/book.mbstring.php) module for PHP
 
 #### Database
 
