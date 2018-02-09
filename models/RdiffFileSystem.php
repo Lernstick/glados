@@ -298,7 +298,8 @@ class RdiffFileSystem extends Model
      */
     public function getNewestBackupVersion()
     {
-        $file = end(glob($this->rdiffBackupDataDir . "/session_statistics.*.data"));
+        $tmp = glob($this->rdiffBackupDataDir . "/session_statistics.*.data");
+        $file = end($tmp);
         if (preg_match($this->dateRegex, $file, $matches)) {
             return $matches[0];
         }
