@@ -1,0 +1,37 @@
+Subject: Remove dev environment
+From: Roman Gruber <roman.gruber@bwzofingen.ch>
+--- a/config/web.php
++++ b/config/web.php
+@@ -78,19 +78,4 @@
+     'runtimePath' => '/var/lib/glados/runtime',
+ ];
+ 
+-if (YII_ENV_DEV) {
+-    // configuration adjustments for 'dev' environment
+-    $config['bootstrap'][] = 'debug';
+-    $config['modules']['debug'] = [
+-        'class' => 'yii\debug\Module',
+-        'allowedIPs' => ['10.16.0.222', '192.168.0.115', '127.0.0.1']
+-    ];
+-
+-    $config['bootstrap'][] = 'gii';
+-    $config['modules']['gii'] = [
+-        'class' => 'yii\gii\Module',
+-        'allowedIPs' => ['10.16.0.222', '192.168.0.115', '127.0.0.1']
+-    ];
+-}
+-
+ return $config;
+--- a/web/index.php
++++ b/web/index.php
+@@ -1,8 +1,8 @@
+ <?php
+ 
+ // comment out the following two lines when deployed to production
+-defined('YII_DEBUG') or define('YII_DEBUG', true);
+-defined('YII_ENV') or define('YII_ENV', 'dev');
++defined('YII_DEBUG') or define('YII_DEBUG', false);
++defined('YII_ENV') or define('YII_ENV', 'prod');
+ 
+ require('/usr/share/yii2/autoload.php');
+ require('/usr/share/yii2/yiisoft/yii2/Yii.php');

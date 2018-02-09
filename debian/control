@@ -1,0 +1,36 @@
+Source: glados
+Section: web
+Priority: optional
+Maintainer: Roman Gruber <roman.gruber@bwzofingen.ch>
+Build-Depends: debhelper (>= 9)
+Standards-Version: 3.9.5
+Homepage: https://github.com/imedias/glados
+#Vcs-Git: git://anonscm.debian.org/collab-maint/glados.git
+Vcs-Browser: https://github.com/imedias/glados
+
+Package: glados
+Architecture: all
+Depends: ${misc:Depends},
+    apache2,
+    mysql-server,
+    php5,
+    php5-mysql,
+    squashfs-tools,
+    rdiff-backup,
+    avahi-daemon,
+    openssh-client,
+    dbconfig-common,
+    php5-inotify,
+    yii2-glados
+Suggests: www-browser
+Description:  The exam server webinterface
+ Glados is a fully configurable webinterface to take, manage and create exams using the Lernstick.
+ It allows to:
+  * Create exams in a simple manner
+  * Create complex exams with specific system configuration, additional software or permissions
+  * Manage running exams
+  * Configure backup intervals for exams
+  * Restore specific files from the backup history
+  * Create tickets for exams
+  * Generate exam results from the backups
+  * Submit corrected exams
