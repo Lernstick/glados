@@ -1,0 +1,12 @@
+glados for Debian
+-----------------
+
+Get the newest source package by
+
+ debian/rules get-orig-source
+
+Build the package by
+
+ dpkg-buildpackage -us -uc
+
+ -- Roman Gruber <roman.gruber@bwzofingen.ch>  Tue, 16 Jan 2018 10:45:38 +0100

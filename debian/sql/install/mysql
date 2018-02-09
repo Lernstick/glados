@@ -1,0 +1,4 @@
+#!/bin/bash
+/usr/share/glados/yii migrate --migrationPath=@yii/rbac/migrations --interactive=0
+/usr/share/glados/yii rbac/init --interactive=0
+/usr/share/glados/yii migrate --interactive=0

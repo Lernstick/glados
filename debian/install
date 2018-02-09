@@ -1,0 +1,22 @@
+yii     usr/share/glados
+functions.php   usr/share/glados
+
+assets      usr/share/glados
+commands    usr/share/glados
+components  usr/share/glados
+controllers usr/share/glados
+howtos      usr/share/glados
+mail        usr/share/glados
+migrations  usr/share/glados
+models      usr/share/glados
+scripts     usr/share/glados
+views       usr/share/glados
+web         usr/share/glados
+
+config/console.php  usr/share/glados/config
+config/web.php      usr/share/glados/config
+
+debian/conf/*   etc/glados
+
+debian/sql/upgrade/*    usr/share/dbconfig-common/scripts/glados/upgrade/mysql
+debian/sql/install/*    usr/share/dbconfig-common/scripts/glados/install

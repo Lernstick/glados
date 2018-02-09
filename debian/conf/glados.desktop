@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Glados
+Comment=Exam management over web
+Exec=sensible-browser http://localhost/glados/
+Terminal=false
+Type=Application
+Categories=Database;
