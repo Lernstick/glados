@@ -40,9 +40,21 @@ desktop_install() {
 }
 
 phpini_install() {
-	mkdir -p /etc/php5/mods-available
-	ln -sf ../../glados/glados.ini /etc/php5/mods-available/glados.ini
-	php5enmod glados
+	mkdir -p /etc/php/7.0/mods-available
+	ln -sf /etc/glados/glados.ini /etc/php/7.0/mods-available/glados.ini
+	phpenmod glados
+}
+
+
+php_inotify_install(){
+    pecl install inotify
+    cat > /etc/php/7.0/mods-available/inotify.ini <<'EOF'
+; configuration for php inotify module
+; priority=20
+extension=inotify.so
+EOF
+
+    phpenmod inotify
 }
 
 apache_install() {
@@ -52,6 +64,7 @@ apache_install() {
     avahi_install
     desktop_install
     phpini_install
+    php_inotify_install
 
     COMMON_STATE=$(dpkg-query -f '${Status}' -W 'apache2.2-common' 2>/dev/null | awk '{print $3}' || true)
 

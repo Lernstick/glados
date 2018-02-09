@@ -16,6 +16,10 @@ apache_remove() {
     rm -f /etc/apache2/conf-available/glados.conf
 }
 
+php_inotify_remove(){
+    pecl uninstall inotify
+}
+
 if [ -f /usr/share/debconf/confmodule ]; then
     . /usr/share/debconf/confmodule
 fi
@@ -39,7 +43,10 @@ if [ "$1" = "remove" ] || [ "$1" = "purge" ]; then
         db_version 2.0
 
         apache_remove $1
-        php5dismod glados
+        phpdismod glados
+
+        php_inotify_remove $1
+        phpdismod inotify
 
         # Redirection of 3 is needed because Debconf uses it and it might
         # be inherited by webserver. See bug #446324.
@@ -62,10 +69,11 @@ if [ "$1" = "remove" ] || [ "$1" = "purge" ]; then
             rm -f /etc/avahi/services/glados.service
         fi
 
-        if [ -h /etc/php5/mods-available/glados.ini ] ; then
-            rm -f /etc/php5/mods-available/glados.ini
+        if [ -h /etc/php/7.0/mods-available/glados.ini ] ; then
+            rm -f /etc/php/7.0/mods-available/glados.ini
         fi
 
+        rm -f /etc/php/7.0/mods-available/inotify.ini
         rm -rf /etc/glados /var/lib/glados
     fi
 fi

@@ -13,14 +13,18 @@ Architecture: all
 Depends: ${misc:Depends},
     apache2,
     mysql-server,
-    php5,
-    php5-mysql,
+    php,
+    php-zip,
+    php-mysql,
+    php-gd,
+    php-mbstring,
+    php-pear,
+    php-dev,
     squashfs-tools,
     rdiff-backup,
     avahi-daemon,
     openssh-client,
     dbconfig-common,
-    php5-inotify,
     yii2-glados
 Suggests: www-browser
 Description:  The exam server webinterface
