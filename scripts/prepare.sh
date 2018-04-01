@@ -8,6 +8,9 @@ zenity="/usr/bin/zenity"
 infoFile="/run/initramfs/info"
 python="/usr/bin/python"
 
+# source os-release
+. /etc/os-release
+
 # transmit state to server
 function clientState()
 {
@@ -84,6 +87,7 @@ mkdir -p "/run/initramfs/backup/etc/live/config/"
 mkdir -p "/run/initramfs/backup/etc/lernstick-firewall/"
 mkdir -p "/run/initramfs/backup/etc/avahi/"
 mkdir -p "/run/initramfs/backup/root/.ssh"
+mkdir -p "/run/initramfs/backup/usr/share/applications"
 
 # set proper permissions
 chown user:user "/run/initramfs/backup/home/user/Schreibtisch/"
@@ -113,6 +117,7 @@ sed -i 's/ShowNotUsedInfo=.*/ShowNotUsedInfo=false/g' "/run/initramfs/backup/etc
 sed -i 's/AutoStartInstaller=.*/AutoStartInstaller=false/g' "/run/initramfs/backup/etc/lernstickWelcome"
 echo "ShowExamInfo=true" >>"/run/initramfs/backup/etc/lernstickWelcome" #TODO: replace with sed
 cp -p "/usr/share/applications/finish_exam.desktop" "/run/initramfs/backup/home/user/Schreibtisch/"
+cp -p "/usr/share/applications/finish_exam.desktop" "/run/initramfs/backup/usr/share/applications/"
 chown user:user "/run/initramfs/backup/home/user/Schreibtisch/finish_exam.desktop"
 
 # This is to fix an issue when the DNS name of the exam server end in .local (which is the case in most Microsoft
@@ -188,7 +193,11 @@ if [ -n "${actionConfig}" ]; then
 
   # config->url_whitelist
   if [ "$(config_value "url_whitelist")" != "" ]; then
-    config_value "url_whitelist" | tee -a /run/initramfs/newroot/etc/lernstick-firewall/url_whitelist
+    if [ "${VERSION_ID}" = "9" ]; then
+      config_value "url_whitelist" | sed 's/\./\\\./g' | tee -a /run/initramfs/newroot/etc/lernstick-firewall/url_whitelist
+    else
+      config_value "url_whitelist" | tee -a /run/initramfs/newroot/etc/lernstick-firewall/url_whitelist
+    fi
   fi
 
   # config->libre_autosave
@@ -262,7 +271,11 @@ echo "${sshKey}" >>"/run/initramfs/backup/root/.ssh/authorized_keys"
 
 # hand over open ports
 echo "tcp ${gladosIp} 22" >>/run/initramfs/backup/etc/lernstick-firewall/net_whitelist_input
-echo "${gladosProto}://${gladosIp}:${gladosPort}" >>/run/initramfs/backup/etc/lernstick-firewall/url_whitelist
+if [ "${VERSION_ID}" = "9" ]; then
+  echo "${gladosProto}://${gladosIp}" | sed 's/\./\\\./g' >>/run/initramfs/backup/etc/lernstick-firewall/url_whitelist
+else
+  echo "${gladosProto}://${gladosIp}:${gladosPort}" >>/run/initramfs/backup/etc/lernstick-firewall/url_whitelist
+fi
 echo "tcp ${gladosIp} ${gladosPort}" >>/run/initramfs/backup/etc/lernstick-firewall/net_whitelist
 sort -u -o /run/initramfs/backup/etc/lernstick-firewall/url_whitelist /run/initramfs/backup/etc/lernstick-firewall/url_whitelist
 
