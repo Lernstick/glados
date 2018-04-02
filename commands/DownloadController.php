@@ -193,6 +193,7 @@ class DownloadController extends DaemonController implements DaemonInterface
                 $this->ticket->client_state = "preparing system";
                 $this->ticket->save();
 
+                /* run the prepare.sh script on the client */
                 $cmd = "ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa -o "
                      . "UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "
                      . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip) . " "
@@ -207,20 +208,6 @@ class DownloadController extends DaemonController implements DaemonInterface
                 });
 
                 $retval = $cmd->run();
-                var_dump($retval);
-
-/*$infoFile = <<<EOF
-gladosIp="${gladosIp}"
-gladosHost="${gladosHost}"
-gladosPort="${gladosPort}"
-partitionSystem="$(blkid -l -L system)"
-
-urlDownload="${urlDownload}"
-urlFinish="${urlFinish}"
-urlNotify="${urlNotify}"
-urlMd5="${urlMd5}"
-urlConfig="${urlConfig}"
-EOF;*/
 
                 $eventItem = new EventItem([
                     'event' => 'ticket/' . $this->ticket->id,
