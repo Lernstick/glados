@@ -177,6 +177,20 @@ $requirements = array(
         'condition' => is_executable('/usr/bin/ssh') && is_executable('/usr/bin/ssh-keygen'),
         'by' => 'SSH',
         'memo' => 'Please install the <a href="https://www.openssh.com/">OpenSSH</a> package.'
-    ),    
+    ),
+    'GD' => array(
+        'name' => 'PHP GD extension',
+        'mandatory' => true,
+        'condition' => extension_loaded('gd'),
+        'by' => 'Backup and Restore daemon',
+        'memo' => 'Please install the <a href="http://php.net/manual/en/book.image.php">PHP GD</a> extension.',
+    ),
+    'ZIP' => array(
+        'name' => 'zip',
+        'mandatory' => true,
+        'condition' => extension_loaded('zip'),
+        'by' => 'Generate results',
+        'memo' => 'Please install the <a href="http://php.net/manual/en/book.zip.php">PHP Zip</a> extension.',
+    ),
 );
 $requirementsChecker->checkYii()->check($requirements)->render();
