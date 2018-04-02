@@ -5,8 +5,12 @@ wget="/usr/bin/wget"
 wgetOptions="--dns-timeout=30"
 timeout=10
 zenity="/usr/bin/zenity"
-infoFile="/run/initramfs/info"
+initrd="/run/initramfs"
+infoFile="${initrd}/info"
 python="/usr/bin/python"
+examUser="user"
+desktop="$(sudo -u ${examUser} xdg-user-dir DESKTOP)"
+home="$(sudo -u ${examUser} xdg-user-dir)"
 
 # source os-release
 . /etc/os-release
@@ -45,8 +49,8 @@ function do_exit()
   #iptables-save | grep -v "searchExamServer" | iptables-restore
 
   # unmount the filesystem
-  umount /run/initramfs/newroot
-  umount -l /run/initramfs/{base,exam}
+  umount ${initrd}/newroot
+  umount -l ${initrd}/{base,exam}
   exit
 }
 trap do_exit EXIT
@@ -56,7 +60,7 @@ set -o allexport
 . <(strings /proc/$(pgrep firefox)/environ | awk -F= '$1=="DISPLAY"||$1=="XAUTHORITY"') 
 set +o allexport
 
-echo 0 > /run/initramfs/restore
+echo 0 > ${initrd}/restore
 
 token=$1
 [ -r "${infoFile}" ] && . ${infoFile}
@@ -79,68 +83,74 @@ urlConfig="${urlConfig}"
 EOF
 
 # create necessary directory structure
-mkdir -p "/run/initramfs/backup/etc/NetworkManager/"{system-connections,dispatcher.d}
-mkdir -p "/run/initramfs/backup/home/user/Schreibtisch/"
-mkdir -p "/run/initramfs/backup/usr/bin/"
-mkdir -p "/run/initramfs/backup/usr/sbin/"
-mkdir -p "/run/initramfs/backup/etc/live/config/"
-mkdir -p "/run/initramfs/backup/etc/lernstick-firewall/"
-mkdir -p "/run/initramfs/backup/etc/avahi/"
-mkdir -p "/run/initramfs/backup/root/.ssh"
-mkdir -p "/run/initramfs/backup/usr/share/applications"
+mkdir -p "${initrd}/backup/etc/NetworkManager/"{system-connections,dispatcher.d}
+mkdir -p "${initrd}/backup/${desktop}/"
+mkdir -p "${initrd}/backup/usr/bin/"
+mkdir -p "${initrd}/backup/usr/sbin/"
+mkdir -p "${initrd}/backup/etc/live/config/"
+mkdir -p "${initrd}/backup/etc/lernstick-firewall/"
+mkdir -p "${initrd}/backup/etc/avahi/"
+mkdir -p "${initrd}/backup/root/.ssh"
+mkdir -p "${initrd}/backup/usr/share/applications"
 
 # set proper permissions
-chown user:user "/run/initramfs/backup/home/user/Schreibtisch/"
-chown user:user "/run/initramfs/backup/home/user/"
-chmod 755 "/run/initramfs/backup/root"
-chmod 700 "/run/initramfs/backup/root/.ssh"
+chown user:user "${initrd}/backup/${desktop}/"
+chown user:user "${initrd}/backup/${home}/"
+chmod 755 "${initrd}/backup/root"
+chmod 700 "${initrd}/backup/root/.ssh"
 
 # get all active network connections
 con=$(LC_ALL=C nmcli -t -f state,connection d status | awk -F: '$1=="connected"{print $2}')
-echo "${con}" | LC_ALL=C xargs -I{} cp -p "/etc/NetworkManager/system-connections/{}" "/run/initramfs/backup/etc/NetworkManager/system-connections/"
+echo "${con}" | LC_ALL=C xargs -I{} cp -p "/etc/NetworkManager/system-connections/{}" "${initrd}/backup/etc/NetworkManager/system-connections/"
 
 # edit copied connections manually, because nmcli will remove the wifi-sec.psk password when edited by nmcli modify
-#sed -i '/\[connection\]/a permissions=user:root:;' /run/initramfs/backup/etc/NetworkManager/system-connections/*
+#sed -i '/\[connection\]/a permissions=user:root:;' ${initrd}/backup/etc/NetworkManager/system-connections/*
 
 # copy needed scripts and files
-cp -p "/etc/NetworkManager/dispatcher.d/02searchExamServer" "/run/initramfs/backup/etc/NetworkManager/dispatcher.d/02searchExamServer"
-cp -p "/usr/bin/finishExam" "/run/initramfs/backup/usr/bin/finishExam"
+cp -p "/etc/NetworkManager/dispatcher.d/02searchExamServer" "${initrd}/backup/etc/NetworkManager/dispatcher.d/02searchExamServer"
+cp -p "/usr/bin/finishExam" "${initrd}/backup/usr/bin/finishExam"
 
 # those should be removed as fast as possible
-cp -p "/usr/bin/lernstick_backup" "/run/initramfs/backup/usr/bin/lernstick_backup" #TODO: remove
-cp -p "/usr/bin/lernstick_autostart" "/run/initramfs/backup/usr/bin/lernstick_autostart" #TODO: remove
-cp -p "/usr/sbin/lernstick-firewall" "/run/initramfs/backup/usr/sbin/lernstick-firewall" #TODO: remove
-cp -p "/etc/lernstick-firewall/lernstick-firewall.conf" "/run/initramfs/backup/etc/lernstick-firewall/lernstick-firewall.conf" #TODO: remove
+cp -p "/usr/bin/lernstick_backup" "${initrd}/backup/usr/bin/lernstick_backup" #TODO: remove
+cp -p "/usr/bin/lernstick_autostart" "${initrd}/backup/usr/bin/lernstick_autostart" #TODO: remove
+cp -p "/usr/sbin/lernstick-firewall" "${initrd}/backup/usr/sbin/lernstick-firewall" #TODO: remove
+cp -p "/etc/lernstick-firewall/lernstick-firewall.conf" "${initrd}/backup/etc/lernstick-firewall/lernstick-firewall.conf" #TODO: remove
 
-cp -p "/etc/lernstickWelcome" "/run/initramfs/backup/etc/lernstickWelcome"
-sed -i 's/ShowNotUsedInfo=.*/ShowNotUsedInfo=false/g' "/run/initramfs/backup/etc/lernstickWelcome"
-sed -i 's/AutoStartInstaller=.*/AutoStartInstaller=false/g' "/run/initramfs/backup/etc/lernstickWelcome"
-echo "ShowExamInfo=true" >>"/run/initramfs/backup/etc/lernstickWelcome" #TODO: replace with sed
-cp -p "/usr/share/applications/finish_exam.desktop" "/run/initramfs/backup/home/user/Schreibtisch/"
-cp -p "/usr/share/applications/finish_exam.desktop" "/run/initramfs/backup/usr/share/applications/"
-chown user:user "/run/initramfs/backup/home/user/Schreibtisch/finish_exam.desktop"
+# config of /etc/lernstickWelcome
+cp -p "/etc/lernstickWelcome" "${initrd}/backup/etc/lernstickWelcome"
+sed -i 's/ShowNotUsedInfo=.*/ShowNotUsedInfo=false/g' "${initrd}/backup/etc/lernstickWelcome"
+sed -i 's/AutoStartInstaller=.*/AutoStartInstaller=false/g' "${initrd}/backup/etc/lernstickWelcome"
+echo "ShowExamInfo=true" >>"${initrd}/backup/etc/lernstickWelcome" #TODO: replace with sed
+cp -p "/usr/share/applications/finish_exam.desktop" "${initrd}/backup/${desktop}/"
+cp -p "/usr/share/applications/finish_exam.desktop" "${initrd}/backup/usr/share/applications/"
+chown user:user "${initrd}/backup/${desktop}/finish_exam.desktop"
 
-# This is to fix an issue when the DNS name of the exam server end in .local (which is the case in most Microsoft
-# domain environments). In case if a .local name the mDNS policy in /etc/nsswitch.conf will catch. This ends in ssh
-# login delays of up to 20 seconds. Changing it to .alocal is a workaround. Better is not to use mDNS in an exam.
-sed 's/#domain-name=local/domain-name=.alocal/' /etc/avahi/avahi-daemon.conf >/run/initramfs/backup/etc/avahi/avahi-daemon.conf
+# This is to fix an issue when the DNS name of the exam server ends in .local (which is the
+# case in most Microsoft domain environments). In case of a .local name the mDNS policy in
+# /etc/nsswitch.conf will catch. This ends in ssh login delays of up to 20 seconds. Changing it 
+# to .alocal is a workaround. Better is not to use mDNS in an exam.
+sed 's/#domain-name=local/domain-name=.alocal/' /etc/avahi/avahi-daemon.conf >${initrd}/backup/etc/avahi/avahi-daemon.conf
 
 # mount/prepare the root filesystem
-mount /lib/live/mount/medium/live/filesystem.squashfs /run/initramfs/base
-if [ -e /run/initramfs/squashfs/exam.squashfs ]; then
-  mount /run/initramfs/squashfs/exam.squashfs /run/initramfs/exam
+mount /lib/live/mount/medium/live/filesystem.squashfs ${initrd}/base
+if [ -e ${initrd}/squashfs/exam.squashfs ]; then
+  mount ${initrd}/squashfs/exam.squashfs ${initrd}/exam
 fi
-if [ -e /run/initramfs/squashfs/exam.zip ]; then
-  unzip -o /run/initramfs/squashfs/exam.zip -d /run/initramfs/exam
-  chown -R 1000:1000 /run/initramfs/exam/home/user 2>/dev/null
-  chown -R 0:0 /run/initramfs/exam/home/user/Screenshots 2>/dev/null
+if [ -e ${initrd}/squashfs/exam.zip ]; then
+  unzip -o ${initrd}/squashfs/exam.zip -d ${initrd}/exam
+  # fix permissions of the files in the home dir
+  chown -R 1000:1000 ${initrd}/exam/${home} 2>/dev/null
+  chown -R 0:0 ${initrd}/exam/${home}/Screenshots 2>/dev/null
 fi
-mount -t aufs -o br=/run/initramfs/backup=rw:/run/initramfs/exam=ro:/run/initramfs/base=ro none "/run/initramfs/newroot"
+mount -t aufs -o br=${initrd}/backup=rw:${initrd}/exam=ro:${initrd}/base=ro none "${initrd}/newroot"
 
 # remove policykit action for lernstick welcome application
-rm -f /run/initramfs/newroot/usr/share/polkit-1/actions/ch.lernstick.welcome.policy
+rm -f ${initrd}/newroot/usr/share/polkit-1/actions/ch.lernstick.welcome.policy
 
-# apply specific config if available
+###########################################
+# apply specific exam config if available #
+###########################################
+
 if [ -n "${actionConfig}" ]; then
   # get the config
   config="$(${wget} ${wgetOptions} -qO- "${urlConfig}")"
@@ -153,50 +163,50 @@ if [ -n "${actionConfig}" ]; then
 
   # config->grp_netdev
   if [ "$(config_value "grp_netdev")" = "False" ]; then
-    chroot /run/initramfs/newroot gpasswd -d user netdev
-    sed -i 's/netdev//' /run/initramfs/newroot/etc/live/config/user-setup.conf
+    chroot ${initrd}/newroot gpasswd -d user netdev
+    sed -i 's/netdev//' ${initrd}/newroot/etc/live/config/user-setup.conf
   else
-    chroot /run/initramfs/newroot gpasswd -a user netdev
+    chroot ${initrd}/newroot gpasswd -a user netdev
   fi
 
   # config->allow_sudo
   if [ "$(config_value "allow_sudo")" = "False" ]; then
-    sed '/user  ALL=(ALL) PASSWD: ALL/ s/^/#/' /etc/sudoers >/run/initramfs/backup/etc/sudoers
+    sed '/user  ALL=(ALL) PASSWD: ALL/ s/^/#/' /etc/sudoers >${initrd}/backup/etc/sudoers
   else
-    sed '/^#user  ALL=(ALL) PASSWD: ALL/ s/^#//' /etc/sudoers >/run/initramfs/backup/etc/sudoers
+    sed '/^#user  ALL=(ALL) PASSWD: ALL/ s/^#//' /etc/sudoers >${initrd}/backup/etc/sudoers
   fi
 
   # config->allow_sudo
   if [ "$(config_value "allow_mount")" = "False" ]; then
-    chroot /run/initramfs/newroot sed -i 's/^ResultAny=.*/ResultAny=auth_admin/;s/^ResultInactive=.*/ResultInactive=auth_admin/;s/^ResultActive=.*/ResultActive=auth_admin/' /etc/polkit-1/localauthority/50-local.d/10-udisks2.pkla
+    chroot ${initrd}/newroot sed -i 's/^ResultAny=.*/ResultAny=auth_admin/;s/^ResultInactive=.*/ResultInactive=auth_admin/;s/^ResultActive=.*/ResultActive=auth_admin/' /etc/polkit-1/localauthority/50-local.d/10-udisks2.pkla
   else
-    chroot /run/initramfs/newroot sed -i 's/^ResultAny=.*/ResultAny=yes/;s/^ResultInactive=.*/ResultInactive=yes/;s/^ResultActive=.*/ResultActive=yes/' /etc/polkit-1/localauthority/50-local.d/10-udisks2.pkla
+    chroot ${initrd}/newroot sed -i 's/^ResultAny=.*/ResultAny=yes/;s/^ResultInactive=.*/ResultInactive=yes/;s/^ResultActive=.*/ResultActive=yes/' /etc/polkit-1/localauthority/50-local.d/10-udisks2.pkla
   fi
 
   # config->firewall_off
   if [ "$(config_value "firewall_off")" = "False" ]; then
-    chroot /run/initramfs/newroot systemctl enable lernstick-firewall.service
+    chroot ${initrd}/newroot systemctl enable lernstick-firewall.service
   else
-    chroot /run/initramfs/newroot systemctl disable lernstick-firewall.service
+    chroot ${initrd}/newroot systemctl disable lernstick-firewall.service
   fi
 
   # config->screenshots
   if [ "$(config_value "screenshots")" = "False" ]; then
-    chroot /run/initramfs/newroot sed -i 's/BackupScreenshot=.*/BackupScreenshot=false/' /etc/lernstickWelcome 
+    chroot ${initrd}/newroot sed -i 's/BackupScreenshot=.*/BackupScreenshot=false/' /etc/lernstickWelcome 
   else
     # write/append config options
     bf=$(config_value "screenshots_interval")
-    chroot /run/initramfs/newroot sed -i '/^BackupScreenshot=/{h;s/=.*/=true/};${x;/^$/{s//BackupScreenshot=true/;H};x}' /etc/lernstickWelcome
-    chroot /run/initramfs/newroot sed -i '/^Backup=/{h;s/=.*/=true/};${x;/^$/{s//Backup=true/;H};x}' /etc/lernstickWelcome
-    chroot /run/initramfs/newroot sed -i '/^BackupFrequency=/{h;s/=.*/='$bf'/};${x;/^$/{s//BackupFrequency='$bf'/;H};x}' /etc/lernstickWelcome
+    chroot ${initrd}/newroot sed -i '/^BackupScreenshot=/{h;s/=.*/=true/};${x;/^$/{s//BackupScreenshot=true/;H};x}' /etc/lernstickWelcome
+    chroot ${initrd}/newroot sed -i '/^Backup=/{h;s/=.*/=true/};${x;/^$/{s//Backup=true/;H};x}' /etc/lernstickWelcome
+    chroot ${initrd}/newroot sed -i '/^BackupFrequency=/{h;s/=.*/='$bf'/};${x;/^$/{s//BackupFrequency='$bf'/;H};x}' /etc/lernstickWelcome
   fi
 
   # config->url_whitelist
   if [ "$(config_value "url_whitelist")" != "" ]; then
     if [ "${VERSION_ID}" = "9" ]; then
-      config_value "url_whitelist" | sed 's/\./\\\./g' | tee -a /run/initramfs/newroot/etc/lernstick-firewall/url_whitelist
+      config_value "url_whitelist" | sed 's/\./\\\./g' | tee -a ${initrd}/newroot/etc/lernstick-firewall/url_whitelist
     else
-      config_value "url_whitelist" | tee -a /run/initramfs/newroot/etc/lernstick-firewall/url_whitelist
+      config_value "url_whitelist" | tee -a ${initrd}/newroot/etc/lernstick-firewall/url_whitelist
     fi
   fi
 
@@ -227,62 +237,67 @@ if [ -n "${actionConfig}" ]; then
 </oor:items>'
 
   # if the file exists, remove the xml entries
-  if [ -e '/run/initramfs/newroot/home/user/.config/libreoffice/4/user/registrymodifications.xcu' ]; then
+  if [ -e '${initrd}/newroot/${home}/.config/libreoffice/4/user/registrymodifications.xcu' ]; then
     sed -i -e '\#org.openoffice.Office.Recovery/AutoSave.*TimeIntervall#d' \
       -e '\#org.openoffice.Office.Recovery/AutoSave.*Enabled#d' \
       -e '\#org.openoffice.Office.Common/Save/Document.*CreateBackup#d' \
       -e '\#</oor:items>#d' \
-      /run/initramfs/newroot/home/user/.config/libreoffice/4/user/registrymodifications.xcu
+      ${initrd}/newroot/${home}/.config/libreoffice/4/user/registrymodifications.xcu
   else
     # else create the needed config directory
-    mkdir -p /run/initramfs/newroot/home/user/.config/libreoffice/4/user
+    mkdir -p ${initrd}/newroot/${home}/.config/libreoffice/4/user
     registry='<?xml version="1.0" encoding="UTF-8"?>
 <oor:items xmlns:oor="http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 '${registry}
   fi
 
   # append the xml entries to the file
-  echo "${registry}" >> /run/initramfs/newroot/home/user/.config/libreoffice/4/user/registrymodifications.xcu
+  echo "${registry}" >> ${initrd}/newroot/${home}/.config/libreoffice/4/user/registrymodifications.xcu
 
   # fix the permissions
-  chown -R user:user /run/initramfs/newroot/home/user/.config
+  chown -R user:user ${initrd}/newroot/${home}/.config
 
 else
-  # these are the default values, if the exam server does not provide a config file and the exam file has not configured them
+  # these are the default values, if the exam server does not provide a config file and the
+  # exam file has not configured them
   $DEBUG && >&2 echo "no config available, setting default values"
 
   # remove user from the netdev group to prevent him from changing network connections
-  chroot /run/initramfs/newroot gpasswd -d user netdev
-  sed -i 's/netdev//' /run/initramfs/newroot/etc/live/config/user-setup.conf
+  chroot ${initrd}/newroot gpasswd -d user netdev
+  sed -i 's/netdev//' ${initrd}/newroot/etc/live/config/user-setup.conf
 
   # remove sudo privileges
-  sed '/user  ALL=(ALL) PASSWD: ALL/ s/^/#/' /etc/sudoers >/run/initramfs/backup/etc/sudoers
+  sed '/user  ALL=(ALL) PASSWD: ALL/ s/^/#/' /etc/sudoers >${initrd}/backup/etc/sudoers
 
   # prevent user from mounting external media
-  chroot /run/initramfs/newroot sed -i 's/^ResultAny=.*/ResultAny=auth_admin/;s/^ResultInactive=.*/ResultInactive=auth_admin/;s/^ResultActive=.*/ResultActive=auth_admin/' /etc/polkit-1/localauthority/50-local.d/10-udisks2.pkla
+  chroot ${initrd}/newroot sed -i 's/^ResultAny=.*/ResultAny=auth_admin/;s/^ResultInactive=.*/ResultInactive=auth_admin/;s/^ResultActive=.*/ResultActive=auth_admin/' /etc/polkit-1/localauthority/50-local.d/10-udisks2.pkla
 
   # enable the firewall
-  chroot /run/initramfs/newroot systemctl enable lernstick-firewall.service
+  chroot ${initrd}/newroot systemctl enable lernstick-firewall.service
 
 fi
 
 # hand over the ssh key from the exam server
-echo "${sshKey}" >>"/run/initramfs/backup/root/.ssh/authorized_keys"
+echo "${sshKey}" >>"${initrd}/backup/root/.ssh/authorized_keys"
 
 # hand over open ports
-echo "tcp ${gladosIp} 22" >>/run/initramfs/backup/etc/lernstick-firewall/net_whitelist_input
-if [ "${VERSION_ID}" = "9" ]; then
-  echo "${gladosProto}://${gladosIp}" | sed 's/\./\\\./g' >>/run/initramfs/backup/etc/lernstick-firewall/url_whitelist
-else
-  echo "${gladosProto}://${gladosIp}:${gladosPort}" >>/run/initramfs/backup/etc/lernstick-firewall/url_whitelist
-fi
-echo "tcp ${gladosIp} ${gladosPort}" >>/run/initramfs/backup/etc/lernstick-firewall/net_whitelist
-sort -u -o /run/initramfs/backup/etc/lernstick-firewall/url_whitelist /run/initramfs/backup/etc/lernstick-firewall/url_whitelist
+echo "tcp ${gladosIp} 22" >>${initrd}/backup/etc/lernstick-firewall/net_whitelist_input
 
-# grab all UUIDs from physical ethernet connection to bring them down before rebooting the
+# hand over the url whitelist
+if [ "${VERSION_ID}" = "9" ]; then
+  echo "${gladosProto}://${gladosIp}" | sed 's/\./\\\./g' >>${initrd}/backup/etc/lernstick-firewall/url_whitelist
+else
+  echo "${gladosProto}://${gladosIp}:${gladosPort}" >>${initrd}/backup/etc/lernstick-firewall/url_whitelist
+fi
+
+# hand over allowed ip/ports
+echo "tcp ${gladosIp} ${gladosPort}" >>${initrd}/backup/etc/lernstick-firewall/net_whitelist
+sort -u -o ${initrd}/backup/etc/lernstick-firewall/url_whitelist ${initrd}/backup/etc/lernstick-firewall/url_whitelist
+
+# grab all UUIDs from physical ethernet connections to bring them down before rebooting the
 # system. This forces network-manager to reconnect each of them. This solves a problem when
 # the system recieves an IP-address at bootup (by ipconfig) and NM handles it as "manual" IP.
-# We don't loose DNS servers and the DHCP lease will be renewed.
+# We don't loose DNS servers and the DHCP lease will be renewed properly.
 eths=$(LC_ALL=C nmcli -t -f state,type,con-uuid d status | awk -F: '$1=="connected"&&$2=="ethernet"{print $3}')
 
 # export variables needed in the screen underneath
