@@ -47,3 +47,18 @@ Config Item     | Description
 ----
 
 If you start the `Search Exam Server` utility now, it will only search for your given IP-address, thus other exam servers in the network will be ignored.
+
+### Automatically search for exam server
+
+You can configure the exam client, so that on **every** network connection that comes up, the search for an exam server is started. This can be done by setting
+
+    SearchExamServer=true
+
+in the config file `/etc/lernstickWelcome`.
+
+> Notice, that the utillity now starts on **every** network connection (LAN, WLAN, VPN and so on).
+
+----
+
+It is recommended to create a shortcut for `Search Exam Server` on the Desktop.
+
