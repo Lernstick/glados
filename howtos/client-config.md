@@ -26,12 +26,12 @@ Create a config file `/etc/lernstick-exam-client.conf` with the following conten
     gladosProto="http"
     gladosDesc="Description"
 
-    actionDownload='glados/index.php?r=ticket/download&token={token}'
-    actionFinish='glados/index.php?r=ticket/finish&token={token}'
-    actionNotify='glados/index.php?r=ticket/notify&token={token}&state={state}'
-    actionSSHKey='glados/index.php?r=ticket/ssh-key'
-    actionMd5='glados/index.php?r=ticket/md5&token={token}'
-    actionConfig='glados/index.php?r=ticket/config&token={token}'
+    actionDownload='glados/index.php/ticket/download/{token}'
+    actionFinish='glados/index.php/ticket/finish/{token}'
+    actionNotify='glados/index.php/ticket/notify/{token}?state={state}'
+    actionSSHKey='glados/index.php/ticket/ssh-key'
+    actionMd5='glados/index.php/ticket/md5/{token}'
+    actionConfig='glados/index.php/ticket/config/{token}'
 
 The below table explaines the keys and values:
 
