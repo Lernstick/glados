@@ -327,6 +327,16 @@ class Ticket extends \yii\db\ActiveRecord
             $eventItem->generate();
         }
 
+        if($this->attributesChanged([ 'last_backup' ])){
+            $eventItem = new EventItem([
+                'event' => 'ticket/' . $this->id,
+                'priority' => 2,
+                'data' => [
+                    'last_backup' => $this->last_backup,
+                ],
+            ]);
+            $eventItem->generate();
+        }
 
         if($this->attributesChanged([ 'client_state' ])){
             $eventItem = new EventItem([

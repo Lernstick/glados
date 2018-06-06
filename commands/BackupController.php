@@ -45,7 +45,7 @@ class BackupController extends DaemonController implements DaemonInterface
     /**
      * @var boolean Whether it is the last backup or not 
      */
-    private $finishBackup;
+    private $finishBackup = false;
 
     /**
      * @var boolean Whether the backup is manually or automatic started
@@ -145,11 +145,6 @@ class BackupController extends DaemonController implements DaemonInterface
     public function processItem ($ticket)
     {
         $this->ticket = $ticket;
-        if ($this->ticket->backup_last < $this->ticket->end) {
-            $this->finishBackup = true;
-        } else {
-            $this->finishBackup = false;
-        }
 
         if (!is_writable(\Yii::$app->params['backupPath'])) {
             $this->ticket->backup_state = \Yii::$app->params['backupPath'] . ': No such file or directory or not writable.';
@@ -236,7 +231,14 @@ class BackupController extends DaemonController implements DaemonInterface
             }else{
                 $this->ticket->backup_last = new Expression('NOW()');
                 $this->ticket->backup_state = 'backup successful.';
+
+                # If it's the last backup, tell the client and set last_backup to 1
                 if ($this->finishBackup == true) {
+                    $this->ticket->last_backup = 1;
+                    $this->ticket->save(false);
+                }
+
+                if ($this->ticket->last_backup == 1){
                     $this->ticket->runCommand('echo 0 > /home/user/shutdown');
                 }
 
@@ -254,8 +256,6 @@ class BackupController extends DaemonController implements DaemonInterface
             }
 
             $this->ticket->backup_last_try = new Expression('NOW()');
-            #$this->ticket->backup_lock = 0;
-            #$this->ticket->save(false);
             $this->unlockItem($this->ticket);
 
         }
@@ -348,7 +348,8 @@ class BackupController extends DaemonController implements DaemonInterface
             ->where(['not', ['start' => null]])
             ->andWhere(['not', ['end' => null]])
             ->andWhere(['not', ['ip' => null]])
-            ->andWhere('`backup_last` < `end`')
+            //->andWhere('`backup_last` < `end`')
+            ->andWhere(['last_backup' => 0])
             ->andWhere([
                 'or',
                 ['<', 'backup_last_try', new Expression('NOW() - INTERVAL 1 MINUTE')],
@@ -381,6 +382,7 @@ class BackupController extends DaemonController implements DaemonInterface
         // then search for finished tickets for a last backup
         if (($ticket = $this->finished()) !== null) {
             $this->lockItem($ticket);
+            $this->finishBackup = true;
             return $ticket;
         }
 

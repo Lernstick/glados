@@ -756,6 +756,7 @@ class TicketController extends Controller
         }
 
         $model->end = new Expression('NOW()');
+        $model->last_backup = 0;
         $model->save();
 
         $act = new Activity([

@@ -402,9 +402,26 @@ $this->params['breadcrumbs'][] = $this->title;
                         }
                     }',
                 ]) . ActiveEventField::widget([
+                    'options' => [
+                        'style' => 'float:left'
+                    ],
                     'content' => yii::$app->formatter->format($model->backup_state, 'ntext'),
                     'event' => 'ticket/' . $model->id,
                     'jsonSelector' => 'backup_state',
+                ]) . ActiveEventField::widget([
+                    'content' => yii::$app->formatter->format('&nbsp;<i class="glyphicon glyphicon-ok text-success"></i>&nbsp;last backup successful', 'html'),
+                    'options' => [
+                        'class' => $model->last_backup == 1 ? '' : 'hidden'
+                    ],
+                    'event' => 'ticket/' . $model->id,
+                    'jsonSelector' => 'last_backup',
+                    'jsHandler' => 'function(d, s){
+                        if(d == "1"){
+                            s.classList.remove("hidden");
+                        }else if(d == "0"){
+                            s.classList.add("hidden");
+                        }
+                    }',
                 ]),
             ],
             [
