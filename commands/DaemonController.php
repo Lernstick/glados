@@ -113,7 +113,6 @@ class DaemonController extends Controller
         # controller and 1234 is the pid of the daemon, used to identify lines in the logfile.
         $tmp = explode('\\', str_replace('controller', '', strtolower(get_called_class())));
         $this->daemonInfo = end($tmp) . ':' . getmypid();
-
     }
 
     /**
@@ -244,7 +243,7 @@ class DaemonController extends Controller
 
         if ($toDB === true){
             $this->daemon->state = $message;
-            $this->daemon->save();
+            $this->daemon->save(false);
         }
 
         if ($toFile === true && $this->logFileIsWritable === true) {
@@ -327,7 +326,33 @@ class DaemonController extends Controller
     public function pingOthers ()
     {
 
-        /* search for daemons with alive date older than 2 minutes */
+        /* search for daemons that are not running anymore and reap them */
+        $query = Daemon::find()
+            ->where(['not', ['pid' => $this->daemon->pid]])
+            ->orderBy(['alive' => SORT_ASC]);
+
+        $models = $query->all();
+        foreach($models as $daemon) {
+            if ($daemon->running !== true) {
+                $this->logError("daemon " . $daemon->pid . ": not running anymore, seems to be crashed", true);
+                $daemon->delete();
+
+                $daemons = new DaemonSearch();
+                $runningDaemons = $daemons->search([])->totalCount;
+
+                $eventItem = new EventItem([
+                    'event' => 'runningDaemons',
+                    'priority' => 0,
+                    'concerns' => ['users' => ['ALL']],
+                    'data' => [
+                        'runningDaemons' => $runningDaemons,
+                    ],
+                ]);
+                $eventItem->generate();
+            }
+        }
+
+        /* search for daemons with alive date older than 2 minutes and ping them */
         $query = Daemon::find()
             ->where(['not', ['pid' => $this->daemon->pid]])
             ->andWhere([

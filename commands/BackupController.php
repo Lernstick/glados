@@ -326,7 +326,7 @@ class BackupController extends DaemonController implements DaemonInterface
                 if ($daemon->running != true) {
                     $ticket->backup_lock = $ticket->restore_lock = 0;
                     $ticket->save(false);
-                    $daemon->delete();
+                    //$daemon->delete();
                 }
             } else {
                 $ticket->backup_lock = $ticket->restore_lock = 0;
