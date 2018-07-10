@@ -11,7 +11,7 @@ use app\models\DaemonInterface;
 
 /**
  * Analyzer Daemon
- * Desc: TODO
+ * This daemon analizes the squash filesystems and updates the database accordingly
  */
 class AnalyzeController extends DaemonController implements DaemonInterface
 {

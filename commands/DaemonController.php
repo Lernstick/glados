@@ -65,6 +65,7 @@ class DaemonController extends Controller
         0 => ['download', 'run-once'],
         1 => ['backup', 'run-once'],
         2 => ['analyze', 'run-once'],
+        3 => ['dbclean', 'run-once'],
     ];
 
     public $daemonInfo = 'daemon:0';
