@@ -29,6 +29,13 @@ class DaemonController extends Controller
     protected $loadarr = [];
 
     /**
+     * @var array An array holding the timestamp of the last invocation of a job in
+     * [[joblist]]. The key corresponds to the key in [[joblist]] and the value is
+     * the timestamp of the last invocation.
+     */
+    public $jobLastRun = [];
+
+    /**
      * @var app\models\Daemon the daemon instance for db updates
      */
     public $daemon;
@@ -52,20 +59,24 @@ class DaemonController extends Controller
 
     /**
      * @var array list of controllers and actions to work trough in one iteration.
+     * The interval (in seconds) describes that the action should be executed only
+     * after that interval has passed. This is optional.
+     *
      * The list has the following pattern:
      * [
-     *     0 => ['controller1', 'action1'],
+     *     0 => ['controller1', 'action1', interval1],
      *     1 => ['controller1', 'action2'],
-     *     2 => ['controller2', 'action2'],
+     *     2 => ['controller2', 'action2', interval3],
      *     ...
-     *     N => ['controllerN', 'actionN']
+     *     N => ['controllerN', 'actionN', intervalN]
      * ]
+     *
      */
     public $joblist = [
         0 => ['download', 'run-once'],
         1 => ['backup', 'run-once'],
         2 => ['analyze', 'run-once'],
-        3 => ['dbclean', 'run-once'],
+        3 => ['dbclean', 'run-once', 300],
     ];
 
     public $daemonInfo = 'daemon:0';
@@ -406,10 +417,20 @@ class DaemonController extends Controller
         while (true) {
             $tot = false;
             foreach ($this->joblist as $priority => $task) {
+
+                // bail out if the task has an interval set and its not reached already
+                if (isset($task[2]) && array_key_exists($priority, $this->jobLastRun)) {
+                    if ($this->jobLastRun[$priority] > microtime(true) - $task[2]) {
+                        continue;
+                    }
+                }
                 $controller = Yii::$app->createControllerByID($task[0]);
                 $controller->daemon = $this->daemon;
                 $ret = $controller->runAction($task[1]);
                 $controller = null;
+
+                $this->jobLastRun[$priority] = microtime(true);
+
                 if ($ret === true) {
                     $this->calcLoad(1);
                     $tot = true;

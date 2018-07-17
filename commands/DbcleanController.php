@@ -66,8 +66,6 @@ class DbcleanController extends DaemonController implements DaemonInterface
      */
     public function processItem ($item = null)
     {
-        $this->logInfo('Cleaning database...', true, false, true);
-
         $cleanEvents = \Yii::$app->db
             ->createCommand()
             ->delete('event', ['<', 'generated_at', microtime(true) - 3600]);
@@ -79,6 +77,7 @@ class DbcleanController extends DaemonController implements DaemonInterface
         $cleanEventStreams->execute();
 
         $this->dbcleaned = microtime(true);
+        $this->logInfo('Database cleaned.', true, false, true);
     }
 
     /**
