@@ -122,6 +122,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => $model->screenshots_interval*60, # in seconds
                 'format' => 'duration'
             ],
+            [
+                'label' => 'Maximum brightness',
+                'value' => $model->max_brightness/100,
+                'format' => 'percent'
+            ],            
         ],
     ]) ?>
 

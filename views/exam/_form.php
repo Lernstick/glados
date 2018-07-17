@@ -7,6 +7,7 @@ use yii\widgets\Pjax;
 //use kartik\file\FileInput;
 use yii\web\JsExpression;
 use limion\jqueryfileupload\JQueryFileUpload;
+use kartik\range\RangeInput;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Exam */
@@ -160,6 +161,15 @@ $this->registerJs($js);
         <div class="col-md-6">
             <?= $form->field($model, 'url_whitelist')->textarea([
                 'rows' => '6',
+            ]) ?>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <?= $form->field($model, 'max_brightness')->widget(RangeInput::classname(), [
+                'options' => ['placeholder' => 'Select range ...'],
+                'html5Options' => ['min'=>0, 'max'=>100, 'step'=>1],
+                'addon' => ['append'=>['content'=>'%']]
             ]) ?>
         </div>
     </div>
