@@ -11,7 +11,8 @@ use app\models\EventItem;
  *
  * @property integer $id
  * @property string $uuid string unique id identifying the event stream
- * @property double $stopped_at timestamp in seconds with microseconds when the event stream has stopped. 
+ * @property double $stopped_at timestamp in seconds with microseconds when the event stream has stopped.
+ * @property integer $started_at timestamp in seconds when the event stream has started.
  * @property integer $lastEventId 
  * @property string $listenEvents array the names of all the event that the streamer should listen on, comma separated.
  */
