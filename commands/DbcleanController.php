@@ -5,6 +5,7 @@ namespace app\commands;
 use yii;
 use app\commands\DaemonController;
 use app\models\DaemonInterface;
+use yii\db\Expression;
 
 /**
  * DB Clean Daemon
@@ -13,11 +14,15 @@ use app\models\DaemonInterface;
 class DbcleanController extends DaemonController implements DaemonInterface
 {
 
+    /**
+     * @var int interval in which the db should be cleaned (in seconds)
+     */    
+    public $cleanInterval = 300;
 
     /**
      * @var int timestamp when the db was cleaned the last time 
      */    
-    public $dbcleaned = null;
+    private $dbcleaned = null;
 
     /**
      * @inheritdoc
@@ -57,20 +62,23 @@ class DbcleanController extends DaemonController implements DaemonInterface
     /**
      * @inheritdoc
      *
-     * Delete all event items older than 3600 seconds
+     * Delete all event items older than 3600 seconds and all event streams older than 1 week
      */
     public function processItem ($item = null)
     {
-        $now = microtime(true);
-        $timestamp = $now - 3600;
-
         $this->logInfo('Cleaning database...', true, false, true);
 
-        $q = \Yii::$app->db
+        $cleanEvents = \Yii::$app->db
             ->createCommand()
-            ->delete('event', ['<', 'generated_at', $timestamp]);
-        $q->execute();
-        $this->dbcleaned = $now;
+            ->delete('event', ['<', 'generated_at', microtime(true) - 3600]);
+        $cleanEvents->execute();
+
+        $cleanEventStreams = \Yii::$app->db
+            ->createCommand()
+            ->delete('event_stream', ['<', 'started_at', new Expression('NOW() - INTERVAL 1 WEEK')]);
+        $cleanEventStreams->execute();
+
+        $this->dbcleaned = microtime(true);
     }
 
     /**
@@ -94,7 +102,7 @@ class DbcleanController extends DaemonController implements DaemonInterface
      */
     public function getNextItem ()
     {
-        if ($this->dbcleaned < microtime(true) - 300){
+        if ($this->dbcleaned < microtime(true) - $this->cleanInterval){
             return true;
         } else {
             return false;

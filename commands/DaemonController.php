@@ -81,7 +81,7 @@ class DaemonController extends Controller
 
         /**
          * Register a tick handler that calls pcntl_signal_dispatch();
-         * In doJob(), there must sometimes be manual calls of pcntl_signal_dispatch();
+         * In [[doJob()]], there must sometimes be manual calls of pcntl_signal_dispatch();
          * A tick is an event that occurs for every N low-level tickable statements executed by
          * the parser within the declare block. The value for N is specified using ticks=N within
          * the declare block's directive section.

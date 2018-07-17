@@ -10,10 +10,10 @@ use app\models\EventItem;
  * This is the model class for event streams.
  *
  * @property integer $id
- * @property string $uuid 
+ * @property string $uuid string unique id identifying the event stream
  * @property double $stopped_at timestamp in seconds with microseconds when the event stream has stopped. 
  * @property integer $lastEventId 
- * @property string $listenEvents the names of all the event that the streamer should listen on, comma separated.
+ * @property string $listenEvents array the names of all the event that the streamer should listen on, comma separated.
  */
 class EventStream extends EventItem
 {
