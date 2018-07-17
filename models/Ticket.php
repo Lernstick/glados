@@ -35,6 +35,7 @@ use app\models\EventItem;
  * @property timestamp $startTime
  * @property array $classMap
  * @property boolean $valid
+ * @property boolean $abandoned
  * @property boolean $backup
  * @property Backup[] $backups
  * @property integer $state
@@ -170,7 +171,7 @@ class Ticket extends \yii\db\ActiveRecord
         return [
             'token' => 'This is a randomly generated, unique token to <b>identify the ticket</b>. The test taker has to provide this token to gain access to his exam.',
             'backup_interval' => 'This value (in seconds) sets the <b>interval to create automatic backups</b> of the exam system. Set to <code>0</code> to disable automatic backup.',
-            'time_limit' => 'This has the same effect as the value in the exam. Leave empty to inherit the value configured in the exam' . (isset($this->exam) ? ' (' . yii::$app->formatter->format($this->exam->time_limit, 'timeLimit') . ')' : '') . '. Set to <code>0</code> for no time limit. Notice, this will <b>override the setting in the exam</b>.',
+            'time_limit' => 'If this value (in minutes) is set, the exam status view of the student will show the time left. This has the same effect as the value in the exam. Leave empty to inherit the value configured in the exam' . (isset($this->exam) ? ' (' . yii::$app->formatter->format($this->exam->time_limit, 'timeLimit') . ')' : '') . '. Set to <code>0</code> for no time limit. Notice, this will <b>override the setting in the exam</b>.',
             'exam_id' => 'Choose the exam this ticket has to be assigned to in the list below. Notice, only exams assigned to you will be shown underneath.',
             'test_taker' => 'Here you can <b>assign the ticket to a student</b>. If left empty, this can also be done later (even when the exam has finished), but it is recommended to set this value as soon as possible, to keep track of the tickets. If not set the ticket will be unassigned/anonymous.',
             'start' => 'The start time of the exam. This should not be manually edited.',
@@ -440,6 +441,38 @@ class Ticket extends \yii\db\ActiveRecord
     }
 
     /**
+     * Determine whether the ticket is abandoned or not. To be abandoned the ticket must satisfy all
+     * the following:
+     * 
+     *  - be in the RUNNING state
+     *  - an IP address must be set
+     *  - a backup_interval > 0 must be set
+     *  - if no time limit (in the ticket or exam) is set, the difference between the last successful
+     *    backup and the last backup attempt must be geather than the configured abandonTicket time
+     *  - if a time limit is set (in the ticket or exam, if both are set the one from the ticket will
+     *    be taken), the difference between the last successful backup and the last backup attempt must
+     *    be greather than that time limit
+     * 
+     * @return bool
+     */
+    public function getAbandoned() {
+
+        $blt = strtotime($this->backup_last_try);
+        $bl = strtotime($this->backup_last);
+        $at = \Yii::$app->params['abandonTicket'];
+        $ttl = $this->time_limit;
+        $etl = $this->exam->time_limit;
+        $t = ($ttl > 0 ? $ttl*60 : ($ttl === 0 ? $at : ($ttl === null ? ($etl > 0 ? $etl*60 : $at) : $at)));
+
+        return (
+            $this->state == self::STATE_RUNNING &&
+            $this->ip != null &&
+            $this->backup_interval != 0 &&
+            $blt - $bl > $t
+        );
+    }
+
+    /**
      * Returns if there is a backup
      *
      * @return bool
@@ -495,7 +528,7 @@ class Ticket extends \yii\db\ActiveRecord
             } else if (is_int($this->exam->time_limit) && $this->exam->time_limit == 0) {
                 return true;
             } else if (is_int($this->exam->time_limit) && $this->exam->time_limit > 0) {
-                $a->add(new \DateInterval('PT' . intval($this->exam->time_limit) . 'M'));            
+                $a->add(new \DateInterval('PT' . intval($this->exam->time_limit) . 'M'));
             } else {
                 return true;
             }
@@ -639,7 +672,7 @@ class Ticket extends \yii\db\ActiveRecord
         //$query = parent::find();
         $query = new TicketQuery(get_called_class());
 
-        $query->select(['`ticket`.*', new \yii\db\Expression('(case
+        $query->addSelect(['`ticket`.*', new \yii\db\Expression('(case
             WHEN (start is not null and end is not null and test_taker > "") THEN
                 3 # submitted
             WHEN (start is not null and end is not null) THEN

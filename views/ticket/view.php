@@ -422,7 +422,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             s.classList.add("hidden");
                         }
                     }',
-                ]),
+                ]) . ($model->abandoned ? ('&nbsp;<a tabindex="0" class="label label-danger" role="button" data-toggle="popover" data-html="true" data-trigger="focus" title="Abandoned Ticket" data-content="This ticket is abandoned and thus excluded from regular backup. A reason for this could be that the backup process was not able to perform a backup of the client. After some time of failed backup attempts, the ticket will be abandoned (the value of <i>Time Limit</i> of this ticket/exam or ' . yii::$app->formatter->format(\Yii::$app->params['abandonTicket'], 'duration') . ' if nothing is set). You can still force a backup by clicking Actions->Backup Now.">Abandoned</a>') : ''),
             ],
             [
                 'attribute' => 'restore_state',

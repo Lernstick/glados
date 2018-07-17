@@ -308,7 +308,7 @@ class BackupController extends DaemonController implements DaemonInterface
     }
 
     /**
-     * Clean up abandoned tickets. If a ticket stays in backup_lock or restore_lock and
+     * Clean up locked tickets. If a ticket stays in backup_lock or restore_lock and
      * its associated daemon is not running anymore, this function will unlock those tickets.
      *
      * @return void
@@ -348,7 +348,6 @@ class BackupController extends DaemonController implements DaemonInterface
             ->where(['not', ['start' => null]])
             ->andWhere(['not', ['end' => null]])
             ->andWhere(['not', ['ip' => null]])
-            //->andWhere('`backup_last` < `end`')
             ->andWhere(['last_backup' => 0])
             ->andWhere([
                 'or',
@@ -386,12 +385,65 @@ class BackupController extends DaemonController implements DaemonInterface
             return $ticket;
         }
 
-        // now those which weren't tried in the last n seconds (n=backup_interval)
+        /*
+         * Now those which weren't tried in the last n seconds (n=backup_interval)
+         */
         $query = Ticket::find()
+            ->joinWith('exam')
             ->where(['not', ['start' => null]])
             ->andWhere(['end' => null])
             ->andWhere(['not', ['ip' => null]])
             ->andWhere(['not', ['backup_interval' => 0]])
+            ->andWhere([
+                'or',
+                [
+                    'and',
+                    ['`ticket`.`time_limit`' => null],
+                    [
+                        'or',
+                        ['`exam`.`time_limit`' => null],
+                        ['`exam`.`time_limit`' => 0],
+                    ],
+                    [
+                        '<',
+                        new Expression('COALESCE(unix_timestamp(`ticket`.`backup_last_try`) - unix_timestamp(`ticket`.`backup_last`), 0)'),
+                        \Yii::$app->params['abandonTicket']
+                    ]
+                ],
+                [
+                    'and',
+                    ['`ticket`.`time_limit`' => null],
+                    ['not', ['`exam`.`time_limit`' => null]],
+                    ['not', ['`exam`.`time_limit`' => 0]],                    
+                    [
+                        '>=',
+                        new Expression('COALESCE(unix_timestamp(`ticket`.`backup_last`), 0) + `exam`.`time_limit`*60'),
+                        new Expression('unix_timestamp(NOW())')
+                    ]
+                ],
+                [
+                    'and',
+                    ['`ticket`.`time_limit`' => 0],
+                    [
+                        '<',
+                        new Expression('COALESCE(unix_timestamp(`ticket`.`backup_last_try`) - unix_timestamp(`ticket`.`backup_last`), 0)'),
+                        \Yii::$app->params['abandonTicket']
+                    ]
+                ],
+                [
+                    'and',
+                    [
+                        '>',
+                        '`ticket`.`time_limit`',
+                        0
+                    ],
+                    [
+                        '>=',
+                        new Expression('COALESCE(unix_timestamp(`ticket`.`backup_last`), 0) + `ticket`.`time_limit`*60'),
+                        new Expression('unix_timestamp(NOW())')
+                    ]
+                ]
+            ])
             ->andWhere([
                 'or',
                 [
