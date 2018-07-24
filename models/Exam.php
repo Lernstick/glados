@@ -94,7 +94,7 @@ class Exam extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Name',
             'subject' => 'Subject',
-            'file' => 'Exam File',
+            'file' => 'Exam Image File (zip, squashfs)',
             'md5' => 'MD5 Checksum',
             'file_list' => 'File List',
             'user_id' => 'User ID',
@@ -276,7 +276,7 @@ class Exam extends \yii\db\ActiveRecord
 
     public function validateRunningTickets($attribute, $params)
     {
-        $this->runningTicketCount != 0 ? $this->addError($attribute, 'Exam update is disabled while there are ' . $this->runningTicketCount . ' tickets in "Running" state.') : null;
+        $this->runningTicketCount != 0 ? $this->addError($attribute, 'Exam edit is disabled while there are ' . $this->runningTicketCount . ' tickets in "Running" state.') : null;
     }
 
     /**

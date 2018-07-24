@@ -53,7 +53,7 @@ $this->registerJs($active_tabs);
             <ul class="dropdown-menu">
                 <li>
                     <?= Html::a(
-                        '<span class="glyphicon glyphicon-pencil"></span> Update',
+                        '<span class="glyphicon glyphicon-pencil"></span> Edit',
                         ['update', 'id' => $model->id],
                         ['data-pjax' => 0]
                     ) ?>
