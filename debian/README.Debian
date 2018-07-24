@@ -1,6 +1,8 @@
 glados for Debian
 -----------------
 
+Adjust the version number in debian/conf/params.php
+
 Get the newest source package by
 
  debian/rules get-orig-source
