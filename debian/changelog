@@ -1,3 +1,16 @@
+glados (1.0.4-deb8) unstable; urgency=low
+
+  * Fix several bugs:
+    - When a daemon crashes it should vanish in the database
+    - Cleanup event and event_stream table in the db periodically
+    - Stop backuping old tickets that are still in running state
+    - Last backup not triggering when backup_last > end 
+  * New Features:
+    - Setting to adjust/lock screen brightness
+  * Changed some names of fields for better comprehension
+
+ -- Roman Gruber <roman.gruber@bwzofingen.ch>  Tue, 24 Jul 2018 16:01:42 +0200
+
 glados (1.0.3-deb8) unstable; urgency=low
 
   * Initial release

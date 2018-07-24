@@ -7,6 +7,14 @@ Get the newest source package by
 
  debian/rules get-orig-source
 
+Write a changelog entry. Date format:
+
+ LC_ALL=c date -R
+
+Maybe adjust year in debian/copyright.
+
+Rename the file in debian/sql/upgrade/<version> to the new version.
+
 Build the package by
 
  dpkg-buildpackage -us -uc
