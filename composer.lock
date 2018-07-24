@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3822d34affeef8d1c3cc32c6572db05c",
+    "content-hash": "86e02537cbaf93cdfd3260b117d8fb28",
     "packages": [
         {
             "name": "bower-asset/blueimp-canvas-to-blob",

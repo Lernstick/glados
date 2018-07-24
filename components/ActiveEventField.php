@@ -194,7 +194,7 @@ class ActiveEventField extends Pjax
 
         }else{
 
-            if (extension_loaded('inotify') && isset($listenEvents) && isset($uuid)) {
+            if (\Yii::$app->params['liveEvents'] && extension_loaded('inotify') && isset($listenEvents) && isset($uuid)) {
 
                 foreach($listenEvents as $event){
                     $e[] = $event[2] !== null ? $event[0] . ':' . $event[2] : $event[0];

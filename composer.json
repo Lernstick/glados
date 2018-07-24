@@ -36,7 +36,13 @@
     },
     "config": {
         "process-timeout": 1800,
-        "vendor-dir": "/usr/share/yii2"
+        "vendor-dir": "/usr/share/yii2",
+        "fxp-asset": {
+            "installer-paths": {
+                "npm-asset-library": "/usr/share/yii2/npm",
+                "bower-asset-library": "/usr/share/yii2/bower"
+            }
+        }
     },
     "scripts": {
         "post-create-project-cmd": [
@@ -55,10 +61,6 @@
             "generateCookieValidationKey": [
                 "config/web.php"
             ]
-        },
-        "asset-installer-paths": {
-            "npm-asset-library": "/usr/share/yii2/npm",
-            "bower-asset-library": "/usr/share/yii2/bower"
         }
     }
 }
