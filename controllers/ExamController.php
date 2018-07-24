@@ -216,7 +216,7 @@ class ExamController extends Controller
 
         if ($mode === 'default') {
             if ($model->runningTicketCount != 0){
-                Yii::$app->session->addFlash('danger', 'Exam update is disabled while there are ' . $model->runningTicketCount . ' tickets in "Running" state.');
+                Yii::$app->session->addFlash('danger', 'Exam edit is disabled while there are ' . $model->runningTicketCount . ' tickets in "Running" state.');
                 return $this->redirect(['view', 'id' => $model->id]);
             }
 

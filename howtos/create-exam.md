@@ -4,7 +4,7 @@ To start the exam creation, navigate to `Actions->Create Exam`. In the appearing
 
 The *Name* and *Subject* fields are to identify the exam. The *Name* may not be unique, but it is not recommended to create multiple exams with the same name for reasons of clarity.
 
-You can set a *Time Limit*. Notice that this can also be set in the [ticket](create-single-ticket.md) and the value in the ticket will override this one.
+You can set a *Time Limit* (in minutes). Notice that this can also be set in the [ticket](create-single-ticket.md) and the value in the ticket will override this one.
 
 For more information about the *Remote Backup Path*, please visit [this page](remote-backup-path.md).
 

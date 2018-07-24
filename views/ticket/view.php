@@ -111,7 +111,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <ul class="dropdown-menu">
                 <li>
                     <?= Html::a(
-                        '<span class="glyphicon glyphicon-pencil"></span> Update',
+                        '<span class="glyphicon glyphicon-pencil"></span> Edit',
                         ['update', 'id' => $model->id],
                         ['data-pjax' => 0]
                     ) ?>
@@ -402,10 +402,27 @@ $this->params['breadcrumbs'][] = $this->title;
                         }
                     }',
                 ]) . ActiveEventField::widget([
+                    'options' => [
+                        'style' => 'float:left'
+                    ],
                     'content' => yii::$app->formatter->format($model->backup_state, 'ntext'),
                     'event' => 'ticket/' . $model->id,
                     'jsonSelector' => 'backup_state',
-                ]),
+                ]) . ActiveEventField::widget([
+                    'content' => yii::$app->formatter->format('&nbsp;<i class="glyphicon glyphicon-ok text-success"></i>&nbsp;last backup successful', 'html'),
+                    'options' => [
+                        'class' => $model->last_backup == 1 ? '' : 'hidden'
+                    ],
+                    'event' => 'ticket/' . $model->id,
+                    'jsonSelector' => 'last_backup',
+                    'jsHandler' => 'function(d, s){
+                        if(d == "1"){
+                            s.classList.remove("hidden");
+                        }else if(d == "0"){
+                            s.classList.add("hidden");
+                        }
+                    }',
+                ]) . ($model->abandoned ? ('&nbsp;<a tabindex="0" class="label label-danger" role="button" data-toggle="popover" data-html="true" data-trigger="focus" title="Abandoned Ticket" data-content="This ticket is abandoned and thus excluded from regular backup. A reason for this could be that the backup process was not able to perform a backup of the client. After some time of failed backup attempts, the ticket will be abandoned (the value of <i>Time Limit</i> of this ticket/exam or ' . yii::$app->formatter->format(\Yii::$app->params['abandonTicket'], 'duration') . ' if nothing is set). You can still force a backup by clicking Actions->Backup Now.">Abandoned</a>') : ''),
             ],
             [
                 'attribute' => 'restore_state',

@@ -6,10 +6,10 @@ use yii\helpers\Html;
 /* @var $model app\models\User */
 /* @var $searchModel app\models\TicketSearch */
 
-$this->title = 'Update User: ' . $model->id;
+$this->title = 'Edit User: ' . $model->id;
 $this->params['breadcrumbs'][] = ['label' => 'Users', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = 'Update';
+$this->params['breadcrumbs'][] = 'Edit';
 ?>
 <div class="user-update">
 

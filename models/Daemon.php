@@ -157,7 +157,7 @@ class Daemon extends \yii\db\ActiveRecord
     public function attributesChanged($attributes)
     {
         foreach ($attributes as $attribute) {
-            if ($this->presaveAttributes[$attribute] != $this->attributes[$attribute]) {
+            if ($this->presaveAttributes[$attribute] != $this->getAttributes()[$attribute]) {
                 return true;
             }
         }

@@ -80,11 +80,13 @@ $config = [
 
 if (YII_ENV_DEV) {
     // configuration adjustments for 'dev' environment
-    $config['bootstrap'][] = 'debug';
-    $config['modules']['debug'] = [
-        'class' => 'yii\debug\Module',
-        'allowedIPs' => ['10.16.0.222', '192.168.0.115', '127.0.0.1']
-    ];
+    if($_SERVER['PATH_INFO'] != '/event/stream') {
+        $config['bootstrap'][] = 'debug';
+        $config['modules']['debug'] = [
+            'class' => 'yii\debug\Module',
+            'allowedIPs' => ['10.16.0.222', '192.168.0.115', '127.0.0.1']
+        ];
+    }
 
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [

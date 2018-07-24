@@ -10,10 +10,11 @@ use app\models\EventItem;
  * This is the model class for event streams.
  *
  * @property integer $id
- * @property string $uuid 
- * @property double $stopped_at timestamp in seconds with microseconds when the event stream has stopped. 
+ * @property string $uuid string unique id identifying the event stream
+ * @property double $stopped_at timestamp in seconds with microseconds when the event stream has stopped.
+ * @property integer $started_at timestamp in seconds when the event stream has started.
  * @property integer $lastEventId 
- * @property string $listenEvents the names of all the event that the streamer should listen on, comma separated.
+ * @property string $listenEvents array the names of all the event that the streamer should listen on, comma separated.
  */
 class EventStream extends EventItem
 {
@@ -211,7 +212,7 @@ class EventStream extends EventItem
         $this->_listenEvents = preg_replace('/\:.*$/', '', $this->_listenEvents);
         $this->_listenEvents[] = 'event/' . $this->uuid;
 
-        file_put_contents('/tmp/le', print_r($this->_listenEvents, true) . PHP_EOL, FILE_APPEND);
+        //file_put_contents('/tmp/le', print_r($this->_listenEvents, true) . PHP_EOL, FILE_APPEND);
 
         foreach($this->_listenEvents as $event){
             if(basename($event) == "*"){

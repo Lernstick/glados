@@ -10,7 +10,7 @@ The ticket *Token* (used to indentify the exam, see [Taking an Exam](take-exam.m
 
 > Notice, this will increase network traffic, if set to a very low value.
 
-You can set a *Time Limit* for your exam, but this will have no indication (nothing will happen tough, if the time is up). In the [Ticket-view](ticket-view.md) can be seen whether the ticket is valid or not (time has expired).
+You can set a *Time Limit* (in minutes) for your exam, but this will have no indication (nothing will happen tough, if the time is up). In the [Ticket-view](ticket-view.md) can be seen whether the ticket is valid or not (time has expired).
 
 > This will override the setting [configured in the exam](create-exam.md).
 

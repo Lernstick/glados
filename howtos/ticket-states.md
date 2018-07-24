@@ -9,7 +9,7 @@ Currently there are 4 different states a ticket can occupy. This is incicated in
 
 ### The open state
 
-This incicates that a ticket has not been used yet and there was no activity until now. It is an exam ready to be taken. Newly created tickets are usually in the open state.
+This indicates that a ticket has not been used yet and there was no activity until now. It is an exam ready to be taken. Newly created tickets are usually in the open state.
 
 ### The running state
 

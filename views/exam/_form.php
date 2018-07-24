@@ -7,6 +7,7 @@ use yii\widgets\Pjax;
 //use kartik\file\FileInput;
 use yii\web\JsExpression;
 use limion\jqueryfileupload\JQueryFileUpload;
+use kartik\range\RangeInput;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Exam */
@@ -163,6 +164,15 @@ $this->registerJs($js);
             ]) ?>
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-6">
+            <?= $form->field($model, 'max_brightness')->widget(RangeInput::classname(), [
+                'options' => ['placeholder' => 'Select range ...'],
+                'html5Options' => ['min'=>0, 'max'=>100, 'step'=>1],
+                'addon' => ['append'=>['content'=>'%']]
+            ]) ?>
+        </div>
+    </div>
     
     <?php Pjax::end(); ?>
 
@@ -240,7 +250,7 @@ $this->registerJs($js);
     </div>
 
     <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? 'Next Step' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::submitButton($model->isNewRecord ? 'Next Step' : 'Apply', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>
