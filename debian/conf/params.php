@@ -1,6 +1,6 @@
 <?php
 return [
-    'version' =>                '1.0.3',
+    'version' =>                '1.0.4',
     'itemsPerPage' =>           10,
     'tokenLength' =>            10,
     'uploadPath' =>             '/var/lib/glados/uploads/',
@@ -14,4 +14,6 @@ return [
     'maxDaemons' =>             10,
     'upperBound' =>             80,
     'lowerBound' =>             20,
+    'abandonTicket' =>          10800, // leave the ticket after 3 hours of failed backup attempts
+    'liveEvents' =>             true, // enable or disable live data
 ];
