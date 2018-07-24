@@ -2,17 +2,19 @@ Subject: Remove dev environment
 From: Roman Gruber <roman.gruber@bwzofingen.ch>
 --- a/config/web.php
 +++ b/config/web.php
-@@ -78,19 +78,4 @@
+@@ -78,21 +78,4 @@
      'runtimePath' => '/var/lib/glados/runtime',
  ];
  
 -if (YII_ENV_DEV) {
 -    // configuration adjustments for 'dev' environment
--    $config['bootstrap'][] = 'debug';
--    $config['modules']['debug'] = [
--        'class' => 'yii\debug\Module',
--        'allowedIPs' => ['10.16.0.222', '192.168.0.115', '127.0.0.1']
--    ];
+-    if($_SERVER['PATH_INFO'] != '/event/stream') {
+-        $config['bootstrap'][] = 'debug';
+-        $config['modules']['debug'] = [
+-            'class' => 'yii\debug\Module',
+-            'allowedIPs' => ['10.16.0.222', '192.168.0.115', '127.0.0.1']
+-        ];
+-    }
 -
 -    $config['bootstrap'][] = 'gii';
 -    $config['modules']['gii'] = [
