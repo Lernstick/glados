@@ -71,7 +71,7 @@ class DaemonSearch extends Daemon
         $models = $dataProvider->models;
         foreach($models as $model){
             if($model->running != true && ($key = array_search($model, $models)) !== false){
-                $model->delete();
+                //$model->delete();
                 unset($models[$key]);
                 continue;
             }

@@ -51,13 +51,13 @@ Make sure, that you also instruct the student to save his/her essay in the direc
 
 Finally, the zip file is done. Of course you can provide more files and directories if you want.
 
-Now press `Add files...` and upload the created zip file. Once the upload has finished, press `Update` below.
+Now press `Add files...` and upload the created zip file. Once the upload has finished, press `Apply` below.
 
 We have now created an exam, now we need to create tickets for the students to take the exam.
 
 ### Generating tickets
 
-After pressing `Update` in the step before, we are now in the [exam view](exam-view.md).
+After pressing `Apply` in the step before, we are now in the [exam view](exam-view.md).
 
 I have a list of students, who should take the exam. Thus, in the exam view, press `Actions->Create assigned Tickets`. This is my example list (though, the essays might be of very high quality):
 

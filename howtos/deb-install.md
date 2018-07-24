@@ -8,7 +8,7 @@ This guide describes how to install GLaDOS from the Debian package.
 
 To install the needed requirements, run the following command:
 
-    apt-get install apache2 mysql-server php5 php5-mysql php5-gd squashfs-tools rdiff-backup avahi-daemon openssh-client
+    apt-get install apache2 mysql-server php5 php5-mysql php5-gd squashfs-tools rdiff-backup avahi-daemon openssh-client dbconfig-common
 
 ### Installation
 

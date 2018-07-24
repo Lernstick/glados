@@ -29,6 +29,13 @@ class DaemonController extends Controller
     protected $loadarr = [];
 
     /**
+     * @var array An array holding the timestamp of the last invocation of a job in
+     * [[joblist]]. The key corresponds to the key in [[joblist]] and the value is
+     * the timestamp of the last invocation.
+     */
+    public $jobLastRun = [];
+
+    /**
      * @var app\models\Daemon the daemon instance for db updates
      */
     public $daemon;
@@ -52,19 +59,24 @@ class DaemonController extends Controller
 
     /**
      * @var array list of controllers and actions to work trough in one iteration.
+     * The interval (in seconds) describes that the action should be executed only
+     * after that interval has passed. This is optional.
+     *
      * The list has the following pattern:
      * [
-     *     0 => ['controller1', 'action1'],
+     *     0 => ['controller1', 'action1', interval1],
      *     1 => ['controller1', 'action2'],
-     *     2 => ['controller2', 'action2'],
+     *     2 => ['controller2', 'action2', interval3],
      *     ...
-     *     N => ['controllerN', 'actionN']
+     *     N => ['controllerN', 'actionN', intervalN]
      * ]
+     *
      */
     public $joblist = [
         0 => ['download', 'run-once'],
         1 => ['backup', 'run-once'],
         2 => ['analyze', 'run-once'],
+        3 => ['dbclean', 'run-once', 300],
     ];
 
     public $daemonInfo = 'daemon:0';
@@ -80,7 +92,7 @@ class DaemonController extends Controller
 
         /**
          * Register a tick handler that calls pcntl_signal_dispatch();
-         * In doJob(), there must sometimes be manual calls of pcntl_signal_dispatch();
+         * In [[doJob()]], there must sometimes be manual calls of pcntl_signal_dispatch();
          * A tick is an event that occurs for every N low-level tickable statements executed by
          * the parser within the declare block. The value for N is specified using ticks=N within
          * the declare block's directive section.
@@ -113,7 +125,6 @@ class DaemonController extends Controller
         # controller and 1234 is the pid of the daemon, used to identify lines in the logfile.
         $tmp = explode('\\', str_replace('controller', '', strtolower(get_called_class())));
         $this->daemonInfo = end($tmp) . ':' . getmypid();
-
     }
 
     /**
@@ -244,7 +255,7 @@ class DaemonController extends Controller
 
         if ($toDB === true){
             $this->daemon->state = $message;
-            $this->daemon->save();
+            $this->daemon->save(false);
         }
 
         if ($toFile === true && $this->logFileIsWritable === true) {
@@ -327,7 +338,33 @@ class DaemonController extends Controller
     public function pingOthers ()
     {
 
-        /* search for daemons with alive date older than 2 minutes */
+        /* search for daemons that are not running anymore and reap them */
+        $query = Daemon::find()
+            ->where(['not', ['pid' => $this->daemon->pid]])
+            ->orderBy(['alive' => SORT_ASC]);
+
+        $models = $query->all();
+        foreach($models as $daemon) {
+            if ($daemon->running !== true) {
+                $this->logError("daemon " . $daemon->pid . ": not running anymore, seems to be crashed", true);
+                $daemon->delete();
+
+                $daemons = new DaemonSearch();
+                $runningDaemons = $daemons->search([])->totalCount;
+
+                $eventItem = new EventItem([
+                    'event' => 'runningDaemons',
+                    'priority' => 0,
+                    'concerns' => ['users' => ['ALL']],
+                    'data' => [
+                        'runningDaemons' => $runningDaemons,
+                    ],
+                ]);
+                $eventItem->generate();
+            }
+        }
+
+        /* search for daemons with alive date older than 2 minutes and ping them */
         $query = Daemon::find()
             ->where(['not', ['pid' => $this->daemon->pid]])
             ->andWhere([
@@ -380,10 +417,20 @@ class DaemonController extends Controller
         while (true) {
             $tot = false;
             foreach ($this->joblist as $priority => $task) {
+
+                // bail out if the task has an interval set and its not reached already
+                if (isset($task[2]) && array_key_exists($priority, $this->jobLastRun)) {
+                    if ($this->jobLastRun[$priority] > microtime(true) - $task[2]) {
+                        continue;
+                    }
+                }
                 $controller = Yii::$app->createControllerByID($task[0]);
                 $controller->daemon = $this->daemon;
                 $ret = $controller->runAction($task[1]);
                 $controller = null;
+
+                $this->jobLastRun[$priority] = microtime(true);
+
                 if ($ret === true) {
                     $this->calcLoad(1);
                     $tot = true;

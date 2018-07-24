@@ -28,6 +28,17 @@ use yii\widgets\Pjax;
             'captionOptions' => ['class' => 'dev_item']
         ],
         [
+            'attribute' => 'last_backup',
+            'format' => 'raw',
+            'value' =>  ActiveEventField::widget([
+                'content' => $ticketModel->last_backup,
+                'event' => 'ticket/' . $ticketModel->id,
+                'jsonSelector' => 'last_backup',
+            ]),
+            'visible' => YII_ENV_DEV,
+            'captionOptions' => ['class' => 'dev_item']
+        ],
+        [
             'attribute' => 'backup_interval',
             'format' => 'raw',
             'value' =>  $ticketModel->backup_interval == 0 ? 'No Backup' : yii::$app->formatter->format($ticketModel->backup_interval, 'duration'),
@@ -37,8 +48,6 @@ use yii\widgets\Pjax;
             'format' => 'raw',
             'value' => yii::$app->formatter->format($ticketModel->backup_last, 'timeago') . ' (<b>last try</b>: ' . yii::$app->formatter->format($ticketModel->backup_last_try, 'timeago') . ')',
         ],        
-        //'backup_last:timeago',
-        //'backup_last_try:timeago',
         'backup_size:shortSize',        
         [
             'attribute' => 'backup_state',
