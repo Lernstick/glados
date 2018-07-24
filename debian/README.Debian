@@ -15,6 +15,8 @@ Maybe adjust year in debian/copyright.
 
 Rename the file in debian/sql/upgrade/<version> to the new version.
 
+Update debian/control yii2-glados package to the newest version.
+
 Build the package by
 
  dpkg-buildpackage -us -uc
