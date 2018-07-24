@@ -22,7 +22,7 @@ Depends: ${misc:Depends},
     openssh-client,
     dbconfig-common,
     php5-inotify,
-    yii2-glados
+    yii2-glados (>= 2.0.15.1-1)
 Suggests: www-browser
 Description:  The exam server webinterface
  Glados is a fully configurable webinterface to take, manage and create exams using the Lernstick.
