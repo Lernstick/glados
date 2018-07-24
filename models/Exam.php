@@ -65,20 +65,22 @@ class Exam extends \yii\db\ActiveRecord
         $this->backup_path = $this->isNewRecord ? '/home/user' : $this->backup_path;
         $this->screenshots_interval = $this->isNewRecord ? 5 : $this->screenshots_interval;
         $this->libre_autosave_interval = $this->isNewRecord ? 10 : $this->libre_autosave_interval;
+        $this->max_brightness = $this->isNewRecord ? 100 : $this->max_brightness;
     }
 
     /**
-     * @inheritdoc
+     * @inheritdoc 
      */
     public function rules()
     {
         return [
-            [['id', 'name', 'subject', 'examFile', 'user_id', 'grp_netdev', 'allow_sudo', 'allow_mount', 'firewall_off', 'screenshots', 'screenshots_interval', 'url_whitelist', 'time_limit', 'libre_autosave', 'libre_autosave_interval', 'libre_createbackup'], 'validateRunningTickets'],
+            [['id', 'name', 'subject', 'examFile', 'user_id', 'grp_netdev', 'allow_sudo', 'allow_mount', 'firewall_off', 'screenshots', 'screenshots_interval', 'url_whitelist', 'time_limit', 'libre_autosave', 'libre_autosave_interval', 'libre_createbackup', 'max_brightness'], 'validateRunningTickets'],
             [['name', 'subject', 'backup_path', 'screenshots_interval', 'libre_autosave_interval'], 'required'],
             [['time_limit'], 'integer', 'min' => 0],
             [['screenshots_interval', 'libre_autosave_interval'], 'integer', 'min' => 1],
             [['user_id'], 'integer'],
             [['name', 'subject'], 'string', 'max' => 52],
+            [['max_brightness'], 'integer', 'min' => 0, 'max' => 100],
             [['file'], 'file', 'skipOnEmpty' => true, 'extensions' => ['squashfs', 'zip'], 'checkExtensionByMimeType' => false],
         ];
     }
@@ -111,7 +113,8 @@ class Exam extends \yii\db\ActiveRecord
             'submittedTicketCount' => 'Submitted Tickets',
             'libre_autosave' => 'Libreoffice: Save AutoRecovery information',
             'libre_autosave_interval' => 'Libreoffice: Save AutoRecovery information interval',
-            'libre_createbackup' => 'Libreoffice: Always create backup copy'
+            'libre_createbackup' => 'Libreoffice: Always create backup copy',
+            'max_brightness' => 'Maximum brightness'
         ];
     }
 
@@ -134,6 +137,7 @@ class Exam extends \yii\db\ActiveRecord
             'file' => 'Use a <b>squashfs-Filesystem or a ZIP-File</b> for the exam. Squashfs is a highly compressed read-only filesystem for Linux. This file contains all files, settings and applications for the exam (all changes made on the original machine). These changes are applied to the exam system as soon as the exam starts. See <b>Help</b> for more information on how to create those files.',
             'libre_createbackup' => 'If the <b>Always create backup copy</b> option is selected, the old version of the file is saved to the backup directory whenever you save the current version of the file. The backup copy has the same name as the document, but the extension is <code>.BAK</code>. If the backup folder (default: <code>/home/user/.config/libreoffice/4/backup</code>) already contains such a file, it will be overwritten without warning. (See <a target="_blank" href="https://help.libreoffice.org/Common/Saving_Documents_Automatically">LibreOffice Help</a>)',
             'libre_autosave' => 'Check to <b>save recovery information automatically every n minutes</b>. This command saves the information necessary to restore the current document in case of a crash. Additionally, in case of a crash LibreOffice tries automatically to save AutoRecovery information for all open documents, if possible. (See <a target="_blank" href="https://help.libreoffice.org/Common/Saving_Documents_Automatically">LibreOffice Help</a>)',
+            'max_brightness' => 'Maximum screen brightness in percent. Notice that some devices have buttons to adjust screen brightness on hardware level. This cannot be controlled by this setting.'
         ];
     }
 

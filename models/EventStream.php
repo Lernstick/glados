@@ -212,7 +212,7 @@ class EventStream extends EventItem
         $this->_listenEvents = preg_replace('/\:.*$/', '', $this->_listenEvents);
         $this->_listenEvents[] = 'event/' . $this->uuid;
 
-        file_put_contents('/tmp/le', print_r($this->_listenEvents, true) . PHP_EOL, FILE_APPEND);
+        //file_put_contents('/tmp/le', print_r($this->_listenEvents, true) . PHP_EOL, FILE_APPEND);
 
         foreach($this->_listenEvents as $event){
             if(basename($event) == "*"){
