@@ -13,7 +13,7 @@ Write a changelog entry. Date format:
 
 Maybe adjust year in debian/copyright.
 
-Rename the file in debian/sql/upgrade/<version> to the new version.
+Rename the file in debian/sql/upgrade/<version> to the new version and change the content to the latest migration.
 
 Update debian/control yii2-glados package to the newest version.
 
