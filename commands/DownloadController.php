@@ -144,6 +144,8 @@ class DownloadController extends DaemonController implements DaemonInterface
             $output = "";
             $logFile = Yii::getAlias('@runtime/logs/download.' . $this->ticket->token . '.' . date('c') . '.log');
 
+            @mkdir(dirname($logFile), 0755, true);
+
             $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use (&$output, $logFile) {
                 echo $this->ansiFormat($event->line, $event->channel == ShellCommand::STDOUT ? Console::NORMAL : Console::FG_RED);
                 $output .= $event->line;
@@ -152,7 +154,7 @@ class DownloadController extends DaemonController implements DaemonInterface
                     $this->ticket->download_progress = intval($match[1])/100;
                     $this->ticket->save();
                 }
-                file_put_contents($logFile, $event->line, FILE_APPEND);
+                @file_put_contents($logFile, $event->line, FILE_APPEND);
             });
 
             $retval = $cmd->run();
