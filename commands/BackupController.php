@@ -417,7 +417,7 @@ class BackupController extends DaemonController implements DaemonInterface
                     ['not', ['`exam`.`time_limit`' => 0]],                    
                     [
                         '>=',
-                        new Expression('COALESCE(unix_timestamp(`ticket`.`backup_last`), 0) + `exam`.`time_limit`*60'),
+                        new Expression('COALESCE(unix_timestamp(`ticket`.`backup_last`), unix_timestamp(`ticket`.`start`)) + `exam`.`time_limit`*60'),
                         new Expression('unix_timestamp(NOW())')
                     ]
                 ],
@@ -439,7 +439,7 @@ class BackupController extends DaemonController implements DaemonInterface
                     ],
                     [
                         '>=',
-                        new Expression('COALESCE(unix_timestamp(`ticket`.`backup_last`), 0) + `ticket`.`time_limit`*60'),
+                        new Expression('COALESCE(unix_timestamp(`ticket`.`backup_last`), unix_timestamp(`ticket`.`start`)) + `ticket`.`time_limit`*60'),
                         new Expression('unix_timestamp(NOW())')
                     ]
                 ]
