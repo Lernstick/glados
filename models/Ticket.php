@@ -476,7 +476,7 @@ class Ticket extends \yii\db\ActiveRecord
         );
     }
 
-    /*
+    /**
      * Determine whether the ticket's last backup has failed over time
      *
      * @return bool
@@ -489,7 +489,7 @@ class Ticket extends \yii\db\ActiveRecord
                 $this->state == self::STATE_SUBMITTED
             ) &&
             $this->last_backup == 0 &&
-            $this->abandoned()
+            $this->abandoned
         );
     }
 
