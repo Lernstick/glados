@@ -444,7 +444,7 @@ class Ticket extends \yii\db\ActiveRecord
      * Determine whether the ticket is abandoned or not. To be abandoned the ticket must satisfy all
      * the following:
      * 
-     *  - be in the RUNNING state
+     *  - be in the RUNNING/CLOSED or SUBMITTED state
      *  - an IP address must be set
      *  - a backup_interval > 0 must be set
      *  - if no time limit (in the ticket or exam) is set, the difference between the last successful
@@ -473,6 +473,23 @@ class Ticket extends \yii\db\ActiveRecord
             $this->ip != null &&
             $this->backup_interval != 0 &&
             $blt - $bl > $t
+        );
+    }
+
+    /*
+     * Determine whether the ticket's last backup has failed over time
+     *
+     * @return bool
+     */
+    public function getLastBackupFailed ()
+    {
+        return (
+            (
+                $this->state == self::STATE_CLOSED ||
+                $this->state == self::STATE_SUBMITTED
+            ) &&
+            $this->last_backup == 0 &&
+            $this->abandoned()
         );
     }
 
