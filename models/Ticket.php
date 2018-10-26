@@ -465,7 +465,11 @@ class Ticket extends \yii\db\ActiveRecord
         $t = ($ttl > 0 ? $ttl*60 : ($ttl === 0 ? $at : ($ttl === null ? ($etl > 0 ? $etl*60 : $at) : $at)));
 
         return (
-            $this->state == self::STATE_RUNNING &&
+            (
+                $this->state == self::STATE_RUNNING ||
+                $this->state == self::STATE_CLOSED ||
+                $this->state == self::STATE_SUBMITTED
+            ) &&
             $this->ip != null &&
             $this->backup_interval != 0 &&
             $blt - $bl > $t

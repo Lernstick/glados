@@ -344,8 +344,8 @@ class BackupController extends DaemonController implements DaemonInterface
      */
     private function finished ()
     {
-        $query = Ticket::find()
-            ->where(['not', ['start' => null]])
+        $query = $this->queryNotAbandoned()
+            ->andWhere(['not', ['start' => null]])
             ->andWhere(['not', ['end' => null]])
             ->andWhere(['not', ['ip' => null]])
             ->andWhere(['last_backup' => 0])
@@ -388,13 +388,54 @@ class BackupController extends DaemonController implements DaemonInterface
         /*
          * Now those which weren't tried in the last n seconds (n=backup_interval)
          */
-        $query = Ticket::find()
-            ->joinWith('exam')
-            ->where(['not', ['start' => null]])
+        $query = $this->queryNotAbandoned()
+            ->andWhere(['not', ['start' => null]])
             ->andWhere(['end' => null])
             ->andWhere(['not', ['ip' => null]])
             ->andWhere(['not', ['backup_interval' => 0]])
             ->andWhere([
+                'or',
+                [
+                    '<',
+                    new Expression('unix_timestamp(`backup_last_try`) + `backup_interval`'),
+                    new Expression('unix_timestamp(NOW())')
+                ],
+                ['backup_last_try' => null],
+                [
+                    'and',
+                    [
+                        '<',
+                        new Expression('unix_timestamp(`backup_last`)'),
+                        new Expression('unix_timestamp(`backup_last_try`) - 5')
+                    ],
+                    ['<', 'backup_last_try', new Expression('NOW() - INTERVAL 1 MINUTE')],
+                ]
+            ])
+            ->andWhere(['backup_lock' => 0])
+            ->andWhere(['restore_lock' => 0])
+            ->andWhere(['bootup_lock' => 0])
+            ->orderBy(new Expression('unix_timestamp(`backup_last_try`) + `backup_interval` ASC'));
+
+        // finally lock the next ticket and return it
+        if (($ticket = $query->one()) !== null) {
+            $this->lockItem($ticket);
+            return $ticket;
+        }
+
+        return null;
+
+    }
+
+    /**
+     * Returns the query for a ticket which is not abandoned
+     *
+     * @return yii\db\Query
+     */
+    public function queryNotAbandoned ()
+    {
+        return Ticket::find()
+            ->joinWith('exam')
+            ->where([
                 'or',
                 [
                     'and',
@@ -443,38 +484,7 @@ class BackupController extends DaemonController implements DaemonInterface
                         new Expression('unix_timestamp(NOW())')
                     ]
                 ]
-            ])
-            ->andWhere([
-                'or',
-                [
-                    '<',
-                    new Expression('unix_timestamp(`backup_last_try`) + `backup_interval`'),
-                    new Expression('unix_timestamp(NOW())')
-                ],
-                ['backup_last_try' => null],
-                [
-                    'and',
-                    [
-                        '<',
-                        new Expression('unix_timestamp(`backup_last`)'),
-                        new Expression('unix_timestamp(`backup_last_try`) - 5')
-                    ],
-                    ['<', 'backup_last_try', new Expression('NOW() - INTERVAL 1 MINUTE')],
-                ]
-            ])
-            ->andWhere(['backup_lock' => 0])
-            ->andWhere(['restore_lock' => 0])
-            ->andWhere(['bootup_lock' => 0])
-            ->orderBy(new Expression('unix_timestamp(`backup_last_try`) + `backup_interval` ASC'));            
-
-        // finally lock the next ticket and return it
-        if (($ticket = $query->one()) !== null) {
-            $this->lockItem($ticket);
-            return $ticket;
-        }
-
-        return null;
-
+            ]);
     }
 
     /**
