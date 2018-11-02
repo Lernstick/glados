@@ -429,62 +429,26 @@ class BackupController extends DaemonController implements DaemonInterface
     /**
      * Returns the query for a ticket which is not abandoned
      *
+     * @see models/Ticket.php: function getAbandoned()
+     * 
      * @return yii\db\Query
      */
     public function queryNotAbandoned ()
     {
+        $at = \Yii::$app->params['abandonTicket'] === null ? 'NULL' : \Yii::$app->params['abandonTicket'];
         return Ticket::find()
             ->joinWith('exam')
-            ->where([
-                'or',
+            ->where(
                 [
-                    'and',
-                    ['`ticket`.`time_limit`' => null],
-                    [
-                        'or',
-                        ['`exam`.`time_limit`' => null],
-                        ['`exam`.`time_limit`' => 0],
-                    ],
-                    [
-                        '<',
-                        new Expression('COALESCE(unix_timestamp(`ticket`.`backup_last_try`) - unix_timestamp(`ticket`.`backup_last`), 0)'),
-                        \Yii::$app->params['abandonTicket']
-                    ]
-                ],
-                [
-                    'and',
-                    ['`ticket`.`time_limit`' => null],
-                    ['not', ['`exam`.`time_limit`' => null]],
-                    ['not', ['`exam`.`time_limit`' => 0]],                    
-                    [
-                        '>=',
-                        new Expression('COALESCE(unix_timestamp(`ticket`.`backup_last`), unix_timestamp(`ticket`.`start`)) + `exam`.`time_limit`*60'),
-                        new Expression('unix_timestamp(NOW())')
-                    ]
-                ],
-                [
-                    'and',
-                    ['`ticket`.`time_limit`' => 0],
-                    [
-                        '<',
-                        new Expression('COALESCE(unix_timestamp(`ticket`.`backup_last_try`) - unix_timestamp(`ticket`.`backup_last`), 0)'),
-                        \Yii::$app->params['abandonTicket']
-                    ]
-                ],
-                [
-                    'and',
-                    [
-                        '>',
-                        '`ticket`.`time_limit`',
-                        0
-                    ],
-                    [
-                        '>=',
-                        new Expression('COALESCE(unix_timestamp(`ticket`.`backup_last`), unix_timestamp(`ticket`.`start`)) + `ticket`.`time_limit`*60'),
-                        new Expression('unix_timestamp(NOW())')
-                    ]
+                    '>=',
+
+                    # the computed abandoned time (cat). Ticket is abandoned after this amount of seconds
+                    new Expression('COALESCE(NULLIF(`ticket`.`time_limit`,0),NULLIF(`exam`.`time_limit`,0),ABS(' . $at . '/60),180)*60'),
+
+                    # amount of time since last successful backup or since the exam has started and the last backup try or now (nbt)
+                    new Expression('COALESCE(unix_timestamp(`ticket`.`backup_last_try`), unix_timestamp(NOW())) - COALESCE(unix_timestamp(`ticket`.`backup_last`), unix_timestamp(`ticket`.`start`))')
                 ]
-            ]);
+            );
     }
 
     /**
