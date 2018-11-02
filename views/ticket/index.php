@@ -64,7 +64,15 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             'start:timeago',
             'end:timeago',
-            'valid:boolean',
+            #'valid:boolean',
+            [
+                'attribute' => 'abandoned',
+                'format' => 'boolean',
+                'filter' => array(
+                    'Yes' => 'Yes',
+                    'No' => 'No',
+                ),
+            ],               
             'test_taker',
             [
                 'class' => 'yii\grid\ActionColumn',

@@ -7,6 +7,8 @@ use yii\base\Model;
 use yii\helpers\ArrayHelper;
 use yii\data\ActiveDataProvider;
 use app\models\Ticket;
+use yii\db\Expression;
+
 
 /**
  * TicketSearch represents the model behind the search form about `app\models\Ticket`.
@@ -18,6 +20,7 @@ class TicketSearch extends Ticket
     public $examSubject;
     public $userId;
     public $state;
+    public $abandoned;
 
     /**
      * @inheritdoc
@@ -35,7 +38,7 @@ class TicketSearch extends Ticket
     {
         return [
             [['exam_id'], 'integer'],
-            [['token', 'examSubject', 'examName', 'userId', 'test_taker', 'state'], 'safe'],
+            [['token', 'examSubject', 'examName', 'userId', 'test_taker', 'state', 'abandoned'], 'safe'],
         ];
     }
 
@@ -69,6 +72,7 @@ class TicketSearch extends Ticket
         $dataProvider->setSort([
             'attributes' => [
                 'state',
+                'token',
                 'start',
                 'end',
                 'examName' => [
@@ -81,7 +85,7 @@ class TicketSearch extends Ticket
                     'desc' => ['exam.subject' => SORT_DESC],
                     'label' => 'Exam Subject'
                 ],
-                'test_taker'
+                'test_taker',
             ]
         ]);
 
@@ -109,6 +113,31 @@ class TicketSearch extends Ticket
             $q->andFilterWhere(['like', 'exam.name', $this->examName])
             ->andFilterWhere(['exam.subject' => $this->examSubject]);
         }]);
+
+        $at = \Yii::$app->params['abandonTicket'] === null ? 'NULL' : \Yii::$app->params['abandonTicket'];
+
+        if ($this->abandoned == 'Yes') {
+            $query->andFilterHaving(['or',
+                ['state' => Ticket::STATE_RUNNING],
+                ['state' => Ticket::STATE_CLOSED],
+                ['state' => Ticket::STATE_SUBMITTED]
+            ])
+            ->andFilterWhere(['not', ['ip' => null]])
+            ->andFilterWhere(['not', ['backup_interval' => 0]])
+            ->andFilterWhere(['last_backup' => 0]);
+        }
+
+        if ($this->abandoned == 'Yes' || $this->abandoned == 'No') {
+            $query->andFilterWhere([
+                $this->abandoned == 'Yes' ? '<' : '>=',
+
+                # the computed abandoned time (cat). Ticket is abandoned after this amount of seconds
+                new Expression('COALESCE(NULLIF(`ticket`.`time_limit`,0),NULLIF(`exam`.`time_limit`,0),ABS(' . $at . '/60),180)*60'),
+
+                # amount of time since last successful backup or since the exam has started and the last backup try or now (nbt)
+                new Expression('COALESCE(unix_timestamp(`ticket`.`backup_last_try`), unix_timestamp(NOW())) - COALESCE(unix_timestamp(`ticket`.`backup_last`), unix_timestamp(`ticket`.`start`))')
+            ]);
+        }
 
         Yii::$app->user->can('ticket/index/all') ?: $query->own();
 

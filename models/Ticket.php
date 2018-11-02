@@ -447,6 +447,7 @@ class Ticket extends \yii\db\ActiveRecord
      *  - be in the RUNNING/CLOSED or SUBMITTED state
      *  - an IP address must be set
      *  - a backup_interval > 0 must be set
+     *  - no last backup existing
      *  - if the computed abandon time is smaller than the no successfull backup time
      * 
      * Notes:
@@ -513,6 +514,7 @@ class Ticket extends \yii\db\ActiveRecord
             ) &&
             $this->ip != null &&
             $this->backup_interval != 0 &&
+            $this->last_backup == 0 &&
             $cat < $nbt
         );
     }
