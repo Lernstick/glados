@@ -12,6 +12,9 @@ use app\models\Exam;
  */
 class ExamSearch extends Exam
 {
+
+    public $userName;
+
     /**
      * @inheritdoc
      */
@@ -19,7 +22,7 @@ class ExamSearch extends Exam
     {
         return [
             [['id', 'user_id'], 'integer'],
-            [['name', 'subject', 'file'], 'safe'],
+            [['name', 'subject', 'file', 'userName'], 'safe'],
         ];
     }
 
@@ -50,6 +53,18 @@ class ExamSearch extends Exam
             ),
         ]);
 
+        $dataProvider->setSort([
+            'attributes' => [
+                'name',
+                'subject',
+                'userName' => [
+                    'asc' => ['user.username' => SORT_ASC],
+                    'desc' => ['user.username' => SORT_DESC],
+                    'label' => 'Owner'
+                ]
+            ]
+        ]);
+
         $this->load($params);
 
         if (!$this->validate()) {
@@ -65,6 +80,11 @@ class ExamSearch extends Exam
         $query->andFilterWhere(['like', 'name', $this->name])
             ->andFilterWhere(['like', 'subject', $this->subject])
             ->andFilterWhere(['like', 'file', $this->file]);
+
+        // filter by exam name, subject and user_id
+        $query->joinWith(['user' => function ($q) {
+            $q->andFilterWhere(['like', 'user.username', $this->userName]);
+        }]);
 
         Yii::$app->user->can('exam/index/all') ?: $query->own();
 

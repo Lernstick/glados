@@ -189,6 +189,12 @@ class Exam extends \yii\db\ActiveRecord
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
 
+    /* Getter for exam name */
+    public function getUserName()
+    {
+        return $this->user->username;
+    }
+
     /**
      * @return int
      */

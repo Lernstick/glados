@@ -42,13 +42,13 @@ $this->params['breadcrumbs'][] = $this->title;
             'name',
             'subject',
             [
-                'attribute' => 'user.username',
+                'attribute' => 'userName',
                 'label' => 'Owner',
                 'value' => function($model){
                     return ( $model->user_id == null ? '<span class="not-set">(user removed)</span>' : '<span>' . $model->user->username . '</span>' );
                 },
                 'format' => 'html',
-            ],            
+            ],
             'ticketCount',
 
             [
