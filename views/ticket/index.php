@@ -45,8 +45,17 @@ $this->params['breadcrumbs'][] = $this->title;
         },
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-
-            'state:state',
+            [
+                'attribute' => 'state',
+                'format' => 'state',
+                'filter' => array(
+                    0 => yii::$app->formatter->format(0, 'state'),
+                    1 => yii::$app->formatter->format(1, 'state'),
+                    2 => yii::$app->formatter->format(2, 'state'),
+                    3 => yii::$app->formatter->format(3, 'state'),
+                    4 => yii::$app->formatter->format(4, 'state'),
+                ),
+            ],            
             'token',
             'examName',
             [
