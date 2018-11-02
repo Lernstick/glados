@@ -29,7 +29,7 @@ $(document).on('click', '.special-dropdown .dropdown-menu .pagination a', functi
 
 $('#confirmRestore').on('show.bs.modal', function(e) {
     $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
-    $('#confirmRestoreItemPath').html($(e.relatedTarget).data('path'));
+    $('#confirmRestoreItemPath').text($(e.relatedTarget).data('path')).html();
     $('#confirmRestoreItemDate').html($(e.relatedTarget).data('version'));
 });
 

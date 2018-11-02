@@ -12,7 +12,7 @@ if ($model->type == 'dir') {
 
     if ($model->state != 'missing') {
         echo Html::a(
-            '<span class="glyphicon glyphicon-folder-open"></span> ' . $model->displayName,
+            '<span class="glyphicon glyphicon-folder-open"></span> ' . yii::$app->formatter->format($model->displayName, 'text'),
             Url::to([
                 false,
                 'id' => $ticket->id,
@@ -24,13 +24,13 @@ if ($model->type == 'dir') {
             []
         );
     } else {
-        echo '<span><span class="glyphicon glyphicon-folder-open"></span> <del>' . $model->displayName . '</del></span>';
+        echo '<span><span class="glyphicon glyphicon-folder-open"></span> <del>' . yii::$app->formatter->format($model->displayName, 'text') . '</del></span>';
     }
 
 } else {
     if ($model->state != 'missing') {
         echo Html::a(
-            '<span><span class="glyphicon glyphicon-file"></span> ' . $model->displayName . '</span>',
+            '<span><span class="glyphicon glyphicon-file"></span> ' . yii::$app->formatter->format($model->displayName, 'text') . '</span>',
             Url::to([
                 'backup/file',
                 'ticket_id' => $ticket->id,
@@ -46,7 +46,7 @@ if ($model->type == 'dir') {
         );
 
     } else {
-        echo '<span><span class="glyphicon glyphicon-file"></span> <del>' . $model->displayName . '</del></span>';
+        echo '<span><span class="glyphicon glyphicon-file"></span> <del>' . yii::$app->formatter->format($model->displayName, 'text') . '</del></span>';
     }
     echo "&nbsp;&nbsp;&nbsp;";
     echo "<span class='backup-browse-options'>";
