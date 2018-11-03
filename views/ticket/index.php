@@ -128,7 +128,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
                 'urlCreator' => function ($action, $model, $key, $index) {
                     if ($action === 'report') {
-                        return Url::toRoute(['ticket/report', 'id' => $model->id]);
+                        return Url::toRoute(['ticket/view', 'id' => $model->id, 'mode' => 'report']);
                     }
                     return Url::toRoute(['ticket/' . $action, 'id' => $model->id]);
                 },
