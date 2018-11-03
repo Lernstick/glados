@@ -48,7 +48,7 @@ use yii\widgets\Pjax;
             'format' => 'raw',
             'value' => yii::$app->formatter->format($ticketModel->backup_last, 'timeago') . ' (<b>last try</b>: ' . yii::$app->formatter->format($ticketModel->backup_last_try, 'timeago') . ')',
         ],        
-        'backup_size:shortSize',        
+        'backup_size:shortSize',
         [
             'attribute' => 'backup_state',
             'format' => 'raw',

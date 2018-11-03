@@ -2,8 +2,10 @@
 
 use yii\helpers\Html;
 use yii\helpers\Url;
-use yii\grid\GridView;
+#use yii\grid\GridView;
 use yii\widgets\Pjax;
+use kartik\grid\GridView;
+use kartik\dynagrid\DynaGrid;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\ExamSearch */
@@ -17,27 +19,11 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
-    <div class="dropdown">
-      <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-        <i class="glyphicon glyphicon-list-alt"></i>
-        Actions&nbsp;<span class="caret"></span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-        <li>
-            <?= Html::a('<span class="glyphicon glyphicon-plus"></span> Create Exam', ['create']) ?>
-        </li>
-      </ul>
-    </div>
-    <br>
-
     <?php Pjax::begin(); ?>
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'tableOptions' => ['class' => 'table table-bordered table-hover'],
-        'layout' => '{items} {summary} {pager}',
+    <?= DynaGrid::widget([
+        'showPersonalize' => true,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+            ['class' => 'kartik\grid\SerialColumn', 'order' => DynaGrid::ORDER_FIX_LEFT],
 
             'name',
             'subject',
@@ -50,20 +36,62 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'html',
             ],
             'ticketCount',
-
+            [
+                'attribute' => 'time_limit',
+                #'format' => 'shortSize',
+                'visible'=>false
+            ],            
+            [
+                'attribute' => 'fileSize',
+                'format' => 'shortSize',
+                'visible'=>false
+            ],
+            [
+                'attribute' => 'grp_netdev',
+                'format' => 'boolean',
+                'visible'=>false
+            ],
+            [
+                'attribute' => 'allow_sudo',
+                'format' => 'boolean',
+                'visible'=>false
+            ],
+            [
+                'attribute' => 'allow_mount',
+                'format' => 'boolean',
+                'visible'=>false
+            ],
+            [
+                'attribute' => 'firewall_off',
+                'format' => 'boolean',
+                'visible'=>false
+            ],
+            [
+                'attribute' => 'screenshots',
+                'format' => 'boolean',
+                'visible'=>false
+            ],
+            [
+                'attribute' => 'screenshots_interval',
+                'label' => 'Screenshot Interval',
+                'value' => function($model){
+                    return $model->screenshots_interval*60; # in seconds
+                },
+                'format' => 'duration',
+                'visible'=>false
+            ],
+            [
+                'attribute' => 'max_brightness',
+                'label' => 'Maximum brightness',
+                'value' => function($model){
+                    return $model->max_brightness/100;
+                },
+                'format' => 'percent',
+                'visible'=>false
+            ],
             [
                 'class' => 'yii\grid\ActionColumn',
-                'template' => '{view} {update} {delete} {create-many}',
-                'buttons' => [
-                    'create-many' => function ($url) {
-                        return Html::a('<span class="glyphicon glyphicon-plus-sign"></span>', $url,
-                            [
-                                'title' => 'Create Tickets',
-                                'data-pjax' => '0',
-                            ]
-                        );
-                    },
-                ],
+                'template' => '{view} {update} {delete}',
                 'urlCreator' => function ($action, $model, $key, $index) {
                     if ($action === 'create-many') {
                         return Url::toRoute(['ticket/create-many', 'exam_id' => $model->id]);
@@ -72,6 +100,22 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
             ],
         ],
+        'storage' => DynaGrid::TYPE_COOKIE,
+        'theme' => 'simple-default',
+        'gridOptions' => [
+            'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
+            'panel' => ['heading' => '<h3 class="panel-title">Your Exams</h3>'],
+            'toolbar' =>  [
+                ['content' =>
+                    Html::a('<i class="glyphicon glyphicon-plus"></i>', ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => 'Create Exam']) . ' ' .
+                    Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/exam/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => 'Reset Grid'])
+                ],
+                ['content' => '{dynagridFilter}{dynagridSort}{dynagrid}'],
+                '{export}',
+        ]            
+        ],
+        'options' => ['id' => 'dynagrid-exam-index'] // a unique identifier is important
     ]); ?>
 
     <?= $this->render('@app/views/_notification', [

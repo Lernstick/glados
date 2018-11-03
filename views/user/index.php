@@ -1,7 +1,8 @@
 <?php
 
 use yii\helpers\Html;
-use yii\grid\GridView;
+use kartik\grid\GridView;
+use kartik\dynagrid\DynaGrid;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\UserSearch */
@@ -15,25 +16,10 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
-    <div class="dropdown">
-      <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-        <i class="glyphicon glyphicon-list-alt"></i>
-        Actions&nbsp;<span class="caret"></span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-        <li>
-            <?= Html::a('<span class="glyphicon glyphicon-plus"></span> Create User', ['create']) ?>
-        </li>
-      </ul>
-    </div>
-    <br>
-
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'layout' => '{items} {summary} {pager}',
+    <?= DynaGrid::widget([
+        'showPersonalize' => true,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+            ['class' => 'kartik\grid\SerialColumn', 'order' => DynaGrid::ORDER_FIX_LEFT],
 
             'username',
             [
@@ -44,5 +30,22 @@ $this->params['breadcrumbs'][] = $this->title;
 
             ['class' => 'yii\grid\ActionColumn'],
         ],
+        'storage' => DynaGrid::TYPE_COOKIE,
+        'theme' => 'simple-default',
+        'gridOptions' => [
+            'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
+            'panel' => ['heading' => '<h3 class="panel-title">Users</h3>'],
+            'toolbar' =>  [
+                ['content' =>
+                    Html::a('<i class="glyphicon glyphicon-plus"></i>', ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => 'Create User']) . ' ' .
+                    Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/user/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => 'Reset Grid'])
+                ],
+                ['content' => '{dynagridFilter}{dynagridSort}{dynagrid}'],
+                '{export}',
+        ]            
+        ],
+        'options' => ['id' => 'dynagrid-user-index'] // a unique identifier is important
     ]); ?>
+
 </div>

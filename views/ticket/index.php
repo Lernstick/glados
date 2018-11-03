@@ -2,9 +2,10 @@
 
 use yii\helpers\Html;
 use yii\helpers\Url;
-use yii\grid\GridView;
 use yii\widgets\ActiveField;
 use yii\widgets\Pjax;
+use kartik\grid\GridView;
+use kartik\dynagrid\DynaGrid;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\TicketSearch */
@@ -18,33 +19,13 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
-    <div class="dropdown">
-      <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-        <i class="glyphicon glyphicon-list-alt"></i>
-        Actions&nbsp;<span class="caret"></span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-        <li>
-            <?= Html::a('<span class="glyphicon glyphicon-plus"></span> Create Ticket', ['create']) ?>
-        </li>
-        <li>
-            <?= Html::a('<span class="glyphicon glyphicon-envelope"></span> Submit Ticket', ['update', 'mode' => 'submit']) ?>
-        </li>
-      </ul>
-    </div>
-    <br>
-
     <?php Pjax::begin(); ?>
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'tableOptions' => ['class' => 'table table-bordered table-hover'],
-        'layout' => '{items} {summary} {pager}',
-        'rowOptions' => function($model) {
-            return array_key_exists($model->state, $model->classMap) ? ['class' => $model->classMap[$model->state]] : null;
-        },
+
+    <?= DynaGrid::widget([
+        'showPersonalize' => true,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+            ['class' => 'kartik\grid\SerialColumn', 'order' => DynaGrid::ORDER_FIX_LEFT],
+
             [
                 'attribute' => 'state',
                 'format' => 'state',
@@ -55,7 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     3 => yii::$app->formatter->format(3, 'state'),
                     4 => yii::$app->formatter->format(4, 'state'),
                 ),
-            ],            
+            ],
             'token',
             'examName',
             [
@@ -72,8 +53,66 @@ $this->params['breadcrumbs'][] = $this->title;
                     'Yes' => 'Yes',
                     'No' => 'No',
                 ),
-            ],               
+            ],
             'test_taker',
+            [
+                'attribute' => 'time_limit',
+                'format' => 'raw',
+                'visible' => false
+            ],            
+            [
+                'attribute' => 'duration',
+                'format' => 'duration',
+                'visible' => false
+            ],
+            [
+                'attribute' => 'valid',
+                'format' => 'boolean',
+                'visible' => false
+            ],
+            [
+                'attribute' => 'ip',
+                'format' => 'raw',
+                'visible' => false
+            ],
+            [
+                'attribute' => 'client_state',
+                'format' => 'raw',
+                'visible' => false
+            ],
+            [
+                'attribute' => 'backup_interval',
+                'format' => 'raw',
+                'value' =>  function($model) {
+                    return $model->backup_interval == 0 ? 'No Backup' : yii::$app->formatter->format($model->backup_interval, 'duration');
+                },
+                'visible' => false
+            ],
+            [
+                'attribute' => 'backup_size',
+                'format' => 'shortSize',
+                'visible' => false
+            ],
+            [
+                'attribute' => 'backup_last',
+                'format' => 'timeago',
+                'visible' => false
+            ],
+            [
+                'attribute' => 'backup_last_try',
+                'format' => 'timeago',
+                'visible' => false
+            ],
+            [
+                'attribute' => 'backup_state',
+                'format' => 'raw',
+                'visible' => false
+            ],
+            [
+                'attribute' => 'restore_state',
+                'format' => 'raw',
+                'visible' => false
+            ],
             [
                 'class' => 'yii\grid\ActionColumn',
                 'template' => '{view} {update} {delete} {report}',
@@ -95,6 +134,26 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
             ],
         ],
+        'storage' => DynaGrid::TYPE_COOKIE,
+        'theme' => 'simple-default',
+        'gridOptions' => [
+            'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
+            'panel' => ['heading' => '<h3 class="panel-title">Your Tickets</h3>'],
+            'rowOptions' => function($model) {
+                return array_key_exists($model->state, $model->classMap) ? ['class' => $model->classMap[$model->state]] : null;
+            },            
+            'toolbar' =>  [
+                ['content' =>
+                    Html::a('<i class="glyphicon glyphicon-plus"></i>', ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => 'Create Ticket']) . ' ' .
+                    Html::a('<i class="glyphicon glyphicon-envelope"></i>', ['update', 'mode' => 'submit'], ['data-pjax' => 0, 'class' => 'btn btn-info', 'title' => 'Submit Ticket']) . ' ' .
+                    Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/ticket/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => 'Reset Grid'])
+                ],
+                ['content' => '{dynagridFilter}{dynagridSort}{dynagrid}'],
+                '{export}',
+        ]            
+        ],
+        'options' => ['id' => 'dynagrid-ticket-index'] // a unique identifier is important
     ]); ?>
 
     <?= $this->render('@app/views/_notification', [

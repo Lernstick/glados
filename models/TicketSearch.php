@@ -85,7 +85,15 @@ class TicketSearch extends Ticket
                     'desc' => ['exam.subject' => SORT_DESC],
                     'label' => 'Exam Subject'
                 ],
-                'test_taker',
+                'time_limit',
+                'ip',
+                'client_state',
+                'backup_interval',
+                'backup_size',
+                'backup_last',
+                'backup_last_try',
+                'backup_state',
+                'restore_state',
             ]
         ]);
 

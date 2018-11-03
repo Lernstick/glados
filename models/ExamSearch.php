@@ -61,7 +61,15 @@ class ExamSearch extends Exam
                     'asc' => ['user.username' => SORT_ASC],
                     'desc' => ['user.username' => SORT_DESC],
                     'label' => 'Owner'
-                ]
+                ],
+                'time_limit',
+                'grp_netdev',
+                'allow_sudo',
+                'allow_mount',
+                'firewall_off',
+                'screenshots',
+                'screenshots_interval',
+                'max_brightness',
             ]
         ]);
 

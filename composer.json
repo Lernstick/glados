@@ -21,6 +21,7 @@
         "kartik-v/yii2-widget-growl": "@dev",
         "kartik-v/yii2-widget-select2": "@dev",
         "kartik-v/yii2-widget-rangeinput": "*",
+        "kartik-v/yii2-dynagrid": "dev-master",
         "miloschuman/yii2-highcharts-widget": "*",
         "limion/yii2-jquery-fileupload-widget": "~1.0",
         "fxp/composer-asset-plugin": "^1.4.1",

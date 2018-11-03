@@ -8,6 +8,14 @@ $config = [
     'bootstrap' => ['log'],
     'timezone' => 'Europe/Zurich',
     'vendorPath' => '/usr/share/yii2',
+    'modules' => [
+        'dynagrid' => [
+            'class' => '\kartik\dynagrid\Module',
+        ],
+        'gridview' => [
+            'class' => '\kartik\grid\Module',
+        ],
+    ],    
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation

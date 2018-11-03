@@ -56,6 +56,11 @@ class UserSearch extends User
         $dataProvider->setSort([
             'attributes' => [
                 'username',
+                'role' => [
+                    'asc' => ['auth_assignment.item_name' => SORT_ASC],
+                    'desc' => ['auth_assignment.item_name' => SORT_DESC],
+                    'label' => 'Owner'
+                ],
                 'last_visited',
             ]
         ]);
