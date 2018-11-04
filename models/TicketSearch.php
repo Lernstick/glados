@@ -87,6 +87,7 @@ class TicketSearch extends Ticket
                 ],
                 'time_limit',
                 'ip',
+                'test_taker',
                 'client_state',
                 'backup_interval',
                 'backup_size',

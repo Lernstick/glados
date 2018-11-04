@@ -6,10 +6,15 @@ use yii\widgets\ActiveField;
 use yii\widgets\Pjax;
 use kartik\grid\GridView;
 use kartik\dynagrid\DynaGrid;
+use kartik\select2\Select2;
+use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\TicketSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+
+$q_examName = isset(Yii::$app->request->queryParams['TicketSearch']['examName']) ? Yii::$app->request->queryParams['TicketSearch']['examName'] : null;
+$q_testTaker = isset(Yii::$app->request->queryParams['TicketSearch']['test_taker']) ? Yii::$app->request->queryParams['TicketSearch']['test_taker'] : null;
 
 $this->title = 'Tickets';
 $this->params['breadcrumbs'][] = $this->title;
@@ -38,7 +43,34 @@ $this->params['breadcrumbs'][] = $this->title;
                 ),
             ],
             'token',
-            'examName',
+            #'examName',
+            [
+                'attribute' => 'examName',
+                'value' => 'examName',
+                'filter' => Select2::widget([
+                    'data' => [0 => ['id' => $q_examName, 'text' => $q_examName]],
+                    'name' => 'TicketSearch[examName]',
+                    #'initValueText' => isset(Yii::$app->request->queryParams['TicketSearch']['examName']) ? Yii::$app->request->queryParams['TicketSearch']['examName'] : null,
+                    'theme' => Select2::THEME_BOOTSTRAP,
+                    'pluginOptions' => [
+                        'allowClear' => true,
+                        'minimumInputLength' => 2,
+                        'placeholder' => '',
+                        'language' => [
+                            'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
+                        ],
+                        'ajax' => [
+                            'url' => \yii\helpers\Url::to(['ticket/index', 'mode' => 'list', 'attr' => 'examName']),
+                            'dataType' => 'json',
+                            'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(q) { return q.text; }'),
+                        'templateSelection' => new JsExpression('function (q) { return q.text; }'),
+                        'initSelection' => new JsExpression('function (e, c) { var d = []; d.push({id: e[0][1].text, text: e[0][1].text}); c(d); }'),
+                    ],
+                ]),
+            ],             
             [
                 'attribute' => 'examSubject',
                 'filter' => $searchModel->subjectList,
@@ -54,7 +86,33 @@ $this->params['breadcrumbs'][] = $this->title;
                     'No' => 'No',
                 ),
             ],
-            'test_taker',
+            #'test_taker',
+            [
+                'attribute' => 'test_taker',
+                'value' => 'test_taker',
+                'filter' => Select2::widget([
+                    'data' => [0 => ['id' => $q_testTaker, 'text' => $q_testTaker]],
+                    'name' => 'TicketSearch[test_taker]',
+                    'theme' => Select2::THEME_BOOTSTRAP,
+                    'pluginOptions' => [
+                        'allowClear' => true,
+                        'placeholder' => '',
+                        'minimumInputLength' => 2,
+                        'language' => [
+                            'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
+                        ],
+                        'ajax' => [
+                            'url' => \yii\helpers\Url::to(['ticket/index', 'mode' => 'list', 'attr' => 'testTaker']),
+                            'dataType' => 'json',
+                            'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(q) { return q.text; }'),
+                        'templateSelection' => new JsExpression('function (q) { return q.text; }'),
+                        'initSelection' => new JsExpression('function (e, c) { var d = []; d.push({id: e[0][1].text, text: e[0][1].text}); c(d); }'),
+                    ],
+                ]),
+            ],            
             [
                 'attribute' => 'time_limit',
                 'format' => 'raw',

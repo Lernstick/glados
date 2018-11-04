@@ -80,24 +80,52 @@ class TicketController extends Controller
 
     /**
      * Lists all Ticket models.
+     *
+     * @param string $mode mode
+     * @param string $attr attribute to make a list of
+     * @param string $q query
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex($mode = null, $attr = null, $q = null)
     {
 
-        #TODO not user->id, because not set.
-        //$current_user = Yii::$app->user->id;
-        Yii::$app->session['ticketViewReturnURL'] = Yii::$app->request->Url;
+        if ($mode === null) {
+            Yii::$app->session['ticketViewReturnURL'] = Yii::$app->request->Url;
 
-        $searchModel = new TicketSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $session = Yii::$app->session;
+            $searchModel = new TicketSearch();
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+            $session = Yii::$app->session;
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-            'session' => $session,
-        ]);
+            return $this->render('index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+                'session' => $session,
+            ]);
+        } else if ($mode == 'list') {
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            $out = ['results' => [
+                #0 => ['id' => '', 'text' => ''],
+                0 => ['id' => $q, 'text' => $q]
+            ]];
+            if (!is_null($q) && !is_null($attr)) {
+                $data = [];
+                if ($attr == 'testTaker') {
+                    $query = Ticket::find()
+                        ->select('test_taker as id, test_taker AS text')->distinct()
+                        ->where(['like', 'test_taker', $q]);
+                } else if ($attr == 'examName') {
+                    $query = Ticket::find()->joinWith(['exam'])
+                        ->select('exam.name as id, exam.name AS text')->distinct()
+                        ->where(['like', 'exam.name', $q]);
+                }
+                $command = $query->limit(20)->createCommand();
+                $data = $command->queryAll();
+                $out['results'] = array_merge($out['results'], array_values($data));
+            }
+            return $out;
+        }
+
+
     }
 
     //TODO: rbac
