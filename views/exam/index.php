@@ -6,6 +6,8 @@ use yii\helpers\Url;
 use yii\widgets\Pjax;
 use kartik\grid\GridView;
 use kartik\dynagrid\DynaGrid;
+use kartik\select2\Select2;
+use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\ExamSearch */
@@ -25,15 +27,106 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'kartik\grid\SerialColumn', 'order' => DynaGrid::ORDER_FIX_LEFT],
 
-            'name',
-            'subject',
+            //'name',
             [
+                'attribute'=>'name',
+                'filterType'=>GridView::FILTER_SELECT2,
+                'filterWidgetOptions'=>[
+                    'name' => 'ExamSearch[name]',
+                    'pluginOptions' => [
+                        'dropdownAutoWidth' => true,
+                        'width' => 'auto',
+                        'allowClear' => true,
+                        'minimumInputLength' => 2,
+                        'placeholder' => '',
+                        'language' => [
+                            'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
+                        ],
+                        'ajax' => [
+                            'url' => \yii\helpers\Url::to(['exam/index', 'mode' => 'list', 'attr' => 'name']),
+                            'dataType' => 'json',
+                            'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(q) { return q.text; }'),
+                        'templateSelection' => new JsExpression('function (q) { return q.text; }'),
+                    ],
+                ],
+                'filterInputOptions' => [
+                    'placeholder' => 'Any'
+                ],
+                'format'=>'raw'
+            ],
+            [
+                'attribute'=>'subject',
+                'filterType'=>GridView::FILTER_SELECT2,
+                'filterWidgetOptions'=>[
+                    'name' => 'ExamSearch[subject]',
+                    'pluginOptions' => [
+                        'dropdownAutoWidth' => true,
+                        'width' => 'auto',
+                        'allowClear' => true,
+                        'minimumInputLength' => 2,
+                        'placeholder' => '',
+                        'language' => [
+                            'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
+                        ],
+                        'ajax' => [
+                            'url' => \yii\helpers\Url::to(['exam/index', 'mode' => 'list', 'attr' => 'subject']),
+                            'dataType' => 'json',
+                            'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(q) { return q.text; }'),
+                        'templateSelection' => new JsExpression('function (q) { return q.text; }'),
+                    ],
+                ],
+                'filterInputOptions' => [
+                    'placeholder' => 'Any'
+                ],
+                'format'=>'raw'
+            ],
+            /*[
                 'attribute' => 'userName',
                 'label' => 'Owner',
                 'value' => function($model){
                     return ( $model->user_id == null ? '<span class="not-set">(user removed)</span>' : '<span>' . $model->user->username . '</span>' );
                 },
                 'format' => 'html',
+            ],*/
+            [
+                'attribute'=>'userName',
+                'label' => 'Owner',
+                'value' => function($model){
+                    return ( $model->user_id == null ? '<span class="not-set">(user removed)</span>' : '<span>' . $model->user->username . '</span>' );
+                },
+                'filterType'=>GridView::FILTER_SELECT2,
+                'filterWidgetOptions'=>[
+                    'name' => 'ExamSearch[userName]',
+                    'pluginOptions' => [
+                        'dropdownAutoWidth' => true,
+                        'width' => 'auto',
+                        'allowClear' => true,
+                        'minimumInputLength' => 2,
+                        'placeholder' => '',
+                        'language' => [
+                            'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
+                        ],
+                        'ajax' => [
+                            'url' => \yii\helpers\Url::to(['user/index', 'mode' => 'list', 'attr' => 'username']),
+                            'dataType' => 'json',
+                            'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(q) { return q.text; }'),
+                        'templateSelection' => new JsExpression('function (q) { return q.text; }'),
+                    ],
+                ],
+                'filterInputOptions' => [
+                    'placeholder' => 'Any'
+                ],
+                'format' => 'raw',
+                'visible' => Yii::$app->user->can('user/index')
             ],
             'ticketCount',
             [

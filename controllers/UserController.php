@@ -47,18 +47,42 @@ class UserController extends Controller
 
     /**
      * Lists all User models.
+     *
+     * @param string $mode mode
+     * @param string $attr attribute to make a list of
+     * @param string $q query
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex($mode = null, $attr = null, $q = null)
     {
-        $searchModel = new UserSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        if ($mode === null) {
+            $searchModel = new UserSearch();
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
-    }
+            return $this->render('index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]);
+        } else if ($mode == 'list') {
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            $out = ['results' => [
+                #0 => ['id' => '', 'text' => ''],
+                0 => ['id' => $q, 'text' => $q]
+            ]];
+            if (!is_null($q) && !is_null($attr)) {
+                $data = [];
+                $searchModel = new UserSearch();
+                if ($attr == 'username') {
+                    $query = $searchModel->selectList('username', $q);
+                }
+                
+                $command = $query->limit(20)->createCommand();
+                $data = $command->queryAll();
+                $out['results'] = array_merge($out['results'], array_values($data));
+            }
+            return $out;
+        }
+    } 
 
     /**
      * Displays a single User model.

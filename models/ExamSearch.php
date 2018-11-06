@@ -108,4 +108,21 @@ class ExamSearch extends Exam
 
     }
 
+    /**
+     * Lists an attribute
+     * @param attr attribute to list
+     *
+     * @return TicketQuery
+     */
+    public function selectList($attr, $q)
+    {
+        $query = Exam::find();
+        $query->select([$attr . ' as id', $attr . ' AS text'])
+            ->distinct()
+            ->where(['like', $attr, $q]);
+
+        Yii::$app->user->can('exam/index/all') ?: $query->own();
+        return $query;
+    }
+
 }

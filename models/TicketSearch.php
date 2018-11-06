@@ -109,7 +109,7 @@ class TicketSearch extends Ticket
         // filter by exam name, subject and user_id
         $query->joinWith(['exam' => function ($q) {
             $q->andFilterWhere(['like', 'exam.name', $this->examName])
-            ->andFilterWhere(['exam.subject' => $this->examSubject]);
+            ->andFilterWhere(['like', 'exam.subject', $this->examSubject]);
         }]);
 
         $at = \Yii::$app->params['abandonTicket'] === null ? 'NULL' : \Yii::$app->params['abandonTicket'];
@@ -157,7 +157,7 @@ class TicketSearch extends Ticket
         // filter by exam name, subject and user_id
         $query->joinWith(['exam' => function ($q) {
             $q->andFilterWhere(['like', 'exam.name', $this->examName])
-            ->andFilterWhere(['exam.subject' => $this->examSubject]);
+            ->andFilterWhere(['like', 'exam.subject', $this->examSubject]);
         }]);
 
         Yii::$app->user->can('ticket/index/all') ?: $query->own();
@@ -231,6 +231,27 @@ class TicketSearch extends Ticket
                 )'
             )
         );
+    }
+
+    /**
+     * Lists an attribute
+     * @param attr attribute to list
+     *
+     * @return TicketQuery
+     */
+    public function selectList($attr, $q)
+    {
+        $query = Ticket::find();
+        /*if (strpos($attr, '.') !== false) {
+            $join = explode('.', $attr)[0];
+            $query->joinWith(['exam']);
+        }*/
+        $query->select([$attr . ' as id', $attr . ' AS text'])
+            ->distinct()
+            ->where(['like', $attr, $q]);
+
+        Yii::$app->user->can('ticket/index/all') ?: $query->own();
+        return $query;
     }
 
 }

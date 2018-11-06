@@ -12,9 +12,7 @@ use yii\web\JsExpression;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\TicketSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-
-$q_examName = isset(Yii::$app->request->queryParams['TicketSearch']['examName']) ? Yii::$app->request->queryParams['TicketSearch']['examName'] : null;
-$q_testTaker = isset(Yii::$app->request->queryParams['TicketSearch']['test_taker']) ? Yii::$app->request->queryParams['TicketSearch']['test_taker'] : null;
+/* @var $preSelect array */
 
 $this->title = 'Tickets';
 $this->params['breadcrumbs'][] = $this->title;
@@ -42,16 +40,11 @@ $this->params['breadcrumbs'][] = $this->title;
                     4 => yii::$app->formatter->format(4, 'state'),
                 ),
             ],
-            'token',
-            #'examName',
             [
-                'attribute' => 'examName',
-                'value' => 'examName',
-                'filter' => Select2::widget([
-                    'data' => [0 => ['id' => $q_examName, 'text' => $q_examName]],
-                    'name' => 'TicketSearch[examName]',
-                    #'initValueText' => isset(Yii::$app->request->queryParams['TicketSearch']['examName']) ? Yii::$app->request->queryParams['TicketSearch']['examName'] : null,
-                    'theme' => Select2::THEME_BOOTSTRAP,
+                'attribute'=>'token',
+                'filterType'=>GridView::FILTER_SELECT2,
+                'filterWidgetOptions'=>[
+                    'name' => 'TicketSearch[token]',
                     'pluginOptions' => [
                         'dropdownAutoWidth' => true,
                         'width' => 'auto',
@@ -62,21 +55,82 @@ $this->params['breadcrumbs'][] = $this->title;
                             'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
                         ],
                         'ajax' => [
-                            'url' => \yii\helpers\Url::to(['ticket/index', 'mode' => 'list', 'attr' => 'examName']),
+                            'url' => \yii\helpers\Url::to(['ticket/index', 'mode' => 'list', 'attr' => 'token']),
                             'dataType' => 'json',
                             'data' => new JsExpression('function(params) { return {q:params.term}; }')
                         ],
                         'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
                         'templateResult' => new JsExpression('function(q) { return q.text; }'),
                         'templateSelection' => new JsExpression('function (q) { return q.text; }'),
-                        'initSelection' => new JsExpression('function (e, c) { var d = []; d.push({id: e[0][1].text, text: e[0][1].text}); c(d); }'),
                     ],
-                ]),
-            ],             
+                ],
+                'filterInputOptions' => [
+                    'placeholder' => 'Any'
+                ],
+                'format'=>'raw'
+            ],
             [
+                'attribute'=>'examName',
+                'filterType'=>GridView::FILTER_SELECT2,
+                'filterWidgetOptions'=>[
+                    'name' => 'TicketSearch[examName]',
+                    'pluginOptions' => [
+                        'dropdownAutoWidth' => true,
+                        'width' => 'auto',
+                        'allowClear' => true,
+                        'minimumInputLength' => 2,
+                        'placeholder' => '',
+                        'language' => [
+                            'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
+                        ],
+                        'ajax' => [
+                            'url' => \yii\helpers\Url::to(['exam/index', 'mode' => 'list', 'attr' => 'name']),
+                            'dataType' => 'json',
+                            'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(q) { return q.text; }'),
+                        'templateSelection' => new JsExpression('function (q) { return q.text; }'),
+                    ],
+                ],
+                'filterInputOptions' => [
+                    'placeholder' => 'Any'
+                ],
+                'format'=>'raw'
+            ],
+            /*[
                 'attribute' => 'examSubject',
                 'filter' => $searchModel->subjectList,
-            ],
+            ],*/
+            [
+                'attribute'=>'examSubject',
+                'filterType'=>GridView::FILTER_SELECT2,
+                'filterWidgetOptions'=>[
+                    'name' => 'TicketSearch[examSubject]',
+                    'pluginOptions' => [
+                        'dropdownAutoWidth' => true,
+                        'width' => 'auto',
+                        'allowClear' => true,
+                        'minimumInputLength' => 2,
+                        'placeholder' => '',
+                        'language' => [
+                            'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
+                        ],
+                        'ajax' => [
+                            'url' => \yii\helpers\Url::to(['exam/index', 'mode' => 'list', 'attr' => 'subject']),
+                            'dataType' => 'json',
+                            'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(q) { return q.text; }'),
+                        'templateSelection' => new JsExpression('function (q) { return q.text; }'),
+                    ],
+                ],
+                'filterInputOptions' => [
+                    'placeholder' => 'Any'
+                ],
+                'format'=>'raw'
+            ],          
             'start:timeago',
             'end:timeago',
             #'valid:boolean',
@@ -88,20 +142,17 @@ $this->params['breadcrumbs'][] = $this->title;
                     'No' => 'No',
                 ),
             ],
-            #'test_taker',
             [
-                'attribute' => 'test_taker',
-                'value' => 'test_taker',
-                'filter' => Select2::widget([
-                    'data' => [0 => ['id' => $q_testTaker, 'text' => $q_testTaker]],
+                'attribute'=>'test_taker',
+                'filterType'=>GridView::FILTER_SELECT2,
+                'filterWidgetOptions'=>[
                     'name' => 'TicketSearch[test_taker]',
-                    'theme' => Select2::THEME_BOOTSTRAP,
                     'pluginOptions' => [
                         'dropdownAutoWidth' => true,
-                        'width' => 'auto',                    
+                        'width' => 'auto',
                         'allowClear' => true,
-                        'placeholder' => '',
                         'minimumInputLength' => 2,
+                        'placeholder' => '',
                         'language' => [
                             'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
                         ],
@@ -113,10 +164,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
                         'templateResult' => new JsExpression('function(q) { return q.text; }'),
                         'templateSelection' => new JsExpression('function (q) { return q.text; }'),
-                        'initSelection' => new JsExpression('function (e, c) { var d = []; d.push({id: e[0][1].text, text: e[0][1].text}); c(d); }'),
                     ],
-                ]),
-            ],            
+                ],
+                'filterInputOptions' => [
+                    'placeholder' => 'Any'
+                ],
+                'format'=>'raw'
+            ],             
             [
                 'attribute' => 'time_limit',
                 'format' => 'raw',

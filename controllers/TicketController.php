@@ -109,15 +109,13 @@ class TicketController extends Controller
             ]];
             if (!is_null($q) && !is_null($attr)) {
                 $data = [];
+                $searchModel = new TicketSearch();
                 if ($attr == 'testTaker') {
-                    $query = Ticket::find()
-                        ->select('test_taker as id, test_taker AS text')->distinct()
-                        ->where(['like', 'test_taker', $q]);
-                } else if ($attr == 'examName') {
-                    $query = Ticket::find()->joinWith(['exam'])
-                        ->select('exam.name as id, exam.name AS text')->distinct()
-                        ->where(['like', 'exam.name', $q]);
+                    $query = $searchModel->selectList('test_taker', $q);
+                } else if ($attr == 'token') {
+                    $query = $searchModel->selectList('token', $q);
                 }
+                
                 $command = $query->limit(20)->createCommand();
                 $data = $command->queryAll();
                 $out['results'] = array_merge($out['results'], array_values($data));
@@ -920,5 +918,4 @@ class TicketController extends Controller
             return false;
         }
     }
-
 }

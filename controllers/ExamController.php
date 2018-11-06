@@ -50,23 +50,49 @@ class ExamController extends Controller
 
     /**
      * Lists all Exam models.
+     *
+     * @param string $mode mode
+     * @param string $attr attribute to make a list of
+     * @param string $q query
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex($mode = null, $attr = null, $q = null)
     {
 
-        Yii::$app->session['examViewReturnURL'] = Yii::$app->request->Url;
-        $params = Yii::$app->request->queryParams;
+        if ($mode === null) {
+            Yii::$app->session['examViewReturnURL'] = Yii::$app->request->Url;
+            $params = Yii::$app->request->queryParams;
 
-        $searchModel = new ExamSearch();
-        $dataProvider = $searchModel->search($params);
-        $session = Yii::$app->session;
+            $searchModel = new ExamSearch();
+            $dataProvider = $searchModel->search($params);
+            $session = Yii::$app->session;
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-            'session' => $session,
-        ]);
+            return $this->render('index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+                'session' => $session,
+            ]);
+        } else if ($mode == 'list') {
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            $out = ['results' => [
+                #0 => ['id' => '', 'text' => ''],
+                0 => ['id' => $q, 'text' => $q]
+            ]];
+            if (!is_null($q) && !is_null($attr)) {
+                $data = [];
+                $searchModel = new ExamSearch();
+                if ($attr == 'name') {
+                    $query = $searchModel->selectList('name', $q);
+                } else if ($attr == 'subject') {
+                    $query = $searchModel->selectList('subject', $q);
+                }
+
+                $command = $query->limit(20)->createCommand();
+                $data = $command->queryAll();
+                $out['results'] = array_merge($out['results'], array_values($data));
+            }
+            return $out;
+        }
     }
 
     /**

@@ -1,8 +1,12 @@
 <?php
 
 use yii\helpers\Html;
+use yii\widgets\Pjax;
 use kartik\grid\GridView;
 use kartik\dynagrid\DynaGrid;
+use kartik\select2\Select2;
+use yii\web\JsExpression;
+
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\UserSearch */
@@ -16,12 +20,42 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
+    <?php Pjax::begin(); ?>
     <?= DynaGrid::widget([
         'showPersonalize' => true,
         'columns' => [
             ['class' => 'kartik\grid\SerialColumn', 'order' => DynaGrid::ORDER_FIX_LEFT],
 
-            'username',
+            //'username',
+            [
+                'attribute'=>'username',
+                'filterType'=>GridView::FILTER_SELECT2,
+                'filterWidgetOptions'=>[
+                    'name' => 'UserSearch[username]',
+                    'pluginOptions' => [
+                        'dropdownAutoWidth' => true,
+                        'width' => 'auto',
+                        'allowClear' => true,
+                        'minimumInputLength' => 2,
+                        'placeholder' => '',
+                        'language' => [
+                            'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
+                        ],
+                        'ajax' => [
+                            'url' => \yii\helpers\Url::to(['user/index', 'mode' => 'list', 'attr' => 'username']),
+                            'dataType' => 'json',
+                            'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(q) { return q.text; }'),
+                        'templateSelection' => new JsExpression('function (q) { return q.text; }'),
+                    ],
+                ],
+                'filterInputOptions' => [
+                    'placeholder' => 'Any'
+                ],
+                'format'=>'raw'
+            ],
             [
                 'attribute' => 'role',
                 'filter' => $searchModel->roleList,
@@ -47,5 +81,8 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
         'options' => ['id' => 'dynagrid-user-index'] // a unique identifier is important
     ]); ?>
+
+    <?php Pjax::end(); ?>
+
 
 </div>
