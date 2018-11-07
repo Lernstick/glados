@@ -31,7 +31,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute'=>'username',
                 'filterType'=>GridView::FILTER_SELECT2,
                 'filterWidgetOptions'=>[
-                    'name' => 'UserSearch[username]',
                     'pluginOptions' => [
                         'dropdownAutoWidth' => true,
                         'width' => 'auto',

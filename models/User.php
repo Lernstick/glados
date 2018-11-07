@@ -3,7 +3,7 @@
 namespace app\models;
 
 use Yii;
-use yii\db\ActiveRecord;
+use app\models\Base;
 use yii\web\IdentityInterface;
 use app\models\EventItem;
 
@@ -26,7 +26,7 @@ use app\models\EventItem;
  * @property Role $role
  */
 
-class User extends ActiveRecord implements IdentityInterface
+class User extends Base implements IdentityInterface
 {
 
     const SCENARIO_CREATE = 'create';

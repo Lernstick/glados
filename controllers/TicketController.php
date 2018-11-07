@@ -103,22 +103,15 @@ class TicketController extends Controller
             ]);
         } else if ($mode == 'list') {
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            $out = ['results' => [
-                #0 => ['id' => '', 'text' => ''],
-                0 => ['id' => $q, 'text' => $q]
-            ]];
+            $out = [];
             if (!is_null($q) && !is_null($attr)) {
-                $data = [];
+                //$data = [];
                 $searchModel = new TicketSearch();
                 if ($attr == 'testTaker') {
-                    $query = $searchModel->selectList('test_taker', $q);
+                    $out = $searchModel->selectList('test_taker', $q);
                 } else if ($attr == 'token') {
-                    $query = $searchModel->selectList('token', $q);
+                    $out = $searchModel->selectList('token', $q);
                 }
-                
-                $command = $query->limit(20)->createCommand();
-                $data = $command->queryAll();
-                $out['results'] = array_merge($out['results'], array_values($data));
             }
             return $out;
         }

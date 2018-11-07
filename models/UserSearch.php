@@ -94,20 +94,4 @@ class UserSearch extends User
         return ArrayHelper::map($roles, 'name', 'name');
     }
 
-    /**
-     * Lists an attribute
-     * @param attr attribute to list
-     *
-     * @return TicketQuery
-     */
-    public function selectList($attr, $q)
-    {
-        $query = User::find();
-        $query->select([$attr . ' as id', $attr . ' AS text'])
-            ->distinct()
-            ->where(['like', $attr, $q]);
-
-        return $query;
-    }
-
 }

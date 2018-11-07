@@ -74,25 +74,20 @@ class ExamController extends Controller
             ]);
         } else if ($mode == 'list') {
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            $out = ['results' => [
-                #0 => ['id' => '', 'text' => ''],
-                0 => ['id' => $q, 'text' => $q]
-            ]];
+            $out = [];
             if (!is_null($q) && !is_null($attr)) {
-                $data = [];
                 $searchModel = new ExamSearch();
                 if ($attr == 'name') {
-                    $query = $searchModel->selectList('name', $q);
+                    $out = $searchModel->selectList('name', $q);
                 } else if ($attr == 'subject') {
-                    $query = $searchModel->selectList('subject', $q);
+                    $out = $searchModel->selectList('subject', $q);
+                } else if ($attr == 'resultExam') {
+                    $attr = 'CONCAT(name, " - ", subject)';
+                    $out = $searchModel->selectList($attr, $q, 'id', false);
                 }
-
-                $command = $query->limit(20)->createCommand();
-                $data = $command->queryAll();
-                $out['results'] = array_merge($out['results'], array_values($data));
             }
             return $out;
-        }
+        } 
     }
 
     /**

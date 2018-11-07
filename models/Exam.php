@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use app\models\Base;
 
 /**
  * This is the model class for table "exam".
@@ -27,7 +28,7 @@ use Yii;
  * @property integer runningTicketCount
  * @property integer closedTicketCount
  */
-class Exam extends \yii\db\ActiveRecord
+class Exam extends Base
 {
 
     /**

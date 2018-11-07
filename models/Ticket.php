@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use app\models\Base;
 use yii\helpers\ArrayHelper;
 use yii\web\ConflictHttpException;
 use yii\base\Event;
@@ -50,7 +51,7 @@ use app\models\EventItem;
  * @property Exam $exam
  * @property Exam $exam
  */
-class Ticket extends \yii\db\ActiveRecord
+class Ticket extends Base
 {
 
     /**

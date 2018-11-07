@@ -65,23 +65,15 @@ class UserController extends Controller
             ]);
         } else if ($mode == 'list') {
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            $out = ['results' => [
-                #0 => ['id' => '', 'text' => ''],
-                0 => ['id' => $q, 'text' => $q]
-            ]];
+            $out = [];
             if (!is_null($q) && !is_null($attr)) {
-                $data = [];
                 $searchModel = new UserSearch();
                 if ($attr == 'username') {
-                    $query = $searchModel->selectList('username', $q);
+                    $out = $searchModel->selectList('username', $q);
                 }
-                
-                $command = $query->limit(20)->createCommand();
-                $data = $command->queryAll();
-                $out['results'] = array_merge($out['results'], array_values($data));
             }
             return $out;
-        }
+        } 
     } 
 
     /**

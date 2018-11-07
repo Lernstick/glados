@@ -3,6 +3,8 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use kartik\datetime\DateTimePicker;
+use kartik\select2\Select2;
+use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Ticket */
@@ -48,7 +50,13 @@ $this->registerJs($js);
             <?= $form->field($model, 'token')->textInput(['readOnly' => false]) ?>
         </div>
         <div class="col-md-6">
-            <?= $form->field($model, 'exam_id')->dropDownList($searchModel->getExamList(), [ 'prompt' => 'Choose an Exam ...' ]) ?>
+            <?= $form->field($model, 'exam_id')->widget(Select2::classname(), [
+                'data' => $searchModel->getExamList(),
+                'options' => ['placeholder' => 'Choose an Exam ...'],
+                'pluginOptions' => [
+                    'allowClear' => true
+                ],
+            ]); ?>
         </div>
     </div>
 

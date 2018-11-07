@@ -233,25 +233,4 @@ class TicketSearch extends Ticket
         );
     }
 
-    /**
-     * Lists an attribute
-     * @param attr attribute to list
-     *
-     * @return TicketQuery
-     */
-    public function selectList($attr, $q)
-    {
-        $query = Ticket::find();
-        /*if (strpos($attr, '.') !== false) {
-            $join = explode('.', $attr)[0];
-            $query->joinWith(['exam']);
-        }*/
-        $query->select([$attr . ' as id', $attr . ' AS text'])
-            ->distinct()
-            ->where(['like', $attr, $q]);
-
-        Yii::$app->user->can('ticket/index/all') ?: $query->own();
-        return $query;
-    }
-
 }

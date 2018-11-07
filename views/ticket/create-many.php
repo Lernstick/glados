@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use kartik\select2\Select2;
 use yii\web\JsExpression;
 
 
@@ -176,7 +177,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div class="row">
         <div class="col-md-6">
-            <?= $form->field($model, 'exam_id')->dropDownList($searchModel->getExamList(), [ 'prompt' => 'Choose an Exam ...' ])->hint('Choose the exam those tickets has to be assigned to in the list below. Notice, only exams assigned to you will be shown underneath.') ?>
+            <?= $form->field($model, 'exam_id')->widget(Select2::classname(), [
+                'data' => $searchModel->getExamList(),
+                'options' => ['placeholder' => 'Choose an Exam ...'],
+                'pluginOptions' => [
+                    'allowClear' => true
+                ],
+            ])->hint('Choose the exam those tickets has to be assigned to in the list below. Notice, only exams assigned to you will be shown underneath.'); ?>
         </div>
         <div class="col-md-6">
             <?= $form->field($model, 'class')->textInput([
