@@ -38,7 +38,7 @@ class TicketSearch extends Ticket
     {
         return [
             [['exam_id'], 'integer'],
-            [['token', 'examSubject', 'examName', 'userId', 'test_taker', 'state', 'abandoned'], 'safe'],
+            [['token', 'examSubject', 'examName', 'userId', 'test_taker', 'state', 'abandoned', 'start', 'end'], 'safe'],
         ];
     }
 
@@ -146,9 +146,16 @@ class TicketSearch extends Ticket
         $query->andFilterWhere([
             'id' => $this->id,
             'exam_id' => $this->exam_id,
-            'start' => $this->start,
-            'end' => $this->end,
         ]);
+
+        //var_dump($this->start);
+
+        $startEnd = new \DateTime($this->start);
+        $startEnd->modify('+1 day');
+        $endEnd = new \DateTime($this->start);
+        $endEnd->modify('+1 day');
+        $query->andFilterWhere(['between', 'start', $this->start, $startEnd->format('Y-m-d')]);
+        $query->andFilterWhere(['between', 'end', $this->end, $endEnd->format('Y-m-d')]);
 
         $query->andFilterWhere(['like', 'token', $this->token])
             ->andFilterWhere(['like', 'test_taker', $this->test_taker])

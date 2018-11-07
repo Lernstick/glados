@@ -16,5 +16,5 @@ return [
     'upperBound' =>             80,
     'lowerBound' =>             20,
     'abandonTicket' =>          10800, // leave the ticket after 3 hours of failed backup attempts
-    'liveEvents' =>             false, // enable or disable live data
+    'liveEvents' =>             true, // enable or disable live data
 ];

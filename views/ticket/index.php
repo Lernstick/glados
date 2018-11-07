@@ -101,8 +101,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 'filter' => $searchModel->subjectList,
             ],*/
             [
-                'attribute'=>'examSubject',
-                'filterType'=>GridView::FILTER_SELECT2,
+                'attribute' => 'examSubject',
+                'filterType' => GridView::FILTER_SELECT2,
                 'filterWidgetOptions'=>[
                     'pluginOptions' => [
                         'dropdownAutoWidth' => true,
@@ -126,10 +126,36 @@ $this->params['breadcrumbs'][] = $this->title;
                 'filterInputOptions' => [
                     'placeholder' => 'Any'
                 ],
-                'format'=>'raw'
+                'format' => 'raw'
             ],          
-            'start:timeago',
-            'end:timeago',
+            //'start:timeago',
+            //'end:timeago',
+            [
+                'attribute' => 'start',
+                'format' => 'timeago',
+                'filterType' => GridView::FILTER_DATE,
+                'filterWidgetOptions' => [
+                    'options' => ['placeholder' => 'Enter day...'],
+                    'pluginOptions' => [
+                       'format' => 'yyyy-mm-dd',
+                       'todayHighlight' => true,
+                       'autoclose' => true,
+                    ]
+                ],
+            ],
+            [
+                'attribute' => 'end',
+                'format' => 'timeago',
+                'filterType' => GridView::FILTER_DATE,
+                'filterWidgetOptions' => [
+                    'options' => ['placeholder' => 'Enter day...'],
+                    'pluginOptions' => [
+                       'format' => 'yyyy-mm-dd',
+                       'todayHighlight' => true,
+                       'autoclose' => true,
+                    ]
+                ],
+            ],            
             #'valid:boolean',
             [
                 'attribute' => 'abandoned',
@@ -138,7 +164,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'Yes' => 'Yes',
                     'No' => 'No',
                 ),
-            ],
+            ],            
             [
                 'attribute'=>'test_taker',
                 'filterType'=>GridView::FILTER_SELECT2,

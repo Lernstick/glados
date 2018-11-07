@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "b28dadaacb290eb616ea4dfd23f82b7c",
+    "content-hash": "ae79a7726db7ad95ec39e267f5d26809",
     "packages": [
         {
             "name": "bower-asset/blueimp-canvas-to-blob",
@@ -24,16 +24,16 @@
         },
         {
             "name": "bower-asset/blueimp-file-upload",
-            "version": "v9.26.0",
+            "version": "v9.27.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/blueimp/jQuery-File-Upload.git",
-                "reference": "10a66db5f3bf5ea69ea3d7751e02ad37c841dd62"
+                "reference": "44f0f4c4d688031dc793ae0c705217ea7e54f82a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/blueimp/jQuery-File-Upload/zipball/10a66db5f3bf5ea69ea3d7751e02ad37c841dd62",
-                "reference": "10a66db5f3bf5ea69ea3d7751e02ad37c841dd62",
+                "url": "https://api.github.com/repos/blueimp/jQuery-File-Upload/zipball/44f0f4c4d688031dc793ae0c705217ea7e54f82a",
+                "reference": "44f0f4c4d688031dc793ae0c705217ea7e54f82a",
                 "shasum": ""
             },
             "require": {
@@ -84,7 +84,7 @@
                 "upload",
                 "widget"
             ],
-            "time": "2018-11-01T22:10:05+00:00"
+            "time": "2018-11-07T11:32:50+00:00"
         },
         {
             "name": "bower-asset/blueimp-gallery",
@@ -743,12 +743,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/kartik-v/yii2-dynagrid.git",
-                "reference": "ed7fc67d77ce2742981ec391f9df1a632d5eb254"
+                "reference": "60bdcb8f012557ce4930700f043a782edc56ad1d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kartik-v/yii2-dynagrid/zipball/ed7fc67d77ce2742981ec391f9df1a632d5eb254",
-                "reference": "ed7fc67d77ce2742981ec391f9df1a632d5eb254",
+                "url": "https://api.github.com/repos/kartik-v/yii2-dynagrid/zipball/60bdcb8f012557ce4930700f043a782edc56ad1d",
+                "reference": "60bdcb8f012557ce4930700f043a782edc56ad1d",
                 "shasum": ""
             },
             "require": {
@@ -795,20 +795,20 @@
                 "widget",
                 "yii2"
             ],
-            "time": "2018-09-20 19:04:35"
+            "time": "2018-11-07 17:40:02"
         },
         {
             "name": "kartik-v/yii2-grid",
-            "version": "v3.2.6",
+            "version": "v3.2.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/kartik-v/yii2-grid.git",
-                "reference": "3d5a7fe12941992714dcb9c3f4a01c0320f4f057"
+                "reference": "233fcf68fc6197e9451c95117ea45be153db1a8e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kartik-v/yii2-grid/zipball/3d5a7fe12941992714dcb9c3f4a01c0320f4f057",
-                "reference": "3d5a7fe12941992714dcb9c3f4a01c0320f4f057",
+                "url": "https://api.github.com/repos/kartik-v/yii2-grid/zipball/233fcf68fc6197e9451c95117ea45be153db1a8e",
+                "reference": "233fcf68fc6197e9451c95117ea45be153db1a8e",
                 "shasum": ""
             },
             "require": {
@@ -847,7 +847,7 @@
                 "widget",
                 "yii2"
             ],
-            "time": "2018-10-09T08:12:05+00:00"
+            "time": "2018-11-03T18:08:29+00:00"
         },
         {
             "name": "kartik-v/yii2-krajee-base",
@@ -1054,6 +1054,60 @@
             "time": "2018-09-27T17:51:42+00:00"
         },
         {
+            "name": "kartik-v/yii2-widget-datepicker",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kartik-v/yii2-widget-datepicker.git",
+                "reference": "ac89cc2371afd1574eb064245758ccfb6b852dd0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kartik-v/yii2-widget-datepicker/zipball/ac89cc2371afd1574eb064245758ccfb6b852dd0",
+                "reference": "ac89cc2371afd1574eb064245758ccfb6b852dd0",
+                "shasum": ""
+            },
+            "require": {
+                "kartik-v/yii2-krajee-base": ">=2.0.0"
+            },
+            "type": "yii2-extension",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.4.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "kartik\\date\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Kartik Visweswaran",
+                    "email": "kartikv2@gmail.com",
+                    "homepage": "http://www.krajee.com/"
+                }
+            ],
+            "description": "Enhanced Yii2 wrapper for the bootstrap datepicker plugin (sub repo split from yii2-widgets).",
+            "homepage": "https://github.com/kartik-v/yii2-widget-datepicker",
+            "keywords": [
+                "date",
+                "extension",
+                "form",
+                "jquery",
+                "picker",
+                "plugin",
+                "select2",
+                "widget",
+                "yii2"
+            ],
+            "time": "2018-11-05 12:32:36"
+        },
+        {
             "name": "kartik-v/yii2-widget-datetimepicker",
             "version": "v1.4.8",
             "source": {
@@ -1113,12 +1167,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/kartik-v/yii2-widget-growl.git",
-                "reference": "93952f23826b36982ce0843720e7a134421558dc"
+                "reference": "af68935689073625ee578686ad4b96477d1cd526"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kartik-v/yii2-widget-growl/zipball/93952f23826b36982ce0843720e7a134421558dc",
-                "reference": "93952f23826b36982ce0843720e7a134421558dc",
+                "url": "https://api.github.com/repos/kartik-v/yii2-widget-growl/zipball/af68935689073625ee578686ad4b96477d1cd526",
+                "reference": "af68935689073625ee578686ad4b96477d1cd526",
                 "shasum": ""
             },
             "require": {
@@ -1159,7 +1213,7 @@
                 "widget",
                 "yii2"
             ],
-            "time": "2018-10-09 11:14:59"
+            "time": "2018-11-05 12:33:39"
         },
         {
             "name": "kartik-v/yii2-widget-rangeinput",
@@ -1221,12 +1275,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/kartik-v/yii2-widget-select2.git",
-                "reference": "d83b74022e2cba650072270738bdf63fb4ff007f"
+                "reference": "2bbb9cae329bd536f1a22ae14f8e0dc890063f66"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kartik-v/yii2-widget-select2/zipball/d83b74022e2cba650072270738bdf63fb4ff007f",
-                "reference": "d83b74022e2cba650072270738bdf63fb4ff007f",
+                "url": "https://api.github.com/repos/kartik-v/yii2-widget-select2/zipball/2bbb9cae329bd536f1a22ae14f8e0dc890063f66",
+                "reference": "2bbb9cae329bd536f1a22ae14f8e0dc890063f66",
                 "shasum": ""
             },
             "require": {
@@ -1266,7 +1320,7 @@
                 "widget",
                 "yii2"
             ],
-            "time": "2018-10-25 03:23:23"
+            "time": "2018-11-05 12:34:42"
         },
         {
             "name": "limion/yii2-jquery-fileupload-widget",
@@ -2433,6 +2487,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "kartik-v/yii2-widget-datepicker": 20,
         "kartik-v/yii2-widget-growl": 20,
         "kartik-v/yii2-widget-select2": 20,
         "kartik-v/yii2-dynagrid": 20,

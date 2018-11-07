@@ -18,6 +18,7 @@
         "yiisoft/yii2-swiftmailer": "*",
         "kartik-v/yii2-mpdf": "*",
         "kartik-v/yii2-widget-datetimepicker": "*",
+        "kartik-v/yii2-widget-datepicker": "@dev",
         "kartik-v/yii2-widget-growl": "@dev",
         "kartik-v/yii2-widget-select2": "@dev",
         "kartik-v/yii2-widget-rangeinput": "*",

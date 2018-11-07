@@ -65,10 +65,10 @@ $this->registerJs($js);
             <?= $model->isNewRecord ? null : $form->field($model, 'start')->widget(DateTimePicker::classname(), [
                 'options' => ['placeholder' => 'Enter start time ...'],
                 'pluginOptions' => [
-            	   'format' => 'yyyy-mm-dd hh:ii:ss',
-            	   'todayHighlight' => true,
-            	   'todayBtn' => true,
-            	   'autoclose' => true,
+                   'format' => 'yyyy-mm-dd hh:ii:ss',
+                   'todayHighlight' => true,
+                   'todayBtn' => true,
+                   'autoclose' => true,
                 ]
             ]); ?>
         </div>
