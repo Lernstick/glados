@@ -8,6 +8,7 @@ use kartik\grid\GridView;
 use kartik\dynagrid\DynaGrid;
 use kartik\select2\Select2;
 use yii\web\JsExpression;
+use yii\bootstrap\Dropdown;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\TicketSearch */
@@ -23,6 +24,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <?php Pjax::begin(); ?>
+
+    <?=Html::beginForm(['ticket/bulk'], 'post', ['id' => 'ticket-index-form']);?>
 
     <?= DynaGrid::widget([
         'showPersonalize' => true,
@@ -334,6 +337,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     return Url::toRoute(['ticket/' . $action, 'id' => $model->id]);
                 },
             ],
+            ['class'=>'kartik\grid\CheckboxColumn', 'order'=>DynaGrid::ORDER_FIX_RIGHT],
         ],
         'storage' => DynaGrid::TYPE_COOKIE,
         'theme' => 'simple-default',
@@ -352,14 +356,45 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
                 ['content' => '{dynagridFilter}{dynagridSort}{dynagrid}'],
                 '{export}',
+                ['content' =>
+                    '<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        <i class="glyphicon glyphicon-list-alt"></i>
+                        Actions&nbsp;<span class="caret"></span>
+                    </button>
+                    ' . Dropdown::widget([
+                        'options' => [
+                            'class' => 'dropdown-menu-right',
+                        ],
+                        'items' => [
+                            '<li role="presentation" class="dropdown-header">Perform action with selected items</li>',
+                            '<li>' . Html::a('<span class="glyphicon glyphicon-trash"></span> Delete all selected items', '#', [
+                                'onclick' => new JsExpression('(function(e) {
+                                    var keys = $("#w9").yiiGridView("getSelectedRows").length;
+                                    if(keys > 0) {
+                                        $("#ticket-index-form").submit()
+                                    } else { 
+                                        alert(e);
+                                        e.stopPropagation();
+                                    }
+                                })();'),
+                                'data' => [
+                                    'confirm' => 'Are you sure you want to delete all selected items?'
+                                ],
+                            ]) . '</li>',
+                        ],
+                    ]),
+                ]
         ]            
         ],
-        'options' => ['id' => 'dynagrid-ticket-index'] // a unique identifier is important
+        'options' => ['id' => 'ticket-index-dynagrid'], // a unique identifier is important
+        'id' => 'ticket-index-grid'
     ]); ?>
 
     <?= $this->render('@app/views/_notification', [
         'session' => $session,
     ]) ?>
+
+    <?= Html::endForm();?>
 
     <?php Pjax::end(); ?>
 
