@@ -7,7 +7,6 @@ use yii\widgets\Pjax;
 use kartik\grid\GridView;
 use kartik\dynagrid\DynaGrid;
 use kartik\select2\Select2;
-use dosamigos\selectize\SelectizeDropDownList;
 use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
