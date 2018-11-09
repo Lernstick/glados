@@ -172,12 +172,18 @@ class TicketSearch extends Ticket
         return $dataProvider;
     }
 
-    public function getExamList()
+    public function getExamList($id = null)
     {
 
+        $query = Exam::find();
+
+        if (!is_null($id)) {
+            $query->where(['id' => $id]);
+        }
+
         $exams = Yii::$app->user->can('ticket/index/all') ? 
-            Exam::find()->asArray()->all() : 
-            Exam::find()->where(['user_id' => Yii::$app->user->id])->asArray()->all();
+            $query->asArray()->all() : 
+            $query->where(['user_id' => Yii::$app->user->id])->asArray()->all();
 
         return ArrayHelper::map($exams, 'id', function($exams){
                 return $exams['subject'] . ' - ' . $exams['name'];

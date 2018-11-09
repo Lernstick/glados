@@ -56,7 +56,7 @@ class ExamController extends Controller
      * @param string $q query
      * @return mixed
      */
-    public function actionIndex($mode = null, $attr = null, $q = null)
+    public function actionIndex($mode = null, $attr = null, $q = null, $page = 1, $per_page = 10)
     {
 
         if ($mode === null) {
@@ -75,15 +75,15 @@ class ExamController extends Controller
         } else if ($mode == 'list') {
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             $out = [];
-            if (!is_null($q) && !is_null($attr)) {
+            if (!is_null($attr)) {
                 $searchModel = new ExamSearch();
                 if ($attr == 'name') {
-                    $out = $searchModel->selectList('name', $q);
+                    $out = $searchModel->selectList('name', $q, $page, $per_page);
                 } else if ($attr == 'subject') {
-                    $out = $searchModel->selectList('subject', $q);
+                    $out = $searchModel->selectList('subject', $q, $page, $per_page);
                 } else if ($attr == 'resultExam') {
                     $attr = 'CONCAT(name, " - ", subject)';
-                    $out = $searchModel->selectList($attr, $q, 'id', false);
+                    $out = $searchModel->selectList($attr, $q, $page, $per_page, 'id', false, 'name');
                 }
             }
             return $out;

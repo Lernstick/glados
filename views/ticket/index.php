@@ -7,6 +7,7 @@ use yii\widgets\Pjax;
 use kartik\grid\GridView;
 use kartik\dynagrid\DynaGrid;
 use kartik\select2\Select2;
+use dosamigos\selectize\SelectizeDropDownList;
 use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
@@ -48,15 +49,28 @@ $this->params['breadcrumbs'][] = $this->title;
                         'dropdownAutoWidth' => true,
                         'width' => 'auto',
                         'allowClear' => true,
-                        'minimumInputLength' => 2,
+                        'minimumInputLength' => 3,
                         'placeholder' => '',
-                        'language' => [
-                            'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
-                        ],
                         'ajax' => [
                             'url' => \yii\helpers\Url::to(['ticket/index', 'mode' => 'list', 'attr' => 'token']),
                             'dataType' => 'json',
-                            'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                            'delay' => 250,
+                            'cache' => true,
+                            'data' => new JsExpression('function(params) {
+                                return {
+                                    q: params.term,
+                                    page: params.page,
+                                    per_page: 10
+                                };
+                            }'),
+                            'processResults' => new JsExpression('function(data, page) {
+                                return {
+                                    results: data.results,
+                                    pagination: {
+                                        more: data.results.length === 10 // If there are 10 matches, theres at least another page
+                                    }
+                                };
+                            }'),
                         ],
                         'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
                         'templateResult' => new JsExpression('function(q) { return q.text; }'),
@@ -76,15 +90,27 @@ $this->params['breadcrumbs'][] = $this->title;
                         'dropdownAutoWidth' => true,
                         'width' => 'auto',
                         'allowClear' => true,
-                        'minimumInputLength' => 2,
                         'placeholder' => '',
-                        'language' => [
-                            'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
-                        ],
                         'ajax' => [
                             'url' => \yii\helpers\Url::to(['exam/index', 'mode' => 'list', 'attr' => 'name']),
                             'dataType' => 'json',
-                            'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                            'delay' => 250,
+                            'cache' => true,
+                            'data' => new JsExpression('function(params) {
+                                return {
+                                    q: params.term,
+                                    page: params.page,
+                                    per_page: 10
+                                };
+                            }'),
+                            'processResults' => new JsExpression('function(data, page) {
+                                return {
+                                    results: data.results,
+                                    pagination: {
+                                        more: data.results.length === 10 // If there are 10 matches, theres at least another page
+                                    }
+                                };
+                            }'),
                         ],
                         'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
                         'templateResult' => new JsExpression('function(q) { return q.text; }'),
@@ -108,15 +134,27 @@ $this->params['breadcrumbs'][] = $this->title;
                         'dropdownAutoWidth' => true,
                         'width' => 'auto',
                         'allowClear' => true,
-                        'minimumInputLength' => 2,
                         'placeholder' => '',
-                        'language' => [
-                            'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
-                        ],
                         'ajax' => [
                             'url' => \yii\helpers\Url::to(['exam/index', 'mode' => 'list', 'attr' => 'subject']),
                             'dataType' => 'json',
-                            'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                            'delay' => 250,
+                            'cache' => true,
+                            'data' => new JsExpression('function(params) {
+                                return {
+                                    q: params.term,
+                                    page: params.page,
+                                    per_page: 10
+                                };
+                            }'),
+                            'processResults' => new JsExpression('function(data, page) {
+                                return {
+                                    results: data.results,
+                                    pagination: {
+                                        more: data.results.length === 10 // If there are 10 matches, theres at least another page
+                                    }
+                                };
+                            }'),
                         ],
                         'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
                         'templateResult' => new JsExpression('function(q) { return q.text; }'),
@@ -173,15 +211,27 @@ $this->params['breadcrumbs'][] = $this->title;
                         'dropdownAutoWidth' => true,
                         'width' => 'auto',
                         'allowClear' => true,
-                        'minimumInputLength' => 2,
                         'placeholder' => '',
-                        'language' => [
-                            'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
-                        ],
                         'ajax' => [
                             'url' => \yii\helpers\Url::to(['ticket/index', 'mode' => 'list', 'attr' => 'testTaker']),
                             'dataType' => 'json',
-                            'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                            'delay' => 250,
+                            'cache' => true,
+                            'data' => new JsExpression('function(params) {
+                                return {
+                                    q: params.term,
+                                    page: params.page,
+                                    per_page: 10
+                                };
+                            }'),
+                            'processResults' => new JsExpression('function(data, page) {
+                                return {
+                                    results: data.results,
+                                    pagination: {
+                                        more: data.results.length === 10 // If there are 10 matches, theres at least another page
+                                    }
+                                };
+                            }'),
                         ],
                         'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
                         'templateResult' => new JsExpression('function(q) { return q.text; }'),

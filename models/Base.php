@@ -33,34 +33,46 @@ class Base extends \yii\db\ActiveRecord
 
     /**
      * Lists an attribute
-     * @param attr attribute to list
-     * @param q query
-     * @param id which attribute should be the id
-     * @param showQuery whether the query itself should be shown in the 
+     * @param string attr attribute to list
+     * @param string q query
+     * @param int page
+     * @param int per_page
+     * @param int id which attribute should be the id
+     * @param bool showQuery whether the query itself should be shown in the 
      *                  output list.
      *
-     * @return TicketQuery
+     * @return array
      */
-    public function selectList($attr, $q, $id = null, $showQuery = true)
+    public function selectList($attr, $q, $page = 1, $per_page = 10, $id = null, $showQuery = true, $orderBy = null)
     {
         $id = is_null($id) ? $attr : $id;
         $query = $this->find();
         $query->select([$id . ' as id', $attr . ' AS text'])
-            ->distinct()
-            ->where(['like', $attr, $q]);
+            ->distinct();
+
+        if (!is_null($q) && $q != '') {
+            $query->where(['like', $attr, $q]);
+        }
+
+        if (is_null($orderBy)) {
+            $query->orderBy($attr);
+        } else {
+            $query->orderBy($orderBy);
+        }
 
         if ($this->tableName() != "user") {
             Yii::$app->user->can($this->tableName() . '/index/all') ?: $query->own();
         }
 
         $out = ['results' => []];
-        if ($showQuery === true) {
+        if ($showQuery === true && $page == 1) {
             $out = ['results' => [
                 0 => ['id' => $q, 'text' => $q]
             ]];
+            $per_page -= 1;
         }
 
-        $command = $query->limit(20)->createCommand();
+        $command = $query->limit($per_page)->offset(($page-1)*$per_page)->createCommand();
         $data = $command->queryAll();
         $out['results'] = array_merge($out['results'], array_values($data));
         return $out;

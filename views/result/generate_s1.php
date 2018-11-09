@@ -66,15 +66,27 @@ $this->registerJs($js);
                         'dropdownAutoWidth' => true,
                         'width' => 'auto',
                         'allowClear' => true,
-                        'minimumInputLength' => 2,
                         'placeholder' => '',
-                        'language' => [
-                            'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
-                        ],
                         'ajax' => [
                             'url' => \yii\helpers\Url::to(['exam/index', 'mode' => 'list', 'attr' => 'resultExam']),
                             'dataType' => 'json',
-                            'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                            'delay' => 250,
+                            'cache' => true,
+                            'data' => new JsExpression('function(params) {
+                                return {
+                                    q: params.term,
+                                    page: params.page,
+                                    per_page: 10
+                                };
+                            }'),
+                            'processResults' => new JsExpression('function(data, page) {
+                                return {
+                                    results: data.results,
+                                    pagination: {
+                                        more: data.results.length === 10 // If there are 10 matches, theres at least another page
+                                    }
+                                };
+                            }'),
                         ],
                         'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
                         'templateResult' => new JsExpression('function(q) { return q.text; }'),

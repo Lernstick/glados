@@ -53,7 +53,7 @@ class UserController extends Controller
      * @param string $q query
      * @return mixed
      */
-    public function actionIndex($mode = null, $attr = null, $q = null)
+    public function actionIndex($mode = null, $attr = null, $q = null, $page = 1, $per_page = 10)
     {
         if ($mode === null) {
             $searchModel = new UserSearch();
@@ -66,10 +66,10 @@ class UserController extends Controller
         } else if ($mode == 'list') {
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             $out = [];
-            if (!is_null($q) && !is_null($attr)) {
+            if (!is_null($attr)) {
                 $searchModel = new UserSearch();
                 if ($attr == 'username') {
-                    $out = $searchModel->selectList('username', $q);
+                    $out = $searchModel->selectList('username', $q, $page, $per_page);
                 }
             }
             return $out;
