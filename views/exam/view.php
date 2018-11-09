@@ -40,6 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= DetailView::widget([
             'model' => $model,
             'attributes' => [
+                'createdAt:timeago',
                 'name',
                 'subject',
                 [

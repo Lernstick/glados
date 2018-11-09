@@ -27,7 +27,20 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'kartik\grid\SerialColumn', 'order' => DynaGrid::ORDER_FIX_LEFT],
 
-            //'name',
+            [
+                'attribute' => 'createdAt',
+                'format' => 'timeago',
+                'filterType' => GridView::FILTER_DATE,
+                'filterWidgetOptions' => [
+                    'options' => ['placeholder' => 'Enter day...'],
+                    'pluginOptions' => [
+                       'format' => 'yyyy-mm-dd',
+                       'todayHighlight' => true,
+                       'autoclose' => true,
+                    ]
+                ],
+                'visible' => false,
+            ],
             [
                 'attribute'=>'name',
                 'filterType'=>GridView::FILTER_SELECT2,

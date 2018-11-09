@@ -93,6 +93,7 @@ class Exam extends Base
     {
         return [
             'id' => 'ID',
+            'createdAt' => 'Created At',
             'name' => 'Name',
             'subject' => 'Subject',
             'file' => 'Exam Image File (zip, squashfs)',

@@ -22,7 +22,7 @@ class ExamSearch extends Exam
     {
         return [
             [['id', 'user_id'], 'integer'],
-            [['name', 'subject', 'file', 'userName'], 'safe'],
+            [['name', 'subject', 'file', 'userName', 'createdAt'], 'safe'],
         ];
     }
 
@@ -54,7 +54,9 @@ class ExamSearch extends Exam
         ]);
 
         $dataProvider->setSort([
+            'defaultOrder' => ['createdAt' => SORT_DESC],
             'attributes' => [
+                'createdAt',
                 'name',
                 'subject',
                 'userName' => [
@@ -84,6 +86,10 @@ class ExamSearch extends Exam
         $query->andFilterWhere([
             'id' => $this->id,
         ]);
+
+        $createdEnd = new \DateTime($this->createdAt);
+        $createdEnd->modify('+1 day');
+        $query->andFilterWhere(['between', 'createdAt', $this->createdAt, $createdEnd->format('Y-m-d')]);
 
         $query->andFilterWhere(['like', 'name', $this->name])
             ->andFilterWhere(['like', 'subject', $this->subject])

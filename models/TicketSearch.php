@@ -38,7 +38,7 @@ class TicketSearch extends Ticket
     {
         return [
             [['exam_id'], 'integer'],
-            [['token', 'examSubject', 'examName', 'userId', 'test_taker', 'state', 'abandoned', 'start', 'end'], 'safe'],
+            [['token', 'examSubject', 'examName', 'userId', 'test_taker', 'state', 'abandoned', 'start', 'end', 'createdAt'], 'safe'],
         ];
     }
 
@@ -70,11 +70,18 @@ class TicketSearch extends Ticket
         ]);
 
         $dataProvider->setSort([
+            'defaultOrder' => ['createdAt' => SORT_DESC],
             'attributes' => [
                 'state',
+                'createdAt',
                 'token',
                 'start',
                 'end',
+                'duration' => [
+                    'asc' => ['TIMEDIFF(start, end)' => SORT_ASC],
+                    'desc' => ['TIMEDIFF(start, end)' => SORT_DESC],
+                    'label' => 'Duration'
+                ],
                 'examName' => [
                     'asc' => ['exam.name' => SORT_ASC],
                     'desc' => ['exam.name' => SORT_DESC],
@@ -148,14 +155,16 @@ class TicketSearch extends Ticket
             'exam_id' => $this->exam_id,
         ]);
 
-        //var_dump($this->start);
-
         $startEnd = new \DateTime($this->start);
         $startEnd->modify('+1 day');
         $endEnd = new \DateTime($this->start);
         $endEnd->modify('+1 day');
         $query->andFilterWhere(['between', 'start', $this->start, $startEnd->format('Y-m-d')]);
         $query->andFilterWhere(['between', 'end', $this->end, $endEnd->format('Y-m-d')]);
+
+        $createdEnd = new \DateTime($this->createdAt);
+        $createdEnd->modify('+1 day');
+        $query->andFilterWhere(['between', 'ticket.createdAt', $this->createdAt, $createdEnd->format('Y-m-d')]);
 
         $query->andFilterWhere(['like', 'token', $this->token])
             ->andFilterWhere(['like', 'test_taker', $this->test_taker])
