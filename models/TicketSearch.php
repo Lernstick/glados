@@ -246,10 +246,7 @@ class TicketSearch extends Ticket
                 'TIMESTAMPDIFF(
                     SECOND,
                     `start`,
-                    IF(`end` is null,
-                        CURRENT_TIMESTAMP(),
-                        `end`
-                    )
+                    `end`
                 )'
             )
         );

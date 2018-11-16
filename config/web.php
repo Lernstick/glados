@@ -15,7 +15,17 @@ $config = [
         'gridview' => [
             'class' => '\kartik\grid\Module',
         ],
-    ],    
+    ],
+    'container' => [
+        'definitions' => [
+            'yii\widgets\LinkPager' => [
+                'firstPageLabel' => '«',
+                'lastPageLabel'  => '»',
+                'nextPageLabel' => '›',
+                'prevPageLabel' => '‹',
+            ],
+        ],
+    ],
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
