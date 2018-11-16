@@ -30,7 +30,38 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DynaGrid::widget([
         'showPersonalize' => true,
         'columns' => [
-            ['class' => 'kartik\grid\SerialColumn', 'order' => DynaGrid::ORDER_FIX_LEFT],
+            //['class' => 'kartik\grid\SerialColumn', 'order' => DynaGrid::ORDER_FIX_LEFT],
+
+            [
+                'order' => DynaGrid::ORDER_FIX_LEFT,
+                'format' => 'raw',
+                'label' => '#',
+                'value' => function($model, $key, $index, $column) use ($monitor) {
+                    $offset = $column->grid->dataProvider->getPagination()->getOffset();
+                    return $monitor ? ActiveEventField::widget([
+                        'options' => [ 'tag' => 'span' ],
+                        'event' => 'ticket/' . $model->id,
+                        'content' => $offset + $index + 1,
+                        'jsonSelector' => 'state',
+                        'jsHandler' => 'function(d, s){
+                            t = s.parentNode.parentNode;
+                            t.classList.remove("success");
+                            t.classList.remove("info");
+                            t.classList.remove("danger");
+                            t.classList.remove("warning");
+                            if(d == 0){
+                                t.classList.add("success");
+                            } else if(d == 1){
+                                t.classList.add("info");
+                            } else if(d == 2){
+                                t.classList.add("danger");
+                            } else if(d == 3){
+                                t.classList.add("warning");
+                            }
+                        }',
+                    ]) : $offset + $index + 1;
+                },
+            ],
 
             [
                 'attribute' => 'createdAt',
@@ -63,23 +94,14 @@ $this->params['breadcrumbs'][] = $this->title;
                         'event' => 'ticket/' . $model->id,
                         'jsonSelector' => 'state',
                         'jsHandler' => 'function(d, s){
-                            t = s.parentNode.parentNode;
-                            t.classList.remove("success");
-                            t.classList.remove("info");
-                            t.classList.remove("danger");
-                            t.classList.remove("warning");
                             if(d == 0){
                                 s.innerHTML = "Open";
-                                t.classList.add("success");
                             } else if(d == 1){
                                 s.innerHTML = "Running";
-                                t.classList.add("info");
                             } else if(d == 2){
                                 s.innerHTML = "Closed";
-                                t.classList.add("danger");
                             } else if(d == 3){
                                 s.innerHTML = "Submitted";
-                                t.classList.add("warning");
                             } else {
                                 s.innerHTML = "Unknown";
                             }
@@ -168,10 +190,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
                 'format'=>'raw'
             ],
-            /*[
-                'attribute' => 'examSubject',
-                'filter' => $searchModel->subjectList,
-            ],*/
             [
                 'attribute' => 'examSubject',
                 'filterType' => GridView::FILTER_SELECT2,
