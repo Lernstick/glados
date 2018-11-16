@@ -10,6 +10,7 @@ use app\models\Daemon;
 use app\models\Activity;
 use app\models\Screenshot;
 use app\models\ScreenshotSearch;
+use app\models\EventItem;
 use app\components\ShellCommand;
 use yii\helpers\FileHelper;
 use yii\helpers\Console;
@@ -157,6 +158,8 @@ class BackupController extends DaemonController implements DaemonInterface
             return;
         }
 
+        $oldNewestScreenshot = $this->ticket->newestScreenshot;
+
         $this->logInfo('Processing ticket (backup): ' .
             ( empty($this->ticket->test_taker) ? $this->ticket->token : $this->ticket->test_taker) .
             ' (' . $this->ticket->ip . ')', true);
@@ -249,6 +252,17 @@ class BackupController extends DaemonController implements DaemonInterface
                 foreach ($dataProvider->models as $model) {
                     $model->getThumbnail();
                 }
+
+                //if ($oldNewestScreenshot != $this->ticket->newestScreenshot) {
+                    $eventItem = new EventItem([
+                        'event' => 'ticket/' . $this->ticket->id,
+                        'priority' => 0,
+                        'data' => [
+                            'newestScreenshot' => $this->ticket->newestScreenshot->tsrc,
+                        ],
+                    ]);
+                    $eventItem->generate();
+                //}
 
                 # Calculate the size
                 $this->logInfo("Calculate backup size...");

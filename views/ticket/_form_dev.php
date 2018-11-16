@@ -17,5 +17,6 @@ use kartik\datetime\DateTimePicker;
         <?= $form->field($model, 'backup_lock')->checkbox() ?>
         <?= $form->field($model, 'restore_lock')->checkbox() ?>
         <?= $form->field($model, 'bootup_lock')->checkbox() ?>
+        <?= $form->field($model, 'last_backup')->checkbox() ?>
     </div>
 </div>

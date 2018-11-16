@@ -47,9 +47,9 @@ class ScreenshotController extends Controller
     public function actionView($token, $date, $type = 'normal')
     {
         if (($model = Screenshot::findOne($token, $date)) !== null){
-            if ($type = 'normal') {
+            if ($type == 'normal') {
                 return \Yii::$app->response->sendFile($model->path, null, ['inline' => true]);
-            } else if ($type = 'thumb') {
+            } else if ($type == 'thumb') {
                 return \Yii::$app->response->sendFile($model->thumbnail, null, ['inline' => true]);
             } else {
                 throw new NotFoundHttpException('The requested page does not exist.');

@@ -37,6 +37,19 @@ return [
                 ],
             ],
         ],
+        'urlManager' => [
+            'enablePrettyUrl' => true,
+            'scriptUrl' => $params['scriptUrl'],
+            'rules' => [
+                'activities' => 'activity/index',
+                '<controller>s' => '<controller>/index',
+                '<controller>/<id:\d+>' => '<controller>/view',
+                '<controller>/<action:(update|delete|backup|restore|stop|kill)>/<id:\d+>' => '<controller>/<action>',
+                'howto/img/<id>' => 'howto/img',
+                'howto/<id>' => 'howto/view',
+                'ticket/<action:(config|download|finish|notify|md5)>/<token:.*>' => 'ticket/<action>',
+            ]
+        ],
         'db' => $db,
     ],
     'params' => $params,

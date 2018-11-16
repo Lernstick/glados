@@ -4,6 +4,7 @@ return [
     'version' =>                '1.0.4',
     'itemsPerPage' =>           10,
     'tokenLength' =>            10,
+    'scriptUrl' =>              '/glados/index.php', // needed for console scripts to know how to generate URL
     'uploadPath' =>             '/var/lib/glados/uploads/',
     'backupPath' =>             '/var/lib/glados/backups/',
     'resultPath' =>             '/var/lib/glados/results/',

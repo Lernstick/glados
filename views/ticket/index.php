@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\StringHelper;
 use yii\helpers\Url;
 use yii\widgets\ActiveField;
 use yii\widgets\Pjax;
@@ -8,11 +9,13 @@ use kartik\grid\GridView;
 use kartik\dynagrid\DynaGrid;
 use kartik\select2\Select2;
 use yii\web\JsExpression;
+use app\components\ActiveEventField;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\TicketSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $preSelect array */
+/* @var $monitor bool */
 
 $this->title = 'Tickets';
 $this->params['breadcrumbs'][] = $this->title;
@@ -45,7 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'state',
-                'format' => 'state',
+                'format' => 'raw',
                 'filter' => array(
                     0 => yii::$app->formatter->format(0, 'state'),
                     1 => yii::$app->formatter->format(1, 'state'),
@@ -53,6 +56,36 @@ $this->params['breadcrumbs'][] = $this->title;
                     3 => yii::$app->formatter->format(3, 'state'),
                     4 => yii::$app->formatter->format(4, 'state'),
                 ),
+                'value' => function($model) use ($monitor) {
+                    return $monitor ? ActiveEventField::widget([
+                        'options' => [ 'tag' => 'span' ],
+                        'content' => yii::$app->formatter->format($model->state, 'state'),
+                        'event' => 'ticket/' . $model->id,
+                        'jsonSelector' => 'state',
+                        'jsHandler' => 'function(d, s){
+                            t = s.parentNode.parentNode;
+                            t.classList.remove("success");
+                            t.classList.remove("info");
+                            t.classList.remove("danger");
+                            t.classList.remove("warning");
+                            if(d == 0){
+                                s.innerHTML = "Open";
+                                t.classList.add("success");
+                            } else if(d == 1){
+                                s.innerHTML = "Running";
+                                t.classList.add("info");
+                            } else if(d == 2){
+                                s.innerHTML = "Closed";
+                                t.classList.add("danger");
+                            } else if(d == 3){
+                                s.innerHTML = "Submitted";
+                                t.classList.add("warning");
+                            } else {
+                                s.innerHTML = "Unknown";
+                            }
+                        }',
+                    ]) : yii::$app->formatter->format($model->state, 'state');
+                },
             ],
             [
                 'attribute'=>'token',
@@ -276,11 +309,81 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'raw',
                 'visible' => false
             ],
+            /*[
+                'attribute' => 'client_state',
+                'format' => 'raw',
+                'visible' => false,
+                'value' => $monitor ? function($model) {
+                    return ActiveEventField::widget([
+                        'content' => yii::$app->formatter->format(StringHelper::truncate($model->client_state, 30), 'text'),
+                        'event' => 'ticket/' . $model->id,
+                        'jsonSelector' => 'client_state',
+                        'jsHandler' => 'function(d, s){
+                            if (d.length > 30) {
+                                s.innerHTML = d.substr(0, 30) + "...";
+                            }else{
+                                s.innerHTML = d;
+                            }
+                        }',  
+                    ]);
+                } : 'client_state',
+            ],*/
+
             [
                 'attribute' => 'client_state',
                 'format' => 'raw',
-                'visible' => false
+                'visible' => false,
+                'value' =>  $monitor ? function($model) {
+                    return ActiveEventField::widget([
+                            'options' => [ 'tag' => 'span' ],
+                            'content' => $model->client_state,
+                            'event' => 'ticket/' . $model->id,
+                            'jsonSelector' => 'client_state',
+                        ]);
+                } : 'client_state',
             ],
+
+            [
+                'attribute' => 'download_progress',
+                'format' => 'raw',
+                'visible' => false,
+                'value' => function($model) use ($monitor) {
+                    return $monitor ? ( '<div class="progress" style="display: inline-table; width:100%;">' . 
+                        ActiveEventField::widget([
+                            'content' => ActiveEventField::widget([
+                                'options' => [ 'tag' => 'span' ],
+                                'content' => yii::$app->formatter->format($model->download_progress, 'percent'),
+                                'event' => 'ticket/' . $model->id,
+                                'jsonSelector' => 'download_progress',
+                                'jsHandler' => 'function(d, s){
+                                    s.innerHTML = d;
+                                    s.parentNode.style = "width:" + d;
+                                }',
+                            ]),
+                            'event' => 'ticket/' . $model->id,
+                            'jsonSelector' => 'download_lock',
+                            'jsHandler' => 'function(d, s){
+                                if(d == "1"){
+                                    s.classList.add("active");
+                                    s.parentNode.classList.add("in");
+                                }else if(d == "0"){
+                                    s.classList.remove("active");
+                                    s.parentNode.classList.remove("in");
+                                }
+                            }',
+                            'options' => [
+                                'class' => 'progress-bar progress-bar-striped ' . ($model->download_lock == 1 ? 'active' : null),
+                                'role' => '"progressbar',
+                                'aria-valuenow' => '0',
+                                'aria-valuemin' => '0',
+                                'aria-valuemax' => '100',
+                                'style' => 'width:' . yii::$app->formatter->format($model->download_progress, 'percent') . ';',
+                            ]
+                        ]) . 
+                    '</div>' ) : yii::$app->formatter->format($model->download_progress, 'percent');
+                },
+            ],
+
             [
                 'attribute' => 'backup_interval',
                 'format' => 'raw',
@@ -307,12 +410,61 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'backup_state',
                 'format' => 'raw',
-                'visible' => false
+                'visible' => false,
+                'value' => $monitor ? function($model) {
+                    return ActiveEventField::widget([
+                            'options' => [
+                                'tag' => 'i',
+                                'class' => 'glyphicon glyphicon-cog ' . ($model->backup_lock == 1 ? 'gly-spin' : 'hidden'),
+                                'style' => 'float: left;',
+                            ],
+                            'event' => 'ticket/' . $model->id,
+                            'jsonSelector' => 'backup_lock',
+                            'jsHandler' => 'function(d, s){
+                                if(d == "1"){
+                                    s.classList.add("gly-spin");
+                                    s.classList.remove("hidden");
+                                }else if(d == "0"){
+                                    s.classList.remove("gly-spin");
+                                    s.classList.add("hidden");
+                                }
+                            }',
+                        ]) . ActiveEventField::widget([
+                            'options' => [
+                                'style' => 'float:left'
+                            ],
+                            'content' => yii::$app->formatter->format($model->backup_state, 'ntext'),
+                            'event' => 'ticket/' . $model->id,
+                            'jsonSelector' => 'backup_state',
+                        ]);
+                } : 'backup_state',
             ],
             [
                 'attribute' => 'restore_state',
                 'format' => 'raw',
                 'visible' => false
+            ],
+            [
+                'attribute' => 'newestScreenshot',
+                'format' => 'raw',
+                'visible' => false,
+                'value' => function($model) use ($monitor) {
+                    return $monitor ? ActiveEventField::widget([
+                        'options' => [
+                            'tag' => 'img',
+                            'src' => $model->newestScreenshot !== null ? $model->newestScreenshot->tsrc : '',
+                            'alt' => $model->newestScreenshot !== null ? '' : 'No screenshot'
+                        ],
+                        'event' => 'ticket/' . $model->id,
+                        'jsonSelector' => 'newestScreenshot',
+                        'jsHandler' => 'function(d, s){
+                            s.src = d;
+                        }',
+                    ]) : Html::img(
+                        $model->newestScreenshot !== null ? $model->newestScreenshot->tsrc : '',
+                        [ 'alt' => $model->newestScreenshot !== null ? '' : 'No screenshot' ]
+                    );
+                },
             ],
             [
                 'class' => 'yii\grid\ActionColumn',
@@ -345,6 +497,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 return array_key_exists($model->state, $model->classMap) ? ['class' => $model->classMap[$model->state]] : null;
             },            
             'toolbar' =>  [
+                ['content' => 
+                    Html::a('<i class="glyphicon glyphicon-facetime-video"></i>', Url::current(['monitor' => $monitor ? false : true], true), ['data-pjax' => 0, 'class' => $monitor ? 'btn btn-danger pulse' : 'btn btn-default', 'title' => 'Monitor Tickets'])
+                ],
                 ['content' =>
                     Html::a('<i class="glyphicon glyphicon-plus"></i>', ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => 'Create Ticket']) . ' ' .
                     Html::a('<i class="glyphicon glyphicon-envelope"></i>', ['update', 'mode' => 'submit'], ['data-pjax' => 0, 'class' => 'btn btn-info', 'title' => 'Submit Ticket']) . ' ' .

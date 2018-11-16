@@ -86,7 +86,7 @@ class TicketController extends Controller
      * @param string $q query
      * @return mixed
      */
-    public function actionIndex($mode = null, $attr = null, $q = null, $page = 1, $per_page = 10)
+    public function actionIndex($mode = null, $attr = null, $q = null, $page = 1, $per_page = 10, $monitor = false)
     {
 
         if ($mode === null) {
@@ -100,6 +100,7 @@ class TicketController extends Controller
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
                 'session' => $session,
+                'monitor' => boolval($monitor),
             ]);
         } else if ($mode == 'list') {
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -114,7 +115,6 @@ class TicketController extends Controller
             }
             return $out;
         }
-
 
     }
 

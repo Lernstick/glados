@@ -6,6 +6,7 @@ use Yii;
 use yii\base\Model;
 use yii\helpers\Url;
 use yii\imagine\Image;
+use yii\helpers\FileHelper;
 
 /**
  * This is the model class for screenshot.
@@ -102,7 +103,6 @@ class Screenshot extends Model
         }
 
         return null;
-
     }
 
     /**
@@ -122,7 +122,7 @@ class Screenshot extends Model
                 $path = $dir . '/' . $screenshot;
                 if(@is_array(getimagesize($path))){
                     $models[] = new Screenshot([
-                        'path' => $path,
+                        'path' => FileHelper::normalizePath($path),
                         'token' => $token,
                         'date' => filemtime($path),
                     ]);
@@ -130,6 +130,39 @@ class Screenshot extends Model
             }
         }
         return $models;
+    }
+
+    /**
+     * Return the newest Screeshot model related to the token
+     *
+     * @param string $token - token
+     * @return Screenshot|null
+     */
+    public function findNewest($token)
+    {
+        $dir = \Yii::$app->params['backupPath'] . '/' . $token . '/Screenshots/';
+        $mtime = 0;
+        $file = null;
+        if (file_exists($dir)) {
+            $files = scandir($dir, SCANDIR_SORT_DESCENDING);
+            foreach ($files as $screenshot) {
+                $path = $dir . '/' . $screenshot;
+                if (filemtime($path) > $mtime && @is_array(getimagesize($path))) {
+                    $mtime = filemtime($path);
+                    $file = $path;
+                }
+            }
+        }
+
+        if ($file !== null) {
+            return new Screenshot([
+                'path' => FileHelper::normalizePath($file),
+                'token' => $token,
+                'date' => $mtime,
+            ]);
+        } else {
+            return null;
+        }
     }
 
     /**

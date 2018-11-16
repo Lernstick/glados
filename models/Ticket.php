@@ -10,6 +10,7 @@ use yii\base\Event;
 use app\models\Backup;
 use app\models\Restore;
 use app\models\EventItem;
+use app\models\ScreenshotSearch;
 
 /**
  * This is the model class for table "ticket".
@@ -125,7 +126,7 @@ class Ticket extends Base
             [['time_limit'], 'integer', 'min' => 0],
             [['exam_id'], 'validateExam', 'skipOnEmpty' => false, 'skipOnError' => false, 'on' => self::SCENARIO_DEFAULT],
             [['start', 'end', 'test_taker', 'ip', 'state', 'download_lock'], 'safe'],
-            [['start', 'end', 'test_taker', 'ip', 'state', 'download_lock', 'backup_lock', 'restore_lock', 'bootup_lock'], 'safe', 'on' => self::SCENARIO_DEV],
+            [['start', 'end', 'test_taker', 'ip', 'state', 'download_lock', 'backup_lock', 'restore_lock', 'bootup_lock', 'last_backup'], 'safe', 'on' => self::SCENARIO_DEV],
             [['token'], 'unique'],
             [['token'], 'string', 'max' => 32],
             [['token'], 'checkIfClosed', 'on' => self::SCENARIO_SUBMIT],
@@ -151,7 +152,7 @@ class Ticket extends Base
             'duration' => 'Duration',
             'result' => 'Result',
             'time_limit' => 'Time Limit',
-            'download_progress' => 'Exam Download Progress',
+            'download_progress' => 'Download Progress',
             'client_state' => 'Client State',
             'ip' => 'IP Address',
             'test_taker' => 'Test Taker',
@@ -201,6 +202,18 @@ class Ticket extends Base
         return $this->exam->user->id == \Yii::$app->user->id ? true : false;
     }
 
+    public function getScreenshots()
+    {
+        $searchModel = new ScreenshotSearch();
+        return $searchModel->search($this->token);
+    }
+
+    public function getNewestScreenshot()
+    {
+        $searchModel = new ScreenshotSearch();
+        return $searchModel->findNewest($this->token);
+    }
+
     public function getConcerns()
     {
         return [
@@ -230,6 +243,7 @@ class Ticket extends Base
      */
     public function updateEvent()
     {
+
         if($this->attributesChanged([ 'start', 'end', 'test_taker', 'result' ])){
             $eventItem = new EventItem([
                 'event' => 'ticket/' . $this->id,
@@ -241,6 +255,7 @@ class Ticket extends Base
             ]);
             $eventItem->generate();
         }
+
         if($this->attributesChanged([ 'download_progress' ])){
             $eventItem = new EventItem([
                 'event' => 'ticket/' . $this->id,
@@ -358,6 +373,20 @@ class Ticket extends Base
             $act->save();
 
         }
+
+        if($this->attributesChanged([ 'start', 'end' ])){
+            $eventItem = new EventItem([
+                'event' => 'ticket/' . $this->id,
+                'priority' => 0,
+                'concerns' => $this->concerns,
+                'data' => [
+                    'state' => $this->findOne($this->id)->state,
+                ],
+            ]);
+            $eventItem->generate();
+        }
+
+
         return;
     }
 
