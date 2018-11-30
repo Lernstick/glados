@@ -86,7 +86,7 @@ class TicketController extends Controller
      * @param string $q query
      * @return mixed
      */
-    public function actionIndex($mode = null, $attr = null, $q = null, $page = 1, $per_page = 10, $id = null, $showQuery = true)
+    public function actionIndex($mode = null, $attr = null, $q = null, $page = 1, $per_page = 10)
     {
 
         if ($mode === null) {
@@ -109,11 +109,7 @@ class TicketController extends Controller
                 if ($attr == 'testTaker') {
                     $out = $searchModel->selectList('test_taker', $q, $page, $per_page);
                 } else if ($attr == 'token') {
-                    if ($id == 'id') {
-                        $out = $searchModel->selectList('token', $q, $page, $per_page, 'id', $showQuery);
-                    } else {
-                        $out = $searchModel->selectList('token', $q, $page, $per_page);
-                    }
+                    $out = $searchModel->selectList('token', $q, $page, $per_page);
                 }
             }
             return $out;

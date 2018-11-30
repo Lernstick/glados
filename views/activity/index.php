@@ -10,9 +10,9 @@ use kartik\select2\Select2;
 use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\TicketSearch */
+/* @var $searchModel app\models\ActivitySearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-/* @var $preSelect array */
+/* @var $last_visited */
 
 $this->title = 'Activities';
 $this->params['breadcrumbs'][] = $this->title;
