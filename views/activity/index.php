@@ -1,14 +1,18 @@
 <?php
 
 use yii\helpers\Html;
-use yii\grid\GridView;
+use yii\helpers\Url;
+use yii\widgets\ActiveField;
 use yii\widgets\Pjax;
-use app\components\ActiveEventField;
+use kartik\grid\GridView;
+use kartik\dynagrid\DynaGrid;
+use kartik\select2\Select2;
+use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\ActivitySearch */
+/* @var $searchModel app\models\TicketSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-/* @var $last_visited */
+/* @var $preSelect array */
 
 $this->title = 'Activities';
 $this->params['breadcrumbs'][] = $this->title;
@@ -17,11 +21,137 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <?php Pjax::begin(['id' => 'activities']); ?>
+    <?php Pjax::begin(); ?>
 
-    <?= $this->render('_item', [
-        'model' => $searchModel,
-        'dataProvider' => $dataProvider,
+    <?= DynaGrid::widget([
+        'showPersonalize' => true,
+        'columns' => [
+            [
+                'attribute' => 'date',
+                'format' => 'timeago',
+                'filterType' => GridView::FILTER_DATE,
+                'filterWidgetOptions' => [
+                    'options' => ['placeholder' => 'Enter day...'],
+                    'pluginOptions' => [
+                       'format' => 'yyyy-mm-dd',
+                       'todayHighlight' => true,
+                       'autoclose' => true,
+                    ]
+                ],
+                'contentOptions' => [
+                    'class' => 'col-md-2',
+                ],
+            ],
+            [
+                'attribute' => 'token',
+                'value' => function ($model) {
+                    return Html::a(
+                        $model->ticket->token,
+                        ['ticket/view', 'id' => $model->ticket->id],
+                        ['data-pjax' => 0]
+                    );
+                },
+                'filterType'=>GridView::FILTER_SELECT2,
+                'filterWidgetOptions'=>[
+                    'pluginOptions' => [
+                        'dropdownAutoWidth' => true,
+                        'width' => 'auto',
+                        'allowClear' => true,
+                        'minimumInputLength' => 3,
+                        'placeholder' => '',
+                        'ajax' => [
+                            'url' => \yii\helpers\Url::to(['ticket/index', 'mode' => 'list','attr' => 'token']),
+                            'dataType' => 'json',
+                            'delay' => 250,
+                            'cache' => true,
+                            'data' => new JsExpression('function(params) {
+                                return {
+                                    q: params.term,
+                                    page: params.page,
+                                    per_page: 10
+                                };
+                            }'),
+                            'processResults' => new JsExpression('function(data, page) {
+                                return {
+                                    results: data.results,
+                                    pagination: {
+                                        more: data.results.length === 10 // If there are 10 matches, theres at least another page
+                                    }
+                                };
+                            }'),
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(q) { return q.text; }'),
+                        'templateSelection' => new JsExpression('function (q) { return q.text; }'),
+                    ],
+                ],
+                'filterInputOptions' => [
+                    'placeholder' => 'Any'
+                ],
+                'format'=>'raw',
+                'contentOptions' => [
+                    'class' => 'col-md-1',
+                ],
+            ],
+            [
+                'attribute' => 'description',
+                'format' => 'raw',
+                'filterType'=>GridView::FILTER_SELECT2,
+                'filterWidgetOptions'=>[
+                    'pluginOptions' => [
+                        'dropdownAutoWidth' => true,
+                        'width' => 'auto',
+                        'allowClear' => true,
+                        'placeholder' => '',
+                        'ajax' => [
+                            'url' => \yii\helpers\Url::to(['activity/index', 'mode' => 'list', 'attr' => 'description']),
+                            'dataType' => 'json',
+                            'delay' => 250,
+                            'cache' => true,
+                            'data' => new JsExpression('function(params) {
+                                return {
+                                    q: params.term,
+                                    page: params.page,
+                                    per_page: 10
+                                };
+                            }'),
+                            'processResults' => new JsExpression('function(data, page) {
+                                return {
+                                    results: data.results,
+                                    pagination: {
+                                        more: data.results.length === 10 // If there are 10 matches, theres at least another page
+                                    }
+                                };
+                            }'),
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(q) { return q.text; }'),
+                        'templateSelection' => new JsExpression('function (q) { return q.text; }'),
+                    ],
+                ],
+                'filterInputOptions' => [
+                    'placeholder' => 'Any'
+                ],
+                'contentOptions' => [
+                    'class' => 'col-md-8',
+                ],
+            ],
+        ],
+        'storage' => DynaGrid::TYPE_COOKIE,
+        'theme' => 'simple-default',
+        'gridOptions' => [
+            'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
+            'panel' => ['heading' => '<h3 class="panel-title">Activities</h3>'],
+            'toolbar' =>  [
+                ['content' =>
+                    Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/activity/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => 'Reset Grid'])
+                ],
+                ['content' => '{dynagridFilter}{dynagridSort}{dynagrid}'],
+                '{export}',
+            ]            
+        ],
+        'options' => ['id' => 'dynagrid-activities-index'] // a unique identifier is important
     ]); ?>
 
     <?php Pjax::end(); ?>

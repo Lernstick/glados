@@ -357,7 +357,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
                 ['content' => '{dynagridFilter}{dynagridSort}{dynagrid}'],
                 '{export}',
-        ]            
+            ]            
         ],
         'options' => ['id' => 'dynagrid-ticket-index'] // a unique identifier is important
     ]); ?>

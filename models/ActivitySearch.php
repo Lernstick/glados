@@ -12,6 +12,9 @@ use app\models\Activity;
  */
 class ActivitySearch extends Activity
 {
+
+    public $token;
+
     /**
      * @inheritdoc
      */
@@ -19,7 +22,7 @@ class ActivitySearch extends Activity
     {
         return [
             [['id'], 'integer'],
-            [['date', 'description', 'ticket_id'], 'safe'],
+            [['date', 'description', 'ticket_id', 'token'], 'safe'],
         ];
     }
 
@@ -45,10 +48,22 @@ class ActivitySearch extends Activity
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'sort' => ['defaultOrder' => ['date' => SORT_DESC]],
             'pagination' => array(
-                'pageSize' => 20,
+                'pageSize' => 10,
             ),
+        ]);
+
+        $dataProvider->setSort([
+            'defaultOrder' => ['date' => SORT_DESC],
+            'attributes' => [
+                'date',
+                'description',
+                'ticket_id',
+                'token' => [
+                    'asc' => ['ticket.token' => SORT_ASC],
+                    'desc' => ['ticket.token' => SORT_DESC],
+                ],
+            ]
         ]);
 
         $this->load($params);
@@ -61,9 +76,16 @@ class ActivitySearch extends Activity
 
         $query->andFilterWhere([
             'id' => $this->id,
-            'date' => $this->date,
             'ticket_id' => $this->ticket_id
         ]);
+
+        $query->joinWith(['ticket' => function ($q) {
+            $q->andFilterWhere(['like', 'ticket.token', $this->token]);
+        }]);
+
+        $dateEnd = new \DateTime($this->date);
+        $dateEnd->modify('+1 day');
+        $query->andFilterWhere(['between', 'date', $this->date, $dateEnd->format('Y-m-d')]);
 
         $query->andFilterWhere(['like', 'description', $this->description]);
 

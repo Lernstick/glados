@@ -15,7 +15,7 @@ use yii\db\ActiveRecord;
  * @property string $date
  * @property string $description
  */
-class Activity extends \yii\db\ActiveRecord
+class Activity extends Base
 {
 
         /**
@@ -56,6 +56,7 @@ class Activity extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'token' => 'Ticket',
             'date' => 'Date',
             'description' => 'Description',
         ];
@@ -106,6 +107,12 @@ class Activity extends \yii\db\ActiveRecord
     public function getTicket()
     {
         return $this->hasOne(Ticket::className(), ['id' => 'ticket_id']);
+    }
+
+    /* Getter for exam name */
+    public function getToken()
+    {
+        return $this->ticket->id;
     }
 
     /** 

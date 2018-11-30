@@ -40,6 +40,7 @@ class Base extends \yii\db\ActiveRecord
      * @param int id which attribute should be the id
      * @param bool showQuery whether the query itself should be shown in the 
      *                  output list.
+     * @param string the attribute to order by
      *
      * @return array
      */
