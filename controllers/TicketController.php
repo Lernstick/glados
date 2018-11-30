@@ -108,9 +108,19 @@ class TicketController extends Controller
             if (!is_null($attr)) {
                 $searchModel = new TicketSearch();
                 if ($attr == 'testTaker') {
-                    $out = $searchModel->selectList('test_taker', $q, $page, $per_page);
+                    $out = $searchModel->selectList('test_taker', $q, $page, $per_page, null, true, null, true);
                 } else if ($attr == 'token') {
                     $out = $searchModel->selectList('token', $q, $page, $per_page);
+                } else if ($attr == 'backupState') {
+                    $out = $searchModel->selectList('backup_state', $q, $page, $per_page, null, true, null, true);
+                } else if ($attr == 'clientState') {
+                    $out = $searchModel->selectList('client_state', $q, $page, $per_page);
+                } else if ($attr == 'restoreState') {
+                    $out = $searchModel->selectList('restore_state', $q, $page, $per_page, null, true, null, true);
+                } else if ($attr == 'downloadState') {
+                    $out = $searchModel->selectList('download_state', $q, $page, $per_page, null, true, null, true);
+                } else if ($attr == 'ip') {
+                    $out = $searchModel->selectList('ip', $q, $page, $per_page, null, true, null, true);
                 }
             }
             return $out;

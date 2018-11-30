@@ -38,7 +38,7 @@ class TicketSearch extends Ticket
     {
         return [
             [['exam_id'], 'integer'],
-            [['token', 'examSubject', 'examName', 'userId', 'test_taker', 'state', 'abandoned', 'start', 'end', 'createdAt'], 'safe'],
+            [['token', 'examSubject', 'examName', 'userId', 'test_taker', 'state', 'abandoned', 'start', 'end', 'createdAt', 'online', 'ip', 'backup_state', 'client_state', 'backup_last', 'backup_last_try', 'restore_state', 'download_state'], 'safe'],
         ];
     }
 
@@ -96,12 +96,14 @@ class TicketSearch extends Ticket
                 'ip',
                 'test_taker',
                 'client_state',
+                'online',
                 'backup_interval',
                 'backup_size',
                 'backup_last',
                 'backup_last_try',
                 'backup_state',
                 'restore_state',
+                'download_state',
             ]
         ]);
 
@@ -118,6 +120,12 @@ class TicketSearch extends Ticket
             $q->andFilterWhere(['like', 'exam.name', $this->examName])
             ->andFilterWhere(['like', 'exam.subject', $this->examSubject]);
         }]);
+
+        if ($this->online == '(not set)') {
+            $query->andWhere(['online' => null]);
+        } else {
+            $query->andFilterWhere(['online' => $this->online]);
+        }
 
         $at = \Yii::$app->params['abandonTicket'] === null ? 'NULL' : \Yii::$app->params['abandonTicket'];
 
@@ -166,9 +174,46 @@ class TicketSearch extends Ticket
         $createdEnd->modify('+1 day');
         $query->andFilterWhere(['between', 'ticket.createdAt', $this->createdAt, $createdEnd->format('Y-m-d')]);
 
+        $blEnd = new \DateTime($this->backup_last);
+        $blEnd->modify('+1 day');
+        $bltEnd = new \DateTime($this->backup_last_try);
+        $bltEnd->modify('+1 day');
+        $query->andFilterWhere(['between', 'backup_last', $this->backup_last, $blEnd->format('Y-m-d')]);
+        $query->andFilterWhere(['between', 'end', $this->backup_last_try, $bltEnd->format('Y-m-d')]);
+
         $query->andFilterWhere(['like', 'token', $this->token])
-            ->andFilterWhere(['like', 'test_taker', $this->test_taker])
+            ->andFilterWhere(['like', 'client_state', $this->client_state])
             ->andFilterHaving(['state' => $this->state]);
+
+        if ($this->test_taker == '(not set)') {
+            $query->andWhere(['in', 'test_taker', [null, '']]);
+        } else {
+            $query->andFilterWhere(['like', 'test_taker', $this->test_taker]);
+        }
+
+        if ($this->ip == '(not set)') {
+            $query->andWhere(['ip' => null]);
+        } else {
+            $query->andFilterWhere(['like', 'ip', $this->ip]);
+        }
+
+        if ($this->backup_state == '(not set)') {
+            $query->andWhere(['backup_state' => null]);
+        } else {
+            $query->andFilterWhere(['like', 'backup_state', $this->backup_state]);
+        }
+
+        if ($this->restore_state == '(not set)') {
+            $query->andWhere(['restore_state' => null]);
+        } else {
+            $query->andFilterWhere(['like', 'restore_state', $this->restore_state]);
+        }
+
+        if ($this->download_state == '(not set)') {
+            $query->andWhere(['download_state' => null]);
+        } else {
+            $query->andFilterWhere(['like', 'download_state', $this->download_state]);
+        }
 
         // filter by exam name, subject and user_id
         $query->joinWith(['exam' => function ($q) {

@@ -68,6 +68,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'timeago',
                 'filterType' => GridView::FILTER_DATE,
                 'filterWidgetOptions' => [
+                    'disabled' => $monitor,
                     'options' => ['placeholder' => 'Enter day...'],
                     'pluginOptions' => [
                        'format' => 'yyyy-mm-dd',
@@ -80,12 +81,19 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'state',
                 'format' => 'raw',
-                'filter' => array(
-                    0 => yii::$app->formatter->format(0, 'state'),
-                    1 => yii::$app->formatter->format(1, 'state'),
-                    2 => yii::$app->formatter->format(2, 'state'),
-                    3 => yii::$app->formatter->format(3, 'state'),
-                    4 => yii::$app->formatter->format(4, 'state'),
+                'filter' => Html::activeDropDownList($searchModel, 'state', 
+                    array(
+                        0 => yii::$app->formatter->format(0, 'state'),
+                        1 => yii::$app->formatter->format(1, 'state'),
+                        2 => yii::$app->formatter->format(2, 'state'),
+                        3 => yii::$app->formatter->format(3, 'state'),
+                        4 => yii::$app->formatter->format(4, 'state'),
+                    ),
+                    [
+                        'class'=>'form-control',
+                        'prompt' => '',
+                        'disabled' => $monitor,
+                    ]
                 ),
                 'value' => function($model) use ($monitor) {
                     return $monitor ? ActiveEventField::widget([
@@ -110,9 +118,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
             ],
             [
-                'attribute'=>'token',
-                'filterType'=>GridView::FILTER_SELECT2,
-                'filterWidgetOptions'=>[
+                'attribute' => 'token',
+                'filterType' => GridView::FILTER_SELECT2,
+                'filterWidgetOptions' => [
+                    'disabled' => $monitor,
                     'pluginOptions' => [
                         'dropdownAutoWidth' => true,
                         'width' => 'auto',
@@ -148,12 +157,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 'filterInputOptions' => [
                     'placeholder' => 'Any'
                 ],
-                'format'=>'raw'
+                'format' => 'raw'
             ],
             [
                 'attribute'=>'examName',
                 'filterType'=>GridView::FILTER_SELECT2,
                 'filterWidgetOptions'=>[
+                    'disabled' => $monitor,
                     'pluginOptions' => [
                         'dropdownAutoWidth' => true,
                         'width' => 'auto',
@@ -194,6 +204,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'examSubject',
                 'filterType' => GridView::FILTER_SELECT2,
                 'filterWidgetOptions'=>[
+                    'disabled' => $monitor,
                     'pluginOptions' => [
                         'dropdownAutoWidth' => true,
                         'width' => 'auto',
@@ -237,6 +248,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'timeago',
                 'filterType' => GridView::FILTER_DATE,
                 'filterWidgetOptions' => [
+                    'disabled' => $monitor,
                     'options' => ['placeholder' => 'Enter day...'],
                     'pluginOptions' => [
                        'format' => 'yyyy-mm-dd',
@@ -250,6 +262,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'timeago',
                 'filterType' => GridView::FILTER_DATE,
                 'filterWidgetOptions' => [
+                    'disabled' => $monitor,
                     'options' => ['placeholder' => 'Enter day...'],
                     'pluginOptions' => [
                        'format' => 'yyyy-mm-dd',
@@ -266,11 +279,23 @@ $this->params['breadcrumbs'][] = $this->title;
                     'Yes' => 'Yes',
                     'No' => 'No',
                 ),
-            ],            
+                'filter' => Html::activeDropDownList($searchModel, 'abandoned', 
+                    array(
+                        'Yes' => 'Yes',
+                        'No' => 'No',
+                    ),
+                    [
+                        'class'=>'form-control',
+                        'prompt' => '',
+                        'disabled' => $monitor,
+                    ]
+                ),
+            ],
             [
                 'attribute'=>'test_taker',
                 'filterType'=>GridView::FILTER_SELECT2,
                 'filterWidgetOptions'=>[
+                    'disabled' => $monitor,
                     'pluginOptions' => [
                         'dropdownAutoWidth' => true,
                         'width' => 'auto',
@@ -325,6 +350,43 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'ip',
                 'format' => 'raw',
+                'filterType'=>GridView::FILTER_SELECT2,
+                'filterWidgetOptions'=>[
+                    'disabled' => $monitor,
+                    'pluginOptions' => [
+                        'dropdownAutoWidth' => true,
+                        'width' => 'auto',
+                        'allowClear' => true,
+                        'placeholder' => '',
+                        'ajax' => [
+                            'url' => \yii\helpers\Url::to(['ticket/index', 'mode' => 'list', 'attr' => 'ip']),
+                            'dataType' => 'json',
+                            'delay' => 250,
+                            'cache' => true,
+                            'data' => new JsExpression('function(params) {
+                                return {
+                                    q: params.term,
+                                    page: params.page,
+                                    per_page: 10
+                                };
+                            }'),
+                            'processResults' => new JsExpression('function(data, page) {
+                                return {
+                                    results: data.results,
+                                    pagination: {
+                                        more: data.results.length === 10 // If there are 10 matches, theres at least another page
+                                    }
+                                };
+                            }'),
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(q) { return q.text; }'),
+                        'templateSelection' => new JsExpression('function (q) { return q.text; }'),
+                    ],
+                ],
+                'filterInputOptions' => [
+                    'placeholder' => 'Any'
+                ],
                 'visible' => false
             ],
             /*[
@@ -359,6 +421,61 @@ $this->params['breadcrumbs'][] = $this->title;
                             'jsonSelector' => 'client_state',
                         ]);
                 } : 'client_state',
+                'filterType'=>GridView::FILTER_SELECT2,
+                'filterWidgetOptions'=>[
+                    'disabled' => $monitor,
+                    'pluginOptions' => [
+                        'dropdownAutoWidth' => true,
+                        'width' => 'auto',
+                        'allowClear' => true,
+                        'placeholder' => '',
+                        'ajax' => [
+                            'url' => \yii\helpers\Url::to(['ticket/index', 'mode' => 'list', 'attr' => 'clientState']),
+                            'dataType' => 'json',
+                            'delay' => 250,
+                            'cache' => true,
+                            'data' => new JsExpression('function(params) {
+                                return {
+                                    q: params.term,
+                                    page: params.page,
+                                    per_page: 10
+                                };
+                            }'),
+                            'processResults' => new JsExpression('function(data, page) {
+                                return {
+                                    results: data.results,
+                                    pagination: {
+                                        more: data.results.length === 10 // If there are 10 matches, theres at least another page
+                                    }
+                                };
+                            }'),
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(q) { return q.text; }'),
+                        'templateSelection' => new JsExpression('function (q) { return q.text; }'),
+                    ],
+                ],
+                'filterInputOptions' => [
+                    'placeholder' => 'Any'
+                ],
+            ],
+
+            [
+                'attribute' => 'online',
+                'format' => 'boolean',
+                'filter' => Html::activeDropDownList($searchModel, 'online', 
+                    array(
+                        0 => 'No',
+                        1 => 'Yes',
+                        '(not set)' => '(not set)'
+                    ),
+                    [
+                        'class'=>'form-control',
+                        'prompt' => '',
+                        'disabled' => $monitor,
+                    ]
+                ),
+                'visible' => false,
             ],
 
             [
@@ -403,6 +520,57 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
 
             [
+                'attribute' => 'download_state',
+                'format' => 'raw',
+                'visible' => false,
+                'value' =>  $monitor ? function($model) {
+                    return ActiveEventField::widget([
+                            'options' => [ 'tag' => 'span' ],
+                            'content' => $model->download_state,
+                            'event' => 'ticket/' . $model->id,
+                            'jsonSelector' => 'download_state',
+                        ]);
+                } : 'download_state',
+                'filterType'=>GridView::FILTER_SELECT2,
+                'filterWidgetOptions'=>[
+                    'disabled' => $monitor,
+                    'pluginOptions' => [
+                        'dropdownAutoWidth' => true,
+                        'width' => 'auto',
+                        'allowClear' => true,
+                        'placeholder' => '',
+                        'ajax' => [
+                            'url' => \yii\helpers\Url::to(['ticket/index', 'mode' => 'list', 'attr' => 'downloadState']),
+                            'dataType' => 'json',
+                            'delay' => 250,
+                            'cache' => true,
+                            'data' => new JsExpression('function(params) {
+                                return {
+                                    q: params.term,
+                                    page: params.page,
+                                    per_page: 10
+                                };
+                            }'),
+                            'processResults' => new JsExpression('function(data, page) {
+                                return {
+                                    results: data.results,
+                                    pagination: {
+                                        more: data.results.length === 10 // If there are 10 matches, theres at least another page
+                                    }
+                                };
+                            }'),
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(q) { return q.text; }'),
+                        'templateSelection' => new JsExpression('function (q) { return q.text; }'),
+                    ],
+                ],
+                'filterInputOptions' => [
+                    'placeholder' => 'Any'
+                ],
+            ],
+
+            [
                 'attribute' => 'backup_interval',
                 'format' => 'raw',
                 'value' =>  function($model) {
@@ -415,16 +583,39 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'shortSize',
                 'visible' => false
             ],
+
             [
                 'attribute' => 'backup_last',
                 'format' => 'timeago',
+                'filterType' => GridView::FILTER_DATE,
+                'filterWidgetOptions' => [
+                    'disabled' => $monitor,
+                    'options' => ['placeholder' => 'Enter day...'],
+                    'pluginOptions' => [
+                       'format' => 'yyyy-mm-dd',
+                       'todayHighlight' => true,
+                       'autoclose' => true,
+                    ]
+                ],
                 'visible' => false
-            ],
+            ],  
+
             [
                 'attribute' => 'backup_last_try',
                 'format' => 'timeago',
+                'filterType' => GridView::FILTER_DATE,
+                'filterWidgetOptions' => [
+                    'disabled' => $monitor,
+                    'options' => ['placeholder' => 'Enter day...'],
+                    'pluginOptions' => [
+                       'format' => 'yyyy-mm-dd',
+                       'todayHighlight' => true,
+                       'autoclose' => true,
+                    ]
+                ],
                 'visible' => false
-            ],
+            ],  
+
             [
                 'attribute' => 'backup_state',
                 'format' => 'raw',
@@ -456,11 +647,86 @@ $this->params['breadcrumbs'][] = $this->title;
                             'jsonSelector' => 'backup_state',
                         ]);
                 } : 'backup_state',
+                'filterType'=>GridView::FILTER_SELECT2,
+                'filterWidgetOptions'=>[
+                    'disabled' => $monitor,
+                    'pluginOptions' => [
+                        'dropdownAutoWidth' => true,
+                        'width' => 'auto',
+                        'allowClear' => true,
+                        'placeholder' => '',
+                        'ajax' => [
+                            'url' => \yii\helpers\Url::to(['ticket/index', 'mode' => 'list', 'attr' => 'backupState']),
+                            'dataType' => 'json',
+                            'delay' => 250,
+                            'cache' => true,
+                            'data' => new JsExpression('function(params) {
+                                return {
+                                    q: params.term,
+                                    page: params.page,
+                                    per_page: 10
+                                };
+                            }'),
+                            'processResults' => new JsExpression('function(data, page) {
+                                return {
+                                    results: data.results,
+                                    pagination: {
+                                        more: data.results.length === 10 // If there are 10 matches, theres at least another page
+                                    }
+                                };
+                            }'),
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(q) { return q.text; }'),
+                        'templateSelection' => new JsExpression('function (q) { return q.text; }'),
+                    ],
+                ],
+                'filterInputOptions' => [
+                    'placeholder' => 'Any'
+                ],
             ],
+
             [
                 'attribute' => 'restore_state',
                 'format' => 'raw',
-                'visible' => false
+                'visible' => false,
+                'filterType'=>GridView::FILTER_SELECT2,
+                'filterWidgetOptions'=>[
+                    'disabled' => $monitor,
+                    'pluginOptions' => [
+                        'dropdownAutoWidth' => true,
+                        'width' => 'auto',
+                        'allowClear' => true,
+                        'placeholder' => '',
+                        'ajax' => [
+                            'url' => \yii\helpers\Url::to(['ticket/index', 'mode' => 'list', 'attr' => 'restoreState']),
+                            'dataType' => 'json',
+                            'delay' => 250,
+                            'cache' => true,
+                            'data' => new JsExpression('function(params) {
+                                return {
+                                    q: params.term,
+                                    page: params.page,
+                                    per_page: 10
+                                };
+                            }'),
+                            'processResults' => new JsExpression('function(data, page) {
+                                return {
+                                    results: data.results,
+                                    pagination: {
+                                        more: data.results.length === 10 // If there are 10 matches, theres at least another page
+                                    }
+                                };
+                            }'),
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(q) { return q.text; }'),
+                        'templateSelection' => new JsExpression('function (q) { return q.text; }'),
+                    ],
+                ],
+                'filterInputOptions' => [
+                    'placeholder' => 'Any'
+                ],
             ],
             [
                 'attribute' => 'newestScreenshot',

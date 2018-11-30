@@ -40,10 +40,12 @@ class Base extends \yii\db\ActiveRecord
      * @param int id which attribute should be the id
      * @param bool showQuery whether the query itself should be shown in the 
      *                  output list.
+     * @param string|null orderBy
+     # @param bool notSet whether to show (not set) entry or not
      *
      * @return array
      */
-    public function selectList($attr, $q, $page = 1, $per_page = 10, $id = null, $showQuery = true, $orderBy = null)
+    public function selectList($attr, $q, $page = 1, $per_page = 10, $id = null, $showQuery = true, $orderBy = null, $notSet = false)
     {
         $id = is_null($id) ? $attr : $id;
         $query = $this->find();
@@ -65,16 +67,25 @@ class Base extends \yii\db\ActiveRecord
         }
 
         $out = ['results' => []];
+
         if ($showQuery === true && $page == 1) {
-            $out = ['results' => [
-                0 => ['id' => $q, 'text' => $q]
-            ]];
+            $out['results'][] = ['id' => $q, 'text' => $q];
+            $per_page -= 1;
+        }
+
+        if ($notSet === true && $page == 1) {
+            $out['results'][] = ['id' => '(not set)', 'text' => '<span class="not-set">(not set)</span>'];
             $per_page -= 1;
         }
 
         $command = $query->limit($per_page)->offset(($page-1)*$per_page)->createCommand();
-        $data = $command->queryAll();
-        $out['results'] = array_merge($out['results'], array_values($data));
+        $data = array_values($command->queryAll());
+        array_walk($data, function(&$el, $idx) {
+            //var_dump(mb_strimwidth($el['text'], 0, 10, "..."));
+            $el['text'] = mb_strimwidth($el['text'], 0, 40, "...");
+            $el['id'] = mb_strimwidth($el['id'], 0, 37, "");
+        });
+        $out['results'] = array_merge($out['results'], $data);
         return $out;
     }
 
