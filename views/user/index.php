@@ -73,7 +73,14 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             'last_visited',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'order' => DynaGrid::ORDER_FIX_RIGHT,
+                'contentOptions' => [
+                    'class' => 'text-nowrap',
+                    'style' => 'width:10px;',
+                ],
+            ],
         ],
         'storage' => DynaGrid::TYPE_COOKIE,
         'theme' => 'simple-default',

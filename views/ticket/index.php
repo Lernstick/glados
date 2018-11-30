@@ -316,6 +316,11 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'class' => 'yii\grid\ActionColumn',
+                'order' => DynaGrid::ORDER_FIX_RIGHT,
+                'contentOptions' => [
+                    'class' => 'text-nowrap',
+                    'style' => 'width:10px;',
+                ],
                 'template' => '{view} {update} {delete} {report}',
                 'buttons' => [
                     'report' => function ($url) {
