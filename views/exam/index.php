@@ -174,7 +174,20 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'raw',
                 'visible' => Yii::$app->user->can('user/index')
             ],
-            'ticketCount',
+            [
+                'attribute' => 'ticketInfo',
+                'format' => 'html',
+                'value' => function($model){
+                    $a = array();
+                    $model->openTicketCount != 0 ? $a[] = Html::a($model->openTicketCount, ['ticket/index', 'TicketSearch[examName]' => $model->name, 'TicketSearch[examSubject]' => $model->subject, 'TicketSearch[state]' => 0], ['class' => 'bg-success text-success']) : null;
+                    $model->runningTicketCount != 0 ? $a[] = Html::a($model->runningTicketCount, ['ticket/index', 'TicketSearch[examName]' => $model->name, 'TicketSearch[examSubject]' => $model->subject, 'TicketSearch[state]' => 1], ['class' => 'bg-info text-info']) : null;
+                    $model->closedTicketCount != 0 ? $a[] = Html::a($model->closedTicketCount, ['ticket/index', 'TicketSearch[examName]' => $model->name, 'TicketSearch[examSubject]' => $model->subject, 'TicketSearch[state]' => 2], ['class' => 'bg-danger text-danger']) : null;
+                    $model->submittedTicketCount != 0 ? $a[] = Html::a($model->submittedTicketCount, ['ticket/index', 'TicketSearch[examName]' => $model->name, 'TicketSearch[examSubject]' => $model->subject, 'TicketSearch[state]' => 3], ['class' => 'bg-warning text-warning']) : null;
+
+                    return (count($a) == 0 ? '' : (count($a) == 1 ? implode(',', $a) . '/' : ('(' . implode(',', $a) . ')/'))) . 
+                        ($model->ticketCount != 0 ? Html::a($model->ticketCount, ['ticket/index', 'TicketSearch[examName]' => $model->name, 'TicketSearch[examSubject]' => $model->subject], ['class' => 'text-muted']) : $model->ticketCount);
+                },
+            ],  
             [
                 'attribute' => 'time_limit',
                 #'format' => 'shortSize',

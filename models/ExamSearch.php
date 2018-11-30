@@ -46,6 +46,13 @@ class ExamSearch extends Exam
     {
         $query = Exam::find();
 
+        $query->addSelect([
+                '`exam`.*',
+                'IF(ticket.id is NULL, 0, COUNT(*)) AS _ticketCount'
+            ])
+            ->joinWith('tickets')
+            ->groupBy('exam.id');
+
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination'=>array(
@@ -56,13 +63,20 @@ class ExamSearch extends Exam
         $dataProvider->setSort([
             'defaultOrder' => ['createdAt' => SORT_DESC],
             'attributes' => [
-                'createdAt',
+                'createdAt' => [
+                    'asc' => ['exam.createdAt' => SORT_ASC],
+                    'desc' => ['exam.createdAt' => SORT_DESC],
+                ],
                 'name',
                 'subject',
                 'userName' => [
                     'asc' => ['user.username' => SORT_ASC],
                     'desc' => ['user.username' => SORT_DESC],
                     'label' => 'Owner'
+                ],
+                'ticketInfo' => [
+                    'asc' => ['_ticketCount' => SORT_ASC],
+                    'desc' => ['_ticketCount' => SORT_DESC],
                 ],
                 'time_limit',
                 'grp_netdev',

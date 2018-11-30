@@ -73,9 +73,9 @@ class RdiffFileSystem extends Model
      * @var array A list of file or directory names to omit when reading a directory
      */
     public $excludeList = [
-        #'/^\./',                    // exclude all dotfiles
-        '/^\.$/',
-        '/^\.\.$/',        
+        #'/^\./',                   // exclude all dotfiles
+        '/^\.$/',                   // exclude the . entry
+        '/^\.\.$/',                 // exclude the .. entry
     ];
 
     /**
