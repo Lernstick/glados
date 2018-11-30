@@ -354,6 +354,7 @@ class Ticket extends Base
                 'ticket_id' => $this->id,
                 'description' => 'Client state changed: ' .
                 $this->presaveAttributes['client_state'] . ' -> ' . $this->client_state,
+                'severity' => Activity::SEVERITY_INFORMATIONAL,
             ]);
             $act->save();
 

@@ -149,7 +149,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
                 ['content' => '{dynagridFilter}{dynagridSort}{dynagrid}'],
                 '{export}',
-            ]            
+            ],
+            'rowOptions' => function($model) {
+                return array_key_exists($model->severity, $model->classMap) ? ['class' => $model->classMap[$model->severity]] : null;
+            },    
         ],
         'options' => ['id' => 'dynagrid-activities-index'] // a unique identifier is important
     ]); ?>

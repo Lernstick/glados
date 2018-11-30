@@ -118,6 +118,7 @@ class DownloadController extends DaemonController implements DaemonInterface
             $act = new Activity([
                     'ticket_id' => $this->ticket->id,
                     'description' => 'Download failed: network error',
+                    'severity' => Activity::SEVERITY_WARNING,
             ]);
             $act->save();
 
@@ -165,6 +166,7 @@ class DownloadController extends DaemonController implements DaemonInterface
                 $act = new Activity([
                         'ticket_id' => $this->ticket->id,
                         'description' => 'Download failed: rsync failed (retval: ' . $retval . ')',
+                        'severity' => Activity::SEVERITY_WARNING,
                 ]);
                 $act->save();
 
@@ -175,7 +177,8 @@ class DownloadController extends DaemonController implements DaemonInterface
                     'ticket_id' => $this->ticket->id,
                     'description' => 'Exam download finished by ' . $this->ticket->ip .
                     ' from ' . ( $this->ticket->test_taker ? $this->ticket->test_taker :
-                    'Ticket with token ' . $this->ticket->token ) . '.'
+                    'Ticket with token ' . $this->ticket->token ) . '.',
+                    'severity' => Activity::SEVERITY_SUCCESS,
                 ]);
                 $act->save();
                 $this->ticket->download_progress = 1;
@@ -245,7 +248,8 @@ class DownloadController extends DaemonController implements DaemonInterface
 
             $act = new Activity([
                 'ticket_id' => $this->ticket->id,
-                'description' => 'Exam download aborted (server side).'
+                'description' => 'Exam download aborted (server side).',
+                'severity' => Activity::SEVERITY_ERROR,
             ]);
             $act->save();
         }

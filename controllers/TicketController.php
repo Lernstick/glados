@@ -541,7 +541,8 @@ class TicketController extends Controller
                     'ticket_id' => $model->id,
                     'description' => 'Exam download successfully requested by ' . 
                     $model->ip . ' from ' . ( $model->test_taker ? $model->test_taker :
-                    'Ticket with token ' . $model->token ) . '.'
+                    'Ticket with token ' . $model->token ) . '.',
+                    'severity' => Activity::SEVERITY_SUCCESS,
                 ]);
                 $act->save();
 
@@ -644,7 +645,8 @@ class TicketController extends Controller
                 'ticket_id' => $event->data->id,
                 'description' => 'Exam download successfully requested by ' . 
                 $event->data->ip . ' from ' . ( $event->data->test_taker ? $event->data->test_taker :
-                'Ticket with token ' . $event->data->token ) . '.'
+                'Ticket with token ' . $event->data->token ) . '.',
+                'severity' => Activity::SEVERITY_SUCCESS,
             ]);
             $act->save();
         }, $model);
@@ -663,7 +665,8 @@ class TicketController extends Controller
                     'ticket_id' => $event->data->id,
                     'description' => 'Exam download aborted by ' . $event->data->ip . 
                     ' from ' . ( $event->data->test_taker ? $event->data->test_taker :
-                    'Ticket with token ' . $event->data->token ) . ' (client side).'
+                    'Ticket with token ' . $event->data->token ) . ' (client side).',
+                    'severity' => Activity::SEVERITY_WARNING,
                 ]);
                 $act->save();
                 die();
@@ -695,7 +698,8 @@ class TicketController extends Controller
                 'ticket_id' => $event->data->id,
                 'description' => 'Exam download finished by ' . $event->data->ip .
                 ' from ' . ( $event->data->test_taker ? $event->data->test_taker :
-                'Ticket with token ' . $event->data->token ) . '.'
+                'Ticket with token ' . $event->data->token ) . '.',
+                'severity' => Activity::SEVERITY_SUCCESS,
             ]);
             $act->save();
 
@@ -782,6 +786,7 @@ class TicketController extends Controller
             'ticket_id' => $model->id,
             'description' => 'Exam finished by ' . ( $model->test_taker ?
             $model->test_taker : 'Ticket with token ' . $token ) . '.',
+            'severity' => Activity::SEVERITY_INFORMATIONAL,
         ]);
         $act->save();
 

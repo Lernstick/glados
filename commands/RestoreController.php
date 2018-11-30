@@ -93,6 +93,7 @@ class RestoreController extends DaemonController
             $act = new Activity([
                     'ticket_id' => $this->ticket->id,
                     'description' => 'Restore failed: ' . $this->ticket->restore_state,
+                    'severity' => Activity::SEVERITY_WARNING,
             ]);
             $act->save();
             return;
@@ -126,6 +127,7 @@ class RestoreController extends DaemonController
                 $act = new Activity([
                         'ticket_id' => $this->ticket->id,
                         'description' => 'Restore failed: ' . $this->ticket->restore_state,
+                        'severity' => Activity::SEVERITY_WARNING,
                 ]);
                 $act->save();
 
@@ -196,6 +198,7 @@ class RestoreController extends DaemonController
             $act = new Activity([
                     'ticket_id' => $this->ticket->id,
                     'description' => 'Restore failed: rdiff-backup failed (retval: ' . $retval . ')',
+                    'severity' => Activity::SEVERITY_WARNING,
             ]);
             $act->save();
 
@@ -207,6 +210,7 @@ class RestoreController extends DaemonController
             $act = new Activity([
                     'ticket_id' => $this->ticket->id,
                     'description' => 'Restore of ' . $this->restore->file . ' as it was as of ' . yii::$app->formatter->format($this->restore->restoreDate, 'datetime') . ' was successful.',
+                    'severity' => Activity::SEVERITY_SUCCESS,
             ]);
             $act->save();
 

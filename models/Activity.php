@@ -18,7 +18,15 @@ use yii\db\ActiveRecord;
 class Activity extends Base
 {
 
-        /**
+    /* activity severity constants */
+    const SEVERITY_CRITICAL = 2;
+    const SEVERITY_ERROR = 3;
+    const SEVERITY_WARNING = 4;
+    const SEVERITY_NOTICE = 5;
+    const SEVERITY_INFORMATIONAL = 6;
+    const SEVERITY_SUCCESS = 7;
+
+    /**
      * @inheritdoc
      */
     public function init()
@@ -99,6 +107,24 @@ class Activity extends Base
         ]);
         $event->generate();
 
+    }
+
+    /**
+     * Mapping of the different severities and the color classes
+     *
+     * @return array
+     */
+    public function getClassMap()
+    {
+        return [
+            self::SEVERITY_CRITICAL => "danger",
+            self::SEVERITY_ERROR  => "danger",
+            self::SEVERITY_WARNING => "warning",
+            self::SEVERITY_NOTICE => "primary",
+            self::SEVERITY_INFORMATIONAL => "info",
+            self::SEVERITY_SUCCESS => "success",
+            null => "default",
+        ];
     }
 
     /**
