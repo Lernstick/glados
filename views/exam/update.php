@@ -9,6 +9,7 @@ $this->title = 'Edit Exam: ' . ' ' . $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'Exams', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Edit';
+
 ?>
 <div class="exam-update">
 
@@ -16,6 +17,7 @@ $this->params['breadcrumbs'][] = 'Edit';
 
     <?= $this->render('_form', [
         'model' => $model,
+        'step' => $step,
     ]) ?>
 
 </div>

@@ -93,9 +93,48 @@ $this->registerJs($js);
 
 <div class="exam-form">
 
-    <?php $form = ActiveForm::begin([
+    <?php $form = $step == 0 || $step == 2 ? ActiveForm::begin([
         'options' => ['enctype' => 'multipart/form-data'],
+    ]) : ActiveForm::begin([
+        'options' => ['enctype' => 'multipart/form-data'],
+        'action' => ['create', '#' => 'file']
     ]); ?>
+
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#general">
+            <i class="glyphicon glyphicon-home"></i>
+            General
+        </a></li>
+        <li>
+            <?= Html::a(
+                '<i class="glyphicon glyphicon-book"></i> Libreoffice',
+                '#libreoffice',
+                ['data-toggle' => 'tab']
+            ) ?>
+        </li>
+        <?= $step != 1 ? '<li>' . Html::a(
+                '<i class="glyphicon glyphicon-file"></i> Exam File',
+                '#file',
+                ['data-toggle' => 'tab']
+            ) . 
+        '</li>' : '' ?>
+        <li>
+            <?= Html::a(
+                '<i class="glyphicon glyphicon-exclamation-sign"></i> Expert Settings',
+                '#expert',
+                ['data-toggle' => 'tab']
+            ) ?>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+
+    <?php Pjax::begin([
+        'id' => 'general',
+        'options' => ['class' => 'tab-pane fade in active'],
+    ]); ?>
+
+    <br>
 
     <div class="row">
         <div class="col-md-6">
@@ -118,59 +157,39 @@ $this->registerJs($js);
         </div>        
     </div>
 
-    <ul class="nav nav-tabs">
-        <li class="active"><a data-toggle="tab" href="#general">
-            <i class="glyphicon glyphicon-home"></i>
-            General
-        </a></li>
-        <li>
-            <?= Html::a(
-                '<i class="glyphicon glyphicon-book"></i> Libreoffice',
-                '#libreoffice',
-                ['data-toggle' => 'tab']
-            ) ?>
-        </li>
-    </ul>
+    <hr>
 
-    <div class="tab-content">
-
-    <?php Pjax::begin([
-        'id' => 'general',
-        'options' => ['class' => 'tab-pane fade in active'],
-    ]); ?>
-
-    <br>
-    <div class="alert alert-warning" role="alert"><i class="glyphicon glyphicon-warning-sign"></i> Please notice, all these settings will <b>override</b> the settings configured in the <b>exam file</b>!</div>
-    <div class="row">
-        <div class="col-md-6">
-            <?= $form->field($model, 'grp_netdev')->checkbox() ?>
-            <?= $form->field($model, 'allow_sudo')->checkbox() ?>
-            <?= $form->field($model, 'allow_mount')->checkbox() ?>
-            <?= $form->field($model, 'firewall_off')->checkbox() ?>
+    <div class="panel panel-warning">
+        <div class="panel-heading">
+            <i class="glyphicon glyphicon-warning-sign"></i> Please notice, all the settings below will <b>override</b> the settings configured in the <b>exam file</b>!
+        </div>
+        <div class="panel-body">
             <div class="row">
-                <div class="col-md-6" style="width:auto;">
-                    <?= $form->field($model, 'screenshots')->checkbox() ?>
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-6" style="width:auto;">
+                            <?= $form->field($model, 'screenshots')->checkbox() ?>
+                        </div>
+                        <div class="col-md-6">
+                            <?= $form->field($model, 'screenshots_interval', [
+                                'template' => '{label}<div class="input-group"><div class="input-group-addon">with Interval of</div>{input}<span class="input-group-addon" id="basic-addon2">minutes</span></div>{hint}{error}'
+                            ])->textInput(['type' => 'number', 'disabled' => !$model->screenshots])->label(false); ?>
+                        </div>                
+                        <div class="col-md-12">
+                            <?= $form->field($model, 'max_brightness')->widget(RangeInput::classname(), [
+                                'options' => ['placeholder' => 'Select range ...'],
+                                'html5Options' => ['min'=>0, 'max'=>100, 'step'=>1],
+                                'addon' => ['append'=>['content'=>'%']]
+                            ]) ?>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-md-6">
-                    <?= $form->field($model, 'screenshots_interval', [
-                        'template' => '{label}<div class="input-group"><div class="input-group-addon">with Interval of</div>{input}<span class="input-group-addon" id="basic-addon2">minutes</span></div>{hint}{error}'
-                    ])->textInput(['type' => 'number', 'disabled' => !$model->screenshots])->label(false); ?>
-                </div>                
+                    <?= $form->field($model, 'url_whitelist')->textarea([
+                        'rows' => '6',
+                    ]) ?>
+                </div>
             </div>
-        </div>
-        <div class="col-md-6">
-            <?= $form->field($model, 'url_whitelist')->textarea([
-                'rows' => '6',
-            ]) ?>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
-            <?= $form->field($model, 'max_brightness')->widget(RangeInput::classname(), [
-                'options' => ['placeholder' => 'Select range ...'],
-                'html5Options' => ['min'=>0, 'max'=>100, 'step'=>1],
-                'addon' => ['append'=>['content'=>'%']]
-            ]) ?>
         </div>
     </div>
     
@@ -182,75 +201,125 @@ $this->registerJs($js);
     ]); ?>
 
     <br>
-    <div class="alert alert-warning" role="alert"><i class="glyphicon glyphicon-warning-sign"></i> Please notice, all these settings will <b>override</b> the settings configured in the <b>exam file</b>!</div>
-    <div class="row">
-        <div class="col-md-6" style="width:auto;">
-            <?= $form->field($model, 'libre_autosave')->checkbox() ?>
+    <div class="panel panel-warning">
+        <div class="panel-heading">
+            <i class="glyphicon glyphicon-warning-sign"></i> Please notice, all the settings below will <b>override</b> the settings configured in the <b>exam file</b>!
         </div>
-        <div class="col-md-3">
-            <?= $form->field($model, 'libre_autosave_interval', [
-                'template' => '{label}<div class="input-group"><div class="input-group-addon">with Interval of</div>{input}<span class="input-group-addon" id="basic-addon2">minutes</span></div>{hint}{error}'
-            ])->textInput(['type' => 'number', 'disabled' => !$model->libre_autosave])->label(false); ?>
-        </div>
-        <div class="col-md-6">
-            <?= $form->field($model, 'libre_createbackup')->checkbox() ?>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6" style="width:auto;">
+                    <?= $form->field($model, 'libre_autosave')->checkbox() ?>
+                </div>
+                <div class="col-md-3">
+                    <?= $form->field($model, 'libre_autosave_interval', [
+                        'template' => '{label}<div class="input-group"><div class="input-group-addon">with Interval of</div>{input}<span class="input-group-addon" id="basic-addon2">minutes</span></div>{hint}{error}'
+                    ])->textInput(['type' => 'number', 'disabled' => !$model->libre_autosave])->label(false); ?>
+                </div>
+                <div class="col-md-6">
+                    <?= $form->field($model, 'libre_createbackup')->checkbox() ?>
+                </div>
+            </div>
         </div>
     </div>
 
     <?php Pjax::end(); ?>
 
-    <hr>
-    <div class="row">
-        <div class="col-md-12">
-            <?php
-            if(!$model->isNewRecord) {
+    <?php Pjax::begin([
+        'id' => 'expert',
+        'options' => ['class' => 'tab-pane fade'],
+    ]); ?>
 
-                echo Html::activeLabel($model, 'file');
-                echo JQueryFileUpload::widget([
-                    'model' => $model,
-                    'name' => 'file',
-                    'url' => ['update', 'id' => $model->id, 'mode' => 'upload'],
-                    'appearance' => 'ui', // available values: 'ui','plus' or 'basic'
-                    'formId' => $form->id,
-                    'options' => [
-                        'multiple' => false
-                    ],
-                    'clientOptions' => [
-                        'maxFileSize' => 4000000000,
-                        'dataType' => 'json',
-                        'acceptFileTypes' => new yii\web\JsExpression('/(\.|\/)(squashfs|zip)$/i'),
-                        'maxNumberOfFiles' => 1,
-                        'autoUpload' => false
-                    ],
-                ]);
-                echo Html::activeHint($model, 'file', ['class' => 'hint-block']);
-                echo "<hr>";
-            }
-            ?>
-
-            <?php
-            if($model->file && Yii::$app->file->set($model->file)->exists) {
-                $js = new JsExpression('var fupload = jQuery("#w0").fileupload({
-                    "maxFileSize":4000000000,
-                    "dataType":"json",
-                    "acceptFileTypes":/(\.|\/)(squashfs|zip)$/i,
-                    "maxNumberOfFiles":1,
-                    "autoUpload":false,
-                    "url":' . json_encode(Url::to(['update', 'id' => $model->id, 'mode' => 'upload']), JSON_HEX_AMP) . ',
-                    progressServerRate: 0.5,
-                    progressServerDecayExp: 3.5
-                });
-                jQuery("#w0").fileupload("option", "done").call(fupload, $.Event("done"), {result: {files: files}});');
-                $this->registerJs($js);
-            }
-            ?>
+    <br>
+    <div class="panel panel-danger">
+        <div class="panel-heading">
+            <i class="glyphicon glyphicon-warning-sign"></i> The following settings should only be used, if you know what you are doing!
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <?= $form->field($model, 'grp_netdev')->checkbox() ?>
+                    <?= $form->field($model, 'allow_sudo')->checkbox() ?>
+                    <?= $form->field($model, 'allow_mount')->checkbox() ?>
+                    <?= $form->field($model, 'firewall_off')->checkbox() ?>
+                </div>
+                <div class="col-md-6">
+                </div>
+            </div>
         </div>
     </div>
 
+    <?php Pjax::end(); ?>
+
+    <?php Pjax::begin([
+        'id' => 'file',
+        'options' => ['class' => 'tab-pane fade'],
+    ]); ?>
+
+    <br>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <?= Html::activeLabel($model, 'file'); ?>
+            <?= Html::activeHint($model, 'file', ['class' => 'hint-block'])?>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <?php
+                    if(!$model->isNewRecord) {
+
+                        //echo Html::activeLabel($model, 'file');
+                        echo JQueryFileUpload::widget([
+                            'model' => $model,
+                            'name' => 'file',
+                            'url' => ['update', 'id' => $model->id, 'mode' => 'upload'],
+                            'appearance' => 'ui', // available values: 'ui','plus' or 'basic'
+                            'mainView'=>'@app/views/exam/_upload_main',
+                            'uploadTemplateView'=>'@app/views/exam/_upload_upload',
+                            'downloadTemplateView'=>'@app/views/exam/_upload_download',
+                            'formId' => $form->id,
+                            'options' => [
+                                'multiple' => false
+                            ],
+                            'clientOptions' => [
+                                'maxFileSize' => 4000000000,
+                                'dataType' => 'json',
+                                'acceptFileTypes' => new yii\web\JsExpression('/(\.|\/)(squashfs|zip)$/i'),
+                                'maxNumberOfFiles' => 1,
+                                'autoUpload' => true
+                            ],
+                        ]);
+                        echo "<hr>";
+                    }
+                    ?>
+
+                    <?php
+                    if($model->file && Yii::$app->file->set($model->file)->exists) {
+                        $js = new JsExpression('var fupload = jQuery("#w0").fileupload({
+                            "maxFileSize":4000000000,
+                            "dataType":"json",
+                            "acceptFileTypes":/(\.|\/)(squashfs|zip)$/i,
+                            "maxNumberOfFiles":1,
+                            "autoUpload":true,
+                            "url":' . json_encode(Url::to(['update', 'id' => $model->id, 'mode' => 'upload']), JSON_HEX_AMP) . ',
+                            progressServerRate: 0.5,
+                            progressServerDecayExp: 3.5
+                        });
+                        jQuery("#w0").fileupload("option", "done").call(fupload, $.Event("done"), {result: {files: files}});');
+                        $this->registerJs($js);
+                    }
+                    ?>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <?php Pjax::end(); ?>
+
+    </div>
+    <hr>
+
     <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? 'Next Step' : 'Apply', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::submitButton($model->isNewRecord ? 'Next Step' : ($step == 2 ? 'Finish' : 'Apply'), ['class' => $model->isNewRecord || $step == 2 ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

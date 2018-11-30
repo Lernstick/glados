@@ -217,10 +217,11 @@ class ExamController extends Controller
         $model = new Exam();
 
         if ($model->load(\Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['update', 'id' => $model->id]);
+            return $this->redirect(['update', 'id' => $model->id, 'step' => 2]);
         } else {
             return $this->render('create', [
                 'model' => $model,
+                'step' => 1,
             ]);
         }
     }
@@ -229,9 +230,11 @@ class ExamController extends Controller
      * Updates an existing Exam model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
+     * @param string $mode default or file
+     * @param integer $step 0 means a normal edit of the exam, 1 is step 1 in create exam, 2 is step 2 in create exam
      * @return mixed
      */
-    public function actionUpdate($id, $mode = 'default')
+    public function actionUpdate($id, $mode = 'default', $step = 0)
     {
         $model = $this->findModel($id);
 
@@ -244,9 +247,17 @@ class ExamController extends Controller
             if ($model->load(Yii::$app->request->post()) && $model->save()){
                 return $this->redirect(['view', 'id' => $model->id]);
             }else{
-                return $this->render('update', [
-                    'model' => $model,
-                ]);
+                if ($step == 0) {
+                    return $this->render('update', [
+                        'model' => $model,
+                        'step' => $step,
+                    ]);
+                } else if ($step == 2) {
+                    return $this->render('create_s2', [
+                        'model' => $model,
+                        'step' => $step,
+                    ]);
+                }
             }
         }else if ($mode === 'upload') {
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;

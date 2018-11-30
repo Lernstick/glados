@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use app\models\Base;
+use yii\helpers\Html;
 
 /**
  * This is the model class for table "exam".
@@ -108,7 +109,7 @@ class Exam extends Base
             'url_whitelist' => 'HTTP URL Whitelist',
             'time_limit' => 'Time Limit',
             'backup_path' => 'Remote Backup Path',
-            'ticketInfo' => '# Tickets',
+            'ticketInfo' => 'Related Tickets',
             'ticketCount' => '# Tickets',
             'openTicketCount' => 'Open Tickets',
             'runningTicketCount' => 'Running Tickets',
@@ -272,6 +273,73 @@ class Exam extends Base
     {
         return (strpos($this->fileInfo, 'Squashfs') !== false || strpos($this->fileInfo, 'Zip') !== false ? true : false);
     }
+
+    /**
+     * @return string
+     */
+    public function getTicketInfo()
+    {
+        $a = array();
+
+        $this->openTicketCount != 0 ?
+            $a[] = Html::a($this->openTicketCount, [
+                'ticket/index',
+                'TicketSearch[examId]' => $this->id,
+                'TicketSearch[state]' => 0
+            ], [
+                'data-pjax' => 0,
+                'class' => 'bg-success text-success',
+                'title' => 'Number of Tickets in open state'
+            ]) : null;
+        $this->runningTicketCount != 0 ?
+            $a[] = Html::a($this->runningTicketCount, [
+                'ticket/index',
+                'TicketSearch[examId]' => $this->id,
+                'TicketSearch[state]' => 1
+            ], [
+                'data-pjax' => 0,
+                'class' => 'bg-info text-info',
+                'title' => 'Number of Tickets in running state'
+            ]) : null;
+        $this->closedTicketCount != 0 ?
+            $a[] = Html::a($this->closedTicketCount, [
+                'ticket/index',
+                'TicketSearch[examId]' => $this->id,
+                'TicketSearch[state]' => 2
+            ], [
+                'data-pjax' => 0,
+                'class' => 'bg-danger text-danger',
+                'title' => 'Number of Tickets in closed state'
+            ]) : null;
+        $this->submittedTicketCount != 0 ? 
+            $a[] = Html::a($this->submittedTicketCount, [
+                'ticket/index',
+                'TicketSearch[examId]' => $this->id,
+                'TicketSearch[state]' => 3
+            ], [
+                'data-pjax' => 0,
+                'class' => 'bg-warning text-warning',
+                'title' => 'Number of Tickets in submitted state'
+            ]) : null;
+
+        return ( count($a) == 0 ? 
+                '' : 
+                ( count($a) == 1 ? 
+                    implode(',', $a) . '/' : 
+                    ( '(' . implode(',', $a) . ')/' )
+                )
+            ) . 
+            ( $this->ticketCount != 0 ? 
+                Html::a($this->ticketCount, [
+                    'ticket/index',
+                    'TicketSearch[examId]' => $this->id,
+                ], [
+                    'data-pjax' => 0,
+                    'class' => 'text-muted',
+                    'title' => 'Total number of Tickets'
+                ]) : 
+                $this->ticketCount );
+    }  
 
     /**
      * @return string

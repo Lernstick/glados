@@ -49,24 +49,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     'value' => $model->time_limit == Null ? 'No Time Limit' : yii::$app->formatter->format($model->{'time_limit'}*60, 'duration'),
                 ],
                 [
-                    'attribute' => 'file',
-                    'value' => basename($model->file, '.squashfs') . ' ' . (
-                        $model->fileConsistency ? 
-                        '<span title="' . $model->file . '" class="label label-success">' . 
-                        '<span class="glyphicon glyphicon-ok"></span> Test passed</span> ' . Html::a(
-                            '<span class="glyphicon glyphicon-search"></span> Browse contents',
-                            ['view', 'id' => $model->id, 'mode' => 'squashfs'],
-                            ['data-pjax' => 0]
-                        ) :
-                        '<span title="' . $model->file . '" class="label label-danger">' . 
-                        '<span class="glyphicon glyphicon-remove"></span> Test failed</span>'
-                    ),
-                    'format' => 'raw',
-                ],
-                'md5',
-                'fileSize:shortSize',
-                'fileInfo:html',
-                [
                     'attribute' => 'user.username',
                     'label' => 'Owner',
                     'value' => ( $model->user_id == null ? '<span class="not-set">(user removed)</span>' : '<span>' . $model->user->username . '</span>' ),
@@ -74,18 +56,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     'visible' => Yii::$app->user->can('exam/view/all'),
                 ],
                 [
-                    'attribute' => 'ticketCount',
-    		        'format' => 'raw',
-                    'value' => Html::a(
-                        $model->ticketCount,
-                        ['ticket/index', 'TicketSearch[examName]' => $model->name, 'TicketSearch[examSubject]' => $model->subject],
-                        ['data-pjax' => 0]
-                    )
+                    'attribute' => 'ticketInfo',
+                    'format' => 'raw',
                 ],
-                'openTicketCount',
-                'runningTicketCount',
-                'closedTicketCount',
-                'submittedTicketCount',
                 [
                     'attribute' => 'file_analyzed',
                     'format' => 'raw',
@@ -99,6 +72,38 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= $this->render('@app/views/_notification', [
             'session' => $session,
         ]) ?>
+
+    <?php Pjax::end(); ?>
+
+    <?php Pjax::begin([
+        'id' => 'file',
+        'options' => ['class' => 'tab-pane fade'],
+    ]); ?>
+
+    <?= DetailView::widget([
+        'model' => $model,
+        'attributes' => [
+            [
+                'attribute' => 'file',
+                'value' => basename($model->file, '.squashfs') . ' ' . (
+                    $model->fileConsistency ? 
+                    '<span title="' . $model->file . '" class="label label-success">' . 
+                    '<span class="glyphicon glyphicon-ok"></span> Test passed</span> ' . Html::a(
+                        '<span class="glyphicon glyphicon-search"></span> Browse contents',
+                        ['view', 'id' => $model->id, 'mode' => 'squashfs'],
+                        ['data-pjax' => 0]
+                    ) : (empty($model->file) || $model->file == null ? 
+                    '<span class="not-set">(file not found)</span>' : 
+                    '<span title="' . $model->file . '" class="label label-danger">' . 
+                    '<span class="glyphicon glyphicon-remove"></span> Test failed</span>')
+                ),
+                'format' => 'raw',
+            ],
+            'md5',
+            'fileSize:shortSize',
+            'fileInfo:html',
+        ],
+    ]) ?>
 
     <?php Pjax::end(); ?>
 
