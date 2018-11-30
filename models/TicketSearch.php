@@ -79,8 +79,8 @@ class TicketSearch extends Ticket
                 'start',
                 'end',
                 'duration' => [
-                    'asc' => ['TIMEDIFF(start, end)' => SORT_ASC],
-                    'desc' => ['TIMEDIFF(start, end)' => SORT_DESC],
+                    'asc' => ['TIMEDIFF(COALESCE(end, NOW()), COALESCE(start, NOW()))' => SORT_ASC],
+                    'desc' => ['TIMEDIFF(COALESCE(end, NOW()), COALESCE(start, NOW()))' => SORT_DESC],
                     'label' => 'Duration'
                 ],
                 'examName' => [

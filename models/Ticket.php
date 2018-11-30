@@ -607,14 +607,13 @@ class Ticket extends Base
     /**
      * Returns the duration of the test
      *
-     * @return DateInterval object
+     * @return DateInterval object|null
      */    
     public function getDuration(){
 
         $a = new \DateTime($this->start);
         $b = new \DateTime($this->end);
-
-        return $a->diff($b);
+        return $a == $b ? null : $a->diff($b);
     }
 
     /**
