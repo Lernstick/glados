@@ -16,6 +16,7 @@ use yii\db\Expression;
 class TicketSearch extends Ticket
 {
 
+    public $examId;
     public $examName;
     public $examSubject;
     public $userId;
@@ -38,7 +39,7 @@ class TicketSearch extends Ticket
     {
         return [
             [['exam_id'], 'integer'],
-            [['token', 'examSubject', 'examName', 'userId', 'test_taker', 'state', 'abandoned', 'start', 'end', 'createdAt'], 'safe'],
+            [['token', 'examId', 'examSubject', 'examName', 'userId', 'test_taker', 'state', 'abandoned', 'start', 'end', 'createdAt'], 'safe'],
         ];
     }
 
@@ -116,6 +117,7 @@ class TicketSearch extends Ticket
         // filter by exam name, subject and user_id
         $query->joinWith(['exam' => function ($q) {
             $q->andFilterWhere(['like', 'exam.name', $this->examName])
+            ->andFilterWhere(['exam.id' => $this->examId])
             ->andFilterWhere(['like', 'exam.subject', $this->examSubject]);
         }]);
 
