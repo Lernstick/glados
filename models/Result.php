@@ -302,7 +302,7 @@ class Result extends Model
 
                 $act = new Activity([
                     'ticket_id' => $ticket->id,
-                    'description' => 'Exam result handed in.'
+                    'description' => 'Exam result handed in.',
                     'severity' => Activity::SEVERITY_INFORMATIONAL,
                 ]);
                 $act->save();
