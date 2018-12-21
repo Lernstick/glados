@@ -7,6 +7,7 @@ timeout=10
 zenity="/usr/bin/zenity"
 initrd="/run/initramfs"
 infoFile="${initrd}/info"
+mountFile="${initrd}/mount"
 python="/usr/bin/python"
 examUser="user"
 desktop="$(sudo -u ${examUser} xdg-user-dir DESKTOP)"
@@ -135,14 +136,35 @@ sed 's/#domain-name=local/domain-name=.alocal/' /etc/avahi/avahi-daemon.conf >${
 mount /lib/live/mount/medium/live/filesystem.squashfs ${initrd}/base
 if [ -e ${initrd}/squashfs/exam.squashfs ]; then
   mount ${initrd}/squashfs/exam.squashfs ${initrd}/exam
+  # find out whether the squashfs is an overlayfs
+  type=$(unsquashfs -ll ${initrd}/squashfs/exam.squashfs | awk '$1~/^c/&&$3=="0,"&&$4=="0"{print "overlay"; exit}')
+  if [ "${type}" != "overlay" ]; then
+    # find out whether the squashfs is an aufs
+    type=$(unsquashfs -ll ${initrd}/squashfs/exam.squashfs | awk '$0~/\/\.wh\./{print "aufs"; exit}')
+  fi
 fi
 if [ -e ${initrd}/squashfs/exam.zip ]; then
   unzip -o ${initrd}/squashfs/exam.zip -d ${initrd}/exam
+  type="zip"
   # fix permissions of the files in the home dir
   chown -R 1000:1000 ${initrd}/exam/${home} 2>/dev/null
   chown -R 0:0 ${initrd}/exam/${home}/Screenshots 2>/dev/null
 fi
-mount -t aufs -o br=${initrd}/backup=rw:${initrd}/exam=ro:${initrd}/base=ro none "${initrd}/newroot"
+
+mkdir ${initrd}/work
+if [ "${type}" = "aufs" ]; then
+  # in there are whiteouts for aufs (\.wh\.*) and no whiteouts for overlayfs (character devices with 0/0) it is an aufs filesystem
+  mount -t aufs -o br=${initrd}/backup=rw:${initrd}/exam=ro:${initrd}/base=ro none "${initrd}/newroot"
+  cat <<EOF >"${mountFile}"
+mount -t aufs -o br=/backup=rw:/exam=ro:/base=ro none "/newroot"
+EOF
+else
+  # in all other cases the filesystem in treated as overlay
+  mount -t overlay overlay -o lowerdir=${initrd}/exam:${initrd}/base,upperdir=${initrd}/backup,workdir=${initrd}/work ${initrd}/newroot
+  cat <<EOF >"${mountFile}"
+mount -t overlay overlay -o lowerdir=/exam:/base,upperdir=/backup,workdir=/work /newroot
+EOF
+fi
 
 # remove policykit action for lernstick welcome application
 rm -f ${initrd}/newroot/usr/share/polkit-1/actions/ch.lernstick.welcome.policy
