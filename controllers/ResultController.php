@@ -128,7 +128,7 @@ class ResultController extends Controller
                         @unlink($zipFile);
                     }, $model);
 
-                    return \Yii::$app->response->sendFile($zipFile, 'result.zip');                
+                    return \Yii::$app->response->sendFile($zipFile, 'result.zip');
                 }
 
             } else {

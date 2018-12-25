@@ -9,6 +9,32 @@ use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Exam */
+/* @var $type string */
+
+if ($type == "squashfs") {
+    $columns = [
+        ['class' => 'yii\grid\SerialColumn'],
+        'mode',
+        'date:date',
+        'time:time',
+        'owner',
+        'group',
+        'size:shortSize',
+        'path',
+    ];
+} else if ($type == "zip") {
+    $columns = [
+        ['class' => 'yii\grid\SerialColumn'],
+        'length',
+        'method',
+        'cmpr',
+        'date:date',
+        'time:time',
+        'crc32',
+        'size:shortSize',
+        'path',
+    ];
+}
 
 ?>
 
@@ -22,17 +48,7 @@ use yii\web\JsExpression;
         'rowOptions' => function($data) {
             return null;
         },
-
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-            'mode',
-            'date:date',
-            'time:time',
-            'owner',
-            'group',
-            'size:shortSize',
-            'path',
-        ],
+        'columns' => $columns,
     ]) ?>
 
 </div>

@@ -67,6 +67,9 @@ $config = [
         'squashfs' => [
             'class' => 'app\components\Squashfs',
         ],
+        'zip' => [
+            'class' => 'app\components\Zip',
+        ],
         'formatter' => [
             'class' => 'app\components\customFormatter',
             'defaultTimeZone' => 'Europe/Zurich',

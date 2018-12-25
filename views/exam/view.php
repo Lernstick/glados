@@ -85,12 +85,15 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             [
                 'attribute' => 'file',
-                'value' => basename($model->file, '.squashfs') . ' ' . (
+                'value' => Html::a(basename($model->file),
+                        ['view', 'id' => $model->id, 'mode' => 'file'],
+                        ['data-pjax' => 0]
+                    ) . ' ' . (
                     $model->fileConsistency ? 
                     '<span title="' . $model->file . '" class="label label-success">' . 
                     '<span class="glyphicon glyphicon-ok"></span> Test passed</span> ' . Html::a(
                         '<span class="glyphicon glyphicon-search"></span> Browse contents',
-                        ['view', 'id' => $model->id, 'mode' => 'squashfs'],
+                        ['view', 'id' => $model->id, 'mode' => 'browse'],
                         ['data-pjax' => 0]
                     ) : (empty($model->file) || $model->file == null ? 
                     '<span class="not-set">(file not found)</span>' : 

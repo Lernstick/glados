@@ -117,17 +117,32 @@ class ExamController extends Controller
                 'session' => $session,
             ]);
 
-        } else if ($mode == "squashfs"){
-            $file_list = Yii::$app->squashfs->set($model->file)->fileList;
+        } else if ($mode == "browse"){
+            $type = pathinfo($model->file, PATHINFO_EXTENSION);
+
+            if ($type == "squashfs") {
+                $file_list = Yii::$app->squashfs->set($model->file)->fileList;
+            } else if ($type == "zip") {
+                $file_list = Yii::$app->zip->set($model->file)->fileList;
+            } else {
+                throw new NotFoundHttpException('The requested file has not a valid extension (zip, squashfs).');
+            }
 
             $dataProvider = new ArrayDataProvider([
                 'allModels' => $file_list,
             ]);
 
             return $this->render('_view-file-details', [
+                'model' => $model,
+                'type' => $type,
                 'dataProvider' => $dataProvider,
             ]);
-
+        } else if ($mode == "file"){
+            if (Yii::$app->file->set($model->file)->exists) {
+                return \Yii::$app->response->sendFile($model->file);
+            } else {
+                throw new NotFoundHttpException('The requested file does not exist.');
+            }
         } else if ($mode == "monitor"){
             $params["TicketSearch"]["exam_id"] = $model->id;
             $params["sort"] = 'token';
