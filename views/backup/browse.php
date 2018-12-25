@@ -136,52 +136,64 @@ $this->registerJs($js);
 
       </div>
       <div class="col-sm-4">
-        <div class="pull-right special-dropdown">
-          Version: 
-          <button class="btn toggle-dropdown" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-describedby="btnGroupAddon"> <span class="glyphicon glyphicon-cog"></span> <?= $date == 'all' ? 'All versions overlapping' : (yii::$app->formatter->format($fs->version, 'datetime') . ($fs->version == $fs->newestBackupVersion ? ' (current)' : null)); ?></button>
 
-          <?php Pjax::begin([
-              'id' => 'w101',
-              'options' => ['tag' => 'ul', 'class' => 'dropdown-menu dropdown-menu-right'],
+        <!--<div class="col-sm-12 input-group input-group-sm">
+          <span class="input-group-addon" id="search-addon" style="min-width:70px;">Search</span>
+          <?= Html::input("text", "q", null, [
+            'class' => 'form-control',
+            'id' => 'q',
+            'placeholder' => 'Ex: file.pdf',
+            'aria-describedby' => 'search-addon',
+            'style' => 'width:100%;'
           ]); ?>
-          <?= ListView::widget([
-              'dataProvider' => $VersionsDataProvider,
-              'options' => [
-                  'tag' => false,
-                  //'class' => 'dropdown-menu dropdown-menu-right'
-              ],
-              /*'itemOptions' => function($model) {
-                  return [
-                      'tag'=> 'li',
-                      'class' => 'list-group-item-success'
-                  ];
-              },*/
-              'itemOptions' => [
-                  'tag' => 'li',
-              ],
-              'viewParams' => ['ticket' => $ticket, 'fs' => $fs, 'date' => $date, 'options' => $options],
-              'itemView' => '_browse_version',
-              'emptyText' => 'No versions.',
-              'emptyTextOptions' => [
-                  'tag' => 'li',
-                  'class' => 'empty dropdown-header',
-              ],
-              'layout' => '{items} {summary} {pager}',
-              'summaryOptions' => [
-                  'tag' => 'li',
-                  'class' => 'summary dropdown-header',
-              ],
-              'pager' => [
-                  'maxButtonCount' => 3,
-                  'options' => [
-                      'class' => 'dropdown-header pagination pagination-sm',
-                      'style' => 'padding: 3px 20px;'
-                  ]
-              ],        
-          ]); ?>
-          <?php Pjax::end() ?>
+        </div>-->
+        <div class="input-group input-group-sm col-sm-12 pull-right special-dropdown">
+          <span class="input-group-addon" id="version-addon" style="min-width:70px;">Version</span>
+          <span class="input-group-btn" style="width:100%;">
+            <button style="width:100%;" class="btn btn-default toggle-dropdown" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-describedby="version-addon"> <span class="glyphicon glyphicon-cog"></span> <?= $date == 'all' ? 'All versions overlapping' : (yii::$app->formatter->format($fs->version, 'datetime') . ($fs->version == $fs->newestBackupVersion ? ' (current)' : null)); ?></button>
 
-          
+            <?php Pjax::begin([
+                'id' => 'w101',
+                'options' => ['tag' => 'ul', 'class' => 'dropdown-menu dropdown-menu-right'],
+            ]); ?>
+            <?= ListView::widget([
+                'dataProvider' => $VersionsDataProvider,
+                'options' => [
+                    'tag' => false,
+                    //'class' => 'dropdown-menu dropdown-menu-right'
+                ],
+                /*'itemOptions' => function($model) {
+                    return [
+                        'tag'=> 'li',
+                        'class' => 'list-group-item-success'
+                    ];
+                },*/
+                'itemOptions' => [
+                    'tag' => 'li',
+                ],
+                'viewParams' => ['ticket' => $ticket, 'fs' => $fs, 'date' => $date, 'options' => $options],
+                'itemView' => '_browse_version',
+                'emptyText' => 'No versions.',
+                'emptyTextOptions' => [
+                    'tag' => 'li',
+                    'class' => 'empty dropdown-header',
+                ],
+                'layout' => '{items} {summary} {pager}',
+                'summaryOptions' => [
+                    'tag' => 'li',
+                    'class' => 'summary dropdown-header',
+                ],
+                'pager' => [
+                    'maxButtonCount' => 3,
+                    'options' => [
+                        'class' => 'dropdown-header pagination pagination-sm',
+                        'style' => 'padding: 3px 20px;'
+                    ]
+                ],        
+            ]); ?>
+            <?php Pjax::end() ?>
+
+          </span>
         </div>
       </div>
     </div>
