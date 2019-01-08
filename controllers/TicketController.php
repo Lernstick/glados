@@ -555,7 +555,12 @@ class TicketController extends Controller
                 $model->download_progress = 0;
                 $model->save();
 
-                $count = Daemon::find()->where(['description' => 'Daemon base controller'])->count();
+                # saerch for running daemons
+                $daemonSearchModel = new DaemonSearch();
+                $daemonDataProvider = $daemonSearchModel->search(['DaemonSearch' => ['description' => 'Daemon base controller']]);
+                $count = $daemonDataProvider->getTotalCount();
+
+                # if no daemon is running already, start one
                 if($count == 0){
                     $daemon = new Daemon();
                     $daemon->startDaemon();
