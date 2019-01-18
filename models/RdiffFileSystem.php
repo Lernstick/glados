@@ -464,6 +464,38 @@ class RdiffFileSystem extends Model
     }
 
     /**
+     * Returns whether the file was a whiteout in one of its versions
+     *
+     * @return bool
+     */
+    public function getWasWhiteout()
+    {
+        $fs = new RdiffFileSystem([
+            'root' => $this->root,
+            'location' => $this->location,
+            'restoreUser' => $this->restoreUser,
+            'restoreHost' => $this->restoreHost,
+            'options' => $this->options,
+        ]);
+        foreach ($this->versions as $version) {
+            if ($fs->slash($this->path)->versionAt($version)->isWhiteout == true) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns whether the current version is the oldest
+     *
+     * @return bool
+     */
+    public function getIsOldestVersion()
+    {
+        return $this->version == end(array_values($this->versions));;
+    }
+
+    /**
      * Populates all file info of the current path if not already done
      *
      * @param bool $force - force the function to repopulate
