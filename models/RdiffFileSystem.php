@@ -491,6 +491,7 @@ class RdiffFileSystem extends Model
                 }
                 if (isset($start) && isset($end)) {
                     foreach (array_slice($lines, $start, $end-$start) as $line) {
+                        // spilt the line in key and value (where value is all after the first space)
                         $stat = explode(" ", trim($line), 2);
                         $this->_fileInfo[$stat[0]] = $stat[1];
                     }
