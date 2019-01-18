@@ -61,8 +61,12 @@ class ExamSearch extends Exam
         ]);
 
         $dataProvider->setSort([
-            'defaultOrder' => ['createdAt' => SORT_DESC],
+            'defaultOrder' => [
+                'createdAt' => SORT_DESC,
+                'id' => SORT_DESC
+            ],
             'attributes' => [
+                'id',
                 'createdAt' => [
                     'asc' => ['exam.createdAt' => SORT_ASC],
                     'desc' => ['exam.createdAt' => SORT_DESC],
