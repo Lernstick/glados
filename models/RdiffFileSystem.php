@@ -455,7 +455,7 @@ class RdiffFileSystem extends Model
     public function getState()
     {
         /* reverse state if it's a whiteout file */
-        if (strpos($this->basename, '.wh.') === 0) {
+        if ($this->isWhiteout) {
             $state = $this->getRealState();
             return $state == 'missing' ? 'normal' : 'missing';
         } else {
@@ -491,7 +491,7 @@ class RdiffFileSystem extends Model
                 }
                 if (isset($start) && isset($end)) {
                     foreach (array_slice($lines, $start, $end-$start) as $line) {
-                        $stat = explode(" ", trim($line));
+                        $stat = explode(" ", trim($line), 2);
                         $this->_fileInfo[$stat[0]] = $stat[1];
                     }
                 }
@@ -555,14 +555,59 @@ class RdiffFileSystem extends Model
     }
 
     /**
+     * @return string|null the file type (reg, dir, sym, dev, None...)
+     */
+    public function getRealType()
+    {
+        $this->populateFileInfo();
+        return isset($this->_fileInfo["Type"]) ? $this->_fileInfo["Type"] : null;
+    }
+
+    /**
+     * @return string|null the file type (Ex: c 0 0)
+     */
+    public function getDeviceNum()
+    {
+        $this->populateFileInfo();
+        return isset($this->_fileInfo["DeviceNum"]) ? $this->_fileInfo["DeviceNum"] : null;
+    }
+
+    /**
+     * Is it a whiteout or not
+     *
+     * @return bool - whether the file is a whiteout or not
+     */
+    public function getIsWhiteout()
+    {
+        return $this->isWhiteoutAUFS || $this->isWhiteoutOverlay;
+    }
+
+    /**
+     * @return Is it an overlayFS whiteout
+     * @see https://www.kernel.org/doc/Documentation/filesystems/overlayfs.txt for overlayFS whiteout files
+     */
+    public function getIsWhiteoutOverlay()
+    {
+        return $this->realType === "dev" && $this->deviceNum === "c 0 0";
+    }
+
+    /**
+     * @return Is it an AUFS whiteout
+     * @see http://aufs.sourceforge.net/aufs.html for AUFS whiteout files
+     */
+    public function getIsWhiteoutAUFS()
+    {
+        return strpos($this->basename, '.wh.') === 0;
+    }
+
+    /**
      * Getter for the file name to display in the webinterface
      *
      * @return string - the file name without the leading .wh. in case of a whiteout file
-     * @see http://aufs.sourceforge.net/aufs.html for whiteout files
      */
     public function getDisplayName()
     {
-        if (strpos($this->basename, '.wh.') === 0) {
+        if ($this->isWhiteoutAUFS) {
             return substr($this->basename, 4);
         } else {
             return $this->basename;

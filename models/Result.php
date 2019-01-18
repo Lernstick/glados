@@ -200,6 +200,9 @@ class Result extends Model
                                 continue;
                             }
 
+                            // if the file is readable (permission set) (overlayFS whiteouts will have no read permission set)
+                            if (!is_readable($file)) { continue; }
+
                             // if all tests passed, include the file/dir
                             $this->zipInclude($file, $ticket->name . '/' . str_replace($source . '/', '', $file), $zip);
                         }
