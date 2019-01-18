@@ -71,8 +71,12 @@ class TicketSearch extends Ticket
         ]);
 
         $dataProvider->setSort([
-            'defaultOrder' => ['createdAt' => SORT_DESC],
+            'defaultOrder' => [
+                'createdAt' => SORT_DESC,
+                'id' => SORT_DESC
+            ],
             'attributes' => [
+                'id',
                 'state',
                 'createdAt',
                 'token',
