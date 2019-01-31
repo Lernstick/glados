@@ -223,6 +223,7 @@ class Result extends Model
      */
     private function zipInclude ($source, $target, $zip)
     {
+        $target = $this->sanitizePath($target);
         if (is_dir($source) === false) {
             return $zip->addFile($source, $target);
         } else {
@@ -242,6 +243,24 @@ class Result extends Model
         } else {
             return false;
         }
+    }
+
+    /**
+     * Sanitize path for Windows and Mac systems
+     *
+     * @return string filename
+     * @see https://stackoverflow.com/a/42058764/2768341
+     * @todo also transliterate characters (see http://userguide.icu-project.org/transforms/general)
+     */
+    public function sanitizePath($filename, $replacement = '')
+    {
+        $filename = preg_replace(
+            '~
+            [\<\>\:\"\\\|\?\*]            # file system reserved https://en.wikipedia.org/wiki/Filename#Reserved_characters_and_words
+            ~x',
+            $replacement, $filename);
+
+        return $filename;
     }
 
     /**
