@@ -29,6 +29,7 @@ use \mPDF;
 use app\components\customResponse;
 use app\components\AccessRule;
 use yii\data\ArrayDataProvider;
+use yii\widgets\ActiveForm;
 
 
 /**
@@ -279,6 +280,7 @@ class TicketController extends Controller
                 return $this->render('create', [
                     'model' => $model,
                     'searchModel' => $searchModel,
+                    'attr' => null,
                 ]);
             }
         }else if ($mode === 'many') {
@@ -353,7 +355,7 @@ class TicketController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionUpdate($mode = 'default', $id = null, $token = null)
+    public function actionUpdate($mode = 'default', $id = null, $token = null, $attr = null, $validate = false)
     {
         if ($mode === 'default') {
             $model = $this->findModel($id);
@@ -367,9 +369,25 @@ class TicketController extends Controller
                 return $this->render('update', [
                     'model' => $model,
                     'searchModel' => $searchModel,
+                    'attr' => $attr
                 ]);
             }
-        }else if ($mode === 'submit') {
+        } else if ($mode === 'editable') {
+            $model = $this->findModel($id);
+            $searchModel = new TicketSearch();
+
+            $model->scenario = YII_ENV_DEV ? Ticket::SCENARIO_DEV : Ticket::SCENARIO_DEFAULT;
+            if ($model->load(Yii::$app->request->post())) {
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                return $validate ? ActiveForm::validate($model) : $model->save();
+            } else {
+                return $this->renderAjax('_form', [
+                    'model' => $model,
+                    'searchModel' => $searchModel,
+                    'attr' => $attr
+                ]);
+            }
+        } else if ($mode === 'submit') {
             $params = Yii::$app->request->post('Ticket');
             $token = (isset($params['token']) && !empty($params['token'])) ? $params['token'] : null;
             $test_taker = (isset($params['test_taker']) && !empty($params['test_taker'])) ? $params['test_taker'] : null;

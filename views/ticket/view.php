@@ -7,6 +7,7 @@ use yii\widgets\Pjax;
 use yii\helpers\Url;
 use yii\bootstrap\Modal;
 use app\components\ActiveEventField;
+use app\components\Editable;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Ticket */
@@ -38,6 +39,7 @@ $(window).bind('hashchange', function() {
     var prefix = "tab_";
     $('.nav-tabs a[href*="' + document.location.hash.replace(prefix, "") + '"]').tab('show');
 }).trigger('hashchange');
+
 JS;
 $this->registerJs($active_tabs);
 
@@ -277,7 +279,15 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'createdAt:timeago',
-            'token',
+            //'token',
+            [
+                'attribute' => 'token',
+                'value' => Editable::widget([
+                    'content' => yii::$app->formatter->format($model->token, 'text'),
+                    'editUrl' => ['ticket/update', 'id' => $model->id, 'mode' => 'editable', 'attr' => 'token' ],
+                ]),
+                'format' => 'raw'
+            ],
             [
                 'attribute' => 'state',
                 'value' => '<span class="label label-' . (
@@ -307,7 +317,14 @@ $this->params['breadcrumbs'][] = $this->title;
                      . ( $model->validTime !== false ? ($model->validTime === true ? 'No Time Limit' : 'for ' . yii::$app->formatter->format($model->validTime, 'duration') . ' after start') : '<span class="not-set">(expired)</span>' ),
                 'format' => 'html',
             ],
-            'test_taker',
+            [
+                'attribute' => 'test_taker',
+                'value' => Editable::widget([
+                    'content' => empty($model->test_taker) ? '<span class="not-set">(not set)</span>' : yii::$app->formatter->format($model->test_taker, 'text'),
+                    'editUrl' => ['ticket/update', 'id' => $model->id, 'mode' => 'editable', 'attr' => 'test_taker' ],
+                ]),
+                'format' => 'raw'
+            ],
             [
                 'attribute' => 'ip',
                 'format' => 'raw',

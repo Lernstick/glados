@@ -266,3 +266,16 @@ table.detail-view td {
     margin-bottom: 0;
     margin-top: 0;
 }
+
+.editable {
+  color: #428bca;
+  border-bottom: dashed 1px #0088cc;
+}
+
+.editable:hover {
+  border-bottom: dashed 1px #0088cc !important;
+}
+
+.select2-container {
+  z-index: 1100;
+}

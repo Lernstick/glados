@@ -18,6 +18,7 @@ $this->params['breadcrumbs'][] = 'Edit';
     <?= $this->render('_form', [
         'model' => $model,
         'searchModel' => $searchModel,
+        'attr' => $attr,
     ]) ?>
 
 </div>

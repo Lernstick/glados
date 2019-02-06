@@ -115,6 +115,7 @@ class Ticket extends Base
     public function rules()
     {
         return [
+            [['exam_id', 'token', 'backup_interval'], 'required'],
             [['exam_id', 'token', 'backup_interval'], 'required', 'on' => self::SCENARIO_DEFAULT],
             [['token', 'test_taker'], 'required', 'on' => self::SCENARIO_SUBMIT],
             [['start', 'ip'], 'required', 'on' => self::SCENARIO_DOWNLOAD],
