@@ -13,9 +13,19 @@ class Editable extends Pjax
      * @var string the content between the opening and closing tag.
      */
     public $content;
+
+     /**
+     * @var string URL to load the edit form.
+     */
     public $editUrl;
-    public $uuid;
+
+     /**
+     * @var string content in the popover to be shown, when the form is loading.
+     */
     public $loading = "<span>Loading...</span>";
+
+    private $uuid;
+    
 
     /**
      * @inheritdoc
