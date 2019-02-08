@@ -130,13 +130,18 @@ class DownloadController extends DaemonController implements DaemonInterface
             $this->ticket->runCommand('echo "download in progress" > ' . $this->remotePath . '/state');
             $this->ticket->save(false);
 
-            $ext = pathinfo($this->ticket->exam->file)['extension'];
-            $cmd = "rsync --checksum --partial --progress "
+            // create a temporary directory
+            $td = sys_get_temp_dir() . "/" . generate_uuid();
+            mkdir($td);
+            symlink($this->ticket->exam->file, $td . "/exam.squashfs");
+            symlink($this->ticket->exam->file2, $td . "/exam.zip");
+
+            $cmd = "rsync -L --checksum --partial --progress "
                  . "--bwlimit=" . escapeshellarg(\Yii::$app->params['examDownloadBandwith']) . " "
                  . "--rsh='ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
                  . " -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' "
-                 . escapeshellarg($this->ticket->exam->file) . " "
-                 . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . ":" . $this->remotePath . '/squashfs/exam.' . $ext) . " "
+                 . $td . '/*' . " "
+                 . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . ":" . $this->remotePath . '/squashfs/') . " "
                  . "| stdbuf -oL tr '\\r' '\\n' ";
 
             $this->logInfo('Executing rsync: ' . $cmd);
@@ -159,6 +164,11 @@ class DownloadController extends DaemonController implements DaemonInterface
             });
 
             $retval = $cmd->run();
+
+            // remove the temporary directory
+            @unlink($td . "/exam.squashfs");
+            @unlink($td . "/exam.zip");
+            @rmdir($td);
 
             if($retval != 0){
                 $this->logError('rsync failed (retval: ' . $retval . '), output: ' . PHP_EOL . $output);

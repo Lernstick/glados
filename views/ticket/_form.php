@@ -41,6 +41,8 @@ $this->registerJs($js, \yii\web\View::POS_READY);
 
 if (Yii::$app->request->isAjax) {
     $ajax = <<< 'SCRIPT'
+    $("form#ajax-form input:text, form textarea").first().select();
+
     $("form#ajax-form").on('beforeSubmit', function(event) {
         event.preventDefault(); // stopping submitting
         var data = $(this).serializeArray();
@@ -79,12 +81,8 @@ SCRIPT;
         'enableAjaxValidation' => Yii::$app->request->isAjax,
         'validationUrl' => [ 'ticket/update', 'id' => $model->id, 'mode' => 'editable', 'attr' => $attr, 'validate' => true ],
         'fieldConfig' => Yii::$app->request->isAjax ? [
-            'labelOptions' => [
-                'class' =>  'hidden'
-            ],
-            'hintOptions' => [
-                'class' => 'hidden'
-            ],
+            'labelOptions' => [ 'class' =>  'hidden' ],
+            'hintOptions' => [ 'class' => 'hidden' ],
         ] : null
     ]); ?>
 

@@ -84,19 +84,40 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             [
-                'attribute' => 'file',
-                'value' => Html::a(basename($model->file),
-                        ['view', 'id' => $model->id, 'mode' => 'file'],
+                'attribute' => 'file2',
+                'value' => Html::a(basename($model->file2),
+                        ['view', 'id' => $model->id, 'mode' => 'file', 'type' => 'zip'],
                         ['data-pjax' => 0]
                     ) . ' ' . (
-                    $model->fileConsistency ? 
+                    $model->file2Consistency ? 
+                    '<span title="' . $model->file2 . '" class="label label-success">' . 
+                    '<span class="glyphicon glyphicon-ok"></span> Test passed</span> ' . Html::a(
+                        '<span class="glyphicon glyphicon-search"></span> Browse contents',
+                        ['view', 'id' => $model->id, 'mode' => 'browse', 'type' => 'zip'],
+                        ['data-pjax' => 0]
+                    ) : (empty($model->file2) || $model->file2 == null ? 
+                    '<span class="not-set">(no zip file)</span>' : 
+                    '<span title="' . $model->file2 . '" class="label label-danger">' . 
+                    '<span class="glyphicon glyphicon-remove"></span> Test failed</span>')
+                ),
+                'format' => 'raw',
+            ],
+            'file2Size:shortSize',
+            'file2Info:html',
+            [
+                'attribute' => 'file',
+                'value' => Html::a(basename($model->file),
+                        ['view', 'id' => $model->id, 'mode' => 'file', 'type' => 'squashfs'],
+                        ['data-pjax' => 0]
+                    ) . ' ' . (
+                    $model->file1Consistency ? 
                     '<span title="' . $model->file . '" class="label label-success">' . 
                     '<span class="glyphicon glyphicon-ok"></span> Test passed</span> ' . Html::a(
                         '<span class="glyphicon glyphicon-search"></span> Browse contents',
-                        ['view', 'id' => $model->id, 'mode' => 'browse'],
+                        ['view', 'id' => $model->id, 'mode' => 'browse', 'type' => 'squashfs'],
                         ['data-pjax' => 0]
                     ) : (empty($model->file) || $model->file == null ? 
-                    '<span class="not-set">(file not found)</span>' : 
+                    '<span class="not-set">(no squashfs file)</span>' : 
                     '<span title="' . $model->file . '" class="label label-danger">' . 
                     '<span class="glyphicon glyphicon-remove"></span> Test failed</span>')
                 ),
