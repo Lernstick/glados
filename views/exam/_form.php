@@ -314,7 +314,7 @@ $this->registerJs($js);
     <br>
     <div class="panel panel-default">
         <div class="panel-heading">
-            <?= Html::activeLabel($model, 'file'); ?>
+            <?= Html::Label('Exam Image files'); ?>
             <?= Html::activeHint($model, 'file', ['class' => 'hint-block'])?>
         </div>
         <div class="panel-body">
