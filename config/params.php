@@ -8,6 +8,7 @@ return [
     'backupPath' =>             '/var/lib/glados/backups/',
     'resultPath' =>             '/var/lib/glados/results/',
     'tmpPath' =>                '/var/lib/glados/tmp/',
+    'sciptsPath' =>             '/usr/share/glados/scripts/',
     'dotSSH' =>                 '/var/lib/glados/.ssh/',
     'daemonLogFilePath' =>      '/var/log/glados',
     'examDownloadBandwith' =>   '10m', // 10MB per second, set 0 for no limit

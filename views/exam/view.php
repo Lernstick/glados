@@ -117,7 +117,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['view', 'id' => $model->id, 'mode' => 'browse', 'type' => 'squashfs'],
                         ['data-pjax' => 0]
                     ) : (empty($model->file) || $model->file == null ? 
-                    '<span class="not-set">(no squashfs file)</span>' : 
+                    '<span class="not-set">(no image file)</span>' : 
                     '<span title="' . $model->file . '" class="label label-danger">' . 
                     '<span class="glyphicon glyphicon-remove"></span> Test failed</span>')
                 ),
