@@ -95,7 +95,7 @@ class ExamController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionView($id, $mode = 'default')
+    public function actionView($id, $mode = 'default', $type = 'squashfs')
     {
 
         $model = $this->findModel($id);
@@ -118,12 +118,10 @@ class ExamController extends Controller
             ]);
 
         } else if ($mode == "browse"){
-            $type = pathinfo($model->file, PATHINFO_EXTENSION);
-
             if ($type == "squashfs") {
                 $file_list = Yii::$app->squashfs->set($model->file)->fileList;
             } else if ($type == "zip") {
-                $file_list = Yii::$app->zip->set($model->file)->fileList;
+                $file_list = Yii::$app->zip->set($model->file2)->fileList;
             } else {
                 throw new NotFoundHttpException('The requested file has not a valid extension (zip, squashfs).');
             }
@@ -138,10 +136,18 @@ class ExamController extends Controller
                 'dataProvider' => $dataProvider,
             ]);
         } else if ($mode == "file"){
-            if (Yii::$app->file->set($model->file)->exists) {
-                return \Yii::$app->response->sendFile($model->file);
-            } else {
-                throw new NotFoundHttpException('The requested file does not exist.');
+            if ($type == 'squashfs') {
+                if (Yii::$app->file->set($model->file)->exists) {
+                    return \Yii::$app->response->sendFile($model->file);
+                } else {
+                    throw new NotFoundHttpException('The requested file does not exist.');
+                }
+            } else if ($type == 'zip') {
+                if (Yii::$app->file->set($model->file2)->exists) {
+                    return \Yii::$app->response->sendFile($model->file2);
+                } else {
+                    throw new NotFoundHttpException('The requested file does not exist.');
+                }
             }
         } else if ($mode == "monitor"){
             $params["TicketSearch"]["exam_id"] = $model->id;
@@ -276,7 +282,19 @@ class ExamController extends Controller
             }
         }else if ($mode === 'upload') {
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            $model->file = UploadedFile::getInstanceByName('file');
+
+            $file = UploadedFile::getInstanceByName('file');
+            $extension = end(explode('.', $file->name));
+
+            /*if ($pathinfo['extension'] == 'zip') {
+                $model->file2 = $file;
+            } else if ($pathinfo['extension'] == 'squashfs') {
+                $model->file = $file;
+            }*/
+            //$model->file = UploadedFile::getInstanceByName('file');
+
+            //var_dump(UploadedFile::getInstanceByName('file'));
+            //die();
 
             /**
              * @var array mapping of errorcodes and meaning
@@ -293,50 +311,56 @@ class ExamController extends Controller
                 8 => 'A PHP extension stopped the file upload.',
             ];
 
-            if ($model->file !== null) {
-                $fileError = $phpErrors[$model->file->error] ? $phpErrors[$model->file->error] : 'Unknown PHP File Upload Error: ' . $model->file->error;
+            if ($file !== null) {
+                $fileError = $phpErrors[$file->error] ? $phpErrors[$file->error] : 'Unknown PHP File Upload Error: ' . $file->error;
             } else {
                 $fileError = 'Unknown File Upload Error';
             }
 
             if (!is_dir(\Yii::$app->params['uploadPath'])) {
                 $fileError = 'The upload directory (' . \Yii::$app->params['uploadPath'] . ') does not exist.';
-                @unlink($model->file);
+                @unlink($file);
                 return [ 'files' => [[
-                    'name' => basename($model->file),
+                    'name' => basename($file),
                     'error' => $fileError,
                 ]]];                
             } else if (!is_writable(\Yii::$app->params['uploadPath'])) {
                 $fileError = 'The upload directory (' . \Yii::$app->params['uploadPath'] . ') is not writable.';
-                @unlink($model->file);
+                @unlink($file);
                 return [ 'files' => [[
-                    'name' => basename($model->file),
+                    'name' => basename($file),
                     'error' => $fileError,
                 ]]]; 
             }
 
-            if ($model->file != null && $model->upload()) {
-                $model->file = $model->filePath;
+            if ($file != null && $model->upload($file)) {
+
+                $file = $model->filePath;
+                if ($extension == 'zip') {
+                    $model->file2 = $model->filePath;
+                } else if ($extension == 'squashfs') {
+                    $model->file = $model->filePath;
+                }
 
                 if(!$model->save()){
-                    @unlink($model->file);
+                    @unlink($file);
                     return [ 'files' => [[
-                        'name' => basename($model->file),
+                        'name' => basename($file),
                         'error' => $model->errors['id'][0],
                     ]]];
                 }
             }else{
-                @unlink($model->file);
+                @unlink($file);
                 return [ 'files' => [[
-                    'name' => basename($model->file),
+                    'name' => basename($file),
                     'error' => $model->errors['file'][0] . ' ' . $fileError,
                 ]]];
             }
 
             return [ 'files' => [[
-                'name' => basename($model->file),
-                'size' => filesize($model->file),
-                'deleteUrl' => Url::to(['delete', 'id' => $model->id, 'mode' => 'squashfs', 'file' => basename($model->file)]),
+                'name' => basename($file),
+                'size' => filesize($file),
+                'deleteUrl' => Url::to(['delete', 'id' => $model->id, 'mode' => 'file', 'type' => $extension]),
                 'deleteType' => 'POST'
             ]]];
 
@@ -349,7 +373,7 @@ class ExamController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionDelete($id, $mode = 'exam')
+    public function actionDelete($id, $mode = 'exam', $type = null)
     {
 
         $model = $this->findModel($id);
@@ -363,11 +387,17 @@ class ExamController extends Controller
             Yii::$app->session->addFlash('danger', 'The Exam has been deleted successfully.');
 
             return $this->redirect(Yii::$app->session['examViewReturnURL']);
-        }else if ($mode === 'squashfs') {
+        }else if ($mode === 'file') {
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            return [ 'files' => [[
-                basename($model->file) => $model->deleteFile(),
-            ]]];
+            if ($type == 'squashfs') {
+                return [ 'files' => [[
+                    basename($model->file) => $model->deleteFile('squashfs'),
+                ]]];
+            } else if ($type == 'zip') {
+                return [ 'files' => [[
+                    basename($model->file2) => $model->deleteFile('zip'),
+                ]]];
+            }
         }
 
     }

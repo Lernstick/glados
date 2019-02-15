@@ -51,7 +51,7 @@ function do_exit()
 
   # unmount the filesystem
   umount ${initrd}/newroot
-  umount -l ${initrd}/{base,exam}
+  umount -l ${initrd}/{base,exam,tmpfs}
   exit
 }
 trap do_exit EXIT
@@ -143,28 +143,44 @@ if [ -e ${initrd}/squashfs/exam.squashfs ]; then
     type=$(unsquashfs -ll ${initrd}/squashfs/exam.squashfs | awk '$0~/\/\.wh\./{print "aufs"; exit}')
   fi
 fi
+
 if [ -e ${initrd}/squashfs/exam.zip ]; then
-  unzip -o ${initrd}/squashfs/exam.zip -d ${initrd}/exam
+  mount -t tmpfs tmpfs ${initrd}/tmpfs
+  unzip -o ${initrd}/squashfs/exam.zip -d ${initrd}/tmpfs
   type="zip"
   # fix permissions of the files in the home dir
-  chown -R 1000:1000 ${initrd}/exam/${home} 2>/dev/null
-  chown -R 0:0 ${initrd}/exam/${home}/Screenshots 2>/dev/null
+  chown -R 1000:1000 ${initrd}/tmpfs/${home} 2>/dev/null
+  chown -R 0:0 ${initrd}/tmpfs/${home}/Screenshots 2>/dev/null
 fi
 
+# mount the whole filesystem, the result filesystem looks like this
+# +---------------+
+# | tmpfs (rw)    |
+# +---------------+
+# | zip (ro)      |
+# +---------------+
+# | squashfs (ro) |
+# +---------------+
+# | base (ro)     |
+# +---------------+
 mkdir ${initrd}/work
 if [ "${type}" = "aufs" ]; then
   # in there are whiteouts for aufs (\.wh\.*) and no whiteouts for overlayfs (character devices with 0/0) it is an aufs filesystem
-  mount -t aufs -o br=${initrd}/backup=rw:${initrd}/exam=ro:${initrd}/base=ro none "${initrd}/newroot"
+  mount -t aufs -o br=${initrd}/backup=rw:${initrd}/tmpfs=ro:${initrd}/exam=ro:${initrd}/base=ro none "${initrd}/newroot"
   cat <<EOF >"${mountFile}"
-mount -t aufs -o br=/backup=rw:/exam=ro:/base=ro none "/newroot"
+mount -t aufs -o br=/backup=rw:/tmpfs=ro:/exam=ro:/base=ro none "/newroot"
 EOF
 else
   # in all other cases the filesystem in treated as overlay
-  mount -t overlay overlay -o lowerdir=${initrd}/exam:${initrd}/base,upperdir=${initrd}/backup,workdir=${initrd}/work ${initrd}/newroot
+  mount -t overlay overlay -o lowerdir=${initrd}/tmpfs:${initrd}/exam:${initrd}/base,upperdir=${initrd}/backup,workdir=${initrd}/work ${initrd}/newroot
   cat <<EOF >"${mountFile}"
-mount -t overlay overlay -o lowerdir=/exam:/base,upperdir=/backup,workdir=/work /newroot
+mount -t overlay overlay -o lowerdir=/tmpfs:/exam:/base,upperdir=/backup,workdir=/work /newroot
 EOF
 fi
+
+# install the shutdown hook
+cp -pf "${initrd}/squashfs/mount.sh" "/lib/systemd/lernstick-shutdown"
+chmod 755 "/lib/systemd/lernstick-shutdown"
 
 # remove policykit action for lernstick welcome application
 rm -f ${initrd}/newroot/usr/share/polkit-1/actions/ch.lernstick.welcome.policy

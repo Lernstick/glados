@@ -10,11 +10,11 @@
             </td>                    
         {% } %}
         <td class="col-md-6">
-            <p class="name">
+            <p>
                 {% if (file.url) { %}
                     <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" {%=file.thumbnailUrl?'data-gallery':''%}>{%=file.name%}</a>
                 {% } else { %}
-                    <span class="glyphicon glyphicon-file"></span>&nbsp;<span>{%=file.name%} (<span class="size">{%=o.formatFileSize(file.size)%}</span>)</span>
+                    <span class="glyphicon glyphicon-file"></span>&nbsp;<span class="name">{%=file.name%}</span> (<span class="size">{%=o.formatFileSize(file.size)%}</span>)
                 {% } %}
             </p>
             {% if (file.error) { %}
@@ -22,7 +22,7 @@
             {% } %}
         </td>
 
-        <td class="col-md-6">
+        <td colspan="2" class="col-md-6">
             {% if (file.deleteUrl) { %}
                 <button title="Remove the file" class="pull-right btn btn-default delete" data-type="{%=file.deleteType%}" data-url="{%=file.deleteUrl%}"{% if (file.deleteWithCredentials) { %} data-xhr-fields='{"withCredentials":true}'{% } %}>
                     <i class="glyphicon glyphicon-trash"></i>

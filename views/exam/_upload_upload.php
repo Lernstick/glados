@@ -3,7 +3,7 @@
 {% for (var i=0, file; file=o.files[i]; i++) { %}
     <tr class="template-upload fade">
         <td class="col-md-6">
-            <p class="name" style="display:inline"><span class="glyphicon glyphicon-file"></span>&nbsp;{%=file.name%} (<p class="size" style="display:inline"><?= Yii::t('jqueryfileupload', 'Processing') ?>...</p>)</p>
+            <p style="display:inline"><span class="glyphicon glyphicon-file"></span>&nbsp;<span class="name">{%=file.name%}</span> (<p class="size" style="display:inline"><?= Yii::t('jqueryfileupload', 'Processing') ?>...</p>)</p>
             <strong class="error text-danger"></strong>
         </td>
         <td class="col-md-4">

@@ -13,18 +13,30 @@ use kartik\range\RangeInput;
 /* @var $model app\models\Exam */
 /* @var $form yii\widgets\ActiveForm */
 
+if(($model->file && Yii::$app->file->set($model->file)->exists) || ($model->file2 && Yii::$app->file->set($model->file2)->exists)) {
+    $this->registerJs('var files = [];');
+}
+
 if($model->file && Yii::$app->file->set($model->file)->exists) {
-    $js = new JsExpression("
-        var files = [
-            {
-                'name':'" . basename($model->file) . "',
-                'size':" . filesize($model->file) . ",
-                'deleteUrl':'" . Url::to(['delete', 'id' => $model->id, 'mode' => 'squashfs', 'file' => basename($model->file)]) . "',
-                'deleteType':'POST'
-            }
-        ];
-    ");
-    $this->registerJs($js);
+    $this->registerJs(new JsExpression("
+        files.push({
+            'name':'" . basename($model->file) . "',
+            'size':" . filesize($model->file) . ",
+            'deleteUrl':'" . Url::to(['delete', 'id' => $model->id, 'mode' => 'file', 'type' => 'squashfs']) . "',
+            'deleteType':'POST'
+        });
+    "));
+}
+
+if($model->file2 && Yii::$app->file->set($model->file2)->exists) {
+    $this->registerJs(new JsExpression("
+        files.push({
+            'name':'" . basename($model->file2) . "',
+            'size':" . filesize($model->file2) . ",
+            'deleteUrl':'" . Url::to(['delete', 'id' => $model->id, 'mode' => 'file', 'type' => 'zip']) . "',
+            'deleteType':'POST'
+        });
+    "));
 }
 
 $js = <<< 'SCRIPT'
@@ -51,6 +63,50 @@ $('.hint-block').each(function () {
 
     $hint.remove()
 });
+
+// add custom validation to the process queue of fileupload
+$.blueimp.fileupload.prototype.options.processQueue.push(
+    {
+        action: "validateFiles",
+        acceptFileTypes: "@",
+        maxFileSize: "@",
+        minFileSize: "@",
+        maxNumberOfFiles: "@",
+        disabled: "@disableValidation"
+    }
+);
+$.widget("blueimp.fileupload", $.blueimp.fileupload, {
+    processActions: {
+        validateFiles: function (data, options) {
+            var currentFile = data.files[data.index];
+            if (currentFile.error === true) {
+                return;
+            }
+            var files = new Array();
+            // get all files
+            $('#fileupload-exam tbody.files td span.name').each(function() {
+                var name = $(this).html();
+                files.push(name);
+            });
+            //files.push(currentFile.name);
+
+            // get number of squashfs's and zip's
+            sqs = files.filter(function(val) { return val.split('.').pop() === 'squashfs'; }).length;
+            zips = files.filter(function(val) { return val.split('.').pop() === 'zip'; }).length;
+
+            dfd = $.Deferred();
+            if ((sqs > 1 || zips > 1) && currentFile.name != files[0]) {
+                data.files[data.index].error = 'Only one file of each type (zip and squashfs) is allowed.';
+                data.files.error = true;
+                dfd.rejectWith(this, [data]);
+            } else {
+                dfd.resolveWith(this, [data]);
+            }
+            return dfd.promise();
+        }
+    }
+});
+
 SCRIPT;
 // Register tooltip/popover initialization javascript
 $this->registerJs($js);
@@ -258,12 +314,12 @@ $this->registerJs($js);
     <br>
     <div class="panel panel-default">
         <div class="panel-heading">
-            <?= Html::activeLabel($model, 'file'); ?>
+            <?= Html::Label('Exam Image files'); ?>
             <?= Html::activeHint($model, 'file', ['class' => 'hint-block'])?>
         </div>
         <div class="panel-body">
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-12" id="fileupload-exam">
                     <?php
                     if(!$model->isNewRecord) {
 
@@ -278,14 +334,15 @@ $this->registerJs($js);
                             'downloadTemplateView'=>'@app/views/exam/_upload_download',
                             'formId' => $form->id,
                             'options' => [
-                                'multiple' => false
+                                'multiple' => true,
+                                'sequentialUploads' => true
                             ],
                             'clientOptions' => [
                                 'maxFileSize' => 4000000000,
                                 'dataType' => 'json',
                                 'acceptFileTypes' => new yii\web\JsExpression('/(\.|\/)(squashfs|zip)$/i'),
-                                'maxNumberOfFiles' => 1,
-                                'autoUpload' => true
+                                'maxNumberOfFiles' => 2,
+                                'autoUpload' => true,
                             ],
                         ]);
                         echo "<hr>";
@@ -293,18 +350,20 @@ $this->registerJs($js);
                     ?>
 
                     <?php
-                    if($model->file && Yii::$app->file->set($model->file)->exists) {
+                    if(($model->file && Yii::$app->file->set($model->file)->exists) || ($model->file2 && Yii::$app->file->set($model->file2)->exists)) {
                         $js = new JsExpression('var fupload = jQuery("#w0").fileupload({
                             "maxFileSize":4000000000,
                             "dataType":"json",
                             "acceptFileTypes":/(\.|\/)(squashfs|zip)$/i,
-                            "maxNumberOfFiles":1,
+                            "maxNumberOfFiles":2,
                             "autoUpload":true,
+                            "sequentialUploads": true,
                             "url":' . json_encode(Url::to(['update', 'id' => $model->id, 'mode' => 'upload']), JSON_HEX_AMP) . ',
                             progressServerRate: 0.5,
                             progressServerDecayExp: 3.5
                         });
-                        jQuery("#w0").fileupload("option", "done").call(fupload, $.Event("done"), {result: {files: files}});');
+                        jQuery("#w0").fileupload("option", "done").call(fupload, $.Event("done"), {result: {files: files}});
+                        ');
                         $this->registerJs($js);
                     }
                     ?>

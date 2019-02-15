@@ -58,7 +58,7 @@ class Exam extends Base
 
         $this->on(self::EVENT_BEFORE_UPDATE, function($instance){
             if ($this->getOldAttribute('file') != $this->file) {
-                $this->md5 = $this->file == null ? null : md5_file($this->file);
+                $this->md5 = $this->file == null ? null : @md5_file($this->file);
                 $this->{"file_analyzed"} = 0;
             }
         });
@@ -83,7 +83,7 @@ class Exam extends Base
             [['user_id'], 'integer'],
             [['name', 'subject'], 'string', 'max' => 52],
             [['max_brightness'], 'integer', 'min' => 0, 'max' => 100],
-            [['file'], 'file', 'skipOnEmpty' => true, 'extensions' => ['squashfs', 'zip'], 'checkExtensionByMimeType' => false],
+            [['file', 'file2'], 'file', 'skipOnEmpty' => true, 'extensions' => ['squashfs', 'zip'], 'checkExtensionByMimeType' => false],
         ];
     }
 
@@ -97,7 +97,12 @@ class Exam extends Base
             'createdAt' => 'Created At',
             'name' => 'Name',
             'subject' => 'Subject',
-            'file' => 'Exam Image File (zip, squashfs)',
+            'file' => 'Exam Image File (squashfs)',
+            'fileInfo' => 'Squashfs File Info',
+            'fileSize' => 'Squashfs File Size',
+            'file2' => 'Exam Zip File',
+            'file2Info' => 'Zip File Info',
+            'file2Size' => 'Zip File Size',
             'md5' => 'MD5 Checksum',
             'file_list' => 'File List',
             'user_id' => 'User ID',
@@ -149,12 +154,12 @@ class Exam extends Base
     /**
      * @return boolean
      */
-    public function upload()
+    public function upload($file)
     {
-        $this->filePath = \Yii::$app->params['uploadPath'] . '/' . generate_uuid() . '.' . $this->file->extension;
+        $this->filePath = \Yii::$app->params['uploadPath'] . '/' . generate_uuid() . '.' . $file->extension;
 
         if ($this->validate(['file'])) {
-            return $this->file->saveAs($this->filePath, true);
+            return $file->saveAs($this->filePath, true);
         } else {
             return false;
         }
@@ -163,12 +168,17 @@ class Exam extends Base
     /**
      * @return boolean
      */
-    public function deleteFile()
+    public function deleteFile($type = 'squashfs')
     {
-        $file = $this->file;
-        $this->file = null;
-        $this->md5 = null;
-        $this->{"file_analyzed"} = 0;
+        if ($type == 'squashfs') {
+            $file = $this->file;
+            $this->file = null;
+            $this->md5 = null;
+            $this->{"file_analyzed"} = 0;
+        } else if ($type == 'zip') {
+            $file = $this->file2;
+            $this->file2 = null;
+        }
 
         if (file_exists($file) && is_file($file) && $this->save()) {
             return @unlink($file);
@@ -182,7 +192,8 @@ class Exam extends Base
      */
     public function delete()
     {
-        $this->deleteFile();
+        $this->deleteFile('squashfs');
+        $this->deleteFile('zip');
         return parent::delete();
     }
 
@@ -271,7 +282,39 @@ class Exam extends Base
      */
     public function getFileConsistency()
     {
-        return (strpos($this->fileInfo, 'Squashfs') !== false || strpos($this->fileInfo, 'Zip') !== false ? true : false);
+        return ($this->file1Consistency || $this->file2Consistency) !== false ? true : false ;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getFile1Consistency()
+    {
+        return strpos($this->fileInfo, 'Squashfs') !== false ? true : false;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFile2Size()
+    {
+        return Yii::$app->file->set($this->file2)->size;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFile2Info()
+    {
+        return str_replace(',', '<br>', Yii::$app->file->set($this->file2)->info);
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getFile2Consistency()
+    {
+        return strpos($this->file2Info, 'Zip') !== false ? true : false;
     }
 
     /**
