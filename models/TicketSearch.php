@@ -247,16 +247,15 @@ class TicketSearch extends Ticket
     {
 
         $query = Ticket::find();
+        return $query
+            ->addSelect(['`ticket`.*', new \yii\db\Expression('TIMESTAMPDIFF(
+                SECOND,
+                `start`,
+                `end`
+            ) as diff')])
+            ->having('diff <= :diff', [':diff' => 28800]) // only count exams shorter or equal than 8 hours
+            ->sum('diff');
 
-        return $query->sum(
-            new \yii\db\Expression(
-                'TIMESTAMPDIFF(
-                    SECOND,
-                    `start`,
-                    `end`
-                )'
-            )
-        );
     }
 
 }

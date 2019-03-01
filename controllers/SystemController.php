@@ -6,13 +6,15 @@ use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use app\models\Config;
+use app\models\Stats;
+use app\models\StatsSearch;
 use app\components\AccessRule;
 use yii\web\NotFoundHttpException;
 
 /**
- * ConfigController implements the CRUD actions for Config model.
+ * SystemController implements the CRUD actions for System model.
  */
-class ConfigController extends Controller
+class SystemController extends Controller
 {
 
     /**
@@ -37,12 +39,12 @@ class ConfigController extends Controller
     }
 
     /**
-     * Displays a single Screenshot thumbnail.
+     * Displays System Config.
      *
      * @return mixed
      * @throws NotFoundHttpException if the config file cannot be found/parsed
      */
-    public function actionSystem()
+    public function actionConfig()
     {
 
         $model = Config::findOne([
@@ -50,12 +52,30 @@ class ConfigController extends Controller
         ]);
 
         if ($model !== null) {
-            return $this->render('system', [
+            return $this->render('config', [
                 'model' => $model,
             ]);
         } else {
             throw new NotFoundHttpException('The avahi service file (/etc/avahi/services/glados.service) could not be parsed.');
         }
+    }
+
+    /**
+     * Displays System Statistics.
+     *
+     * @return mixed
+     * @throws NotFoundHttpException if the config file cannot be found/parsed
+     */
+    public function actionStats()
+    {
+
+        $searchModel = new StatsSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('stats', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
     }
 
 }

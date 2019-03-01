@@ -176,9 +176,20 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
             ],
 
             [
-                'label' => 'Config',
-                'url' => ['/config/system'],
-                'visible' => Yii::$app->user->can('config/system'),
+                'label' => 'System',
+                'visible' => Yii::$app->user->can('system/config') || Yii::$app->user->can('system/stats'),
+                'items' => [
+                    [
+                        'label' => 'Config',
+                        'url' => ['/system/config'],
+                        'visible' => Yii::$app->user->can('system/config'),
+                    ],
+                    [
+                        'label' => 'Statistics',
+                        'url' => ['/system/stats'],
+                        'visible' => Yii::$app->user->can('system/stats'),
+                    ],
+                ],
             ],
 
             [
