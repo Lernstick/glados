@@ -157,7 +157,7 @@ class Ticket extends Base
             'ip' => 'IP Address',
             'test_taker' => 'Test Taker',
             'backup' => 'Backup',
-            'backup_last' => 'Last Backup',
+            'backup_last' => 'Last Successful Backup',
             'backup_last_try' => 'Last Backup Try',
             'backup_state' => 'Backup State',
             'backup_interval' => 'Backup Interval',
@@ -451,7 +451,7 @@ class Ticket extends Base
      *  - an IP address must be set
      *  - a backup_interval > 0 must be set
      *  - no last backup existing
-     *  - if the computed abandon time is smaller than the no successfull backup time
+     *  - if the computed abandon time is smaller than the no successful backup time
      * 
      * Notes:
      *  1. the "computed abandon time" (cat) is calculated according to the following table:
@@ -480,7 +480,7 @@ class Ticket extends Base
      *            at:    abandon time from the configuration
      *            abs(): the absolute value function
      *
-     *  2. the "no (successfull) backup time" (nbt) is calculated according to the following table:
+     *  2. the "no (successful) backup time" (nbt) is calculated according to the following table:
      *      blt    bl     st     nbt
      *      null   null   set    now-st
      *      null   set    set    now-bl
@@ -488,7 +488,7 @@ class Ticket extends Base
      *      set    set    set    blt-bl
      * 
      *      where blt:   last backup try time
-     *            bl:    last successfull backup time
+     *            bl:    last successful backup time
      *            st:    ticket start time
      *
      * @return bool
@@ -506,7 +506,7 @@ class Ticket extends Base
         # computed abandoned time
         $cat = coalesce(nullif($ttl, 0), nullif($etl, 0), abs($at/60), 180)*60;
 
-        # no (successfull) backup time
+        # no (successful) backup time
         $nbt = coalesce($blt, $now) - coalesce($bl, $st);
 
         return (

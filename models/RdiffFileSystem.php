@@ -31,6 +31,7 @@ use app\models\Daemon;
  * @property string $group 
  * @property string $displayName Trailing name component of the path to display in the webinterface
  * @property string $realState
+ * @property string $q search query
  */
 class RdiffFileSystem extends Model
 {
@@ -87,6 +88,11 @@ class RdiffFileSystem extends Model
         '/^\/shutdown$/',
         '/^\/Schreibtisch\/finish_exam.desktop$/',
     ];
+
+    /**
+     * @var string search query
+     */
+    public $q = null;
 
     /**
      * @var string The current location
@@ -360,6 +366,9 @@ class RdiffFileSystem extends Model
      */
     public function getContents()
     {
+
+        if ($this->q !== null) {
+        }
 
         if ($this->type == 'file') {
             $contents = [];

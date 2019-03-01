@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ListView;
 use yii\widgets\Pjax;
+use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $ItemsDataProvider yii\data\ArrayDataProvider */
@@ -12,6 +13,7 @@ use yii\widgets\Pjax;
 /* @var $fs app\models\RdiffFileSystem the Rdiff data model */
 /* @var $date string the date */
 /* @var $options array RdiffbackupFilesystem options array */
+/* @var $q string backup search query */
 
 $js = <<< 'SCRIPT'
 /* To initialize BS3 tooltips set this below */
@@ -50,6 +52,50 @@ $(document).on('click', '#confirmRestore a#restore-now', function (e) {
 SCRIPT;
 // Register tooltip/popover initialization javascript
 $this->registerJs($js);
+
+$ajax = <<< 'SCRIPT'
+(function($){
+  $.deparam = $.deparam || function(uri, data){
+    if(uri === undefined){
+      uri = window.location.search;
+    }
+    var queryString = {};
+    uri.replace(
+      new RegExp("([^?=&]+)(=([^&#]*))?", "g"),
+      function($0, $1, $2, $3) { queryString[$1] = $3; }
+    );
+
+    var ret = data || [];
+    Object.keys(queryString).map(function(key, index) {
+      const container = {};
+      container["name"] = key;
+      container["value"] = queryString[key];
+      ret.push(container);
+    });
+
+    return ret;
+
+  };
+})(jQuery);
+
+$("form#backup-search-form").on('beforeSubmit', function(event) {
+    event.preventDefault(); // stopping submitting
+    var data = $(this).serializeArray();
+    //var url = $(this).attr('action');
+    var url = $(location).attr('href');
+    var method = $(this).attr('method');
+    var container = $(this).closest('[data-pjax-container]')[0];
+    arr = $.deparam(url, data);
+    console.log(arr, data);
+
+
+    $.pjax({url: url, data: data, type: method, container: "#" + container.id, async:false});
+    return false;
+
+});
+SCRIPT;
+// Register ajax submit javascript
+$this->registerJs($ajax, \yii\web\View::POS_READY);
 
 ?>
 
@@ -137,16 +183,22 @@ $this->registerJs($js);
       </div>
       <div class="col-sm-4">
 
-        <!--<div class="col-sm-12 input-group input-group-sm">
-          <span class="input-group-addon" id="search-addon" style="min-width:70px;">Search</span>
-          <?= Html::input("text", "q", null, [
-            'class' => 'form-control',
-            'id' => 'q',
-            'placeholder' => 'Ex: file.pdf',
-            'aria-describedby' => 'search-addon',
-            'style' => 'width:100%;'
-          ]); ?>
-        </div>-->
+        <?php $form = ActiveForm::begin([
+          'id' => 'backup-search-form',
+          'action' => [ 'ticket/view' ],
+          'method' => 'get',
+        ]); ?>
+          <div class="col-sm-12 input-group input-group-sm">
+            <span class="input-group-addon" id="search-addon" style="min-width:70px;">Search</span>
+            <?= Html::input("text", "q", $q, [
+              'class' => 'form-control',
+              'id' => 'q',
+              'placeholder' => 'Ex: file.pdf',
+              'aria-describedby' => 'search-addon',
+              'style' => 'width:100%;'
+            ]); ?>
+          </div>
+        <?php ActiveForm::end(); ?>
         <div class="input-group input-group-sm col-sm-12 pull-right special-dropdown">
           <span class="input-group-addon" id="version-addon" style="min-width:70px;">Version</span>
           <span class="input-group-btn" style="width:100%;">

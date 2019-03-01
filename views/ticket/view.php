@@ -366,6 +366,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'fs' => $fs,
             'date' => $date,
             'options' => $options,
+            'q' => $q,
         ]); ?>
 
     <?php Pjax::end() ?>

@@ -126,7 +126,7 @@ class TicketController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionView($id, $mode = 'default', $online = -1, $path = '/', $showDotFiles = false, $date = null)
+    public function actionView($id, $mode = 'default', $online = -1, $path = '/', $showDotFiles = false, $date = null, $q = null)
     {
 
         $model = $this->findModel($id);
@@ -172,6 +172,7 @@ class TicketController extends Controller
                 'restoreUser' => 'root',
                 'restoreHost' => $model->ip,
                 'options' => $options,
+                'q' => $q,
             ]);
 
             if ($date == null) {
@@ -219,6 +220,7 @@ class TicketController extends Controller
                 'fs' => $fs,
                 'date' => $date,
                 'options' => $options,
+                'q' => $q
             ]);
         } else if ($mode == 'probe') {
             //$model = $this->findModel($id);
