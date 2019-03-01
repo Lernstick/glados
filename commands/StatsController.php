@@ -81,7 +81,18 @@ class StatsController extends DaemonController implements DaemonInterface
 
 
         $this->logInfo('Statistics updated.', true, false, true);
-        $this->updateItem('statsUpdatedAt', microtime(true), 'timestamp', $this->lastUpdated->format('Y-m-d H:i:s'));
+        $this->statsUpdated();
+    }
+
+    public function statsUpdated() {
+        if (($model = Stats::find()->where(['key' => 'statsUpdatedAt'])->one()) !== null) {
+            $model->value = microtime(true);
+            $model->type = 'timestamp';
+            $model->date = new Expression('NOW()');
+            return $model->save();
+        } else {
+            return $this->insertItem('statsUpdatedAt', microtime(true), 'timestamp', new Expression('NOW()'));
+        }
     }
 
 
@@ -140,7 +151,6 @@ class StatsController extends DaemonController implements DaemonInterface
         } else {
             return $this->insertItem($key, $value, $type, $date);
         }
-        
     }
 
     public function incrementItem ($key, $value, $type) {
