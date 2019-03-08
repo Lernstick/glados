@@ -22,7 +22,7 @@ class ActivitySearch extends Activity
     {
         return [
             [['id'], 'integer'],
-            [['date', 'description', 'ticket_id', 'token'], 'safe'],
+            [['date', 'description', 'ticket_id', 'token', 'severity'], 'safe'],
         ];
     }
 
@@ -76,7 +76,8 @@ class ActivitySearch extends Activity
 
         $query->andFilterWhere([
             'id' => $this->id,
-            'ticket_id' => $this->ticket_id
+            'ticket_id' => $this->ticket_id,
+            'severity' => $this->severity
         ]);
 
         $query->joinWith(['ticket' => function ($q) {

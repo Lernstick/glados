@@ -67,6 +67,7 @@ class Activity extends Base
             'token' => 'Ticket',
             'date' => 'Date',
             'description' => 'Description',
+            'severity' => 'Severity',
         ];
     }
 
@@ -124,6 +125,23 @@ class Activity extends Base
             self::SEVERITY_INFORMATIONAL => "info",
             self::SEVERITY_SUCCESS => "success",
             null => "default",
+        ];
+    }
+
+    /**
+     * Mapping of the different severities and names
+     *
+     * @return array
+     */
+    public function getNameMap()
+    {
+        return [
+            self::SEVERITY_CRITICAL => "critical",
+            self::SEVERITY_ERROR  => "error",
+            self::SEVERITY_WARNING => "warning",
+            self::SEVERITY_NOTICE => "notice",
+            self::SEVERITY_INFORMATIONAL => "info",
+            self::SEVERITY_SUCCESS => "success",
         ];
     }
 

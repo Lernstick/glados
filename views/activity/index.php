@@ -8,6 +8,7 @@ use kartik\grid\GridView;
 use kartik\dynagrid\DynaGrid;
 use kartik\select2\Select2;
 use yii\web\JsExpression;
+use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\ActivitySearch */
@@ -22,6 +23,11 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <?php Pjax::begin(); ?>
+
+    <?php $form = ActiveForm::begin([
+        'action' => ['index'],
+        'method' => 'get',
+    ]); ?>
 
     <?= DynaGrid::widget([
         'showPersonalize' => true,
@@ -144,6 +150,21 @@ $this->params['breadcrumbs'][] = $this->title;
             'filterModel' => $searchModel,
             'panel' => ['heading' => '<h3 class="panel-title">Activities</h3>'],
             'toolbar' =>  [
+                ['content' => $form->field($searchModel, 'severity')->label(false)->widget(Select2::classname(), [
+                        'data' => $searchModel->nameMap,
+                        'hideSearch' => true,
+                        'options' => [
+                            'placeholder' => 'Severity',
+                        ],
+                        'pluginOptions' => [
+                            'allowClear' => true,
+                            'width' => '110px',
+                        ],
+                        'pluginEvents' => [
+                            'change' => 'function() { this.form.submit() }',
+                        ]
+                    ])
+                ],
                 ['content' =>
                     Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/activity/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => 'Reset Grid'])
                 ],
@@ -156,6 +177,8 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
         'options' => ['id' => 'dynagrid-activities-index'] // a unique identifier is important
     ]); ?>
+
+    <?php ActiveForm::end(); ?>
 
     <?php Pjax::end(); ?>
 
