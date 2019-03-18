@@ -102,7 +102,7 @@ chmod 700 "${initrd}/backup/root/.ssh"
 
 # get all active network connections
 con=$(LC_ALL=C nmcli -t -f state,connection d status | awk -F: '$1=="connected"{print $2}')
-echo "${con}" | LC_ALL=C xargs -I{} cp -p "/etc/NetworkManager/system-connections/{}" "${initrd}/backup/etc/NetworkManager/system-connections/"
+while IFS= read -r c; do echo "${c}"; echo "${c}.nmconnection"; done <<< "${con}" | LC_ALL=C xargs -I{} cp -p "/etc/NetworkManager/system-connections/{}" "${initrd}/backup/etc/NetworkManager/system-connections/"
 
 # edit copied connections manually, because nmcli will remove the wifi-sec.psk password when edited by nmcli modify
 #sed -i '/\[connection\]/a permissions=user:root:;' ${initrd}/backup/etc/NetworkManager/system-connections/*
