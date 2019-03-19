@@ -284,17 +284,8 @@ class ExamController extends Controller
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
             $file = UploadedFile::getInstanceByName('file');
-            $extension = end(explode('.', $file->name));
-
-            /*if ($pathinfo['extension'] == 'zip') {
-                $model->file2 = $file;
-            } else if ($pathinfo['extension'] == 'squashfs') {
-                $model->file = $file;
-            }*/
-            //$model->file = UploadedFile::getInstanceByName('file');
-
-            //var_dump(UploadedFile::getInstanceByName('file'));
-            //die();
+            $tmp = explode('.', $file->name);
+            $extension = end($tmp);
 
             /**
              * @var array mapping of errorcodes and meaning
