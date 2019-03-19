@@ -49,7 +49,7 @@ $this->title = $model->token;
 <div class="panel panel-default">
   <div class="panel-heading">Barcode</div>
   <div class="panel-body">
-    <barcode code="<?= Html::encode($model->token) ?>" type="C128C" />
+    <barcode code="<?= Html::encode($model->token) ?>" type="C128A" />
   </div>
 </div>
 

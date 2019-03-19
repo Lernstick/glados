@@ -131,7 +131,6 @@ class TicketController extends Controller
 
         $model = $this->findModel($id);
         if ($mode == 'default') {
-            //$model = $this->findModel($id);
             $session = Yii::$app->session;
 
             $lastState = $session['ticketLastState' . $model->id];
@@ -221,7 +220,6 @@ class TicketController extends Controller
                 'options' => $options,
             ]);
         } else if ($mode == 'probe') {
-            //$model = $this->findModel($id);
             //$online = $model->runCommand('source /info; ping -nq -W 10 -c 1 "${gladosIp}"', 'C', 10)[1];
             $model->online = $model->runCommand('true', 'C', 10)[1] == 0 ? 1 : 0;
             $model->save(false);
@@ -230,8 +228,6 @@ class TicketController extends Controller
                 #'online' => $online,
             ]);
         } else if ($mode == 'report') {
-            //$model = $this->findModel($id);
-
             $content = $this->renderPartial('report', [
                 'model' => $model,
             ]);
