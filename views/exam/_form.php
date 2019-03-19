@@ -63,7 +63,11 @@ $('.hint-block').each(function () {
 
     $hint.remove()
 });
+SCRIPT;
+// Register tooltip/popover initialization javascript
+$this->registerJs($js);
 
+$js = <<< 'SCRIPT'
 // add custom validation to the process queue of fileupload
 $.blueimp.fileupload.prototype.options.processQueue.push(
     {
@@ -106,10 +110,11 @@ $.widget("blueimp.fileupload", $.blueimp.fileupload, {
         }
     }
 });
-
 SCRIPT;
-// Register tooltip/popover initialization javascript
-$this->registerJs($js);
+// file upload client side validation
+if (!$model->isNewRecord) {
+    $this->registerJs($js);
+}
 
 $active_tabs = <<<JS
 // Change hash for page-reload
@@ -129,17 +134,17 @@ $this->registerJs($active_tabs);
 
 $js = <<< 'SCRIPT'
 $("input[name='Exam[libre_autosave]']").click(function(){
-    if ($(this).is(':checked')) {                    
-        $('#exam-libre_autosave_interval').attr("disabled", false);               
-    } else if ($(this).not(':checked')) {                          
-        $('#exam-libre_autosave_interval').attr("disabled", true);                            
+    if ($(this).is(':checked')) {
+        $('#exam-libre_autosave_interval').attr("disabled", false);
+    } else if ($(this).not(':checked')) {
+        $('#exam-libre_autosave_interval').attr("disabled", true);
     }
 });
 $("input[name='Exam[screenshots]']").click(function(){
-    if ($(this).is(':checked')) {                    
-        $('#exam-screenshots_interval').attr("disabled", false);               
-    } else if ($(this).not(':checked')) {                          
-        $('#exam-screenshots_interval').attr("disabled", true);                            
+    if ($(this).is(':checked')) {
+        $('#exam-screenshots_interval').attr("disabled", false);
+    } else if ($(this).not(':checked')) {
+        $('#exam-screenshots_interval').attr("disabled", true);
     }
 });
 SCRIPT;
