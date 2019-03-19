@@ -135,9 +135,15 @@ class DownloadController extends DaemonController implements DaemonInterface
             mkdir($tempDir);
 
             // all contents in this directory are rsynced to the client
-            symlink($this->ticket->exam->file, $tempDir . "/exam.squashfs");
-            symlink($this->ticket->exam->file2, $tempDir . "/exam.zip");
-            symlink(\Yii::$app->params['sciptsPath'] . "/mount.sh", $tempDir . "/mount.sh");
+            if (file_exists($this->ticket->exam->file)) {
+                symlink($this->ticket->exam->file, $tempDir . "/exam.squashfs");
+            }
+            if (file_exists($this->ticket->exam->file2)) {
+                symlink($this->ticket->exam->file2, $tempDir . "/exam.zip");
+            }
+            if (file_exists(\Yii::$app->params['sciptsPath'] . "/mount.sh")) {            
+                symlink(\Yii::$app->params['sciptsPath'] . "/mount.sh", $tempDir . "/mount.sh");
+            }
 
             $cmd = "rsync -L --checksum --partial --progress "
                  . "--bwlimit=" . escapeshellarg(\Yii::$app->params['examDownloadBandwith']) . " "

@@ -539,8 +539,8 @@ class TicketController extends Controller
                 return $this->render('token-request', [
                     'model' => $model,
                 ]);                
-            } else if (!Yii::$app->file->set($model->exam->file)->exists) {
-                $model->addError('token', 'The exam file cannot be found.');
+            } else if (!$model->exam->fileConsistency) {
+                $model->addError('token', 'The exam file is not valid.');
                 return $this->render('token-request', [
                     'model' => $model,
                 ]);                

@@ -80,6 +80,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'options' => ['class' => 'tab-pane fade'],
     ]); ?>
 
+
     <div class="row">
 
     <?php if ( (empty($model->file) || $model->file == null) && (empty($model->file2) || $model->file2 == null) ) { ?>

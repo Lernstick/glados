@@ -278,11 +278,21 @@ class Exam extends Base
     }
 
     /**
+     * Returns true whether both files are consistent and not empty
+     *
      * @return boolean
      */
     public function getFileConsistency()
     {
-        return ($this->file1Consistency || $this->file2Consistency) !== false ? true : false ;
+        if (empty($this->file) && empty($this->file2)) {
+            return false;
+        } else if (empty($this->file)) {
+            return $this->file2Consistency;
+        } else if (empty($this->file2)) {
+            return $this->file1Consistency;
+        } else {
+            return $this->file1Consistency && $this->file2Consistency;
+        }
     }
 
     /**
@@ -290,7 +300,13 @@ class Exam extends Base
      */
     public function getFile1Consistency()
     {
-        return strpos($this->fileInfo, 'Squashfs') !== false ? true : false;
+        if (empty($this->file)) {
+            return false;
+        } else if (!Yii::$app->file->set($this->file)->exists) {
+            return false;
+        } else {
+            return strpos($this->fileInfo, 'Squashfs') !== false ? true : false;
+        }
     }
 
     /**
@@ -314,7 +330,13 @@ class Exam extends Base
      */
     public function getFile2Consistency()
     {
-        return strpos($this->file2Info, 'Zip') !== false ? true : false;
+        if (empty($this->file2)) {
+            return false;
+        } else if (!Yii::$app->file->set($this->file2)->exists) {
+            return false;
+        } else {
+            return strpos($this->file2Info, 'Zip') !== false ? true : false;
+        }
     }
 
     /**
