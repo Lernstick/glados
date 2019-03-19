@@ -122,8 +122,8 @@ cp -p "/etc/lernstickWelcome" "${initrd}/backup/etc/lernstickWelcome"
 sed -i 's/ShowNotUsedInfo=.*/ShowNotUsedInfo=false/g' "${initrd}/backup/etc/lernstickWelcome"
 sed -i 's/AutoStartInstaller=.*/AutoStartInstaller=false/g' "${initrd}/backup/etc/lernstickWelcome"
 echo "ShowExamInfo=true" >>"${initrd}/backup/etc/lernstickWelcome" #TODO: replace with sed
-cp -p "/usr/share/applications/finish_exam.desktop" "${initrd}/backup/${desktop}/"
 cp -p "/usr/share/applications/finish_exam.desktop" "${initrd}/backup/usr/share/applications/"
+chmod 644 "${initrd}/backup/usr/share/applications/finish_exam.desktop"
 chown user:user "${initrd}/backup/${desktop}/finish_exam.desktop"
 
 # This is to fix an issue when the DNS name of the exam server ends in .local (which is the
@@ -184,6 +184,16 @@ chmod 755 "/lib/systemd/lernstick-shutdown"
 
 # remove policykit action for lernstick welcome application
 rm -f ${initrd}/newroot/usr/share/polkit-1/actions/ch.lernstick.welcome.policy
+
+# place finish_exam.desktop in "favorite apps" of Gnome3's dash
+if [ -e ${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps ]; then
+  newvalue=$(awk -F'[\,,\[,\], ]' '{if($0~/^favorite-apps=/){ printf "favorite-apps=["; for(i = 2; i <= NF; i++) { if($i!="") {printf "%s, ", $i;} } printf "'\''finish_exam.desktop'\'']\n"; } else { print $0; } }' ${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps)
+  echo "${newvalue}" > "${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps"
+else
+  echo "[org/gnome/shell]
+favorite-apps=['finish_exam.desktop']" > "${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps"
+fi
+chroot ${initrd}/newroot dconf update
 
 ###########################################
 # apply specific exam config if available #
