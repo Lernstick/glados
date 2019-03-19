@@ -129,7 +129,7 @@ $this->registerJs($js);
                   'data-version' => yii::$app->formatter->format($fs->version, 'backupVersion'),
               ]
           );    
-          echo ")</span>";
+          echo "</span>";
         }
 
 ?>
