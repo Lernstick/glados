@@ -58,8 +58,14 @@ class RestoreController extends DaemonController
     /**
      * @inheritdoc
      */
-    public function doJob ($id, $file, $date, $restorePath = null)
+    public function doJob ()
     {
+        $args = func_get_args();
+        $id = $args[0];
+        $file = $args[1];
+        $date = $args[2];
+        $restorePath = isset($args[3]) ? $args[3] : null;
+
         pcntl_signal_dispatch();
         $this->cleanup();
 
@@ -93,6 +99,7 @@ class RestoreController extends DaemonController
             $act = new Activity([
                     'ticket_id' => $this->ticket->id,
                     'description' => 'Restore failed: ' . $this->ticket->restore_state,
+                    'severity' => Activity::SEVERITY_WARNING,
             ]);
             $act->save();
             return;
@@ -126,6 +133,7 @@ class RestoreController extends DaemonController
                 $act = new Activity([
                         'ticket_id' => $this->ticket->id,
                         'description' => 'Restore failed: ' . $this->ticket->restore_state,
+                        'severity' => Activity::SEVERITY_WARNING,
                 ]);
                 $act->save();
 
@@ -196,6 +204,7 @@ class RestoreController extends DaemonController
             $act = new Activity([
                     'ticket_id' => $this->ticket->id,
                     'description' => 'Restore failed: rdiff-backup failed (retval: ' . $retval . ')',
+                    'severity' => Activity::SEVERITY_WARNING,
             ]);
             $act->save();
 
@@ -207,6 +216,7 @@ class RestoreController extends DaemonController
             $act = new Activity([
                     'ticket_id' => $this->ticket->id,
                     'description' => 'Restore of ' . $this->restore->file . ' as it was as of ' . yii::$app->formatter->format($this->restore->restoreDate, 'datetime') . ' was successful.',
+                    'severity' => Activity::SEVERITY_SUCCESS,
             ]);
             $act->save();
 

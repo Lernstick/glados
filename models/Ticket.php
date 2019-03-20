@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use app\models\Base;
 use yii\helpers\ArrayHelper;
 use yii\web\ConflictHttpException;
 use yii\base\Event;
@@ -50,7 +51,7 @@ use app\models\EventItem;
  * @property Exam $exam
  * @property Exam $exam
  */
-class Ticket extends \yii\db\ActiveRecord
+class Ticket extends Base
 {
 
     /**
@@ -114,6 +115,7 @@ class Ticket extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['exam_id', 'token', 'backup_interval'], 'required'],
             [['exam_id', 'token', 'backup_interval'], 'required', 'on' => self::SCENARIO_DEFAULT],
             [['token', 'test_taker'], 'required', 'on' => self::SCENARIO_SUBMIT],
             [['start', 'ip'], 'required', 'on' => self::SCENARIO_DOWNLOAD],
@@ -353,6 +355,7 @@ class Ticket extends \yii\db\ActiveRecord
                 'ticket_id' => $this->id,
                 'description' => 'Client state changed: ' .
                 $this->presaveAttributes['client_state'] . ' -> ' . $this->client_state,
+                'severity' => Activity::SEVERITY_INFORMATIONAL,
             ]);
             $act->save();
 
@@ -444,31 +447,95 @@ class Ticket extends \yii\db\ActiveRecord
      * Determine whether the ticket is abandoned or not. To be abandoned the ticket must satisfy all
      * the following:
      * 
-     *  - be in the RUNNING state
+     *  - be in the RUNNING/CLOSED or SUBMITTED state
      *  - an IP address must be set
      *  - a backup_interval > 0 must be set
-     *  - if no time limit (in the ticket or exam) is set, the difference between the last successful
-     *    backup and the last backup attempt must be geather than the configured abandonTicket time
-     *  - if a time limit is set (in the ticket or exam, if both are set the one from the ticket will
-     *    be taken), the difference between the last successful backup and the last backup attempt must
-     *    be greather than that time limit
+     *  - no last backup existing
+     *  - if the computed abandon time is smaller than the no successfull backup time
      * 
+     * Notes:
+     *  1. the "computed abandon time" (cat) is calculated according to the following table:
+     *      etl    ttl    at     cat
+     *      null   null   null   10800
+     *      null   null   >0     abs(at)
+     *      null   >0     null   10800
+     *      null   >0     >0     abs(at)
+     *      null   >0     null   ttl
+     *      null   >0     >0     ttl
+     *      0      null   null   10800
+     *      0      null   >0     abs(at)
+     *      0      0      null   10800
+     *      0      0      >0     abs(at)
+     *      0      >0     null   ttl
+     *      0      >0     >0     ttl
+     *      >0     null   null   etl
+     *      >0     null   >0     etl
+     *      >0     0      null   etl
+     *      >0     0      >0     etl
+     *      >0     >0     null   ttl
+     *      >0     >0     >0     ttl
+     *
+     *      where etl:   time limit from the exam
+     *            ttl:   time limit from the ticket
+     *            at:    abandon time from the configuration
+     *            abs(): the absolute value function
+     *
+     *  2. the "no (successfull) backup time" (nbt) is calculated according to the following table:
+     *      blt    bl     st     nbt
+     *      null   null   set    now-st
+     *      null   set    set    now-bl
+     *      set    null   set    blt-st
+     *      set    set    set    blt-bl
+     * 
+     *      where blt:   last backup try time
+     *            bl:    last successfull backup time
+     *            st:    ticket start time
+     *
      * @return bool
      */
     public function getAbandoned() {
 
-        $blt = strtotime($this->backup_last_try);
-        $bl = strtotime($this->backup_last);
-        $at = \Yii::$app->params['abandonTicket'];
         $ttl = $this->time_limit;
         $etl = $this->exam->time_limit;
-        $t = ($ttl > 0 ? $ttl*60 : ($ttl === 0 ? $at : ($ttl === null ? ($etl > 0 ? $etl*60 : $at) : $at)));
+        $at = \Yii::$app->params['abandonTicket'];
+        $bl = strtotime($this->backup_last);
+        $blt = strtotime($this->backup_last_try);
+        $st = strtotime($this->start);
+        $now = strtotime("now");
+
+        # computed abandoned time
+        $cat = coalesce(nullif($ttl, 0), nullif($etl, 0), abs($at/60), 180)*60;
+
+        # no (successfull) backup time
+        $nbt = coalesce($blt, $now) - coalesce($bl, $st);
 
         return (
-            $this->state == self::STATE_RUNNING &&
+            (
+                $this->state == self::STATE_RUNNING ||
+                $this->state == self::STATE_CLOSED ||
+                $this->state == self::STATE_SUBMITTED
+            ) &&
             $this->ip != null &&
             $this->backup_interval != 0 &&
-            $blt - $bl > $t
+            $this->last_backup == 0 &&
+            $cat < $nbt
+        );
+    }
+
+    /**
+     * Determine whether the ticket's last backup has failed over time
+     *
+     * @return bool
+     */
+    public function getLastBackupFailed ()
+    {
+        return (
+            (
+                $this->state == self::STATE_CLOSED ||
+                $this->state == self::STATE_SUBMITTED
+            ) &&
+            $this->last_backup == 0 &&
+            $this->abandoned
         );
     }
 
@@ -542,14 +609,13 @@ class Ticket extends \yii\db\ActiveRecord
     /**
      * Returns the duration of the test
      *
-     * @return DateInterval object
+     * @return DateInterval object|null
      */    
     public function getDuration(){
 
         $a = new \DateTime($this->start);
         $b = new \DateTime($this->end);
-
-        return $a->diff($b);
+        return $a == $b ? null : $a->diff($b);
     }
 
     /**

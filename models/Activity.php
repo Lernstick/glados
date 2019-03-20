@@ -15,10 +15,18 @@ use yii\db\ActiveRecord;
  * @property string $date
  * @property string $description
  */
-class Activity extends \yii\db\ActiveRecord
+class Activity extends Base
 {
 
-        /**
+    /* activity severity constants */
+    const SEVERITY_CRITICAL = 2;
+    const SEVERITY_ERROR = 3;
+    const SEVERITY_WARNING = 4;
+    const SEVERITY_NOTICE = 5;
+    const SEVERITY_INFORMATIONAL = 6;
+    const SEVERITY_SUCCESS = 7;
+
+    /**
      * @inheritdoc
      */
     public function init()
@@ -56,8 +64,10 @@ class Activity extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'token' => 'Ticket',
             'date' => 'Date',
             'description' => 'Description',
+            'severity' => 'Severity',
         ];
     }
 
@@ -101,11 +111,52 @@ class Activity extends \yii\db\ActiveRecord
     }
 
     /**
+     * Mapping of the different severities and the color classes
+     *
+     * @return array
+     */
+    public function getClassMap()
+    {
+        return [
+            self::SEVERITY_CRITICAL => "danger",
+            self::SEVERITY_ERROR  => "danger",
+            self::SEVERITY_WARNING => "warning",
+            self::SEVERITY_NOTICE => "primary",
+            self::SEVERITY_INFORMATIONAL => "info",
+            self::SEVERITY_SUCCESS => "success",
+            null => "default",
+        ];
+    }
+
+    /**
+     * Mapping of the different severities and names
+     *
+     * @return array
+     */
+    public function getNameMap()
+    {
+        return [
+            self::SEVERITY_CRITICAL => "critical",
+            self::SEVERITY_ERROR  => "error",
+            self::SEVERITY_WARNING => "warning",
+            self::SEVERITY_NOTICE => "notice",
+            self::SEVERITY_INFORMATIONAL => "info",
+            self::SEVERITY_SUCCESS => "success",
+        ];
+    }
+
+    /**
      * @return \yii\db\ActiveQuery
      */
     public function getTicket()
     {
         return $this->hasOne(Ticket::className(), ['id' => 'ticket_id']);
+    }
+
+    /* Getter for exam name */
+    public function getToken()
+    {
+        return $this->ticket->id;
     }
 
     /** 

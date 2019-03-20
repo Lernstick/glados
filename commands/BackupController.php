@@ -174,8 +174,11 @@ class BackupController extends DaemonController implements DaemonInterface
             $act = new Activity([
                     'ticket_id' => $this->ticket->id,
                     'description' => 'Backup failed: ' . $this->ticket->backup_state,
+                    'severity' => Activity::SEVERITY_WARNING,
             ]);
             $act->save();
+
+            $this->backup_failed();
 
         }else{
             $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? 1 : 0;
@@ -222,8 +225,11 @@ class BackupController extends DaemonController implements DaemonInterface
                 $act = new Activity([
                         'ticket_id' => $this->ticket->id,
                         'description' => 'Backup failed: rdiff-backup failed (retval: ' . $retval . ')',
+                        'severity' => Activity::SEVERITY_WARNING,
                 ]);
                 $act->save();
+
+                $this->backup_failed();
 
                 if ($this->finishBackup == true) {
                     $this->ticket->runCommand('echo "backup failed, waiting for next try..." > /home/user/shutdown');
@@ -276,8 +282,11 @@ class BackupController extends DaemonController implements DaemonInterface
             $act = new Activity([
                     'ticket_id' => $this->ticket->id,
                     'description' => 'Backup failed: ' . $this->ticket->backup_state,
+                    'severity' => Activity::SEVERITY_WARNING,
             ]);
             $act->save();
+
+            $this->backup_failed();
 
         }
 
@@ -336,6 +345,23 @@ class BackupController extends DaemonController implements DaemonInterface
     }
 
     /**
+     * If ticket is abandoned make an activity entry
+     *
+     * @return void
+     */
+    private function backup_failed()
+    {
+        if ($this->ticket->abandoned == true) {
+            $act = new Activity([
+                    'ticket_id' => $this->ticket->id,
+                    'description' => 'Backup failed: leaving ticket in abandoned state.',
+                    'severity' => Activity::SEVERITY_ERROR,
+            ]);
+            $act->save();
+        }
+    }
+
+    /**
      * Returns a ticket model which has the finish process initiated.
      * Those tickets only need one last backup, therefore they have higher 
      * priority against the others.
@@ -344,8 +370,8 @@ class BackupController extends DaemonController implements DaemonInterface
      */
     private function finished ()
     {
-        $query = Ticket::find()
-            ->where(['not', ['start' => null]])
+        $query = $this->queryNotAbandoned()
+            ->andWhere(['not', ['start' => null]])
             ->andWhere(['not', ['end' => null]])
             ->andWhere(['not', ['ip' => null]])
             ->andWhere(['last_backup' => 0])
@@ -388,62 +414,11 @@ class BackupController extends DaemonController implements DaemonInterface
         /*
          * Now those which weren't tried in the last n seconds (n=backup_interval)
          */
-        $query = Ticket::find()
-            ->joinWith('exam')
-            ->where(['not', ['start' => null]])
+        $query = $this->queryNotAbandoned()
+            ->andWhere(['not', ['start' => null]])
             ->andWhere(['end' => null])
             ->andWhere(['not', ['ip' => null]])
             ->andWhere(['not', ['backup_interval' => 0]])
-            ->andWhere([
-                'or',
-                [
-                    'and',
-                    ['`ticket`.`time_limit`' => null],
-                    [
-                        'or',
-                        ['`exam`.`time_limit`' => null],
-                        ['`exam`.`time_limit`' => 0],
-                    ],
-                    [
-                        '<',
-                        new Expression('COALESCE(unix_timestamp(`ticket`.`backup_last_try`) - unix_timestamp(`ticket`.`backup_last`), 0)'),
-                        \Yii::$app->params['abandonTicket']
-                    ]
-                ],
-                [
-                    'and',
-                    ['`ticket`.`time_limit`' => null],
-                    ['not', ['`exam`.`time_limit`' => null]],
-                    ['not', ['`exam`.`time_limit`' => 0]],                    
-                    [
-                        '>=',
-                        new Expression('COALESCE(unix_timestamp(`ticket`.`backup_last`), 0) + `exam`.`time_limit`*60'),
-                        new Expression('unix_timestamp(NOW())')
-                    ]
-                ],
-                [
-                    'and',
-                    ['`ticket`.`time_limit`' => 0],
-                    [
-                        '<',
-                        new Expression('COALESCE(unix_timestamp(`ticket`.`backup_last_try`) - unix_timestamp(`ticket`.`backup_last`), 0)'),
-                        \Yii::$app->params['abandonTicket']
-                    ]
-                ],
-                [
-                    'and',
-                    [
-                        '>',
-                        '`ticket`.`time_limit`',
-                        0
-                    ],
-                    [
-                        '>=',
-                        new Expression('COALESCE(unix_timestamp(`ticket`.`backup_last`), 0) + `ticket`.`time_limit`*60'),
-                        new Expression('unix_timestamp(NOW())')
-                    ]
-                ]
-            ])
             ->andWhere([
                 'or',
                 [
@@ -465,7 +440,7 @@ class BackupController extends DaemonController implements DaemonInterface
             ->andWhere(['backup_lock' => 0])
             ->andWhere(['restore_lock' => 0])
             ->andWhere(['bootup_lock' => 0])
-            ->orderBy(new Expression('unix_timestamp(`backup_last_try`) + `backup_interval` ASC'));            
+            ->orderBy(new Expression('unix_timestamp(`backup_last_try`) + `backup_interval` ASC'));
 
         // finally lock the next ticket and return it
         if (($ticket = $query->one()) !== null) {
@@ -475,6 +450,30 @@ class BackupController extends DaemonController implements DaemonInterface
 
         return null;
 
+    }
+
+    /**
+     * Returns the query for a ticket which is not abandoned
+     *
+     * @see models/Ticket.php: function getAbandoned()
+     * 
+     * @return yii\db\Query
+     */
+    public function queryNotAbandoned ()
+    {
+        $at = \Yii::$app->params['abandonTicket'] === null ? 'NULL' : \Yii::$app->params['abandonTicket'];
+        return Ticket::find()
+            ->joinWith('exam')
+            ->where([
+                '>=',
+
+                # the computed abandoned time (cat). Ticket is abandoned after this amount of seconds
+                new Expression('COALESCE(NULLIF(`ticket`.`time_limit`,0),NULLIF(`exam`.`time_limit`,0),ABS(' . $at . '/60),180)*60'),
+
+                # amount of time since last successful backup or since the exam has started and the last backup try or now (nbt)
+                new Expression('COALESCE(unix_timestamp(`ticket`.`backup_last_try`), unix_timestamp(NOW())) - COALESCE(unix_timestamp(`ticket`.`backup_last`), unix_timestamp(`ticket`.`start`))')
+            ])
+            ->andWhere(['last_backup' => 0]);
     }
 
     /**

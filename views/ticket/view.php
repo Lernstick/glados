@@ -7,6 +7,7 @@ use yii\widgets\Pjax;
 use yii\helpers\Url;
 use yii\bootstrap\Modal;
 use app\components\ActiveEventField;
+use app\components\Editable;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Ticket */
@@ -22,25 +23,6 @@ use app\components\ActiveEventField;
 /* @var $date string the date */
 /* @var $options array RdiffbackupFilesystem options array */
 
-$active_tabs = <<<JS
-// Change hash for page-reload
-$('.nav-tabs a').on('shown.bs.tab', function (e) {
-    var prefix = "tab_";
-    window.location.hash = e.target.hash.replace("#", "#" + prefix);
-});
-
-//$('.nav-tabs a[id="browseButton"]').on('shown.bs.tab', function (e) {
-//    $.pjax({url: this.href, container: '#browse', push: false});
-//});
-
-// Javascript to enable link to tab
-$(window).bind('hashchange', function() {
-    var prefix = "tab_";
-    $('.nav-tabs a[href*="' + document.location.hash.replace(prefix, "") + '"]').tab('show');
-}).trigger('hashchange');
-JS;
-$this->registerJs($active_tabs);
-
 $this->title = 'Ticket #' . $model->id;
 $this->params['breadcrumbs'][] = ['label' => 'Tickets', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
@@ -51,197 +33,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <ul class="nav nav-tabs">
-        <li class="active"><a data-toggle="tab" href="#general">
-            <i class="glyphicon glyphicon-home"></i>
-            General
-        </a></li>
-        <li>
-            <?= Html::a(
-                '<i class="glyphicon glyphicon-comment"></i> Activity Log',
-                '#activities',
-                ['data-toggle' => 'tab']
-            ) ?>
-        </li>
-        <li>
-            <?= Html::a(
-                '<i class="glyphicon glyphicon-hdd"></i> Backups',
-                Url::to(['backup/index', 'ticket_id' => $model->id, '#' => 'backups']),
-                ['data-toggle' => 'tab']
-            ); ?>
-        </li>
-        <li>
-            <?= Html::a(
-                '<i class="glyphicon glyphicon-folder-open"></i> Browse Backup',
-                Url::to(['backup/browse', 'ticket_id' => $model->id, '#' => 'browse']),
-                ['data-toggle' => 'tab', 'id' => 'browseButton']
-            ); ?>
-        </li>
-
-        <?php if (Yii::$app->user->can('screenshot/view')) { ?>
-            <li><a data-toggle="tab" href="#screenshots">
-                <i class="glyphicon glyphicon-picture"></i>
-                Screenshots
-            </a></li>
-        <?php } else { ?>
-            <li class="disabled"><a class="disabled" data-toggle="" href="#">
-                <i class="glyphicon glyphicon-picture"></i>
-                Screenshots
-            </a></li>
-        <?php } ?>
-        <li>
-            <?= Html::a(
-                '<i class="glyphicon glyphicon-sunglasses"></i> Result',
-                Url::to(['result/view', 'token' => $model->token, '#' => 'result']),
-                ['data-toggle' => 'tab']
-            ); ?>
-        </li>        
-        <li>
-            <?= Html::a(
-                '<i class="glyphicon glyphicon-tasks"></i> Restores',
-                Url::to(['restore/index', 'ticket_id' => $model->id, '#' => 'restores']),
-                ['data-toggle' => 'tab']
-            ); ?>
-        </li>
-        <li class="dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                <i class="glyphicon glyphicon-list-alt"></i>
-                Actions&nbsp;<span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-                <li>
-                    <?= Html::a(
-                        '<span class="glyphicon glyphicon-pencil"></span> Edit',
-                        ['update', 'id' => $model->id],
-                        ['data-pjax' => 0]
-                    ) ?>
-                </li>
-                <li>
-                    <?= Html::a(
-                        '<span class="glyphicon glyphicon-trash"></span> Delete',
-                        ['delete', 'id' => $model->id],
-                        [
-                            'data' => [
-                                'confirm' => 'Are you sure you want to delete this item?',
-                                'method' => 'post',
-                            ],
-                        ]
-                    ) ?>
-                </li>
-                <li>
-                    <?= Html::a(
-                        '<span class="glyphicon glyphicon-save-file"></span> Generate PDF',
-                        ['view', 'mode' => 'report', 'id' => $model->id],
-                        ['data-pjax' => 0]
-                    ) ?>
-                </li>
-                
-                <li>
-                    <?= Html::a(
-                        '<span class="glyphicon glyphicon-hdd"></span> Backup Now',
-                        ['backup', 'id' => $model->id, '#' => 'backups'],
-                        ['id' => 'backup-now']
-                    ) ?>
-                </li>
-
-                <li>
-                    <?= Html::a(
-                        '<span class="glyphicon glyphicon-tasks"></span> Restore Desktop',
-                        Url::to([
-                            'ticket/restore',
-                            'id' => $model->id,
-                            'file' => '::Desktop::',
-                            'date' => 'now',
-                        ]),
-                        [
-                            'data-href' => Url::to([
-                                'ticket/restore',
-                                'id' => $model->id,
-                                'file' => '::Desktop::',
-                                'date' => 'now',
-                                '#' => 'tab_restores',
-                            ]),
-                            'data-toggle' => 'modal',
-                            'data-target' => '#confirmRestore',
-                            'data-path' => 'Desktop',
-                            'data-version' => 'last backup',
-                        ]
-                    ) ?>
-                </li>
-
-                <li>
-                    <?= Html::a(
-                        '<span class="glyphicon glyphicon-tasks"></span> Restore Documents',
-                        Url::to([
-                            'ticket/restore',
-                            'id' => $model->id,
-                            'file' => '::Documents::',
-                            'date' => 'now',
-                        ]),
-                        [
-                            'data-href' => Url::to([
-                                'ticket/restore',
-                                'id' => $model->id,
-                                'file' => '::Documents::',
-                                'date' => 'now',
-                                '#' => 'tab_restores',
-                            ]),
-                            'data-toggle' => 'modal',
-                            'data-target' => '#confirmRestore',
-                            'data-path' => 'Documents',
-                            'data-version' => 'last backup',
-                        ]
-                    ) ?>
-                </li>
-
-                <?php if (Yii::$app->user->can('screenshot/snap')) { ?>
-                    <li>
-                        <?= Html::a(
-                            '<span class="glyphicon glyphicon-picture"></span> Get Live Screenshot', [
-                                'screenshot/snap',
-                                'token' => $model->token,
-                            ]
-                        ) ?>
-                    </li>
-                <?php } ?>
-
-               <li>
-                    <?= Html::a(
-                        '<span class="glyphicon glyphicon-question-sign"></span> Visit the Manual',
-                        Url::to(['howto/view', 'id' => 'ticket-view.md']),
-                        ['data-pjax' => 0]
-                    ); ?>
-                </li>
-
-                <?php if (YII_ENV_DEV) {
-                    echo '<li class="divider"></li>';
-                    echo '<li>';
-                        echo Html::a(
-                            '<span class="glyphicon glyphicon-file"></span> Download Exam',
-                            ['download', 'token' => $model->token],
-                            ['data-pjax' => 0, 'class' => 'dev_item']
-                        );
-                    echo '</li>';
-                    echo '<li>';
-                        echo Html::a(
-                            '<span class="glyphicon glyphicon-step-forward"></span> Finish Exam',
-                            ['finish', 'token' => $model->token],
-                            ['data-pjax' => 0, 'class' => 'dev_item']
-                        );
-                    echo '</li>';
-                    echo '<li>';
-                        echo Html::a(
-                            '<span class="glyphicon glyphicon-list-alt"></span> Get Exam Config',
-                            ['config', 'token' => $model->token],
-                            ['data-pjax' => 0, 'class' => 'dev_item']
-                        );
-                    echo '</li>';                    
-                } ?>
-
-            </ul>            
-        </li>
-
-    </ul>
+    <?= $this->render('_nav', [
+        'model' => $model,
+    ]) ?>
 
     <?php Pjax::begin([
         'id' => 'backup-now-container',
@@ -276,7 +70,15 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'token',
+            'createdAt:timeago',
+            [
+                'attribute' => 'token',
+                'value' => Editable::widget([
+                    'content' => yii::$app->formatter->format($model->token, 'text'),
+                    'editUrl' => ['ticket/update', 'id' => $model->id, 'mode' => 'editable', 'attr' => 'token' ],
+                ]),
+                'format' => 'raw'
+            ],
             [
                 'attribute' => 'state',
                 'value' => '<span class="label label-' . (
@@ -306,7 +108,14 @@ $this->params['breadcrumbs'][] = $this->title;
                      . ( $model->validTime !== false ? ($model->validTime === true ? 'No Time Limit' : 'for ' . yii::$app->formatter->format($model->validTime, 'duration') . ' after start') : '<span class="not-set">(expired)</span>' ),
                 'format' => 'html',
             ],
-            'test_taker',
+            [
+                'attribute' => 'test_taker',
+                'value' => Editable::widget([
+                    'content' => empty($model->test_taker) ? '<span class="not-set">(not set)</span>' : yii::$app->formatter->format($model->test_taker, 'text'),
+                    'editUrl' => ['ticket/update', 'id' => $model->id, 'mode' => 'editable', 'attr' => 'test_taker' ],
+                ]),
+                'format' => 'raw'
+            ],
             [
                 'attribute' => 'ip',
                 'format' => 'raw',
@@ -422,7 +231,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             s.classList.add("hidden");
                         }
                     }',
-                ]) . ($model->abandoned ? ('&nbsp;<a tabindex="0" class="label label-danger" role="button" data-toggle="popover" data-html="true" data-trigger="focus" title="Abandoned Ticket" data-content="This ticket is abandoned and thus excluded from regular backup. A reason for this could be that the backup process was not able to perform a backup of the client. After some time of failed backup attempts, the ticket will be abandoned (the value of <i>Time Limit</i> of this ticket/exam or ' . yii::$app->formatter->format(\Yii::$app->params['abandonTicket'], 'duration') . ' if nothing is set). You can still force a backup by clicking Actions->Backup Now.">Abandoned</a>') : ''),
+                ]) . yii::$app->formatter->format('<div style="float:left;" class="' . ($model->lastBackupFailed ? '' : 'hidden') . '">&nbsp;<i class="glyphicon glyphicon-remove text-danger"></i>&nbsp;last backup failed</div>', 'html')
+                . ($model->abandoned ? ('&nbsp;<a tabindex="0" class="label label-danger" role="button" data-toggle="popover" data-html="true" data-trigger="focus" title="Abandoned Ticket" data-content="This ticket is abandoned and thus excluded from regular backup. A reason for this could be that the backup process was not able to perform a backup of the client. After some time of failed backup attempts, the ticket will be abandoned (the value of <i>Time Limit</i> of this ticket/exam or <i>' . yii::$app->formatter->format(\Yii::$app->params['abandonTicket'], 'duration') . '</i> if nothing is set). You can still force a backup by clicking Actions->Backup Now.">Abandoned</a>') : ''),
             ],
             [
                 'attribute' => 'restore_state',

@@ -6,6 +6,7 @@ use yii\widgets\ListView;
 use app\components\ActiveEventField;
 use yii\bootstrap\Modal;
 use yii\widgets\Pjax;
+use app\components\Editable;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\BackupSearch */
@@ -40,15 +41,18 @@ use yii\widgets\Pjax;
         ],
         [
             'attribute' => 'backup_interval',
-            'format' => 'raw',
-            'value' =>  $ticketModel->backup_interval == 0 ? 'No Backup' : yii::$app->formatter->format($ticketModel->backup_interval, 'duration'),
+            'value' => Editable::widget([
+                'content' => ($ticketModel->backup_interval == 0 ? 'No Backup' : yii::$app->formatter->format($ticketModel->backup_interval, 'duration')),
+                'editUrl' => ['ticket/update', 'id' => $ticketModel->id, 'mode' => 'editable', 'attr' => 'backup_interval' ],
+            ]),
+            'format' => 'raw'
         ],
         [
             'attribute' => 'backup_last',
             'format' => 'raw',
             'value' => yii::$app->formatter->format($ticketModel->backup_last, 'timeago') . ' (<b>last try</b>: ' . yii::$app->formatter->format($ticketModel->backup_last_try, 'timeago') . ')',
         ],        
-        'backup_size:shortSize',        
+        'backup_size:shortSize',
         [
             'attribute' => 'backup_state',
             'format' => 'raw',

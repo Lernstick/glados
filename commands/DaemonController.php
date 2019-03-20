@@ -77,6 +77,7 @@ class DaemonController extends Controller
         1 => ['backup', 'run-once'],
         2 => ['analyze', 'run-once'],
         3 => ['dbclean', 'run-once', 300],
+        3 => ['unlock', 'run-once', 120],
     ];
 
     public $daemonInfo = 'daemon:0';
@@ -178,6 +179,8 @@ class DaemonController extends Controller
         ]);
         $eventItem->generate();
 
+        $this->cleanupVanished();
+
         $this->_pidfile = fopen('/tmp/user/daemon/' . $this->daemon->pid, 'w');
         $this->logInfo('Started with pid: ' . $this->daemon->pid);
     }
@@ -226,6 +229,32 @@ class DaemonController extends Controller
 
         $this->logInfo('Stopped, cause: ' . $cause);
         #exit;
+    }
+
+    /**
+     * Cleans daemons that are still runnning according to the database, but
+     * are not (because of a reboot maybe)
+     *
+     * @return void
+     */
+    public function cleanupVanished ()
+    {
+        $uptime = (float) explode(' ', file_get_contents( '/proc/uptime' ))[0];
+
+        $query = Daemon::find()
+            ->where(['not', ['pid' => $this->daemon->pid]])
+            ->andWhere([
+                '<',
+                'started_at',
+                new Expression('NOW() - INTERVAL ' . $uptime . ' SECOND'),
+            ]);
+
+        $models = $query->all();
+        foreach($models as $daemon) {
+            $this->logError("daemon " . $daemon->pid . ": not running anymore, was started before reboot", true);
+            $daemon->delete();
+        }
+
     }
 
     /**

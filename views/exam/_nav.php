@@ -1,12 +1,7 @@
 <?php
 
 use yii\helpers\Html;
-use yii\widgets\DetailView;
-use yii\helpers\ArrayHelper;
-use yii\widgets\Pjax;
 use yii\helpers\Url;
-use miloschuman\highcharts\Highcharts;
-use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Exam */
@@ -33,6 +28,13 @@ $this->registerJs($active_tabs);
         <?= Html::a(
             '<i class="glyphicon glyphicon-home"></i> General',
             Url::to(['exam/view', 'id' => $model->id, '#' => 'general']),
+            ['data-toggle' => '']
+        ); ?>
+    </li>
+    <li>
+        <?= Html::a(
+            '<i class="glyphicon glyphicon-file"></i> Exam Files',
+            Url::to(['exam/view', 'id' => $model->id, '#' => 'file']),
             ['data-toggle' => '']
         ); ?>
     </li>

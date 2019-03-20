@@ -29,6 +29,7 @@ use \mPDF;
 use app\components\customResponse;
 use app\components\AccessRule;
 use yii\data\ArrayDataProvider;
+use yii\widgets\ActiveForm;
 
 
 /**
@@ -80,24 +81,42 @@ class TicketController extends Controller
 
     /**
      * Lists all Ticket models.
+     *
+     * @param string $mode mode
+     * @param string $attr attribute to make a list of
+     * @param string $q query
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex($mode = null, $attr = null, $q = null, $page = 1, $per_page = 10)
     {
 
-        #TODO not user->id, because not set.
-        //$current_user = Yii::$app->user->id;
-        Yii::$app->session['ticketViewReturnURL'] = Yii::$app->request->Url;
+        if ($mode === null) {
+            Yii::$app->session['ticketViewReturnURL'] = Yii::$app->request->Url;
 
-        $searchModel = new TicketSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $session = Yii::$app->session;
+            $searchModel = new TicketSearch();
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+            $session = Yii::$app->session;
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-            'session' => $session,
-        ]);
+            return $this->render('index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+                'session' => $session,
+            ]);
+        } else if ($mode == 'list') {
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            $out = [];
+            if (!is_null($attr)) {
+                $searchModel = new TicketSearch();
+                if ($attr == 'testTaker') {
+                    $out = $searchModel->selectList('test_taker', $q, $page, $per_page);
+                } else if ($attr == 'token') {
+                    $out = $searchModel->selectList('token', $q, $page, $per_page);
+                }
+            }
+            return $out;
+        }
+
+
     }
 
     //TODO: rbac
@@ -112,7 +131,6 @@ class TicketController extends Controller
 
         $model = $this->findModel($id);
         if ($mode == 'default') {
-            //$model = $this->findModel($id);
             $session = Yii::$app->session;
 
             $lastState = $session['ticketLastState' . $model->id];
@@ -202,7 +220,6 @@ class TicketController extends Controller
                 'options' => $options,
             ]);
         } else if ($mode == 'probe') {
-            //$model = $this->findModel($id);
             //$online = $model->runCommand('source /info; ping -nq -W 10 -c 1 "${gladosIp}"', 'C', 10)[1];
             $model->online = $model->runCommand('true', 'C', 10)[1] == 0 ? 1 : 0;
             $model->save(false);
@@ -211,8 +228,6 @@ class TicketController extends Controller
                 #'online' => $online,
             ]);
         } else if ($mode == 'report') {
-            //$model = $this->findModel($id);
-
             $content = $this->renderPartial('report', [
                 'model' => $model,
             ]);
@@ -261,6 +276,7 @@ class TicketController extends Controller
                 return $this->render('create', [
                     'model' => $model,
                     'searchModel' => $searchModel,
+                    'attr' => null,
                 ]);
             }
         }else if ($mode === 'many') {
@@ -335,7 +351,7 @@ class TicketController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionUpdate($mode = 'default', $id = null, $token = null)
+    public function actionUpdate($mode = 'default', $id = null, $token = null, $attr = null, $validate = false)
     {
         if ($mode === 'default') {
             $model = $this->findModel($id);
@@ -349,9 +365,25 @@ class TicketController extends Controller
                 return $this->render('update', [
                     'model' => $model,
                     'searchModel' => $searchModel,
+                    'attr' => $attr
                 ]);
             }
-        }else if ($mode === 'submit') {
+        } else if ($mode === 'editable') {
+            $model = $this->findModel($id);
+            $searchModel = new TicketSearch();
+
+            $model->scenario = YII_ENV_DEV ? Ticket::SCENARIO_DEV : Ticket::SCENARIO_DEFAULT;
+            if ($model->load(Yii::$app->request->post())) {
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                return $validate ? ActiveForm::validate($model) : $model->save();
+            } else {
+                return $this->renderAjax('_form', [
+                    'model' => $model,
+                    'searchModel' => $searchModel,
+                    'attr' => $attr
+                ]);
+            }
+        } else if ($mode === 'submit') {
             $params = Yii::$app->request->post('Ticket');
             $token = (isset($params['token']) && !empty($params['token'])) ? $params['token'] : null;
             $test_taker = (isset($params['test_taker']) && !empty($params['test_taker'])) ? $params['test_taker'] : null;
@@ -507,8 +539,8 @@ class TicketController extends Controller
                 return $this->render('token-request', [
                     'model' => $model,
                 ]);                
-            } else if (!Yii::$app->file->set($model->exam->file)->exists) {
-                $model->addError('token', 'The exam file cannot be found.');
+            } else if (!$model->exam->fileConsistency) {
+                $model->addError('token', 'The exam file is not valid.');
                 return $this->render('token-request', [
                     'model' => $model,
                 ]);                
@@ -523,7 +555,8 @@ class TicketController extends Controller
                     'ticket_id' => $model->id,
                     'description' => 'Exam download successfully requested by ' . 
                     $model->ip . ' from ' . ( $model->test_taker ? $model->test_taker :
-                    'Ticket with token ' . $model->token ) . '.'
+                    'Ticket with token ' . $model->token ) . '.',
+                    'severity' => Activity::SEVERITY_SUCCESS,
                 ]);
                 $act->save();
 
@@ -536,7 +569,12 @@ class TicketController extends Controller
                 $model->download_progress = 0;
                 $model->save();
 
-                $count = Daemon::find()->where(['description' => 'Daemon base controller'])->count();
+                # saerch for running daemons
+                $daemonSearchModel = new DaemonSearch();
+                $daemonDataProvider = $daemonSearchModel->search(['DaemonSearch' => ['description' => 'Daemon base controller']]);
+                $count = $daemonDataProvider->getTotalCount();
+
+                # if no daemon is running already, start one
                 if($count == 0){
                     $daemon = new Daemon();
                     $daemon->startDaemon();
@@ -626,7 +664,8 @@ class TicketController extends Controller
                 'ticket_id' => $event->data->id,
                 'description' => 'Exam download successfully requested by ' . 
                 $event->data->ip . ' from ' . ( $event->data->test_taker ? $event->data->test_taker :
-                'Ticket with token ' . $event->data->token ) . '.'
+                'Ticket with token ' . $event->data->token ) . '.',
+                'severity' => Activity::SEVERITY_SUCCESS,
             ]);
             $act->save();
         }, $model);
@@ -645,7 +684,8 @@ class TicketController extends Controller
                     'ticket_id' => $event->data->id,
                     'description' => 'Exam download aborted by ' . $event->data->ip . 
                     ' from ' . ( $event->data->test_taker ? $event->data->test_taker :
-                    'Ticket with token ' . $event->data->token ) . ' (client side).'
+                    'Ticket with token ' . $event->data->token ) . ' (client side).',
+                    'severity' => Activity::SEVERITY_WARNING,
                 ]);
                 $act->save();
                 die();
@@ -677,7 +717,8 @@ class TicketController extends Controller
                 'ticket_id' => $event->data->id,
                 'description' => 'Exam download finished by ' . $event->data->ip .
                 ' from ' . ( $event->data->test_taker ? $event->data->test_taker :
-                'Ticket with token ' . $event->data->token ) . '.'
+                'Ticket with token ' . $event->data->token ) . '.',
+                'severity' => Activity::SEVERITY_SUCCESS,
             ]);
             $act->save();
 
@@ -764,6 +805,7 @@ class TicketController extends Controller
             'ticket_id' => $model->id,
             'description' => 'Exam finished by ' . ( $model->test_taker ?
             $model->test_taker : 'Ticket with token ' . $token ) . '.',
+            'severity' => Activity::SEVERITY_INFORMATIONAL,
         ]);
         $act->save();
 
@@ -892,5 +934,4 @@ class TicketController extends Controller
             return false;
         }
     }
-
 }

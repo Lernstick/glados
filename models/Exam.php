@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use app\models\Base;
+use yii\helpers\Html;
 
 /**
  * This is the model class for table "exam".
@@ -27,7 +29,7 @@ use Yii;
  * @property integer runningTicketCount
  * @property integer closedTicketCount
  */
-class Exam extends \yii\db\ActiveRecord
+class Exam extends Base
 {
 
     /**
@@ -56,7 +58,7 @@ class Exam extends \yii\db\ActiveRecord
 
         $this->on(self::EVENT_BEFORE_UPDATE, function($instance){
             if ($this->getOldAttribute('file') != $this->file) {
-                $this->md5 = $this->file == null ? null : md5_file($this->file);
+                $this->md5 = $this->file == null ? null : @md5_file($this->file);
                 $this->{"file_analyzed"} = 0;
             }
         });
@@ -81,7 +83,7 @@ class Exam extends \yii\db\ActiveRecord
             [['user_id'], 'integer'],
             [['name', 'subject'], 'string', 'max' => 52],
             [['max_brightness'], 'integer', 'min' => 0, 'max' => 100],
-            [['file'], 'file', 'skipOnEmpty' => true, 'extensions' => ['squashfs', 'zip'], 'checkExtensionByMimeType' => false],
+            [['file', 'file2'], 'file', 'skipOnEmpty' => true, 'extensions' => ['squashfs', 'zip'], 'checkExtensionByMimeType' => false],
         ];
     }
 
@@ -92,9 +94,15 @@ class Exam extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'createdAt' => 'Created At',
             'name' => 'Name',
             'subject' => 'Subject',
-            'file' => 'Exam Image File (zip, squashfs)',
+            'file' => 'Exam Image File (squashfs)',
+            'fileInfo' => 'Squashfs File Info',
+            'fileSize' => 'Squashfs File Size',
+            'file2' => 'Exam Zip File',
+            'file2Info' => 'Zip File Info',
+            'file2Size' => 'Zip File Size',
             'md5' => 'MD5 Checksum',
             'file_list' => 'File List',
             'user_id' => 'User ID',
@@ -106,7 +114,8 @@ class Exam extends \yii\db\ActiveRecord
             'url_whitelist' => 'HTTP URL Whitelist',
             'time_limit' => 'Time Limit',
             'backup_path' => 'Remote Backup Path',
-            'ticketCount' => 'Total Tickets',
+            'ticketInfo' => 'Related Tickets',
+            'ticketCount' => '# Tickets',
             'openTicketCount' => 'Open Tickets',
             'runningTicketCount' => 'Running Tickets',
             'closedTicketCount' => 'Closed Tickets',
@@ -137,19 +146,20 @@ class Exam extends \yii\db\ActiveRecord
             'file' => 'Use a <b>squashfs-Filesystem or a ZIP-File</b> for the exam. Squashfs is a highly compressed read-only filesystem for Linux. This file contains all files, settings and applications for the exam (all changes made on the original machine). These changes are applied to the exam system as soon as the exam starts. See <b>Help</b> for more information on how to create those files.',
             'libre_createbackup' => 'If the <b>Always create backup copy</b> option is selected, the old version of the file is saved to the backup directory whenever you save the current version of the file. The backup copy has the same name as the document, but the extension is <code>.BAK</code>. If the backup folder (default: <code>/home/user/.config/libreoffice/4/backup</code>) already contains such a file, it will be overwritten without warning. (See <a target="_blank" href="https://help.libreoffice.org/Common/Saving_Documents_Automatically">LibreOffice Help</a>)',
             'libre_autosave' => 'Check to <b>save recovery information automatically every n minutes</b>. This command saves the information necessary to restore the current document in case of a crash. Additionally, in case of a crash LibreOffice tries automatically to save AutoRecovery information for all open documents, if possible. (See <a target="_blank" href="https://help.libreoffice.org/Common/Saving_Documents_Automatically">LibreOffice Help</a>)',
-            'max_brightness' => 'Maximum screen brightness in percent. Notice that some devices have buttons to adjust screen brightness on hardware level. This cannot be controlled by this setting.'
+            'max_brightness' => 'Maximum screen brightness in percent. Notice that some devices have buttons to adjust screen brightness on hardware level. This cannot be controlled by this setting.',
+            'ticketInfo' => 'Related Tickets (# open, # running, # closed, # submitted)/# total tickets'
         ];
     }
 
     /**
      * @return boolean
      */
-    public function upload()
+    public function upload($file)
     {
-        $this->filePath = \Yii::$app->params['uploadPath'] . '/' . generate_uuid() . '.' . $this->file->extension;
+        $this->filePath = \Yii::$app->params['uploadPath'] . '/' . generate_uuid() . '.' . $file->extension;
 
         if ($this->validate(['file'])) {
-            return $this->file->saveAs($this->filePath, true);
+            return $file->saveAs($this->filePath, true);
         } else {
             return false;
         }
@@ -158,12 +168,17 @@ class Exam extends \yii\db\ActiveRecord
     /**
      * @return boolean
      */
-    public function deleteFile()
+    public function deleteFile($type = 'squashfs')
     {
-        $file = $this->file;
-        $this->file = null;
-        $this->md5 = null;
-        $this->{"file_analyzed"} = 0;
+        if ($type == 'squashfs') {
+            $file = $this->file;
+            $this->file = null;
+            $this->md5 = null;
+            $this->{"file_analyzed"} = 0;
+        } else if ($type == 'zip') {
+            $file = $this->file2;
+            $this->file2 = null;
+        }
 
         if (file_exists($file) && is_file($file) && $this->save()) {
             return @unlink($file);
@@ -177,7 +192,8 @@ class Exam extends \yii\db\ActiveRecord
      */
     public function delete()
     {
-        $this->deleteFile();
+        $this->deleteFile('squashfs');
+        $this->deleteFile('zip');
         return parent::delete();
     }
 
@@ -187,6 +203,12 @@ class Exam extends \yii\db\ActiveRecord
     public function getUser()
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
+    }
+
+    /* Getter for exam name */
+    public function getUserName()
+    {
+        return $this->user->username;
     }
 
     /**
@@ -256,12 +278,133 @@ class Exam extends \yii\db\ActiveRecord
     }
 
     /**
+     * Returns true whether both files are consistent and not empty
+     *
      * @return boolean
      */
     public function getFileConsistency()
     {
-        return (strpos($this->fileInfo, 'Squashfs') !== false || strpos($this->fileInfo, 'Zip') !== false ? true : false);
+        if (empty($this->file) && empty($this->file2)) {
+            return false;
+        } else if (empty($this->file)) {
+            return $this->file2Consistency;
+        } else if (empty($this->file2)) {
+            return $this->file1Consistency;
+        } else {
+            return $this->file1Consistency && $this->file2Consistency;
+        }
     }
+
+    /**
+     * @return boolean
+     */
+    public function getFile1Consistency()
+    {
+        if (empty($this->file)) {
+            return false;
+        } else if (!Yii::$app->file->set($this->file)->exists) {
+            return false;
+        } else {
+            return strpos($this->fileInfo, 'Squashfs') !== false ? true : false;
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getFile2Size()
+    {
+        return Yii::$app->file->set($this->file2)->size;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFile2Info()
+    {
+        return str_replace(',', '<br>', Yii::$app->file->set($this->file2)->info);
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getFile2Consistency()
+    {
+        if (empty($this->file2)) {
+            return false;
+        } else if (!Yii::$app->file->set($this->file2)->exists) {
+            return false;
+        } else {
+            return strpos($this->file2Info, 'Zip') !== false ? true : false;
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getTicketInfo()
+    {
+        $a = array();
+
+        $this->openTicketCount != 0 ?
+            $a[] = Html::a($this->openTicketCount, [
+                'ticket/index',
+                'TicketSearch[examId]' => $this->id,
+                'TicketSearch[state]' => 0
+            ], [
+                'data-pjax' => 0,
+                'class' => 'bg-success text-success',
+                'title' => 'Number of Tickets in open state'
+            ]) : null;
+        $this->runningTicketCount != 0 ?
+            $a[] = Html::a($this->runningTicketCount, [
+                'ticket/index',
+                'TicketSearch[examId]' => $this->id,
+                'TicketSearch[state]' => 1
+            ], [
+                'data-pjax' => 0,
+                'class' => 'bg-info text-info',
+                'title' => 'Number of Tickets in running state'
+            ]) : null;
+        $this->closedTicketCount != 0 ?
+            $a[] = Html::a($this->closedTicketCount, [
+                'ticket/index',
+                'TicketSearch[examId]' => $this->id,
+                'TicketSearch[state]' => 2
+            ], [
+                'data-pjax' => 0,
+                'class' => 'bg-danger text-danger',
+                'title' => 'Number of Tickets in closed state'
+            ]) : null;
+        $this->submittedTicketCount != 0 ? 
+            $a[] = Html::a($this->submittedTicketCount, [
+                'ticket/index',
+                'TicketSearch[examId]' => $this->id,
+                'TicketSearch[state]' => 3
+            ], [
+                'data-pjax' => 0,
+                'class' => 'bg-warning text-warning',
+                'title' => 'Number of Tickets in submitted state'
+            ]) : null;
+
+        return ( count($a) == 0 ? 
+                '' : 
+                ( count($a) == 1 ? 
+                    implode(',', $a) . '/' : 
+                    ( '(' . implode(',', $a) . ')/' )
+                )
+            ) . 
+            ( $this->ticketCount != 0 ? 
+                Html::a($this->ticketCount, [
+                    'ticket/index',
+                    'TicketSearch[examId]' => $this->id,
+                ], [
+                    'data-pjax' => 0,
+                    'class' => 'text-muted',
+                    'title' => 'Total number of Tickets'
+                ]) : 
+                $this->ticketCount );
+    }  
 
     /**
      * @return string

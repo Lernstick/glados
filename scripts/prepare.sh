@@ -7,6 +7,7 @@ timeout=10
 zenity="/usr/bin/zenity"
 initrd="/run/initramfs"
 infoFile="${initrd}/info"
+mountFile="${initrd}/mount"
 python="/usr/bin/python"
 examUser="user"
 desktop="$(sudo -u ${examUser} xdg-user-dir DESKTOP)"
@@ -50,7 +51,7 @@ function do_exit()
 
   # unmount the filesystem
   umount ${initrd}/newroot
-  umount -l ${initrd}/{base,exam}
+  umount -l ${initrd}/{base,exam,tmpfs}
   exit
 }
 trap do_exit EXIT
@@ -101,7 +102,7 @@ chmod 700 "${initrd}/backup/root/.ssh"
 
 # get all active network connections
 con=$(LC_ALL=C nmcli -t -f state,connection d status | awk -F: '$1=="connected"{print $2}')
-echo "${con}" | LC_ALL=C xargs -I{} cp -p "/etc/NetworkManager/system-connections/{}" "${initrd}/backup/etc/NetworkManager/system-connections/"
+while IFS= read -r c; do echo "${c}"; echo "${c}.nmconnection"; done <<< "${con}" | LC_ALL=C xargs -I{} cp -p "/etc/NetworkManager/system-connections/{}" "${initrd}/backup/etc/NetworkManager/system-connections/"
 
 # edit copied connections manually, because nmcli will remove the wifi-sec.psk password when edited by nmcli modify
 #sed -i '/\[connection\]/a permissions=user:root:;' ${initrd}/backup/etc/NetworkManager/system-connections/*
@@ -121,8 +122,8 @@ cp -p "/etc/lernstickWelcome" "${initrd}/backup/etc/lernstickWelcome"
 sed -i 's/ShowNotUsedInfo=.*/ShowNotUsedInfo=false/g' "${initrd}/backup/etc/lernstickWelcome"
 sed -i 's/AutoStartInstaller=.*/AutoStartInstaller=false/g' "${initrd}/backup/etc/lernstickWelcome"
 echo "ShowExamInfo=true" >>"${initrd}/backup/etc/lernstickWelcome" #TODO: replace with sed
-cp -p "/usr/share/applications/finish_exam.desktop" "${initrd}/backup/${desktop}/"
 cp -p "/usr/share/applications/finish_exam.desktop" "${initrd}/backup/usr/share/applications/"
+chmod 644 "${initrd}/backup/usr/share/applications/finish_exam.desktop"
 chown user:user "${initrd}/backup/${desktop}/finish_exam.desktop"
 
 # This is to fix an issue when the DNS name of the exam server ends in .local (which is the
@@ -135,17 +136,64 @@ sed 's/#domain-name=local/domain-name=.alocal/' /etc/avahi/avahi-daemon.conf >${
 mount /lib/live/mount/medium/live/filesystem.squashfs ${initrd}/base
 if [ -e ${initrd}/squashfs/exam.squashfs ]; then
   mount ${initrd}/squashfs/exam.squashfs ${initrd}/exam
+  # find out whether the squashfs is an overlayfs
+  type=$(unsquashfs -ll ${initrd}/squashfs/exam.squashfs | awk '$1~/^c/&&$3=="0,"&&$4=="0"{print "overlay"; exit}')
+  if [ "${type}" != "overlay" ]; then
+    # find out whether the squashfs is an aufs
+    type=$(unsquashfs -ll ${initrd}/squashfs/exam.squashfs | awk '$0~/\/\.wh\./{print "aufs"; exit}')
+  fi
 fi
+
 if [ -e ${initrd}/squashfs/exam.zip ]; then
-  unzip -o ${initrd}/squashfs/exam.zip -d ${initrd}/exam
+  mount -t tmpfs tmpfs ${initrd}/tmpfs
+  unzip -o ${initrd}/squashfs/exam.zip -d ${initrd}/tmpfs
+  type="zip"
   # fix permissions of the files in the home dir
-  chown -R 1000:1000 ${initrd}/exam/${home} 2>/dev/null
-  chown -R 0:0 ${initrd}/exam/${home}/Screenshots 2>/dev/null
+  chown -R 1000:1000 ${initrd}/tmpfs/${home} 2>/dev/null
+  chown -R 0:0 ${initrd}/tmpfs/${home}/Screenshots 2>/dev/null
 fi
-mount -t aufs -o br=${initrd}/backup=rw:${initrd}/exam=ro:${initrd}/base=ro none "${initrd}/newroot"
+
+# mount the whole filesystem, the result filesystem looks like this
+# +---------------+
+# | tmpfs (rw)    |
+# +---------------+
+# | zip (ro)      |
+# +---------------+
+# | squashfs (ro) |
+# +---------------+
+# | base (ro)     |
+# +---------------+
+mkdir ${initrd}/work
+if [ "${type}" = "aufs" ]; then
+  # in there are whiteouts for aufs (\.wh\.*) and no whiteouts for overlayfs (character devices with 0/0) it is an aufs filesystem
+  mount -t aufs -o br=${initrd}/backup=rw:${initrd}/tmpfs=ro:${initrd}/exam=ro:${initrd}/base=ro none "${initrd}/newroot"
+  cat <<EOF >"${mountFile}"
+mount -t aufs -o br=/backup=rw:/tmpfs=ro:/exam=ro:/base=ro none "/newroot"
+EOF
+else
+  # in all other cases the filesystem in treated as overlay
+  mount -t overlay overlay -o lowerdir=${initrd}/tmpfs:${initrd}/exam:${initrd}/base,upperdir=${initrd}/backup,workdir=${initrd}/work ${initrd}/newroot
+  cat <<EOF >"${mountFile}"
+mount -t overlay overlay -o lowerdir=/tmpfs:/exam:/base,upperdir=/backup,workdir=/work /newroot
+EOF
+fi
+
+# install the shutdown hook
+cp -pf "${initrd}/squashfs/mount.sh" "/lib/systemd/lernstick-shutdown"
+chmod 755 "/lib/systemd/lernstick-shutdown"
 
 # remove policykit action for lernstick welcome application
 rm -f ${initrd}/newroot/usr/share/polkit-1/actions/ch.lernstick.welcome.policy
+
+# place finish_exam.desktop in "favorite apps" of Gnome3's dash
+if [ -e ${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps ]; then
+  newvalue=$(awk -F'[\,,\[,\], ]' '{if($0~/^favorite-apps=/){ printf "favorite-apps=["; for(i = 2; i <= NF; i++) { if($i!="") {printf "%s, ", $i;} } printf "'\''finish_exam.desktop'\'']\n"; } else { print $0; } }' ${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps)
+  echo "${newvalue}" > "${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps"
+else
+  echo "[org/gnome/shell]
+favorite-apps=['finish_exam.desktop']" > "${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps"
+fi
+chroot ${initrd}/newroot dconf update
 
 ###########################################
 # apply specific exam config if available #

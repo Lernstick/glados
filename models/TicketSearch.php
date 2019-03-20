@@ -7,6 +7,8 @@ use yii\base\Model;
 use yii\helpers\ArrayHelper;
 use yii\data\ActiveDataProvider;
 use app\models\Ticket;
+use yii\db\Expression;
+
 
 /**
  * TicketSearch represents the model behind the search form about `app\models\Ticket`.
@@ -14,9 +16,12 @@ use app\models\Ticket;
 class TicketSearch extends Ticket
 {
 
+    public $examId;
     public $examName;
     public $examSubject;
     public $userId;
+    public $state;
+    public $abandoned;
 
     /**
      * @inheritdoc
@@ -34,7 +39,7 @@ class TicketSearch extends Ticket
     {
         return [
             [['exam_id'], 'integer'],
-            [['token', 'examSubject', 'examName', 'userId', 'test_taker'], 'safe'],
+            [['token', 'examId', 'examSubject', 'examName', 'userId', 'test_taker', 'state', 'abandoned', 'start', 'end', 'createdAt'], 'safe'],
         ];
     }
 
@@ -66,10 +71,22 @@ class TicketSearch extends Ticket
         ]);
 
         $dataProvider->setSort([
+            'defaultOrder' => [
+                'createdAt' => SORT_DESC,
+                'id' => SORT_DESC
+            ],
             'attributes' => [
+                'id',
                 'state',
+                'createdAt',
+                'token',
                 'start',
                 'end',
+                'duration' => [
+                    'asc' => ['TIMEDIFF(COALESCE(end, NOW()), COALESCE(start, NOW()))' => SORT_ASC],
+                    'desc' => ['TIMEDIFF(COALESCE(end, NOW()), COALESCE(start, NOW()))' => SORT_DESC],
+                    'label' => 'Duration'
+                ],
                 'examName' => [
                     'asc' => ['exam.name' => SORT_ASC],
                     'desc' => ['exam.name' => SORT_DESC],
@@ -80,7 +97,16 @@ class TicketSearch extends Ticket
                     'desc' => ['exam.subject' => SORT_DESC],
                     'label' => 'Exam Subject'
                 ],
-                'test_taker'
+                'time_limit',
+                'ip',
+                'test_taker',
+                'client_state',
+                'backup_interval',
+                'backup_size',
+                'backup_last',
+                'backup_last_try',
+                'backup_state',
+                'restore_state',
             ]
         ]);
 
@@ -92,33 +118,88 @@ class TicketSearch extends Ticket
             return $dataProvider;
         }
 
+        // filter by exam name, subject and user_id
+        $query->joinWith(['exam' => function ($q) {
+            $q->andFilterWhere(['like', 'exam.name', $this->examName])
+            ->andFilterWhere(['exam.id' => $this->examId])
+            ->andFilterWhere(['like', 'exam.subject', $this->examSubject]);
+        }]);
+
+        $at = \Yii::$app->params['abandonTicket'] === null ? 'NULL' : \Yii::$app->params['abandonTicket'];
+
+        if ($this->abandoned == 'Yes' || $this->abandoned == 'No') {
+            $query->andFilterHaving(['or',
+                ['state' => Ticket::STATE_RUNNING],
+                ['state' => Ticket::STATE_CLOSED],
+                ['state' => Ticket::STATE_SUBMITTED]
+            ])
+            ->andFilterWhere(['not', ['ip' => null]])
+            ->andFilterWhere(['not', ['backup_interval' => 0]])
+            ->andFilterWhere(['last_backup' => 0]);
+
+            $query->andFilterWhere([
+                '<',
+
+                # the computed abandoned time (cat). Ticket is abandoned after this amount of seconds
+                new Expression('COALESCE(NULLIF(`ticket`.`time_limit`,0),NULLIF(`exam`.`time_limit`,0),ABS(' . $at . '/60),180)*60'),
+
+                # amount of time since last successful backup or since the exam has started and the last backup try or now (nbt)
+                new Expression('COALESCE(unix_timestamp(`ticket`.`backup_last_try`), unix_timestamp(NOW())) - COALESCE(unix_timestamp(`ticket`.`backup_last`), unix_timestamp(`ticket`.`start`), 0)')
+            ]);
+
+            if ($this->abandoned == 'No') {
+                $aband_ids = ArrayHelper::getColumn($query->all(), 'id');
+
+                # invert the query for anadoned=yes
+                $query = Ticket::find()->where(['not', ['ticket.id' => $aband_ids]]);
+                $dataProvider->query = $query;
+            }
+        }
+
         $query->andFilterWhere([
             'id' => $this->id,
             'exam_id' => $this->exam_id,
-            'start' => $this->start,
-            'end' => $this->end,
         ]);
 
+        $startEnd = new \DateTime($this->start);
+        $startEnd->modify('+1 day');
+        $endEnd = new \DateTime($this->start);
+        $endEnd->modify('+1 day');
+        $query->andFilterWhere(['between', 'start', $this->start, $startEnd->format('Y-m-d')]);
+        $query->andFilterWhere(['between', 'end', $this->end, $endEnd->format('Y-m-d')]);
+
+        $createdEnd = new \DateTime($this->createdAt);
+        $createdEnd->modify('+1 day');
+        $query->andFilterWhere(['between', 'ticket.createdAt', $this->createdAt, $createdEnd->format('Y-m-d')]);
+
         $query->andFilterWhere(['like', 'token', $this->token])
-            ->andFilterWhere(['like', 'test_taker', $this->test_taker]);
+            ->andFilterWhere(['like', 'test_taker', $this->test_taker])
+            ->andFilterHaving(['state' => $this->state]);
 
         // filter by exam name, subject and user_id
         $query->joinWith(['exam' => function ($q) {
             $q->andFilterWhere(['like', 'exam.name', $this->examName])
-            ->andFilterWhere(['exam.subject' => $this->examSubject]);
+            ->andFilterWhere(['like', 'exam.subject', $this->examSubject]);
         }]);
+
 
         Yii::$app->user->can('ticket/index/all') ?: $query->own();
 
         return $dataProvider;
     }
 
-    public function getExamList()
+    public function getExamList($id = null)
     {
 
+        $query = Exam::find();
+
+        if (!is_null($id)) {
+            $query->where(['id' => $id]);
+        }
+
         $exams = Yii::$app->user->can('ticket/index/all') ? 
-            Exam::find()->asArray()->all() : 
-            Exam::find()->where(['user_id' => Yii::$app->user->id])->asArray()->all();
+            $query->asArray()->all() : 
+            $query->where(['user_id' => Yii::$app->user->id])->asArray()->all();
 
         return ArrayHelper::map($exams, 'id', function($exams){
                 return $exams['subject'] . ' - ' . $exams['name'];
@@ -172,10 +253,7 @@ class TicketSearch extends Ticket
                 'TIMESTAMPDIFF(
                     SECOND,
                     `start`,
-                    IF(`end` is null,
-                        CURRENT_TIMESTAMP(),
-                        `end`
-                    )
+                    `end`
                 )'
             )
         );

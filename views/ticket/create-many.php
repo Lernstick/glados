@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use kartik\select2\Select2;
 use yii\web\JsExpression;
 
 
@@ -176,7 +177,43 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div class="row">
         <div class="col-md-6">
-            <?= $form->field($model, 'exam_id')->dropDownList($searchModel->getExamList(), [ 'prompt' => 'Choose an Exam ...' ])->hint('Choose the exam those tickets has to be assigned to in the list below. Notice, only exams assigned to you will be shown underneath.') ?>
+             <?= $form->field($model, 'exam_id')->widget(Select2::classname(), [
+                'data' => [],
+                'pluginOptions' => [
+                    'dropdownAutoWidth' => true,
+                    'width' => 'auto',
+                    'allowClear' => true,
+                    'placeholder' => '',
+                    'ajax' => [
+                        'url' => \yii\helpers\Url::to(['exam/index', 'mode' => 'list', 'attr' => 'resultExam']),
+                        'dataType' => 'json',
+                        'delay' => 250,
+                        'cache' => true,
+                        'data' => new JsExpression('function(params) {
+                            return {
+                                q: params.term,
+                                page: params.page,
+                                per_page: 10
+                            };
+                        }'),
+                        'processResults' => new JsExpression('function(data, page) {
+                            return {
+                                results: data.results,
+                                pagination: {
+                                    more: data.results.length === 10 // If there are 10 matches, theres at least another page
+                                }
+                            };
+                        }'),
+                    ],
+                    'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                    'templateResult' => new JsExpression('function(q) { return q.text; }'),
+                    'templateSelection' => new JsExpression('function (q) { return q.text; }'),
+                ],
+                'options' => [
+                    'placeholder' => 'Choose an Exam ...'
+                ]
+            ])->hint('Choose the exam those tickets has to be assigned to in the list below. Notice, only exams assigned to you will be shown underneath.'); ?>
+
         </div>
         <div class="col-md-6">
             <?= $form->field($model, 'class')->textInput([

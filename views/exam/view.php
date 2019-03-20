@@ -40,6 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= DetailView::widget([
             'model' => $model,
             'attributes' => [
+                'createdAt:timeago',
                 'name',
                 'subject',
                 [
@@ -48,24 +49,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     'value' => $model->time_limit == Null ? 'No Time Limit' : yii::$app->formatter->format($model->{'time_limit'}*60, 'duration'),
                 ],
                 [
-                    'attribute' => 'file',
-                    'value' => basename($model->file, '.squashfs') . ' ' . (
-                        $model->fileConsistency ? 
-                        '<span title="' . $model->file . '" class="label label-success">' . 
-                        '<span class="glyphicon glyphicon-ok"></span> Test passed</span> ' . Html::a(
-                            '<span class="glyphicon glyphicon-search"></span> Browse contents',
-                            ['view', 'id' => $model->id, 'mode' => 'squashfs'],
-                            ['data-pjax' => 0]
-                        ) :
-                        '<span title="' . $model->file . '" class="label label-danger">' . 
-                        '<span class="glyphicon glyphicon-remove"></span> Test failed</span>'
-                    ),
-                    'format' => 'raw',
-                ],
-                'md5',
-                'fileSize:shortSize',
-                'fileInfo:html',
-                [
                     'attribute' => 'user.username',
                     'label' => 'Owner',
                     'value' => ( $model->user_id == null ? '<span class="not-set">(user removed)</span>' : '<span>' . $model->user->username . '</span>' ),
@@ -73,18 +56,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     'visible' => Yii::$app->user->can('exam/view/all'),
                 ],
                 [
-                    'attribute' => 'ticketCount',
-    		        'format' => 'raw',
-                    'value' => Html::a(
-                        $model->ticketCount,
-                        ['ticket/index', 'TicketSearch[examName]' => $model->name, 'TicketSearch[examSubject]' => $model->subject],
-                        ['data-pjax' => 0]
-                    )
+                    'attribute' => 'ticketInfo',
+                    'format' => 'raw',
                 ],
-                'openTicketCount',
-                'runningTicketCount',
-                'closedTicketCount',
-                'submittedTicketCount',
                 [
                     'attribute' => 'file_analyzed',
                     'format' => 'raw',
@@ -98,6 +72,144 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= $this->render('@app/views/_notification', [
             'session' => $session,
         ]) ?>
+
+    <?php Pjax::end(); ?>
+
+    <?php Pjax::begin([
+        'id' => 'file',
+        'options' => ['class' => 'tab-pane fade'],
+    ]); ?>
+
+
+    <div class="row">
+
+    <?php if ( (empty($model->file) || $model->file == null) && (empty($model->file2) || $model->file2 == null) ) { ?>
+
+        <div class="col-sm-12 col-md-6">
+          <div class="panel panel-danger">
+            <div class="panel-heading">
+              <span>Exam file</span>
+            </div>
+            <div class="panel-body">
+              <p>
+                <span class="not-set">No file found</span>
+              </p>
+              <p class="text-muted">
+                <span>You have to provide at least one exam file.</span><br>
+                <span class="glyphicon glyphicon-alert"></span>
+                <span>For more information, please visit <?= Html::a('Manual / Create an exam', ['/howto/view', 'id' => 'create-exam.md'], ['class' => 'alert-link']) ?>.</span>
+              </p>
+              <p>
+                  <?= Html::a(
+                    '<span class="glyphicon glyphicon-plus"></span> Add file ...',
+                    ['update', 'id' => $model->id, '#' => 'tab_file'],
+                    ['data-pjax' => 0, 'class' => 'btn btn-default', 'role' => 'button']
+                ); ?>
+              </p>
+            </div>
+          </div>
+        </div>
+
+    <?php } if (!empty($model->file2)) { ?>
+
+      <div class="col-sm-12 col-md-6">
+        <div class="panel <?= ($model->file2Consistency ? 'panel-default' : 'panel-danger'); ?>">
+          <div class="panel-heading">
+            <span><?= $model->getattributeLabel('file2')?></span>
+          </div>
+          <div class="panel-body">
+            <p>
+                <?= '<span class="glyphicon glyphicon-file"></span> ' . basename($model->file2); ?>
+            </p>
+            <p>
+                <span class="text-muted">Consistency: </span><?= ($model->file2Consistency ? 
+                    '<span class="text-success">File valid</span>' :  
+                    '<strong><span class="not-set">File not valid</span></strong>'
+                ) ?><br>
+                <span class="text-muted">Size: <?= yii::$app->formatter->format($model->file2Size, 'shortSize') ?></span><br>
+                <span class="text-muted"><?= yii::$app->formatter->format($model->file2Info, 'html') ?></span>
+            </p>
+            <p>
+                <?= Html::a(
+                    '<span class="glyphicon glyphicon-search"></span> Browse',
+                    ['view', 'id' => $model->id, 'mode' => 'browse', 'type' => 'zip'],
+                    [
+                        'data-pjax' => 0,
+                        'class' => [
+                            'btn',
+                            'btn-default',
+                            $model->file2Consistency ? null : 'disabled',
+                        ],
+                        'role' => 'button'
+                    ]
+                ); ?>
+                <?= Html::a(
+                    '<span class="glyphicon glyphicon-download-alt"></span> Download',
+                    ['view', 'id' => $model->id, 'mode' => 'file', 'type' => 'zip'],
+                    ['data-pjax' => 0, 'class' => 'btn btn-default', 'role' => 'button']
+                ); ?>
+                <?= Html::a(
+                    '<span class="glyphicon glyphicon-pencil"></span> Change',
+                    ['update', 'id' => $model->id, '#' => 'tab_file'],
+                    ['data-pjax' => 0, 'class' => 'btn btn-default', 'role' => 'button']
+                ); ?>
+            </p>
+          </div>
+        </div>
+      </div>
+
+    <?php } if (!empty($model->file)) { ?>
+
+      <div class="col-sm-12 col-md-6">
+        <div class="panel <?= ($model->file1Consistency ? 'panel-default' : 'panel-danger'); ?>">
+          <div class="panel-heading">
+            <span><?= $model->getattributeLabel('file')?></span>
+          </div>
+          <div class="panel-body">
+            <p>
+                <?= '<span class="glyphicon glyphicon-file"></span> ' . basename($model->file); ?>
+            </p>
+            <p>
+                <span class="text-muted">Consistency: </span><?= ($model->file1Consistency ? 
+                    '<span class="text-success">File valid</span>' :  
+                    '<span class="not-set">File not valid</span>'
+                ) ?><br>
+                <span class="text-muted">Size: <?= yii::$app->formatter->format($model->fileSize, 'shortSize') ?></span><br>
+                <span class="text-muted">MD5 Checksum: <?= yii::$app->formatter->format($model->md5, 'text') ?></span><br>
+                <span class="text-muted"><?= yii::$app->formatter->format($model->fileInfo, 'html') ?></span>
+            </p>
+            <p>
+                <?= Html::a(
+                    '<span class="glyphicon glyphicon-search"></span> Browse',
+                    ['view', 'id' => $model->id, 'mode' => 'browse', 'type' => 'squashfs'],
+                    [
+                        'data-pjax' => 0,
+                        'class' => [
+                            'btn',
+                            'btn-default',
+                            $model->file1Consistency ? null : 'disabled',
+                        ],
+                        'role' => 'button'
+                    ]
+                ); ?>
+                <?= Html::a(
+                    '<span class="glyphicon glyphicon-download-alt"></span> Download',
+                    ['view', 'id' => $model->id, 'mode' => 'file', 'type' => 'squashfs'],
+                    ['data-pjax' => 0, 'class' => 'btn btn-default', 'role' => 'button']
+                ); ?>
+                <?= Html::a(
+                    '<span class="glyphicon glyphicon-pencil"></span> Change',
+                    ['update', 'id' => $model->id, '#' => 'tab_file'],
+                    ['data-pjax' => 0, 'class' => 'btn btn-default', 'role' => 'button']
+                ); ?>
+            </p>
+          </div>
+        </div>
+      </div>
+
+    <?php } ?>
+
+    </div>
 
     <?php Pjax::end(); ?>
 

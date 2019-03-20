@@ -46,23 +46,42 @@ class ActivityController extends Controller
 
     /**
      * Lists all Activity models.
+     *
+     * @param string $mode mode
+     * @param string $attr attribute to make a list of
+     * @param string $q query
+     * @param int $page page
+     * @param int $per_page entries per page
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex($mode = null, $attr = null, $q = null, $page = 1, $per_page = 10)
     {
 
-        $this->on(self::EVENT_AFTER_ACTION, function(){
-            $model = new ActivitySearch();
-            $model->lastvisited = 'now';
-        });
+        if ($mode === null) {
+            $this->on(self::EVENT_AFTER_ACTION, function(){
+                $model = new ActivitySearch();
+                $model->lastvisited = 'now';
+            });
 
-        $searchModel = new ActivitySearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+            $searchModel = new ActivitySearch();
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
+            return $this->render('index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]);
+        } else if ($mode == 'list') {
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            $out = [];
+            if (!is_null($attr)) {
+                $searchModel = new ActivitySearch();
+                if ($attr == 'description') {
+                    $out = $searchModel->selectList('description', $q, $page, $per_page);
+                }
+            }
+            return $out;
+        }
+
     }
 
 

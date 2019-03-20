@@ -118,6 +118,7 @@ class DownloadController extends DaemonController implements DaemonInterface
             $act = new Activity([
                     'ticket_id' => $this->ticket->id,
                     'description' => 'Download failed: network error',
+                    'severity' => Activity::SEVERITY_WARNING,
             ]);
             $act->save();
 
@@ -129,13 +130,27 @@ class DownloadController extends DaemonController implements DaemonInterface
             $this->ticket->runCommand('echo "download in progress" > ' . $this->remotePath . '/state');
             $this->ticket->save(false);
 
-            $ext = pathinfo($this->ticket->exam->file)['extension'];
-            $cmd = "rsync --checksum --partial --progress "
+            // create a temporary directory
+            $tempDir = sys_get_temp_dir() . "/" . generate_uuid();
+            mkdir($tempDir);
+
+            // all contents in this directory are rsynced to the client
+            if (file_exists($this->ticket->exam->file)) {
+                symlink($this->ticket->exam->file, $tempDir . "/exam.squashfs");
+            }
+            if (file_exists($this->ticket->exam->file2)) {
+                symlink($this->ticket->exam->file2, $tempDir . "/exam.zip");
+            }
+            if (file_exists(\Yii::$app->params['sciptsPath'] . "/mount.sh")) {            
+                symlink(\Yii::$app->params['sciptsPath'] . "/mount.sh", $tempDir . "/mount.sh");
+            }
+
+            $cmd = "rsync -L --checksum --partial --progress "
                  . "--bwlimit=" . escapeshellarg(\Yii::$app->params['examDownloadBandwith']) . " "
                  . "--rsh='ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
                  . " -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' "
-                 . escapeshellarg($this->ticket->exam->file) . " "
-                 . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . ":" . $this->remotePath . '/squashfs/exam.' . $ext) . " "
+                 . $tempDir . '/*' . " "
+                 . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . ":" . $this->remotePath . '/squashfs/') . " "
                  . "| stdbuf -oL tr '\\r' '\\n' ";
 
             $this->logInfo('Executing rsync: ' . $cmd);
@@ -159,12 +174,19 @@ class DownloadController extends DaemonController implements DaemonInterface
 
             $retval = $cmd->run();
 
+            // remove the temporary directory
+            @unlink($tempDir . "/exam.squashfs");
+            @unlink($tempDir . "/exam.zip");
+            @unlink($tempDir . "/mount.sh");
+            @rmdir($tempDir);
+
             if($retval != 0){
                 $this->logError('rsync failed (retval: ' . $retval . '), output: ' . PHP_EOL . $output);
 
                 $act = new Activity([
                         'ticket_id' => $this->ticket->id,
                         'description' => 'Download failed: rsync failed (retval: ' . $retval . ')',
+                        'severity' => Activity::SEVERITY_WARNING,
                 ]);
                 $act->save();
 
@@ -175,7 +197,8 @@ class DownloadController extends DaemonController implements DaemonInterface
                     'ticket_id' => $this->ticket->id,
                     'description' => 'Exam download finished by ' . $this->ticket->ip .
                     ' from ' . ( $this->ticket->test_taker ? $this->ticket->test_taker :
-                    'Ticket with token ' . $this->ticket->token ) . '.'
+                    'Ticket with token ' . $this->ticket->token ) . '.',
+                    'severity' => Activity::SEVERITY_SUCCESS,
                 ]);
                 $act->save();
                 $this->ticket->download_progress = 1;
@@ -245,7 +268,8 @@ class DownloadController extends DaemonController implements DaemonInterface
 
             $act = new Activity([
                 'ticket_id' => $this->ticket->id,
-                'description' => 'Exam download aborted (server side).'
+                'description' => 'Exam download aborted (server side).',
+                'severity' => Activity::SEVERITY_ERROR,
             ]);
             $act->save();
         }

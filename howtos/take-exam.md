@@ -27,7 +27,7 @@ The exam has started now.
 
 ----
 
-To finish the exam double-click the `Finish exam` icon on the desktop. You should **save all your work** before doing this. **This is not reversible!**
+To finish the exam click the `Finish exam` icon in the "favorite applications" dash. You should **save all your work** before doing this. **This is not reversible!**
 
 ![Finish exam 1](img/finish_exam.jpg)
 

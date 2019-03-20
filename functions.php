@@ -10,4 +10,31 @@ function generate_uuid() {
 	);
 }
 
+/**
+ * Equivalent to MySQLs COALESCE()
+ * Returns the first non-null or nonmissing value from a list of numeric arguments. 
+ * 
+ * @return null|int
+ */
+function coalesce(){
+	$args = func_get_args();
+	foreach ($args as $arg) {
+		if (is_numeric ($arg)){
+			return $arg;
+		}
+	}
+	return null;
+}
+
+/**
+ * Equivalent to MySQLs NULLIF()
+ * @param mixed expr1 expression to compare
+ * @param mixed expr2 expression to compare
+ * 
+ * @return null|mixed
+ */
+function nullif($expr1, $expr2){
+	return $expr1 == $expr2 ? null : $expr1;
+}
+
 ?>

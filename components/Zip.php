@@ -7,7 +7,7 @@ use yii\base\Component;
 use yii\web\NotFoundHttpException;
 use yii\helpers\FileHelper;
  
-class Squashfs extends File
+class Zip extends File
 {
 
     /**
@@ -20,8 +20,8 @@ class Squashfs extends File
     {
         parent::__construct();
         
-        if (!file_exists('/usr/bin/unsquashfs') || !is_executable('/usr/bin/unsquashfs')) {
-            throw new NotFoundHttpException('/usr/bin/unsquashfs: No such file or directory or the binary is not executable. Please install squashsftools.');
+        if (!file_exists('/usr/bin/unzip') || !is_executable('/usr/bin/unzip')) {
+            throw new NotFoundHttpException('/usr/bin/unzip: No such file or directory or the binary is not executable. Please install unzip.');
         }
     }
 
@@ -34,40 +34,42 @@ class Squashfs extends File
     }
 
     /**
-     * Generates an array with file information about every file in the squash filesystem
+     * Generates an array with file information about every file in the zip file
      *
      * @return array the file list. The array has the following structure, for example:
      *      [
      *          [
-     *              'mode' => '-rwxr-wr-x',
-     *              'owner' => 'root',
-     *              'group' => 'root',
-     *              'size' => 27,
+     *              'length' => 312,
+     *              'method' => Stored,
+     *              'size' => 123,
+     *              'cmpr' => '18%',
      *              'date' => '2015-03-13',
      *              'time' => '16:56',
-     *              'path' => 'squashfs-root/home/user/file'
+     *              'crc32' => 'd73d1fd1',
+     *              'path' => 'home/user/file'
      *          ],
      *      ]
      */
     public function getFileList()
     {
-        exec('/usr/bin/unsquashfs -ll ' . escapeshellarg($this->path), $output, $retval);
-        for ($i=3;$i<=count($output);$i++){
+        exec('/usr/bin/unzip -v ' . escapeshellarg($this->path), $output, $retval);
+        for ($i=3;$i<=count($output) - 3;$i++){
             if(!array_key_exists($i, $output)){
                 break;
             }
 
             list(
-                $a['mode'],
-                $a['owner'],
-                $a['group'],
+                $a['length'],
+                $a['method'],
                 $a['size'],
+                $a['cmpr'],
                 $a['date'],
                 $a['time'],
+                $a['crc32'],
                 $a['path'],
-            ) = preg_split('/[\s,\/]+/', $output[$i], 7, PREG_SPLIT_NO_EMPTY);
-            $a['path'] = FileHelper::normalizePath(substr($a['path'], strlen('squashfs-root')));
+            ) = preg_split('/[\s]+/', $output[$i], 8, PREG_SPLIT_NO_EMPTY);
 
+            $a['path'] = FileHelper::normalizePath("/" . $a['path']);
             $file_list[] = $a;
         }
         return $this->exists ? $file_list : null;
@@ -76,7 +78,7 @@ class Squashfs extends File
     public function file_exists($path)
     {
         foreach ($this->fileList as $file) {
-            if ($file['path'] == FileHelper::normalizePath('squashfs-root/' . $path)) {
+            if ($file['path'] == FileHelper::normalizePath('/' . $path)) {
                 return true;
             }
         }

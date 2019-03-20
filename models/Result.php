@@ -200,6 +200,9 @@ class Result extends Model
                                 continue;
                             }
 
+                            // if the file is readable (permission set) (overlayFS whiteouts will have no read permission set)
+                            if (!is_readable($file)) { continue; }
+
                             // if all tests passed, include the file/dir
                             $this->zipInclude($file, $ticket->name . '/' . str_replace($source . '/', '', $file), $zip);
                         }
@@ -220,6 +223,7 @@ class Result extends Model
      */
     private function zipInclude ($source, $target, $zip)
     {
+        $target = $this->sanitizePath($target);
         if (is_dir($source) === false) {
             return $zip->addFile($source, $target);
         } else {
@@ -239,6 +243,24 @@ class Result extends Model
         } else {
             return false;
         }
+    }
+
+    /**
+     * Sanitize path for Windows and Mac systems
+     *
+     * @return string filename
+     * @see https://stackoverflow.com/a/42058764/2768341
+     * @todo also transliterate characters (see http://userguide.icu-project.org/transforms/general)
+     */
+    public function sanitizePath($filename, $replacement = '')
+    {
+        $filename = preg_replace(
+            '~
+            [\<\>\:\"\\\|\?\*]            # file system reserved https://en.wikipedia.org/wiki/Filename#Reserved_characters_and_words
+            ~x',
+            $replacement, $filename);
+
+        return $filename;
     }
 
     /**
@@ -302,7 +324,8 @@ class Result extends Model
 
                 $act = new Activity([
                     'ticket_id' => $ticket->id,
-                    'description' => 'Exam result handed in.'
+                    'description' => 'Exam result handed in.',
+                    'severity' => Activity::SEVERITY_INFORMATIONAL,
                 ]);
                 $act->save();
             }

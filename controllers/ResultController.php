@@ -128,7 +128,7 @@ class ResultController extends Controller
                         @unlink($zipFile);
                     }, $model);
 
-                    return \Yii::$app->response->sendFile($zipFile, 'result.zip');                
+                    return \Yii::$app->response->sendFile($zipFile, 'result.zip');
                 }
 
             } else {
@@ -183,6 +183,10 @@ class ResultController extends Controller
             ]);
 
         } else if ($mode === 'step2'){
+
+            if ($hash === null){
+                throw new NotFoundHttpException('The requested page does not exist.');
+            }
 
             $searchModel = new TicketSearch();
             $dataProvider = $searchModel->search(Yii::$app->request->queryParams);

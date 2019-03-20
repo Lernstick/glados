@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use kartik\select2\Select2;
 use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
@@ -54,24 +55,53 @@ $this->registerJs($js);
 
     <div class="result-form">
 
-        <?php $form = ActiveForm::begin([
-            'options' => ['enctype' => 'multipart/form-data'],
-            'method' => 'get',
-            'action' => ['result/generate'],
-        ]); ?>
+        <?= Html::beginForm(['result/generate'], 'get', ['enctype' => 'multipart/form-data']); ?>
         <div class="row">
             <div class="col-md-12">
-                <?= $form->field($model, 'exam_id')->dropDownList($searchModel->getExamList(), [
+
+                <?= Select2::widget([
                     'name' => 'exam_id',
-                    'prompt' => 'Choose an Exam ...'
-                ])->hint('Choose the exam to generate results from.') ?>
+                    'options' => ['placeholder' => 'Choose an Exam ...'],
+                    'pluginOptions' => [
+                        'dropdownAutoWidth' => true,
+                        'width' => 'auto',
+                        'allowClear' => true,
+                        'placeholder' => '',
+                        'ajax' => [
+                            'url' => \yii\helpers\Url::to(['exam/index', 'mode' => 'list', 'attr' => 'resultExam']),
+                            'dataType' => 'json',
+                            'delay' => 250,
+                            'cache' => true,
+                            'data' => new JsExpression('function(params) {
+                                return {
+                                    q: params.term,
+                                    page: params.page,
+                                    per_page: 10
+                                };
+                            }'),
+                            'processResults' => new JsExpression('function(data, page) {
+                                return {
+                                    results: data.results,
+                                    pagination: {
+                                        more: data.results.length === 10 // If there are 10 matches, theres at least another page
+                                    }
+                                };
+                            }'),
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(q) { return q.text; }'),
+                        'templateSelection' => new JsExpression('function (q) { return q.text; }'),
+                    ],
+                ]); ?>
+
             </div>
         </div>
+        <br>
         <div class="form-group">
             <?= Html::submitButton('Next step', ['class' => 'btn btn-success']) ?>
         </div>
 
-        <?php ActiveForm::end(); ?>
+        <?= Html::endForm() ?>
 
     </div>
 

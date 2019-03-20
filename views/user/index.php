@@ -1,7 +1,12 @@
 <?php
 
 use yii\helpers\Html;
-use yii\grid\GridView;
+use yii\widgets\Pjax;
+use kartik\grid\GridView;
+use kartik\dynagrid\DynaGrid;
+use kartik\select2\Select2;
+use yii\web\JsExpression;
+
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\UserSearch */
@@ -15,34 +20,87 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
-    <div class="dropdown">
-      <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-        <i class="glyphicon glyphicon-list-alt"></i>
-        Actions&nbsp;<span class="caret"></span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-        <li>
-            <?= Html::a('<span class="glyphicon glyphicon-plus"></span> Create User', ['create']) ?>
-        </li>
-      </ul>
-    </div>
-    <br>
-
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'layout' => '{items} {summary} {pager}',
+    <?php Pjax::begin(); ?>
+    <?= DynaGrid::widget([
+        'showPersonalize' => true,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+            ['class' => 'kartik\grid\SerialColumn', 'order' => DynaGrid::ORDER_FIX_LEFT],
 
-            'username',
+            //'username',
+            [
+                'attribute'=>'username',
+                'filterType'=>GridView::FILTER_SELECT2,
+                'filterWidgetOptions'=>[
+                    'pluginOptions' => [
+                        'dropdownAutoWidth' => true,
+                        'width' => 'auto',
+                        'allowClear' => true,
+                        'placeholder' => '',
+                        'ajax' => [
+                            'url' => \yii\helpers\Url::to(['user/index', 'mode' => 'list', 'attr' => 'username']),
+                            'dataType' => 'json',
+                            'delay' => 250,
+                            'cache' => true,
+                            'data' => new JsExpression('function(params) {
+                                return {
+                                    q: params.term,
+                                    page: params.page,
+                                    per_page: 10
+                                };
+                            }'),
+                            'processResults' => new JsExpression('function(data, page) {
+                                return {
+                                    results: data.results,
+                                    pagination: {
+                                        more: data.results.length === 10 // If there are 10 matches, theres at least another page
+                                    }
+                                };
+                            }'),
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(q) { return q.text; }'),
+                        'templateSelection' => new JsExpression('function (q) { return q.text; }'),
+                    ],
+                ],
+                'filterInputOptions' => [
+                    'placeholder' => 'Any'
+                ],
+                'format'=>'raw'
+            ],
             [
                 'attribute' => 'role',
                 'filter' => $searchModel->roleList,
             ],
             'last_visited',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'order' => DynaGrid::ORDER_FIX_RIGHT,
+                'contentOptions' => [
+                    'class' => 'text-nowrap',
+                    'style' => 'width:10px;',
+                ],
+            ],
         ],
+        'storage' => DynaGrid::TYPE_COOKIE,
+        'theme' => 'simple-default',
+        'gridOptions' => [
+            'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
+            'panel' => ['heading' => '<h3 class="panel-title">Users</h3>'],
+            'toolbar' =>  [
+                ['content' =>
+                    Html::a('<i class="glyphicon glyphicon-plus"></i>', ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => 'Create User']) . ' ' .
+                    Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/user/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => 'Reset Grid'])
+                ],
+                ['content' => '{dynagridFilter}{dynagridSort}{dynagrid}'],
+                '{export}',
+        ]            
+        ],
+        'options' => ['id' => 'dynagrid-user-index'] // a unique identifier is important
     ]); ?>
+
+    <?php Pjax::end(); ?>
+
+
 </div>
