@@ -184,6 +184,10 @@ class ResultController extends Controller
 
         } else if ($mode === 'step2'){
 
+            if ($hash === null){
+                throw new NotFoundHttpException('The requested page does not exist.');
+            }
+
             $searchModel = new TicketSearch();
             $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
             $dataProvider->query = $dataProvider->query->andWhere(['token' => $model->tokens])->orderBy('test_taker');

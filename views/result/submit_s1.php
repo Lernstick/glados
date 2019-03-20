@@ -47,7 +47,9 @@ $this->title .= ' - Step 1';
                 'url' => ['submit', 'mode' => 'upload'],
                 'appearance' => 'ui',
                 'formId' => $form->id,
-                'downloadTemplateView'=>'@app/views/result/download',
+                'mainView'=>'@app/views/result/_upload_main',
+                'uploadTemplateView'=>'@app/views/result/_upload_upload',
+                'downloadTemplateView'=>'@app/views/result/_upload_download',
                 'options' => [
                     'multiple' => false
                 ],
@@ -56,7 +58,7 @@ $this->title .= ' - Step 1';
                     'dataType' => 'json',
                     'acceptFileTypes' => new yii\web\JsExpression('/(\.|\/)(zip)$/i'),
                     'maxNumberOfFiles' => 1,
-                    'autoUpload' => false
+                    'autoUpload' => true
                 ],
             ]);
 
