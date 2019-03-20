@@ -1,9 +1,11 @@
 glados for Debian
 -----------------
 
-Adjust the version number in debian/conf/params.php
+Adjust the version number in debian/conf/params.php and add all new parameters (if some)
 
-Get the newest source package by
+Tag a new release with the new version
+
+Get the newest source package by (should now be the newest version)
 
  debian/rules get-orig-source
 
@@ -16,6 +18,8 @@ Maybe adjust year in debian/copyright.
 Rename the file in debian/sql/upgrade/<version> to the new version and change the content to the latest migration.
 
 Update debian/control yii2-glados package to the newest version.
+
+Have a look at debian/patches if file in the patches have changed
 
 Build the package by
 

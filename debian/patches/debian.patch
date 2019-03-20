@@ -2,7 +2,7 @@ Subject: Remove dev environment
 From: Roman Gruber <roman.gruber@bwzofingen.ch>
 --- a/config/web.php
 +++ b/config/web.php
-@@ -78,21 +78,4 @@
+@@ -99,21 +99,4 @@
      'runtimePath' => '/var/lib/glados/runtime',
  ];
  
@@ -26,8 +26,8 @@ From: Roman Gruber <roman.gruber@bwzofingen.ch>
  return $config;
 --- a/web/index.php
 +++ b/web/index.php
-@@ -1,8 +1,8 @@
- <?php
+@@ -4,8 +4,8 @@
+ setlocale(LC_CTYPE, "C.UTF-8") || setlocale(LC_CTYPE, "en_US.UTF-8");
  
  // comment out the following two lines when deployed to production
 -defined('YII_DEBUG') or define('YII_DEBUG', true);

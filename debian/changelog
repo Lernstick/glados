@@ -1,3 +1,37 @@
+glados (1.0.5-deb9) unstable; urgency=low
+
+  * Fixed several bugs:
+    - New tickets with time limit set, did not backup initially
+    - Refactored abandoned ticket system
+    - Abandoned tickets stop to backup after "abandonTicket" time
+    - In backup browse view: filename are html encoded now
+    - Fixed a bug, that when a client never sends the "booted up" message, the
+      server will probe such clients now repeatly, such that backups can be
+      initialted
+    - When zip file are generated, some characters in the filenames were not
+      compatible to extract on Windows systems, such filenames are sanitized
+    - A change in networkmanager's naming scheme for system-connection files 
+      caused active newwork connections to not be tranfered to the exam
+    - Fixed php7 strict errors
+    - Barcodes in the PDF files are changed from C128C to C128A
+    - The "Hand-in" button in the exam is now trusted and in the Gnome3 dash
+  * New Features:
+    - Possibility to upload two files for an exam (a squashfs file + a zip
+      file)
+    - Support for the newest Lernstick with overlayfs squash-filesystems (aufs
+      filesystems are still supported)
+    - Zip-files can now be browsed too in the exam view
+    - More filter possibilities in index view of tickets/exams/users/activities
+      - Select2 fields in dropdowns
+      - Datepicker for dates
+    - Customizable index views for tickets/exams/users/activities
+    - Most fields are sortable
+    - Tickets and Exams have now create dates
+    - Activities have severities now
+    - Some fields in the ticket view are directly editable now
+
+ -- Roman Gruber <roman.gruber@bwzofingen.ch> Wed, 20 Mar 2019 17:33:12 +0100
+
 glados (1.0.4-deb9) unstable; urgency=low
 
   * Fix several bugs:
