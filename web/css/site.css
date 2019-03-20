@@ -279,3 +279,22 @@ table.detail-view td {
 .select2-container {
   /*z-index: 1100;*/
 }
+
+/* severity select2 field in avtivities index view */
+.select2-activity-severity {
+  min-width: 110px;
+}
+
+.select2-activity-severity ul.select2-selection__rendered {
+  padding-right: 30px !important;
+}
+
+.select2-activity-severity ul.select2-selection__rendered:before {
+  content: "";
+  position: absolute;
+  right: 7px;
+  top: 42%;
+  border-top: 5px solid #888;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+}

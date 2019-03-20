@@ -150,15 +150,20 @@ $this->params['breadcrumbs'][] = $this->title;
             'filterModel' => $searchModel,
             'panel' => ['heading' => '<h3 class="panel-title">Activities</h3>'],
             'toolbar' =>  [
-                ['content' => $form->field($searchModel, 'severity')->label(false)->widget(Select2::classname(), [
+                ['content' => $form->field($searchModel, 'severity', [
+                        'options' => [
+                            'class' => 'select2-activity-severity',
+                        ]
+                    ])->label(false)->widget(Select2::classname(), [
                         'data' => $searchModel->nameMap,
                         'hideSearch' => true,
                         'options' => [
+                            'multiple' => true,
                             'placeholder' => 'Severity',
                         ],
                         'pluginOptions' => [
                             'allowClear' => true,
-                            'width' => '110px',
+                            'width' => '100%',
                         ],
                         'pluginEvents' => [
                             'change' => 'function() { this.form.submit() }',
