@@ -16,7 +16,6 @@ class LanguageSelector implements BootstrapInterface
 
     public function bootstrap($app)
     {
-
         $preferredLanguage = $app->request->getPreferredLanguage($this->supportedLanguages);
         $app->language = $preferredLanguage;
     }

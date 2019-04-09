@@ -63,11 +63,11 @@ class Activity extends Base
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'token' => 'Ticket',
-            'date' => 'Date',
-            'description' => 'Description',
-            'severity' => 'Severity',
+            'id' => \Yii::t('activities', 'ID'),
+            'token' => \Yii::t('activities', 'Ticket'),
+            'date' => \Yii::t('activities', 'Date'),
+            'description' => \Yii::t('activities', 'Description'),
+            'severity' => \Yii::t('activities', 'Severity'),
         ];
     }
 

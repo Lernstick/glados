@@ -15,7 +15,7 @@ use yii\widgets\ActiveForm;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $last_visited */
 
-$this->title = 'Activities';
+$this->title = \Yii::t('activities', 'Activities');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="activity-index">
@@ -37,7 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'timeago',
                 'filterType' => GridView::FILTER_DATE,
                 'filterWidgetOptions' => [
-                    'options' => ['placeholder' => 'Enter day...'],
+                    'options' => ['placeholder' => \Yii::t('app', 'Enter day...')],
                     'pluginOptions' => [
                        'format' => 'yyyy-mm-dd',
                        'todayHighlight' => true,
@@ -92,7 +92,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                 ],
                 'filterInputOptions' => [
-                    'placeholder' => 'Any'
+                    'placeholder' => \Yii::t('app', 'Any')
                 ],
                 'format'=>'raw',
                 'contentOptions' => [
@@ -136,7 +136,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                 ],
                 'filterInputOptions' => [
-                    'placeholder' => 'Any'
+                    'placeholder' => \Yii::t('app', 'Any')
                 ],
                 'contentOptions' => [
                     'class' => 'col-md-8',
@@ -148,7 +148,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'gridOptions' => [
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
-            'panel' => ['heading' => '<h3 class="panel-title">Activities</h3>'],
+            'panel' => ['heading' => '<h3 class="panel-title">' . \Yii::t('activities', 'Activities') . '</h3>'],
             'toolbar' =>  [
                 ['content' => $form->field($searchModel, 'severity', [
                         'options' => [
@@ -159,7 +159,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'hideSearch' => true,
                         'options' => [
                             'multiple' => true,
-                            'placeholder' => 'Severity',
+                            'placeholder' => \Yii::t('activities', 'Severity'),
                         ],
                         'pluginOptions' => [
                             'allowClear' => true,

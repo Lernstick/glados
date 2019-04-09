@@ -17,10 +17,11 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    'exam{n,plural,=0{s} =1{} other{s}} completed' => '',
-    'exam{n,plural,=0{s} =1{} other{s}} created' => '',
-    'hour{n,plural,=0{s} =1{} other{s}} spent in exams' => '',
-    'new activit{n,plural,=0{ies} =1{y} other{ies}}' => '',
+    'Any' => 'Alle',
+    'Enter day...' => 'Tag eingeben...',
     'running exam{n,plural,=0{s} =1{} other{s}}' => 'laufende Pürfung{n,plural,=0{en} =1{} other{en}}',
-    'This is a string to translate!' => '@@test@@',
+    'exam{n,plural,=0{s} =1{} other{s}} completed' => 'Prüfung{n,plural,=0{en} =1{} other{en}} abgeschlossen',
+    'exam{n,plural,=0{s} =1{} other{s}} created' => 'Prüfung{n,plural,=0{en} =1{} other{en}} erstellt',
+    'hour{n,plural,=0{s} =1{} other{s}} spent in exams' => 'Stund{n,plural,=0{en} =1{e} other{en}} in Prüfungen verbracht',
+    'new activit{n,plural,=0{ies} =1{y} other{ies}}' => 'neue Aktivität{n,plural,=0{en} =1{} other{en}}',
 ];

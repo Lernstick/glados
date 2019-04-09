@@ -520,7 +520,7 @@ class TicketController extends Controller
         if ($step == 1) {
             if ($model === null) {
                 $model = new Ticket(['scenario' => Ticket::SCENARIO_DEFAULT]);
-                !empty($token) ? $model->addError('token', 'Ticket not found.') : null;
+                !empty($token) ? $model->addError('token', \Yii::t('tickets', 'Ticket not found.')) : null;
                 $model->token = $token;
             }
             return $this->render('token-request', [
@@ -529,24 +529,24 @@ class TicketController extends Controller
         } else if ($step == 2) {
             if ($model === null) {
                 $model = new Ticket(['scenario' => Ticket::SCENARIO_DEFAULT]);
-                $token !== null ? $model->addError('token', 'Ticket not found.') : null;
+                $token !== null ? $model->addError('token', \Yii::t('tickets', 'Ticket not found.')) : null;
                 $model->token = $token;
                 return $this->render('token-request', [
                     'model' => $model,
                 ]);                
             } else if (!$model->valid) {
-                $model->addError('token', 'The ticket has expired.');
+                $model->addError('token', \Yii::t('tickets', 'The ticket has expired.'));
                 return $this->render('token-request', [
                     'model' => $model,
                 ]);                
             } else if (!$model->exam->fileConsistency) {
-                $model->addError('token', 'The exam file is not valid.');
+                $model->addError('token', \Yii::t('tickets', 'The exam file is not valid.'));
                 return $this->render('token-request', [
                     'model' => $model,
                 ]);                
             } else if ($model->download_lock != 0) {
-                $model->addError('token', 'Another instance is already running, '
-                                        . 'multiple downloads are not allowed.');
+                $model->addError('token', \Yii::t('tickets', 'Another instance is already running, '
+                                        . 'multiple downloads are not allowed.'));
                 return $this->render('token-request', [
                     'model' => $model,
                 ]);                
