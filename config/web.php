@@ -8,6 +8,7 @@ $config = [
     'bootstrap' => ['log'],
     'timezone' => 'Europe/Zurich',
     'vendorPath' => '/usr/share/yii2',
+    'language' => 'de',
     'modules' => [
         'dynagrid' => [
             'class' => '\kartik\dynagrid\Module',
@@ -60,6 +61,15 @@ $config = [
                 'howto/<id>' => 'howto/view',
                 'ticket/<action:(config|download|finish|notify|md5)>/<token:.*>' => 'ticket/<action>',
             ]
+        ],
+        'i18n' => [
+            'translations' => [
+                'app*' => [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@app/messages',
+                    'sourceLanguage' => 'en',
+                ],
+            ],
         ],
         'file' => [
             'class' => 'app\components\File',
