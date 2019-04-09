@@ -4,11 +4,18 @@ $params = require(__DIR__ . '/params.php');
 
 $config = [
     'id' => 'basic',
+    'name' => 'GLaDOS',
+    'version' => '1.0.5',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log'],
+    'bootstrap' => [
+        'log',
+        [
+            'class' => 'app\components\LanguageSelector',
+            'supportedLanguages' => ['en', 'de'],
+        ],
+    ],
     'timezone' => 'Europe/Zurich',
     'vendorPath' => '/usr/share/yii2',
-    'language' => 'de',
     'modules' => [
         'dynagrid' => [
             'class' => '\kartik\dynagrid\Module',

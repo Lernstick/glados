@@ -209,7 +209,7 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">&copy; GLaDOS <?= ' ' . \Yii::$app->params['version'] . ' - ' . date('Y') ?>
+        <p class="pull-left">&copy; GLaDOS <?= ' ' . \Yii::$app->version . ' - ' . date('Y') ?>
             <?= ActiveEventField::widget([
                 'options' => [
                     'tag' => 'i',

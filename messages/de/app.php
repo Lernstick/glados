@@ -21,6 +21,6 @@ return [
     'exam{n,plural,=0{s} =1{} other{s}} created' => '',
     'hour{n,plural,=0{s} =1{} other{s}} spent in exams' => '',
     'new activit{n,plural,=0{ies} =1{y} other{ies}}' => '',
-    'running exam{n,plural,=0{s} =1{} other{s}}' => '',
+    'running exam{n,plural,=0{s} =1{} other{s}}' => 'laufende Pürfung{n,plural,=0{en} =1{} other{en}}',
     'This is a string to translate!' => '@@test@@',
 ];
