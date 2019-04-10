@@ -135,9 +135,10 @@ class TicketController extends Controller
 
             $lastState = $session['ticketLastState' . $model->id];
             if(isset($lastState) && $lastState != $model->state){
-                $session->addFlash('info', 'The Ticket state has changed from ' . 
-                    Yii::$app->formatter->format($lastState, 'state') . ' to ' . 
-                    Yii::$app->formatter->format($model->state, 'state'));
+                $session->addFlash('info', Yii::t('tickets', 'The Ticket state has changed from {from} to {to}', [
+                    'from' => Yii::$app->formatter->format($lastState, 'state'),
+                    'to' => Yii::$app->formatter->format($model->state, 'state')
+                ]));
             }
             $session['ticketLastState' . $model->id] = $model->state;
 
@@ -232,7 +233,10 @@ class TicketController extends Controller
                 'model' => $model,
             ]);
 
-            $title = 'Ticket for "' . $model->exam->subject . ' - ' . $model->exam->name . '"';
+            $title = \Yii::t('exams', 'Ticket for "{exam} - {subject}"', [
+                'exam' => $model->exam->subject,
+                'subject' => $model->exam->name
+            ]);
 
             $pdf = new Pdf([
                 'mode' => Pdf::MODE_UTF8, 
@@ -289,7 +293,7 @@ class TicketController extends Controller
                 }
 
                 if ($count == $c) {
-                    Yii::$app->session->addFlash('success', 'You have successfully created ' . $count . ' new Tickets.');
+                    Yii::$app->session->addFlash('success', Yii::t('tickets', 'You have successfully created {n} new Tickets.', ['n' => $count]));
                     return $this->redirect(['exam/view', 'id' => $exam_id]);
                 } else {
                     foreach ($model->getErrors() as $attribute => $value){
@@ -321,7 +325,7 @@ class TicketController extends Controller
 
                     if(count($names) != 0) {
                         if ($c == count($names)) {
-                            Yii::$app->session->addFlash('success', 'You have successfully created ' . $c . ' new Tickets.');
+                            Yii::$app->session->addFlash('success', Yii::t('tickets', 'You have successfully created {n} new Tickets.', ['n' => $c]));
                             return $this->redirect(['exam/view', 'id' => $model->exam_id]);
                         }else{
                             foreach ($ticket->getErrors() as $attribute => $value){
@@ -391,7 +395,7 @@ class TicketController extends Controller
             if (($model = Ticket::findOne(['token' => $token])) === null) {
                 $model = new Ticket(['scenario' => Ticket::SCENARIO_SUBMIT]);
                 $model->token = $token;
-                $model->token != null ? $model->addError('token', 'Ticket not found.') : null;
+                $model->token != null ? $model->addError('token', Yii::t('tickets', 'Ticket not found.')) : null;
 
                 return $this->render('submit', [
                     'model' => $model,
@@ -430,7 +434,7 @@ class TicketController extends Controller
     {
         if ($mode == 'single') {
             $this->findModel($id)->delete();
-            Yii::$app->session->addFlash('danger', 'The Ticket has been deleted successfully.');
+            Yii::$app->session->addFlash('danger', Yii::t('tickets', 'The Ticket has been deleted successfully.'));
 
             return $this->redirect(Yii::$app->session['ticketViewReturnURL']);
         }else if ($mode == 'many') {
@@ -447,11 +451,11 @@ class TicketController extends Controller
 
             #TODO: errors?
             if($c == 0){
-                Yii::$app->session->addFlash('danger', 'There are no Open Tickets to delete.');
+                Yii::$app->session->addFlash('danger', Yii::t('tickets', 'There are no Open Tickets to delete.'));
                 return $this->redirect(['exam/view', 'id' => $exam_id]);
             }
 
-            Yii::$app->session->addFlash('danger', $c . ' Open Tickets have been deleted successfully.');
+            Yii::$app->session->addFlash('danger', Yii::t('tickets', '{n} Open Tickets have been deleted successfully.', ['n' => $c]));
             return $this->redirect(['exam/view', 'id' => $exam_id]);
         }
     }
@@ -467,7 +471,7 @@ class TicketController extends Controller
 
         $model = Ticket::findOne(['token' => $token]);
         if (!$model) {
-            throw new NotFoundHttpException('The requested page does not exist.');
+            throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
         } else {
             echo $model->exam->md5;
             return;
@@ -485,7 +489,7 @@ class TicketController extends Controller
 
         $model = Ticket::findOne(['token' => $token]);
         if (!$model) {
-            throw new NotFoundHttpException('The requested page does not exist.');
+            throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
         } else {
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             return [
@@ -857,7 +861,7 @@ class TicketController extends Controller
         $daemon = new Daemon();
         $pid = $daemon->startRestore($id, $file, $date);
 
-        Yii::$app->session->addFlash('info', 'Restore started.');
+        Yii::$app->session->addFlash('info', \Yii::t('tickets', 'Restore started.'));
 
         if(Yii::$app->request->isAjax){
             return $this->runAction('view', ['id' => $id]);
@@ -894,7 +898,7 @@ class TicketController extends Controller
         if (file_exists($pubKeyFile)) {
             return file_get_contents($pubKeyFile);
         } else {
-            throw new ServerErrorHttpException('The public key could not be generated.');
+            throw new ServerErrorHttpException(\Yii::t('tickets', 'The public key could not be generated.'));
         }
     }
 
@@ -913,7 +917,7 @@ class TicketController extends Controller
                 return $model;
             }
         }
-        throw new NotFoundHttpException('The requested page does not exist.');
+        throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
     }
 
     /**
@@ -929,8 +933,10 @@ class TicketController extends Controller
         if(Yii::$app->user->can($r . '/all') || $model->exam->user_id == Yii::$app->user->id){
             return true;
         }else{
-            throw new ForbiddenHttpException('You are not allowed to ' . \Yii::$app->controller->action->id . 
-                    ' this ' . \Yii::$app->controller->id . '.');
+            throw new ForbiddenHttpException(\Yii::t('app', 'You are not allowed to {action} this {item}.', [
+                'action' => \Yii::$app->controller->action->id,
+                'item' => \Yii::$app->controller->id
+            ]));
             return false;
         }
     }

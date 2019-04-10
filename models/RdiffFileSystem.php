@@ -713,7 +713,7 @@ class RdiffFileSystem extends Model
             foreach ($output as $line) {
                 $out .= $line . PHP_EOL;
             }
-            throw new NotFoundHttpException('The file could not be restored. ' . PHP_EOL . $out);
+            throw new NotFoundHttpException(\Yii::t('restores', 'The file could not be restored.') . ' ' . PHP_EOL . $out);
         }
     }
 

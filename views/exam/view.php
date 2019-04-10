@@ -14,7 +14,7 @@ use yii\web\JsExpression;
 /* @var $model app\models\Exam */
 
 $this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Exams', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => \Yii::t('exams', 'Exams'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
@@ -50,8 +50,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
                 [
                     'attribute' => 'user.username',
-                    'label' => 'Owner',
-                    'value' => ( $model->user_id == null ? '<span class="not-set">(user removed)</span>' : '<span>' . $model->user->username . '</span>' ),
+                    'label' => \Yii::t('exams', 'Owner'),
+                    'value' => ( $model->user_id == null ? '<span class="not-set">(' . \Yii::t('exams', 'user removed') . ')</span>' : '<span>' . $model->user->username . '</span>' ),
                     'format' => 'html',
                     'visible' => Yii::$app->user->can('exam/view/all'),
                 ],
@@ -88,20 +88,20 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="col-sm-12 col-md-6">
           <div class="panel panel-danger">
             <div class="panel-heading">
-              <span>Exam file</span>
+              <span><?= \Yii::t('exams', 'Exam file') ?></span>
             </div>
             <div class="panel-body">
               <p>
-                <span class="not-set">No file found</span>
+                <span class="not-set"><?= \Yii::t('exams', 'No file found') ?></span>
               </p>
               <p class="text-muted">
-                <span>You have to provide at least one exam file.</span><br>
+                <span><?= \Yii::t('exams', 'You have to provide at least one exam file.') ?></span><br>
                 <span class="glyphicon glyphicon-alert"></span>
-                <span>For more information, please visit <?= Html::a('Manual / Create an exam', ['/howto/view', 'id' => 'create-exam.md'], ['class' => 'alert-link']) ?>.</span>
+                <span><?= \Yii::t('exams', 'For more information, please visit ') ?><?= Html::a(\Yii::t('exams', 'Manual / Create an exam'), ['/howto/view', 'id' => 'create-exam.md'], ['class' => 'alert-link']) ?>.</span>
               </p>
               <p>
                   <?= Html::a(
-                    '<span class="glyphicon glyphicon-plus"></span> Add file ...',
+                    '<span class="glyphicon glyphicon-plus"></span> ' . \Yii::t('exams', 'Add file ...'),
                     ['update', 'id' => $model->id, '#' => 'tab_file'],
                     ['data-pjax' => 0, 'class' => 'btn btn-default', 'role' => 'button']
                 ); ?>
@@ -122,16 +122,16 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?= '<span class="glyphicon glyphicon-file"></span> ' . basename($model->file2); ?>
             </p>
             <p>
-                <span class="text-muted">Consistency: </span><?= ($model->file2Consistency ? 
-                    '<span class="text-success">File valid</span>' :  
-                    '<strong><span class="not-set">File not valid</span></strong>'
+                <span class="text-muted"><?= \Yii::t('exams', 'Consistency') ?>: </span><?= ($model->file2Consistency ? 
+                    '<span class="text-success">' . \Yii::t('exams', 'File valid') . '</span>' :  
+                    '<strong><span class="not-set">' . \Yii::t('exams', 'File not valid') . '</span></strong>'
                 ) ?><br>
-                <span class="text-muted">Size: <?= yii::$app->formatter->format($model->file2Size, 'shortSize') ?></span><br>
+                <span class="text-muted"><?= \Yii::t('exams', 'Size') ?>: <?= yii::$app->formatter->format($model->file2Size, 'shortSize') ?></span><br>
                 <span class="text-muted"><?= yii::$app->formatter->format($model->file2Info, 'html') ?></span>
             </p>
             <p>
                 <?= Html::a(
-                    '<span class="glyphicon glyphicon-search"></span> Browse',
+                    '<span class="glyphicon glyphicon-search"></span> ' . \Yii::t('exams', 'Browse'),
                     ['view', 'id' => $model->id, 'mode' => 'browse', 'type' => 'zip'],
                     [
                         'data-pjax' => 0,
@@ -144,12 +144,12 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]
                 ); ?>
                 <?= Html::a(
-                    '<span class="glyphicon glyphicon-download-alt"></span> Download',
+                    '<span class="glyphicon glyphicon-download-alt"></span> ' . \Yii::t('exams', 'Download'),
                     ['view', 'id' => $model->id, 'mode' => 'file', 'type' => 'zip'],
                     ['data-pjax' => 0, 'class' => 'btn btn-default', 'role' => 'button']
                 ); ?>
                 <?= Html::a(
-                    '<span class="glyphicon glyphicon-pencil"></span> Change',
+                    '<span class="glyphicon glyphicon-pencil"></span> ' . \Yii::t('exams', 'Change'),
                     ['update', 'id' => $model->id, '#' => 'tab_file'],
                     ['data-pjax' => 0, 'class' => 'btn btn-default', 'role' => 'button']
                 ); ?>
@@ -170,17 +170,17 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?= '<span class="glyphicon glyphicon-file"></span> ' . basename($model->file); ?>
             </p>
             <p>
-                <span class="text-muted">Consistency: </span><?= ($model->file1Consistency ? 
-                    '<span class="text-success">File valid</span>' :  
-                    '<span class="not-set">File not valid</span>'
+                <span class="text-muted"><?= \Yii::t('exams', 'Consistency') ?>: </span><?= ($model->file1Consistency ? 
+                    '<span class="text-success">' . \Yii::t('exams', 'File valid') . '</span>' :  
+                    '<span class="not-set">' . \Yii::t('exams', 'File not valid') . '</span>'
                 ) ?><br>
-                <span class="text-muted">Size: <?= yii::$app->formatter->format($model->fileSize, 'shortSize') ?></span><br>
-                <span class="text-muted">MD5 Checksum: <?= yii::$app->formatter->format($model->md5, 'text') ?></span><br>
+                <span class="text-muted"><?= \Yii::t('exams', 'Size') ?>: <?= yii::$app->formatter->format($model->fileSize, 'shortSize') ?></span><br>
+                <span class="text-muted"><?= \Yii::t('exams', 'MD5 Checksum') ?>: <?= yii::$app->formatter->format($model->md5, 'text') ?></span><br>
                 <span class="text-muted"><?= yii::$app->formatter->format($model->fileInfo, 'html') ?></span>
             </p>
             <p>
                 <?= Html::a(
-                    '<span class="glyphicon glyphicon-search"></span> Browse',
+                    '<span class="glyphicon glyphicon-search"></span> ' . \Yii::t('exams', 'Browse'),
                     ['view', 'id' => $model->id, 'mode' => 'browse', 'type' => 'squashfs'],
                     [
                         'data-pjax' => 0,
@@ -193,12 +193,12 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]
                 ); ?>
                 <?= Html::a(
-                    '<span class="glyphicon glyphicon-download-alt"></span> Download',
+                    '<span class="glyphicon glyphicon-download-alt"></span> ' . \Yii::t('exams', 'Download'),
                     ['view', 'id' => $model->id, 'mode' => 'file', 'type' => 'squashfs'],
                     ['data-pjax' => 0, 'class' => 'btn btn-default', 'role' => 'button']
                 ); ?>
                 <?= Html::a(
-                    '<span class="glyphicon glyphicon-pencil"></span> Change',
+                    '<span class="glyphicon glyphicon-pencil"></span> ' . \Yii::t('exams', 'Change'),
                     ['update', 'id' => $model->id, '#' => 'tab_file'],
                     ['data-pjax' => 0, 'class' => 'btn btn-default', 'role' => 'button']
                 ); ?>
@@ -218,7 +218,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'options' => ['class' => 'tab-pane fade'],
     ]); ?>
 
-    <div class="alert alert-warning" role="alert"><i class="glyphicon glyphicon-warning-sign"></i> Please notice, all these settings will <b>override</b> the settings configured in the exam file!</div>
+    <div class="alert alert-warning" role="alert"><i class="glyphicon glyphicon-warning-sign"></i> <?= \Yii::t('exams', 'Please notice, all these settings will <b>override</b> the settings configured in the exam file!') ?></div>
 
     <?= DetailView::widget([
         'model' => $model,
@@ -230,12 +230,12 @@ $this->params['breadcrumbs'][] = $this->title;
             'firewall_off:boolean',
             'screenshots:boolean',
             [
-                'label' => 'Screenshot Interval',
+                'label' => \Yii::t('exams', 'Screenshot Interval'),
                 'value' => $model->screenshots_interval*60, # in seconds
                 'format' => 'duration'
             ],
             [
-                'label' => 'Maximum brightness',
+                'label' => \Yii::t('exams', 'Maximum brightness'),
                 'value' => $model->max_brightness/100,
                 'format' => 'percent'
             ],            
@@ -248,7 +248,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'libre_autosave:boolean',
             [
-                'label' => 'Libreoffice Autosave Interval',
+                'label' => \Yii::t('exams', 'Libreoffice Autosave Interval'),
                 'value' => $model->libre_autosave_interval*60, # in seconds
                 'format' => 'duration'
             ],
@@ -263,8 +263,8 @@ $this->params['breadcrumbs'][] = $this->title;
         'itemView' => function ($model, $key, $index, $widget) {
             return '<td>' . $model . '</td>';
         },
-        'emptyText' => '<table class="table table-bordered table-hover"><tr><th>HTTP URL Whitelist</th></tr><tr><td>No URLs found.</td></tr></table>',
-        'layout' => '<table class="table table-bordered table-hover"><tr><th>HTTP URL Whitelist</th></tr>{items}</table> {pager} {summary}',
+        'emptyText' => '<table class="table table-bordered table-hover"><tr><th>HTTP URL Whitelist</th></tr><tr><td>' . \Yii::t('exams', 'No URLs found.') . '</td></tr></table>',
+        'layout' => '<table class="table table-bordered table-hover"><tr><th>' . \Yii::t('exams', 'HTTP URL Whitelist') . '</th></tr>{items}</table> {pager} {summary}',
     ]); ?>
 
     <?php Pjax::end(); ?>
@@ -298,7 +298,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                 ],
                 'title' => [
-                    'text' => 'Tickets for Exam "' . $model->name . '" in "' . $model->subject . '"'
+                    'text' => \Yii::t('exams', 'Tickets for Exam "{exam}" in "{subject}"', [
+                        'exam' => $model->name,
+                        'subject' => $model->subject
+                    ])
                 ],
                 'tooltip' => [
                     'pointFormat' => '{series.name}: <b>{point.percentage:.1f}%</b>'
@@ -315,33 +318,33 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
                 'series' => [
                     [
-                        'name' => 'Tickets',
+                        'name' => \Yii::t('exams', 'Tickets'),
                         'colorByPoint' => true,
                         'data' => [
                             [
-                                'name' => 'Open',
+                                'name' => \Yii::t('exams', 'Open'),
                                 'y' => $model->openTicketCount,
                                 'color' => '#5cb85c'
                             ],
                             [
-                                'name' => 'Running',
+                                'name' => \Yii::t('exams', 'Running'),
                                 'y' => $model->runningTicketCount,
                                 'color' => '#286090',
                                 'sliced' => true,
                                 'selected' => true
                             ],
                             [
-                                'name' => 'Closed',
+                                'name' => \Yii::t('exams', 'Closed'),
                                 'y' => $model->closedTicketCount,
                                 'color' => '#d9534f'
                             ],
                             [
-                                'name' => 'Submitted',
+                                'name' => \Yii::t('exams', 'Submitted'),
                                 'y' => $model->submittedTicketCount,
                                 'color' => '#f0ad4e'
                             ],
                             [
-                                'name' => 'Unknown',
+                                'name' => \Yii::t('exams', 'Unknown'),
                                 'y' => $model->ticketCount - $model->openTicketCount - $model->runningTicketCount - $model->closedTicketCount - $model->submittedTicketCount,
                                 'color' => '#dddddd'
                             ]

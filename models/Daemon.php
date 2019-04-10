@@ -52,13 +52,13 @@ class Daemon extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'pid' => 'Process ID',
-            'uuid' => 'Process UUID',
-            'state' => 'State',
-            'load' => 'Load (Last 5 minutes)',
-            'description' => 'Description',
-            'started_at' => 'Started At',
+            'id' => \Yii::t('daemons', 'ID'),
+            'pid' => \Yii::t('daemons', 'Process ID'),
+            'uuid' => \Yii::t('daemons', 'Process UUID'),
+            'state' => \Yii::t('daemons', 'State'),
+            'load' => \Yii::t('daemons', 'Load (Last 5 minutes)'),
+            'description' => \Yii::t('daemons', 'Description'),
+            'started_at' => \Yii::t('daemons', 'Started At'),
         ];
     }
 

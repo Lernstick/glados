@@ -65,7 +65,7 @@ class BackupController extends Controller
 		$ticket = Ticket::findOne($ticket_id);
 
         if (!file_exists(\Yii::$app->params['backupPath'] . '/' . $ticket->token)) {
-            return '<span>No Backup yet.</span>';
+            return '<span>' . \Yii::t('backups', 'No Backup yet.') . '</span>';
         }
 
 		$fs = new RdiffFileSystem([
@@ -114,7 +114,7 @@ class BackupController extends Controller
 	        	return $this->redirect(['ticket/view', 'id' => $ticket_id, '#' => 'tab_browse']);
 	        }
         }else{
-            throw new NotFoundHttpException('The requested page does not exist.');
+            throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
         }
 
 

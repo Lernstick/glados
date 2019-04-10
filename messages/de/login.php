@@ -17,13 +17,8 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    'Activities' => 'Aktivitäten',
-    'Date' => 'Datum',
-    'Description' => 'Bezeichnung',
-    'ID' => 'ID',
-    'No activities found.' => 'Keine Aktivitäten gefunden.',
-    'Severity' => 'Fehlerstufe',
-    'Ticket' => 'Ticket',
-    'new activities; click to load' => 'neue Aktivitäten; Klicken zum laden',
-    'Reset Grid' => '',
+    'Login' => '',
+    'Please fill out the following fields to login:' => '',
+    'To modify the users, please login as <strong>admin</strong>.' => '',
+    'You may login with <strong>admin/admin</strong> or <strong>teacher/teacher</strong>.' => '',
 ];

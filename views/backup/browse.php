@@ -60,7 +60,7 @@ $this->registerJs($js);
 
         <div class="">
         <?= Html::a(
-            '<span class="glyphicon glyphicon-' . ($options['showDotFiles'] ? 'check' : 'unchecked') . '"></span> Show hidden files',
+            '<span class="glyphicon glyphicon-' . ($options['showDotFiles'] ? 'check' : 'unchecked') . '"></span> ' . \Yii::t('tickets', 'Show hidden files'),
             Url::to([
                 false,
                 'id' => $ticket->id,
@@ -74,7 +74,7 @@ $this->registerJs($js);
 
 <?php
 
-        echo "<span>Path</span>: " . Html::a(
+        echo '<span>' . \Yii::t('tickets', 'Path') . '</span>: ' . Html::a(
             '<span class="glyphicon glyphicon-folder-open"></span> ' . $fs->root,
             Url::to([
                 false,
@@ -106,7 +106,7 @@ $this->registerJs($js);
           echo "&nbsp;&nbsp;&nbsp;";
           echo "<span class='backup-browse-options'>";
           echo Html::a(
-              '<span class="glyphicon glyphicon-tasks"></span> Restore this state of the directory',
+              '<span class="glyphicon glyphicon-tasks"></span> ' . \Yii::t('tickets', 'Restore this state of the directory'),
               Url::to([
                   'ticket/restore',
                   'id' => $ticket->id,
@@ -148,9 +148,9 @@ $this->registerJs($js);
           ]); ?>
         </div>-->
         <div class="input-group input-group-sm col-sm-12 pull-right special-dropdown">
-          <span class="input-group-addon" id="version-addon" style="min-width:70px;">Version</span>
+          <span class="input-group-addon" id="version-addon" style="min-width:70px;"><?= \Yii::t('tickets', 'Version') ?></span>
           <span class="input-group-btn" style="width:100%;">
-            <button style="width:100%;" class="btn btn-default toggle-dropdown" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-describedby="version-addon"> <span class="glyphicon glyphicon-cog"></span> <?= $date == 'all' ? 'All versions overlapping' : (yii::$app->formatter->format($fs->version, 'datetime') . ($fs->version == $fs->newestBackupVersion ? ' (current)' : null)); ?></button>
+            <button style="width:100%;" class="btn btn-default toggle-dropdown" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-describedby="version-addon"> <span class="glyphicon glyphicon-cog"></span> <?= $date == 'all' ? \Yii::t('tickets', 'All versions overlapping') : (yii::$app->formatter->format($fs->version, 'datetime') . ($fs->version == $fs->newestBackupVersion ? ' (' . \Yii::t('tickets', 'current') . ')' : null)); ?></button>
 
             <?php Pjax::begin([
                 'id' => 'w101',
@@ -173,7 +173,7 @@ $this->registerJs($js);
                 ],
                 'viewParams' => ['ticket' => $ticket, 'fs' => $fs, 'date' => $date, 'options' => $options],
                 'itemView' => '_browse_version',
-                'emptyText' => 'No versions.',
+                'emptyText' => \Yii::t('tickets', 'No versions.'),
                 'emptyTextOptions' => [
                     'tag' => 'li',
                     'class' => 'empty dropdown-header',
@@ -211,7 +211,7 @@ $this->registerJs($js);
         ],
         'itemView' => '_browse_item',
         'viewParams' => ['ticket' => $ticket, 'date' => $date, 'options' => $options],
-        'emptyText' => 'No files or directories.',
+        'emptyText' => \Yii::t('tickets', 'No files or directories.'),
         'emptyTextOptions' => [
             'tag' => 'div',
             'class' => 'empty list-group-item backup-browse-item',

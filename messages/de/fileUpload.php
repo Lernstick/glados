@@ -17,13 +17,16 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    'Activities' => 'Aktivitäten',
-    'Date' => 'Datum',
-    'Description' => 'Bezeichnung',
-    'ID' => 'ID',
-    'No activities found.' => 'Keine Aktivitäten gefunden.',
-    'Severity' => 'Fehlerstufe',
-    'Ticket' => 'Ticket',
-    'new activities; click to load' => 'neue Aktivitäten; Klicken zum laden',
-    'Reset Grid' => '',
+    'A PHP extension stopped the file upload.' => '',
+    'Failed to write file to disk.' => '',
+    'Missing a temporary folder' => '',
+    'No file was uploaded' => '',
+    'The upload directory ({dir}) does not exist.' => '',
+    'The upload directory ({dir}) is not writable.' => '',
+    'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form' => '',
+    'The uploaded file exceeds the upload_max_filesize directive in php.ini' => '',
+    'The uploaded file was only partially uploaded' => '',
+    'There is no error, the file uploaded with success' => '',
+    'Unknown File Upload Error' => '',
+    'Unknown PHP File Upload Error: {error}' => '',
 ];

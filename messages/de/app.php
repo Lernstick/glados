@@ -17,11 +17,17 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    'Any' => 'Alle',
-    'Enter day...' => 'Tag eingeben...',
-    'running exam{n,plural,=0{s} =1{} other{s}}' => 'laufende Pürfung{n,plural,=0{en} =1{} other{en}}',
     'exam{n,plural,=0{s} =1{} other{s}} completed' => 'Prüfung{n,plural,=0{en} =1{} other{en}} abgeschlossen',
     'exam{n,plural,=0{s} =1{} other{s}} created' => 'Prüfung{n,plural,=0{en} =1{} other{en}} erstellt',
     'hour{n,plural,=0{s} =1{} other{s}} spent in exams' => 'Stund{n,plural,=0{en} =1{e} other{en}} in Prüfungen verbracht',
     'new activit{n,plural,=0{ies} =1{y} other{ies}}' => 'neue Aktivität{n,plural,=0{en} =1{} other{en}}',
+    'running exam{n,plural,=0{s} =1{} other{s}}' => 'laufende Pürfung{n,plural,=0{en} =1{} other{en}}',
+    'Check your exam result!' => '',
+    'Login' => '',
+    'Please contact us if you think this is a server error. Thank you.' => '',
+    'The above error occurred while the Web server was processing your request.' => '',
+    'The requested page does not exist.' => '',
+    'You are not allowed to {action} this {item}.' => '',
+    'Any' => '@@Alle@@',
+    'Enter day...' => '@@Tag eingeben...@@',
 ];

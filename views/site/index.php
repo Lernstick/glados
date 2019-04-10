@@ -83,7 +83,7 @@ $this->title = 'GLaDOS';
 
     <div class="col-md-12">
         <div class="jumbotron alert-info">
-            <p>Check your exam result!</p>
+            <p><?= \Yii::t('app', 'Check your exam result!') ?></p>
             <?= $this->render('/result/_form', [
                 'model' => new Ticket(),
             ]);

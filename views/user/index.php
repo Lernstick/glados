@@ -12,7 +12,7 @@ use yii\web\JsExpression;
 /* @var $searchModel app\models\UserSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Users';
+$this->title = \Yii::t('users', 'Users');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="user-index">
@@ -63,7 +63,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                 ],
                 'filterInputOptions' => [
-                    'placeholder' => 'Any'
+                    'placeholder' => \Yii::t('form', 'Any')
                 ],
                 'format'=>'raw'
             ],
@@ -87,11 +87,11 @@ $this->params['breadcrumbs'][] = $this->title;
         'gridOptions' => [
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
-            'panel' => ['heading' => '<h3 class="panel-title">Users</h3>'],
+            'panel' => ['heading' => '<h3 class="panel-title">' . \Yii::t('users', 'Users') . '</h3>'],
             'toolbar' =>  [
                 ['content' =>
-                    Html::a('<i class="glyphicon glyphicon-plus"></i>', ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => 'Create User']) . ' ' .
-                    Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/user/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => 'Reset Grid'])
+                    Html::a('<i class="glyphicon glyphicon-plus"></i>', ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => \Yii::t('users', 'Create User')]) . ' ' .
+                    Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/user/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => \Yii::t('users', 'Reset Grid')])
                 ],
                 ['content' => '{dynagridFilter}{dynagridSort}{dynagrid}'],
                 '{export}',

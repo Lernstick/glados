@@ -8,7 +8,7 @@ use yii\grid\GridView;
 /* @var $searchModel app\models\HowtoSearch */
 /* @var $dataProvider yii\data\ArrayDataProvider */
 
-$this->title = 'Howtos';
+$this->title = \Yii::t('help', 'Howtos');
 $this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['index']];
 ?>
 
@@ -23,7 +23,7 @@ $this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['index']];
         'layout' => '{items} {summary} {pager}',
         'columns' => [
             [
-                   'label' => 'Guide / Howto',
+                   'label' => \Yii::t('help', 'Guide / Howto'),
                    'format' => 'raw',
                     'value'=>function ($model) {
                         return Html::a($model->title, Url::to(['howto/view', 'id' => $model->id]));

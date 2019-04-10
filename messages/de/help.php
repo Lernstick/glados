@@ -17,13 +17,9 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    'Activities' => 'Aktivitäten',
-    'Date' => 'Datum',
-    'Description' => 'Bezeichnung',
-    'ID' => 'ID',
-    'No activities found.' => 'Keine Aktivitäten gefunden.',
-    'Severity' => 'Fehlerstufe',
-    'Ticket' => 'Ticket',
-    'new activities; click to load' => 'neue Aktivitäten; Klicken zum laden',
-    'Reset Grid' => '',
+    'Guide / Howto' => '',
+    'Help' => '',
+    'Howto' => '',
+    'Howtos' => '',
+    'Navigation' => '',
 ];

@@ -6,10 +6,10 @@ use yii\helpers\Html;
 /* @var $model app\models\Ticket */
 /* @var $searchModel app\models\TicketSearch */
 
-$this->title = 'Edit Ticket: ' . ' ' . $model->token;
-$this->params['breadcrumbs'][] = ['label' => 'Tickets', 'url' => ['index']];
+$this->title = \Yii::t('tickets', 'Edit Ticket: {token}', [ 'token' => $model->token ]);
+$this->params['breadcrumbs'][] = ['label' => \Yii::t('tickets', 'Tickets'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->token, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = 'Edit';
+$this->params['breadcrumbs'][] = \Yii::t('tickets', 'Edit');
 ?>
 <div class="ticket-update">
 

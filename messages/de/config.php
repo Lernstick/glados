@@ -17,13 +17,13 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    'Activities' => 'Aktivitäten',
-    'Date' => 'Datum',
-    'Description' => 'Bezeichnung',
-    'ID' => 'ID',
-    'No activities found.' => 'Keine Aktivitäten gefunden.',
-    'Severity' => 'Fehlerstufe',
-    'Ticket' => 'Ticket',
-    'new activities; click to load' => 'neue Aktivitäten; Klicken zum laden',
-    'Reset Grid' => '',
+    'Avahi Port' => '',
+    'Avahi Protocol' => '',
+    'Avahi Service File' => '',
+    'Avahi TXT Records' => '',
+    'Host' => '',
+    'IP' => '',
+    'Options' => '',
+    'Port' => '',
+    'System Configuation' => '',
 ];

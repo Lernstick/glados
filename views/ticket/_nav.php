@@ -31,25 +31,25 @@ $this->registerJs($active_tabs);
 <ul class="nav nav-tabs">
     <li class="active"><a data-toggle="tab" href="#general">
         <i class="glyphicon glyphicon-home"></i>
-        General
+        <?= \Yii::t('tickets', 'General') ?>
     </a></li>
     <li>
         <?= Html::a(
-            '<i class="glyphicon glyphicon-comment"></i> Activity Log',
+            '<i class="glyphicon glyphicon-comment"></i> ' . \Yii::t('tickets', 'Activity Log'),
             '#activities',
             ['data-toggle' => 'tab']
         ) ?>
     </li>
     <li>
         <?= Html::a(
-            '<i class="glyphicon glyphicon-hdd"></i> Backups',
+            '<i class="glyphicon glyphicon-hdd"></i> ' . \Yii::t('tickets', 'Backups'),
             Url::to(['backup/index', 'ticket_id' => $model->id, '#' => 'backups']),
             ['data-toggle' => 'tab']
         ); ?>
     </li>
     <li>
         <?= Html::a(
-            '<i class="glyphicon glyphicon-folder-open"></i> Browse Backup',
+            '<i class="glyphicon glyphicon-folder-open"></i> ' . \Yii::t('tickets', 'Browse Backup'),
             Url::to(['backup/browse', 'ticket_id' => $model->id, '#' => 'browse']),
             ['data-toggle' => 'tab', 'id' => 'browseButton']
         ); ?>
@@ -58,24 +58,24 @@ $this->registerJs($active_tabs);
     <?php if (Yii::$app->user->can('screenshot/view')) { ?>
         <li><a data-toggle="tab" href="#screenshots">
             <i class="glyphicon glyphicon-picture"></i>
-            Screenshots
+            <?= \Yii::t('tickets', 'Screenshots') ?>
         </a></li>
     <?php } else { ?>
         <li class="disabled"><a class="disabled" data-toggle="" href="#">
             <i class="glyphicon glyphicon-picture"></i>
-            Screenshots
+            <?= \Yii::t('tickets', 'Screenshots') ?>
         </a></li>
     <?php } ?>
     <li>
         <?= Html::a(
-            '<i class="glyphicon glyphicon-sunglasses"></i> Result',
+            '<i class="glyphicon glyphicon-sunglasses"></i> ' . \Yii::t('tickets', 'Result'),
             Url::to(['result/view', 'token' => $model->token, '#' => 'result']),
             ['data-toggle' => 'tab']
         ); ?>
     </li>        
     <li>
         <?= Html::a(
-            '<i class="glyphicon glyphicon-tasks"></i> Restores',
+            '<i class="glyphicon glyphicon-tasks"></i> ' . \Yii::t('tickets', 'Restores'),
             Url::to(['restore/index', 'ticket_id' => $model->id, '#' => 'restores']),
             ['data-toggle' => 'tab']
         ); ?>
@@ -83,23 +83,23 @@ $this->registerJs($active_tabs);
     <li class="dropdown">
         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
             <i class="glyphicon glyphicon-list-alt"></i>
-            Actions&nbsp;<span class="caret"></span>
+            <?= \Yii::t('tickets', 'Actions') ?>&nbsp;<span class="caret"></span>
         </a>
         <ul class="dropdown-menu">
             <li>
                 <?= Html::a(
-                    '<span class="glyphicon glyphicon-pencil"></span> Edit',
+                    '<span class="glyphicon glyphicon-pencil"></span> ' . \Yii::t('tickets', 'Edit'),
                     ['update', 'id' => $model->id],
                     ['data-pjax' => 0]
                 ) ?>
             </li>
             <li>
                 <?= Html::a(
-                    '<span class="glyphicon glyphicon-trash"></span> Delete',
+                    '<span class="glyphicon glyphicon-trash"></span> ' . \Yii::t('tickets', 'Delete'),
                     ['delete', 'id' => $model->id],
                     [
                         'data' => [
-                            'confirm' => 'Are you sure you want to delete this item?',
+                            'confirm' => \Yii::t('tickets', 'Are you sure you want to delete this ticket?'),
                             'method' => 'post',
                         ],
                     ]
@@ -107,7 +107,7 @@ $this->registerJs($active_tabs);
             </li>
             <li>
                 <?= Html::a(
-                    '<span class="glyphicon glyphicon-save-file"></span> Generate PDF',
+                    '<span class="glyphicon glyphicon-save-file"></span> ' . \Yii::t('tickets', 'Generate PDF'),
                     ['view', 'mode' => 'report', 'id' => $model->id],
                     ['data-pjax' => 0]
                 ) ?>
@@ -115,7 +115,7 @@ $this->registerJs($active_tabs);
             
             <li>
                 <?= Html::a(
-                    '<span class="glyphicon glyphicon-hdd"></span> Backup Now',
+                    '<span class="glyphicon glyphicon-hdd"></span> ' . \Yii::t('tickets', 'Backup Now'),
                     ['backup', 'id' => $model->id, '#' => 'backups'],
                     ['id' => 'backup-now']
                 ) ?>
@@ -123,7 +123,7 @@ $this->registerJs($active_tabs);
 
             <li>
                 <?= Html::a(
-                    '<span class="glyphicon glyphicon-tasks"></span> Restore Desktop',
+                    '<span class="glyphicon glyphicon-tasks"></span> ' . \Yii::t('tickets', 'Restore Desktop'),
                     Url::to([
                         'ticket/restore',
                         'id' => $model->id,
@@ -148,7 +148,7 @@ $this->registerJs($active_tabs);
 
             <li>
                 <?= Html::a(
-                    '<span class="glyphicon glyphicon-tasks"></span> Restore Documents',
+                    '<span class="glyphicon glyphicon-tasks"></span> ' . \Yii::t('tickets', 'Restore Documents'),
                     Url::to([
                         'ticket/restore',
                         'id' => $model->id,
@@ -174,7 +174,7 @@ $this->registerJs($active_tabs);
             <?php if (Yii::$app->user->can('screenshot/snap')) { ?>
                 <li>
                     <?= Html::a(
-                        '<span class="glyphicon glyphicon-picture"></span> Get Live Screenshot', [
+                        '<span class="glyphicon glyphicon-picture"></span> ' . \Yii::t('tickets', 'Get Live Screenshot'), [
                             'screenshot/snap',
                             'token' => $model->token,
                         ]
@@ -184,7 +184,7 @@ $this->registerJs($active_tabs);
 
            <li>
                 <?= Html::a(
-                    '<span class="glyphicon glyphicon-question-sign"></span> Visit the Manual',
+                    '<span class="glyphicon glyphicon-question-sign"></span> ' . \Yii::t('tickets', 'Visit the Manual'),
                     Url::to(['howto/view', 'id' => 'ticket-view.md']),
                     ['data-pjax' => 0]
                 ); ?>
@@ -194,28 +194,28 @@ $this->registerJs($active_tabs);
                 echo '<li class="divider"></li>';
                 echo '<li>';
                     echo Html::a(
-                        '<span class="glyphicon glyphicon-file"></span> Download Exam',
+                        '<span class="glyphicon glyphicon-file"></span> ' . \Yii::t('tickets', 'Download Exam'),
                         ['download', 'token' => $model->token],
                         ['data-pjax' => 0, 'class' => 'dev_item']
                     );
                 echo '</li>';
                 echo '<li>';
                     echo Html::a(
-                        '<span class="glyphicon glyphicon-step-forward"></span> Finish Exam',
+                        '<span class="glyphicon glyphicon-step-forward"></span> ' . \Yii::t('tickets', 'Finish Exam'),
                         ['finish', 'token' => $model->token],
                         ['data-pjax' => 0, 'class' => 'dev_item']
                     );
                 echo '</li>';
                 echo '<li>';
                     echo Html::a(
-                        '<span class="glyphicon glyphicon-list-alt"></span> Get Exam Config',
+                        '<span class="glyphicon glyphicon-list-alt"></span> ' . \Yii::t('tickets', 'Get Exam Config'),
                         ['config', 'token' => $model->token],
                         ['data-pjax' => 0, 'class' => 'dev_item']
                     );
-                echo '</li>';                    
+                echo '</li>';
             } ?>
 
-        </ul>            
+        </ul>
     </li>
 
 </ul>

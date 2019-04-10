@@ -189,7 +189,7 @@ class UserController extends Controller
                 return $model;
             }
         }
-        throw new NotFoundHttpException('The requested page does not exist.');
+        throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
 
         /*if (($model = User::findOne($id)) !== null) {
             return $model;
@@ -204,8 +204,10 @@ class UserController extends Controller
         if(Yii::$app->user->can($r . '/all') || $model->id == Yii::$app->user->id){
             return true;
         }else{
-            throw new ForbiddenHttpException('You are not allowed to ' . \Yii::$app->controller->action->id . 
-                    ' this ' . \Yii::$app->controller->id . '.');
+            throw new ForbiddenHttpException(\Yii::t('app', 'You are not allowed to {action} this {item}.', [
+                'action' => \Yii::$app->controller->action->id,
+                'item' => \Yii::$app->controller->id
+            ]));
             return false;
         }
     }

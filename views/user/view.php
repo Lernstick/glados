@@ -10,7 +10,7 @@ use yii\helpers\ArrayHelper;
 /* @var $model app\models\User */
 
 $this->title = $model->username;
-$this->params['breadcrumbs'][] = ['label' => 'Users', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => \Yii::t('users', 'Users'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
 $active_tabs = <<<JS
@@ -36,11 +36,11 @@ $this->registerJs($active_tabs);
     <ul class="nav nav-tabs">
         <li class="active"><a data-toggle="tab" href="#general">
             <i class="glyphicon glyphicon-home"></i>
-            General
+            <?= \Yii::t('users', 'General') ?>
         </a></li>
         <li>
             <?= Html::a(
-                '<i class="glyphicon glyphicon-check"></i> Permissions',
+                '<i class="glyphicon glyphicon-check"></i> ' . \Yii::t('users', 'Permissions'),
                 '#permissions',
                 ['data-toggle' => 'tab']
             ) ?>
@@ -48,30 +48,30 @@ $this->registerJs($active_tabs);
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                 <i class="glyphicon glyphicon-list-alt"></i>
-                Actions<span class="caret"></span>
+                <?= \Yii::t('users', 'Actions') ?><span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
                 <li>
                     <?= Html::a(
-                        '<span class="glyphicon glyphicon-pencil"></span> Edit',
+                        '<span class="glyphicon glyphicon-pencil"></span> '. \Yii::t('users', 'Edit'),
                         ['update', 'id' => $model->id],
                         ['data-pjax' => 0]
                     ) ?>
                 </li>
                 <li>
                     <?= Html::a(
-                        '<span class="glyphicon glyphicon-wrench"></span> Reset Password',
+                        '<span class="glyphicon glyphicon-wrench"></span> ' . \Yii::t('users', 'Reset Password'),
                         ['reset-password', 'id' => $model->id],
                         ['data-pjax' => 0]
                     ) ?>
                 </li>
                 <li>
                     <?= Html::a(
-                        '<span class="glyphicon glyphicon-trash"></span> Delete',
+                        '<span class="glyphicon glyphicon-trash"></span> ' . \Yii::t('users', 'Delete'),
                         ['delete', 'id' => $model->id],
                         [
                             'data' => [
-                                'confirm' => 'Are you sure you want to delete this item?',
+                                'confirm' => \Yii::t('users', 'Are you sure you want to delete this item?'),
                                 'method' => 'post',
                             ],
                         ]
@@ -115,7 +115,7 @@ $this->registerJs($active_tabs);
                     'description',
                 ],
                 'layout' => '{items} {pager}',
-                'emptyText' => 'No permissions found.',
+                'emptyText' => \Yii::t('users', 'No permissions found.'),
             ]); ?>
 
         </div>

@@ -158,8 +158,8 @@ $js = new JsExpression("
 
 $this->registerJs($js);
 
-$this->title = 'Create multiple Tickets';
-$this->params['breadcrumbs'][] = ['label' => 'Tickets', 'url' => ['index']];
+$this->title = \Yii::t('tickets', 'Create multiple Tickets');
+$this->params['breadcrumbs'][] = ['label' => \Yii::t('tickets', 'Tickets'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="ticket-create">
@@ -168,8 +168,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div class="alert alert-success" role="alert">
         <span class="glyphicon glyphicon-alert"></span>
-        <span>For more information, please visit <?= Html::a('Manual / Create multiple tickets', ['/howto/view', 'id' => 'create-multiple-tickets.md'], ['class' => 'alert-link']) ?>.</span>
+        <span>    <?= \Yii::t('tickets', 'For more information, please visit {link}.', [
+            'link' => Html::a('Manual / Create multiple tickets', ['/howto/view', 'id' => 'create-multiple-tickets.md'], ['class' => 'alert-link'])
+        ]) ?></span>
     </div>
+
+
 
     <div class="ticket-form">
 
@@ -210,15 +214,15 @@ $this->params['breadcrumbs'][] = $this->title;
                     'templateSelection' => new JsExpression('function (q) { return q.text; }'),
                 ],
                 'options' => [
-                    'placeholder' => 'Choose an Exam ...'
+                    'placeholder' => \Yii::t('tickets', 'Choose an Exam ...')
                 ]
-            ])->hint('Choose the exam those tickets has to be assigned to in the list below. Notice, only exams assigned to you will be shown underneath.'); ?>
+            ])->hint(\Yii::t('tickets', 'Choose the exam those tickets has to be assigned to in the list below. Notice, only exams assigned to you will be shown underneath.')); ?>
 
         </div>
         <div class="col-md-6">
             <?= $form->field($model, 'class')->textInput([
-               'placeholder' => 'Not yet used...',
-            ])->hint('This has no function yet.'); ?>
+               'placeholder' => \Yii::t('tickets', 'Not yet used...'),
+            ])->hint(\Yii::t('tickets', 'This has no function yet.')); ?>
         </div>
     </div>
 
@@ -226,28 +230,29 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="col-sm-6">
 
         <div class="form-group">
-            <?= Html::label('Names'); ?>
+            <?= Html::label(\Yii::t('tickets', 'Names')); ?>
             <?= Html::textarea('name', '', [
-                'placeholder' => 'Please insert a list of names separated by tab, comma, semicolon, newline or all of them combined...',
+                'placeholder' => \Yii::t('tickets', 'Please insert a list of names separated by tab, comma, semicolon, newline or all of them combined...'),
                 'class' => 'form-control',
                 'rows' => '18',
             ]); ?>
-            <div class="hint-block">Student names can be inserted in various different formats. Blocks from an Excel list can just be copied in this field. If you want to combine different formats, use two newlines inbetween them. The preview proposal to the right shows how the names are parsed.</div>
+            <div class="hint-block"><?= \Yii::t('tickets', 'Student names can be inserted in various different formats. Blocks from an Excel list can just be copied in this field. If you want to combine different formats, use two newlines inbetween them. The preview proposal to the right shows how the names are parsed.') ?></div>
         </div>
 
         <?= $form->field($model, 'names')->input([
-            'placeholder' => 'Please insert a list of names separated by tab, comma, semicolon, newline or all of them combined...',
+            'placeholder' => \Yii::t('tickets', 'Please insert a list of names separated by tab, comma, semicolon, newline or all of them combined...'),
         ])->hiddenInput()->label(false); ?>
 
         <div class="form-group">
-            <?= Html::submitButton('Create', ['class' => 'btn btn-success', 'id' => 'dynamicmodel-submit-btn']) ?>
+            <?= Html::submitButton(\Yii::t('tickets', 'Create'), ['class' => 'btn btn-success', 'id' => 'dynamicmodel-submit-btn']) ?>
         </div>
 
         <?php ActiveForm::end(); ?>
 
     </div>
     <div class="col-sm-6">
-        <?= Html::label('Preview Proposal'); ?>
+        <?= Html::label(\Yii::t('tickets', 'Preview Proposal')); ?>
+        <div class="hint-block"><?= \Yii::t('tickets', 'This field shows how the names are parsed.') ?></div>
         <div id="preview"></div>
     </div>
     </div>

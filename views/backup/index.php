@@ -50,7 +50,7 @@ use app\components\Editable;
         [
             'attribute' => 'backup_last',
             'format' => 'raw',
-            'value' => yii::$app->formatter->format($ticketModel->backup_last, 'timeago') . ' (<b>last try</b>: ' . yii::$app->formatter->format($ticketModel->backup_last_try, 'timeago') . ')',
+            'value' => yii::$app->formatter->format($ticketModel->backup_last, 'timeago') . ' (<b>' . \Yii::t('tickets', 'last try') . '</b>: ' . yii::$app->formatter->format($ticketModel->backup_last_try, 'timeago') . ')',
         ],        
         'backup_size:shortSize',
         [
@@ -87,7 +87,7 @@ use app\components\Editable;
     'options' => ['id' => 'backups-accordion', 'class' => 'panel-group'],
     'itemOptions' => ['class' => 'panel panel-default'],
     'itemView' => '_item',
-    'emptyText' => 'No backups found.',
+    'emptyText' => \Yii::t('tickets', 'No backups found.'),
     'layout' => '{items} <br>{summary} {pager}',
 ]); ?>
 
@@ -95,8 +95,8 @@ use app\components\Editable;
 
 Modal::begin([
     'id' => 'backupLogModal',
-    'header' => '<h4>Backup Log</h4>',
-    'footer' => Html::Button('Close', ['data-dismiss' => 'modal', 'class' => 'btn btn-default']),
+    'header' => '<h4>' . \Yii::t('tickets', 'Backup Log') . '</h4>',
+    'footer' => Html::Button(\Yii::t('tickets', 'Close'), ['data-dismiss' => 'modal', 'class' => 'btn btn-default']),
     'size' => \yii\bootstrap\Modal::SIZE_LARGE
 ]);
 

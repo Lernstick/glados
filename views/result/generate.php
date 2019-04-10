@@ -11,9 +11,9 @@ use yii\helpers\FileHelper;
 /* @var $tickets array */
 /* @var $form yii\widgets\ActiveForm */
 
-$this->title = 'Generate Result - ' . $model->exam->name;
-$this->params['breadcrumbs'][] = ['label' => 'Exams', 'url' => ['exam/index']];
-$this->params['breadcrumbs'][] = ['label' => 'Generate Result', 'url' => ['result/generate']];
+$this->title = \Yii::t('results', 'Generate Result') . ' - ' . $model->exam->name;
+$this->params['breadcrumbs'][] = ['label' => \Yii::t('results', 'Exams'), 'url' => ['exam/index']];
+$this->params['breadcrumbs'][] = ['label' => \Yii::t('results', 'Generate Result'), 'url' => ['result/generate']];
 $this->params['breadcrumbs'][] = ['label' => $model->exam->name, 'url' => [
     'exam/view',
     'id' => $model->exam->id,
@@ -86,7 +86,9 @@ $this->registerJs($format_tk, yii\web\View::POS_HEAD);
 
     <div class="alert alert-success" role="alert">
         <span class="glyphicon glyphicon-alert"></span>
-        <span>For more information, please visit <?= Html::a('Manual / Generate results', ['/howto/view', 'id' => 'generate-results.md'], ['class' => 'alert-link']) ?>.</span>
+        <span><?= \Yii::t('results', 'For more information, please visit {link}.', [
+            'link' => Html::a('Manual / Generate results', ['/howto/view', 'id' => 'generate-results.md'], ['class' => 'alert-link'])
+        ]) ?></span>
     </div>
 
     <div class="result-form">
@@ -97,10 +99,10 @@ $this->registerJs($format_tk, yii\web\View::POS_HEAD);
                 <?= $form->field($ticket, 'exam_id')->dropDownList([
                     $ticket->exam_id => $ticket->exam->subject . ' - ' . $ticket->exam->name
                 ], [
-                    'prompt' => 'Choose an Exam ...',
+                    'prompt' => \Yii::t('results', 'Choose an Exam ...'),
                     'readOnly' => true,
                     'disabled' => true,
-                ])->hint('Choose the exam to generate results from.') ?>
+                ])->hint(\Yii::t('results', 'Choose the exam to generate results from.')) ?>
             </div>
         </div>
         <?php ActiveForm::end(); ?>
@@ -112,7 +114,7 @@ $this->registerJs($format_tk, yii\web\View::POS_HEAD);
         <div class="row">
             <div class="col-md-6">
                 <?= $form->field($model, 'path', [
-                'template' => '{label}<div class="input-group"><span title="Remote Backup Path" class="input-group-addon" id="basic-addon2">' . FileHelper::normalizePath($ticket->exam->backup_path) . '/</span>{input}</div>{hint}{error}'
+                'template' => '{label}<div class="input-group"><span title="' . \Yii::t('tickets', 'Remote Backup Path') . '" class="input-group-addon" id="basic-addon2">' . FileHelper::normalizePath($ticket->exam->backup_path) . '/</span>{input}</div>{hint}{error}'
             ])->textInput() ?>
                 <?= $form->field($model, 'inc_dotfiles')->checkbox() ?>
                 <?= $form->field($model, 'inc_screenshots')->checkbox() ?>
@@ -121,15 +123,15 @@ $this->registerJs($format_tk, yii\web\View::POS_HEAD);
             <div class="col-md-6">
                 <?= $form->field($model, 'inc_pattern')->widget(Select2::classname(), [
                     'data' => [
-                        'word' => 'Word Documents',
-                        'excel' => 'Excel Documents',
-                        'pp' => 'Powerpoint Documents',
-                        'pdf' => 'PDF Documents',
-                        'text' => 'Text Files',
-                        'images' => 'Images',
+                        'word' => \Yii::t('results', 'Word Documents'),
+                        'excel' => \Yii::t('results', 'Excel Documents'),
+                        'pp' => \Yii::t('results', 'Powerpoint Documents'),
+                        'pdf' => \Yii::t('results', 'PDF Documents'),
+                        'text' => \Yii::t('results', 'Text Files'),
+                        'images' => \Yii::t('results', 'Images'),
                     ],
                     'options' => [
-                        'placeholder' => 'Select file types to include ...',
+                        'placeholder' => \Yii::t('results', 'Select file types to include ...'),
                         'multiple' => true,
                     ],
                     'pluginOptions' => [
@@ -146,7 +148,7 @@ $this->registerJs($format_tk, yii\web\View::POS_HEAD);
                     'data' => $tickets,
                     'options' => [
                         'value' => array_keys($selectedTickets),
-                        'placeholder' => 'Select Tickets ...',
+                        'placeholder' => \Yii::t('results', 'Select Tickets ...'),
                         'multiple' => true,
                     ],
                     'pluginOptions' => [
@@ -159,7 +161,7 @@ $this->registerJs($format_tk, yii\web\View::POS_HEAD);
         </div>
 
         <div class="form-group">
-            <?= Html::submitButton('Generate ZIP-File', ['class' => 'btn btn-success']) ?>
+            <?= Html::submitButton(\Yii::t('results', 'Generate ZIP-File'), ['class' => 'btn btn-success']) ?>
         </div>
 
         <?php ActiveForm::end(); ?>

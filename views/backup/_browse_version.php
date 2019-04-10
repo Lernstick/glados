@@ -11,7 +11,7 @@ use yii\helpers\Url;
 /* @var $options array RdiffbackupFilesystem options array */
 
 echo Html::a(
-    ($model == 'all' ? 'All versions overlapping' : yii::$app->formatter->format($model, 'datetime') . ($model == $fs->newestBackupVersion ? ' (current)' : null)) . ' <span class="glyphicon glyphicon-ok" style="visibility:' . ($date == $model ? 'visible' : 'hidden') . ';"></span>',
+    ($model == 'all' ? \Yii::t('tickets', 'All versions overlapping') : yii::$app->formatter->format($model, 'datetime') . ($model == $fs->newestBackupVersion ? ' (' . \Yii::t('tickets', 'current') . ')' : null)) . ' <span class="glyphicon glyphicon-ok" style="visibility:' . ($date == $model ? 'visible' : 'hidden') . ';"></span>',
     Url::to([
         false,
         'id' => $ticket->id,

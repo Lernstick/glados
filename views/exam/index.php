@@ -13,7 +13,7 @@ use yii\web\JsExpression;
 /* @var $searchModel app\models\ExamSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Exams';
+$this->title = \Yii::t('exams', 'Exams');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="exam-index">
@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'timeago',
                 'filterType' => GridView::FILTER_DATE,
                 'filterWidgetOptions' => [
-                    'options' => ['placeholder' => 'Enter day...'],
+                    'options' => ['placeholder' => \Yii::t('form', 'Enter day...')],
                     'pluginOptions' => [
                        'format' => 'yyyy-mm-dd',
                        'todayHighlight' => true,
@@ -42,9 +42,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 'visible' => false,
             ],
             [
-                'attribute'=>'name',
-                'filterType'=>GridView::FILTER_SELECT2,
-                'filterWidgetOptions'=>[
+                'attribute' => 'name',
+                'filterType' => GridView::FILTER_SELECT2,
+                'filterWidgetOptions' => [
                     'pluginOptions' => [
                         'dropdownAutoWidth' => true,
                         'width' => 'auto',
@@ -77,14 +77,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                 ],
                 'filterInputOptions' => [
-                    'placeholder' => 'Any'
+                    'placeholder' => \Yii::t('form', 'Any')
                 ],
                 'format'=>'raw'
             ],
             [
-                'attribute'=>'subject',
-                'filterType'=>GridView::FILTER_SELECT2,
-                'filterWidgetOptions'=>[
+                'attribute' => 'subject',
+                'filterType' => GridView::FILTER_SELECT2,
+                'filterWidgetOptions' => [
                     'pluginOptions' => [
                         'dropdownAutoWidth' => true,
                         'width' => 'auto',
@@ -117,7 +117,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                 ],
                 'filterInputOptions' => [
-                    'placeholder' => 'Any'
+                    'placeholder' => \Yii::t('form', 'Any')
                 ],
                 'format'=>'raw'
             ],
@@ -130,13 +130,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'html',
             ],*/
             [
-                'attribute'=>'userName',
-                'label' => 'Owner',
+                'attribute' => 'userName',
+                'label' => \Yii::t('exams', 'Owner'),
                 'value' => function($model){
-                    return ( $model->user_id == null ? '<span class="not-set">(user removed)</span>' : '<span>' . $model->user->username . '</span>' );
+                    return ( $model->user_id == null ? '<span class="not-set">(' . \Yii::t('exams', 'user removed') . ')</span>' : '<span>' . $model->user->username . '</span>' );
                 },
-                'filterType'=>GridView::FILTER_SELECT2,
-                'filterWidgetOptions'=>[
+                'filterType' => GridView::FILTER_SELECT2,
+                'filterWidgetOptions' => [
                     'pluginOptions' => [
                         'dropdownAutoWidth' => true,
                         'width' => 'auto',
@@ -169,7 +169,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                 ],
                 'filterInputOptions' => [
-                    'placeholder' => 'Any'
+                    'placeholder' => \Yii::t('form', 'Any')
                 ],
                 'format' => 'raw',
                 'visible' => Yii::$app->user->can('user/index')
@@ -224,7 +224,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'max_brightness',
-                'label' => 'Maximum brightness',
+                'label' => \Yii::t('exams', 'Maximum brightness'),
                 'value' => function($model){
                     return $model->max_brightness/100;
                 },
@@ -252,11 +252,11 @@ $this->params['breadcrumbs'][] = $this->title;
         'gridOptions' => [
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
-            'panel' => ['heading' => '<h3 class="panel-title">Your Exams</h3>'],
+            'panel' => ['heading' => '<h3 class="panel-title">' . \Yii::t('exams', 'Your Exams') . '</h3>'],
             'toolbar' =>  [
                 ['content' =>
-                    Html::a('<i class="glyphicon glyphicon-plus"></i>', ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => 'Create Exam']) . ' ' .
-                    Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/exam/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => 'Reset Grid'])
+                    Html::a('<i class="glyphicon glyphicon-plus"></i>', ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => \Yii::t('exams', 'Create Exam')]) . ' ' .
+                    Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/exam/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => \Yii::t('exams', 'Reset Grid')])
                 ],
                 ['content' => '{dynagridFilter}{dynagridSort}{dynagrid}'],
                 '{export}',

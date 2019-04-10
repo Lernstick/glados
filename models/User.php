@@ -93,13 +93,13 @@ class User extends Base implements IdentityInterface
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'username' => 'Username',
-            'password' => 'Password',
-            'password_repeat' => 'Repeat Password',
-            'last_visited' => 'Last Visited', 
-            'role' => 'Role',
-            'change_password' => 'User has to change password at next login',
+            'id' => \Yii::t('users', 'ID'),
+            'username' => \Yii::t('users', 'Username'),
+            'password' => \Yii::t('users', 'Password'),
+            'password_repeat' => \Yii::t('users', 'Repeat Password'),
+            'last_visited' => \Yii::t('users', 'Last Visited'), 
+            'role' => \Yii::t('users', 'Role'),
+            'change_password' => \Yii::t('users', 'User has to change password at next login'),
         ];
     }
 

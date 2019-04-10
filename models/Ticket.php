@@ -139,29 +139,29 @@ class Ticket extends Base
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'state' => 'State',
-            'token' => 'Token',
-            'exam.name' => 'Exam Name',
-            'exam.subject' => 'Exam Subject',
-            'exam_id' => 'Exam',
-            'valid' => 'Valid',
-            'validTime' => 'Valid for',
-            'start' => 'Started',
-            'end' => 'Finished',
-            'duration' => 'Duration',
-            'result' => 'Result',
-            'time_limit' => 'Time Limit',
-            'download_progress' => 'Exam Download Progress',
-            'client_state' => 'Client State',
-            'ip' => 'IP Address',
-            'test_taker' => 'Test Taker',
-            'backup' => 'Backup',
-            'backup_last' => 'Last Backup',
-            'backup_last_try' => 'Last Backup Try',
-            'backup_state' => 'Backup State',
-            'backup_interval' => 'Backup Interval',
-            'backup_size' => 'Current Backup Size',
+            'id' => \Yii::t('tickets', 'ID'),
+            'state' => \Yii::t('tickets', 'State'),
+            'token' => \Yii::t('tickets', 'Token'),
+            'exam.name' => \Yii::t('tickets', 'Exam Name'),
+            'exam.subject' => \Yii::t('tickets', 'Exam Subject'),
+            'exam_id' => \Yii::t('tickets', 'Exam'),
+            'valid' => \Yii::t('tickets', 'Valid'),
+            'validTime' => \Yii::t('tickets', 'Valid for'),
+            'start' => \Yii::t('tickets', 'Started'),
+            'end' => \Yii::t('tickets', 'Finished'),
+            'duration' => \Yii::t('tickets', 'Duration'),
+            'result' => \Yii::t('tickets', 'Result'),
+            'time_limit' => \Yii::t('tickets', 'Time Limit'),
+            'download_progress' => \Yii::t('tickets', 'Exam Download Progress'),
+            'client_state' => \Yii::t('tickets', 'Client State'),
+            'ip' => \Yii::t('tickets', 'IP Address'),
+            'test_taker' => \Yii::t('tickets', 'Test Taker'),
+            'backup' => \Yii::t('tickets', 'Backup'),
+            'backup_last' => \Yii::t('tickets', 'Last Backup'),
+            'backup_last_try' => \Yii::t('tickets', 'Last Backup Try'),
+            'backup_state' => \Yii::t('tickets', 'Backup State'),
+            'backup_interval' => \Yii::t('tickets', 'Backup Interval'),
+            'backup_size' => \Yii::t('tickets', 'Current Backup Size'),
         ];
     }
 
@@ -171,13 +171,15 @@ class Ticket extends Base
     public function attributeHints()
     {
         return [
-            'token' => 'This is a randomly generated, unique token to <b>identify the ticket</b>. The test taker has to provide this token to gain access to his exam.',
-            'backup_interval' => 'This value (in seconds) sets the <b>interval to create automatic backups</b> of the exam system. Set to <code>0</code> to disable automatic backup.',
-            'time_limit' => 'If this value (in minutes) is set, the exam status view of the student will show the time left. This has the same effect as the value in the exam. Leave empty to inherit the value configured in the exam' . (isset($this->exam) ? ' (' . yii::$app->formatter->format($this->exam->time_limit, 'timeLimit') . ')' : '') . '. Set to <code>0</code> for no time limit. Notice, this will <b>override the setting in the exam</b>.',
-            'exam_id' => 'Choose the exam this ticket has to be assigned to in the list below. Notice, only exams assigned to you will be shown underneath.',
-            'test_taker' => 'Here you can <b>assign the ticket to a student</b>. If left empty, this can also be done later (even when the exam has finished), but it is recommended to set this value as soon as possible, to keep track of the tickets. If not set the ticket will be unassigned/anonymous.',
-            'start' => 'The start time of the exam. This should not be manually edited.',
-            'end' => 'The finish time of the exam. This should not be manually edited.',
+            'token' => \Yii::t('tickets', 'This is a randomly generated, unique token to <b>identify the ticket</b>. The test taker has to provide this token to gain access to his exam.'),
+            'backup_interval' => \Yii::t('tickets', 'This value (in seconds) sets the <b>interval to create automatic backups</b> of the exam system. Set to <code>0</code> to disable automatic backup.'),
+            'time_limit' => \Yii::t('tickets', 'If this value (in minutes) is set, the exam status view of the student will show the time left. This has the same effect as the value in the exam. Leave empty to inherit the value configured in the exam{x}. Set to <code>0</code> for no time limit. Notice, this will <b>override the setting in the exam</b>.', [
+                'x' => (isset($this->exam) ? ' (' . yii::$app->formatter->format($this->exam->time_limit, 'timeLimit') . ')' : '')
+            ]),
+            'exam_id' => \Yii::t('tickets', 'Choose the exam this ticket has to be assigned to in the list below. Notice, only exams assigned to you will be shown underneath.'),
+            'test_taker' => \Yii::t('tickets', 'Here you can <b>assign the ticket to a student</b>. If left empty, this can also be done later (even when the exam has finished), but it is recommended to set this value as soon as possible, to keep track of the tickets. If not set the ticket will be unassigned/anonymous.'),
+            'start' => \Yii::t('tickets', 'The start time of the exam. This should not be manually edited.'),
+            'end' => \Yii::t('tickets', 'The finish time of the exam. This should not be manually edited.'),
         ];
     }
 
@@ -221,7 +223,7 @@ class Ticket extends Base
 
     public function getResultName()
     {
-        return ($this->test_taker ? $this->test_taker . ' - ' . $this->token : '_NoName - ' . $this->token) . ($this->result != null && file_exists($this->result) ? ' - Result already generated.' : ' - No result yet.');
+        return ($this->test_taker ? $this->test_taker . ' - ' . $this->token : '_NoName - ' . $this->token) . ($this->result != null && file_exists($this->result) ? ' - ' . \Yii::t('tickets', 'Result already generated.') : ' - ' . \Yii::t('tickets', 'No result yet.'));
     }
 
     /**
@@ -706,10 +708,10 @@ class Ticket extends Base
 
         if(Yii::$app->user->can('ticket/create/all') || $this->own == true){
             if (!$exam->fileConsistency){
-                $this->addError($attribute, 'As long as the exam file is not valid, no tickets can be created for this exam.');
+                $this->addError($attribute, \Yii::t('tickets', 'As long as the exam file is not valid, no tickets can be created for this exam.'));
             }
         }else{
-            $this->addError($attribute, 'You are not allowed to perform this action on this exam.');
+            $this->addError($attribute, \Yii::t('tickets', 'You are not allowed to perform this action on this exam.'));
         }
 
     }
@@ -724,7 +726,7 @@ class Ticket extends Base
     public function checkIfClosed($attribute, $params)
     {
         if ($this->state != self::STATE_CLOSED) {
-            $this->addError($attribute, 'This ticket is not in closed state.');
+            $this->addError($attribute, \Yii::t('tickets', 'This ticket is not in closed state.'));
         }
     }
 

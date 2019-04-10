@@ -28,7 +28,7 @@ $model->token = null;
             'name' => 'token',
             'class' => 'form-control input-lg',
             'style' => 'text-align:center',
-            'placeholder' => 'Insert your token here!',
+            'placeholder' => \Yii::t('results', 'Insert your token here!'),
         ])->label(false)->hint(false); ?>
     </div>
     <div class="col-md-3"></div>
