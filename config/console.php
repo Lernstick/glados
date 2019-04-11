@@ -28,6 +28,15 @@ return [
             'class' => 'app\components\customFormatter',
             'defaultTimeZone' => 'Europe/Zurich',
         ],
+        'i18n' => [
+            'translations' => [
+                '*' => [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@app/messages',
+                    'sourceLanguage' => 'en',
+                ],
+            ],
+        ],
         'log' => [
             'targets' => [
                 [
