@@ -172,9 +172,9 @@ class BackupController extends DaemonController implements DaemonInterface
             $this->unlockItem($this->ticket);
             
             $act = new Activity([
-                    'ticket_id' => $this->ticket->id,
-                    'description' => 'Backup failed: ' . $this->ticket->backup_state,
-                    'severity' => Activity::SEVERITY_WARNING,
+                'ticket_id' => $this->ticket->id,
+                'description' => 'Backup failed: ' . $this->ticket->backup_state,
+                'severity' => Activity::SEVERITY_WARNING,
             ]);
             $act->save();
 
@@ -223,9 +223,10 @@ class BackupController extends DaemonController implements DaemonInterface
                 $this->logError($this->ticket->backup_state);
 
                 $act = new Activity([
-                        'ticket_id' => $this->ticket->id,
-                        'description' => 'Backup failed: rdiff-backup failed (retval: ' . $retval . ')',
-                        'severity' => Activity::SEVERITY_WARNING,
+                    'ticket_id' => $this->ticket->id,
+                    'description' => yiit('activities', 'Backup failed: rdiff-backup failed (retval: {retval})'),
+                    'params' => [ 'retval' => $retval ],
+                    'severity' => Activity::SEVERITY_WARNING,
                 ]);
                 $act->save();
 
@@ -281,7 +282,7 @@ class BackupController extends DaemonController implements DaemonInterface
 
             $act = new Activity([
                     'ticket_id' => $this->ticket->id,
-                    'description' => 'Backup failed: ' . $this->ticket->backup_state,
+                    'description' => yiit('activities', 'Backup failed: backup aborted.'),
                     'severity' => Activity::SEVERITY_WARNING,
             ]);
             $act->save();
@@ -354,7 +355,7 @@ class BackupController extends DaemonController implements DaemonInterface
         if ($this->ticket->abandoned == true) {
             $act = new Activity([
                     'ticket_id' => $this->ticket->id,
-                    'description' => 'Backup failed: leaving ticket in abandoned state.',
+                    'description' => yiit('activities', 'Backup failed: leaving ticket in abandoned state.'),
                     'severity' => Activity::SEVERITY_ERROR,
             ]);
             $act->save();

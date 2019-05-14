@@ -555,13 +555,28 @@ class TicketController extends Controller
                     'model' => $model,
                 ]);                
             } else {
-                $act = new Activity([
-                    'ticket_id' => $model->id,
-                    'description' => 'Exam download successfully requested by ' . 
-                    $model->ip . ' from ' . ( $model->test_taker ? $model->test_taker :
-                    'Ticket with token ' . $model->token ) . '.',
-                    'severity' => Activity::SEVERITY_SUCCESS,
-                ]);
+
+                if ($model->test_taker) {
+                    $act = new Activity([
+                        'ticket_id' => $model->id,
+                        'description' => yiit('activities', 'Exam download successfully requested by {ip} from {test_taker}.'),
+                        'params' => [
+                            'ip' => $model->ip,
+                            'test_taker' => $model->test_taker,
+                        ],
+                        'severity' => Activity::SEVERITY_SUCCESS,
+                    ]);
+                } else {
+                    $act = new Activity([
+                        'ticket_id' => $model->id,
+                        'description' => yiit('activities', 'Exam download successfully requested by {ip} from Ticket with token {token}.'),
+                        'params' => [
+                            'ip' => $model->ip,
+                            'token' => $model->token,
+                        ],
+                        'severity' => Activity::SEVERITY_SUCCESS,
+                    ]);
+                }
                 $act->save();
 
                 $model->scenario = Ticket::SCENARIO_DOWNLOAD;
@@ -592,167 +607,6 @@ class TicketController extends Controller
             ]);
         }
 
-    }
-
-    /**
-     * Downloads an exam file after checking ticket validity. (deprecated)
-     *
-     * @param string $token
-     * @return mixed The response object or an array with the error description
-     */
-    public function actionDownload2($token)
-    {
-
-        $model = Ticket::findOne(['token' => $token]);
-
-        if (!$model || !$model->valid){
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            #throw new \yii\web\HttpException(403, 'The provided ticket is invalid.');
-            return [ 'code' => 403, 'msg' => 'The provided ticket is invalid.' ];
-        }
-
-        if (!Yii::$app->file->set($model->exam->file)->exists){
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            #throw new \yii\web\HttpException(404, 'The exam file cannot be found.');
-            return [ 'code' => 404, 'msg' => 'The exam file cannot be found.' ];
-        }
-
-        if($model->download_lock != 0) {
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            #throw new \yii\web\HttpException(404, 'Another instance is already running; ' .
-            #                                      'multiple downloads are not allowed.');
-            return [ 'code' => 403, 'msg' => 'Another instance is already running; ' .
-                                             'multiple downloads are not allowed.' ];
-        }
-
-        $query = Ticket::find()
-            ->where(['not', ['start' => null]])
-            ->andWhere(['end' => null])
-            ->andWhere(['download_lock' => 1]);
-
-        $concurrentExamDownloads = 10;
-        if ($concurrentExamDownloads != 0) {
-            if(intval($query->count()) >= $concurrentExamDownloads){
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                #$headers = Yii::$app->response->headers;
-                #$headers->add('Retry-After', 20);                
-                #throw new \yii\web\HttpException(509, 'The server is busy, please wait. Retry in {i} seconds.');
-                return [
-                    'code' => 509,
-                    'msg' => 'The server is busy, please wait. Retry in {i} seconds.',
-                    'wait' => 20,
-                ];
-            }
-        }
-
-        $model->scenario = Ticket::SCENARIO_DOWNLOAD;
-
-        $model->bootup_lock = 1;
-        $model->download_lock = 1;
-        $model->start = $model->state == 0 ? new Expression('NOW()') : $model->start;
-        $model->ip = Yii::$app->request->userIp;
-        $model->save();
-
-        ignore_user_abort(true);
-        \Yii::$app->response->bandwidth = 10 * 1024 * 1024; // 10MB per second, set 0 for no limit
-
-        # log activity before [[send()]] is called upon the request.
-        \Yii::$app->response->on(\app\components\customResponse::EVENT_BEFORE_SEND, function($event) {
-            $ticket = Ticket::findOne($event->data->id);
-            $ticket->scenario = Ticket::SCENARIO_DOWNLOAD;
-            $ticket->download_progress = 0;
-            $ticket->client_state = "download in progress";
-            $ticket->save();
-
-            $act = new Activity([
-                'ticket_id' => $event->data->id,
-                'description' => 'Exam download successfully requested by ' . 
-                $event->data->ip . ' from ' . ( $event->data->test_taker ? $event->data->test_taker :
-                'Ticket with token ' . $event->data->token ) . '.',
-                'severity' => Activity::SEVERITY_SUCCESS,
-            ]);
-            $act->save();
-        }, $model);
-       
-        # calculate the percentage, write it to the database and look if the client side aborted the download 
-        \Yii::$app->response->on(\app\components\customResponse::EVENT_WHILE_SEND, function($event) {
-            $ticket = Ticket::findOne($event->data->id);
-            $ticket->scenario = Ticket::SCENARIO_DOWNLOAD;
-
-            if(connection_aborted()){
-                $ticket->download_lock = 0;
-                $ticket->client_state = "aborted, waiting for download";
-                $ticket->save();
-
-                $act = new Activity([
-                    'ticket_id' => $event->data->id,
-                    'description' => 'Exam download aborted by ' . $event->data->ip . 
-                    ' from ' . ( $event->data->test_taker ? $event->data->test_taker :
-                    'Ticket with token ' . $event->data->token ) . ' (client side).',
-                    'severity' => Activity::SEVERITY_WARNING,
-                ]);
-                $act->save();
-                die();
-            }
-
-            $ticket->download_progress = $event->sender->progress/filesize($event->data->exam->file);
-
-            /*if ($ticket->download_progress > 0.5) {
-                $ticket->download_lock = 0;
-                $ticket->save();
-                die();
-            }*/
-            $ticket->download_lock = 1;
-            $ticket->client_state = "download in progress";
-            $ticket->save();
-
-        }, $model);
-
-        # log that the [[send()]] process ended. TODO: success or not?
-        \Yii::$app->response->on(\app\components\customResponse::EVENT_AFTER_SEND, function($event) {
-            $ticket = Ticket::findOne($event->data->id);
-            $ticket->scenario = Ticket::SCENARIO_DOWNLOAD;
-            $ticket->download_progress = 1;
-            $ticket->download_lock = 0;
-            $ticket->client_state = "download finished";
-            $ticket->save();
-
-            $act = new Activity([
-                'ticket_id' => $event->data->id,
-                'description' => 'Exam download finished by ' . $event->data->ip .
-                ' from ' . ( $event->data->test_taker ? $event->data->test_taker :
-                'Ticket with token ' . $event->data->token ) . '.',
-                'severity' => Activity::SEVERITY_SUCCESS,
-            ]);
-            $act->save();
-
-            /* if there is a backup available, restore the latest */
-            $backupSearchModel = new BackupSearch();
-            $backupDataProvider = $backupSearchModel->search($ticket->token);
-            if ($backupDataProvider->totalCount > 0) {
-                $restoreDaemon = new Daemon();
-                /* run the restore daemon in the foreground */
-                $pid = $restoreDaemon->startRestore($ticket->id, '/', 'now', false, '/run/initramfs/backup/' . $ticket->exam->backup_path);
-            }
-            //$ticket->continueBootup();
-            $ticket->runCommand('echo 0 > /run/initramfs/restore');
-            //$ticket->bootup_lock = 0;
-            $ticket->save();
-
-        }, $model);
-
-        /* Start a new backup Daemon on the background */
-        $searchModel = new DaemonSearch();
-        if($searchModel->search([])->totalCount < 3){
-            $backupDaemon = new Daemon();
-            $backupDaemon->startBackup();
-        }
-        if($searchModel->search([])->totalCount < 3){
-            $backupDaemon = new Daemon();
-            $backupDaemon->startBackup();
-        }
-
-        return \Yii::$app->response->sendFile($model->exam->file);
     }
 
     /**
@@ -805,12 +659,21 @@ class TicketController extends Controller
         $model->last_backup = 0;
         $model->save();
 
-        $act = new Activity([
-            'ticket_id' => $model->id,
-            'description' => 'Exam finished by ' . ( $model->test_taker ?
-            $model->test_taker : 'Ticket with token ' . $token ) . '.',
-            'severity' => Activity::SEVERITY_INFORMATIONAL,
-        ]);
+        if ($model->test_taker) {
+            $act = new Activity([
+                'ticket_id' => $model->id,
+                'description' => yiit('activities', 'Exam finished by {test_taker}.'),
+                'params' => [ 'test_taker' => $model->test_taker ],
+                'severity' => Activity::SEVERITY_INFORMATIONAL,
+            ]);
+        } else {
+            $act = new Activity([
+                'ticket_id' => $model->id,
+                'description' => yiit('activities', 'Exam finished by Ticket with token {token}.'),
+                'params' => [ 'token' => $token ],
+                'severity' => Activity::SEVERITY_INFORMATIONAL,
+            ]);
+        }
         $act->save();
 
         /* Start a new backup Daemon on the background */

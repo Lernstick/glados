@@ -48,13 +48,7 @@ use app\components\ActiveEventField;
             'attribute' => 'description',
             'format' => 'raw',
             'value' => function($model) {
-                return \Yii::t('activities', 'Ticket') . '&nbsp;' .
-                    Html::a(
-                        $model->ticket->id,
-                        ['ticket/view', 'id' => $model->ticket->id],
-                        ['data-pjax' => 0]
-                    ) .
-                    ': ' . $model->description;
+                return \Yii::t('activities', $model->description, $model->params);
             },
         ],
 

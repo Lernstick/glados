@@ -7,6 +7,7 @@ use yii\base\Event;
 use app\models\EventItem;
 use app\models\User;
 use yii\db\ActiveRecord;
+use yii\helpers\Json;
 
 /**
  * This is the model class for table "activity".
@@ -69,6 +70,16 @@ class Activity extends Base
             'description' => \Yii::t('activities', 'Description'),
             'severity' => \Yii::t('activities', 'Severity'),
         ];
+    }
+
+    public function getParams()
+    {
+        return Json::decode($this->data);
+    }
+
+    public function setParams($value)
+    {
+        $this->data = Json::encode($value);
     }
 
     public function newActivities()

@@ -106,7 +106,7 @@ class UnlockController extends DaemonController implements DaemonInterface
 
                 $act = new Activity([
                         'ticket_id' => $ticket->id,
-                        'description' => '"Bootup successful" message was not recieved, but client is successfully booted up. Client is now unlocked.',
+                        'description' => yiit('activities', '"Bootup successful" message was not recieved, but client is successfully booted up. Client is now unlocked.'),
                         'severity' => Activity::SEVERITY_NOTICE,
                 ]);
                 $act->save();  

@@ -355,8 +355,11 @@ class Ticket extends Base
 
             $act = new Activity([
                 'ticket_id' => $this->id,
-                'description' => 'Client state changed: ' .
-                $this->presaveAttributes['client_state'] . ' -> ' . $this->client_state,
+                'description' => yiit('activities', 'Client state changed: {old} -> {new}'),
+                'params' => [
+                    'old' => $this->presaveAttributes['client_state'],
+                    'new' => $this->client_state,
+                ],
                 'severity' => Activity::SEVERITY_INFORMATIONAL,
             ]);
             $act->save();
