@@ -1,0 +1,11 @@
+class_name: AcceptanceTester
+modules:
+    enabled:
+        - WebDriver:
+            url: http://127.0.0.1/
+            port: 9515
+            browser: chrome
+        - Yii2:
+            part: orm
+            entryScript: index-test.php
+            cleanup: false
