@@ -77,6 +77,8 @@ class ActivityController extends Controller
                 $searchModel = new ActivitySearch();
                 if ($attr == 'description') {
                     $out = $searchModel->selectList('description', $q, $page, $per_page);
+                } else if ($attr == 'description3') {
+                    $out = $searchModel->selectList('description2.' . \Yii::$app->language, $q, $page, $per_page);
                 }
             }
             return $out;

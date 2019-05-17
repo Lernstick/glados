@@ -14,6 +14,7 @@ class ActivitySearch extends Activity
 {
 
     public $token;
+    public $description4;
 
     /**
      * @inheritdoc
@@ -22,7 +23,7 @@ class ActivitySearch extends Activity
     {
         return [
             [['id'], 'integer'],
-            [['date', 'description', 'ticket_id', 'token', 'severity'], 'safe'],
+            [['date', 'description', 'description4', 'ticket_id', 'token', 'severity'], 'safe'],
         ];
     }
 
@@ -80,9 +81,9 @@ class ActivitySearch extends Activity
             'severity' => $this->severity
         ]);
 
-        $query->joinWith(['ticket' => function ($q) {
-            $q->andFilterWhere(['like', 'ticket.token', $this->token]);
-        }]);
+        $query->joinWith(['ticket', 'description3']);
+        $query->andFilterWhere(['like', 'ticket.token', $this->token]);
+        $query->andFilterWhere(['like', 'description2.' . \Yii::$app->language, $this->description4]);
 
         $dateEnd = new \DateTime($this->date);
         $dateEnd->modify('+1 day');

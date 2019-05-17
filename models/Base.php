@@ -32,6 +32,15 @@ class Base extends \yii\db\ActiveRecord
 {
 
     /**
+     * List of tables that are able to join
+     *
+     * @return array
+     */
+    public function joinTables() {
+        return [];
+    }
+
+    /**
      * Lists an attribute
      * @param string attr attribute to list
      * @param string q query
@@ -50,6 +59,8 @@ class Base extends \yii\db\ActiveRecord
         $query = $this->find();
         $query->select([$id . ' as id', $attr . ' AS text'])
             ->distinct();
+
+        $query->joinWith($this->joinTables());
 
         if (!is_null($q) && $q != '') {
             $query->where(['like', $attr, $q]);

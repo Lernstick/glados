@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\base\Event;
+use app\models\ActivityDescription;
 use app\models\EventItem;
 use app\models\User;
 use yii\db\ActiveRecord;
@@ -27,6 +28,8 @@ class Activity extends Base
     const SEVERITY_INFORMATIONAL = 6;
     const SEVERITY_SUCCESS = 7;
 
+    private $_description;
+
     /**
      * @inheritdoc
      */
@@ -36,6 +39,7 @@ class Activity extends Base
 //            file_put_contents('/tmp/file', '+1');
 //        });
         $this->on(self::EVENT_AFTER_INSERT, [$this, 'eventNewActivities']);
+        $this->on(self::EVENT_BEFORE_INSERT, [$this, 'insertDescription']);
     }
 
     /**
@@ -44,6 +48,60 @@ class Activity extends Base
     public static function tableName()
     {
         return 'activity';
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDescription3()
+    {
+        return $this->hasOne(ActivityDescription::className(), ['id' => 'description2']);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function joinTables()
+    {
+        return [ 'ticket', 'description3' ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescriptionMultilanguage()
+    {
+        $curr = $this->description3[\Yii::$app->language];
+        $orig = $this->description3['en'];
+
+        if (empty($curr)) {
+            if (empty($orig)) {
+                return $this->description;
+            } else {
+                return $orig;
+            }
+        } else {
+            return $curr;
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function setDescriptionMultilanguage($value)
+    {
+        $this->_description = $value;
+    }
+
+    public function insertDescription()
+    {
+
+        $translation = new ActivityDescription([
+            'en' => \Yii::t('activities', $this->description, $this->params, 'en'),
+            'de' => \Yii::t('activities', $this->description, $this->params, 'de'),
+        ]);
+        $translation->save();
+        $this->description2 = $translation->id;
     }
 
     /**
