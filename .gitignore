@@ -15,6 +15,10 @@ phpunit.phar
 # local phpunit config
 /phpunit.xml
 
+#testing files
+tests/_output/*
+tests/_support/_generated
+
 /.ssh
 /backups
 /uploads

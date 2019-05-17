@@ -6,13 +6,9 @@ class HomeCest
 {
     public function ensureThatHomePageWorks(AcceptanceTester $I)
     {
-        $I->amOnPage(Url::toRoute('/site/index'));        
-        $I->see('GLaDOS');
+        $I->amOnPage(Url::toRoute('/'));        
+        $I->see('Check your exam result');
         
         $I->seeLink('Login');
-        $I->click('Login');
-        $I->wait(2); // wait for page to be opened
-        
-        $I->see('Please fill out the following fields to login.');
     }
 }
