@@ -1,5 +1,6 @@
 <?php
 
+use yii\helpers\Url;
 
 /**
  * Inherited Methods
@@ -23,4 +24,26 @@ class AcceptanceTester extends \Codeception\Actor
    /**
     * Define custom actions here
     */
+    public function login($name, $password)
+    {
+        $I = $this;
+
+        $I->amOnPage(Url::toRoute('/site/login'));
+        $I->see('Login', 'h1');
+        $I->amGoingTo('try to login with correct credentials');
+        $I->fillField('input[name="LoginForm[username]"]', $name);
+        $I->fillField('input[name="LoginForm[password]"]', $password);
+        $I->click('login-button');
+        $I->waitForText('Logout', 10);
+    }
+
+    public function logout()
+    {
+        $I = $this;
+
+        $I->seeLink('Logout');
+        $I->click('Logout');
+        $I->waitForText('Login');
+    }
+
 }

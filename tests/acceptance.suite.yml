@@ -10,6 +10,6 @@ modules:
                 args: ["--headless", "--disable-gpu", "--no-sandbox"]
                 binary: "/usr/bin/google-chrome"
         - Yii2:
-            part: orm
+            part: [orm, fixtures]
             entryScript: index-test.php
             cleanup: false

@@ -1,55 +1,45 @@
 <?php
 
 use yii\helpers\Url;
+use app\tests\fixtures\UserFixture;
 
 class LoginCest
 {
-    public function ensureThatLoginWorksWithAdmin(AcceptanceTester $I)
+    public function _fixtures()
     {
-        $I->amOnPage(Url::toRoute('/site/login'));
-        $I->see('Login', 'h1');
-
-        $I->amGoingTo('try to login with correct admin credentials');
-        $I->fillField('input[name="LoginForm[username]"]', 'admin');
-        $I->fillField('input[name="LoginForm[password]"]', 'admin');
-        $I->click('login-button');
-        
-        $I->expectTo('see admin panel');
-        $I->waitForText('Logout', 10);
-        $I->see('Config');
-        $I->see('Profile');
-        $I->see('Users');
-        $I->click('Profile');
-        
-        $I->expectTo('see permissions');
-        $I->waitForText('Role admin');
-
-        $I->click('Logout');
-        $I->waitForText('Login', 10);
+        return [
+            'users' => [
+                'class' => UserFixture::className(),
+                'dataFile' => codecept_data_dir() . 'user.php'
+            ],
+        ];
     }
 
-    public function ensureThatLoginWorksWithTeacher(AcceptanceTester $I)
+    /**
+     * @example { "name": "admin", "pw": "admin", "role": "admin" }
+     * @example { "name": "teacher", "pw": "teacher", "role": "teacher" }
+     */
+    public function testAuthentication(AcceptanceTester $I, \Codeception\Example $example)
     {
-        $I->amOnPage(Url::toRoute('/site/login'));
-        $I->see('Login', 'h1');
+        $I->login($example['name'], $example['pw']);
 
-        $I->amGoingTo('try to login with correct teacher credentials');
-        $I->fillField('input[name="LoginForm[username]"]', 'teacher');
-        $I->fillField('input[name="LoginForm[password]"]', 'teacher');
-        $I->click('login-button');
-        
-        $I->expectTo('see teacher panel');
-        $I->waitForText('Logout', 10);
+        $I->expectTo('see ' . $example['role'] . ' panel');
         $I->see('Profile');
-        $I->dontSee('Config');
-        $I->dontSee('Users');
+
+        if ($example['role'] == "admin") {
+            $I->see('Config');
+            $I->see('Users');
+        } else if ($example['role'] == "teacher") {
+            $I->dontSee('Config');
+            $I->dontSee('Users');
+        }
+
         $I->click('Profile');
         
         $I->expectTo('see permissions');
-        $I->waitForText('Role teacher');
+        $I->waitForText('Role ' . $example['role']);
 
-        $I->click('Logout');
-        $I->waitForText('Login', 10);
+        $I->logout();
     }
 
 }
