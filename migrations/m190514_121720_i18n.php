@@ -11,8 +11,8 @@ class m190514_121720_i18n extends Migration
 {
 
     public $activitiesTable = 'activity';
-    public $descriptionTable = 'description2';
-    public $descriptionColumn = 'description2';
+    public $descriptionTable = 'tr_activity_description';
+    public $descriptionColumn = 'description_id';
     public $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
 
     /**
@@ -29,14 +29,16 @@ class m190514_121720_i18n extends Migration
         ], $this->tableOptions);
 
         $this->addColumn($this->activitiesTable, 'data', $this->string(1024)->defaultValue(null));
+        $this->renameColumn($this->activitiesTable, 'description', 'description_old');
         $this->addColumn($this->activitiesTable, $this->descriptionColumn, $this->integer(11)->notNull());
 
         $models = Activity::find()->all();
         foreach ($models as $model) {
 
+            // TODO: loop through all languages
             $t = new ActivityDescription([
-                'en' => $model->description,
-                'de' => $model->description,
+                'en' => $model->description_old,
+                'de' => $model->description_old,
             ]);
             $t->save();
 
@@ -76,5 +78,6 @@ class m190514_121720_i18n extends Migration
 
         $this->dropColumn($this->activitiesTable, 'data');
         $this->dropColumn($this->activitiesTable, $this->descriptionColumn);
+        $this->renameColumn($this->activitiesTable, 'description_old', 'description');
     }
 }

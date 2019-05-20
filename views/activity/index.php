@@ -99,12 +99,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     'class' => 'col-md-1',
                 ],
             ],
-            /*[
+            [
                 'attribute' => 'description',
                 'format' => 'raw',
-                'value' => function ($model) {
-                    return \Yii::t('activities', $model->description, $model->params);
-                },
                 'filterType'=>GridView::FILTER_SELECT2,
                 'filterWidgetOptions'=>[
                     'pluginOptions' => [
@@ -114,52 +111,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         'placeholder' => '',
                         'ajax' => [
                             'url' => \yii\helpers\Url::to(['activity/index', 'mode' => 'list', 'attr' => 'description']),
-                            'dataType' => 'json',
-                            'delay' => 250,
-                            'cache' => true,
-                            'data' => new JsExpression('function(params) {
-                                return {
-                                    q: params.term,
-                                    page: params.page,
-                                    per_page: 10
-                                };
-                            }'),
-                            'processResults' => new JsExpression('function(data, page) {
-                                return {
-                                    results: data.results,
-                                    pagination: {
-                                        more: data.results.length === 10 // If there are 10 matches, theres at least another page
-                                    }
-                                };
-                            }'),
-                        ],
-                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
-                        'templateResult' => new JsExpression('function(q) { return q.text; }'),
-                        'templateSelection' => new JsExpression('function (q) { return q.text; }'),
-                    ],
-                ],
-                'filterInputOptions' => [
-                    'placeholder' => \Yii::t('form', 'Any')
-                ],
-                'contentOptions' => [
-                    'class' => 'col-md-8',
-                ],
-            ],*/
-            [
-                'attribute' => 'description4',
-                'value' => function ($model) {
-                    return $model->descriptionMultilanguage;
-                },
-                'format' => 'raw',
-                'filterType' => GridView::FILTER_SELECT2,
-                'filterWidgetOptions' => [
-                    'pluginOptions' => [
-                        'dropdownAutoWidth' => true,
-                        'width' => 'auto',
-                        'allowClear' => true,
-                        'placeholder' => '',
-                        'ajax' => [
-                            'url' => \yii\helpers\Url::to(['activity/index', 'mode' => 'list', 'attr' => 'description3']),
                             'dataType' => 'json',
                             'delay' => 250,
                             'cache' => true,

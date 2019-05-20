@@ -9,8 +9,8 @@ use yii\db\ActiveRecord;
  * This is the model class for table "ActivityDescription".
  *
  * @property integer $id
- * @property string $en
- * @property string $de
+ * @property string $en English
+ * @property string $de German
  */
 class ActivityDescription extends Base
 {
@@ -20,6 +20,17 @@ class ActivityDescription extends Base
      */
     public static function tableName()
     {
-        return 'description2';
+        return 'tr_activity_description';
     }
+
+    /**
+     * @inheritdoc
+     *
+     * TODO: fallback to other languages
+     */
+    public function __toString()
+    {
+        return $this->{\Yii::$app->language};
+    }
+
 }

@@ -7,6 +7,7 @@ use yii\base\Event;
 use app\models\ActivityDescription;
 use app\models\EventItem;
 use app\models\User;
+use app\models\Ticket;
 use yii\db\ActiveRecord;
 use yii\helpers\Json;
 
@@ -53,9 +54,25 @@ class Activity extends Base
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getDescription3()
+    public function getDescription()
     {
-        return $this->hasOne(ActivityDescription::className(), ['id' => 'description2']);
+        return $this->gettr_activity_description();
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function setDescription($value)
+    {
+        $this->_description = $value;
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function gettr_activity_description()
+    {
+        return $this->hasOne(ActivityDescription::className(), ['id' => 'description_id']);
     }
 
     /**
@@ -63,45 +80,19 @@ class Activity extends Base
      */
     public function joinTables()
     {
-        return [ 'ticket', 'description3' ];
+        return [ Ticket::tableName(), ActivityDescription::tableName() . " description" ];
     }
 
-    /**
-     * @return string
-     */
-    public function getDescriptionMultilanguage()
-    {
-        $curr = $this->description3[\Yii::$app->language];
-        $orig = $this->description3['en'];
-
-        if (empty($curr)) {
-            if (empty($orig)) {
-                return $this->description;
-            } else {
-                return $orig;
-            }
-        } else {
-            return $curr;
-        }
-    }
-
-    /**
-     * @return string
-     */
-    public function setDescriptionMultilanguage($value)
-    {
-        $this->_description = $value;
-    }
-
+    // TODO: loop through all languages
     public function insertDescription()
     {
-
+        $this->description_old = $this->_description;
         $translation = new ActivityDescription([
-            'en' => \Yii::t('activities', $this->description, $this->params, 'en'),
-            'de' => \Yii::t('activities', $this->description, $this->params, 'de'),
+            'en' => \Yii::t('activities', $this->_description, $this->params, 'en'),
+            'de' => \Yii::t('activities', $this->_description, $this->params, 'de'),
         ]);
         $translation->save();
-        $this->description2 = $translation->id;
+        $this->description_id = $translation->id;
     }
 
     /**
@@ -111,8 +102,8 @@ class Activity extends Base
     {
         return [
             [['date'], 'safe'],
-            [['description'], 'required'],
-            [['description'], 'string', 'max' => 254]
+            //[['description'], 'required'],
+            //[['description'], 'string', 'max' => 254]
         ];
     }
 

@@ -34,7 +34,7 @@ class Base extends \yii\db\ActiveRecord
     /**
      * List of tables that are able to join
      *
-     * @return array
+     * @return array an array with join tables in format [ "table1 alias1", "table2 alias2" ]
      */
     public function joinTables() {
         return [];

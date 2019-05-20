@@ -14,7 +14,7 @@ class ActivitySearch extends Activity
 {
 
     public $token;
-    public $description4;
+    public $description;
 
     /**
      * @inheritdoc
@@ -23,7 +23,7 @@ class ActivitySearch extends Activity
     {
         return [
             [['id'], 'integer'],
-            [['date', 'description', 'description4', 'ticket_id', 'token', 'severity'], 'safe'],
+            [['date', 'description', 'ticket_id', 'token', 'severity'], 'safe'],
         ];
     }
 
@@ -58,7 +58,10 @@ class ActivitySearch extends Activity
             'defaultOrder' => ['date' => SORT_DESC],
             'attributes' => [
                 'date',
-                'description',
+                'description' => [
+                    'asc' => ['description.' . \Yii::$app->language => SORT_ASC],
+                    'desc' => ['description.' . \Yii::$app->language => SORT_DESC],
+                ],
                 'ticket_id',
                 'token' => [
                     'asc' => ['ticket.token' => SORT_ASC],
@@ -81,15 +84,13 @@ class ActivitySearch extends Activity
             'severity' => $this->severity
         ]);
 
-        $query->joinWith(['ticket', 'description3']);
+        $query->joinWith($this->joinTables());
         $query->andFilterWhere(['like', 'ticket.token', $this->token]);
-        $query->andFilterWhere(['like', 'description2.' . \Yii::$app->language, $this->description4]);
+        $query->andFilterWhere(['like', 'description.' . \Yii::$app->language, $this->description]);
 
         $dateEnd = new \DateTime($this->date);
         $dateEnd->modify('+1 day');
         $query->andFilterWhere(['between', 'date', $this->date, $dateEnd->format('Y-m-d')]);
-
-        $query->andFilterWhere(['like', 'description', $this->description]);
 
         Yii::$app->user->can('activity/index/all') ?: $query->own();
 
