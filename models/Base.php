@@ -57,13 +57,11 @@ class Base extends \yii\db\ActiveRecord
     {
         $id = is_null($id) ? $attr : $id;
         $query = $this->find();
-        $query->select([$id . ' as id', $attr . ' AS text'])
-            ->distinct();
 
         $query->joinWith($this->joinTables());
 
         if (!is_null($q) && $q != '') {
-            $query->where(['like', $attr, $q]);
+            $query->having(['like', $attr, $q]);
         }
 
         if (is_null($orderBy)) {
@@ -71,6 +69,8 @@ class Base extends \yii\db\ActiveRecord
         } else {
             $query->orderBy($orderBy);
         }
+
+        $query->groupBy($attr); // distincts even a calculated field
 
         if ($this->tableName() != "user") {
             Yii::$app->user->can($this->tableName() . '/index/all') ?: $query->own();
@@ -86,7 +86,9 @@ class Base extends \yii\db\ActiveRecord
 
         $command = $query->limit($per_page)->offset(($page-1)*$per_page)->createCommand();
         $data = $command->queryAll();
-        $out['results'] = array_merge($out['results'], array_values($data));
+        foreach ($data as $key => $value) {
+            $out['results'][] = ['id' => $value[$id], 'text' => $value[$attr]];
+        }
         return $out;
     }
 

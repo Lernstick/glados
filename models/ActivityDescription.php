@@ -22,15 +22,4 @@ class ActivityDescription extends Base
     {
         return 'tr_activity_description';
     }
-
-    /**
-     * @inheritdoc
-     *
-     * TODO: fallback to other languages
-     */
-    public function __toString()
-    {
-        return $this->{\Yii::$app->language};
-    }
-
 }

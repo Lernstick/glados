@@ -14,7 +14,6 @@ class ActivitySearch extends Activity
 {
 
     public $token;
-    public $description;
 
     /**
      * @inheritdoc
@@ -58,10 +57,7 @@ class ActivitySearch extends Activity
             'defaultOrder' => ['date' => SORT_DESC],
             'attributes' => [
                 'date',
-                'description' => [
-                    'asc' => ['description.' . \Yii::$app->language => SORT_ASC],
-                    'desc' => ['description.' . \Yii::$app->language => SORT_DESC],
-                ],
+                'description',
                 'ticket_id',
                 'token' => [
                     'asc' => ['ticket.token' => SORT_ASC],
@@ -86,7 +82,7 @@ class ActivitySearch extends Activity
 
         $query->joinWith($this->joinTables());
         $query->andFilterWhere(['like', 'ticket.token', $this->token]);
-        $query->andFilterWhere(['like', 'description.' . \Yii::$app->language, $this->description]);
+        $query->andFilterHaving(['like', 'description', $this->description]);
 
         $dateEnd = new \DateTime($this->date);
         $dateEnd->modify('+1 day');

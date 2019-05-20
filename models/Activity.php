@@ -30,6 +30,7 @@ class Activity extends Base
     const SEVERITY_SUCCESS = 7;
 
     private $_description;
+    public $description;
 
     /**
      * @inheritdoc
@@ -49,14 +50,6 @@ class Activity extends Base
     public static function tableName()
     {
         return 'activity';
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getDescription()
-    {
-        return $this->gettr_activity_description();
     }
 
     /**
@@ -225,9 +218,15 @@ class Activity extends Base
      */ 
     public static function find() 
     { 
-        return new ActivityQuery(get_called_class()); 
-    } 
+        $c = \Yii::$app->language;
+        $query = new ActivityQuery(get_called_class());
+        $query->addSelect([
+            '`activity`.*',
+            new \yii\db\Expression('COALESCE(NULLIF(`description`.`' . $c . '`, ""), NULLIF(`description`.`en`, ""), "") as description')
+        ]);
 
+        return $query;
+    }
 
     public function getLastvisited()
     {
