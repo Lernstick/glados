@@ -2,10 +2,10 @@
 modules:
     config:
         WebDriver:
-            host: 10.16.0.222
-            port: 4444
+            host: %WINDOWS_HOST%
+            port: %IE_PORT%
+            url: http://%GLADOS_HOST%/glados/
             browser: 'internet explorer'
-            url: http://10.16.5.11/glados/
             capabilities:
                 se:ieOptions:
-                    ignoreProtectedModeSettings: true
+                    ignoreProtectedModeSettings: true # seems not to work

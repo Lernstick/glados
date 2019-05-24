@@ -3,14 +3,14 @@ modules:
     config:
         WebDriver:
             browser: 'chrome'
-            url: http://127.0.0.1/glados
-            port: 4444
+            url: http://%LOCAL_GLADOS_HOST%/glados
+            port: %CHROME_PORT%
             capabilities:
                 chromeOptions:
                     args: ["--headless", "--disable-gpu", "--no-sandbox"]
-                    binary: "/usr/bin/google-chrome"
+                    binary: %CHROME_BINARY%
 extensions:
     enabled:
         - Codeception\Extension\RunProcess:
-            - xvfb-run java -Dwebdriver.chrome.driver=/usr/bin/chromedriver -jar /root/test/selenium-server-standalone-3.13.0.jar  
-            #- /usr/bin/chromedriver --port=4444
+            0: xvfb-run java -Dwebdriver.chrome.driver=%CHROME_DRIVER% -jar %CHROME_SELENIUM% -port %CHROME_PORT%
+            sleep: 5 # wait 5 seconds for processes to boot
