@@ -9,3 +9,8 @@ modules:
                 chromeOptions:
                     args: ["--headless", "--disable-gpu", "--no-sandbox"]
                     binary: "/usr/bin/google-chrome"
+extensions:
+    enabled:
+        - Codeception\Extension\RunProcess:
+            - xvfb-run java -Dwebdriver.chrome.driver=/usr/bin/chromedriver -jar /root/test/selenium-server-standalone-3.13.0.jar  
+            #- /usr/bin/chromedriver --port=4444

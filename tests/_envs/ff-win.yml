@@ -1,0 +1,11 @@
+# `win` environment config goes here
+modules:
+    config:
+        WebDriver:
+            host: 10.16.0.222
+            port: 4444
+            url: http://10.16.5.11/glados/
+            browser: 'firefox'
+            capabilities:
+                moz:firefoxOptions:
+                    args: ["-headless"]

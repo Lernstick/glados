@@ -1,0 +1,12 @@
+# `saucelabs` environment config goes here
+modules:
+    config:
+        WebDriver:
+            url: http://localhost/glados/
+            host: 'chaoos:<auth-token>@ondemand.saucelabs.com'
+            port: 80
+            browser: microsoftedge
+            capabilities:
+                platform: 'Windows 10'
+                recordVideo: true
+                recordScreenshots: true

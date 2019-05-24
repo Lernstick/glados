@@ -1,0 +1,11 @@
+# `ie` environment config goes here
+modules:
+    config:
+        WebDriver:
+            host: 10.16.0.222
+            port: 4444
+            browser: 'internet explorer'
+            url: http://10.16.5.11/glados/
+            capabilities:
+                se:ieOptions:
+                    ignoreProtectedModeSettings: true

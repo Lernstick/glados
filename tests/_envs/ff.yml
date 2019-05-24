@@ -1,0 +1,17 @@
+# `firefox` environment config goes here
+modules:
+    config:
+        WebDriver:
+            browser: 'firefox'
+            url: http://127.0.0.1/glados
+            port: 4444
+            capabilities:
+                moz:firefoxOptions:
+                    args: ["-headless"]
+                    binary: "/usr/bin/firefox"
+
+extensions:
+    enabled:
+        - Codeception\Extension\RunProcess:
+            - xvfb-run java -Dwebdriver.gecko.driver=/usr/bin/geckodriver -jar /root/test/selenium-server-standalone-3.4.0.jar  
+            #- /usr/bin/chromedriver --port=4444
