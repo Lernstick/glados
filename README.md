@@ -15,8 +15,13 @@ Glados is a fully configurable webinterface to take, manage and create exams usi
 
 ## Installation
 
-* [Using the source package](https://github.com/imedias/glados/blob/master/howtos/manual-install.md)
-* [Using the Debian package](https://github.com/imedias/glados/blob/master/howtos/deb-install.md)
+* [Manual Installation](https://github.com/imedias/glados/blob/master/howtos/manual-install.md) (Using the source package)
+* [Automatic Installation](https://github.com/imedias/glados/blob/master/howtos/deb-install.md) (Using the Debian package)
+
+## Update and Upgrade
+
+* [Softwareupdate on Debian](https://github.com/imedias/glados/blob/master/howtos/deb-update.md)
+* [Upgrade from Debian 8 to 9](https://github.com/imedias/glados/blob/master/howtos/deb-8to9-upgrade.md)
 
 ## Documentation
 

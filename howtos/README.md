@@ -34,8 +34,13 @@ See the [Manual](https://github.com/imedias/glados/tree/master/howtos/README.md)
 
 **Installation**
 
-* [Using the Source package](manual-install.md)
-* [Using the Debian package](deb-install.md)
+* [Manual Installation](manual-install.md) (Using the source package)
+* [Automatic Installation](deb-install.md) (Using the Debian package)
+
+**Update and Upgrade**
+
+* [Softwareupdate on Debian](deb-update.md)
+* [Upgrade from Debian 8 to 9](deb-8to9-upgrade.md)
 
 **Configuration**
 
