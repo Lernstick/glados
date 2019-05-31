@@ -208,7 +208,7 @@ class DownloadController extends DaemonController implements DaemonInterface
                 } else {
                     $act = new Activity([
                         'ticket_id' => $this->ticket->id,
-                        'description' => yiit('activities', 'Exam download finished by {ip} from ticket with token {token}.'),
+                        'description' => yiit('activities', 'Exam download finished by {ip} from Ticket with token {token}.'),
                         'params' => [
                             'ip' => $this->ticket->ip,
                             'token' => $this->ticket->token,
