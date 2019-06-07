@@ -136,8 +136,17 @@ $js = <<< 'SCRIPT'
 $("input[name='Exam[libre_autosave]']").click(function(){
     if ($(this).is(':checked')) {
         $('#exam-libre_autosave_interval').attr("disabled", false);
+        $('#exam-libre_autosave_path').attr("disabled", false);
     } else if ($(this).not(':checked')) {
         $('#exam-libre_autosave_interval').attr("disabled", true);
+        $('#exam-libre_autosave_path').attr("disabled", true);
+    }
+});
+$("input[name='Exam[libre_createbackup]']").click(function(){
+    if ($(this).is(':checked')) {
+        $('#exam-libre_createbackup_path').attr("disabled", false);
+    } else if ($(this).not(':checked')) {
+        $('#exam-libre_createbackup_path').attr("disabled", true);
     }
 });
 $("input[name='Exam[screenshots]']").click(function(){
@@ -268,16 +277,30 @@ $this->registerJs($js);
         </div>
         <div class="panel-body">
             <div class="row">
-                <div class="col-md-6" style="width:auto;">
+                <div class="col-md-6">
                     <?= $form->field($model, 'libre_autosave')->checkbox() ?>
-                </div>
-                <div class="col-md-3">
-                    <?= $form->field($model, 'libre_autosave_interval', [
-                        'template' => '{label}<div class="input-group"><div class="input-group-addon">with Interval of</div>{input}<span class="input-group-addon" id="basic-addon2">minutes</span></div>{hint}{error}'
-                    ])->textInput(['type' => 'number', 'disabled' => !$model->libre_autosave])->label(false); ?>
                 </div>
                 <div class="col-md-6">
                     <?= $form->field($model, 'libre_createbackup')->checkbox() ?>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <?= $form->field($model, 'libre_autosave_path', [
+                        'template' => '{label}<div class="input-group"><div class="input-group-addon">...to the directory</div>{input}</div>{hint}{error}'
+                    ])->textInput(['disabled' => !$model->libre_autosave])->label(false); ?>
+                </div>
+                <div class="col-md-6">
+                    <?= $form->field($model, 'libre_createbackup_path', [
+                        'template' => '{label}<div class="input-group"><div class="input-group-addon">...to the directory</div>{input}</div>{hint}{error}'
+                    ])->textInput(['disabled' => !$model->libre_createbackup])->label(false); ?>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <?= $form->field($model, 'libre_autosave_interval', [
+                        'template' => '{label}<div class="input-group"><div class="input-group-addon">...all</div>{input}<span class="input-group-addon" id="basic-addon2">minutes.</span></div>{hint}{error}'
+                    ])->textInput(['type' => 'number', 'disabled' => !$model->libre_autosave])->label(false); ?>
                 </div>
             </div>
         </div>
