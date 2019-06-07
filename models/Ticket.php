@@ -380,6 +380,10 @@ class Ticket extends Base
         ]);
         $eventItem->generate();
 
+        if ($this->backup == true) {
+            $this->backups[0]->delete();
+        }
+
         return;
     }
 

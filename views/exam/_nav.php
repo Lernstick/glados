@@ -106,13 +106,28 @@ $this->registerJs($active_tabs);
             <li>
                 <?= Html::a(
                     '<span class="glyphicon glyphicon-trash"></span> Delete all Open Tickets',
-                    ['ticket/delete', 'mode' => 'many', 'exam_id' => $model->id],
+                    ['ticket/delete', 'mode' => 'manyOpen', 'exam_id' => $model->id],
                     [
                         'class' => 'btn',
                         'style' => ['text-align' => 'left'],
                         'disabled' => $model->openTicketCount == 0,
                         'data' => [
-                            'confirm' => 'Are you sure you want to delete ALL ' . $model->openTicketCount . ' Open tickets associated to this exam?',
+                            'confirm' => 'Are you sure you want to delete ALL ' . $model->openTicketCount . ' Open Tickets associated to this exam?',
+                            'method' => 'post',
+                        ],
+                    ]
+                ) ?>
+            </li>
+            <li>
+                <?= Html::a(
+                    '<span class="glyphicon glyphicon-trash"></span> Delete <b>ALL</b> associated Tickets',
+                    ['ticket/delete', 'mode' => 'many', 'exam_id' => $model->id],
+                    [
+                        'class' => 'btn',
+                        'style' => ['text-align' => 'left'],
+                        'disabled' => $model->ticketCount == 0,
+                        'data' => [
+                            'confirm' => 'Are you sure you want to delete ALL ' . $model->ticketCount . ' Tickets associated to this exam?',
                             'method' => 'post',
                         ],
                     ]

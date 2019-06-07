@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\base\Model;
+use yii\helpers\FileHelper;
 use app\models\Ticket;
 use app\models\RdiffFileSystem;
 
@@ -68,9 +69,14 @@ class Backup extends Model
         return Ticket::findOne(['token' => $this->token]);
     }
 
+    public function getBackupDir()
+    {
+        return \Yii::$app->params['backupPath'] . '/' . $this->token;
+    }
+
     public function getDir()
     {
-        return \Yii::$app->params['backupPath'] . '/' . $this->token . '/rdiff-backup-data/';
+        return $this->backupDir . '/rdiff-backup-data/';
     }
 
     /**
@@ -134,6 +140,18 @@ class Backup extends Model
         return array_filter($log, function($v) {
             return $v !== PHP_EOL && $v !== '--------------[ Session statistics ]--------------' . PHP_EOL;
         });
+    }
+
+    /**
+     * Removes all backups
+     *
+     * @return void
+     * @throws yii\base\ErrorException
+     * @see https://www.yiiframework.com/doc/api/2.0/yii-helpers-basefilehelper#removeDirectory()-detail
+     */
+    public function delete()
+    {
+        return FileHelper::removeDirectory($this->backupDir);
     }
 
     /**

@@ -433,25 +433,32 @@ class TicketController extends Controller
             Yii::$app->session->addFlash('danger', 'The Ticket has been deleted successfully.');
 
             return $this->redirect(Yii::$app->session['ticketViewReturnURL']);
-        }else if ($mode == 'many') {
+        }else if ($mode == 'manyOpen' || $mode == 'many') {
             $query = Ticket::find()->where(['exam_id' => $exam_id]);
             Yii::$app->user->can('ticket/delete/all') ?: $query->own();
             $models = $query->all();
 
             $c = 0;
-            foreach ($models as $key => $model){
-                if($model->state == Ticket::STATE_OPEN){
+            if ($mode == 'manyOpen'){
+                foreach ($models as $key => $model){
+                    if ($model->state == Ticket::STATE_OPEN){
+                        $model->delete() ? $c++ : null;
+                    }
+                }
+            } else if ($mode == 'many'){
+                foreach ($models as $key => $model){
                     $model->delete() ? $c++ : null;
                 }
             }
 
+
             #TODO: errors?
-            if($c == 0){
-                Yii::$app->session->addFlash('danger', 'There are no Open Tickets to delete.');
+            if ($c == 0){
+                Yii::$app->session->addFlash('danger', 'There are no ' . ( $mode == 'manyOpen' ? 'Open' : '' ) . 'Tickets to delete.');
                 return $this->redirect(['exam/view', 'id' => $exam_id]);
             }
 
-            Yii::$app->session->addFlash('danger', $c . ' Open Tickets have been deleted successfully.');
+            Yii::$app->session->addFlash('danger', $c . ' '  . ( $mode == 'manyOpen' ? 'Open' : '' ) . ' Tickets have been deleted successfully.');
             return $this->redirect(['exam/view', 'id' => $exam_id]);
         }
     }
