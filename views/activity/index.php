@@ -102,7 +102,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'description',
                 'value' => function ($model) {
-                    return \Yii::t(null, $model->tr_activity_description->de, $model->params, 'xxx');
+                    return \Yii::t(null, $model->tr_description, $model->params, 'xxx');
                 },
                 'format' => 'raw',
                 'filterType' => GridView::FILTER_SELECT2,
@@ -145,6 +145,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'class' => 'col-md-8',
                 ],
             ],
+            'test',
         ],
         'storage' => DynaGrid::TYPE_COOKIE,
         'theme' => 'simple-default',

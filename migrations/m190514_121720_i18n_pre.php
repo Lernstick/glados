@@ -2,7 +2,7 @@
 
 use yii\db\Migration;
 use app\models\Activity;
-use app\models\ActivityDescription;
+use app\models\Translation;
 
 /**
  * Class m190514_121720_i18n_pre
@@ -13,7 +13,7 @@ class m190514_121720_i18n_pre extends Migration
 {
 
     public $activitiesTable = 'activity';
-    public $descriptionTable = 'tr_activity_description';
+    public $descriptionTable = 'translation';
     public $descriptionColumn = 'description_id';
     public $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
 
@@ -31,6 +31,7 @@ class m190514_121720_i18n_pre extends Migration
                 'id' => $this->primaryKey(),
                 'en' => $this->string(255)->notNull(),
                 'de' => $this->string(255),
+                //'foreign_id' => $this->integer(11),
             ], $this->tableOptions);
 
         }
@@ -61,7 +62,7 @@ class m190514_121720_i18n_pre extends Migration
             // drop the table
             $this->dropTable($this->descriptionTable);
 
-            if ($this->db->schema->getTableSchema($this->activitiesTable, true)->getColumn('description') === null) {
+            if ($this->db->schema->getTableSchema($this->activitiesTable, true)->getColumn('description_new') !== null) {
                 $this->renameColumn($this->activitiesTable, 'description_new', 'description');
             }
         }
@@ -73,5 +74,10 @@ class m190514_121720_i18n_pre extends Migration
         if ($this->db->schema->getTableSchema($this->activitiesTable, true)->getColumn($this->descriptionColumn) !== null) {
             $this->dropColumn($this->activitiesTable, $this->descriptionColumn);
         }
+
+        if ($this->db->schema->getTableSchema($this->activitiesTable, true)->getColumn('description_old') !== null) {
+            $this->renameColumn($this->activitiesTable, 'description_old', 'description');
+        }
+
     }
 }

@@ -6,13 +6,13 @@ use Yii;
 use yii\db\ActiveRecord;
 
 /**
- * This is the model class for table "ActivityDescription".
+ * This is the model class for table "Translation".
  *
  * @property integer $id
  * @property string $en English
  * @property string $de German
  */
-class ActivityDescription extends Base
+class Translation extends Base
 {
 
     /**
@@ -20,6 +20,6 @@ class ActivityDescription extends Base
      */
     public static function tableName()
     {
-        return 'tr_activity_description';
+        return 'translation';
     }
 }

@@ -2,7 +2,7 @@
 
 use yii\db\Migration;
 use app\models\Activity;
-use app\models\ActivityDescription;
+use app\models\Translation;
 
 /**
  * Class m190531_162014_i18n_migrate
@@ -13,7 +13,7 @@ class m190531_162014_i18n_migrate extends Migration
 {
 
     public $activitiesTable = 'activity';
-    public $descriptionTable = 'tr_activity_description';
+    public $descriptionTable = 'translation';
     public $descriptionColumn = 'description_id';
     public $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
 
@@ -111,11 +111,11 @@ class m190531_162014_i18n_migrate extends Migration
                 }
             }
 
-            $existing = ActivityDescription::find()->where(['en' => $en])->one();
+            $existing = Translation::find()->where(['en' => $en])->one();
 
             if ($existing === null || $existing === false) {
                 // TODO: loop through all languages
-                $new = new ActivityDescription([
+                $new = new Translation([
                     'en' => \Yii::t('activities', $en, $dummy_params, 'en'),
                     'de' => \Yii::t('activities', $en, $dummy_params, 'de'),
                 ]);

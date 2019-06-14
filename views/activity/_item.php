@@ -48,7 +48,7 @@ use app\components\ActiveEventField;
             'attribute' => 'description',
             'format' => 'raw',
             'value' => function($model) {
-                return \Yii::t(null, $model->tr_activity_description->de, $model->params, 'xxx');
+                return \Yii::t(null, $model->description_real, $model->params, 'xxx');
             },
         ],
 

@@ -2,7 +2,7 @@
 
 use yii\db\Migration;
 use app\models\Activity;
-use app\models\ActivityDescription;
+use app\models\Translation;
 
 /**
  * Class m190531_162336_i18n_post
@@ -13,7 +13,7 @@ class m190531_162336_i18n_post extends Migration
 {
 
     public $activitiesTable = 'activity';
-    public $descriptionTable = 'tr_activity_description';
+    public $descriptionTable = 'translation';
     public $descriptionColumn = 'description_id';
     public $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
 
@@ -22,7 +22,7 @@ class m190531_162336_i18n_post extends Migration
      */
     public function safeUp()
     {
-        if (!isset($this->db->schema->getTableSchema($this->activitiesTable, true)->foreignKeys['fk-activity-desc_de'])) {
+        /*if (!isset($this->db->schema->getTableSchema($this->activitiesTable, true)->foreignKeys['fk-activity-desc_de'])) {
             $this->addForeignKey(
                 'fk-activity-desc_de',
                 $this->activitiesTable,
@@ -32,7 +32,7 @@ class m190531_162336_i18n_post extends Migration
                 'CASCADE',
                 'CASCADE'
             );
-        }
+        }*/
 
         if ($this->db->schema->getTableSchema($this->activitiesTable, true)->getColumn('description_old') !== null) {
             $this->dropColumn($this->activitiesTable, 'description_old');
@@ -48,13 +48,15 @@ class m190531_162336_i18n_post extends Migration
             $this->addColumn($this->activitiesTable, 'description_new', $this->string(1024)->defaultValue(null));
         }
 
-        if ($this->db->schema->getTableSchema($this->descriptionTable, true) !== null) {
-
+        /*if ($this->db->schema->getTableSchema($this->descriptionTable, true) !== null) {
             if (isset($this->db->schema->getTableSchema($this->activitiesTable, true)->foreignKeys['fk-activity-desc_de'])) {
                 // remove the foreign key
                 $this->dropForeignKey('fk-activity-desc_de', $this->activitiesTable);
-                $this->alterColumn($this->activitiesTable, $this->descriptionColumn, $this->string(64)->notNull());
             }
+        }*/
+
+        if ($this->db->schema->getTableSchema($this->activitiesTable, true)->getColumn($this->descriptionColumn) !== null) {
+            $this->alterColumn($this->activitiesTable, $this->descriptionColumn, $this->string(64)->notNull());
         }
     }
 }

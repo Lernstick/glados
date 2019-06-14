@@ -4,7 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\base\Event;
-use app\models\ActivityDescription;
+use app\models\Translation;
 use app\models\EventItem;
 use app\models\User;
 use app\models\Ticket;
@@ -29,8 +29,12 @@ class Activity extends Base
     const SEVERITY_INFORMATIONAL = 6;
     const SEVERITY_SUCCESS = 7;
 
-    private $_description;
+    /* db translated fields */
     public $description;
+    public $test;
+
+    /* may be removed */
+    private $_description;
 
     /**
      * @inheritdoc
@@ -53,6 +57,7 @@ class Activity extends Base
     }
 
     /**
+     * TODO: may not be necessary
      * @return void
      */
     public function setDescription($value)
@@ -61,11 +66,33 @@ class Activity extends Base
     }
 
     /**
+     * For each translated db field, such a function must be created, named getTranslationName()
+     * returning the relation to the translation table
+     *
      * @return \yii\db\ActiveQuery
      */
-    public function gettr_activity_description()
+    public function getTranslationDesciption()
     {
-        return $this->hasOne(ActivityDescription::className(), ['id' => 'description_id']);
+        return $this->hasOne(Translation::className(), ['id' => 'description_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTranslationTest()
+    {
+        return $this->hasOne(Translation::className(), ['id' => 'test_id']);
+    }
+
+    /**
+     * For each translated db field, such a function must be created, named getTr_name()
+     * returning the language row with data in it.
+     *
+     * @return string content of the row from the table corresponding to the language
+     */
+    public function getTr_description()
+    {
+        return \Yii::t(null, $this->description, $this->params, 'xxx');
     }
 
     /**
@@ -73,7 +100,11 @@ class Activity extends Base
      */
     public function joinTables()
     {
-        return [ Ticket::tableName(), ActivityDescription::tableName() . " description" ];
+        return [
+            Ticket::tableName(),
+            "translationDesciption description",
+            "translationTest test"
+        ];
     }
 
     public function insertDescription()
@@ -87,13 +118,13 @@ class Activity extends Base
         // TODO: remove description_old
         //$this->description_old = $this->description;
 
-        $tr = ActivityDescription::find()->where([
+        $tr = Translation::find()->where([
             'en' => \Yii::t('activities', $this->description, $params, 'en')
         ])->one();
         
         if ($tr === null || $tr === false) {
             // TODO: loop through all languages
-            $translation = new ActivityDescription([
+            $translation = new Translation([
                 'en' => \Yii::t('activities', $this->description, $params, 'en'),
                 'de' => \Yii::t('activities', $this->description, $params, 'de'),
             ]);
@@ -260,7 +291,8 @@ class Activity extends Base
         $query->addSelect([
             '`activity`.*',
             // first the end-user language, then english (en) as fallback
-            new \yii\db\Expression('COALESCE(NULLIF(`description`.`' . $c . '`, ""), NULLIF(`description`.`en`, ""), "") as description')
+            new \yii\db\Expression('COALESCE(NULLIF(`description`.`' . $c . '`, ""), NULLIF(`description`.`en`, ""), "") as description'),
+            new \yii\db\Expression('COALESCE(NULLIF(`test`.`' . $c . '`, ""), NULLIF(`test`.`en`, ""), "") as test')
         ]);
 
         return $query;
