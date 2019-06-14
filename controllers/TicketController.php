@@ -15,6 +15,7 @@ use app\models\Screenshot;
 use app\models\ScreenshotSearch;
 use app\models\Exam;
 use app\models\EventItem;
+use app\models\Stats;
 use app\models\Daemon;
 use app\models\DaemonSearch;
 use app\models\RdiffFileSystem;
@@ -809,6 +810,15 @@ class TicketController extends Controller
         $model->end = new Expression('NOW()');
         $model->last_backup = 0;
         $model->save();
+
+        // increment the stats for total duration and total completed exams
+        // but count only exams whose duration is less or equal than 8 hours and more
+        // or equal than 15 minutes.
+        $model->refresh();
+        if ($model->durationInSecs <= 28800 && $model->durationInSecs >= 900) {
+            Stats::increment('total_duration', $model->durationInSecs);
+            Stats::increment('completed_exams'); // +1
+        }
 
         $act = new Activity([
             'ticket_id' => $model->id,

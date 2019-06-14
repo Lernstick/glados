@@ -614,12 +614,24 @@ class Ticket extends Base
      * Returns the duration of the test
      *
      * @return DateInterval object|null
-     */    
-    public function getDuration(){
-
+     */
+    public function getDuration()
+    {
         $a = new \DateTime($this->start);
         $b = new \DateTime($this->end);
         return $a == $b ? null : $a->diff($b);
+    }
+
+    /**
+     * Returns the duration in seconds
+     *
+     * @return int The amount of seconds
+     */
+    public function getDurationInSecs()
+    {
+        $a = new \DateTime($this->start);
+        $b = new \DateTime($this->end);
+        return $b->getTimestamp() - $a->getTimestamp();
     }
 
     /**
