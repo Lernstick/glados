@@ -79,7 +79,7 @@ class Base extends \yii\db\ActiveRecord
         $out = ['results' => []];
         if ($showQuery === true && $page == 1) {
             $out = ['results' => [
-                0 => ['id' => $q, 'text' => $q]
+                0 => ['id' => $q, 'text' => $q == null ? $q : \Yii::t('form', '<i>Search for... </i><b>{query}</b>', ['query' => $q])]
             ]];
             $per_page -= 1;
         }
@@ -87,7 +87,11 @@ class Base extends \yii\db\ActiveRecord
         $command = $query->limit($per_page)->offset(($page-1)*$per_page)->createCommand();
         $data = $command->queryAll();
         foreach ($data as $key => $value) {
-            $out['results'][] = ['id' => $value[$id], 'text' => $value[$attr]];
+            $out['results'][] = [
+                'id' => $value[$id],
+                // highlight the matching part
+                'text' => $q == null ? $value[$attr] : preg_replace('/'.$q.'/i', '<b>$0</b>', $value[$attr])
+            ];
         }
         return $out;
     }

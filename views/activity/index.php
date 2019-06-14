@@ -101,9 +101,12 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'description',
+                'value' => function ($model) {
+                    return \Yii::t(null, $model->tr_activity_description->de, $model->params, 'xxx');
+                },
                 'format' => 'raw',
-                'filterType'=>GridView::FILTER_SELECT2,
-                'filterWidgetOptions'=>[
+                'filterType' => GridView::FILTER_SELECT2,
+                'filterWidgetOptions' => [
                     'pluginOptions' => [
                         'dropdownAutoWidth' => true,
                         'width' => 'auto',
