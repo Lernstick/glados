@@ -186,13 +186,17 @@ chmod 755 "/lib/systemd/lernstick-shutdown"
 rm -f ${initrd}/newroot/usr/share/polkit-1/actions/ch.lernstick.welcome.policy
 
 # place finish_exam.desktop in "favorite apps" of Gnome3's dash
-if [ -e ${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps ]; then
+if [ -e "${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps" ]; then
   newvalue=$(awk -F'[\,,\[,\], ]' '{if($0~/^favorite-apps=/){ printf "favorite-apps=["; for(i = 2; i <= NF; i++) { if($i!="") {printf "%s, ", $i;} } printf "'\''finish_exam.desktop'\'']\n"; } else { print $0; } }' ${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps)
   echo "${newvalue}" > "${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps"
 else
   echo "[org/gnome/shell]
 favorite-apps=['finish_exam.desktop']" > "${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps"
 fi
+
+# this touch is needed, because dconf update is not rebuilding the database if the
+# directory containing the rules has the same mtime as before
+touch "${initrd}/newroot/etc/dconf/db/local.d"
 chroot ${initrd}/newroot dconf update
 
 ###########################################
