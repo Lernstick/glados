@@ -60,6 +60,13 @@ class EventController extends Controller
         while($stream->onEvent() === true){
             $message = '';
             foreach($stream->events as $model){
+
+                $data = json_decode($model->data, true);
+                foreach ($data as $key => $value) {
+                    $data[$key] = \Yii::t('live_data', $value);
+                }
+                $model->data = json_encode($data);
+
                 $message .= $this->renderPartial('/event/message', [
                     'model' => $model,
                 ]);

@@ -17,7 +17,5 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    '<i>Search for... </i><b>{query}</b>' => '',
-    'Any' => '',
-    'Enter day...' => '',
+    'setup complete' => 'Setup beendet',
 ];

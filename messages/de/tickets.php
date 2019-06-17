@@ -165,4 +165,5 @@ return [
     'seconds' => '',
     'to the state as it was at <b id=\'confirmRestoreItemDate\'>date</b>' => '',
     '{n} Open Tickets have been deleted successfully.' => '',
+    'Client failed' => '@@Client fehlgeschlagen@@',
 ];

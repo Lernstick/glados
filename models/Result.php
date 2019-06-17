@@ -324,7 +324,7 @@ class Result extends Model
 
                 $act = new Activity([
                     'ticket_id' => $ticket->id,
-                    'description' => yiit('activities', 'Exam result handed in.'),
+                    'description' => yiit('activity', 'Exam result handed in.'),
                     'severity' => Activity::SEVERITY_INFORMATIONAL,
                 ]);
                 $act->save();

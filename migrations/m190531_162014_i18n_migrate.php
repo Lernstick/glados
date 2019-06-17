@@ -2,6 +2,7 @@
 
 use yii\db\Migration;
 use app\models\Activity;
+use app\models\Ticket;
 use app\models\Translation;
 
 /**
@@ -13,12 +14,10 @@ class m190531_162014_i18n_migrate extends Migration
 {
 
     public $activitiesTable = 'activity';
-    public $descriptionTable = 'translation';
-    public $descriptionColumn = 'description_id';
-    public $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
+    public $ticketTable = 'ticket';
 
     // .*? makes id lazy instead of greedy
-    public $regexes = [
+    public $descriptionRegexes = [
         '/^Backup failed: rdiff-backup failed \(retval: (.*?)\)/' => [
             0 => 'Backup failed: rdiff-backup failed (retval: {retval})',
             1 => 'retval',
@@ -80,6 +79,22 @@ class m190531_162014_i18n_migrate extends Migration
         ],
     ];
 
+    public $client_stateRegexes = [
+        '/^Backup failed: rdiff-backup failed \(retval: (.*?)\)/' => [
+            0 => 'Backup failed: rdiff-backup failed (retval: {retval})',
+            1 => 'retval',
+        ],
+    ];
+
+    /**
+     * These entries are only here, such that they will never be removed
+     * from the translation files in messages/LANG/*.php
+     */
+    public function dummy() {
+        // for backward compatibility
+        yiit('activity', 'Client state changed: {old} -> {new}');
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -90,12 +105,12 @@ class m190531_162014_i18n_migrate extends Migration
         $nr = Activity::find()->count();
         $i = 1;
         foreach ($models as $model) {
-            echo "Migrating database record " . $i . "/" . $nr . "\r";
+            echo "Activities: Migrating database record " . $i . "/" . $nr . "\r";
 
             $en = $model->description_old;
             $dummy_params = [];
 
-            foreach ($this->regexes as $regex => $keys) {
+            foreach ($this->descriptionRegexes as $regex => $keys) {
                 $matches = [];
                 if (preg_match($regex, $model->description_old, $matches) == 1) {
                     $en = $keys[0];
@@ -106,7 +121,7 @@ class m190531_162014_i18n_migrate extends Migration
                     }, $keys);
 
                     $dummy_params = array_combine($keys, $vals);
-                    $model->params = array_combine($keys, $matches);
+                    $model->description_params = array_combine($keys, $matches);
                     break 1;
                 }
             }
@@ -116,8 +131,8 @@ class m190531_162014_i18n_migrate extends Migration
             if ($existing === null || $existing === false) {
                 // TODO: loop through all languages
                 $new = new Translation([
-                    'en' => \Yii::t('activities', $en, $dummy_params, 'en'),
-                    'de' => \Yii::t('activities', $en, $dummy_params, 'de'),
+                    'en' => \Yii::t('activity', $en, $dummy_params, 'en'),
+                    'de' => \Yii::t('activity', $en, $dummy_params, 'de'),
                 ]);
                 $new->save();
                 $model->description_id = $new->id;
@@ -130,6 +145,50 @@ class m190531_162014_i18n_migrate extends Migration
         }
         echo "\n";
 
+        /*$models = Ticket::find()->all();
+        $nr = Ticket::find()->count();
+        $i = 1;
+        foreach ($models as $model) {
+            echo "Tickets: Migrating database record " . $i . "/" . $nr . "\r";
+
+            $en = $model->client_state_old;
+            $dummy_params = [];
+
+            foreach ($this->client_stateRegexes as $regex => $keys) {
+                $matches = [];
+                if (preg_match($regex, $model->client_state_old, $matches) == 1) {
+                    $en = $keys[0];
+                    array_shift($keys);
+                    array_shift($matches);
+                    $vals = array_map(function ($e) {
+                        return '{' . $e . '}';
+                    }, $keys);
+
+                    $dummy_params = array_combine($keys, $vals);
+                    $model->client_state_params = array_combine($keys, $matches);
+                    break 1;
+                }
+            }
+
+            $existing = Translation::find()->where(['en' => $en])->one();
+
+            if ($existing === null || $existing === false) {
+                // TODO: loop through all languages
+                $new = new Translation([
+                    'en' => \Yii::t('live_data', $en, $dummy_params, 'en'),
+                    'de' => \Yii::t('live_data', $en, $dummy_params, 'de'),
+                ]);
+                $new->save();
+                $model->client_state_id = $new->id;
+            } else {
+                $model->client_state_id = $existing->id;
+            }
+
+            $model->update(false); // skipping validation as no user input is involved
+            $i = $i + 1;
+        }
+        echo "\n";*/
+
     }
 
     /**
@@ -141,12 +200,24 @@ class m190531_162014_i18n_migrate extends Migration
         $nr = Activity::find()->where(['description_new' => null])->count();
         $i = 1;
         foreach ($models as $model) {
-            echo "Migrating database record " . $i . "/" . $nr . " down\r";
+            echo "Activities: Migrating database record " . $i . "/" . $nr . " down\r";
             Yii::$app->db->createCommand()->update($this->activitiesTable, [
-                'description_new' => \Yii::t('activities', $model->description, $model->params, 'en'),
+                'description_new' => \Yii::t('activity', $model->description, $model->description_params, 'en'),
             ], ['id' => $model->id])->execute();
             $i = $i + 1;
         }
         echo "\n";
+
+        /*$models = Ticket::find()->where(['client_state_new' => null])->all();
+        $nr = Ticket::find()->where(['client_state_new' => null])->count();
+        $i = 1;
+        foreach ($models as $model) {
+            echo "Tickets: Migrating database record " . $i . "/" . $nr . " down\r";
+            Yii::$app->db->createCommand()->update($this->ticketTable, [
+                'client_state_new' => \Yii::t('tickets', $model->client_state, $model->client_state_params, 'en'),
+            ], ['id' => $model->id])->execute();
+            $i = $i + 1;
+        }
+        echo "\n";*/
     }
 }

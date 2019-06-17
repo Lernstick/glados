@@ -5,6 +5,7 @@ namespace app\models;
 use Yii;
 use app\models\Base;
 use yii\helpers\ArrayHelper;
+use app\models\Translation;
 use yii\web\ConflictHttpException;
 use yii\base\Event;
 use app\models\Backup;
@@ -62,6 +63,9 @@ class Ticket extends Base
 
     public $tduration;
 
+    /* db translated fields */
+    public $client_state;
+
     /**
      * @var array An array holding the values of the record before changing
      */
@@ -98,6 +102,11 @@ class Ticket extends Base
         $this->token = $this->isNewRecord ? bin2hex(openssl_random_pseudo_bytes(\Yii::$app->params['tokenLength']/2)) : $this->token;
 
         $this->backup_interval = $this->isNewRecord ? 300 : $this->backup_interval;
+
+        // For each translated db field, such an event needs to be fired
+        //$this->on(self::EVENT_BEFORE_INSERT, [$this, 'changeClient_state']);
+        $this->on(self::EVENT_BEFORE_VALIDATE, [$this, 'changeClient_state']);
+
     }
 
 
@@ -115,20 +124,19 @@ class Ticket extends Base
     public function rules()
     {
         return [
-            [['exam_id', 'token', 'backup_interval'], 'required'],
-            [['exam_id', 'token', 'backup_interval'], 'required', 'on' => self::SCENARIO_DEFAULT],
+            [['exam_id', 'token', 'backup_interval'], 'required', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['token', 'test_taker'], 'required', 'on' => self::SCENARIO_SUBMIT],
             [['start', 'ip'], 'required', 'on' => self::SCENARIO_DOWNLOAD],
             [['end'], 'required', 'on' => self::SCENARIO_FINISH],
-            [['client_state'], 'required', 'on' => self::SCENARIO_NOTIFY],
-            [['exam_id'], 'integer'],
-            [['backup_interval'], 'integer', 'min' => 0],
-            [['time_limit'], 'integer', 'min' => 0],
-            [['exam_id'], 'validateExam', 'skipOnEmpty' => false, 'skipOnError' => false, 'on' => self::SCENARIO_DEFAULT],
-            [['start', 'end', 'test_taker', 'ip', 'state', 'download_lock'], 'safe'],
+            [['token', 'client_state'], 'required', 'on' => self::SCENARIO_NOTIFY],
+            [['exam_id'], 'integer', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
+            [['backup_interval'], 'integer', 'min' => 0, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
+            [['time_limit'], 'integer', 'min' => 0, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
+            [['exam_id'], 'validateExam', 'skipOnEmpty' => false, 'skipOnError' => false, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
+            [['start', 'end', 'test_taker', 'ip', 'state', 'download_lock'], 'safe', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['start', 'end', 'test_taker', 'ip', 'state', 'download_lock', 'backup_lock', 'restore_lock', 'bootup_lock'], 'safe', 'on' => self::SCENARIO_DEV],
-            [['token'], 'unique'],
-            [['token'], 'string', 'max' => 32],
+            [['token'], 'unique', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
+            [['token'], 'string', 'max' => 32, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['token'], 'checkIfClosed', 'on' => self::SCENARIO_SUBMIT],
         ];
     }
@@ -192,11 +200,109 @@ class Ticket extends Base
     public function attributesChanged($attributes)
     {
         foreach($attributes as $attribute){
-            if($this->presaveAttributes[$attribute] != $this->attributes[$attribute]){
-                return true;
+            if (array_key_exists($attribute, $this->presaveAttributes) && array_key_exists($attribute, $this->attributes)) {
+                if ($this->presaveAttributes[$attribute] != $this->attributes[$attribute]){
+                    return true;
+                }
             }
         }
         return false;
+    }
+
+    /**
+     * For each translated db field, such a function must be created, named getTranslationName()
+     * returning the relation to the translation table
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTranslationClient_state()
+    {
+        return $this->hasOne(Translation::className(), ['id' => 'client_state_id']);
+    }
+
+    /**
+     * For each translated db field, such a function must be created, named getTr_name()
+     * returning the language row with data in it.
+     *
+     * @return string content of the row from the table corresponding to the language
+     */
+    public function getTr_client_state()
+    {
+        return \Yii::t(null, $this->client_state, $this->client_state_params, 'xxx');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function joinTables()
+    {
+        return [
+            /* 
+             * For each translated db field, we need an entry like this named:
+             * "translationName name"
+             */
+            "translationClient_state client_state"
+        ];
+    }
+
+    /**
+     * Getter for the data. Returns the data or an empty array if there is
+     * no data.
+     * 
+     * @return array
+     */
+    public function getClient_state_params()
+    {
+        return $this->client_state_data === null ? [] : Json::decode($this->client_state_data);
+    }
+
+    /**
+     * Setter for the data. Format is as follows:
+     * @see https://www.yiiframework.com/doc/guide/2.0/en/tutorial-i18n#message-parameters
+     *
+     *  [
+     *      'key_1' => 'value_1'
+     *      'key_2' => 'value_2'
+     *      ...
+     *      'key_n' => 'value_n'
+     *  ]
+     *
+     * @return void
+     */
+    public function setClient_state_params($value)
+    {
+        $this->client_state_data = Json::encode($value);
+    }
+
+    /**
+     * Automatic insertion of the data in the translation table
+     * For each translated db field such a function needs to be defined
+     *
+     * @return void
+     */
+    public function changeClient_state()
+    {
+        $keys = array_keys($this->client_state_params);
+        $vals = array_map(function ($e) {
+            return '{' . $e . '}';
+        }, $keys);
+        $params = array_combine($keys, $vals);
+
+        $tr = Translation::find()->where([
+            'en' => \Yii::t('tickets', $this->client_state, $params, 'en')
+        ])->one();
+        
+        if ($tr === null || $tr === false) {
+            // TODO: loop through all languages
+            $translation = new Translation([
+                'en' => \Yii::t('live_data', $this->client_state, $params, 'en'),
+                'de' => \Yii::t('live_data', $this->client_state, $params, 'de'),
+            ]);
+            $translation->save();
+            $this->client_state_id = $translation->id;
+        } else {
+            $this->client_state_id = $tr->id;
+        }
     }
 
     public function getOwn()
@@ -343,7 +449,7 @@ class Ticket extends Base
             $eventItem->generate();
         }
 
-        if($this->attributesChanged([ 'client_state' ])){
+        if($this->attributesChanged([ 'client_state_id', 'client_state_params' ])){
             $eventItem = new EventItem([
                 'event' => 'ticket/' . $this->id,
                 'priority' => 1,
@@ -355,10 +461,10 @@ class Ticket extends Base
 
             $act = new Activity([
                 'ticket_id' => $this->id,
-                'description' => yiit('activities', 'Client state changed: {old} -> {new}'),
+                'description' => yiit('activity', 'Client state changed: {client_state}'),
                 'params' => [
-                    'old' => $this->presaveAttributes['client_state'],
-                    'new' => $this->client_state,
+                    //'old' => Translation::findOne($this->presaveAttributes['client_state_id'])->en,
+                    'client_state' => $this->client_state,
                 ],
                 'severity' => Activity::SEVERITY_INFORMATIONAL,
             ]);
@@ -740,8 +846,9 @@ class Ticket extends Base
      */
     public static function find()
     {
-        //$query = parent::find();
+        $c = \Yii::$app->language;
         $query = new TicketQuery(get_called_class());
+        $query->joinWith(Ticket::joinTables());
 
         $query->addSelect(['`ticket`.*', new \yii\db\Expression('(case
             WHEN (start is not null and end is not null and test_taker > "") THEN
@@ -756,6 +863,12 @@ class Ticket extends Base
                 4 # unknown
             END
             ) as state')]);
+
+        $query->addSelect([
+            '`ticket`.*',
+            // first the end-user language, then english (en) as fallback
+            new \yii\db\Expression('COALESCE(NULLIF(`client_state`.`' . $c . '`, ""), NULLIF(`client_state`.`en`, ""), "") as client_state'),
+        ]);
 
         return $query;
     }

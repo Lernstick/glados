@@ -70,7 +70,7 @@ class DownloadController extends DaemonController implements DaemonInterface
             $this->cleanup();
 
             if ($id != '') {
-                if (($this->ticket =  Ticket::findOne(['id' => $id, 'download_lock' => 0, 'bootup_lock' => 1])) == null){
+                if (($this->ticket =  Ticket::findOne(['ticket.id' => $id, 'download_lock' => 0, 'bootup_lock' => 1])) == null){
                     $this->logError('Error: ticket with id ' . $id . ' not found, it is already in processing.');
                     return;
                 }
@@ -117,7 +117,7 @@ class DownloadController extends DaemonController implements DaemonInterface
 
             $act = new Activity([
                     'ticket_id' => $this->ticket->id,
-                    'description' => yiit('activities', 'Download failed: network error.'),
+                    'description' => yiit('activity', 'Download failed: network error.'),
                     'severity' => Activity::SEVERITY_WARNING,
             ]);
             $act->save();
@@ -185,7 +185,7 @@ class DownloadController extends DaemonController implements DaemonInterface
 
                 $act = new Activity([
                         'ticket_id' => $this->ticket->id,
-                        'description' => yiit('activities', 'Download failed: rsync failed (retval: {retval})'),
+                        'description' => yiit('activity', 'Download failed: rsync failed (retval: {retval})'),
                         'params' => [ 'retval' => $retval ],
                         'severity' => Activity::SEVERITY_WARNING,
                 ]);
@@ -198,7 +198,7 @@ class DownloadController extends DaemonController implements DaemonInterface
                 if ($this->ticket->test_taker) {
                     $act = new Activity([
                         'ticket_id' => $this->ticket->id,
-                        'description' => yiit('activities', 'Exam download finished by {ip} from {test_taker}.'),
+                        'description' => yiit('activity', 'Exam download finished by {ip} from {test_taker}.'),
                         'params' => [
                             'ip' => $this->ticket->ip,
                             'test_taker' => $this->ticket->test_taker,
@@ -208,7 +208,7 @@ class DownloadController extends DaemonController implements DaemonInterface
                 } else {
                     $act = new Activity([
                         'ticket_id' => $this->ticket->id,
-                        'description' => yiit('activities', 'Exam download finished by {ip} from Ticket with token {token}.'),
+                        'description' => yiit('activity', 'Exam download finished by {ip} from Ticket with token {token}.'),
                         'params' => [
                             'ip' => $this->ticket->ip,
                             'token' => $this->ticket->token,
@@ -259,8 +259,8 @@ class DownloadController extends DaemonController implements DaemonInterface
                     ],
                 ]);
                 $eventItem->generate();
-                $this->ticket->client_state = "setup complete";
-                $this->ticket->save();                    
+                $this->ticket->client_state = yiit('live_data', "setup complete");
+                $this->ticket->save();
 
             }
 
@@ -285,7 +285,7 @@ class DownloadController extends DaemonController implements DaemonInterface
 
             $act = new Activity([
                 'ticket_id' => $this->ticket->id,
-                'description' => yiit('activities', 'Exam download aborted (server side).'),
+                'description' => yiit('activity', 'Exam download aborted (server side).'),
                 'severity' => Activity::SEVERITY_ERROR,
             ]);
             $act->save();

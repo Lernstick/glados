@@ -7,7 +7,7 @@ namespace app\models;
  *
  * @see Activity
  */
-class ActivityQuery extends \yii\db\ActiveQuery
+class ActivityQuery extends TranslatedActivityQuery
 {
 
     /**

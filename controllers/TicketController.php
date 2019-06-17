@@ -559,7 +559,7 @@ class TicketController extends Controller
                 if ($model->test_taker) {
                     $act = new Activity([
                         'ticket_id' => $model->id,
-                        'description' => yiit('activities', 'Exam download successfully requested by {ip} from {test_taker}.'),
+                        'description' => yiit('activity', 'Exam download successfully requested by {ip} from {test_taker}.'),
                         'params' => [
                             'ip' => $model->ip,
                             'test_taker' => $model->test_taker,
@@ -569,7 +569,7 @@ class TicketController extends Controller
                 } else {
                     $act = new Activity([
                         'ticket_id' => $model->id,
-                        'description' => yiit('activities', 'Exam download successfully requested by {ip} from Ticket with token {token}.'),
+                        'description' => yiit('activity', 'Exam download successfully requested by {ip} from Ticket with token {token}.'),
                         'params' => [
                             'ip' => $model->ip,
                             'token' => $model->token,
@@ -662,14 +662,14 @@ class TicketController extends Controller
         if ($model->test_taker) {
             $act = new Activity([
                 'ticket_id' => $model->id,
-                'description' => yiit('activities', 'Exam finished by {test_taker}.'),
+                'description' => yiit('activity', 'Exam finished by {test_taker}.'),
                 'params' => [ 'test_taker' => $model->test_taker ],
                 'severity' => Activity::SEVERITY_INFORMATIONAL,
             ]);
         } else {
             $act = new Activity([
                 'ticket_id' => $model->id,
-                'description' => yiit('activities', 'Exam finished by Ticket with token {token}.'),
+                'description' => yiit('activity', 'Exam finished by Ticket with token {token}.'),
                 'params' => [ 'token' => $token ],
                 'severity' => Activity::SEVERITY_INFORMATIONAL,
             ]);

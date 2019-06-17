@@ -18,7 +18,7 @@ use yii\helpers\Json;
  * @property string $date
  * @property string $description
  */
-class Activity extends Base
+class Activity extends TranslatedActiveRecord
 {
 
     /* activity severity constants */
@@ -31,21 +31,15 @@ class Activity extends Base
 
     /* db translated fields */
     public $description;
-    public $test;
-
-    /* may be removed */
-    private $_description;
 
     /**
      * @inheritdoc
      */
     public function init()
     {
-//        Event::on(ActiveRecord::className(), ActiveRecord::EVENT_AFTER_INSERT, function ($event) {
-//            file_put_contents('/tmp/file', '+1');
-//        });
         $this->on(self::EVENT_AFTER_INSERT, [$this, 'eventNewActivities']);
-        $this->on(self::EVENT_BEFORE_INSERT, [$this, 'insertDescription']);
+
+        parent::init();
     }
 
     /**
@@ -57,42 +51,13 @@ class Activity extends Base
     }
 
     /**
-     * TODO: may not be necessary
-     * @return void
+     * @inheritdoc
      */
-    public function setDescription($value)
+    public function getTranslatedFields()
     {
-        $this->_description = $value;
-    }
-
-    /**
-     * For each translated db field, such a function must be created, named getTranslationName()
-     * returning the relation to the translation table
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getTranslationDesciption()
-    {
-        return $this->hasOne(Translation::className(), ['id' => 'description_id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getTranslationTest()
-    {
-        return $this->hasOne(Translation::className(), ['id' => 'test_id']);
-    }
-
-    /**
-     * For each translated db field, such a function must be created, named getTr_name()
-     * returning the language row with data in it.
-     *
-     * @return string content of the row from the table corresponding to the language
-     */
-    public function getTr_description()
-    {
-        return \Yii::t(null, $this->description, $this->params, 'xxx');
+        return [
+            'description',
+        ];
     }
 
     /**
@@ -102,38 +67,7 @@ class Activity extends Base
     {
         return [
             Ticket::tableName(),
-            "translationDesciption description",
-            "translationTest test"
         ];
-    }
-
-    public function insertDescription()
-    {
-        $keys = array_keys($this->params);
-        $vals = array_map(function ($e) {
-            return '{' . $e . '}';
-        }, $keys);
-        $params = array_combine($keys, $vals);
-
-        // TODO: remove description_old
-        //$this->description_old = $this->description;
-
-        $tr = Translation::find()->where([
-            'en' => \Yii::t('activities', $this->description, $params, 'en')
-        ])->one();
-        
-        if ($tr === null || $tr === false) {
-            // TODO: loop through all languages
-            $translation = new Translation([
-                'en' => \Yii::t('activities', $this->description, $params, 'en'),
-                'de' => \Yii::t('activities', $this->description, $params, 'de'),
-            ]);
-            $translation->save();
-            $this->description_id = $translation->id;
-        } else {
-            $this->description_id = $tr->id;
-        }
-        
     }
 
     /**
@@ -154,41 +88,12 @@ class Activity extends Base
     public function attributeLabels()
     {
         return [
-            'id' => \Yii::t('activities', 'ID'),
-            'token' => \Yii::t('activities', 'Ticket'),
-            'date' => \Yii::t('activities', 'Date'),
-            'description' => \Yii::t('activities', 'Description'),
-            'severity' => \Yii::t('activities', 'Severity'),
+            'id' => \Yii::t('activity', 'ID'),
+            'token' => \Yii::t('activity', 'Ticket'),
+            'date' => \Yii::t('activity', 'Date'),
+            'description' => \Yii::t('activity', 'Description'),
+            'severity' => \Yii::t('activity', 'Severity'),
         ];
-    }
-
-    /**
-     * Getter for the data. Returns the data or an empty array if there is
-     * no data.
-     * 
-     * @return array
-     */
-    public function getParams()
-    {
-        return $this->data === null ? [] : Json::decode($this->data);
-    }
-
-    /**
-     * Setter for the data. Format is as follows:
-     * @see https://www.yiiframework.com/doc/guide/2.0/en/tutorial-i18n#message-parameters
-     *
-     *  [
-     *      'key_1' => 'value_1'
-     *      'key_2' => 'value_2'
-     *      ...
-     *      'key_n' => 'value_n'
-     *  ]
-     *
-     * @return void
-     */
-    public function setParams($value)
-    {
-        $this->data = Json::encode($value);
     }
 
     public function newActivities()
@@ -285,16 +190,9 @@ class Activity extends Base
      */ 
     public static function find() 
     { 
-        $c = \Yii::$app->language;
+        
         $query = new ActivityQuery(get_called_class());
         $query->joinWith(Activity::joinTables());
-        $query->addSelect([
-            '`activity`.*',
-            // first the end-user language, then english (en) as fallback
-            new \yii\db\Expression('COALESCE(NULLIF(`description`.`' . $c . '`, ""), NULLIF(`description`.`en`, ""), "") as description'),
-            new \yii\db\Expression('COALESCE(NULLIF(`test`.`' . $c . '`, ""), NULLIF(`test`.`en`, ""), "") as test')
-        ]);
-
         return $query;
     }
 

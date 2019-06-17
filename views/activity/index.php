@@ -15,7 +15,7 @@ use yii\widgets\ActiveForm;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $last_visited */
 
-$this->title = \Yii::t('activities', 'Activities');
+$this->title = \Yii::t('activity', 'Activities');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="activity-index">
@@ -102,7 +102,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'description',
                 'value' => function ($model) {
-                    return \Yii::t(null, $model->tr_description, $model->params, 'xxx');
+                    return $model->description_full;
                 },
                 'format' => 'raw',
                 'filterType' => GridView::FILTER_SELECT2,
@@ -145,14 +145,13 @@ $this->params['breadcrumbs'][] = $this->title;
                     'class' => 'col-md-8',
                 ],
             ],
-            'test',
         ],
         'storage' => DynaGrid::TYPE_COOKIE,
         'theme' => 'simple-default',
         'gridOptions' => [
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
-            'panel' => ['heading' => '<h3 class="panel-title">' . \Yii::t('activities', 'Activities') . '</h3>'],
+            'panel' => ['heading' => '<h3 class="panel-title">' . \Yii::t('activity', 'Activities') . '</h3>'],
             'toolbar' =>  [
                 ['content' => $form->field($searchModel, 'severity', [
                         'options' => [
@@ -163,7 +162,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'hideSearch' => true,
                         'options' => [
                             'multiple' => true,
-                            'placeholder' => \Yii::t('activities', 'Severity'),
+                            'placeholder' => \Yii::t('activity', 'Severity'),
                         ],
                         'pluginOptions' => [
                             'allowClear' => true,
@@ -175,7 +174,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ])
                 ],
                 ['content' =>
-                    Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/activity/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => \Yii::t('activities', 'Reset Grid')])
+                    Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/activity/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => \Yii::t('activity', 'Reset Grid')])
                 ],
                 ['content' => '{dynagridFilter}{dynagridSort}{dynagrid}'],
                 '{export}',
