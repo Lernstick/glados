@@ -121,7 +121,7 @@ cp -p "/etc/lernstick-firewall/lernstick-firewall.conf" "${initrd}/backup/etc/le
 cp -p "/etc/lernstickWelcome" "${initrd}/backup/etc/lernstickWelcome"
 sed -i 's/ShowNotUsedInfo=.*/ShowNotUsedInfo=false/g' "${initrd}/backup/etc/lernstickWelcome"
 sed -i 's/AutoStartInstaller=.*/AutoStartInstaller=false/g' "${initrd}/backup/etc/lernstickWelcome"
-echo "ShowExamInfo=true" >>"${initrd}/backup/etc/lernstickWelcome" #TODO: replace with sed
+#echo "ShowExamInfo=true" >>"${initrd}/backup/etc/lernstickWelcome" #TODO: replace with sed
 cp -p "/usr/share/applications/finish_exam.desktop" "${initrd}/backup/usr/share/applications/"
 chmod 644 "${initrd}/backup/usr/share/applications/finish_exam.desktop"
 chown user:user "${initrd}/backup/${desktop}/finish_exam.desktop"
@@ -198,6 +198,51 @@ fi
 # directory containing the rules has the same mtime as before
 touch "${initrd}/newroot/etc/dconf/db/local.d"
 chroot ${initrd}/newroot dconf update
+
+# TODO
+cat <<EOF >"${initrd}/newroot/etc/xdg/autostart/show-info.desktop"
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Version=1.0
+Name=Lernstick Exam Client Startscript
+Name[de_DE]=Lernstick Exam Client Startscript
+Exec=show_info
+X-GNOME-Autostart-enabled=true
+EOF
+
+url="${gladosProto}://${gladosIp}:${gladosPort}/glados/index.php/howto/welcome-to-exam.md?mode=inline"
+
+cat <<EOF >"${initrd}/newroot/show_info.html"
+<!DOCTYPE html>
+<html lang='en-US'>
+    <head>
+        <meta charset='UTF-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+        <meta http-equiv='refresh' content='0;url=${url}' />
+    </head>
+    <body>
+    Please wait, redirecting...
+    </body>
+</html>
+EOF
+
+cat <<'EOF' >"${initrd}/newroot/usr/bin/show_info"
+#!/bin/bash
+
+/usr/bin/firefox -createprofile "showInfo /tmp/showInfo" -no-remote
+/usr/bin/firefox -P "showInfo" -width 850 -height 620 -chrome "/show_info.html"
+
+# remove the profile - also remove it from the profiles.ini file
+rm -R /tmp/showInfo
+ex -e - /home/user/.mozilla/firefox/profiles.ini <<@@@
+g/Name=showInfo/.-2,+2d
+wq
+@@@
+
+EOF
+
+chmod 755 "${initrd}/newroot/usr/bin/show_info"
 
 ###########################################
 # apply specific exam config if available #

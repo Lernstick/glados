@@ -67,6 +67,7 @@ class TicketController extends Controller
                             'ssh-key',   // get public server ssh key
                             'notify',    // notify a new client status
                             'finish',    // finish exam
+                            'status',    // show the status of the exam
                         ],
                         'roles' => ['?', '@'],
                     ],
@@ -597,7 +598,23 @@ class TicketController extends Controller
                 'model' => $model,
             ]);
         }
+    }
 
+    /**
+     * TODO.
+     *
+     * @param string $token
+     * @return mixed 
+     */
+    public function actionStatus($token)
+    {
+        $this->layout = 'client';
+        $model = Ticket::findOne(['token' => $token]);
+
+        return $this->render('/result/_view', [
+            'title' => 'Exam Status',
+            'model' => $model,
+        ]);
     }
 
     /**
