@@ -15,9 +15,9 @@ use yii\widgets\DetailView;
 <div class="panel-heading">
     <h4 class="panel-title">
         <a data-toggle="collapse" data-parent="#accordion" href="#collapse<?= $index + 1 ?>">
-            <?= \Yii::t('tickets', 'Backup') ?> #<?= $widget->dataProvider->totalCount - $key . ' - ' . yii::$app->formatter->format($model->endTime, 'timeago')
+            <?= \Yii::t('ticket', 'Backup') ?> #<?= $widget->dataProvider->totalCount - $key . ' - ' . yii::$app->formatter->format($model->endTime, 'timeago')
              . ' @ ' . yii::$app->formatter->format($model->endTime, 'datetime')
-             . ' (' . yii::$app->formatter->format($model->totalDestinationSizeChange, 'shortSize') . ' / ' . yii::$app->formatter->format($model->errors, 'integer') . ' ' . \Yii::t('tickets', 'errors') . ') '; ?>
+             . ' (' . yii::$app->formatter->format($model->totalDestinationSizeChange, 'shortSize') . ' / ' . yii::$app->formatter->format($model->errors, 'integer') . ' ' . \Yii::t('ticket', 'errors') . ') '; ?>
         </a>
     </h4>
 </div>
@@ -63,7 +63,7 @@ use yii\widgets\DetailView;
                 [
                     'attribute' => 'errors',
                     'value' => $model->errors == 0 ? '0' : $model->errors . ', ' . Html::a(
-                        '<span class="glyphicon glyphicon-modal-window"></span> ' . \Yii::t('tickets', 'Show Errors'),
+                        '<span class="glyphicon glyphicon-modal-window"></span> ' . \Yii::t('ticket', 'Show Errors'),
                         Url::to(['backup/view-errors', 'ticket_id' => $model->ticket->id, 'date' => $model->date]),
                         ['id' => 'errors-show' . $key]
                     ),

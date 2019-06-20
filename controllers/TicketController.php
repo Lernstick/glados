@@ -135,7 +135,7 @@ class TicketController extends Controller
 
             $lastState = $session['ticketLastState' . $model->id];
             if(isset($lastState) && $lastState != $model->state){
-                $session->addFlash('info', Yii::t('tickets', 'The Ticket state has changed from {from} to {to}', [
+                $session->addFlash('info', Yii::t('ticket', 'The Ticket state has changed from {from} to {to}', [
                     'from' => Yii::$app->formatter->format($lastState, 'state'),
                     'to' => Yii::$app->formatter->format($model->state, 'state')
                 ]));
@@ -293,7 +293,7 @@ class TicketController extends Controller
                 }
 
                 if ($count == $c) {
-                    Yii::$app->session->addFlash('success', Yii::t('tickets', 'You have successfully created {n} new Tickets.', ['n' => $count]));
+                    Yii::$app->session->addFlash('success', Yii::t('ticket', 'You have successfully created {n} new Tickets.', ['n' => $count]));
                     return $this->redirect(['exam/view', 'id' => $exam_id]);
                 } else {
                     foreach ($model->getErrors() as $attribute => $value){
@@ -325,7 +325,7 @@ class TicketController extends Controller
 
                     if(count($names) != 0) {
                         if ($c == count($names)) {
-                            Yii::$app->session->addFlash('success', Yii::t('tickets', 'You have successfully created {n} new Tickets.', ['n' => $c]));
+                            Yii::$app->session->addFlash('success', Yii::t('ticket', 'You have successfully created {n} new Tickets.', ['n' => $c]));
                             return $this->redirect(['exam/view', 'id' => $model->exam_id]);
                         }else{
                             foreach ($ticket->getErrors() as $attribute => $value){
@@ -395,7 +395,7 @@ class TicketController extends Controller
             if (($model = Ticket::findOne(['token' => $token])) === null) {
                 $model = new Ticket(['scenario' => Ticket::SCENARIO_SUBMIT]);
                 $model->token = $token;
-                $model->token != null ? $model->addError('token', Yii::t('tickets', 'Ticket not found.')) : null;
+                $model->token != null ? $model->addError('token', Yii::t('ticket', 'Ticket not found.')) : null;
 
                 return $this->render('submit', [
                     'model' => $model,
@@ -434,7 +434,7 @@ class TicketController extends Controller
     {
         if ($mode == 'single') {
             $this->findModel($id)->delete();
-            Yii::$app->session->addFlash('danger', Yii::t('tickets', 'The Ticket has been deleted successfully.'));
+            Yii::$app->session->addFlash('danger', Yii::t('ticket', 'The Ticket has been deleted successfully.'));
 
             return $this->redirect(Yii::$app->session['ticketViewReturnURL']);
         }else if ($mode == 'many') {
@@ -451,11 +451,11 @@ class TicketController extends Controller
 
             #TODO: errors?
             if($c == 0){
-                Yii::$app->session->addFlash('danger', Yii::t('tickets', 'There are no Open Tickets to delete.'));
+                Yii::$app->session->addFlash('danger', Yii::t('ticket', 'There are no Open Tickets to delete.'));
                 return $this->redirect(['exam/view', 'id' => $exam_id]);
             }
 
-            Yii::$app->session->addFlash('danger', Yii::t('tickets', '{n} Open Tickets have been deleted successfully.', ['n' => $c]));
+            Yii::$app->session->addFlash('danger', Yii::t('ticket', '{n} Open Tickets have been deleted successfully.', ['n' => $c]));
             return $this->redirect(['exam/view', 'id' => $exam_id]);
         }
     }
@@ -524,7 +524,7 @@ class TicketController extends Controller
         if ($step == 1) {
             if ($model === null) {
                 $model = new Ticket(['scenario' => Ticket::SCENARIO_DEFAULT]);
-                !empty($token) ? $model->addError('token', \Yii::t('tickets', 'Ticket not found.')) : null;
+                !empty($token) ? $model->addError('token', \Yii::t('ticket', 'Ticket not found.')) : null;
                 $model->token = $token;
             }
             return $this->render('token-request', [
@@ -533,23 +533,23 @@ class TicketController extends Controller
         } else if ($step == 2) {
             if ($model === null) {
                 $model = new Ticket(['scenario' => Ticket::SCENARIO_DEFAULT]);
-                $token !== null ? $model->addError('token', \Yii::t('tickets', 'Ticket not found.')) : null;
+                $token !== null ? $model->addError('token', \Yii::t('ticket', 'Ticket not found.')) : null;
                 $model->token = $token;
                 return $this->render('token-request', [
                     'model' => $model,
                 ]);                
             } else if (!$model->valid) {
-                $model->addError('token', \Yii::t('tickets', 'The ticket has expired.'));
+                $model->addError('token', \Yii::t('ticket', 'The ticket has expired.'));
                 return $this->render('token-request', [
                     'model' => $model,
                 ]);                
             } else if (!$model->exam->fileConsistency) {
-                $model->addError('token', \Yii::t('tickets', 'The exam file is not valid.'));
+                $model->addError('token', \Yii::t('ticket', 'The exam file is not valid.'));
                 return $this->render('token-request', [
                     'model' => $model,
                 ]);                
             } else if ($model->download_lock != 0) {
-                $model->addError('token', \Yii::t('tickets', 'Another instance is already running, '
+                $model->addError('token', \Yii::t('ticket', 'Another instance is already running, '
                                         . 'multiple downloads are not allowed.'));
                 return $this->render('token-request', [
                     'model' => $model,
@@ -724,7 +724,7 @@ class TicketController extends Controller
         $daemon = new Daemon();
         $pid = $daemon->startRestore($id, $file, $date);
 
-        Yii::$app->session->addFlash('info', \Yii::t('tickets', 'Restore started.'));
+        Yii::$app->session->addFlash('info', \Yii::t('ticket', 'Restore started.'));
 
         if(Yii::$app->request->isAjax){
             return $this->runAction('view', ['id' => $id]);
@@ -761,7 +761,7 @@ class TicketController extends Controller
         if (file_exists($pubKeyFile)) {
             return file_get_contents($pubKeyFile);
         } else {
-            throw new ServerErrorHttpException(\Yii::t('tickets', 'The public key could not be generated.'));
+            throw new ServerErrorHttpException(\Yii::t('ticket', 'The public key could not be generated.'));
         }
     }
 

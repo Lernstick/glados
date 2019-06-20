@@ -52,7 +52,7 @@ use app\models\EventItem;
  * @property Exam $exam
  * @property Exam $exam
  */
-class Ticket extends Base
+class Ticket extends TranslatedActiveRecord
 {
 
     /**
@@ -64,7 +64,7 @@ class Ticket extends Base
     public $tduration;
 
     /* db translated fields */
-    public $client_state;
+    public $client_state_db;
 
     /**
      * @var array An array holding the values of the record before changing
@@ -105,7 +105,7 @@ class Ticket extends Base
 
         // For each translated db field, such an event needs to be fired
         //$this->on(self::EVENT_BEFORE_INSERT, [$this, 'changeClient_state']);
-        $this->on(self::EVENT_BEFORE_VALIDATE, [$this, 'changeClient_state']);
+        //$this->on(self::EVENT_BEFORE_VALIDATE, [$this, 'changeClient_state']);
 
     }
 
@@ -116,6 +116,16 @@ class Ticket extends Base
     public static function tableName()
     {
         return 'ticket';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getTranslatedFields()
+    {
+        return [
+            'client_state',
+        ];
     }
 
     /**
@@ -147,29 +157,29 @@ class Ticket extends Base
     public function attributeLabels()
     {
         return [
-            'id' => \Yii::t('tickets', 'ID'),
-            'state' => \Yii::t('tickets', 'State'),
-            'token' => \Yii::t('tickets', 'Token'),
-            'exam.name' => \Yii::t('tickets', 'Exam Name'),
-            'exam.subject' => \Yii::t('tickets', 'Exam Subject'),
-            'exam_id' => \Yii::t('tickets', 'Exam'),
-            'valid' => \Yii::t('tickets', 'Valid'),
-            'validTime' => \Yii::t('tickets', 'Valid for'),
-            'start' => \Yii::t('tickets', 'Started'),
-            'end' => \Yii::t('tickets', 'Finished'),
-            'duration' => \Yii::t('tickets', 'Duration'),
-            'result' => \Yii::t('tickets', 'Result'),
-            'time_limit' => \Yii::t('tickets', 'Time Limit'),
-            'download_progress' => \Yii::t('tickets', 'Exam Download Progress'),
-            'client_state' => \Yii::t('tickets', 'Client State'),
-            'ip' => \Yii::t('tickets', 'IP Address'),
-            'test_taker' => \Yii::t('tickets', 'Test Taker'),
-            'backup' => \Yii::t('tickets', 'Backup'),
-            'backup_last' => \Yii::t('tickets', 'Last Backup'),
-            'backup_last_try' => \Yii::t('tickets', 'Last Backup Try'),
-            'backup_state' => \Yii::t('tickets', 'Backup State'),
-            'backup_interval' => \Yii::t('tickets', 'Backup Interval'),
-            'backup_size' => \Yii::t('tickets', 'Current Backup Size'),
+            'id' => \Yii::t('ticket', 'ID'),
+            'state' => \Yii::t('ticket', 'State'),
+            'token' => \Yii::t('ticket', 'Token'),
+            'exam.name' => \Yii::t('ticket', 'Exam Name'),
+            'exam.subject' => \Yii::t('ticket', 'Exam Subject'),
+            'exam_id' => \Yii::t('ticket', 'Exam'),
+            'valid' => \Yii::t('ticket', 'Valid'),
+            'validTime' => \Yii::t('ticket', 'Valid for'),
+            'start' => \Yii::t('ticket', 'Started'),
+            'end' => \Yii::t('ticket', 'Finished'),
+            'duration' => \Yii::t('ticket', 'Duration'),
+            'result' => \Yii::t('ticket', 'Result'),
+            'time_limit' => \Yii::t('ticket', 'Time Limit'),
+            'download_progress' => \Yii::t('ticket', 'Exam Download Progress'),
+            'client_state' => \Yii::t('ticket', 'Client State'),
+            'ip' => \Yii::t('ticket', 'IP Address'),
+            'test_taker' => \Yii::t('ticket', 'Test Taker'),
+            'backup' => \Yii::t('ticket', 'Backup'),
+            'backup_last' => \Yii::t('ticket', 'Last Backup'),
+            'backup_last_try' => \Yii::t('ticket', 'Last Backup Try'),
+            'backup_state' => \Yii::t('ticket', 'Backup State'),
+            'backup_interval' => \Yii::t('ticket', 'Backup Interval'),
+            'backup_size' => \Yii::t('ticket', 'Current Backup Size'),
         ];
     }
 
@@ -179,15 +189,15 @@ class Ticket extends Base
     public function attributeHints()
     {
         return [
-            'token' => \Yii::t('tickets', 'This is a randomly generated, unique token to <b>identify the ticket</b>. The test taker has to provide this token to gain access to his exam.'),
-            'backup_interval' => \Yii::t('tickets', 'This value (in seconds) sets the <b>interval to create automatic backups</b> of the exam system. Set to <code>0</code> to disable automatic backup.'),
-            'time_limit' => \Yii::t('tickets', 'If this value (in minutes) is set, the exam status view of the student will show the time left. This has the same effect as the value in the exam. Leave empty to inherit the value configured in the exam{x}. Set to <code>0</code> for no time limit. Notice, this will <b>override the setting in the exam</b>.', [
+            'token' => \Yii::t('ticket', 'This is a randomly generated, unique token to <b>identify the ticket</b>. The test taker has to provide this token to gain access to his exam.'),
+            'backup_interval' => \Yii::t('ticket', 'This value (in seconds) sets the <b>interval to create automatic backups</b> of the exam system. Set to <code>0</code> to disable automatic backup.'),
+            'time_limit' => \Yii::t('ticket', 'If this value (in minutes) is set, the exam status view of the student will show the time left. This has the same effect as the value in the exam. Leave empty to inherit the value configured in the exam{x}. Set to <code>0</code> for no time limit. Notice, this will <b>override the setting in the exam</b>.', [
                 'x' => (isset($this->exam) ? ' (' . yii::$app->formatter->format($this->exam->time_limit, 'timeLimit') . ')' : '')
             ]),
-            'exam_id' => \Yii::t('tickets', 'Choose the exam this ticket has to be assigned to in the list below. Notice, only exams assigned to you will be shown underneath.'),
-            'test_taker' => \Yii::t('tickets', 'Here you can <b>assign the ticket to a student</b>. If left empty, this can also be done later (even when the exam has finished), but it is recommended to set this value as soon as possible, to keep track of the tickets. If not set the ticket will be unassigned/anonymous.'),
-            'start' => \Yii::t('tickets', 'The start time of the exam. This should not be manually edited.'),
-            'end' => \Yii::t('tickets', 'The finish time of the exam. This should not be manually edited.'),
+            'exam_id' => \Yii::t('ticket', 'Choose the exam this ticket has to be assigned to in the list below. Notice, only exams assigned to you will be shown underneath.'),
+            'test_taker' => \Yii::t('ticket', 'Here you can <b>assign the ticket to a student</b>. If left empty, this can also be done later (even when the exam has finished), but it is recommended to set this value as soon as possible, to keep track of the tickets. If not set the ticket will be unassigned/anonymous.'),
+            'start' => \Yii::t('ticket', 'The start time of the exam. This should not be manually edited.'),
+            'end' => \Yii::t('ticket', 'The finish time of the exam. This should not be manually edited.'),
         ];
     }
 
@@ -215,10 +225,10 @@ class Ticket extends Base
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getTranslationClient_state()
+    /*public function getTranslationClient_state()
     {
         return $this->hasOne(Translation::className(), ['id' => 'client_state_id']);
-    }
+    }*/
 
     /**
      * For each translated db field, such a function must be created, named getTr_name()
@@ -226,24 +236,10 @@ class Ticket extends Base
      *
      * @return string content of the row from the table corresponding to the language
      */
-    public function getTr_client_state()
+    /*public function getTr_client_state()
     {
         return \Yii::t(null, $this->client_state, $this->client_state_params, 'xxx');
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function joinTables()
-    {
-        return [
-            /* 
-             * For each translated db field, we need an entry like this named:
-             * "translationName name"
-             */
-            "translationClient_state client_state"
-        ];
-    }
+    }*/
 
     /**
      * Getter for the data. Returns the data or an empty array if there is
@@ -251,10 +247,10 @@ class Ticket extends Base
      * 
      * @return array
      */
-    public function getClient_state_params()
+    /*public function getClient_state_params()
     {
         return $this->client_state_data === null ? [] : Json::decode($this->client_state_data);
-    }
+    }*/
 
     /**
      * Setter for the data. Format is as follows:
@@ -269,10 +265,10 @@ class Ticket extends Base
      *
      * @return void
      */
-    public function setClient_state_params($value)
+    /*public function setClient_state_params($value)
     {
         $this->client_state_data = Json::encode($value);
-    }
+    }*/
 
     /**
      * Automatic insertion of the data in the translation table
@@ -280,7 +276,7 @@ class Ticket extends Base
      *
      * @return void
      */
-    public function changeClient_state()
+    /*public function changeClient_state()
     {
         $keys = array_keys($this->client_state_params);
         $vals = array_map(function ($e) {
@@ -289,7 +285,7 @@ class Ticket extends Base
         $params = array_combine($keys, $vals);
 
         $tr = Translation::find()->where([
-            'en' => \Yii::t('tickets', $this->client_state, $params, 'en')
+            'en' => \Yii::t('ticket', $this->client_state, $params, 'en')
         ])->one();
         
         if ($tr === null || $tr === false) {
@@ -303,7 +299,7 @@ class Ticket extends Base
         } else {
             $this->client_state_id = $tr->id;
         }
-    }
+    }*/
 
     public function getOwn()
     {
@@ -329,7 +325,7 @@ class Ticket extends Base
 
     public function getResultName()
     {
-        return ($this->test_taker ? $this->test_taker . ' - ' . $this->token : '_NoName - ' . $this->token) . ($this->result != null && file_exists($this->result) ? ' - ' . \Yii::t('tickets', 'Result already generated.') : ' - ' . \Yii::t('tickets', 'No result yet.'));
+        return ($this->test_taker ? $this->test_taker . ' - ' . $this->token : '_NoName - ' . $this->token) . ($this->result != null && file_exists($this->result) ? ' - ' . \Yii::t('ticket', 'Result already generated.') : ' - ' . \Yii::t('ticket', 'No result yet.'));
     }
 
     /**
@@ -817,10 +813,10 @@ class Ticket extends Base
 
         if(Yii::$app->user->can('ticket/create/all') || $this->own == true){
             if (!$exam->fileConsistency){
-                $this->addError($attribute, \Yii::t('tickets', 'As long as the exam file is not valid, no tickets can be created for this exam.'));
+                $this->addError($attribute, \Yii::t('ticket', 'As long as the exam file is not valid, no tickets can be created for this exam.'));
             }
         }else{
-            $this->addError($attribute, \Yii::t('tickets', 'You are not allowed to perform this action on this exam.'));
+            $this->addError($attribute, \Yii::t('ticket', 'You are not allowed to perform this action on this exam.'));
         }
 
     }
@@ -835,7 +831,7 @@ class Ticket extends Base
     public function checkIfClosed($attribute, $params)
     {
         if ($this->state != self::STATE_CLOSED) {
-            $this->addError($attribute, \Yii::t('tickets', 'This ticket is not in closed state.'));
+            $this->addError($attribute, \Yii::t('ticket', 'This ticket is not in closed state.'));
         }
     }
 
@@ -864,11 +860,11 @@ class Ticket extends Base
             END
             ) as state')]);
 
-        $query->addSelect([
+        /*$query->addSelect([
             '`ticket`.*',
             // first the end-user language, then english (en) as fallback
             new \yii\db\Expression('COALESCE(NULLIF(`client_state`.`' . $c . '`, ""), NULLIF(`client_state`.`en`, ""), "") as client_state'),
-        ]);
+        ]);*/
 
         return $query;
     }

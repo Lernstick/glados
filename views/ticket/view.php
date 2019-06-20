@@ -23,8 +23,8 @@ use app\components\Editable;
 /* @var $date string the date */
 /* @var $options array RdiffbackupFilesystem options array */
 
-$this->title = \Yii::t('tickets', 'Ticket') . ' #' . $model->id;
-$this->params['breadcrumbs'][] = ['label' => \Yii::t('tickets', 'Tickets'), 'url' => ['index']];
+$this->title = \Yii::t('ticket', 'Ticket') . ' #' . $model->id;
+$this->params['breadcrumbs'][] = ['label' => \Yii::t('ticket', 'Tickets'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
@@ -89,7 +89,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'exam.name',
                 'format' => 'raw',
-                'label' => \Yii::t('tickets', 'Exam'),
+                'label' => \Yii::t('ticket', 'Exam'),
                 'value' => Html::a(
                     $model->exam->subject  . ' - ' . $model->exam->name,
                     ['exam/view', 'id' => $model->exam->id],
@@ -104,10 +104,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'valid',
                 'value' => '<span class="label label-'
                      . ( $model->valid ? 'success' : 'danger' )
-                     . '">' . ($model->valid ? \Yii::t('tickets', 'Yes') : \Yii::t('tickets', 'No')) . '</span> '
-                     . ( $model->validTime !== false ? ($model->validTime === true ? \Yii::t('tickets', 'No Time Limit') : \Yii::t('tickets', 'for {time} after start', [
+                     . '">' . ($model->valid ? \Yii::t('ticket', 'Yes') : \Yii::t('ticket', 'No')) . '</span> '
+                     . ( $model->validTime !== false ? ($model->validTime === true ? \Yii::t('ticket', 'No Time Limit') : \Yii::t('ticket', 'for {time} after start', [
                             'time' => yii::$app->formatter->format($model->validTime, 'duration')
-                        ])) : '<span class="not-set">(' . \Yii::t('tickets', 'expired') . ')</span>' ),
+                        ])) : '<span class="not-set">(' . \Yii::t('ticket', 'expired') . ')</span>' ),
 
                     
                 'format' => 'html',
@@ -115,7 +115,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'test_taker',
                 'value' => Editable::widget([
-                    'content' => empty($model->test_taker) ? '<span class="not-set">(' . \Yii::t('tickets', 'not set') . ')</span>' : yii::$app->formatter->format($model->test_taker, 'text'),
+                    'content' => empty($model->test_taker) ? '<span class="not-set">(' . \Yii::t('ticket', 'not set') . ')</span>' : yii::$app->formatter->format($model->test_taker, 'text'),
                     'editUrl' => ['ticket/update', 'id' => $model->id, 'mode' => 'editable', 'attr' => 'test_taker' ],
                 ]),
                 'format' => 'raw'
@@ -150,7 +150,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         }',
                     ]) . ' ' .
-                    Html::a(\Yii::t('tickets', 'Probe'), ['view', 'id' => $model->id, 'mode' => 'probe']),
+                    Html::a(\Yii::t('ticket', 'Probe'), ['view', 'id' => $model->id, 'mode' => 'probe']),
             ],
             [
                 'attribute' => 'client_state',
@@ -222,7 +222,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'event' => 'ticket/' . $model->id,
                     'jsonSelector' => 'backup_state',
                 ]) . ActiveEventField::widget([
-                    'content' => yii::$app->formatter->format('&nbsp;<i class="glyphicon glyphicon-ok text-success"></i>&nbsp;' . \Yii::t('tickets', 'last backup successful'), 'html'),
+                    'content' => yii::$app->formatter->format('&nbsp;<i class="glyphicon glyphicon-ok text-success"></i>&nbsp;' . \Yii::t('ticket', 'last backup successful'), 'html'),
                     'options' => [
                         'class' => $model->last_backup == 1 ? '' : 'hidden'
                     ],
@@ -235,8 +235,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             s.classList.add("hidden");
                         }
                     }',
-                ]) . yii::$app->formatter->format('<div style="float:left;" class="' . ($model->lastBackupFailed ? '' : 'hidden') . '">&nbsp;<i class="glyphicon glyphicon-remove text-danger"></i>&nbsp;' . \Yii::t('tickets', 'last backup failed') . '</div>', 'html')
-                . ($model->abandoned ? ('&nbsp;<a tabindex="0" class="label label-danger" role="button" data-toggle="popover" data-html="true" data-trigger="focus" title="' . \Yii::t('tickets', 'Abandoned Ticket') . '" data-content="' . \Yii::t('tickets', 'This ticket is abandoned and thus excluded from regular backup. A reason for this could be that the backup process was not able to perform a backup of the client. After some time of failed backup attempts, the ticket will be abandoned (the value of <i>Time Limit</i> of this ticket/exam or <i>{default}</i> if nothing is set). You can still force a backup by clicking Actions->Backup Now.', ['default' => yii::$app->formatter->format(\Yii::$app->params['abandonTicket'], 'duration')]) . '">' . \Yii::t('tickets', 'Abandoned') . '</a>') : ''),
+                ]) . yii::$app->formatter->format('<div style="float:left;" class="' . ($model->lastBackupFailed ? '' : 'hidden') . '">&nbsp;<i class="glyphicon glyphicon-remove text-danger"></i>&nbsp;' . \Yii::t('ticket', 'last backup failed') . '</div>', 'html')
+                . ($model->abandoned ? ('&nbsp;<a tabindex="0" class="label label-danger" role="button" data-toggle="popover" data-html="true" data-trigger="focus" title="' . \Yii::t('ticket', 'Abandoned Ticket') . '" data-content="' . \Yii::t('ticket', 'This ticket is abandoned and thus excluded from regular backup. A reason for this could be that the backup process was not able to perform a backup of the client. After some time of failed backup attempts, the ticket will be abandoned (the value of <i>Time Limit</i> of this ticket/exam or <i>{default}</i> if nothing is set). You can still force a backup by clicking Actions->Backup Now.', ['default' => yii::$app->formatter->format(\Yii::$app->params['abandonTicket'], 'duration')]) . '">' . \Yii::t('ticket', 'Abandoned') . '</a>') : ''),
             ],
             [
                 'attribute' => 'restore_state',
@@ -350,7 +350,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'summaryOptions' => [
                 'class' => 'summary col-xs-12 col-md-12',
             ],            
-            'emptyText' => \Yii::t('tickets', 'No screenshots found.'),
+            'emptyText' => \Yii::t('ticket', 'No screenshots found.'),
             'layout' => '{items} <br>{summary} {pager}',
         ]); ?>
 
@@ -400,24 +400,24 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <?php Modal::begin([
     'id' => 'confirmRestore',
-    'header' => '<h4>' . \Yii::t('tickets', 'Confirm Restore') . '</h4>',
-    'footer' => Html::Button(\Yii::t('tickets', 'Cancel'), ['data-dismiss' => 'modal', 'class' => 'btn btn-default']) . '<a id="restore-now" class="btn btn-danger btn-ok">' . \Yii::t('tickets', 'Restore') . '</a>',
+    'header' => '<h4>' . \Yii::t('ticket', 'Confirm Restore') . '</h4>',
+    'footer' => Html::Button(\Yii::t('ticket', 'Cancel'), ['data-dismiss' => 'modal', 'class' => 'btn btn-default']) . '<a id="restore-now" class="btn btn-danger btn-ok">' . \Yii::t('ticket', 'Restore') . '</a>',
     //'size' => \yii\bootstrap\Modal::SIZE_SMALL
 ]); ?>
 
-<p><?= \Yii::t('tickets', "You're about to restore:") ?></p>
+<p><?= \Yii::t('ticket', "You're about to restore:") ?></p>
 <div class="list-group">
   <li class="list-group-item">
     <h4 id='confirmRestoreItemPath' class="list-group-item-heading">/path/to/file</h4>
-    <p class="list-group-item-text"><?= \Yii::t('tickets', "to the state as it was at <b id='confirmRestoreItemDate'>date</b>") ?></p>
+    <p class="list-group-item-text"><?= \Yii::t('ticket', "to the state as it was at <b id='confirmRestoreItemDate'>date</b>") ?></p>
   </li>
 </div>
 
 <div class="alert alert-danger" role="alert">
-  <h4><?= \Yii::t('tickets', 'Important!') ?></h4>
+  <h4><?= \Yii::t('ticket', 'Important!') ?></h4>
 
-  <p><?= \Yii::t('tickets', 'Please notice, that if the <b>file</b> exists on the target machine, it will be permanently <b>OVERWRITTEN</b> by this version!') ?></p>
-  <p><?= \Yii::t('tickets', 'If you restore a <b>directory</b>, notice that the target directory will be restored to the exact same state of this version. Newer files will be <b>REMOVED</b>!') ?></p>
+  <p><?= \Yii::t('ticket', 'Please notice, that if the <b>file</b> exists on the target machine, it will be permanently <b>OVERWRITTEN</b> by this version!') ?></p>
+  <p><?= \Yii::t('ticket', 'If you restore a <b>directory</b>, notice that the target directory will be restored to the exact same state of this version. Newer files will be <b>REMOVED</b>!') ?></p>
 </div>
 
 <?php Modal::end(); ?>

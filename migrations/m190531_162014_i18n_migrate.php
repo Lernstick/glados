@@ -214,7 +214,7 @@ class m190531_162014_i18n_migrate extends Migration
         foreach ($models as $model) {
             echo "Tickets: Migrating database record " . $i . "/" . $nr . " down\r";
             Yii::$app->db->createCommand()->update($this->ticketTable, [
-                'client_state_new' => \Yii::t('tickets', $model->client_state, $model->client_state_params, 'en'),
+                'client_state_new' => \Yii::t('ticket', $model->client_state, $model->client_state_params, 'en'),
             ], ['id' => $model->id])->execute();
             $i = $i + 1;
         }

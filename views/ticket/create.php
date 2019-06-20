@@ -7,8 +7,8 @@ use yii\helpers\Html;
 /* @var $model app\models\Ticket */
 /* @var $searchModel app\models\TicketSearch */
 
-$this->title = \Yii::t('tickets', 'Create Ticket');
-$this->params['breadcrumbs'][] = ['label' => \Yii::t('tickets', 'Tickets'), 'url' => ['index']];
+$this->title = \Yii::t('ticket', 'Create Ticket');
+$this->params['breadcrumbs'][] = ['label' => \Yii::t('ticket', 'Tickets'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="ticket-create">
@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div class="alert alert-success" role="alert">
         <span class="glyphicon glyphicon-alert"></span>
-        <span><?= \Yii::t('tickets', 'For more information, please visit {link}.', [
+        <span><?= \Yii::t('ticket', 'For more information, please visit {link}.', [
             'link' => Html::a('Manual / Create single ticket', ['/howto/view', 'id' => 'create-single-ticket.md'], ['class' => 'alert-link'])
         ]) ?></span>
     </div>

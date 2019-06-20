@@ -114,7 +114,7 @@ $this->registerJs($format_tk, yii\web\View::POS_HEAD);
         <div class="row">
             <div class="col-md-6">
                 <?= $form->field($model, 'path', [
-                'template' => '{label}<div class="input-group"><span title="' . \Yii::t('tickets', 'Remote Backup Path') . '" class="input-group-addon" id="basic-addon2">' . FileHelper::normalizePath($ticket->exam->backup_path) . '/</span>{input}</div>{hint}{error}'
+                'template' => '{label}<div class="input-group"><span title="' . \Yii::t('ticket', 'Remote Backup Path') . '" class="input-group-addon" id="basic-addon2">' . FileHelper::normalizePath($ticket->exam->backup_path) . '/</span>{input}</div>{hint}{error}'
             ])->textInput() ?>
                 <?= $form->field($model, 'inc_dotfiles')->checkbox() ?>
                 <?= $form->field($model, 'inc_screenshots')->checkbox() ?>

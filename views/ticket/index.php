@@ -14,7 +14,7 @@ use yii\web\JsExpression;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $preSelect array */
 
-$this->title = \Yii::t('tickets', 'Tickets');
+$this->title = \Yii::t('ticket', 'Tickets');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="ticket-index">
@@ -212,8 +212,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'abandoned',
                 'format' => 'boolean',
                 'filter' => array(
-                    'Yes' => \Yii::t('tickets', 'Yes'),
-                    'No' => \Yii::t('tickets', 'No'),
+                    'Yes' => \Yii::t('ticket', 'Yes'),
+                    'No' => \Yii::t('ticket', 'No'),
                 ),
             ],            
             [
@@ -285,7 +285,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'backup_interval',
                 'format' => 'raw',
                 'value' =>  function($model) {
-                    return $model->backup_interval == 0 ? \Yii::t('tickets', 'No Backup') : yii::$app->formatter->format($model->backup_interval, 'duration');
+                    return $model->backup_interval == 0 ? \Yii::t('ticket', 'No Backup') : yii::$app->formatter->format($model->backup_interval, 'duration');
                 },
                 'visible' => false
             ],
@@ -326,7 +326,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'report' => function ($url) {
                         return Html::a('<span class="glyphicon glyphicon-save-file"></span>', $url,
                             [
-                                'title' => \Yii::t('tickets', 'Generate PDF Report'),
+                                'title' => \Yii::t('ticket', 'Generate PDF Report'),
                                 'data-pjax' => '0',
                             ]
                         );
@@ -345,15 +345,15 @@ $this->params['breadcrumbs'][] = $this->title;
         'gridOptions' => [
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
-            'panel' => ['heading' => '<h3 class="panel-title">' . \Yii::t('tickets', 'Your Tickets') . '</h3>'],
+            'panel' => ['heading' => '<h3 class="panel-title">' . \Yii::t('ticket', 'Your Tickets') . '</h3>'],
             'rowOptions' => function($model) {
                 return array_key_exists($model->state, $model->classMap) ? ['class' => $model->classMap[$model->state]] : null;
             },            
             'toolbar' =>  [
                 ['content' =>
-                    Html::a('<i class="glyphicon glyphicon-plus"></i>', ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => \Yii::t('tickets', 'Create Ticket')]) . ' ' .
-                    Html::a('<i class="glyphicon glyphicon-envelope"></i>', ['update', 'mode' => 'submit'], ['data-pjax' => 0, 'class' => 'btn btn-info', 'title' => \Yii::t('tickets', 'Submit Ticket')]) . ' ' .
-                    Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/ticket/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => \Yii::t('tickets', 'Reset Grid')])
+                    Html::a('<i class="glyphicon glyphicon-plus"></i>', ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => \Yii::t('ticket', 'Create Ticket')]) . ' ' .
+                    Html::a('<i class="glyphicon glyphicon-envelope"></i>', ['update', 'mode' => 'submit'], ['data-pjax' => 0, 'class' => 'btn btn-info', 'title' => \Yii::t('ticket', 'Submit Ticket')]) . ' ' .
+                    Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/ticket/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => \Yii::t('ticket', 'Reset Grid')])
                 ],
                 ['content' => '{dynagridFilter}{dynagridSort}{dynagrid}'],
                 '{export}',

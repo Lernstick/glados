@@ -14,18 +14,18 @@ use yii\widgets\DetailView;
 <div class="panel-heading">
 	<h4 class="panel-title">
     	<a data-toggle="collapse" data-parent="#backups-accordion" href="#backups-collapse<?= $index + 1 ?>">
-        	<?= \Yii::t('tickets', 'Backup') ?> #<?= $widget->dataProvider->totalCount - $key . ' - ' . yii::$app->formatter->format(intval($model->endTime), 'timeago')
+        	<?= \Yii::t('ticket', 'Backup') ?> #<?= $widget->dataProvider->totalCount - $key . ' - ' . yii::$app->formatter->format(intval($model->endTime), 'timeago')
         	 . ' (' . yii::$app->formatter->format($model->totalDestinationSizeChange, 'shortSize') . ' / ' . yii::$app->formatter->format($model->errors, 'integer') . ' errors) '; ?>
 		</a>
         <div class="pull-right">
             <div class="btn-group">
               <a href="#" class="dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="glyphicon glyphicon-list-alt"></span> <?= \Yii::t('tickets', 'Actions') ?><span class="caret"></span>
+                <span class="glyphicon glyphicon-list-alt"></span> <?= \Yii::t('ticket', 'Actions') ?><span class="caret"></span>
               </a>            
               <ul class="dropdown-menu dropdown-menu-right">
                 <li>
                     <?= Html::a(
-                        '<span class="glyphicon glyphicon-paperclip"></span> '. \Yii::t('tickets', 'Show Log File'),
+                        '<span class="glyphicon glyphicon-paperclip"></span> '. \Yii::t('ticket', 'Show Log File'),
                         Url::to([
                             'backup/log',
                             'ticket_id' => $model->ticket->id,
@@ -33,19 +33,19 @@ use yii\widgets\DetailView;
                         ]),
                         [
                             'id' => 'backup-log-show' . $key,
-                            'title' => \Yii::t('tickets', 'Show backup log')
+                            'title' => \Yii::t('ticket', 'Show backup log')
                         ]
                     ); ?>
                 </li>
                 <li class="divider"></li>
                 <li>
-                    <a class="dropdown-item" href="#"><span class="glyphicon glyphicon-file"></span> <?= \Yii::t('tickets', 'Create Exam from this backup') ?> (TODO)</a>
+                    <a class="dropdown-item" href="#"><span class="glyphicon glyphicon-file"></span> <?= \Yii::t('ticket', 'Create Exam from this backup') ?> (TODO)</a>
                 </li>                
                 <li>
-                    <a class="dropdown-item" href="#"><span class="glyphicon glyphicon-file"></span> <?= \Yii::t('tickets', 'Create ZIP File') ?> (TODO)</a>
+                    <a class="dropdown-item" href="#"><span class="glyphicon glyphicon-file"></span> <?= \Yii::t('ticket', 'Create ZIP File') ?> (TODO)</a>
                 </li>
                 <li>
-                    <a class="dropdown-item" href="#"><span class="glyphicon glyphicon-file"></span> <?= \Yii::t('tickets', 'Create Squash Filesystem') ?> (TODO)</a>
+                    <a class="dropdown-item" href="#"><span class="glyphicon glyphicon-file"></span> <?= \Yii::t('ticket', 'Create Squash Filesystem') ?> (TODO)</a>
                 </li>
               </ul>
             </div>
