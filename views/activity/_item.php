@@ -42,16 +42,8 @@ use app\components\ActiveEventField;
         return $model->date < $model->lastvisited ? null : ['class' => 'warning' ];
     },
     'columns' => [
-
         'date:timeago',
-        [
-            'attribute' => 'description',
-            'format' => 'raw',
-            'value' => function ($model) {
-                return $model->description_full;
-            },
-        ],
-
+        'description',
     ],
     'layout' => '{items} {pager}',
     'headerRowOptions' => [ 'style' => 'width:0%; display:none' ],

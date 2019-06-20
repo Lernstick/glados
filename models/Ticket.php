@@ -52,7 +52,7 @@ use app\models\EventItem;
  * @property Exam $exam
  * @property Exam $exam
  */
-class Ticket extends TranslatedActiveRecord
+class Ticket extends LiveActiveRecord
 {
 
     /**
@@ -65,11 +65,6 @@ class Ticket extends TranslatedActiveRecord
 
     /* db translated fields */
     public $client_state_db;
-
-    /**
-     * @var array An array holding the values of the record before changing
-     */
-    private $presaveAttributes;
 
     /* scenario constants */
     const SCENARIO_DEFAULT = 'default';
@@ -91,11 +86,7 @@ class Ticket extends TranslatedActiveRecord
      */
     public function init()
     {
-        $instance = $this;
-        $this->on(self::EVENT_BEFORE_UPDATE, function($instance){
-            $this->presaveAttributes = $this->getOldAttributes();
-        });
-        $this->on(self::EVENT_AFTER_UPDATE, [$this, 'updateEvent']);
+        $this->on(self::EVENT_AFTER_UPDATE, [$this, 'updateEvent_old']);
         $this->on(self::EVENT_AFTER_DELETE, [$this, 'deleteEvent']);
 
         /* generate the token if it's a new record */
@@ -103,10 +94,7 @@ class Ticket extends TranslatedActiveRecord
 
         $this->backup_interval = $this->isNewRecord ? 300 : $this->backup_interval;
 
-        // For each translated db field, such an event needs to be fired
-        //$this->on(self::EVENT_BEFORE_INSERT, [$this, 'changeClient_state']);
-        //$this->on(self::EVENT_BEFORE_VALIDATE, [$this, 'changeClient_state']);
-
+        parent::init();
     }
 
 
@@ -125,6 +113,27 @@ class Ticket extends TranslatedActiveRecord
     {
         return [
             'client_state',
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getLiveFields()
+    {
+        return [
+            'client_state' => [ 'priority' => 1 ],
+            'download_lock',
+            /*'download_progress' => [
+                'priority' => function ($field, $model) {
+                    return round($field*100) == 100 ? 0 : 2;
+                },
+                'data' => [
+                    'download_progress' => function ($field, $model) {
+                        return yii::$app->formatter->format($field, 'percent');
+                    }
+                ],
+            ],*/
         ];
     }
 
@@ -201,106 +210,6 @@ class Ticket extends TranslatedActiveRecord
         ];
     }
 
-    /**
-     * Checks if attributes have changed
-     * 
-     * @param array $attributes - a list of attributes to check
-     * @return bool
-     */
-    public function attributesChanged($attributes)
-    {
-        foreach($attributes as $attribute){
-            if (array_key_exists($attribute, $this->presaveAttributes) && array_key_exists($attribute, $this->attributes)) {
-                if ($this->presaveAttributes[$attribute] != $this->attributes[$attribute]){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * For each translated db field, such a function must be created, named getTranslationName()
-     * returning the relation to the translation table
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    /*public function getTranslationClient_state()
-    {
-        return $this->hasOne(Translation::className(), ['id' => 'client_state_id']);
-    }*/
-
-    /**
-     * For each translated db field, such a function must be created, named getTr_name()
-     * returning the language row with data in it.
-     *
-     * @return string content of the row from the table corresponding to the language
-     */
-    /*public function getTr_client_state()
-    {
-        return \Yii::t(null, $this->client_state, $this->client_state_params, 'xxx');
-    }*/
-
-    /**
-     * Getter for the data. Returns the data or an empty array if there is
-     * no data.
-     * 
-     * @return array
-     */
-    /*public function getClient_state_params()
-    {
-        return $this->client_state_data === null ? [] : Json::decode($this->client_state_data);
-    }*/
-
-    /**
-     * Setter for the data. Format is as follows:
-     * @see https://www.yiiframework.com/doc/guide/2.0/en/tutorial-i18n#message-parameters
-     *
-     *  [
-     *      'key_1' => 'value_1'
-     *      'key_2' => 'value_2'
-     *      ...
-     *      'key_n' => 'value_n'
-     *  ]
-     *
-     * @return void
-     */
-    /*public function setClient_state_params($value)
-    {
-        $this->client_state_data = Json::encode($value);
-    }*/
-
-    /**
-     * Automatic insertion of the data in the translation table
-     * For each translated db field such a function needs to be defined
-     *
-     * @return void
-     */
-    /*public function changeClient_state()
-    {
-        $keys = array_keys($this->client_state_params);
-        $vals = array_map(function ($e) {
-            return '{' . $e . '}';
-        }, $keys);
-        $params = array_combine($keys, $vals);
-
-        $tr = Translation::find()->where([
-            'en' => \Yii::t('ticket', $this->client_state, $params, 'en')
-        ])->one();
-        
-        if ($tr === null || $tr === false) {
-            // TODO: loop through all languages
-            $translation = new Translation([
-                'en' => \Yii::t('live_data', $this->client_state, $params, 'en'),
-                'de' => \Yii::t('live_data', $this->client_state, $params, 'de'),
-            ]);
-            $translation->save();
-            $this->client_state_id = $translation->id;
-        } else {
-            $this->client_state_id = $tr->id;
-        }
-    }*/
-
     public function getOwn()
     {
         return $this->exam->user->id == \Yii::$app->user->id ? true : false;
@@ -333,7 +242,7 @@ class Ticket extends TranslatedActiveRecord
      * 
      * @return void
      */
-    public function updateEvent()
+    public function updateEvent_old()
     {
         if($this->attributesChanged([ 'start', 'end', 'test_taker', 'result' ])){
             $eventItem = new EventItem([
@@ -357,7 +266,7 @@ class Ticket extends TranslatedActiveRecord
             $eventItem->generate();
         }
 
-        if($this->attributesChanged([ 'download_lock' ])){
+        /*if($this->attributesChanged([ 'download_lock' ])){
             $eventItem = new EventItem([
                 'event' => 'ticket/' . $this->id,
                 'priority' => 0,
@@ -366,7 +275,7 @@ class Ticket extends TranslatedActiveRecord
                 ],
             ]);
             $eventItem->generate();
-        }
+        }*/
 
         if($this->attributesChanged([ 'download_state' ])){
             $eventItem = new EventItem([
@@ -446,14 +355,15 @@ class Ticket extends TranslatedActiveRecord
         }
 
         if($this->attributesChanged([ 'client_state_id', 'client_state_params' ])){
-            $eventItem = new EventItem([
+            /*$eventItem = new EventItem([
                 'event' => 'ticket/' . $this->id,
                 'priority' => 1,
                 'data' => [
                     'client_state' => $this->client_state,
                 ],
+                'translate' => true,
             ]);
-            $eventItem->generate();
+            $eventItem->generate();*/
 
             $act = new Activity([
                 'ticket_id' => $this->id,
@@ -844,7 +754,6 @@ class Ticket extends TranslatedActiveRecord
     {
         $c = \Yii::$app->language;
         $query = new TicketQuery(get_called_class());
-        $query->joinWith(Ticket::joinTables());
 
         $query->addSelect(['`ticket`.*', new \yii\db\Expression('(case
             WHEN (start is not null and end is not null and test_taker > "") THEN
@@ -859,12 +768,6 @@ class Ticket extends TranslatedActiveRecord
                 4 # unknown
             END
             ) as state')]);
-
-        /*$query->addSelect([
-            '`ticket`.*',
-            // first the end-user language, then english (en) as fallback
-            new \yii\db\Expression('COALESCE(NULLIF(`client_state`.`' . $c . '`, ""), NULLIF(`client_state`.`en`, ""), "") as client_state'),
-        ]);*/
 
         return $query;
     }

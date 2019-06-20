@@ -18,8 +18,9 @@ class TranslatedActiveRecord extends Base
     public function init()
     {
         // For each translated db field, such an event needs to be fired
-        foreach ($this->translatedFields as $key => $value) {
-            $this->on(self::EVENT_BEFORE_INSERT, [$this, 'insertTranslation'], $value);
+        foreach ($this->translatedFields as $key => $field) {
+            $this->on(self::EVENT_BEFORE_INSERT, [$this, 'updateTranslation'], $field);
+            $this->on(self::EVENT_BEFORE_UPDATE, [$this, 'updateTranslation'], $field);
         }
 
         parent::init();
@@ -34,7 +35,7 @@ class TranslatedActiveRecord extends Base
         $last = array_pop($parts);
         $pname = implode('_', $parts);
 
-        // return the translated value with data if the property is read directly
+        // return the translated value with data if the property is read directly:
         // echo $this->name;
         if (in_array($name, $this->getTranslatedFields())) {
             return \Yii::t(null, $this->{$name . '_db'}, $this->{$name . '_params'}, 'xxx');
@@ -44,10 +45,6 @@ class TranslatedActiveRecord extends Base
             return $this->{$pname . "_data"} === null ? [] : Json::decode($this->{$pname . "_data"});
         } else if ($last == 'translation' && !empty($pname) && in_array($pname, $this->translatedFields)) {
             return $this->hasOne(Translation::className(), ['id' => $pname . '_id']);
-        } else if ($last == 'translated' && !empty($pname) && in_array($pname, $this->translatedFields)) {
-            return $this->{$pname . '_db'};
-        } else if ($last == 'full' && !empty($pname) && in_array($pname, $this->translatedFields)) {
-            return \Yii::t(null, $this->{$pname . '_db'}, $this->{$pname . '_params'}, 'xxx');
         } else {
             return parent::__get($name);
         }
@@ -72,8 +69,8 @@ class TranslatedActiveRecord extends Base
         $last = array_pop($parts);
         $pname = implode('_', $parts);
 
-        // set the db property if the property is set directly
-        // $this->name = $value
+        // set the db property if the property is set directly:
+        // $this->name = $value;
         if (in_array($name, $this->getTranslatedFields())) {
             return $this->{$name . "_db"} = $value;
         }
@@ -146,11 +143,11 @@ class TranslatedActiveRecord extends Base
     }
 
     /**
-     * Automatic insertion of the data in the translation table
+     * Automatic insertion/update of the data in the translation table
      *
      * @return void
      */
-    public function insertTranslation($event)
+    public function updateTranslation($event)
     {
         if ($event->data !== null) {
             $field = $event->data;

@@ -7,7 +7,7 @@ namespace app\models;
  *
  * @see Ticket
  */
-class TicketQuery extends \yii\db\ActiveQuery
+class TicketQuery extends TranslatedActivityQuery
 {
     /*public function active()
     {

@@ -93,6 +93,7 @@ class m190531_162014_i18n_migrate extends Migration
     public function dummy() {
         // for backward compatibility
         yiit('activity', 'Client state changed: {old} -> {new}');
+        yiit('ticket', 'Client not seen yet');
     }
 
     /**
@@ -145,7 +146,7 @@ class m190531_162014_i18n_migrate extends Migration
         }
         echo "\n";
 
-        /*$models = Ticket::find()->all();
+        $models = Ticket::find()->all();
         $nr = Ticket::find()->count();
         $i = 1;
         foreach ($models as $model) {
@@ -187,7 +188,7 @@ class m190531_162014_i18n_migrate extends Migration
             $model->update(false); // skipping validation as no user input is involved
             $i = $i + 1;
         }
-        echo "\n";*/
+        echo "\n";
 
     }
 
@@ -208,7 +209,7 @@ class m190531_162014_i18n_migrate extends Migration
         }
         echo "\n";
 
-        /*$models = Ticket::find()->where(['client_state_new' => null])->all();
+        $models = Ticket::find()->where(['client_state_new' => null])->all();
         $nr = Ticket::find()->where(['client_state_new' => null])->count();
         $i = 1;
         foreach ($models as $model) {
@@ -218,6 +219,6 @@ class m190531_162014_i18n_migrate extends Migration
             ], ['id' => $model->id])->execute();
             $i = $i + 1;
         }
-        echo "\n";*/
+        echo "\n";
     }
 }

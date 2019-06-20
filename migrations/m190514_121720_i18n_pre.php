@@ -14,6 +14,7 @@ class m190514_121720_i18n_pre extends Migration
 
     public $activitiesTable = 'activity';
     public $ticketTable = 'ticket';
+    public $eventTable = 'event';
 
     public $translationTable = 'translation';
     public $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
@@ -71,6 +72,11 @@ class m190514_121720_i18n_pre extends Migration
             $this->addColumn($this->ticketTable, 'client_state_id', $this->integer(11)->notNull());
         }
 
+        /* event table */
+        if ($this->db->schema->getTableSchema($this->eventTable, true)->getColumn('category') === null) {
+            $this->addColumn($this->eventTable, 'category', $this->string(64)->defaultValue(null));
+        }
+
     }
 
     /**
@@ -124,5 +130,9 @@ class m190514_121720_i18n_pre extends Migration
         $this->alterColumn($this->ticketTable, 'backup_state', 'string(10240)');
         $this->alterColumn($this->ticketTable, 'restore_state', 'string(10240)');
 
+        /* event table */
+        if ($this->db->schema->getTableSchema($this->eventTable, true)->getColumn('category') !== null) {
+            $this->dropColumn($this->eventTable, 'category');
+        }
     }
 }
