@@ -34,14 +34,20 @@ class TranslatedActiveRecord extends Base
         $last = array_pop($parts);
         $pname = implode('_', $parts);
 
+        // return the translated value with data if the property is read directly
+        // echo $this->name;
+        if (in_array($name, $this->getTranslatedFields())) {
+            return \Yii::t(null, $this->{$name . '_db'}, $this->{$name . '_params'}, 'xxx');
+        }
+
         if ($last == 'params' && !empty($pname) && in_array($pname, $this->translatedFields)) {
             return $this->{$pname . "_data"} === null ? [] : Json::decode($this->{$pname . "_data"});
         } else if ($last == 'translation' && !empty($pname) && in_array($pname, $this->translatedFields)) {
             return $this->hasOne(Translation::className(), ['id' => $pname . '_id']);
         } else if ($last == 'translated' && !empty($pname) && in_array($pname, $this->translatedFields)) {
-            return $this->{$pname};
+            return $this->{$pname . '_db'};
         } else if ($last == 'full' && !empty($pname) && in_array($pname, $this->translatedFields)) {
-            return \Yii::t(null, $this->{$pname}, $this->{$pname . '_params'}, 'xxx');
+            return \Yii::t(null, $this->{$pname . '_db'}, $this->{$pname . '_params'}, 'xxx');
         } else {
             return parent::__get($name);
         }
@@ -65,6 +71,12 @@ class TranslatedActiveRecord extends Base
         $parts = explode('_', $name);
         $last = array_pop($parts);
         $pname = implode('_', $parts);
+
+        // set the db property if the property is set directly
+        // $this->name = $value
+        if (in_array($name, $this->getTranslatedFields())) {
+            return $this->{$name . "_db"} = $value;
+        }
 
         if ($last == 'params' && !empty($pname) && in_array($pname, $this->translatedFields)) {
             return $this->{$pname . "_data"} = Json::encode($value);
@@ -105,12 +117,18 @@ class TranslatedActiveRecord extends Base
      *   - description_data with data type string(1024)->defaultValue(null)
      *
      * The following methods/properties will be created automatically:
-     *   - obj->description @return string
-     *   - obj->description_params @return array to set corresponding json
-     *     value in description_data in the database
-     *   - obj->description_translation @return \yii\db\ActiveQuery
-     *   - obj->description_translated @return string
-     *   - obj->description_full @return string
+     *   - obj->getDescription():
+     *          @return string Returns the translated string including the data
+     *   - obj->setDescription($value):
+     *          @param string $value The string in sourceLanguage with placeholders
+     *          @return void
+     *   - obj->getDescription_params()
+     *          @return array Array to set corresponding json value in description_data in the database
+     *   - obj->setDescription_params($value)
+     *          @param array Array of key value pair to replace the placeholders with
+     *          @return void
+     *   - obj->getDescription_translation @return \yii\db\ActiveQuery The relation to the translaton table
+     *   - obj->getDescription_db @return string The string from directly from the database
      */
     public function getTranslatedFields()
     {
@@ -145,14 +163,14 @@ class TranslatedActiveRecord extends Base
             $params = array_combine($keys, $vals);
 
             $tr = Translation::find()->where([
-                'en' => \Yii::t($category, $this->{$field}, $params, 'en')
+                'en' => \Yii::t($category, $this->{$field . '_db'}, $params, 'en')
             ])->one();
             
             if ($tr === null || $tr === false) {
                 // TODO: loop through all languages
                 $translation = new Translation([
-                    'en' => \Yii::t($category, $this->{$field}, $params, 'en'),
-                    'de' => \Yii::t($category, $this->{$field}, $params, 'de'),
+                    'en' => \Yii::t($category, $this->{$field . '_db'}, $params, 'en'),
+                    'de' => \Yii::t($category, $this->{$field . '_db'}, $params, 'de'),
                 ]);
                 $translation->save();
                 $this->{$field . '_id'} = $translation->id;

@@ -225,7 +225,7 @@ class BackupController extends DaemonController implements DaemonInterface
                 $act = new Activity([
                     'ticket_id' => $this->ticket->id,
                     'description' => yiit('activity', 'Backup failed: rdiff-backup failed (retval: {retval})'),
-                    'params' => [ 'retval' => $retval ],
+                    'description_params' => [ 'retval' => $retval ],
                     'severity' => Activity::SEVERITY_WARNING,
                 ]);
                 $act->save();

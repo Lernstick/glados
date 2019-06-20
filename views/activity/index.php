@@ -101,9 +101,6 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'description',
-                'value' => function ($model) {
-                    return $model->description_full;
-                },
                 'format' => 'raw',
                 'filterType' => GridView::FILTER_SELECT2,
                 'filterWidgetOptions' => [

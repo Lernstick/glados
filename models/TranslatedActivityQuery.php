@@ -21,10 +21,17 @@ class TranslatedActivityQuery extends \yii\db\ActiveQuery
 
         $select = array_map(function($value) use ($c) {
             // first the end-user language, then english (en) as fallback
-            return new \yii\db\Expression('COALESCE(
-                NULLIF(`' . $value . '`.`' . $c . '`, ""),
-                NULLIF(`' . $value . '`.`en`, ""),
-                "") as ' . $value);
+            return new \yii\db\Expression('
+                COALESCE(
+                    NULLIF(`' . $value . '`.`' . $c . '`, ""),
+                    NULLIF(`' . $value . '`.`en`, ""),
+                    ""
+                ) as ' . $value . ',
+                COALESCE(
+                    NULLIF(`' . $value . '`.`' . $c . '`, ""),
+                    NULLIF(`' . $value . '`.`en`, ""),
+                    ""
+                ) as ' . $value . '_db');
         }, $class::getTranslatedFields());
         $select = array_merge(['`' . $class::tableName() . '`.*'], $select);
 

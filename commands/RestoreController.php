@@ -133,7 +133,7 @@ class RestoreController extends DaemonController
                 $act = new Activity([
                         'ticket_id' => $this->ticket->id,
                         'description' => yiit('activity', 'Restore failed: "{file}": No such file or directory.'),
-                        'params' => [ 'file' => $file ],
+                        'description_params' => [ 'file' => $file ],
                         'severity' => Activity::SEVERITY_WARNING,
                 ]);
                 $act->save();
@@ -205,7 +205,7 @@ class RestoreController extends DaemonController
             $act = new Activity([
                     'ticket_id' => $this->ticket->id,
                     'description' => yiit('activity', 'Restore failed: rdiff-backup failed (retval: {retval})'),
-                    'params' => [ 'retval' => $retval ],
+                    'description_params' => [ 'retval' => $retval ],
                     'severity' => Activity::SEVERITY_WARNING,
             ]);
             $act->save();
@@ -217,7 +217,7 @@ class RestoreController extends DaemonController
             $act = new Activity([
                     'ticket_id' => $this->ticket->id,
                     'description' => yiit('activity', 'Restore of {file} as it was as of {date} was successful.'),
-                    'params' => [
+                    'description_params' => [
                         'file' => $this->restore->file,
                         'date' => yii::$app->formatter->format($this->restore->restoreDate, 'datetime')
                     ],

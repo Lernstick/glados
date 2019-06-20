@@ -560,7 +560,7 @@ class TicketController extends Controller
                     $act = new Activity([
                         'ticket_id' => $model->id,
                         'description' => yiit('activity', 'Exam download successfully requested by {ip} from {test_taker}.'),
-                        'params' => [
+                        'description_params' => [
                             'ip' => $model->ip,
                             'test_taker' => $model->test_taker,
                         ],
@@ -570,7 +570,7 @@ class TicketController extends Controller
                     $act = new Activity([
                         'ticket_id' => $model->id,
                         'description' => yiit('activity', 'Exam download successfully requested by {ip} from Ticket with token {token}.'),
-                        'params' => [
+                        'description_params' => [
                             'ip' => $model->ip,
                             'token' => $model->token,
                         ],
@@ -663,14 +663,14 @@ class TicketController extends Controller
             $act = new Activity([
                 'ticket_id' => $model->id,
                 'description' => yiit('activity', 'Exam finished by {test_taker}.'),
-                'params' => [ 'test_taker' => $model->test_taker ],
+                'description_params' => [ 'test_taker' => $model->test_taker ],
                 'severity' => Activity::SEVERITY_INFORMATIONAL,
             ]);
         } else {
             $act = new Activity([
                 'ticket_id' => $model->id,
                 'description' => yiit('activity', 'Exam finished by Ticket with token {token}.'),
-                'params' => [ 'token' => $token ],
+                'description_params' => [ 'token' => $token ],
                 'severity' => Activity::SEVERITY_INFORMATIONAL,
             ]);
         }

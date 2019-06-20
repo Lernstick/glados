@@ -462,7 +462,7 @@ class Ticket extends Base
             $act = new Activity([
                 'ticket_id' => $this->id,
                 'description' => yiit('activity', 'Client state changed: {client_state}'),
-                'params' => [
+                'description_params' => [
                     //'old' => Translation::findOne($this->presaveAttributes['client_state_id'])->en,
                     'client_state' => $this->client_state,
                 ],

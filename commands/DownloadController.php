@@ -186,7 +186,7 @@ class DownloadController extends DaemonController implements DaemonInterface
                 $act = new Activity([
                         'ticket_id' => $this->ticket->id,
                         'description' => yiit('activity', 'Download failed: rsync failed (retval: {retval})'),
-                        'params' => [ 'retval' => $retval ],
+                        'description_params' => [ 'retval' => $retval ],
                         'severity' => Activity::SEVERITY_WARNING,
                 ]);
                 $act->save();
@@ -199,7 +199,7 @@ class DownloadController extends DaemonController implements DaemonInterface
                     $act = new Activity([
                         'ticket_id' => $this->ticket->id,
                         'description' => yiit('activity', 'Exam download finished by {ip} from {test_taker}.'),
-                        'params' => [
+                        'description_params' => [
                             'ip' => $this->ticket->ip,
                             'test_taker' => $this->ticket->test_taker,
                         ],
@@ -209,7 +209,7 @@ class DownloadController extends DaemonController implements DaemonInterface
                     $act = new Activity([
                         'ticket_id' => $this->ticket->id,
                         'description' => yiit('activity', 'Exam download finished by {ip} from Ticket with token {token}.'),
-                        'params' => [
+                        'description_params' => [
                             'ip' => $this->ticket->ip,
                             'token' => $this->ticket->token,
                         ],

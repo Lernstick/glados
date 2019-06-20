@@ -30,7 +30,7 @@ class Activity extends TranslatedActiveRecord
     const SEVERITY_SUCCESS = 7;
 
     /* db translated fields */
-    public $description;
+    public $description_db;
 
     /**
      * @inheritdoc
