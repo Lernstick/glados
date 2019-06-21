@@ -1,6 +1,4 @@
-## Overview
-
-See the [Manual](https://github.com/imedias/glados/tree/master/howtos/README.md) on Github.
+## GLaDOS Guide
 
 ###Howtos and Manuals
 
