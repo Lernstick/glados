@@ -17,7 +17,7 @@ cd $APIDOC_PATH
 # cp -R "${GLADOS_PATH}/howtos/de/img" "${GLADOS_PATH}/web/docs/de/img"
 
 # copy the images over to web/docs
-cp -R "${GLADOS_PATH}/howtos/img" "${GLADOS_PATH}/web/docs/en/img"
+cp -R "${GLADOS_PATH}/howtos/img" "${GLADOS_PATH}/web/docs/img"
 
 # adjust the permissions of the docs directory
 chown -R www-data:www-data "${GLADOS_PATH}/web/docs"
