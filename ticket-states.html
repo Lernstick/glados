@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="language" content="en" />
+        <link href="./assets/1cf5ba7/css/bootstrap.css" rel="stylesheet">
+<link href="./assets/be3e053e/solarized_light.css" rel="stylesheet">
+<link href="./assets/1f2e89dd/style.css" rel="stylesheet">
+<script src="./assets/8261f971/jquery.js"></script>
+<script src="./assets/1cf5ba7/js/bootstrap.js"></script>
+<script src="./assets/ae8b5077/jssearch.js"></script>    <title>Ticket states - Howtos and Manuals - GLaDOS Documentation</title>
+</head>
+<body>
+
+<div class="wrap">
+    <nav id="w110" class="navbar-inverse navbar-fixed-top navbar"><div class="navbar-header"><button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#w110-collapse"><span class="sr-only">Toggle navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span></button><a class="navbar-brand" href="./index.html">GLaDOS Documentation</a></div><div id="w110-collapse" class="collapse navbar-collapse"><ul id="w111" class="navbar-nav nav"><li><a href="api/index.html">Class reference</a></li>
+<li><a href="./README.html">Guide</a></li></ul><div class="navbar-form navbar-left" role="search">
+  <div class="form-group">
+    <input id="searchbox" type="text" class="form-control" placeholder="Search">
+  </div>
+</div>
+</div></nav>
+    <div id="search-resultbox" style="display: none;" class="modal-content">
+        <ul id="search-results">
+        </ul>
+    </div>
+
+    
+<div class="row">
+    <div class="col-md-2">
+                <div id="navigation" class="list-group"><a class="list-group-item active" href="#navigation-104" data-toggle="collapse" data-parent="#navigation">Howtos and Manuals <b class="caret"></b></a><div id="navigation-104" class="submenu panel-collapse collapse in"><a class="list-group-item" href="./create-exam.html">Create an exam</a>
+<a class="list-group-item" href="./remote-backup-path.html">Remote Backup Path</a>
+<a class="list-group-item" href="./create-zip-exam-file.html">Create a zip-file as exam file</a>
+<a class="list-group-item" href="./create-squashfs-exam-file.html">Create a squashfs-filesystem as exam file</a>
+<a class="list-group-item" href="./exam-view.html">The exam view</a>
+<a class="list-group-item" href="./create-single-ticket.html">Create a single ticket</a>
+<a class="list-group-item" href="./create-multiple-tickets.html">Create multiple tickets</a>
+<a class="list-group-item" href="./ticket-view.html">The ticket view </a>
+<a class="list-group-item active" href="./ticket-states.html">Ticket states</a>
+<a class="list-group-item" href="./take-exam.html">Taking an Exam</a>
+<a class="list-group-item" href="./generate-results.html">Generate results</a>
+<a class="list-group-item" href="./correct-exams.html">Correct the exams</a>
+<a class="list-group-item" href="./submit-results.html">Submit results back to the student</a>
+<a class="list-group-item" href="./get-exam-result.html">Get the exam result as a student</a></div>
+<a class="list-group-item" href="#navigation-105" data-toggle="collapse" data-parent="#navigation">Troubleshooting <b class="caret"></b></a><div id="navigation-105" class="submenu panel-collapse collapse"><a class="list-group-item" href="./client-crash.html">Client crashes during exam</a>
+<a class="list-group-item" href="./restore-specific-file.html">Restore a specific file</a></div>
+<a class="list-group-item" href="#navigation-106" data-toggle="collapse" data-parent="#navigation">Examples <b class="caret"></b></a><div id="navigation-106" class="submenu panel-collapse collapse"><a class="list-group-item" href="./example-exam-essay.html">Example exam: Essay</a></div>
+<a class="list-group-item" href="#navigation-107" data-toggle="collapse" data-parent="#navigation">Installation <b class="caret"></b></a><div id="navigation-107" class="submenu panel-collapse collapse"><a class="list-group-item" href="./manual-install.html">Manual Installation</a>
+<a class="list-group-item" href="./deb-install.html">Automatic Installation</a></div>
+<a class="list-group-item" href="#navigation-108" data-toggle="collapse" data-parent="#navigation">Update and Upgrade <b class="caret"></b></a><div id="navigation-108" class="submenu panel-collapse collapse"><a class="list-group-item" href="./deb-update.html">Softwareupdate on Debian</a>
+<a class="list-group-item" href="./deb-8to9-upgrade.html">Upgrade from Debian 8 to 9</a></div>
+<a class="list-group-item" href="#navigation-109" data-toggle="collapse" data-parent="#navigation">Configuration <b class="caret"></b></a><div id="navigation-109" class="submenu panel-collapse collapse"><a class="list-group-item" href="./config-files.html">Glados config files</a>
+<a class="list-group-item" href="./client-config.html">Exam client configuration</a>
+<a class="list-group-item" href="./network-config.html">Network configuration</a></div></div>    </div>
+    <div class="col-md-9 guide-content" role="main">
+        <h2>Ticket states <span id="ticket-states"></span><a href="#ticket-states" class="hashlink">&para;</a></h2><p>Currently there are 4 different states a ticket can occupy. This is incicated in the <a href="ticket-view.html">ticket view</a> as one of the following batches:</p>
+<p><img src="img/ticket-open.png" alt="Open" />
+<img src="img/ticket-running.png" alt="Running" />
+<img src="img/ticket-closed.png" alt="Closed" />
+<img src="img/ticket-submitted.png" alt="Submitted" /></p>
+<h3>The open state <span id="the-open-state"></span><a href="#the-open-state" class="hashlink">&para;</a></h3><p>This indicates that a ticket has not been used yet and there was no activity until now. It is an exam ready to be taken. Newly created tickets are usually in the open state.</p>
+<h3>The running state <span id="the-running-state"></span><a href="#the-running-state" class="hashlink">&para;</a></h3><p>This ticket is in use right now. It indicates an exam being taken by a student at this moment. This means that backups will run on this ticket in the specified interval (all 5 minutes by default). Screenshots (if configured) are taken in the specified interval. The time limit is counting down.</p>
+<h3>The closed state <span id="the-closed-state"></span><a href="#the-closed-state" class="hashlink">&para;</a></h3><p>A ticket in the closed state means that the exam has finished and the student has pressed <code>Finish exam</code> (See <a href="take-exam.html">Taking an Exam</a>). It might be possible that the last backup must still be performed in this state, but usually this brands an exam as done.</p>
+<h3>The submitted state <span id="the-submitted-state"></span><a href="#the-submitted-state" class="hashlink">&para;</a></h3><p>If the ticket is anonymous (hence no <em>Test Taker</em> set) and the exam has finished, the ticket will be in the closed state (see above). On the other hand, if a ticket is assigned to a student by providing a name in the <em>Test Taker</em> field and the student finshed the exam, the ticket will be in the submitted state. This is just to distinguish between an anonymous and a assigned ticket.</p>
+        <div class="toplink"><a href="#" class="h1" title="go to top"><span class="glyphicon glyphicon-arrow-up"></a></div>
+    </div>
+</div>
+
+
+</div>
+
+<footer class="footer">
+        <p class="pull-right"><small>Page generated on Fri, 21 Jun 2019 12:49:41 +0000</small></p>
+    Powered by <a href="http://www.yiiframework.com/" rel="external">Yii Framework</a></footer>
+
+<script>jQuery(function ($) {
+    var shiftWindow = function () { scrollBy(0, -50) };
+    if (location.hash) setTimeout(shiftWindow, 1);
+    window.addEventListener("hashchange", shiftWindow);
+var element = document.createElement("script");
+element.src = "./jssearch.index.js";
+document.body.appendChild(element);
+
+var searchBox = $('#searchbox');
+
+// search when typing in search field
+searchBox.on("keyup", function(event) {
+    var query = $(this).val();
+
+    if (query == '' || event.which == 27) {
+        $('#search-resultbox').hide();
+        return;
+    } else if (event.which == 13) {
+        var selectedLink = $('#search-resultbox a.selected');
+        if (selectedLink.length != 0) {
+            document.location = selectedLink.attr('href');
+            return;
+        }
+    } else if (event.which == 38 || event.which == 40) {
+        $('#search-resultbox').show();
+
+        var selected = $('#search-resultbox a.selected');
+        if (selected.length == 0) {
+            $('#search-results').find('a').first().addClass('selected');
+        } else {
+            var next;
+            if (event.which == 40) {
+                next = selected.parent().next().find('a').first();
+            } else {
+                next = selected.parent().prev().find('a').first();
+            }
+            if (next.length != 0) {
+                var resultbox = $('#search-results');
+                var position = next.position();
+
+//              TODO scrolling is buggy and jumps around
+//                resultbox.scrollTop(Math.floor(position.top));
+//                console.log(position.top);
+
+                selected.removeClass('selected');
+                next.addClass('selected');
+            }
+        }
+
+        return;
+    }
+    $('#search-resultbox').show();
+    $('#search-results').html('<li><span class="no-results">No results</span></li>');
+
+    var result = jssearch.search(query);
+
+    if (result.length > 0) {
+        var i = 0;
+        var resHtml = '';
+
+        for (var key in result) {
+            if (i++ > 20) {
+                break;
+            }
+            resHtml = resHtml +
+            '<li><a href="' + result[key].file.u.substr(3) +'"><span class="title">' + result[key].file.t + '</span>' +
+            '<span class="description">' + result[key].file.d + '</span></a></li>';
+        }
+        $('#search-results').html(resHtml);
+    }
+});
+
+// hide the search results on ESC
+$(document).on("keyup", function(event) { if (event.which == 27) { $('#search-resultbox').hide(); } });
+// hide search results on click to document
+$(document).bind('click', function (e) { $('#search-resultbox').hide(); });
+// except the following:
+searchBox.bind('click', function(e) { e.stopPropagation(); });
+$('#search-resultbox').bind('click', function(e) { e.stopPropagation(); });
+
+});</script></body>
+</html>

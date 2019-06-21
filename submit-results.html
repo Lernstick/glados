@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="language" content="en" />
+        <link href="./assets/1cf5ba7/css/bootstrap.css" rel="stylesheet">
+<link href="./assets/be3e053e/solarized_light.css" rel="stylesheet">
+<link href="./assets/1f2e89dd/style.css" rel="stylesheet">
+<script src="./assets/8261f971/jquery.js"></script>
+<script src="./assets/1cf5ba7/js/bootstrap.js"></script>
+<script src="./assets/ae8b5077/jssearch.js"></script>    <title>Submit results back to the student - Howtos and Manuals - GLaDOS Documentation</title>
+</head>
+<body>
+
+<div class="wrap">
+    <nav id="w6" class="navbar-inverse navbar-fixed-top navbar"><div class="navbar-header"><button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#w6-collapse"><span class="sr-only">Toggle navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span></button><a class="navbar-brand" href="./index.html">GLaDOS Documentation</a></div><div id="w6-collapse" class="collapse navbar-collapse"><ul id="w7" class="navbar-nav nav"><li><a href="api/index.html">Class reference</a></li>
+<li><a href="./README.html">Guide</a></li></ul><div class="navbar-form navbar-left" role="search">
+  <div class="form-group">
+    <input id="searchbox" type="text" class="form-control" placeholder="Search">
+  </div>
+</div>
+</div></nav>
+    <div id="search-resultbox" style="display: none;" class="modal-content">
+        <ul id="search-results">
+        </ul>
+    </div>
+
+    
+<div class="row">
+    <div class="col-md-2">
+                <div id="navigation" class="list-group"><a class="list-group-item active" href="#navigation-0" data-toggle="collapse" data-parent="#navigation">Howtos and Manuals <b class="caret"></b></a><div id="navigation-0" class="submenu panel-collapse collapse in"><a class="list-group-item" href="./create-exam.html">Create an exam</a>
+<a class="list-group-item" href="./remote-backup-path.html">Remote Backup Path</a>
+<a class="list-group-item" href="./create-zip-exam-file.html">Create a zip-file as exam file</a>
+<a class="list-group-item" href="./create-squashfs-exam-file.html">Create a squashfs-filesystem as exam file</a>
+<a class="list-group-item" href="./exam-view.html">The exam view</a>
+<a class="list-group-item" href="./create-single-ticket.html">Create a single ticket</a>
+<a class="list-group-item" href="./create-multiple-tickets.html">Create multiple tickets</a>
+<a class="list-group-item" href="./ticket-view.html">The ticket view </a>
+<a class="list-group-item" href="./ticket-states.html">Ticket states</a>
+<a class="list-group-item" href="./take-exam.html">Taking an Exam</a>
+<a class="list-group-item" href="./generate-results.html">Generate results</a>
+<a class="list-group-item" href="./correct-exams.html">Correct the exams</a>
+<a class="list-group-item active" href="./submit-results.html">Submit results back to the student</a>
+<a class="list-group-item" href="./get-exam-result.html">Get the exam result as a student</a></div>
+<a class="list-group-item" href="#navigation-1" data-toggle="collapse" data-parent="#navigation">Troubleshooting <b class="caret"></b></a><div id="navigation-1" class="submenu panel-collapse collapse"><a class="list-group-item" href="./client-crash.html">Client crashes during exam</a>
+<a class="list-group-item" href="./restore-specific-file.html">Restore a specific file</a></div>
+<a class="list-group-item" href="#navigation-2" data-toggle="collapse" data-parent="#navigation">Examples <b class="caret"></b></a><div id="navigation-2" class="submenu panel-collapse collapse"><a class="list-group-item" href="./example-exam-essay.html">Example exam: Essay</a></div>
+<a class="list-group-item" href="#navigation-3" data-toggle="collapse" data-parent="#navigation">Installation <b class="caret"></b></a><div id="navigation-3" class="submenu panel-collapse collapse"><a class="list-group-item" href="./manual-install.html">Manual Installation</a>
+<a class="list-group-item" href="./deb-install.html">Automatic Installation</a></div>
+<a class="list-group-item" href="#navigation-4" data-toggle="collapse" data-parent="#navigation">Update and Upgrade <b class="caret"></b></a><div id="navigation-4" class="submenu panel-collapse collapse"><a class="list-group-item" href="./deb-update.html">Softwareupdate on Debian</a>
+<a class="list-group-item" href="./deb-8to9-upgrade.html">Upgrade from Debian 8 to 9</a></div>
+<a class="list-group-item" href="#navigation-5" data-toggle="collapse" data-parent="#navigation">Configuration <b class="caret"></b></a><div id="navigation-5" class="submenu panel-collapse collapse"><a class="list-group-item" href="./config-files.html">Glados config files</a>
+<a class="list-group-item" href="./client-config.html">Exam client configuration</a>
+<a class="list-group-item" href="./network-config.html">Network configuration</a></div></div>    </div>
+    <div class="col-md-9 guide-content" role="main">
+        <h2>Submit results back to the student <span id="submit-results-back-to-the-student"></span><a href="#submit-results-back-to-the-student" class="hashlink">&para;</a></h2><p>Assuming you <a href="correct-exams.html">corrected the exams</a> and created a directory structure of the following form:</p>
+<pre><code class="hljs nginx"><span class="hljs-title">Albert</span> Einstein - a70e841ef4
+Edmond Halley - 0f1ffeaab2
+Erwin Schroedinger - d1e40c016a
+Johannes Kepler - 4dbfa16308
+Max Planck - 4eb553b010
+Marie Curie - c7de0aca7e
+Michael Faraday - 8794ce80dc
+Niels Bohr - 06cb7004bd
+Richard Phillips Feynman - a20a5eb03f
+Wolfgang Ernst Pauli - 79997928d1
+</code></pre>
+<p>Note that each directory has the form <code>Name - Token</code>, this needs to be satisfied <em>exactly</em>. Assuming that in each directory is the corrected exam of the corresponding student and whatever you want to hand back (maybe a sample solution?). Make sure the directories contain only the parts of the corrected exam, you want the student to see. Remove all other data from the directories.</p>
+<p>Once you are done, create a new zip-file with the above contents. It then should look like the <a href="generate-results.html">generated zip-file</a>, just with corrected exams in it.</p>
+<p>Start the <code>Submit results</code> process now. Click <code>Actions-&gt;Submit results</code> in the navigation.</p>
+<h3>Step 1 <span id="step-1"></span><a href="#step-1" class="hashlink">&para;</a></h3><p>In Step 1, upload the zip-file you created just now.</p>
+<p>After the submitting process, the student will have access to the result as a zip-file likewise. The contents of each zip-file will be everything inside the corresponding directory of the submitted zip-file. So make sure there is no secret content in it.</p>
+<p>Click <code>Next step</code>.</p>
+<h3>Step 2 <span id="step-2"></span><a href="#step-2" class="hashlink">&para;</a></h3><p>You will see a list like the one below.</p>
+<p><img src="img/submit_s2.png" alt="Submit step 2" /></p>
+<p>The uploaded zip-file was scanned and the system found the listed entries in it. The green color suggests that everything is ok with those entries in the zip-file. You can also see, that the exam is successfully identified. In the example above, there are 2 tickets with a result submitted already. This is indicated with yellow color. Please notice, that in such a case already existing results will be overwritten permanently. If you want to remove results from being processed, please edit the zip-file and reupload it in Step 1.</p>
+<p>Check the list and then press <code>Submit all results</code> to submit all the results in the list.</p>
+<h3>Step 3 <span id="step-3"></span><a href="#step-3" class="hashlink">&para;</a></h3><p>The list below shows a short summary on which results could be handed back successfully.</p>
+<p><img src="img/submit_s3.png" alt="Submit step 3" /></p>
+<p>In the example, one exam could not be handed back. This happens mostly when the corresponding directory in the uploaded zip-file is empty, so there is nothing to hand back. In such a case you should check the zip-file again.</p>
+<p>That's it. The student can now <a href="get-exam-result.html">check his/her exam result</a>.</p>
+        <div class="toplink"><a href="#" class="h1" title="go to top"><span class="glyphicon glyphicon-arrow-up"></a></div>
+    </div>
+</div>
+
+
+</div>
+
+<footer class="footer">
+        <p class="pull-right"><small>Page generated on Fri, 21 Jun 2019 12:49:41 +0000</small></p>
+    Powered by <a href="http://www.yiiframework.com/" rel="external">Yii Framework</a></footer>
+
+<script>jQuery(function ($) {
+    var shiftWindow = function () { scrollBy(0, -50) };
+    if (location.hash) setTimeout(shiftWindow, 1);
+    window.addEventListener("hashchange", shiftWindow);
+var element = document.createElement("script");
+element.src = "./jssearch.index.js";
+document.body.appendChild(element);
+
+var searchBox = $('#searchbox');
+
+// search when typing in search field
+searchBox.on("keyup", function(event) {
+    var query = $(this).val();
+
+    if (query == '' || event.which == 27) {
+        $('#search-resultbox').hide();
+        return;
+    } else if (event.which == 13) {
+        var selectedLink = $('#search-resultbox a.selected');
+        if (selectedLink.length != 0) {
+            document.location = selectedLink.attr('href');
+            return;
+        }
+    } else if (event.which == 38 || event.which == 40) {
+        $('#search-resultbox').show();
+
+        var selected = $('#search-resultbox a.selected');
+        if (selected.length == 0) {
+            $('#search-results').find('a').first().addClass('selected');
+        } else {
+            var next;
+            if (event.which == 40) {
+                next = selected.parent().next().find('a').first();
+            } else {
+                next = selected.parent().prev().find('a').first();
+            }
+            if (next.length != 0) {
+                var resultbox = $('#search-results');
+                var position = next.position();
+
+//              TODO scrolling is buggy and jumps around
+//                resultbox.scrollTop(Math.floor(position.top));
+//                console.log(position.top);
+
+                selected.removeClass('selected');
+                next.addClass('selected');
+            }
+        }
+
+        return;
+    }
+    $('#search-resultbox').show();
+    $('#search-results').html('<li><span class="no-results">No results</span></li>');
+
+    var result = jssearch.search(query);
+
+    if (result.length > 0) {
+        var i = 0;
+        var resHtml = '';
+
+        for (var key in result) {
+            if (i++ > 20) {
+                break;
+            }
+            resHtml = resHtml +
+            '<li><a href="' + result[key].file.u.substr(3) +'"><span class="title">' + result[key].file.t + '</span>' +
+            '<span class="description">' + result[key].file.d + '</span></a></li>';
+        }
+        $('#search-results').html(resHtml);
+    }
+});
+
+// hide the search results on ESC
+$(document).on("keyup", function(event) { if (event.which == 27) { $('#search-resultbox').hide(); } });
+// hide search results on click to document
+$(document).bind('click', function (e) { $('#search-resultbox').hide(); });
+// except the following:
+searchBox.bind('click', function(e) { e.stopPropagation(); });
+$('#search-resultbox').bind('click', function(e) { e.stopPropagation(); });
+
+});</script></body>
+</html>

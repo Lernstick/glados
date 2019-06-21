@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="language" content="en" />
+        <link href="./assets/1cf5ba7/css/bootstrap.css" rel="stylesheet">
+<link href="./assets/be3e053e/solarized_light.css" rel="stylesheet">
+<link href="./assets/1f2e89dd/style.css" rel="stylesheet">
+<script src="./assets/8261f971/jquery.js"></script>
+<script src="./assets/1cf5ba7/js/bootstrap.js"></script>
+<script src="./assets/ae8b5077/jssearch.js"></script>    <title>Softwareupdate on Debian - Update and Upgrade - GLaDOS Documentation</title>
+</head>
+<body>
+
+<div class="wrap">
+    <nav id="w198" class="navbar-inverse navbar-fixed-top navbar"><div class="navbar-header"><button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#w198-collapse"><span class="sr-only">Toggle navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span></button><a class="navbar-brand" href="./index.html">GLaDOS Documentation</a></div><div id="w198-collapse" class="collapse navbar-collapse"><ul id="w199" class="navbar-nav nav"><li><a href="api/index.html">Class reference</a></li>
+<li><a href="./README.html">Guide</a></li></ul><div class="navbar-form navbar-left" role="search">
+  <div class="form-group">
+    <input id="searchbox" type="text" class="form-control" placeholder="Search">
+  </div>
+</div>
+</div></nav>
+    <div id="search-resultbox" style="display: none;" class="modal-content">
+        <ul id="search-results">
+        </ul>
+    </div>
+
+    
+<div class="row">
+    <div class="col-md-2">
+                <div id="navigation" class="list-group"><a class="list-group-item" href="#navigation-192" data-toggle="collapse" data-parent="#navigation">Howtos and Manuals <b class="caret"></b></a><div id="navigation-192" class="submenu panel-collapse collapse"><a class="list-group-item" href="./create-exam.html">Create an exam</a>
+<a class="list-group-item" href="./remote-backup-path.html">Remote Backup Path</a>
+<a class="list-group-item" href="./create-zip-exam-file.html">Create a zip-file as exam file</a>
+<a class="list-group-item" href="./create-squashfs-exam-file.html">Create a squashfs-filesystem as exam file</a>
+<a class="list-group-item" href="./exam-view.html">The exam view</a>
+<a class="list-group-item" href="./create-single-ticket.html">Create a single ticket</a>
+<a class="list-group-item" href="./create-multiple-tickets.html">Create multiple tickets</a>
+<a class="list-group-item" href="./ticket-view.html">The ticket view </a>
+<a class="list-group-item" href="./ticket-states.html">Ticket states</a>
+<a class="list-group-item" href="./take-exam.html">Taking an Exam</a>
+<a class="list-group-item" href="./generate-results.html">Generate results</a>
+<a class="list-group-item" href="./correct-exams.html">Correct the exams</a>
+<a class="list-group-item" href="./submit-results.html">Submit results back to the student</a>
+<a class="list-group-item" href="./get-exam-result.html">Get the exam result as a student</a></div>
+<a class="list-group-item" href="#navigation-193" data-toggle="collapse" data-parent="#navigation">Troubleshooting <b class="caret"></b></a><div id="navigation-193" class="submenu panel-collapse collapse"><a class="list-group-item" href="./client-crash.html">Client crashes during exam</a>
+<a class="list-group-item" href="./restore-specific-file.html">Restore a specific file</a></div>
+<a class="list-group-item" href="#navigation-194" data-toggle="collapse" data-parent="#navigation">Examples <b class="caret"></b></a><div id="navigation-194" class="submenu panel-collapse collapse"><a class="list-group-item" href="./example-exam-essay.html">Example exam: Essay</a></div>
+<a class="list-group-item" href="#navigation-195" data-toggle="collapse" data-parent="#navigation">Installation <b class="caret"></b></a><div id="navigation-195" class="submenu panel-collapse collapse"><a class="list-group-item" href="./manual-install.html">Manual Installation</a>
+<a class="list-group-item" href="./deb-install.html">Automatic Installation</a></div>
+<a class="list-group-item active" href="#navigation-196" data-toggle="collapse" data-parent="#navigation">Update and Upgrade <b class="caret"></b></a><div id="navigation-196" class="submenu panel-collapse collapse in"><a class="list-group-item active" href="./deb-update.html">Softwareupdate on Debian</a>
+<a class="list-group-item" href="./deb-8to9-upgrade.html">Upgrade from Debian 8 to 9</a></div>
+<a class="list-group-item" href="#navigation-197" data-toggle="collapse" data-parent="#navigation">Configuration <b class="caret"></b></a><div id="navigation-197" class="submenu panel-collapse collapse"><a class="list-group-item" href="./config-files.html">Glados config files</a>
+<a class="list-group-item" href="./client-config.html">Exam client configuration</a>
+<a class="list-group-item" href="./network-config.html">Network configuration</a></div></div>    </div>
+    <div class="col-md-9 guide-content" role="main">
+        <h2>Softwareupdate on Debian <span id="softwareupdate-on-debian"></span><a href="#softwareupdate-on-debian" class="hashlink">&para;</a></h2><p>This guide describes how to update GLaDOS on a Debian server using the deb-packages.</p>
+<blockquote><p>If you plan to update GLaDOS version <code>&lt;=1.0.4</code> on a Debian 8 server, please notice that GLaDOS version <code>1.0.5</code> and onwards will <strong>not support Debian 8 anymore</strong>. Please consider an upgrade of Debian 8 to Debian 9 following this <a href="deb-8to9-upgrade.html">Guide</a>.</p>
+</blockquote>
+<hr />
+<h3>Updating GLaDOS <span id="updating-glados"></span><a href="#updating-glados" class="hashlink">&para;</a></h3><p>To update GLaDOS, simply download the desired release version on <a href="https://github.com/imedias/glados/releases">GitHub</a>. Download both <code>glados_&lt;glados_version&gt;-deb9_all.deb</code> and <code>yii2-glados_&lt;yii_version&gt;_all.deb</code> to your server.</p>
+<p>Install the newest version by executing (inside the directory of the downloaded files)</p>
+<pre><code class="hljs twig"><span class="xml">apt install ./yii2-glados_<span class="hljs-tag">&lt;<span class="hljs-title">yii_version</span>&gt;</span>_all.deb ./glados_<span class="hljs-tag">&lt;<span class="hljs-title">glados_version</span>&gt;</span>-deb9_all.deb
+</span></code></pre>
+<p>During the update you will be asked some questions:</p>
+<ul>
+<li><em>Upgrade database for glados with dbconfig-common?</em>: <code>yes</code></li>
+</ul>
+<p>Your existing installation will be updated and all needed dependencies are automatically installed.</p>
+        <div class="toplink"><a href="#" class="h1" title="go to top"><span class="glyphicon glyphicon-arrow-up"></a></div>
+    </div>
+</div>
+
+
+</div>
+
+<footer class="footer">
+        <p class="pull-right"><small>Page generated on Fri, 21 Jun 2019 12:49:41 +0000</small></p>
+    Powered by <a href="http://www.yiiframework.com/" rel="external">Yii Framework</a></footer>
+
+<script>jQuery(function ($) {
+    var shiftWindow = function () { scrollBy(0, -50) };
+    if (location.hash) setTimeout(shiftWindow, 1);
+    window.addEventListener("hashchange", shiftWindow);
+var element = document.createElement("script");
+element.src = "./jssearch.index.js";
+document.body.appendChild(element);
+
+var searchBox = $('#searchbox');
+
+// search when typing in search field
+searchBox.on("keyup", function(event) {
+    var query = $(this).val();
+
+    if (query == '' || event.which == 27) {
+        $('#search-resultbox').hide();
+        return;
+    } else if (event.which == 13) {
+        var selectedLink = $('#search-resultbox a.selected');
+        if (selectedLink.length != 0) {
+            document.location = selectedLink.attr('href');
+            return;
+        }
+    } else if (event.which == 38 || event.which == 40) {
+        $('#search-resultbox').show();
+
+        var selected = $('#search-resultbox a.selected');
+        if (selected.length == 0) {
+            $('#search-results').find('a').first().addClass('selected');
+        } else {
+            var next;
+            if (event.which == 40) {
+                next = selected.parent().next().find('a').first();
+            } else {
+                next = selected.parent().prev().find('a').first();
+            }
+            if (next.length != 0) {
+                var resultbox = $('#search-results');
+                var position = next.position();
+
+//              TODO scrolling is buggy and jumps around
+//                resultbox.scrollTop(Math.floor(position.top));
+//                console.log(position.top);
+
+                selected.removeClass('selected');
+                next.addClass('selected');
+            }
+        }
+
+        return;
+    }
+    $('#search-resultbox').show();
+    $('#search-results').html('<li><span class="no-results">No results</span></li>');
+
+    var result = jssearch.search(query);
+
+    if (result.length > 0) {
+        var i = 0;
+        var resHtml = '';
+
+        for (var key in result) {
+            if (i++ > 20) {
+                break;
+            }
+            resHtml = resHtml +
+            '<li><a href="' + result[key].file.u.substr(3) +'"><span class="title">' + result[key].file.t + '</span>' +
+            '<span class="description">' + result[key].file.d + '</span></a></li>';
+        }
+        $('#search-results').html(resHtml);
+    }
+});
+
+// hide the search results on ESC
+$(document).on("keyup", function(event) { if (event.which == 27) { $('#search-resultbox').hide(); } });
+// hide search results on click to document
+$(document).bind('click', function (e) { $('#search-resultbox').hide(); });
+// except the following:
+searchBox.bind('click', function(e) { e.stopPropagation(); });
+$('#search-resultbox').bind('click', function(e) { e.stopPropagation(); });
+
+});</script></body>
+</html>
