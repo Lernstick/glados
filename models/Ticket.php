@@ -184,8 +184,8 @@ class Ticket extends Base
     /**
      * Checks if attributes have changed
      * 
-     * @param array $attributes - a list of attributes to check
-     * @return bool
+     * @param array $attributes A list of attributes to check
+     * @return bool Whether the attributes have changed or not
      */
     public function attributesChanged($attributes)
     {
@@ -388,9 +388,9 @@ class Ticket extends Base
     }
 
     /**
-     * Getter for the start time
+     * Getter for the start time.
      * 
-     * @return integer 
+     * @return integer the start time
      */
     public function getStartTime()
     {
@@ -398,9 +398,9 @@ class Ticket extends Base
     }
 
     /**
-     * Setter for the start time
+     * Setter for the start time.
      *
-     * @param integer $value - the start time
+     * @param integer $value the start time
      * @return void
      */
     public function setStartTime($value)
@@ -423,7 +423,8 @@ class Ticket extends Base
     /**
      * Mapping of the different states and the color classes
      *
-     * @return array
+     * @return array Array whose keys are the states and values are strings
+     * for the css class.
      */
     public function getClassMap()
     {
@@ -438,7 +439,7 @@ class Ticket extends Base
     /**
      * Just returns validity of the ticket.
      *
-     * @return bool
+     * @return bool validity of the ticket
      */
     public function getValid(){
         if($this->state == self::STATE_OPEN || $this->state == self::STATE_RUNNING){
@@ -448,54 +449,57 @@ class Ticket extends Base
     }
 
     /**
-     * Determine whether the ticket is abandoned or not. To be abandoned the ticket must satisfy all
-     * the following:
+     * Determine whether the ticket is abandoned or not.
+     * To be abandoned the ticket must satisfy all the following:
      * 
-     *  - be in the RUNNING/CLOSED or SUBMITTED state
+     *  - be in the [[Ticket::STATE_RUNNING]], [[Ticket::STATE_CLOSED]] or [[Ticket::STATE_SUBMITTED]] state
      *  - an IP address must be set
-     *  - a backup_interval > 0 must be set
+     *  - a `backup_interval` > 0 must be set
      *  - no last backup existing
      *  - if the computed abandon time is smaller than the no successfull backup time
      * 
      * Notes:
-     *  1. the "computed abandon time" (cat) is calculated according to the following table:
-     *      etl    ttl    at     cat
-     *      null   null   null   10800
-     *      null   null   >0     abs(at)
-     *      null   >0     null   10800
-     *      null   >0     >0     abs(at)
-     *      null   >0     null   ttl
-     *      null   >0     >0     ttl
-     *      0      null   null   10800
-     *      0      null   >0     abs(at)
-     *      0      0      null   10800
-     *      0      0      >0     abs(at)
-     *      0      >0     null   ttl
-     *      0      >0     >0     ttl
-     *      >0     null   null   etl
-     *      >0     null   >0     etl
-     *      >0     0      null   etl
-     *      >0     0      >0     etl
-     *      >0     >0     null   ttl
-     *      >0     >0     >0     ttl
-     *
-     *      where etl:   time limit from the exam
-     *            ttl:   time limit from the ticket
-     *            at:    abandon time from the configuration
-     *            abs(): the absolute value function
-     *
-     *  2. the "no (successfull) backup time" (nbt) is calculated according to the following table:
-     *      blt    bl     st     nbt
-     *      null   null   set    now-st
-     *      null   set    set    now-bl
-     *      set    null   set    blt-st
-     *      set    set    set    blt-bl
+     *  * the "computed abandon time" (cat) is calculated according to the following table:
      * 
-     *      where blt:   last backup try time
-     *            bl:    last successfull backup time
-     *            st:    ticket start time
+     *         etl    ttl    at     cat
+     *         null   null   null   10800
+     *         null   null   >0     abs(at)
+     *         null   >0     null   10800
+     *         null   >0     >0     abs(at)
+     *         null   >0     null   ttl
+     *         null   >0     >0     ttl
+     *         0      null   null   10800
+     *         0      null   >0     abs(at)
+     *         0      0      null   10800
+     *         0      0      >0     abs(at)
+     *         0      >0     null   ttl
+     *         0      >0     >0     ttl
+     *         >0     null   null   etl
+     *         >0     null   >0     etl
+     *         >0     0      null   etl
+     *         >0     0      >0     etl
+     *         >0     >0     null   ttl
+     *         >0     >0     >0     ttl
+     * 
      *
-     * @return bool
+     *  * the "no (successfull) backup time" (nbt) is calculated according to the following table:
+     *
+     *         blt    bl     st     nbt
+     *         null   null   set    now-st
+     *         null   set    set    now-bl
+     *         set    null   set    blt-st
+     *         set    set    set    blt-bl
+     * 
+     *   where:
+     *    * etl:   time limit from the exam
+     *    * ttl:   time limit from the ticket
+     *    * at:    abandon time from the configuration
+     *    * abs(): the absolute value function
+     *    * blt:   last backup try time
+     *    * bl:    last successfull backup time
+     *    * st:    ticket start time
+     *
+     * @return bool Whether the ticket is abandoned or not
      */
     public function getAbandoned() {
 
@@ -529,7 +533,7 @@ class Ticket extends Base
     /**
      * Determine whether the ticket's last backup has failed over time
      *
-     * @return bool
+     * @return bool Whether the ticket's last backup has failed over time
      */
     public function getLastBackupFailed ()
     {
@@ -546,7 +550,7 @@ class Ticket extends Base
     /**
      * Returns if there is a backup
      *
-     * @return bool
+     * @return bool Whether there is a backup
      */
     public function getBackup(){
         $backupPath = \Yii::$app->params['backupPath'] . '/' . $this->token . '/' . 'rdiff-backup-data';        
@@ -584,9 +588,7 @@ class Ticket extends Base
     /**
      * Calulates the time the ticket will be valid as DateInterval.
      *
-     * @return DateInterval|bool - Dateinterval object,
-     *                             false, if not valid,
-     *                             true, if it cannot expire
+     * @return DateInterval|bool Dateinterval object, false if not valid, true if it cannot expire
      */
     public function getValidTime(){
         if($this->state == self::STATE_OPEN || $this->state == self::STATE_RUNNING){
@@ -611,7 +613,7 @@ class Ticket extends Base
     }
 
     /**
-     * Returns the duration of the test
+     * Returns the duration of the test as a DateInterval object.
      *
      * @return DateInterval object|null
      */
@@ -623,7 +625,7 @@ class Ticket extends Base
     }
 
     /**
-     * Returns the duration in seconds
+     * Returns the duration in seconds.
      *
      * @return int The amount of seconds
      */
@@ -678,11 +680,11 @@ class Ticket extends Base
     /**
      * Runs a command in the shell of the system.
      * 
-     * @param string $cmd - the command to run
-     * @param string $lc_all - the value of the LC_ALL environment variable
-     * @param integer $timeout - the SSH connection timeout
-     * @return array - the first element contains the output (stdout and stderr),
-     *                 the second element contains the exit code of the command
+     * @param string $cmd the command to run
+     * @param string $lc_all the value of the `LC_ALL` environment variable
+     * @param integer $timeout the SSH connection timeout
+     * @return array the first element contains the output (stdout and stderr),
+     * the second element contains the exit code of the command
      */
     public function runCommand($cmd, $lc_all = "C", $timeout = 30)
     {
@@ -711,7 +713,7 @@ class Ticket extends Base
     /**
      * Returns all backups associated to the ticket
      *
-     * @param string $attribute - the attribute
+     * @param string $attribute the attribute
      * @param array $params
      * @return void
      */

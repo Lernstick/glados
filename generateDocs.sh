@@ -19,7 +19,7 @@ rm -R ${GLADOS_PATH}/web/docs/*
 # generate the api and guide documentation
 cd $APIDOC_PATH
 ./apidoc api   "$GLADOS_PATH"        "${GLADOS_PATH}/web/docs/api" --guide=../    --guidePrefix= --interactive=0 --page-title="GLaDOS Documentation"
-./apidoc guide "$GLADOS_PATH/howtos" "${GLADOS_PATH}/web/docs"  --apiDocs=api --guidePrefix= --interactive=0 --page-title="GLaDOS Documentation"
+./apidoc guide "$GLADOS_PATH/howtos" "${GLADOS_PATH}/web/docs"  --apiDocs=api --guidePrefix= --interactive=0 --page-title="GLaDOS Guide"
 
 # repeat those lines for more languages (de)
 # ./apidoc guide "$GLADOS_PATH/howtos/de" "${GLADOS_PATH}/web/docs/de"  --apiDocs=../api --guidePrefix= --interactive=0 --page-title="GLaDOS Dokumentation"

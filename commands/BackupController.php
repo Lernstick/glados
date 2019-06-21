@@ -453,9 +453,9 @@ class BackupController extends DaemonController implements DaemonInterface
     }
 
     /**
-     * Returns the query for a ticket which is not abandoned
+     * Returns the query for a ticket which is not abandoned.
      *
-     * @see models/Ticket.php: function getAbandoned()
+     * @see Ticket::getAbandoned()
      * 
      * @return yii\db\Query
      */

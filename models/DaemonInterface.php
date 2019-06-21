@@ -2,11 +2,17 @@
 
 namespace app\models;
 
+/**
+ * DaemonInterface
+ * 
+ * DaemonInterface is the interface that should be implemented by classes who support
+ * looping trough items and then locking them before processing.
+ */
 interface DaemonInterface
 {
 
     /**
-     * Finds the next to be processed item.
+     * Finds the next item to be processed.
      *
      * @return object|null the item object that has to be processed next or null if no next
      * object is in the pipeline
@@ -21,7 +27,7 @@ interface DaemonInterface
     public function processItem($item);
 
     /**
-     * Locks an item.
+     * Locks an item for processing.
      *
      * @param object $item the item which should be locked for processing
      * @return bool whether locking was successful or not
@@ -29,7 +35,7 @@ interface DaemonInterface
     public function lockItem($item);
 
     /**
-     * Unlocks an item.
+     * Unlocks an item after processing.
      *
      * @param object $item the item which should be unlocked for processing
      * @return bool whether locking was successful or not
