@@ -19,7 +19,7 @@ Once you are done, create a new zip-file with the above contents. It then should
 
 Start the `Submit results` process now. Click `Actions->Submit results` in the navigation.
 
-## Step 1
+### Step 1
 
 In Step 1, upload the zip-file you created just now.
 
@@ -27,7 +27,7 @@ After the submitting process, the student will have access to the result as a zi
 
 Click `Next step`.
 
-## Step 2
+### Step 2
 
 You will see a list like the one below.
 
@@ -37,7 +37,7 @@ The uploaded zip-file was scanned and the system found the listed entries in it.
 
 Check the list and then press `Submit all results` to submit all the results in the list.
 
-## Step 3
+### Step 3
 
 The list below shows a short summary on which results could be handed back successfully.
 
