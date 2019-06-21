@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="language" content="en" />
+        <link href="./assets/1cf5ba7/css/bootstrap.css" rel="stylesheet">
+<link href="./assets/be3e053e/solarized_light.css" rel="stylesheet">
+<link href="./assets/1f2e89dd/style.css" rel="stylesheet">
+<script src="./assets/8261f971/jquery.js"></script>
+<script src="./assets/1cf5ba7/js/bootstrap.js"></script>
+<script src="./assets/ae8b5077/jssearch.js"></script>    <title>DaemonController, app\commands\DaemonController - Yii Framework 2.0 API Documentation</title>
+</head>
+<body>
+
+<div class="wrap">
+    <nav id="w19" class="navbar-inverse navbar-fixed-top navbar"><div class="navbar-header"><button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#w19-collapse"><span class="sr-only">Toggle navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span></button><a class="navbar-brand" href="./index.html">Yii Framework 2.0 API Documentation</a></div><div id="w19-collapse" class="collapse navbar-collapse"><ul id="w20" class="navbar-nav nav"><li><a href="./index.html">Class reference</a></li>
+<li><a href="../en/README.html">Guide</a></li></ul><div class="navbar-form navbar-left" role="search">
+  <div class="form-group">
+    <input id="searchbox" type="text" class="form-control" placeholder="Search">
+  </div>
+</div>
+</div></nav>
+    <div id="search-resultbox" style="display: none;" class="modal-content">
+        <ul id="search-results">
+        </ul>
+    </div>
+
+    
+<div class="row">
+    <div class="col-md-3">
+                <div id="navigation" class="list-group"><a class="list-group-item" href="#navigation-14" data-toggle="collapse" data-parent="#navigation">app\assets <b class="caret"></b></a><div id="navigation-14" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-assets-appasset.html">AppAsset</a>
+<a class="list-group-item" href="./app-assets-eventasset.html">EventAsset</a></div>
+<a class="list-group-item active" href="#navigation-15" data-toggle="collapse" data-parent="#navigation">app\commands <b class="caret"></b></a><div id="navigation-15" class="submenu panel-collapse collapse in"><a class="list-group-item" href="./app-commands-analyzecontroller.html">AnalyzeController</a>
+<a class="list-group-item" href="./app-commands-backupcontroller.html">BackupController</a>
+<a class="list-group-item active" href="./app-commands-daemoncontroller.html">DaemonController</a>
+<a class="list-group-item" href="./app-commands-dbcleancontroller.html">DbcleanController</a>
+<a class="list-group-item" href="./app-commands-downloadcontroller.html">DownloadController</a>
+<a class="list-group-item" href="./app-commands-rbaccontroller.html">RbacController</a>
+<a class="list-group-item" href="./app-commands-restorecontroller.html">RestoreController</a>
+<a class="list-group-item" href="./app-commands-unlockcontroller.html">UnlockController</a></div>
+<a class="list-group-item" href="#navigation-16" data-toggle="collapse" data-parent="#navigation">app\components <b class="caret"></b></a><div id="navigation-16" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-components-accessrule.html">AccessRule</a>
+<a class="list-group-item" href="./app-components-activeeventfield.html">ActiveEventField</a>
+<a class="list-group-item" href="./app-components-activeeventfieldasset.html">ActiveEventFieldAsset</a>
+<a class="list-group-item" href="./app-components-editable.html">Editable</a>
+<a class="list-group-item" href="./app-components-file.html">File</a>
+<a class="list-group-item" href="./app-components-outputevent.html">OutputEvent</a>
+<a class="list-group-item" href="./app-components-shellcommand.html">ShellCommand</a>
+<a class="list-group-item" href="./app-components-squashfs.html">Squashfs</a>
+<a class="list-group-item" href="./app-components-zip.html">Zip</a></div>
+<a class="list-group-item" href="#navigation-17" data-toggle="collapse" data-parent="#navigation">app\controllers <b class="caret"></b></a><div id="navigation-17" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-controllers-activitycontroller.html">ActivityController</a>
+<a class="list-group-item" href="./app-controllers-backupcontroller.html">BackupController</a>
+<a class="list-group-item" href="./app-controllers-configcontroller.html">ConfigController</a>
+<a class="list-group-item" href="./app-controllers-daemoncontroller.html">DaemonController</a>
+<a class="list-group-item" href="./app-controllers-eventcontroller.html">EventController</a>
+<a class="list-group-item" href="./app-controllers-examcontroller.html">ExamController</a>
+<a class="list-group-item" href="./app-controllers-howtocontroller.html">HowtoController</a>
+<a class="list-group-item" href="./app-controllers-restorecontroller.html">RestoreController</a>
+<a class="list-group-item" href="./app-controllers-resultcontroller.html">ResultController</a>
+<a class="list-group-item" href="./app-controllers-screenshotcontroller.html">ScreenshotController</a>
+<a class="list-group-item" href="./app-controllers-sitecontroller.html">SiteController</a>
+<a class="list-group-item" href="./app-controllers-ticketcontroller.html">TicketController</a>
+<a class="list-group-item" href="./app-controllers-usercontroller.html">UserController</a></div>
+<a class="list-group-item" href="#navigation-18" data-toggle="collapse" data-parent="#navigation">app\models <b class="caret"></b></a><div id="navigation-18" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-models-activity.html">Activity</a>
+<a class="list-group-item" href="./app-models-activityquery.html">ActivityQuery</a>
+<a class="list-group-item" href="./app-models-activitysearch.html">ActivitySearch</a>
+<a class="list-group-item" href="./app-models-authassignment.html">AuthAssignment</a>
+<a class="list-group-item" href="./app-models-authitem.html">AuthItem</a>
+<a class="list-group-item" href="./app-models-backup.html">Backup</a>
+<a class="list-group-item" href="./app-models-backupsearch.html">BackupSearch</a>
+<a class="list-group-item" href="./app-models-base.html">Base</a>
+<a class="list-group-item" href="./app-models-config.html">Config</a>
+<a class="list-group-item" href="./app-models-daemon.html">Daemon</a>
+<a class="list-group-item" href="./app-models-daemoninterface.html">DaemonInterface</a>
+<a class="list-group-item" href="./app-models-daemonsearch.html">DaemonSearch</a>
+<a class="list-group-item" href="./app-models-eventitem.html">EventItem</a>
+<a class="list-group-item" href="./app-models-eventstream.html">EventStream</a>
+<a class="list-group-item" href="./app-models-exam.html">Exam</a>
+<a class="list-group-item" href="./app-models-examquery.html">ExamQuery</a>
+<a class="list-group-item" href="./app-models-examsearch.html">ExamSearch</a>
+<a class="list-group-item" href="./app-models-howto.html">Howto</a>
+<a class="list-group-item" href="./app-models-howtosearch.html">HowtoSearch</a>
+<a class="list-group-item" href="./app-models-loginform.html">LoginForm</a>
+<a class="list-group-item" href="./app-models-rdifffilesystem.html">RdiffFileSystem</a>
+<a class="list-group-item" href="./app-models-restore.html">Restore</a>
+<a class="list-group-item" href="./app-models-restoresearch.html">RestoreSearch</a>
+<a class="list-group-item" href="./app-models-result.html">Result</a>
+<a class="list-group-item" href="./app-models-screenshot.html">Screenshot</a>
+<a class="list-group-item" href="./app-models-screenshotsearch.html">ScreenshotSearch</a>
+<a class="list-group-item" href="./app-models-stats.html">Stats</a>
+<a class="list-group-item" href="./app-models-ticket.html">Ticket</a>
+<a class="list-group-item" href="./app-models-ticketquery.html">TicketQuery</a>
+<a class="list-group-item" href="./app-models-ticketsearch.html">TicketSearch</a>
+<a class="list-group-item" href="./app-models-user.html">User</a>
+<a class="list-group-item" href="./app-models-usersearch.html">UserSearch</a></div></div>    </div>
+    <div class="col-md-9 api-content" role="main">
+        <h1>Class app\commands\DaemonController</h1>
+<div class="top-nav">
+    <a href="index.html">All Classes</a>
+            | <a href="#properties">Properties</a>
+                | <a href="#methods">Methods</a>
+            </div>
+
+<table class="summaryTable docClass table table-bordered">
+    <colgroup>
+        <col class="col-name" />
+        <col class="col-value" />
+    </colgroup>
+            <tr><th>Inheritance</th><td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a> &raquo;
+yii\console\Controller</td></tr>
+                            <tr><th>Subclasses</th><td><a href="app-commands-analyzecontroller.html">app\commands\AnalyzeController</a>, <a href="app-commands-backupcontroller.html">app\commands\BackupController</a>, <a href="app-commands-dbcleancontroller.html">app\commands\DbcleanController</a>, <a href="app-commands-downloadcontroller.html">app\commands\DownloadController</a>, <a href="app-commands-restorecontroller.html">app\commands\RestoreController</a>, <a href="app-commands-unlockcontroller.html">app\commands\UnlockController</a></td></tr>
+                        </table>
+
+<div class="class-description">
+    <p><strong>Daemon base controller</strong></p>
+    
+    </div>
+
+<a id="properties"></a>
+
+<div class="summary doc-property">
+<h2>Public Properties</h2>
+
+<p><a href="#" class="toggle">Hide inherited properties</a></p>
+
+<table class="summary-table table table-striped table-bordered table-hover">
+<colgroup>
+    <col class="col-property" />
+    <col class="col-type" />
+    <col class="col-description" />
+    <col class="col-defined" />
+</colgroup>
+<tr>
+  <th>Property</th><th>Type</th><th>Description</th><th>Defined By</th>
+</tr>
+        <tr id="$_pidfile">
+        <td><a href="app-commands-daemoncontroller.html#$_pidfile-detail">$_pidfile</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Path to the file which is used to determine that the process stopped/started</td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+            <tr id="$daemon">
+        <td><a href="app-commands-daemoncontroller.html#$daemon-detail">$daemon</a></td>
+        <td><a href="app-models-daemon.html">app\models\Daemon</a></td>
+        <td>The daemon instance for db updates</td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+            <tr id="$daemonInfo">
+        <td><a href="app-commands-daemoncontroller.html#$daemonInfo-detail">$daemonInfo</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+            <tr id="$defaultAction">
+        <td><a href="app-commands-daemoncontroller.html#$defaultAction-detail">$defaultAction</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+            <tr id="$errorLogFile">
+        <td><a href="app-commands-daemoncontroller.html#$errorLogFile-detail">$errorLogFile</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+            <tr id="$gid">
+        <td><a href="app-commands-daemoncontroller.html#$gid-detail">$gid</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+            <tr id="$jobLastRun">
+        <td><a href="app-commands-daemoncontroller.html#$jobLastRun-detail">$jobLastRun</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>An array holding the timestamp of the last invocation of a job in
+<a href="app-commands-daemoncontroller.html#$joblist-detail">$joblist</a>.</td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+            <tr id="$joblist">
+        <td><a href="app-commands-daemoncontroller.html#$joblist-detail">$joblist</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>List of controllers and actions to work trough in one iteration.</td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+                <tr id="$logFile">
+        <td><a href="app-commands-daemoncontroller.html#$logFile-detail">$logFile</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+            <tr id="$logFileIsWritable">
+        <td><a href="app-commands-daemoncontroller.html#$logFileIsWritable-detail">$logFileIsWritable</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+                <tr id="$uid">
+        <td><a href="app-commands-daemoncontroller.html#$uid-detail">$uid</a></td>
+        <td><a href="http://www.php.net/language.types.integer">integer</a></td>
+        <td>The uid and gid under which the script should be executed.</td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+    </table>
+</div>
+
+<div class="summary doc-property">
+<h2>Protected Properties</h2>
+
+<p><a href="#" class="toggle">Hide inherited properties</a></p>
+
+<table class="summary-table table table-striped table-bordered table-hover">
+<colgroup>
+    <col class="col-property" />
+    <col class="col-type" />
+    <col class="col-description" />
+    <col class="col-defined" />
+</colgroup>
+<tr>
+  <th>Property</th><th>Type</th><th>Description</th><th>Defined By</th>
+</tr>
+                                        <tr id="$loadarr">
+        <td><a href="app-commands-daemoncontroller.html#$loadarr-detail">$loadarr</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>Holds 300 values 0 or 1, one value or each second in the last
+300 seconds.</td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+                    <tr id="$time">
+        <td><a href="app-commands-daemoncontroller.html#$time-detail">$time</a></td>
+        <td><a href="http://www.php.net/language.types.integer">integer</a></td>
+        <td>Holds the timestamp since last invocation of <a href="app-commands-daemoncontroller.html#calcLoad()-detail">calcLoad()</a>.</td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+        </table>
+</div>
+
+<a id="methods"></a>
+
+<div class="summary doc-method">
+<h2>Public Methods</h2>
+
+<p><a href="#" class="toggle">Hide inherited methods</a></p>
+
+<table class="summary-table table table-striped table-bordered table-hover">
+<colgroup>
+    <col class="col-method" />
+    <col class="col-description" />
+    <col class="col-defined" />
+</colgroup>
+<tr>
+  <th>Method</th><th>Description</th><th>Defined By</th>
+</tr>
+        <tr id="actionRun()">
+        <td><a href="app-commands-daemoncontroller.html#actionRun()-detail">actionRun()</a></td>
+        <td>Default action to run the daemon.</td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+            <tr id="actionRunOnce()">
+        <td><a href="app-commands-daemoncontroller.html#actionRunOnce()-detail">actionRunOnce()</a></td>
+        <td>Default action to run just one iteration of the daemon.</td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+                <tr id="cleanupVanished()">
+        <td><a href="app-commands-daemoncontroller.html#cleanupVanished()-detail">cleanupVanished()</a></td>
+        <td>Cleans daemons that are still runnning according to the database, but
+are not (because of a reboot maybe)</td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+            <tr id="doJob()">
+        <td><a href="app-commands-daemoncontroller.html#doJob()-detail">doJob()</a></td>
+        <td></td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+            <tr id="init()">
+        <td><a href="app-commands-daemoncontroller.html#init()-detail">init()</a></td>
+        <td></td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+            <tr id="log()">
+        <td><a href="app-commands-daemoncontroller.html#log()-detail">log()</a></td>
+        <td>Logs a message to the screen and (if set) to the database</td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+            <tr id="logError()">
+        <td><a href="app-commands-daemoncontroller.html#logError()-detail">logError()</a></td>
+        <td></td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+            <tr id="logInfo()">
+        <td><a href="app-commands-daemoncontroller.html#logInfo()-detail">logInfo()</a></td>
+        <td></td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+            <tr id="pingOthers()">
+        <td><a href="app-commands-daemoncontroller.html#pingOthers()-detail">pingOthers()</a></td>
+        <td>Checks whether the other running daemons are still alive and if not,
+tries to stop and the kills them.</td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+            <tr id="reloadConfig()">
+        <td><a href="app-commands-daemoncontroller.html#reloadConfig()-detail">reloadConfig()</a></td>
+        <td>TODO</td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+            <tr id="signalHandler()">
+        <td><a href="app-commands-daemoncontroller.html#signalHandler()-detail">signalHandler()</a></td>
+        <td></td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+            <tr id="start()">
+        <td><a href="app-commands-daemoncontroller.html#start()-detail">start()</a></td>
+        <td>Initiates the daemon.</td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+            <tr id="stop()">
+        <td><a href="app-commands-daemoncontroller.html#stop()-detail">stop()</a></td>
+        <td>Stops the daemon, cleans up and finally exits the shell script</td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+    </table>
+</div>
+
+<div class="summary doc-method">
+<h2>Protected Methods</h2>
+
+<p><a href="#" class="toggle">Hide inherited methods</a></p>
+
+<table class="summary-table table table-striped table-bordered table-hover">
+<colgroup>
+    <col class="col-method" />
+    <col class="col-description" />
+    <col class="col-defined" />
+</colgroup>
+<tr>
+  <th>Method</th><th>Description</th><th>Defined By</th>
+</tr>
+                <tr id="calcLoad()">
+        <td><a href="app-commands-daemoncontroller.html#calcLoad()-detail">calcLoad()</a></td>
+        <td>Update the load calculation in the last [0,5] minutes</td>
+        <td><a href="app-commands-daemoncontroller.html">app\commands\DaemonController</a></td>
+    </tr>
+                                                </table>
+</div>
+
+<a id="events"></a>
+
+<a id="constants"></a>
+
+<h2>Property Details</h2>
+
+<div class="property-doc">
+
+    <div class="detail-header h3" id="$_pidfile-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#$_pidfile-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $_pidfile        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Path to the file which is used to determine that the process stopped/started</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-commands-daemoncontroller.html#$_pidfile-detail">$_pidfile</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">null</span></div>
+
+
+    <div class="detail-header h3" id="$daemon-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#$daemon-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $daemon        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>The daemon instance for db updates</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="app-models-daemon.html">app\models\Daemon</a></span> <a href="app-commands-daemoncontroller.html#$daemon-detail">$daemon</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">null</span></div>
+
+
+    <div class="detail-header h3" id="$daemonInfo-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#$daemonInfo-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $daemonInfo        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"></span> <a href="app-commands-daemoncontroller.html#$daemonInfo-detail">$daemonInfo</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'daemon:0'</span></div>
+
+
+    <div class="detail-header h3" id="$defaultAction-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#$defaultAction-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $defaultAction        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"></span> <a href="app-commands-daemoncontroller.html#$defaultAction-detail">$defaultAction</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'run'</span></div>
+
+
+    <div class="detail-header h3" id="$errorLogFile-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#$errorLogFile-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $errorLogFile        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"></span> <a href="app-commands-daemoncontroller.html#$errorLogFile-detail">$errorLogFile</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">null</span></div>
+
+
+    <div class="detail-header h3" id="$gid-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#$gid-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $gid        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"></span> <a href="app-commands-daemoncontroller.html#$gid-detail">$gid</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">33</span></div>
+
+
+    <div class="detail-header h3" id="$jobLastRun-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#$jobLastRun-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $jobLastRun        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>An array holding the timestamp of the last invocation of a job in
+<a href="app-commands-daemoncontroller.html#$joblist-detail">$joblist</a>. The key corresponds to the key in <a href="app-commands-daemoncontroller.html#$joblist-detail">$joblist</a> and the value is
+the timestamp of the last invocation.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <a href="app-commands-daemoncontroller.html#$jobLastRun-detail">$jobLastRun</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;[]</span></div>
+
+
+    <div class="detail-header h3" id="$joblist-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#$joblist-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $joblist        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>List of controllers and actions to work trough in one iteration.
+The interval (in seconds) describes that the action should be executed only
+after that interval has passed. This is optional.</p>
+<p>The list has the following pattern:
+[</p>
+<pre><code class="hljs php"><span class="hljs-number">0</span> =&gt; [<span class="hljs-string">'controller1'</span>, <span class="hljs-string">'action1'</span>, interval1],
+<span class="hljs-number">1</span> =&gt; [<span class="hljs-string">'controller1'</span>, <span class="hljs-string">'action2'</span>],
+<span class="hljs-number">2</span> =&gt; [<span class="hljs-string">'controller2'</span>, <span class="hljs-string">'action2'</span>, interval3],
+...
+N =&gt; [<span class="hljs-string">'controllerN'</span>, <span class="hljs-string">'actionN'</span>, intervalN]
+</code></pre>
+<p>]</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <a href="app-commands-daemoncontroller.html#$joblist-detail">$joblist</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;[</span><span style="color: #0000BB">0&nbsp;</span><span style="color: #007700">=&gt;&nbsp;[</span><span style="color: #DD0000">'download'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'run-once'</span><span style="color: #007700">],&nbsp;</span><span style="color: #0000BB">1&nbsp;</span><span style="color: #007700">=&gt;&nbsp;[</span><span style="color: #DD0000">'backup'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'run-once'</span><span style="color: #007700">],&nbsp;</span><span style="color: #0000BB">2&nbsp;</span><span style="color: #007700">=&gt;&nbsp;[</span><span style="color: #DD0000">'analyze'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'run-once'</span><span style="color: #007700">],&nbsp;</span><span style="color: #0000BB">3&nbsp;</span><span style="color: #007700">=&gt;&nbsp;[</span><span style="color: #DD0000">'dbclean'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'run-once'</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">300</span><span style="color: #007700">],&nbsp;</span><span style="color: #0000BB">3&nbsp;</span><span style="color: #007700">=&gt;&nbsp;[</span><span style="color: #DD0000">'unlock'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'run-once'</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">120</span><span style="color: #007700">]]</span></div>
+
+
+    <div class="detail-header h3" id="$loadarr-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#$loadarr-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $loadarr        <span class="detail-header-tag small">
+            protected                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Holds 300 values 0 or 1, one value or each second in the last
+300 seconds. 0 means "no load", 1 means "full load" in that second. This is 
+to calculate the load/business of the daemon in the last 5 minutes.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">protected</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <a href="app-commands-daemoncontroller.html#$loadarr-detail">$loadarr</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;[]</span></div>
+
+
+    <div class="detail-header h3" id="$logFile-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#$logFile-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $logFile        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"></span> <a href="app-commands-daemoncontroller.html#$logFile-detail">$logFile</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">null</span></div>
+
+
+    <div class="detail-header h3" id="$logFileIsWritable-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#$logFileIsWritable-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $logFileIsWritable        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"></span> <a href="app-commands-daemoncontroller.html#$logFileIsWritable-detail">$logFileIsWritable</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">true</span></div>
+
+
+    <div class="detail-header h3" id="$time-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#$time-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $time        <span class="detail-header-tag small">
+            protected                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Holds the timestamp since last invocation of <a href="app-commands-daemoncontroller.html#calcLoad()-detail">calcLoad()</a>.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">protected</span> <span class="signature-type"><a href="http://www.php.net/language.types.integer">integer</a></span> <a href="app-commands-daemoncontroller.html#$time-detail">$time</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">null</span></div>
+
+
+    <div class="detail-header h3" id="$uid-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#$uid-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $uid        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>The uid and gid under which the script should be executed.
+defaults to 33, which in debian is the www-data user.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.integer">integer</a></span> <a href="app-commands-daemoncontroller.html#$uid-detail">$uid</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">33</span></div>
+
+</div>
+<h2>Method Details</h2>
+
+<div class="method-doc">
+
+    <div class="detail-header h3" id="actionRun()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#actionRun()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        actionRun()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Default action to run the daemon.</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-commands-daemoncontroller.html#actionRun()-detail">actionRun</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="actionRunOnce()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#actionRunOnce()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        actionRunOnce()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Default action to run just one iteration of the daemon.</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">mixed</span> <strong><a href="app-commands-daemoncontroller.html#actionRunOnce()-detail">actionRunOnce</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col">mixed</td>
+                  <td class="param-desc-col"><p>Returns the return value of <span class="broken-link">\app\commands\doJobOnce()</span>.</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="calcLoad()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#calcLoad()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        calcLoad()
+        <span class="detail-header-tag small">
+            protected                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Update the load calculation in the last [0,5] minutes</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">protected</span> <span class="signature-type">void</span> <strong><a href="app-commands-daemoncontroller.html#calcLoad()-detail">calcLoad</a></strong> ( <span style="color: #0000BB">$value</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$value</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.integer">integer</a></td>
+                  <td class="param-desc-col"><p>Can be 0 or 1:</p>
+<pre><code class="hljs sql">               - 0 means to count no <span class="hljs-operator"><span class="hljs-keyword">load</span> since <span class="hljs-keyword">last</span> invokation
+               - <span class="hljs-number">1</span> means <span class="hljs-keyword">to</span> <span class="hljs-keyword">count</span> <span class="hljs-keyword">full</span> <span class="hljs-keyword">load</span> since <span class="hljs-keyword">last</span> invokation
+</span></code></pre>
+</td>
+                </tr>
+                                                </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="cleanupVanished()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#cleanupVanished()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        cleanupVanished()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Cleans daemons that are still runnning according to the database, but
+are not (because of a reboot maybe)</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-commands-daemoncontroller.html#cleanupVanished()-detail">cleanupVanished</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="doJob()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#doJob()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        doJob()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-commands-daemoncontroller.html#doJob()-detail">doJob</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="init()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#init()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        init()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-commands-daemoncontroller.html#init()-detail">init</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="log()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#log()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        log()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Logs a message to the screen and (if set) to the database</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-commands-daemoncontroller.html#log()-detail">log</a></strong> ( <span style="color: #0000BB">$message</span>, <span style="color: #0000BB">$error&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">false</span>, <span style="color: #0000BB">$toDB&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">false</span>, <span style="color: #0000BB">$toFile&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">true</span>, <span style="color: #0000BB">$toScreen&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">true</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$message</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"><p>The message to log</p>
+</td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$error</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.boolean">boolean</a></td>
+                  <td class="param-desc-col"><p>If true the line will be printed red, and stored in the
+error log file, defaults to false.</p>
+</td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$toDB</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.boolean">boolean</a></td>
+                  <td class="param-desc-col"><p>If true, log the message to the database, defaults to false</p>
+</td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$toFile</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.boolean">boolean</a></td>
+                  <td class="param-desc-col"><p>If true, log the message to the log file, defaults to true</p>
+</td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$toScreen</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.boolean">boolean</a></td>
+                  <td class="param-desc-col"><p>If true, log the message to the standard output, defaults to true</p>
+</td>
+                </tr>
+                                                </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="logError()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#logError()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        logError()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+        <p>See also [[<a href="app-commands-daemoncontroller.html#log()-detail">log()</a>]].</p>    </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-commands-daemoncontroller.html#logError()-detail">logError</a></strong> ( <span style="color: #0000BB">$message</span>, <span style="color: #0000BB">$toDB&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">false</span>, <span style="color: #0000BB">$toFile&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">true</span>, <span style="color: #0000BB">$toScreen&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">true</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$message</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$toDB</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$toFile</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$toScreen</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                                                </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="logInfo()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#logInfo()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        logInfo()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+        <p>See also [[<a href="app-commands-daemoncontroller.html#log()-detail">log()</a>]].</p>    </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-commands-daemoncontroller.html#logInfo()-detail">logInfo</a></strong> ( <span style="color: #0000BB">$message</span>, <span style="color: #0000BB">$toDB&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">false</span>, <span style="color: #0000BB">$toFile&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">true</span>, <span style="color: #0000BB">$toScreen&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">true</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$message</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$toDB</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$toFile</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$toScreen</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                                                </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="pingOthers()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#pingOthers()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        pingOthers()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Checks whether the other running daemons are still alive and if not,
+tries to stop and the kills them.</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-commands-daemoncontroller.html#pingOthers()-detail">pingOthers</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="reloadConfig()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#reloadConfig()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        reloadConfig()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>TODO</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-commands-daemoncontroller.html#reloadConfig()-detail">reloadConfig</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="signalHandler()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#signalHandler()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        signalHandler()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-commands-daemoncontroller.html#signalHandler()-detail">signalHandler</a></strong> ( <span style="color: #0000BB">$sig</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$sig</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                                                </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="start()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#start()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        start()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Initiates the daemon.</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-commands-daemoncontroller.html#start()-detail">start</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="stop()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-commands-daemoncontroller.html#stop()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        stop()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Stops the daemon, cleans up and finally exits the shell script</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-commands-daemoncontroller.html#stop()-detail">stop</a></strong> ( <span style="color: #0000BB">$cause&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">null</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$cause</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                                                </table>
+
+<!--	-->
+</div>
+        </div>
+</div>
+
+<script type="text/javascript">
+    /*<![CDATA[*/
+    $("a.toggle").on('click', function () {
+        var $this = $(this);
+        if ($this.hasClass('properties-hidden')) {
+            $this.text($this.text().replace(/Show/,'Hide'));
+            $this.parents(".summary").find(".inherited").show();
+            $this.removeClass('properties-hidden');
+        } else {
+            $this.text($this.text().replace(/Hide/,'Show'));
+            $this.parents(".summary").find(".inherited").hide();
+            $this.addClass('properties-hidden');
+        }
+
+        return false;
+    });
+    /*
+     $(".sourceCode a.show").toggle(function () {
+     $(this).text($(this).text().replace(/show/,'hide'));
+     $(this).parents(".sourceCode").find("div.code").show();
+     },function () {
+     $(this).text($(this).text().replace(/hide/,'show'));
+     $(this).parents(".sourceCode").find("div.code").hide();
+     });
+     $("a.sourceLink").click(function () {
+     $(this).attr('target','_blank');
+     });
+     */
+    /*]]>*/
+</script>
+
+
+</div>
+
+<footer class="footer">
+        <p class="pull-right"><small>Page generated on Fri, 21 Jun 2019 10:08:05 +0000</small></p>
+    Powered by <a href="http://www.yiiframework.com/" rel="external">Yii Framework</a></footer>
+
+<script>jQuery(function ($) {
+    var shiftWindow = function () { scrollBy(0, -50) };
+    if (location.hash) setTimeout(shiftWindow, 1);
+    window.addEventListener("hashchange", shiftWindow);
+var element = document.createElement("script");
+element.src = "./jssearch.index.js";
+document.body.appendChild(element);
+
+var searchBox = $('#searchbox');
+
+// search when typing in search field
+searchBox.on("keyup", function(event) {
+    var query = $(this).val();
+
+    if (query == '' || event.which == 27) {
+        $('#search-resultbox').hide();
+        return;
+    } else if (event.which == 13) {
+        var selectedLink = $('#search-resultbox a.selected');
+        if (selectedLink.length != 0) {
+            document.location = selectedLink.attr('href');
+            return;
+        }
+    } else if (event.which == 38 || event.which == 40) {
+        $('#search-resultbox').show();
+
+        var selected = $('#search-resultbox a.selected');
+        if (selected.length == 0) {
+            $('#search-results').find('a').first().addClass('selected');
+        } else {
+            var next;
+            if (event.which == 40) {
+                next = selected.parent().next().find('a').first();
+            } else {
+                next = selected.parent().prev().find('a').first();
+            }
+            if (next.length != 0) {
+                var resultbox = $('#search-results');
+                var position = next.position();
+
+//              TODO scrolling is buggy and jumps around
+//                resultbox.scrollTop(Math.floor(position.top));
+//                console.log(position.top);
+
+                selected.removeClass('selected');
+                next.addClass('selected');
+            }
+        }
+
+        return;
+    }
+    $('#search-resultbox').show();
+    $('#search-results').html('<li><span class="no-results">No results</span></li>');
+
+    var result = jssearch.search(query);
+
+    if (result.length > 0) {
+        var i = 0;
+        var resHtml = '';
+
+        for (var key in result) {
+            if (i++ > 20) {
+                break;
+            }
+            resHtml = resHtml +
+            '<li><a href="' + result[key].file.u.substr(3) +'"><span class="title">' + result[key].file.t + '</span>' +
+            '<span class="description">' + result[key].file.d + '</span></a></li>';
+        }
+        $('#search-results').html(resHtml);
+    }
+});
+
+// hide the search results on ESC
+$(document).on("keyup", function(event) { if (event.which == 27) { $('#search-resultbox').hide(); } });
+// hide search results on click to document
+$(document).bind('click', function (e) { $('#search-resultbox').hide(); });
+// except the following:
+searchBox.bind('click', function(e) { e.stopPropagation(); });
+$('#search-resultbox').bind('click', function(e) { e.stopPropagation(); });
+
+});</script></body>
+</html>
