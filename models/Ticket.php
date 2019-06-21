@@ -11,6 +11,7 @@ use yii\base\Event;
 use app\models\Backup;
 use app\models\Restore;
 use app\models\EventItem;
+use yii\behaviors\AttributesBehavior;
 
 /**
  * This is the model class for table "ticket".
@@ -92,11 +93,15 @@ class Ticket extends LiveActiveRecord
         /* generate the token if it's a new record */
         $this->token = $this->isNewRecord ? bin2hex(openssl_random_pseudo_bytes(\Yii::$app->params['tokenLength']/2)) : $this->token;
 
-        $this->backup_interval = $this->isNewRecord ? 300 : $this->backup_interval;
+        // set default values, but only in this context, not in TicketSearch context
+        // this would overwrite values to search
+        if ($this->isNewRecord && get_called_class() == 'app\models\Ticket') {
+            $this->backup_interval = 300;
+            $this->client_state = yiit('ticket', 'Client not seen yet');
+        }
 
         parent::init();
     }
-
 
     /**
      * @inheritdoc
@@ -123,17 +128,23 @@ class Ticket extends LiveActiveRecord
     {
         return [
             'client_state' => [ 'priority' => 1 ],
-            'download_lock',
-            /*'download_progress' => [
+            'download_lock' => [ 'priority' => 0 ],
+            'download_progress' => [
                 'priority' => function ($field, $model) {
                     return round($field*100) == 100 ? 0 : 2;
                 },
-                'data' => [
-                    'download_progress' => function ($field, $model) {
-                        return yii::$app->formatter->format($field, 'percent');
-                    }
-                ],
-            ],*/
+                'data' => function ($field, $model) {
+                    return [
+                        'download_progress' => yii::$app->formatter->format($model->{$field}, 'percent')
+                    ];
+                }
+            ],
+            'backup_state' => [ 'priority' => 2 ],
+            'restore_state' => [ 'priority' => 2 ],
+            'backup_lock' => [ 'priority' => 0 ],
+            'restore_lock' => [ 'priority' => 0 ],
+            'online',
+            'last_backup',
         ];
     }
 
@@ -255,7 +266,7 @@ class Ticket extends LiveActiveRecord
             ]);
             $eventItem->generate();
         }
-        if($this->attributesChanged([ 'download_progress' ])){
+        /*if($this->attributesChanged([ 'download_progress' ])){
             $eventItem = new EventItem([
                 'event' => 'ticket/' . $this->id,
                 'priority' => round($this->download_progress*100) == 100 ? 0 : 2,
@@ -264,7 +275,7 @@ class Ticket extends LiveActiveRecord
                 ],
             ]);
             $eventItem->generate();
-        }
+        }*/
 
         /*if($this->attributesChanged([ 'download_lock' ])){
             $eventItem = new EventItem([
@@ -288,7 +299,7 @@ class Ticket extends LiveActiveRecord
             $eventItem->generate();
         }
 
-        if($this->attributesChanged([ 'backup_state' ])){
+        /*if($this->attributesChanged([ 'backup_state' ])){
             $eventItem = new EventItem([
                 'event' => 'ticket/' . $this->id,
                 'priority' => 2,
@@ -308,12 +319,12 @@ class Ticket extends LiveActiveRecord
                 ],
             ]);
             $eventItem->generate();
-        }
+        }*/
 
-        if($this->attributesChanged([ 'backup_lock' ])){
+        /*if($this->attributesChanged([ 'backup_lock' ])){
             $eventItem = new EventItem([
                 'event' => 'ticket/' . $this->id,
-                'priority' => 2,
+                'priority' => 0,
                 'data' => [
                     'backup_lock' => $this->backup_lock,
                 ],
@@ -324,15 +335,15 @@ class Ticket extends LiveActiveRecord
         if($this->attributesChanged([ 'restore_lock' ])){
             $eventItem = new EventItem([
                 'event' => 'ticket/' . $this->id,
-                'priority' => 2,
+                'priority' => 0,
                 'data' => [
                     'restore_lock' => $this->restore_lock,
                 ],
             ]);
             $eventItem->generate();
-        }
+        }*/
 
-        if($this->attributesChanged([ 'online' ])){
+        /*if($this->attributesChanged([ 'online' ])){
             $eventItem = new EventItem([
                 'event' => 'ticket/' . $this->id,
                 'priority' => 2,
@@ -352,7 +363,7 @@ class Ticket extends LiveActiveRecord
                 ],
             ]);
             $eventItem->generate();
-        }
+        }*/
 
         if($this->attributesChanged([ 'client_state_id', 'client_state_params' ])){
             /*$eventItem = new EventItem([

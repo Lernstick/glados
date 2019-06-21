@@ -80,10 +80,15 @@ class EventStream extends EventItem
      */
     public $sentEvents;
     /**
-     * @var integer maximum number of low priority events which should be sent in one seconds.
-     * Events exceeding this value, will not be sent.
+     * @var integer maximum number of low priority events which should be sent per second.
+     * Events exceeding this value, will not be sent. Set to 0 to enable sending of ALL events
      */
-    public $maxEventsPerSecond = 1;
+    public $maxEventsPerSecond = 0;
+
+    /**
+     * @var array Array holding all id's of events that are sent during this invokation
+     */
+    public $sentIds = [];
 
     public $pathPrefixes;
 
@@ -300,12 +305,12 @@ class EventStream extends EventItem
     /**
      * This function waits on all streams for an event and generates one or multiple event items.
      * 
-     * The first job of this function is to determine if there are event missing. This can happen when the 
+     * The first job of this function is to determine if there are events missing. This can happen when the 
      * client browser restarted the event stream. This will take up to 5 seconds, depending on the connection
-     * quality. In that time, events can occur. Also, if an event is generated at the excat time when an event 
+     * quality. In that time, events can occur. Also, if an event is generated at the exact time when an event 
      * is processed, another event can occur. All events are stored in the database, which is queried for 
      * such lost events. So, if [[_resumeTime]] and [[_lastEvent]] are set, we have to query the db for lost 
-     * events. If not, or the db returns no record, we continue (or start) listening on the streams.
+     * events. If not or the db returns no record, we continue (or start) listening on the streams.
      * 
      * The function then blocks in the call of [[stream_select()]] until an event happend. If that's the case
      * the file now contains the event [[id]] of the db record. This is done by [[EventItem::generate()]]. The
@@ -317,22 +322,20 @@ class EventStream extends EventItem
     public function onEvent(){
         while($this->calcTimeout() > 0){
 
-            //needed by php to determine a connection abort by the user
+            // needed by php to determine a connection abort by the user
             echo '0' . PHP_EOL . PHP_EOL; ob_flush(); flush();
 
             $this->addWatches();
 
             if($this->_resumeTime && isset($this->_lastEvent)){
 
+                // search for lost events
                 $this->events = EventItem::find()
                     ->where(['>', 'generated_at', $this->_lastEvent->generated_at])
                     ->andWhere(['>', 'id', $this->_lastEvent->id])
                     ->orderBy([ 'generated_at' => SORT_ASC ])->all();
 
-                /*$query = EventItem::find()
-                    ->where(['>', 'generated_at', $this->_lastEvent->generated_at])
-                    ->andWhere(['>', 'id', $this->_lastEvent->id]);*/
-
+                // send all lost events that occured while sending other events
                 if(!empty($this->events)){
                     foreach($this->events as $event){
                         $event->sent_at = microtime(true);
@@ -367,42 +370,46 @@ class EventStream extends EventItem
 
                     $events = inotify_read($socket);
 
-                    //file written
+                    // file written
                     if($events[0]['mask'] == IN_CLOSE_WRITE){
 
                         $event = array_search($events[0]['wd'], $this->_fwd);
 
-                        //the event to reload the event list from the database:
+                        // the event to reload the event list from the database:
                         if ($event == 'event/' . $this->uuid) {
                             $this->removeWatches();
                             continue 2;
                         }
 
                         $id = @file_get_contents('/tmp/user/' . $event);
-                        if(is_numeric($id)){
+                        
+                        if (YII_ENV_DEV) {
+                            file_put_contents('/var/log/glados/stram.log', ">".strval($id)."<".PHP_EOL, FILE_APPEND);
+                        }
+                        if (is_numeric($id)) {
 
-                            if (isset($this->_lastEvent)) {
-                                $this->events[0] = EventItem::find()
-                                    ->where(['id' => $id])
-                                    ->andWhere(['>', 'generated_at', $this->_lastEvent->generated_at])
-                                    ->one();
-                            }else{
-                                $this->events[0] = EventItem::find()->where(['id' => $id])->one();
-                            }
+                            $this->events[0] = EventItem::find()->where(['id' => $id])->one();
 
                             if($this->events[0] !== null){
                                 $this->events[0]->sent_at = microtime(true);
                                 $this->events[0]->debug = YII_ENV_DEV ? json_encode($events[0]) : null;
-                                if($this->events[0]->priority == 0 || ($this->sentEvents/(microtime(true) - $this->_startTime)) < $this->maxEventsPerSecond){
+                                if($this->events[0]->priority == 0 || $this->maxEventsPerSecond == 0 || ($this->sentEvents/(microtime(true) - $this->_startTime)) < $this->maxEventsPerSecond){
                                     $this->sentEvents++;
                                     $this->_lastEvent = $this->events[0];
                                     return true;
                                 }else{
+                                    // bail out if $this->maxEventsPerSecond was exceeded 
                                     continue 2;
                                 }
+                            } else {
+                                file_put_contents('/var/log/glados/stram.log', "null!!".PHP_EOL, FILE_APPEND);
                             }
+                        } else {
+                            // restart the loop and reap lost events
+                            continue 2;
                         }
 
+                        // TODO unused block ???
                         $this->removeWatch($events[0]['wd']);
                         $this->events[0] = new EventItem([
                             'event' => 'daemon/*',
@@ -415,14 +422,13 @@ class EventStream extends EventItem
                             'concerns' => ['user' => 'ALL'],
                             'generated_at' => microtime(true),
                         ]);
-
                         $this->sentEvents++;
                         $this->_lastEvent = $this->events[0];
                         return true;
 
 
-                    //new file/folder created
-                    }else if($events[0]['mask'] == IN_CREATE){
+                    // new file/folder created
+                    } else if ($events[0]['mask'] == IN_CREATE) {
                         $event = array_search($events[0]['wd'], $this->_dwd);
 
                         $this->events[0] = new EventItem([
@@ -441,8 +447,8 @@ class EventStream extends EventItem
                         $this->_lastEvent = $this->events[0];
                         return true;
 
-                    //file removed
-                    }else if($events[0]['mask'] == IN_IGNORED){
+                    // file removed
+                    } else if($events[0]['mask'] == IN_IGNORED) {
                         $this->removeWatch($events[0]['wd']);
                         continue 2;
                     }

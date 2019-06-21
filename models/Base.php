@@ -55,8 +55,20 @@ class Base extends \yii\db\ActiveRecord
      */
     public function selectList($attr, $q, $page = 1, $per_page = 10, $id = null, $showQuery = true, $orderBy = null)
     {
+
         $id = is_null($id) ? $attr : $id;
+
         $query = $this->find();
+
+        if ($this->hasMethod('getTranslatedFields') && in_array($attr, $this->getTranslatedFields())) {
+            //nothing
+        } else {
+            $query->addSelect([$id . ' as xxxidxxx', $attr . ' AS xxxattrxxx']);
+                //->distinct();
+            $id = 'xxxidxxx';
+            $attr = 'xxxattrxxx';
+        }
+
 
         $query->joinWith($this->joinTables());
 
@@ -77,7 +89,7 @@ class Base extends \yii\db\ActiveRecord
         }
 
         $out = ['results' => []];
-        if ($showQuery === true && $page == 1) {
+        if ($showQuery === true && $page == 1 && $q != null) {
             $out = ['results' => [
                 0 => ['id' => $q, 'text' => $q == null ? $q : \Yii::t('form', '<i>Search for... </i><b>{query}</b>', ['query' => $q])]
             ]];
