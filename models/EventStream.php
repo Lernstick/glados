@@ -383,9 +383,6 @@ class EventStream extends EventItem
 
                         $id = @file_get_contents('/tmp/user/' . $event);
                         
-                        if (YII_ENV_DEV) {
-                            file_put_contents('/var/log/glados/stram.log', ">".strval($id)."<".PHP_EOL, FILE_APPEND);
-                        }
                         if (is_numeric($id)) {
 
                             $this->events[0] = EventItem::find()->where(['id' => $id])->one();
@@ -401,8 +398,6 @@ class EventStream extends EventItem
                                     // bail out if $this->maxEventsPerSecond was exceeded 
                                     continue 2;
                                 }
-                            } else {
-                                file_put_contents('/var/log/glados/stram.log', "null!!".PHP_EOL, FILE_APPEND);
                             }
                         } else {
                             // restart the loop and reap lost events

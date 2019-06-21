@@ -11,7 +11,6 @@ use yii\base\Event;
 use app\models\Backup;
 use app\models\Restore;
 use app\models\EventItem;
-use yii\behaviors\AttributesBehavior;
 
 /**
  * This is the model class for table "ticket".
