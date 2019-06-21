@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="language" content="en" />
+        <link href="./assets/1cf5ba7/css/bootstrap.css" rel="stylesheet">
+<link href="./assets/be3e053e/solarized_light.css" rel="stylesheet">
+<link href="./assets/1f2e89dd/style.css" rel="stylesheet">
+<script src="./assets/8261f971/jquery.js"></script>
+<script src="./assets/1cf5ba7/js/bootstrap.js"></script>
+<script src="./assets/ae8b5077/jssearch.js"></script>    <title>Create a squashfs-filesystem as exam file - User Manual - The Definitive Guide to Yii 2.0</title>
+</head>
+<body>
+
+<div class="wrap">
+    <nav id="w130" class="navbar-inverse navbar-fixed-top navbar"><div class="navbar-header"><button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#w130-collapse"><span class="sr-only">Toggle navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span></button><a class="navbar-brand" href="./index.html">The Definitive Guide to Yii 2.0</a></div><div id="w130-collapse" class="collapse navbar-collapse"><ul id="w131" class="navbar-nav nav"><li><a href="../api/index.html">Class reference</a></li>
+<li><a href="./README.html">Guide</a></li></ul><div class="navbar-form navbar-left" role="search">
+  <div class="form-group">
+    <input id="searchbox" type="text" class="form-control" placeholder="Search">
+  </div>
+</div>
+</div></nav>
+    <div id="search-resultbox" style="display: none;" class="modal-content">
+        <ul id="search-results">
+        </ul>
+    </div>
+
+    
+<div class="row">
+    <div class="col-md-2">
+                <div id="navigation" class="list-group"><a class="list-group-item active" href="#navigation-128" data-toggle="collapse" data-parent="#navigation">User Manual <b class="caret"></b></a><div id="navigation-128" class="submenu panel-collapse collapse in"><a class="list-group-item" href="./create-exam.html">Create an exam</a>
+<a class="list-group-item" href="./remote-backup-path.html">Remote Backup Path</a>
+<a class="list-group-item" href="./create-zip-exam-file.html">Create a zip-file as exam file</a>
+<a class="list-group-item active" href="./create-squashfs-exam-file.html">Create a squashfs-filesystem as exam file</a>
+<a class="list-group-item" href="./exam-view.html">The exam view</a>
+<a class="list-group-item" href="./create-single-ticket.html">Create a single ticket</a>
+<a class="list-group-item" href="./create-multiple-tickets.html">Create multiple tickets</a>
+<a class="list-group-item" href="./ticket-view.html">The ticket view </a>
+<a class="list-group-item" href="./ticket-states.html">Ticket states</a>
+<a class="list-group-item" href="./take-exam.html">Taking an Exam</a>
+<a class="list-group-item" href="./generate-results.html">Generate results</a>
+<a class="list-group-item" href="./correct-exams.html">Correct the exams</a>
+<a class="list-group-item" href="./submit-results.html">Submit results back to the student</a>
+<a class="list-group-item" href="./get-exam-result.html">Get the exam result as a student</a>
+<a class="list-group-item" href="./client-crash.html">Client crashes during exam</a>
+<a class="list-group-item" href="./restore-specific-file.html">Restore a specific file</a>
+<a class="list-group-item" href="./example-exam-essay.html">Example exam: Essay</a></div>
+<a class="list-group-item" href="#navigation-129" data-toggle="collapse" data-parent="#navigation">Admin Manual <b class="caret"></b></a><div id="navigation-129" class="submenu panel-collapse collapse"><a class="list-group-item" href="./manual-install.html">Manual Installation</a>
+<a class="list-group-item" href="./deb-install.html">Automatic Installation</a>
+<a class="list-group-item" href="./deb-update.html">Softwareupdate on Debian</a>
+<a class="list-group-item" href="./deb-8to9-upgrade.html">Upgrade from Debian 8 to 9</a>
+<a class="list-group-item" href="./config-files.html">Glados config files</a>
+<a class="list-group-item" href="./client-config.html">Exam client configuration</a>
+<a class="list-group-item" href="./network-config.html">Network configuration</a></div></div>    </div>
+    <div class="col-md-9 guide-content" role="main">
+        <h2>Create a squashfs-filesystem as exam file <span id="create-a-squashfs-filesystem-as-exam-file"></span><a href="#create-a-squashfs-filesystem-as-exam-file" class="hashlink">&para;</a></h2><p>You can also create an exam using a squashfs-filesystem. This is useful when your exam has a more complex form than just a few files at some place in the system. All kinds of exam configurations are possible with a squashfs-filesystem.</p>
+<p>To create such an image file, please follow the steps.</p>
+<hr />
+<h3>Step 1 <span id="step-1"></span><a href="#step-1" class="hashlink">&para;</a></h3><p>The first step is to boot <a href="https://www.imedias.ch/themen/lernstick/index.cfm">Lernstick Prüfungsumgebung</a> on your computer from USB. See the following instructions on how to boot your device from USB:</p>
+<ul>
+<li><a href="https://wiki.lernstick.ch/doku.php?id=anleitungen:systemstart-mac">Start from USB-Device (Mac)</a></li>
+<li><a href="https://wiki.lernstick.ch/doku.php?id=anleitungen:systemstart-uefi">Start from USB-Device (Windows 10)</a></li>
+</ul>
+<blockquote><p>Please make sure to choose <code>Datenpartition: lesen und schreiben</code>, before starting the system:</p>
+</blockquote>
+<p><img src="img/grub.png" alt="Bootscreen" /></p>
+<h3>Step 2 <span id="step-2"></span><a href="#step-2" class="hashlink">&para;</a></h3><p>Once the system has started, you can configure your exam. For example:</p>
+<ul>
+<li>install/uninstall specific applications</li>
+<li>preconfigure applications</li>
+<li>carry specific system configurations, which are not covered in the settings of the <code>Actions-&gt;Create Exam</code> wizard (Notice that, settings which are covered in the wizard will override settings you configure in the squashfs-filesystem).</li>
+<li>grant/deny advanced permissions to files and directories</li>
+<li>copy files needed in the exam to their locations</li>
+<li>...</li>
+</ul>
+<h3>Step 3 <span id="step-3"></span><a href="#step-3" class="hashlink">&para;</a></h3><p>When you finished with the setup for your exam, restart your computer.</p>
+<blockquote><p>This time it is important to choose <code>Datenpartition: nur lesen</code> from the start screen.</p>
+</blockquote>
+<h3>Step 4 <span id="step-4"></span><a href="#step-4" class="hashlink">&para;</a></h3><p>Once the system has started again, open the application <code>Speichermedienverwaltung</code>.</p>
+<p><img src="img/speichermedienverwaltung1.png" alt="Speichermedienverwaltung" /></p>
+<p>Choose now <code>Das System in ein DVD-Abbild konvertieren</code>.</p>
+<p><img src="img/speichermedienverwaltung2.png" alt="Speichermedienverwaltung" /></p>
+<p> Check the box <code>nur Datenpartition</code>. You can leave the other options as they are. Press <code>Weiter</code> and the squashfs-filesystem will be generated.</p>
+<p>Once the process has finished, the <code>.squashfs</code> file is then in</p>
+<pre><code class="hljs ">/media/Lernstick-Squashfs/lernstick.squashfs
+</code></pre>
+<blockquote><p>You can also start your own operating system and grab the file from the Exchange partititon.</p>
+</blockquote>
+<p>This is the file, which holds all information you configured in step 2. You can now upload it in the <code>Actions-&gt;Create Exam</code> wizard.</p>
+        <div class="toplink"><a href="#" class="h1" title="go to top"><span class="glyphicon glyphicon-arrow-up"></a></div>
+    </div>
+</div>
+
+
+</div>
+
+<footer class="footer">
+        <p class="pull-right"><small>Page generated on Fri, 21 Jun 2019 10:08:05 +0000</small></p>
+    Powered by <a href="http://www.yiiframework.com/" rel="external">Yii Framework</a></footer>
+
+<script>jQuery(function ($) {
+    var shiftWindow = function () { scrollBy(0, -50) };
+    if (location.hash) setTimeout(shiftWindow, 1);
+    window.addEventListener("hashchange", shiftWindow);
+var element = document.createElement("script");
+element.src = "./jssearch.index.js";
+document.body.appendChild(element);
+
+var searchBox = $('#searchbox');
+
+// search when typing in search field
+searchBox.on("keyup", function(event) {
+    var query = $(this).val();
+
+    if (query == '' || event.which == 27) {
+        $('#search-resultbox').hide();
+        return;
+    } else if (event.which == 13) {
+        var selectedLink = $('#search-resultbox a.selected');
+        if (selectedLink.length != 0) {
+            document.location = selectedLink.attr('href');
+            return;
+        }
+    } else if (event.which == 38 || event.which == 40) {
+        $('#search-resultbox').show();
+
+        var selected = $('#search-resultbox a.selected');
+        if (selected.length == 0) {
+            $('#search-results').find('a').first().addClass('selected');
+        } else {
+            var next;
+            if (event.which == 40) {
+                next = selected.parent().next().find('a').first();
+            } else {
+                next = selected.parent().prev().find('a').first();
+            }
+            if (next.length != 0) {
+                var resultbox = $('#search-results');
+                var position = next.position();
+
+//              TODO scrolling is buggy and jumps around
+//                resultbox.scrollTop(Math.floor(position.top));
+//                console.log(position.top);
+
+                selected.removeClass('selected');
+                next.addClass('selected');
+            }
+        }
+
+        return;
+    }
+    $('#search-resultbox').show();
+    $('#search-results').html('<li><span class="no-results">No results</span></li>');
+
+    var result = jssearch.search(query);
+
+    if (result.length > 0) {
+        var i = 0;
+        var resHtml = '';
+
+        for (var key in result) {
+            if (i++ > 20) {
+                break;
+            }
+            resHtml = resHtml +
+            '<li><a href="' + result[key].file.u.substr(3) +'"><span class="title">' + result[key].file.t + '</span>' +
+            '<span class="description">' + result[key].file.d + '</span></a></li>';
+        }
+        $('#search-results').html(resHtml);
+    }
+});
+
+// hide the search results on ESC
+$(document).on("keyup", function(event) { if (event.which == 27) { $('#search-resultbox').hide(); } });
+// hide search results on click to document
+$(document).bind('click', function (e) { $('#search-resultbox').hide(); });
+// except the following:
+searchBox.bind('click', function(e) { e.stopPropagation(); });
+$('#search-resultbox').bind('click', function(e) { e.stopPropagation(); });
+
+});</script></body>
+</html>

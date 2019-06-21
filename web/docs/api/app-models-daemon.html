@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="language" content="en" />
+        <link href="./assets/1cf5ba7/css/bootstrap.css" rel="stylesheet">
+<link href="./assets/be3e053e/solarized_light.css" rel="stylesheet">
+<link href="./assets/1f2e89dd/style.css" rel="stylesheet">
+<script src="./assets/8261f971/jquery.js"></script>
+<script src="./assets/1cf5ba7/js/bootstrap.js"></script>
+<script src="./assets/ae8b5077/jssearch.js"></script>    <title>Daemon, app\models\Daemon - Yii Framework 2.0 API Documentation</title>
+</head>
+<body>
+
+<div class="wrap">
+    <nav id="w159" class="navbar-inverse navbar-fixed-top navbar"><div class="navbar-header"><button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#w159-collapse"><span class="sr-only">Toggle navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span></button><a class="navbar-brand" href="./index.html">Yii Framework 2.0 API Documentation</a></div><div id="w159-collapse" class="collapse navbar-collapse"><ul id="w160" class="navbar-nav nav"><li><a href="./index.html">Class reference</a></li>
+<li><a href="../en/README.html">Guide</a></li></ul><div class="navbar-form navbar-left" role="search">
+  <div class="form-group">
+    <input id="searchbox" type="text" class="form-control" placeholder="Search">
+  </div>
+</div>
+</div></nav>
+    <div id="search-resultbox" style="display: none;" class="modal-content">
+        <ul id="search-results">
+        </ul>
+    </div>
+
+    
+<div class="row">
+    <div class="col-md-3">
+                <div id="navigation" class="list-group"><a class="list-group-item" href="#navigation-154" data-toggle="collapse" data-parent="#navigation">app\assets <b class="caret"></b></a><div id="navigation-154" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-assets-appasset.html">AppAsset</a>
+<a class="list-group-item" href="./app-assets-eventasset.html">EventAsset</a></div>
+<a class="list-group-item" href="#navigation-155" data-toggle="collapse" data-parent="#navigation">app\commands <b class="caret"></b></a><div id="navigation-155" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-commands-analyzecontroller.html">AnalyzeController</a>
+<a class="list-group-item" href="./app-commands-backupcontroller.html">BackupController</a>
+<a class="list-group-item" href="./app-commands-daemoncontroller.html">DaemonController</a>
+<a class="list-group-item" href="./app-commands-dbcleancontroller.html">DbcleanController</a>
+<a class="list-group-item" href="./app-commands-downloadcontroller.html">DownloadController</a>
+<a class="list-group-item" href="./app-commands-rbaccontroller.html">RbacController</a>
+<a class="list-group-item" href="./app-commands-restorecontroller.html">RestoreController</a>
+<a class="list-group-item" href="./app-commands-unlockcontroller.html">UnlockController</a></div>
+<a class="list-group-item" href="#navigation-156" data-toggle="collapse" data-parent="#navigation">app\components <b class="caret"></b></a><div id="navigation-156" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-components-accessrule.html">AccessRule</a>
+<a class="list-group-item" href="./app-components-activeeventfield.html">ActiveEventField</a>
+<a class="list-group-item" href="./app-components-activeeventfieldasset.html">ActiveEventFieldAsset</a>
+<a class="list-group-item" href="./app-components-editable.html">Editable</a>
+<a class="list-group-item" href="./app-components-file.html">File</a>
+<a class="list-group-item" href="./app-components-outputevent.html">OutputEvent</a>
+<a class="list-group-item" href="./app-components-shellcommand.html">ShellCommand</a>
+<a class="list-group-item" href="./app-components-squashfs.html">Squashfs</a>
+<a class="list-group-item" href="./app-components-zip.html">Zip</a></div>
+<a class="list-group-item" href="#navigation-157" data-toggle="collapse" data-parent="#navigation">app\controllers <b class="caret"></b></a><div id="navigation-157" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-controllers-activitycontroller.html">ActivityController</a>
+<a class="list-group-item" href="./app-controllers-backupcontroller.html">BackupController</a>
+<a class="list-group-item" href="./app-controllers-configcontroller.html">ConfigController</a>
+<a class="list-group-item" href="./app-controllers-daemoncontroller.html">DaemonController</a>
+<a class="list-group-item" href="./app-controllers-eventcontroller.html">EventController</a>
+<a class="list-group-item" href="./app-controllers-examcontroller.html">ExamController</a>
+<a class="list-group-item" href="./app-controllers-howtocontroller.html">HowtoController</a>
+<a class="list-group-item" href="./app-controllers-restorecontroller.html">RestoreController</a>
+<a class="list-group-item" href="./app-controllers-resultcontroller.html">ResultController</a>
+<a class="list-group-item" href="./app-controllers-screenshotcontroller.html">ScreenshotController</a>
+<a class="list-group-item" href="./app-controllers-sitecontroller.html">SiteController</a>
+<a class="list-group-item" href="./app-controllers-ticketcontroller.html">TicketController</a>
+<a class="list-group-item" href="./app-controllers-usercontroller.html">UserController</a></div>
+<a class="list-group-item active" href="#navigation-158" data-toggle="collapse" data-parent="#navigation">app\models <b class="caret"></b></a><div id="navigation-158" class="submenu panel-collapse collapse in"><a class="list-group-item" href="./app-models-activity.html">Activity</a>
+<a class="list-group-item" href="./app-models-activityquery.html">ActivityQuery</a>
+<a class="list-group-item" href="./app-models-activitysearch.html">ActivitySearch</a>
+<a class="list-group-item" href="./app-models-authassignment.html">AuthAssignment</a>
+<a class="list-group-item" href="./app-models-authitem.html">AuthItem</a>
+<a class="list-group-item" href="./app-models-backup.html">Backup</a>
+<a class="list-group-item" href="./app-models-backupsearch.html">BackupSearch</a>
+<a class="list-group-item" href="./app-models-base.html">Base</a>
+<a class="list-group-item" href="./app-models-config.html">Config</a>
+<a class="list-group-item active" href="./app-models-daemon.html">Daemon</a>
+<a class="list-group-item" href="./app-models-daemoninterface.html">DaemonInterface</a>
+<a class="list-group-item" href="./app-models-daemonsearch.html">DaemonSearch</a>
+<a class="list-group-item" href="./app-models-eventitem.html">EventItem</a>
+<a class="list-group-item" href="./app-models-eventstream.html">EventStream</a>
+<a class="list-group-item" href="./app-models-exam.html">Exam</a>
+<a class="list-group-item" href="./app-models-examquery.html">ExamQuery</a>
+<a class="list-group-item" href="./app-models-examsearch.html">ExamSearch</a>
+<a class="list-group-item" href="./app-models-howto.html">Howto</a>
+<a class="list-group-item" href="./app-models-howtosearch.html">HowtoSearch</a>
+<a class="list-group-item" href="./app-models-loginform.html">LoginForm</a>
+<a class="list-group-item" href="./app-models-rdifffilesystem.html">RdiffFileSystem</a>
+<a class="list-group-item" href="./app-models-restore.html">Restore</a>
+<a class="list-group-item" href="./app-models-restoresearch.html">RestoreSearch</a>
+<a class="list-group-item" href="./app-models-result.html">Result</a>
+<a class="list-group-item" href="./app-models-screenshot.html">Screenshot</a>
+<a class="list-group-item" href="./app-models-screenshotsearch.html">ScreenshotSearch</a>
+<a class="list-group-item" href="./app-models-stats.html">Stats</a>
+<a class="list-group-item" href="./app-models-ticket.html">Ticket</a>
+<a class="list-group-item" href="./app-models-ticketquery.html">TicketQuery</a>
+<a class="list-group-item" href="./app-models-ticketsearch.html">TicketSearch</a>
+<a class="list-group-item" href="./app-models-user.html">User</a>
+<a class="list-group-item" href="./app-models-usersearch.html">UserSearch</a></div></div>    </div>
+    <div class="col-md-9 api-content" role="main">
+        <h1>Class app\models\Daemon</h1>
+<div class="top-nav">
+    <a href="index.html">All Classes</a>
+                | <a href="#methods">Methods</a>
+                    | <a href="#constants">Constants</a>
+    </div>
+
+<table class="summaryTable docClass table table-bordered">
+    <colgroup>
+        <col class="col-name" />
+        <col class="col-value" />
+    </colgroup>
+            <tr><th>Inheritance</th><td><a href="app-models-daemon.html">app\models\Daemon</a> &raquo;
+yii\db\ActiveRecord</td></tr>
+                            <tr><th>Subclasses</th><td><a href="app-models-daemonsearch.html">app\models\DaemonSearch</a></td></tr>
+                        </table>
+
+<div class="class-description">
+    <p><strong>This is the model class for table "daemon".</strong></p>
+    
+    </div>
+
+<a id="properties"></a>
+
+<a id="methods"></a>
+
+<div class="summary doc-method">
+<h2>Public Methods</h2>
+
+<p><a href="#" class="toggle">Hide inherited methods</a></p>
+
+<table class="summary-table table table-striped table-bordered table-hover">
+<colgroup>
+    <col class="col-method" />
+    <col class="col-description" />
+    <col class="col-defined" />
+</colgroup>
+<tr>
+  <th>Method</th><th>Description</th><th>Defined By</th>
+</tr>
+        <tr id="attributeLabels()">
+        <td><a href="app-models-daemon.html#attributeLabels()-detail">attributeLabels()</a></td>
+        <td></td>
+        <td><a href="app-models-daemon.html">app\models\Daemon</a></td>
+    </tr>
+            <tr id="attributesChanged()">
+        <td><a href="app-models-daemon.html#attributesChanged()-detail">attributesChanged()</a></td>
+        <td></td>
+        <td><a href="app-models-daemon.html">app\models\Daemon</a></td>
+    </tr>
+            <tr id="getRunning()">
+        <td><a href="app-models-daemon.html#getRunning()-detail">getRunning()</a></td>
+        <td></td>
+        <td><a href="app-models-daemon.html">app\models\Daemon</a></td>
+    </tr>
+            <tr id="hup()">
+        <td><a href="app-models-daemon.html#hup()-detail">hup()</a></td>
+        <td></td>
+        <td><a href="app-models-daemon.html">app\models\Daemon</a></td>
+    </tr>
+            <tr id="init()">
+        <td><a href="app-models-daemon.html#init()-detail">init()</a></td>
+        <td></td>
+        <td><a href="app-models-daemon.html">app\models\Daemon</a></td>
+    </tr>
+            <tr id="kill()">
+        <td><a href="app-models-daemon.html#kill()-detail">kill()</a></td>
+        <td></td>
+        <td><a href="app-models-daemon.html">app\models\Daemon</a></td>
+    </tr>
+            <tr id="rules()">
+        <td><a href="app-models-daemon.html#rules()-detail">rules()</a></td>
+        <td></td>
+        <td><a href="app-models-daemon.html">app\models\Daemon</a></td>
+    </tr>
+            <tr id="start()">
+        <td><a href="app-models-daemon.html#start()-detail">start()</a></td>
+        <td></td>
+        <td><a href="app-models-daemon.html">app\models\Daemon</a></td>
+    </tr>
+            <tr id="startAnalyzer()">
+        <td><a href="app-models-daemon.html#startAnalyzer()-detail">startAnalyzer()</a></td>
+        <td></td>
+        <td><a href="app-models-daemon.html">app\models\Daemon</a></td>
+    </tr>
+            <tr id="startBackup()">
+        <td><a href="app-models-daemon.html#startBackup()-detail">startBackup()</a></td>
+        <td></td>
+        <td><a href="app-models-daemon.html">app\models\Daemon</a></td>
+    </tr>
+            <tr id="startDaemon()">
+        <td><a href="app-models-daemon.html#startDaemon()-detail">startDaemon()</a></td>
+        <td></td>
+        <td><a href="app-models-daemon.html">app\models\Daemon</a></td>
+    </tr>
+            <tr id="startDownload()">
+        <td><a href="app-models-daemon.html#startDownload()-detail">startDownload()</a></td>
+        <td></td>
+        <td><a href="app-models-daemon.html">app\models\Daemon</a></td>
+    </tr>
+            <tr id="startRestore()">
+        <td><a href="app-models-daemon.html#startRestore()-detail">startRestore()</a></td>
+        <td></td>
+        <td><a href="app-models-daemon.html">app\models\Daemon</a></td>
+    </tr>
+            <tr id="stop()">
+        <td><a href="app-models-daemon.html#stop()-detail">stop()</a></td>
+        <td></td>
+        <td><a href="app-models-daemon.html">app\models\Daemon</a></td>
+    </tr>
+            <tr id="tableName()">
+        <td><a href="app-models-daemon.html#tableName()-detail">tableName()</a></td>
+        <td></td>
+        <td><a href="app-models-daemon.html">app\models\Daemon</a></td>
+    </tr>
+            <tr id="updateEvent()">
+        <td><a href="app-models-daemon.html#updateEvent()-detail">updateEvent()</a></td>
+        <td></td>
+        <td><a href="app-models-daemon.html">app\models\Daemon</a></td>
+    </tr>
+    </table>
+</div>
+
+<a id="events"></a>
+
+<a id="constants"></a>
+<div class="summary doc-const">
+    <h2>Constants</h2>
+
+    <p><a href="#" class="toggle">Hide inherited constants</a></p>
+
+    <table class="summary-table table table-striped table-bordered table-hover">
+    <colgroup>
+        <col class="col-const" />
+        <col class="col-value" />
+        <col class="col-description" />
+        <col class="col-defined" />
+    </colgroup>
+    <tr>
+        <th>Constant</th><th>Value</th><th>Description</th><th>Defined By</th>
+    </tr>
+            <tr id="SIGHUP">
+          <td id="SIGHUP-detail">SIGHUP</td>
+          <td>1</td>
+          <td>
+                        </td>
+          <td><a href="app-models-daemon.html">app\models\Daemon</a></td>
+        </tr>
+            <tr id="SIGKILL">
+          <td id="SIGKILL-detail">SIGKILL</td>
+          <td>9</td>
+          <td>
+                        </td>
+          <td><a href="app-models-daemon.html">app\models\Daemon</a></td>
+        </tr>
+            <tr id="SIGTERM">
+          <td id="SIGTERM-detail">SIGTERM</td>
+          <td>15</td>
+          <td>
+                        </td>
+          <td><a href="app-models-daemon.html">app\models\Daemon</a></td>
+        </tr>
+            <tr id="SIGUSR1">
+          <td id="SIGUSR1-detail">SIGUSR1</td>
+          <td>10</td>
+          <td>
+                        </td>
+          <td><a href="app-models-daemon.html">app\models\Daemon</a></td>
+        </tr>
+        </table>
+</div>
+
+<h2>Method Details</h2>
+
+<div class="method-doc">
+
+    <div class="detail-header h3" id="attributeLabels()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-daemon.html#attributeLabels()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        attributeLabels()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-daemon.html#attributeLabels()-detail">attributeLabels</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="attributesChanged()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-daemon.html#attributesChanged()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        attributesChanged()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-daemon.html#attributesChanged()-detail">attributesChanged</a></strong> ( <span style="color: #0000BB">$attributes</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$attributes</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                                                </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getRunning()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-daemon.html#getRunning()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getRunning()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-daemon.html#getRunning()-detail">getRunning</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="hup()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-daemon.html#hup()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        hup()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-daemon.html#hup()-detail">hup</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="init()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-daemon.html#init()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        init()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-daemon.html#init()-detail">init</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="kill()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-daemon.html#kill()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        kill()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-daemon.html#kill()-detail">kill</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="rules()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-daemon.html#rules()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        rules()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-daemon.html#rules()-detail">rules</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="start()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-daemon.html#start()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        start()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-daemon.html#start()-detail">start</a></strong> ( <span style="color: #0000BB">$command</span>, <span style="color: #0000BB">$arguments&nbsp;</span><span style="color: #007700">=&nbsp;[]</span>, <span style="color: #0000BB">$background&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">true</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$command</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$arguments</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$background</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                                                </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="startAnalyzer()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-daemon.html#startAnalyzer()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        startAnalyzer()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-daemon.html#startAnalyzer()-detail">startAnalyzer</a></strong> ( <span style="color: #0000BB">$id&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">''</span>, <span style="color: #0000BB">$background&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">true</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$id</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$background</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                                                </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="startBackup()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-daemon.html#startBackup()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        startBackup()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-daemon.html#startBackup()-detail">startBackup</a></strong> ( <span style="color: #0000BB">$id&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">''</span>, <span style="color: #0000BB">$background&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">true</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$id</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$background</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                                                </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="startDaemon()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-daemon.html#startDaemon()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        startDaemon()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-daemon.html#startDaemon()-detail">startDaemon</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="startDownload()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-daemon.html#startDownload()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        startDownload()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-daemon.html#startDownload()-detail">startDownload</a></strong> ( <span style="color: #0000BB">$id&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">''</span>, <span style="color: #0000BB">$background&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">true</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$id</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$background</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                                                </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="startRestore()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-daemon.html#startRestore()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        startRestore()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-daemon.html#startRestore()-detail">startRestore</a></strong> ( <span style="color: #0000BB">$id</span>, <span style="color: #0000BB">$file</span>, <span style="color: #0000BB">$date&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'now'</span>, <span style="color: #0000BB">$background&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">true</span>, <span style="color: #0000BB">$restorePath&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">null</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$id</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$file</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$date</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$background</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$restorePath</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                                                </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="stop()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-daemon.html#stop()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        stop()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-daemon.html#stop()-detail">stop</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="tableName()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-daemon.html#tableName()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        tableName()
+        <span class="detail-header-tag small">
+            public                        static            method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public static</span> <span class="signature-type">void</span> <strong><a href="app-models-daemon.html#tableName()-detail">tableName</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="updateEvent()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-daemon.html#updateEvent()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        updateEvent()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-daemon.html#updateEvent()-detail">updateEvent</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+</div>
+        </div>
+</div>
+
+<script type="text/javascript">
+    /*<![CDATA[*/
+    $("a.toggle").on('click', function () {
+        var $this = $(this);
+        if ($this.hasClass('properties-hidden')) {
+            $this.text($this.text().replace(/Show/,'Hide'));
+            $this.parents(".summary").find(".inherited").show();
+            $this.removeClass('properties-hidden');
+        } else {
+            $this.text($this.text().replace(/Hide/,'Show'));
+            $this.parents(".summary").find(".inherited").hide();
+            $this.addClass('properties-hidden');
+        }
+
+        return false;
+    });
+    /*
+     $(".sourceCode a.show").toggle(function () {
+     $(this).text($(this).text().replace(/show/,'hide'));
+     $(this).parents(".sourceCode").find("div.code").show();
+     },function () {
+     $(this).text($(this).text().replace(/hide/,'show'));
+     $(this).parents(".sourceCode").find("div.code").hide();
+     });
+     $("a.sourceLink").click(function () {
+     $(this).attr('target','_blank');
+     });
+     */
+    /*]]>*/
+</script>
+
+
+</div>
+
+<footer class="footer">
+        <p class="pull-right"><small>Page generated on Fri, 21 Jun 2019 10:08:05 +0000</small></p>
+    Powered by <a href="http://www.yiiframework.com/" rel="external">Yii Framework</a></footer>
+
+<script>jQuery(function ($) {
+    var shiftWindow = function () { scrollBy(0, -50) };
+    if (location.hash) setTimeout(shiftWindow, 1);
+    window.addEventListener("hashchange", shiftWindow);
+var element = document.createElement("script");
+element.src = "./jssearch.index.js";
+document.body.appendChild(element);
+
+var searchBox = $('#searchbox');
+
+// search when typing in search field
+searchBox.on("keyup", function(event) {
+    var query = $(this).val();
+
+    if (query == '' || event.which == 27) {
+        $('#search-resultbox').hide();
+        return;
+    } else if (event.which == 13) {
+        var selectedLink = $('#search-resultbox a.selected');
+        if (selectedLink.length != 0) {
+            document.location = selectedLink.attr('href');
+            return;
+        }
+    } else if (event.which == 38 || event.which == 40) {
+        $('#search-resultbox').show();
+
+        var selected = $('#search-resultbox a.selected');
+        if (selected.length == 0) {
+            $('#search-results').find('a').first().addClass('selected');
+        } else {
+            var next;
+            if (event.which == 40) {
+                next = selected.parent().next().find('a').first();
+            } else {
+                next = selected.parent().prev().find('a').first();
+            }
+            if (next.length != 0) {
+                var resultbox = $('#search-results');
+                var position = next.position();
+
+//              TODO scrolling is buggy and jumps around
+//                resultbox.scrollTop(Math.floor(position.top));
+//                console.log(position.top);
+
+                selected.removeClass('selected');
+                next.addClass('selected');
+            }
+        }
+
+        return;
+    }
+    $('#search-resultbox').show();
+    $('#search-results').html('<li><span class="no-results">No results</span></li>');
+
+    var result = jssearch.search(query);
+
+    if (result.length > 0) {
+        var i = 0;
+        var resHtml = '';
+
+        for (var key in result) {
+            if (i++ > 20) {
+                break;
+            }
+            resHtml = resHtml +
+            '<li><a href="' + result[key].file.u.substr(3) +'"><span class="title">' + result[key].file.t + '</span>' +
+            '<span class="description">' + result[key].file.d + '</span></a></li>';
+        }
+        $('#search-results').html(resHtml);
+    }
+});
+
+// hide the search results on ESC
+$(document).on("keyup", function(event) { if (event.which == 27) { $('#search-resultbox').hide(); } });
+// hide search results on click to document
+$(document).bind('click', function (e) { $('#search-resultbox').hide(); });
+// except the following:
+searchBox.bind('click', function(e) { e.stopPropagation(); });
+$('#search-resultbox').bind('click', function(e) { e.stopPropagation(); });
+
+});</script></body>
+</html>

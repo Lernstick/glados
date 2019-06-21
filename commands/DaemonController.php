@@ -36,7 +36,7 @@ class DaemonController extends Controller
     public $jobLastRun = [];
 
     /**
-     * @var app\models\Daemon the daemon instance for db updates
+     * @var Daemon the daemon instance for db updates
      */
     public $daemon;
 

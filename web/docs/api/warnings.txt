@@ -1,0 +1,1900 @@
+Array
+(
+    [0] => Array
+        (
+            [line] => 7
+            [file] => /usr/share/glados/assets/AppAsset.php
+            [message] => No docblock for element 'app\assets\AppAsset'
+        )
+
+    [1] => Array
+        (
+            [line] => 9
+            [file] => /usr/share/glados/assets/AppAsset.php
+            [message] => No docblock for element '$basePath'
+        )
+
+    [2] => Array
+        (
+            [line] => 9
+            [file] => /usr/share/glados/assets/AppAsset.php
+            [message] => No short description for element '$basePath'
+        )
+
+    [3] => Array
+        (
+            [line] => 10
+            [file] => /usr/share/glados/assets/AppAsset.php
+            [message] => No docblock for element '$baseUrl'
+        )
+
+    [4] => Array
+        (
+            [line] => 10
+            [file] => /usr/share/glados/assets/AppAsset.php
+            [message] => No short description for element '$baseUrl'
+        )
+
+    [5] => Array
+        (
+            [line] => 11
+            [file] => /usr/share/glados/assets/AppAsset.php
+            [message] => No docblock for element '$css'
+        )
+
+    [6] => Array
+        (
+            [line] => 11
+            [file] => /usr/share/glados/assets/AppAsset.php
+            [message] => No short description for element '$css'
+        )
+
+    [7] => Array
+        (
+            [line] => 14
+            [file] => /usr/share/glados/assets/AppAsset.php
+            [message] => No docblock for element '$js'
+        )
+
+    [8] => Array
+        (
+            [line] => 14
+            [file] => /usr/share/glados/assets/AppAsset.php
+            [message] => No short description for element '$js'
+        )
+
+    [9] => Array
+        (
+            [line] => 16
+            [file] => /usr/share/glados/assets/AppAsset.php
+            [message] => No docblock for element '$depends'
+        )
+
+    [10] => Array
+        (
+            [line] => 16
+            [file] => /usr/share/glados/assets/AppAsset.php
+            [message] => No short description for element '$depends'
+        )
+
+    [11] => Array
+        (
+            [line] => 7
+            [file] => /usr/share/glados/assets/EventAsset.php
+            [message] => No docblock for element 'app\assets\EventAsset'
+        )
+
+    [12] => Array
+        (
+            [line] => 9
+            [file] => /usr/share/glados/assets/EventAsset.php
+            [message] => No docblock for element '$basePath'
+        )
+
+    [13] => Array
+        (
+            [line] => 9
+            [file] => /usr/share/glados/assets/EventAsset.php
+            [message] => No short description for element '$basePath'
+        )
+
+    [14] => Array
+        (
+            [line] => 10
+            [file] => /usr/share/glados/assets/EventAsset.php
+            [message] => No docblock for element '$baseUrl'
+        )
+
+    [15] => Array
+        (
+            [line] => 10
+            [file] => /usr/share/glados/assets/EventAsset.php
+            [message] => No short description for element '$baseUrl'
+        )
+
+    [16] => Array
+        (
+            [line] => 11
+            [file] => /usr/share/glados/assets/EventAsset.php
+            [message] => No docblock for element '$css'
+        )
+
+    [17] => Array
+        (
+            [line] => 11
+            [file] => /usr/share/glados/assets/EventAsset.php
+            [message] => No short description for element '$css'
+        )
+
+    [18] => Array
+        (
+            [line] => 12
+            [file] => /usr/share/glados/assets/EventAsset.php
+            [message] => No docblock for element '$js'
+        )
+
+    [19] => Array
+        (
+            [line] => 12
+            [file] => /usr/share/glados/assets/EventAsset.php
+            [message] => No short description for element '$js'
+        )
+
+    [20] => Array
+        (
+            [line] => 15
+            [file] => /usr/share/glados/assets/EventAsset.php
+            [message] => No docblock for element '$depends'
+        )
+
+    [21] => Array
+        (
+            [line] => 15
+            [file] => /usr/share/glados/assets/EventAsset.php
+            [message] => No short description for element '$depends'
+        )
+
+    [22] => Array
+        (
+            [line] => 53
+            [file] => /usr/share/glados/commands/DaemonController.php
+            [message] => No docblock for element '$gid'
+        )
+
+    [23] => Array
+        (
+            [line] => 53
+            [file] => /usr/share/glados/commands/DaemonController.php
+            [message] => No short description for element '$gid'
+        )
+
+    [24] => Array
+        (
+            [line] => 83
+            [file] => /usr/share/glados/commands/DaemonController.php
+            [message] => No docblock for element '$daemonInfo'
+        )
+
+    [25] => Array
+        (
+            [line] => 83
+            [file] => /usr/share/glados/commands/DaemonController.php
+            [message] => No short description for element '$daemonInfo'
+        )
+
+    [26] => Array
+        (
+            [line] => 84
+            [file] => /usr/share/glados/commands/DaemonController.php
+            [message] => No docblock for element '$logFile'
+        )
+
+    [27] => Array
+        (
+            [line] => 84
+            [file] => /usr/share/glados/commands/DaemonController.php
+            [message] => No short description for element '$logFile'
+        )
+
+    [28] => Array
+        (
+            [line] => 85
+            [file] => /usr/share/glados/commands/DaemonController.php
+            [message] => No docblock for element '$errorLogFile'
+        )
+
+    [29] => Array
+        (
+            [line] => 85
+            [file] => /usr/share/glados/commands/DaemonController.php
+            [message] => No short description for element '$errorLogFile'
+        )
+
+    [30] => Array
+        (
+            [line] => 86
+            [file] => /usr/share/glados/commands/DaemonController.php
+            [message] => No docblock for element '$logFileIsWritable'
+        )
+
+    [31] => Array
+        (
+            [line] => 86
+            [file] => /usr/share/glados/commands/DaemonController.php
+            [message] => No short description for element '$logFileIsWritable'
+        )
+
+    [32] => Array
+        (
+            [line] => 533
+            [file] => /usr/share/glados/commands/DaemonController.php
+            [message] => No docblock for element 'signalHandler'
+        )
+
+    [33] => Array
+        (
+            [line] => 7
+            [file] => /usr/share/glados/commands/RbacController.php
+            [message] => No docblock for element 'app\commands\RbacController'
+        )
+
+    [34] => Array
+        (
+            [line] => 33
+            [file] => /usr/share/glados/commands/RestoreController.php
+            [message] => No short description for element '$restore'
+        )
+
+    [35] => Array
+        (
+            [line] => 5
+            [file] => /usr/share/glados/components/AccessRule.php
+            [message] => No docblock for element 'app\components\AccessRule'
+        )
+
+    [36] => Array
+        (
+            [line] => 11
+            [file] => /usr/share/glados/components/AccessRule.php
+            [message] => No docblock for element 'matchRole'
+        )
+
+    [37] => Array
+        (
+            [line] => 12
+            [file] => /usr/share/glados/components/ActiveEventField.php
+            [message] => No docblock for element 'app\components\ActiveEventField'
+        )
+
+    [38] => Array
+        (
+            [line] => 48
+            [file] => /usr/share/glados/components/ActiveEventField.php
+            [message] => No docblock for element '$register'
+        )
+
+    [39] => Array
+        (
+            [line] => 48
+            [file] => /usr/share/glados/components/ActiveEventField.php
+            [message] => No short description for element '$register'
+        )
+
+    [40] => Array
+        (
+            [line] => 51
+            [file] => /usr/share/glados/components/ActiveEventField.php
+            [message] => No docblock for element '$onStart'
+        )
+
+    [41] => Array
+        (
+            [line] => 51
+            [file] => /usr/share/glados/components/ActiveEventField.php
+            [message] => No short description for element '$onStart'
+        )
+
+    [42] => Array
+        (
+            [line] => 52
+            [file] => /usr/share/glados/components/ActiveEventField.php
+            [message] => No docblock for element '$onStop'
+        )
+
+    [43] => Array
+        (
+            [line] => 52
+            [file] => /usr/share/glados/components/ActiveEventField.php
+            [message] => No short description for element '$onStop'
+        )
+
+    [44] => Array
+        (
+            [line] => 143
+            [file] => /usr/share/glados/components/ActiveEventField.php
+            [message] => No docblock for element 'handleSend'
+        )
+
+    [45] => Array
+        (
+            [line] => 7
+            [file] => /usr/share/glados/components/ActiveEventFieldAsset.php
+            [message] => No docblock for element 'app\components\ActiveEventFieldAsset'
+        )
+
+    [46] => Array
+        (
+            [line] => 9
+            [file] => /usr/share/glados/components/ActiveEventFieldAsset.php
+            [message] => No docblock for element '$basePath'
+        )
+
+    [47] => Array
+        (
+            [line] => 9
+            [file] => /usr/share/glados/components/ActiveEventFieldAsset.php
+            [message] => No short description for element '$basePath'
+        )
+
+    [48] => Array
+        (
+            [line] => 10
+            [file] => /usr/share/glados/components/ActiveEventFieldAsset.php
+            [message] => No docblock for element '$baseUrl'
+        )
+
+    [49] => Array
+        (
+            [line] => 10
+            [file] => /usr/share/glados/components/ActiveEventFieldAsset.php
+            [message] => No short description for element '$baseUrl'
+        )
+
+    [50] => Array
+        (
+            [line] => 11
+            [file] => /usr/share/glados/components/ActiveEventFieldAsset.php
+            [message] => No docblock for element '$css'
+        )
+
+    [51] => Array
+        (
+            [line] => 11
+            [file] => /usr/share/glados/components/ActiveEventFieldAsset.php
+            [message] => No short description for element '$css'
+        )
+
+    [52] => Array
+        (
+            [line] => 13
+            [file] => /usr/share/glados/components/ActiveEventFieldAsset.php
+            [message] => No docblock for element '$js'
+        )
+
+    [53] => Array
+        (
+            [line] => 13
+            [file] => /usr/share/glados/components/ActiveEventFieldAsset.php
+            [message] => No short description for element '$js'
+        )
+
+    [54] => Array
+        (
+            [line] => 16
+            [file] => /usr/share/glados/components/ActiveEventFieldAsset.php
+            [message] => No docblock for element '$depends'
+        )
+
+    [55] => Array
+        (
+            [line] => 16
+            [file] => /usr/share/glados/components/ActiveEventFieldAsset.php
+            [message] => No short description for element '$depends'
+        )
+
+    [56] => Array
+        (
+            [line] => 9
+            [file] => /usr/share/glados/components/Editable.php
+            [message] => No docblock for element 'app\components\Editable'
+        )
+
+    [57] => Array
+        (
+            [line] => 10
+            [file] => /usr/share/glados/components/File.php
+            [message] => No docblock for element 'app\components\File'
+        )
+
+    [58] => Array
+        (
+            [line] => 91
+            [file] => /usr/share/glados/components/File.php
+            [message] => No docblock for element 'getInfo'
+        )
+
+    [59] => Array
+        (
+            [line] => 9
+            [file] => /usr/share/glados/components/ShellCommand.php
+            [message] => No docblock for element 'app\components\OutputEvent'
+        )
+
+    [60] => Array
+        (
+            [line] => 22
+            [file] => /usr/share/glados/components/ShellCommand.php
+            [message] => No docblock for element 'app\components\ShellCommand'
+        )
+
+    [61] => Array
+        (
+            [line] => 59
+            [file] => /usr/share/glados/components/ShellCommand.php
+            [message] => No docblock for element '$cwd'
+        )
+
+    [62] => Array
+        (
+            [line] => 59
+            [file] => /usr/share/glados/components/ShellCommand.php
+            [message] => No short description for element '$cwd'
+        )
+
+    [63] => Array
+        (
+            [line] => 60
+            [file] => /usr/share/glados/components/ShellCommand.php
+            [message] => No docblock for element '$env'
+        )
+
+    [64] => Array
+        (
+            [line] => 60
+            [file] => /usr/share/glados/components/ShellCommand.php
+            [message] => No short description for element '$env'
+        )
+
+    [65] => Array
+        (
+            [line] => 93
+            [file] => /usr/share/glados/components/ShellCommand.php
+            [message] => No docblock for element 'run'
+        )
+
+    [66] => Array
+        (
+            [line] => 10
+            [file] => /usr/share/glados/components/Squashfs.php
+            [message] => No docblock for element 'app\components\Squashfs'
+        )
+
+    [67] => Array
+        (
+            [line] => 76
+            [file] => /usr/share/glados/components/Squashfs.php
+            [message] => No docblock for element 'file_exists'
+        )
+
+    [68] => Array
+        (
+            [line] => 10
+            [file] => /usr/share/glados/components/Zip.php
+            [message] => No docblock for element 'app\components\Zip'
+        )
+
+    [69] => Array
+        (
+            [line] => 78
+            [file] => /usr/share/glados/components/Zip.php
+            [message] => No docblock for element 'file_exists'
+        )
+
+    [70] => Array
+        (
+            [line] => 23
+            [file] => /usr/share/glados/controllers/ActivityController.php
+            [message] => No docblock for element 'behaviors'
+        )
+
+    [71] => Array
+        (
+            [line] => 88
+            [file] => /usr/share/glados/controllers/ActivityController.php
+            [message] => No docblock for element 'actionNew'
+        )
+
+    [72] => Array
+        (
+            [line] => 16
+            [file] => /usr/share/glados/controllers/BackupController.php
+            [message] => No docblock for element 'app\controllers\BackupController'
+        )
+
+    [73] => Array
+        (
+            [line] => 44
+            [file] => /usr/share/glados/controllers/BackupController.php
+            [message] => No docblock for element 'actionFile'
+        )
+
+    [74] => Array
+        (
+            [line] => 62
+            [file] => /usr/share/glados/controllers/BackupController.php
+            [message] => No docblock for element 'actionBrowse'
+        )
+
+    [75] => Array
+        (
+            [line] => 78
+            [file] => /usr/share/glados/controllers/EventController.php
+            [message] => No docblock for element 'sendMessage'
+        )
+
+    [76] => Array
+        (
+            [line] => 27
+            [file] => /usr/share/glados/controllers/ExamController.php
+            [message] => No docblock for element 'behaviors'
+        )
+
+    [77] => Array
+        (
+            [line] => 17
+            [file] => /usr/share/glados/controllers/HowtoController.php
+            [message] => No docblock for element 'behaviors'
+        )
+
+    [78] => Array
+        (
+            [line] => 21
+            [file] => /usr/share/glados/controllers/ResultController.php
+            [message] => No docblock for element 'behaviors'
+        )
+
+    [79] => Array
+        (
+            [line] => 16
+            [file] => /usr/share/glados/controllers/SiteController.php
+            [message] => No docblock for element 'app\controllers\SiteController'
+        )
+
+    [80] => Array
+        (
+            [line] => 18
+            [file] => /usr/share/glados/controllers/SiteController.php
+            [message] => No docblock for element 'behaviors'
+        )
+
+    [81] => Array
+        (
+            [line] => 41
+            [file] => /usr/share/glados/controllers/SiteController.php
+            [message] => No docblock for element 'actions'
+        )
+
+    [82] => Array
+        (
+            [line] => 54
+            [file] => /usr/share/glados/controllers/SiteController.php
+            [message] => No docblock for element 'actionIndex'
+        )
+
+    [83] => Array
+        (
+            [line] => 79
+            [file] => /usr/share/glados/controllers/SiteController.php
+            [message] => No docblock for element 'actionLogin'
+        )
+
+    [84] => Array
+        (
+            [line] => 102
+            [file] => /usr/share/glados/controllers/SiteController.php
+            [message] => No docblock for element 'actionLogout'
+        )
+
+    [85] => Array
+        (
+            [line] => 45
+            [file] => /usr/share/glados/controllers/TicketController.php
+            [message] => No docblock for element 'behaviors'
+        )
+
+    [86] => Array
+        (
+            [line] => 201
+            [file] => /usr/share/glados/controllers/UserController.php
+            [message] => No docblock for element 'checkRbac'
+        )
+
+    [87] => Array
+        (
+            [line] => 74
+            [file] => /usr/share/glados/models/Activity.php
+            [message] => No docblock for element 'newActivities'
+        )
+
+    [88] => Array
+        (
+            [line] => 90
+            [file] => /usr/share/glados/models/Activity.php
+            [message] => No docblock for element 'eventNewActivities'
+        )
+
+    [89] => Array
+        (
+            [line] => 157
+            [file] => /usr/share/glados/models/Activity.php
+            [message] => No docblock for element 'getToken'
+        )
+
+    [90] => Array
+        (
+            [line] => 172
+            [file] => /usr/share/glados/models/Activity.php
+            [message] => No docblock for element 'getLastvisited'
+        )
+
+    [91] => Array
+        (
+            [line] => 186
+            [file] => /usr/share/glados/models/Activity.php
+            [message] => No docblock for element 'setLastvisited'
+        )
+
+    [92] => Array
+        (
+            [line] => 16
+            [file] => /usr/share/glados/models/ActivitySearch.php
+            [message] => No docblock for element '$token'
+        )
+
+    [93] => Array
+        (
+            [line] => 16
+            [file] => /usr/share/glados/models/ActivitySearch.php
+            [message] => No short description for element '$token'
+        )
+
+    [94] => Array
+        (
+            [line] => 99
+            [file] => /usr/share/glados/models/ActivitySearch.php
+            [message] => No docblock for element 'getNewActivities'
+        )
+
+    [95] => Array
+        (
+            [line] => 22
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No docblock for element '$date'
+        )
+
+    [96] => Array
+        (
+            [line] => 22
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No short description for element '$date'
+        )
+
+    [97] => Array
+        (
+            [line] => 23
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No docblock for element '$token'
+        )
+
+    [98] => Array
+        (
+            [line] => 23
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No short description for element '$token'
+        )
+
+    [99] => Array
+        (
+            [line] => 24
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No docblock for element '$startTime'
+        )
+
+    [100] => Array
+        (
+            [line] => 24
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No short description for element '$startTime'
+        )
+
+    [101] => Array
+        (
+            [line] => 25
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No docblock for element '$endTime'
+        )
+
+    [102] => Array
+        (
+            [line] => 25
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No short description for element '$endTime'
+        )
+
+    [103] => Array
+        (
+            [line] => 26
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No docblock for element '$elapsedTime'
+        )
+
+    [104] => Array
+        (
+            [line] => 26
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No short description for element '$elapsedTime'
+        )
+
+    [105] => Array
+        (
+            [line] => 27
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No docblock for element '$sourceFiles'
+        )
+
+    [106] => Array
+        (
+            [line] => 27
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No short description for element '$sourceFiles'
+        )
+
+    [107] => Array
+        (
+            [line] => 28
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No docblock for element '$sourceFileSize'
+        )
+
+    [108] => Array
+        (
+            [line] => 28
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No short description for element '$sourceFileSize'
+        )
+
+    [109] => Array
+        (
+            [line] => 29
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No docblock for element '$mirrorFiles'
+        )
+
+    [110] => Array
+        (
+            [line] => 29
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No short description for element '$mirrorFiles'
+        )
+
+    [111] => Array
+        (
+            [line] => 30
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No docblock for element '$mirrorFileSize'
+        )
+
+    [112] => Array
+        (
+            [line] => 30
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No short description for element '$mirrorFileSize'
+        )
+
+    [113] => Array
+        (
+            [line] => 31
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No docblock for element '$newFiles'
+        )
+
+    [114] => Array
+        (
+            [line] => 31
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No short description for element '$newFiles'
+        )
+
+    [115] => Array
+        (
+            [line] => 32
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No docblock for element '$newFileSize'
+        )
+
+    [116] => Array
+        (
+            [line] => 32
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No short description for element '$newFileSize'
+        )
+
+    [117] => Array
+        (
+            [line] => 33
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No docblock for element '$deletedFiles'
+        )
+
+    [118] => Array
+        (
+            [line] => 33
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No short description for element '$deletedFiles'
+        )
+
+    [119] => Array
+        (
+            [line] => 34
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No docblock for element '$deletedFileSize'
+        )
+
+    [120] => Array
+        (
+            [line] => 34
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No short description for element '$deletedFileSize'
+        )
+
+    [121] => Array
+        (
+            [line] => 35
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No docblock for element '$changedFiles'
+        )
+
+    [122] => Array
+        (
+            [line] => 35
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No short description for element '$changedFiles'
+        )
+
+    [123] => Array
+        (
+            [line] => 36
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No docblock for element '$changedSourceSize'
+        )
+
+    [124] => Array
+        (
+            [line] => 36
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No short description for element '$changedSourceSize'
+        )
+
+    [125] => Array
+        (
+            [line] => 37
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No docblock for element '$changedMirrorSize'
+        )
+
+    [126] => Array
+        (
+            [line] => 37
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No short description for element '$changedMirrorSize'
+        )
+
+    [127] => Array
+        (
+            [line] => 38
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No docblock for element '$incrementFiles'
+        )
+
+    [128] => Array
+        (
+            [line] => 38
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No short description for element '$incrementFiles'
+        )
+
+    [129] => Array
+        (
+            [line] => 39
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No docblock for element '$incrementFileSize'
+        )
+
+    [130] => Array
+        (
+            [line] => 39
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No short description for element '$incrementFileSize'
+        )
+
+    [131] => Array
+        (
+            [line] => 40
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No docblock for element '$totalDestinationSizeChange'
+        )
+
+    [132] => Array
+        (
+            [line] => 40
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No short description for element '$totalDestinationSizeChange'
+        )
+
+    [133] => Array
+        (
+            [line] => 41
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No docblock for element '$errors'
+        )
+
+    [134] => Array
+        (
+            [line] => 41
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No short description for element '$errors'
+        )
+
+    [135] => Array
+        (
+            [line] => 72
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No docblock for element 'getBackupDir'
+        )
+
+    [136] => Array
+        (
+            [line] => 77
+            [file] => /usr/share/glados/models/Backup.php
+            [message] => No docblock for element 'getDir'
+        )
+
+    [137] => Array
+        (
+            [line] => 20
+            [file] => /usr/share/glados/models/Config.php
+            [message] => No docblock for element '$host'
+        )
+
+    [138] => Array
+        (
+            [line] => 20
+            [file] => /usr/share/glados/models/Config.php
+            [message] => No short description for element '$host'
+        )
+
+    [139] => Array
+        (
+            [line] => 21
+            [file] => /usr/share/glados/models/Config.php
+            [message] => No docblock for element '$ip'
+        )
+
+    [140] => Array
+        (
+            [line] => 21
+            [file] => /usr/share/glados/models/Config.php
+            [message] => No short description for element '$ip'
+        )
+
+    [141] => Array
+        (
+            [line] => 22
+            [file] => /usr/share/glados/models/Config.php
+            [message] => No docblock for element '$port'
+        )
+
+    [142] => Array
+        (
+            [line] => 22
+            [file] => /usr/share/glados/models/Config.php
+            [message] => No short description for element '$port'
+        )
+
+    [143] => Array
+        (
+            [line] => 23
+            [file] => /usr/share/glados/models/Config.php
+            [message] => No docblock for element '$avahiPort'
+        )
+
+    [144] => Array
+        (
+            [line] => 23
+            [file] => /usr/share/glados/models/Config.php
+            [message] => No short description for element '$avahiPort'
+        )
+
+    [145] => Array
+        (
+            [line] => 24
+            [file] => /usr/share/glados/models/Config.php
+            [message] => No docblock for element '$avahiType'
+        )
+
+    [146] => Array
+        (
+            [line] => 24
+            [file] => /usr/share/glados/models/Config.php
+            [message] => No short description for element '$avahiType'
+        )
+
+    [147] => Array
+        (
+            [line] => 25
+            [file] => /usr/share/glados/models/Config.php
+            [message] => No docblock for element '$avahiServiceFile'
+        )
+
+    [148] => Array
+        (
+            [line] => 25
+            [file] => /usr/share/glados/models/Config.php
+            [message] => No short description for element '$avahiServiceFile'
+        )
+
+    [149] => Array
+        (
+            [line] => 26
+            [file] => /usr/share/glados/models/Config.php
+            [message] => No docblock for element '$avahiTxtRecords'
+        )
+
+    [150] => Array
+        (
+            [line] => 26
+            [file] => /usr/share/glados/models/Config.php
+            [message] => No short description for element '$avahiTxtRecords'
+        )
+
+    [151] => Array
+        (
+            [line] => 27
+            [file] => /usr/share/glados/models/Config.php
+            [message] => No docblock for element '$params'
+        )
+
+    [152] => Array
+        (
+            [line] => 27
+            [file] => /usr/share/glados/models/Config.php
+            [message] => No short description for element '$params'
+        )
+
+    [153] => Array
+        (
+            [line] => 81
+            [file] => /usr/share/glados/models/Daemon.php
+            [message] => No docblock for element 'getRunning'
+        )
+
+    [154] => Array
+        (
+            [line] => 91
+            [file] => /usr/share/glados/models/Daemon.php
+            [message] => No docblock for element 'startDaemon'
+        )
+
+    [155] => Array
+        (
+            [line] => 96
+            [file] => /usr/share/glados/models/Daemon.php
+            [message] => No docblock for element 'startBackup'
+        )
+
+    [156] => Array
+        (
+            [line] => 101
+            [file] => /usr/share/glados/models/Daemon.php
+            [message] => No docblock for element 'startDownload'
+        )
+
+    [157] => Array
+        (
+            [line] => 106
+            [file] => /usr/share/glados/models/Daemon.php
+            [message] => No docblock for element 'startAnalyzer'
+        )
+
+    [158] => Array
+        (
+            [line] => 111
+            [file] => /usr/share/glados/models/Daemon.php
+            [message] => No docblock for element 'startRestore'
+        )
+
+    [159] => Array
+        (
+            [line] => 122
+            [file] => /usr/share/glados/models/Daemon.php
+            [message] => No docblock for element 'start'
+        )
+
+    [160] => Array
+        (
+            [line] => 137
+            [file] => /usr/share/glados/models/Daemon.php
+            [message] => No docblock for element 'stop'
+        )
+
+    [161] => Array
+        (
+            [line] => 142
+            [file] => /usr/share/glados/models/Daemon.php
+            [message] => No docblock for element 'kill'
+        )
+
+    [162] => Array
+        (
+            [line] => 152
+            [file] => /usr/share/glados/models/Daemon.php
+            [message] => No docblock for element 'hup'
+        )
+
+    [163] => Array
+        (
+            [line] => 157
+            [file] => /usr/share/glados/models/Daemon.php
+            [message] => No docblock for element 'attributesChanged'
+        )
+
+    [164] => Array
+        (
+            [line] => 167
+            [file] => /usr/share/glados/models/Daemon.php
+            [message] => No docblock for element 'updateEvent'
+        )
+
+    [165] => Array
+        (
+            [line] => 5
+            [file] => /usr/share/glados/models/DaemonInterface.php
+            [message] => No docblock for element 'app\models\DaemonInterface'
+        )
+
+    [166] => Array
+        (
+            [line] => 88
+            [file] => /usr/share/glados/models/DaemonSearch.php
+            [message] => No docblock for element 'virtualAttributeSearch'
+        )
+
+    [167] => Array
+        (
+            [line] => 38
+            [file] => /usr/share/glados/models/EventItem.php
+            [message] => No docblock for element '$oldData'
+        )
+
+    [168] => Array
+        (
+            [line] => 38
+            [file] => /usr/share/glados/models/EventItem.php
+            [message] => No short description for element '$oldData'
+        )
+
+    [169] => Array
+        (
+            [line] => 39
+            [file] => /usr/share/glados/models/EventItem.php
+            [message] => No docblock for element '$jsonData'
+        )
+
+    [170] => Array
+        (
+            [line] => 39
+            [file] => /usr/share/glados/models/EventItem.php
+            [message] => No short description for element '$jsonData'
+        )
+
+    [171] => Array
+        (
+            [line] => 40
+            [file] => /usr/share/glados/models/EventItem.php
+            [message] => No docblock for element '$retry'
+        )
+
+    [172] => Array
+        (
+            [line] => 40
+            [file] => /usr/share/glados/models/EventItem.php
+            [message] => No short description for element '$retry'
+        )
+
+    [173] => Array
+        (
+            [line] => 41
+            [file] => /usr/share/glados/models/EventItem.php
+            [message] => No docblock for element '$sent_at'
+        )
+
+    [174] => Array
+        (
+            [line] => 41
+            [file] => /usr/share/glados/models/EventItem.php
+            [message] => No short description for element '$sent_at'
+        )
+
+    [175] => Array
+        (
+            [line] => 42
+            [file] => /usr/share/glados/models/EventItem.php
+            [message] => No docblock for element '$debug'
+        )
+
+    [176] => Array
+        (
+            [line] => 42
+            [file] => /usr/share/glados/models/EventItem.php
+            [message] => No short description for element '$debug'
+        )
+
+    [177] => Array
+        (
+            [line] => 43
+            [file] => /usr/share/glados/models/EventItem.php
+            [message] => No docblock for element '$path'
+        )
+
+    [178] => Array
+        (
+            [line] => 43
+            [file] => /usr/share/glados/models/EventItem.php
+            [message] => No short description for element '$path'
+        )
+
+    [179] => Array
+        (
+            [line] => 144
+            [file] => /usr/share/glados/models/EventItem.php
+            [message] => No docblock for element 'touchFile'
+        )
+
+    [180] => Array
+        (
+            [line] => 88
+            [file] => /usr/share/glados/models/EventStream.php
+            [message] => No docblock for element '$pathPrefixes'
+        )
+
+    [181] => Array
+        (
+            [line] => 88
+            [file] => /usr/share/glados/models/EventStream.php
+            [message] => No short description for element '$pathPrefixes'
+        )
+
+    [182] => Array
+        (
+            [line] => 38
+            [file] => /usr/share/glados/models/Exam.php
+            [message] => No short description for element '$examFile'
+        )
+
+    [183] => Array
+        (
+            [line] => 39
+            [file] => /usr/share/glados/models/Exam.php
+            [message] => No docblock for element '$filePath'
+        )
+
+    [184] => Array
+        (
+            [line] => 39
+            [file] => /usr/share/glados/models/Exam.php
+            [message] => No short description for element '$filePath'
+        )
+
+    [185] => Array
+        (
+            [line] => 213
+            [file] => /usr/share/glados/models/Exam.php
+            [message] => No docblock for element 'getUserName'
+        )
+
+    [186] => Array
+        (
+            [line] => 424
+            [file] => /usr/share/glados/models/Exam.php
+            [message] => No docblock for element 'validateRunningTickets'
+        )
+
+    [187] => Array
+        (
+            [line] => 16
+            [file] => /usr/share/glados/models/ExamSearch.php
+            [message] => No docblock for element '$userName'
+        )
+
+    [188] => Array
+        (
+            [line] => 16
+            [file] => /usr/share/glados/models/ExamSearch.php
+            [message] => No short description for element '$userName'
+        )
+
+    [189] => Array
+        (
+            [line] => 126
+            [file] => /usr/share/glados/models/ExamSearch.php
+            [message] => No docblock for element 'getTotalExams'
+        )
+
+    [190] => Array
+        (
+            [line] => 15
+            [file] => /usr/share/glados/models/Howto.php
+            [message] => No docblock for element '$id'
+        )
+
+    [191] => Array
+        (
+            [line] => 15
+            [file] => /usr/share/glados/models/Howto.php
+            [message] => No short description for element '$id'
+        )
+
+    [192] => Array
+        (
+            [line] => 16
+            [file] => /usr/share/glados/models/Howto.php
+            [message] => No docblock for element '$title'
+        )
+
+    [193] => Array
+        (
+            [line] => 16
+            [file] => /usr/share/glados/models/Howto.php
+            [message] => No short description for element '$title'
+        )
+
+    [194] => Array
+        (
+            [line] => 17
+            [file] => /usr/share/glados/models/Howto.php
+            [message] => No docblock for element '$content'
+        )
+
+    [195] => Array
+        (
+            [line] => 17
+            [file] => /usr/share/glados/models/Howto.php
+            [message] => No short description for element '$content'
+        )
+
+    [196] => Array
+        (
+            [line] => 13
+            [file] => /usr/share/glados/models/LoginForm.php
+            [message] => No docblock for element '$username'
+        )
+
+    [197] => Array
+        (
+            [line] => 13
+            [file] => /usr/share/glados/models/LoginForm.php
+            [message] => No short description for element '$username'
+        )
+
+    [198] => Array
+        (
+            [line] => 14
+            [file] => /usr/share/glados/models/LoginForm.php
+            [message] => No docblock for element '$password'
+        )
+
+    [199] => Array
+        (
+            [line] => 14
+            [file] => /usr/share/glados/models/LoginForm.php
+            [message] => No short description for element '$password'
+        )
+
+    [200] => Array
+        (
+            [line] => 15
+            [file] => /usr/share/glados/models/LoginForm.php
+            [message] => No docblock for element '$rememberMe'
+        )
+
+    [201] => Array
+        (
+            [line] => 15
+            [file] => /usr/share/glados/models/LoginForm.php
+            [message] => No short description for element '$rememberMe'
+        )
+
+    [202] => Array
+        (
+            [line] => 41
+            [file] => /usr/share/glados/models/RdiffFileSystem.php
+            [message] => No short description for element '$root'
+        )
+
+    [203] => Array
+        (
+            [line] => 46
+            [file] => /usr/share/glados/models/RdiffFileSystem.php
+            [message] => No short description for element '$restoreUser'
+        )
+
+    [204] => Array
+        (
+            [line] => 51
+            [file] => /usr/share/glados/models/RdiffFileSystem.php
+            [message] => No short description for element '$restoreHost'
+        )
+
+    [205] => Array
+        (
+            [line] => 68
+            [file] => /usr/share/glados/models/RdiffFileSystem.php
+            [message] => No docblock for element '$options'
+        )
+
+    [206] => Array
+        (
+            [line] => 68
+            [file] => /usr/share/glados/models/RdiffFileSystem.php
+            [message] => No short description for element '$options'
+        )
+
+    [207] => Array
+        (
+            [line] => 117
+            [file] => /usr/share/glados/models/RdiffFileSystem.php
+            [message] => No docblock for element 'init'
+        )
+
+    [208] => Array
+        (
+            [line] => 149
+            [file] => /usr/share/glados/models/RdiffFileSystem.php
+            [message] => No docblock for element 'getPath'
+        )
+
+    [209] => Array
+        (
+            [line] => 154
+            [file] => /usr/share/glados/models/RdiffFileSystem.php
+            [message] => No docblock for element 'getBasename'
+        )
+
+    [210] => Array
+        (
+            [line] => 159
+            [file] => /usr/share/glados/models/RdiffFileSystem.php
+            [message] => No docblock for element 'getRemotePath'
+        )
+
+    [211] => Array
+        (
+            [line] => 164
+            [file] => /usr/share/glados/models/RdiffFileSystem.php
+            [message] => No docblock for element 'getLocalPath'
+        )
+
+    [212] => Array
+        (
+            [line] => 169
+            [file] => /usr/share/glados/models/RdiffFileSystem.php
+            [message] => No docblock for element 'getIncrementsPath'
+        )
+
+    [213] => Array
+        (
+            [line] => 174
+            [file] => /usr/share/glados/models/RdiffFileSystem.php
+            [message] => No docblock for element 'getRdiffBackupDataDir'
+        )
+
+    [214] => Array
+        (
+            [line] => 21
+            [file] => /usr/share/glados/models/Result.php
+            [message] => No short description for element '$resultFile'
+        )
+
+    [215] => Array
+        (
+            [line] => 22
+            [file] => /usr/share/glados/models/Result.php
+            [message] => No docblock for element '$filePath'
+        )
+
+    [216] => Array
+        (
+            [line] => 22
+            [file] => /usr/share/glados/models/Result.php
+            [message] => No short description for element '$filePath'
+        )
+
+    [217] => Array
+        (
+            [line] => 23
+            [file] => /usr/share/glados/models/Result.php
+            [message] => No docblock for element '$file'
+        )
+
+    [218] => Array
+        (
+            [line] => 23
+            [file] => /usr/share/glados/models/Result.php
+            [message] => No short description for element '$file'
+        )
+
+    [219] => Array
+        (
+            [line] => 24
+            [file] => /usr/share/glados/models/Result.php
+            [message] => No docblock for element '$hash'
+        )
+
+    [220] => Array
+        (
+            [line] => 24
+            [file] => /usr/share/glados/models/Result.php
+            [message] => No short description for element '$hash'
+        )
+
+    [221] => Array
+        (
+            [line] => 25
+            [file] => /usr/share/glados/models/Result.php
+            [message] => No docblock for element '$exam_id'
+        )
+
+    [222] => Array
+        (
+            [line] => 25
+            [file] => /usr/share/glados/models/Result.php
+            [message] => No short description for element '$exam_id'
+        )
+
+    [223] => Array
+        (
+            [line] => 28
+            [file] => /usr/share/glados/models/Result.php
+            [message] => No docblock for element '$inc_dotfiles'
+        )
+
+    [224] => Array
+        (
+            [line] => 28
+            [file] => /usr/share/glados/models/Result.php
+            [message] => No short description for element '$inc_dotfiles'
+        )
+
+    [225] => Array
+        (
+            [line] => 29
+            [file] => /usr/share/glados/models/Result.php
+            [message] => No docblock for element '$inc_screenshots'
+        )
+
+    [226] => Array
+        (
+            [line] => 29
+            [file] => /usr/share/glados/models/Result.php
+            [message] => No short description for element '$inc_screenshots'
+        )
+
+    [227] => Array
+        (
+            [line] => 30
+            [file] => /usr/share/glados/models/Result.php
+            [message] => No docblock for element '$inc_emptydirs'
+        )
+
+    [228] => Array
+        (
+            [line] => 30
+            [file] => /usr/share/glados/models/Result.php
+            [message] => No short description for element '$inc_emptydirs'
+        )
+
+    [229] => Array
+        (
+            [line] => 31
+            [file] => /usr/share/glados/models/Result.php
+            [message] => No docblock for element '$path'
+        )
+
+    [230] => Array
+        (
+            [line] => 31
+            [file] => /usr/share/glados/models/Result.php
+            [message] => No short description for element '$path'
+        )
+
+    [231] => Array
+        (
+            [line] => 32
+            [file] => /usr/share/glados/models/Result.php
+            [message] => No docblock for element '$inc_pattern'
+        )
+
+    [232] => Array
+        (
+            [line] => 32
+            [file] => /usr/share/glados/models/Result.php
+            [message] => No short description for element '$inc_pattern'
+        )
+
+    [233] => Array
+        (
+            [line] => 33
+            [file] => /usr/share/glados/models/Result.php
+            [message] => No docblock for element '$inc_ids'
+        )
+
+    [234] => Array
+        (
+            [line] => 33
+            [file] => /usr/share/glados/models/Result.php
+            [message] => No short description for element '$inc_ids'
+        )
+
+    [235] => Array
+        (
+            [line] => 341
+            [file] => /usr/share/glados/models/Result.php
+            [message] => No docblock for element 'getTokens'
+        )
+
+    [236] => Array
+        (
+            [line] => 349
+            [file] => /usr/share/glados/models/Result.php
+            [message] => No docblock for element 'getDirs'
+        )
+
+    [237] => Array
+        (
+            [line] => 357
+            [file] => /usr/share/glados/models/Result.php
+            [message] => No docblock for element 'getTickets'
+        )
+
+    [238] => Array
+        (
+            [line] => 61
+            [file] => /usr/share/glados/models/Screenshot.php
+            [message] => No docblock for element 'getSrc'
+        )
+
+    [239] => Array
+        (
+            [line] => 70
+            [file] => /usr/share/glados/models/Screenshot.php
+            [message] => No docblock for element 'getTsrc'
+        )
+
+    [240] => Array
+        (
+            [line] => 63
+            [file] => /usr/share/glados/models/Ticket.php
+            [message] => No docblock for element '$tduration'
+        )
+
+    [241] => Array
+        (
+            [line] => 63
+            [file] => /usr/share/glados/models/Ticket.php
+            [message] => No short description for element '$tduration'
+        )
+
+    [242] => Array
+        (
+            [line] => 200
+            [file] => /usr/share/glados/models/Ticket.php
+            [message] => No docblock for element 'getOwn'
+        )
+
+    [243] => Array
+        (
+            [line] => 205
+            [file] => /usr/share/glados/models/Ticket.php
+            [message] => No docblock for element 'getConcerns'
+        )
+
+    [244] => Array
+        (
+            [line] => 217
+            [file] => /usr/share/glados/models/Ticket.php
+            [message] => No docblock for element 'getName'
+        )
+
+    [245] => Array
+        (
+            [line] => 222
+            [file] => /usr/share/glados/models/Ticket.php
+            [message] => No docblock for element 'getResultName'
+        )
+
+    [246] => Array
+        (
+            [line] => 566
+            [file] => /usr/share/glados/models/Ticket.php
+            [message] => No docblock for element 'getLimit'
+        )
+
+    [247] => Array
+        (
+            [line] => 662
+            [file] => /usr/share/glados/models/Ticket.php
+            [message] => No docblock for element 'getExamName'
+        )
+
+    [248] => Array
+        (
+            [line] => 668
+            [file] => /usr/share/glados/models/Ticket.php
+            [message] => No docblock for element 'getExamSubject'
+        )
+
+    [249] => Array
+        (
+            [line] => 673
+            [file] => /usr/share/glados/models/Ticket.php
+            [message] => No docblock for element 'getUserId'
+        )
+
+    [250] => Array
+        (
+            [line] => 19
+            [file] => /usr/share/glados/models/TicketSearch.php
+            [message] => No docblock for element '$examId'
+        )
+
+    [251] => Array
+        (
+            [line] => 19
+            [file] => /usr/share/glados/models/TicketSearch.php
+            [message] => No short description for element '$examId'
+        )
+
+    [252] => Array
+        (
+            [line] => 20
+            [file] => /usr/share/glados/models/TicketSearch.php
+            [message] => No docblock for element '$examName'
+        )
+
+    [253] => Array
+        (
+            [line] => 20
+            [file] => /usr/share/glados/models/TicketSearch.php
+            [message] => No short description for element '$examName'
+        )
+
+    [254] => Array
+        (
+            [line] => 21
+            [file] => /usr/share/glados/models/TicketSearch.php
+            [message] => No docblock for element '$examSubject'
+        )
+
+    [255] => Array
+        (
+            [line] => 21
+            [file] => /usr/share/glados/models/TicketSearch.php
+            [message] => No short description for element '$examSubject'
+        )
+
+    [256] => Array
+        (
+            [line] => 22
+            [file] => /usr/share/glados/models/TicketSearch.php
+            [message] => No docblock for element '$userId'
+        )
+
+    [257] => Array
+        (
+            [line] => 22
+            [file] => /usr/share/glados/models/TicketSearch.php
+            [message] => No short description for element '$userId'
+        )
+
+    [258] => Array
+        (
+            [line] => 23
+            [file] => /usr/share/glados/models/TicketSearch.php
+            [message] => No docblock for element '$state'
+        )
+
+    [259] => Array
+        (
+            [line] => 23
+            [file] => /usr/share/glados/models/TicketSearch.php
+            [message] => No short description for element '$state'
+        )
+
+    [260] => Array
+        (
+            [line] => 24
+            [file] => /usr/share/glados/models/TicketSearch.php
+            [message] => No docblock for element '$abandoned'
+        )
+
+    [261] => Array
+        (
+            [line] => 24
+            [file] => /usr/share/glados/models/TicketSearch.php
+            [message] => No short description for element '$abandoned'
+        )
+
+    [262] => Array
+        (
+            [line] => 191
+            [file] => /usr/share/glados/models/TicketSearch.php
+            [message] => No docblock for element 'getExamList'
+        )
+
+    [263] => Array
+        (
+            [line] => 210
+            [file] => /usr/share/glados/models/TicketSearch.php
+            [message] => No docblock for element 'getSubjectList'
+        )
+
+    [264] => Array
+        (
+            [line] => 220
+            [file] => /usr/share/glados/models/TicketSearch.php
+            [message] => No docblock for element 'getRunningTickets'
+        )
+
+    [265] => Array
+        (
+            [line] => 231
+            [file] => /usr/share/glados/models/TicketSearch.php
+            [message] => No docblock for element 'getCompletedTickets'
+        )
+
+    [266] => Array
+        (
+            [line] => 240
+            [file] => /usr/share/glados/models/TicketSearch.php
+            [message] => No docblock for element 'getTotalTickets'
+        )
+
+    [267] => Array
+        (
+            [line] => 246
+            [file] => /usr/share/glados/models/TicketSearch.php
+            [message] => No docblock for element 'getTotalDuration'
+        )
+
+    [268] => Array
+        (
+            [line] => 35
+            [file] => /usr/share/glados/models/User.php
+            [message] => No docblock for element '$password_repeat'
+        )
+
+    [269] => Array
+        (
+            [line] => 35
+            [file] => /usr/share/glados/models/User.php
+            [message] => No short description for element '$password_repeat'
+        )
+
+    [270] => Array
+        (
+            [line] => 90
+            [file] => /usr/share/glados/models/UserSearch.php
+            [message] => No docblock for element 'getRoleList'
+        )
+
+)

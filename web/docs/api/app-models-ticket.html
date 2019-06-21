@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="language" content="en" />
+        <link href="./assets/1cf5ba7/css/bootstrap.css" rel="stylesheet">
+<link href="./assets/be3e053e/solarized_light.css" rel="stylesheet">
+<link href="./assets/1f2e89dd/style.css" rel="stylesheet">
+<script src="./assets/8261f971/jquery.js"></script>
+<script src="./assets/1cf5ba7/js/bootstrap.js"></script>
+<script src="./assets/ae8b5077/jssearch.js"></script>    <title>Ticket, app\models\Ticket - Yii Framework 2.0 API Documentation</title>
+</head>
+<body>
+
+<div class="wrap">
+    <nav id="w215" class="navbar-inverse navbar-fixed-top navbar"><div class="navbar-header"><button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#w215-collapse"><span class="sr-only">Toggle navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span></button><a class="navbar-brand" href="./index.html">Yii Framework 2.0 API Documentation</a></div><div id="w215-collapse" class="collapse navbar-collapse"><ul id="w216" class="navbar-nav nav"><li><a href="./index.html">Class reference</a></li>
+<li><a href="../en/README.html">Guide</a></li></ul><div class="navbar-form navbar-left" role="search">
+  <div class="form-group">
+    <input id="searchbox" type="text" class="form-control" placeholder="Search">
+  </div>
+</div>
+</div></nav>
+    <div id="search-resultbox" style="display: none;" class="modal-content">
+        <ul id="search-results">
+        </ul>
+    </div>
+
+    
+<div class="row">
+    <div class="col-md-3">
+                <div id="navigation" class="list-group"><a class="list-group-item" href="#navigation-210" data-toggle="collapse" data-parent="#navigation">app\assets <b class="caret"></b></a><div id="navigation-210" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-assets-appasset.html">AppAsset</a>
+<a class="list-group-item" href="./app-assets-eventasset.html">EventAsset</a></div>
+<a class="list-group-item" href="#navigation-211" data-toggle="collapse" data-parent="#navigation">app\commands <b class="caret"></b></a><div id="navigation-211" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-commands-analyzecontroller.html">AnalyzeController</a>
+<a class="list-group-item" href="./app-commands-backupcontroller.html">BackupController</a>
+<a class="list-group-item" href="./app-commands-daemoncontroller.html">DaemonController</a>
+<a class="list-group-item" href="./app-commands-dbcleancontroller.html">DbcleanController</a>
+<a class="list-group-item" href="./app-commands-downloadcontroller.html">DownloadController</a>
+<a class="list-group-item" href="./app-commands-rbaccontroller.html">RbacController</a>
+<a class="list-group-item" href="./app-commands-restorecontroller.html">RestoreController</a>
+<a class="list-group-item" href="./app-commands-unlockcontroller.html">UnlockController</a></div>
+<a class="list-group-item" href="#navigation-212" data-toggle="collapse" data-parent="#navigation">app\components <b class="caret"></b></a><div id="navigation-212" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-components-accessrule.html">AccessRule</a>
+<a class="list-group-item" href="./app-components-activeeventfield.html">ActiveEventField</a>
+<a class="list-group-item" href="./app-components-activeeventfieldasset.html">ActiveEventFieldAsset</a>
+<a class="list-group-item" href="./app-components-editable.html">Editable</a>
+<a class="list-group-item" href="./app-components-file.html">File</a>
+<a class="list-group-item" href="./app-components-outputevent.html">OutputEvent</a>
+<a class="list-group-item" href="./app-components-shellcommand.html">ShellCommand</a>
+<a class="list-group-item" href="./app-components-squashfs.html">Squashfs</a>
+<a class="list-group-item" href="./app-components-zip.html">Zip</a></div>
+<a class="list-group-item" href="#navigation-213" data-toggle="collapse" data-parent="#navigation">app\controllers <b class="caret"></b></a><div id="navigation-213" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-controllers-activitycontroller.html">ActivityController</a>
+<a class="list-group-item" href="./app-controllers-backupcontroller.html">BackupController</a>
+<a class="list-group-item" href="./app-controllers-configcontroller.html">ConfigController</a>
+<a class="list-group-item" href="./app-controllers-daemoncontroller.html">DaemonController</a>
+<a class="list-group-item" href="./app-controllers-eventcontroller.html">EventController</a>
+<a class="list-group-item" href="./app-controllers-examcontroller.html">ExamController</a>
+<a class="list-group-item" href="./app-controllers-howtocontroller.html">HowtoController</a>
+<a class="list-group-item" href="./app-controllers-restorecontroller.html">RestoreController</a>
+<a class="list-group-item" href="./app-controllers-resultcontroller.html">ResultController</a>
+<a class="list-group-item" href="./app-controllers-screenshotcontroller.html">ScreenshotController</a>
+<a class="list-group-item" href="./app-controllers-sitecontroller.html">SiteController</a>
+<a class="list-group-item" href="./app-controllers-ticketcontroller.html">TicketController</a>
+<a class="list-group-item" href="./app-controllers-usercontroller.html">UserController</a></div>
+<a class="list-group-item active" href="#navigation-214" data-toggle="collapse" data-parent="#navigation">app\models <b class="caret"></b></a><div id="navigation-214" class="submenu panel-collapse collapse in"><a class="list-group-item" href="./app-models-activity.html">Activity</a>
+<a class="list-group-item" href="./app-models-activityquery.html">ActivityQuery</a>
+<a class="list-group-item" href="./app-models-activitysearch.html">ActivitySearch</a>
+<a class="list-group-item" href="./app-models-authassignment.html">AuthAssignment</a>
+<a class="list-group-item" href="./app-models-authitem.html">AuthItem</a>
+<a class="list-group-item" href="./app-models-backup.html">Backup</a>
+<a class="list-group-item" href="./app-models-backupsearch.html">BackupSearch</a>
+<a class="list-group-item" href="./app-models-base.html">Base</a>
+<a class="list-group-item" href="./app-models-config.html">Config</a>
+<a class="list-group-item" href="./app-models-daemon.html">Daemon</a>
+<a class="list-group-item" href="./app-models-daemoninterface.html">DaemonInterface</a>
+<a class="list-group-item" href="./app-models-daemonsearch.html">DaemonSearch</a>
+<a class="list-group-item" href="./app-models-eventitem.html">EventItem</a>
+<a class="list-group-item" href="./app-models-eventstream.html">EventStream</a>
+<a class="list-group-item" href="./app-models-exam.html">Exam</a>
+<a class="list-group-item" href="./app-models-examquery.html">ExamQuery</a>
+<a class="list-group-item" href="./app-models-examsearch.html">ExamSearch</a>
+<a class="list-group-item" href="./app-models-howto.html">Howto</a>
+<a class="list-group-item" href="./app-models-howtosearch.html">HowtoSearch</a>
+<a class="list-group-item" href="./app-models-loginform.html">LoginForm</a>
+<a class="list-group-item" href="./app-models-rdifffilesystem.html">RdiffFileSystem</a>
+<a class="list-group-item" href="./app-models-restore.html">Restore</a>
+<a class="list-group-item" href="./app-models-restoresearch.html">RestoreSearch</a>
+<a class="list-group-item" href="./app-models-result.html">Result</a>
+<a class="list-group-item" href="./app-models-screenshot.html">Screenshot</a>
+<a class="list-group-item" href="./app-models-screenshotsearch.html">ScreenshotSearch</a>
+<a class="list-group-item" href="./app-models-stats.html">Stats</a>
+<a class="list-group-item active" href="./app-models-ticket.html">Ticket</a>
+<a class="list-group-item" href="./app-models-ticketquery.html">TicketQuery</a>
+<a class="list-group-item" href="./app-models-ticketsearch.html">TicketSearch</a>
+<a class="list-group-item" href="./app-models-user.html">User</a>
+<a class="list-group-item" href="./app-models-usersearch.html">UserSearch</a></div></div>    </div>
+    <div class="col-md-9 api-content" role="main">
+        <h1>Class app\models\Ticket</h1>
+<div class="top-nav">
+    <a href="index.html">All Classes</a>
+            | <a href="#properties">Properties</a>
+                | <a href="#methods">Methods</a>
+                    | <a href="#constants">Constants</a>
+    </div>
+
+<table class="summaryTable docClass table table-bordered">
+    <colgroup>
+        <col class="col-name" />
+        <col class="col-value" />
+    </colgroup>
+            <tr><th>Inheritance</th><td><a href="app-models-ticket.html">app\models\Ticket</a> &raquo;
+<a href="app-models-base.html">app\models\Base</a> &raquo;
+yii\db\ActiveRecord</td></tr>
+                            <tr><th>Subclasses</th><td><a href="app-models-ticketsearch.html">app\models\TicketSearch</a></td></tr>
+                        </table>
+
+<div class="class-description">
+    <p><strong>This is the model class for table "ticket".</strong></p>
+    
+    </div>
+
+<a id="properties"></a>
+
+<div class="summary doc-property">
+<h2>Public Properties</h2>
+
+<p><a href="#" class="toggle">Hide inherited properties</a></p>
+
+<table class="summary-table table table-striped table-bordered table-hover">
+<colgroup>
+    <col class="col-property" />
+    <col class="col-type" />
+    <col class="col-description" />
+    <col class="col-defined" />
+</colgroup>
+<tr>
+  <th>Property</th><th>Type</th><th>Description</th><th>Defined By</th>
+</tr>
+        <tr id="$state">
+        <td><a href="app-models-ticket.html#$state-detail">$state</a></td>
+        <td><a href="http://www.php.net/language.types.integer">integer</a></td>
+        <td>A value from 0 to 4 representing the state of the ticket.</td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="$tduration">
+        <td><a href="app-models-ticket.html#$tduration-detail">$tduration</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+    </table>
+</div>
+
+<a id="methods"></a>
+
+<div class="summary doc-method">
+<h2>Public Methods</h2>
+
+<p><a href="#" class="toggle">Hide inherited methods</a></p>
+
+<table class="summary-table table table-striped table-bordered table-hover">
+<colgroup>
+    <col class="col-method" />
+    <col class="col-description" />
+    <col class="col-defined" />
+</colgroup>
+<tr>
+  <th>Method</th><th>Description</th><th>Defined By</th>
+</tr>
+        <tr id="attributeHints()">
+        <td><a href="app-models-ticket.html#attributeHints()-detail">attributeHints()</a></td>
+        <td></td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="attributeLabels()">
+        <td><a href="app-models-ticket.html#attributeLabels()-detail">attributeLabels()</a></td>
+        <td></td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="attributesChanged()">
+        <td><a href="app-models-ticket.html#attributesChanged()-detail">attributesChanged()</a></td>
+        <td>Checks if attributes have changed</td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="checkIfClosed()">
+        <td><a href="app-models-ticket.html#checkIfClosed()-detail">checkIfClosed()</a></td>
+        <td>Generates an error message when the ticket is in closed state</td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="deleteEvent()">
+        <td><a href="app-models-ticket.html#deleteEvent()-detail">deleteEvent()</a></td>
+        <td>When the ticket is deleted, this function emits the events</td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="find()">
+        <td><a href="app-models-ticket.html#find()-detail">find()</a></td>
+        <td></td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="getAbandoned()">
+        <td><a href="app-models-ticket.html#getAbandoned()-detail">getAbandoned()</a></td>
+        <td>Determine whether the ticket is abandoned or not. To be abandoned the ticket must satisfy all
+the following:</td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="getActivities()">
+        <td><a href="app-models-ticket.html#getActivities()-detail">getActivities()</a></td>
+        <td></td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="getBackup()">
+        <td><a href="app-models-ticket.html#getBackup()-detail">getBackup()</a></td>
+        <td>Returns if there is a backup</td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="getBackups()">
+        <td><a href="app-models-ticket.html#getBackups()-detail">getBackups()</a></td>
+        <td>Returns all backups associated to the ticket</td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="getClassMap()">
+        <td><a href="app-models-ticket.html#getClassMap()-detail">getClassMap()</a></td>
+        <td>Mapping of the different states and the color classes</td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="getConcerns()">
+        <td><a href="app-models-ticket.html#getConcerns()-detail">getConcerns()</a></td>
+        <td></td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="getDuration()">
+        <td><a href="app-models-ticket.html#getDuration()-detail">getDuration()</a></td>
+        <td>Returns the duration of the test</td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="getDurationInSecs()">
+        <td><a href="app-models-ticket.html#getDurationInSecs()-detail">getDurationInSecs()</a></td>
+        <td>Returns the duration in seconds</td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="getExam()">
+        <td><a href="app-models-ticket.html#getExam()-detail">getExam()</a></td>
+        <td></td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="getExamName()">
+        <td><a href="app-models-ticket.html#getExamName()-detail">getExamName()</a></td>
+        <td></td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="getExamSubject()">
+        <td><a href="app-models-ticket.html#getExamSubject()-detail">getExamSubject()</a></td>
+        <td></td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="getLastBackupFailed()">
+        <td><a href="app-models-ticket.html#getLastBackupFailed()-detail">getLastBackupFailed()</a></td>
+        <td>Determine whether the ticket's last backup has failed over time</td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="getLimit()">
+        <td><a href="app-models-ticket.html#getLimit()-detail">getLimit()</a></td>
+        <td></td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="getName()">
+        <td><a href="app-models-ticket.html#getName()-detail">getName()</a></td>
+        <td></td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="getOwn()">
+        <td><a href="app-models-ticket.html#getOwn()-detail">getOwn()</a></td>
+        <td></td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="getRestores()">
+        <td><a href="app-models-ticket.html#getRestores()-detail">getRestores()</a></td>
+        <td></td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="getResultName()">
+        <td><a href="app-models-ticket.html#getResultName()-detail">getResultName()</a></td>
+        <td></td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="getStartTime()">
+        <td><a href="app-models-ticket.html#getStartTime()-detail">getStartTime()</a></td>
+        <td>Getter for the start time</td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="getUserId()">
+        <td><a href="app-models-ticket.html#getUserId()-detail">getUserId()</a></td>
+        <td></td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="getValid()">
+        <td><a href="app-models-ticket.html#getValid()-detail">getValid()</a></td>
+        <td>Just returns validity of the ticket.</td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="getValidTime()">
+        <td><a href="app-models-ticket.html#getValidTime()-detail">getValidTime()</a></td>
+        <td>Calulates the time the ticket will be valid as DateInterval.</td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="init()">
+        <td><a href="app-models-ticket.html#init()-detail">init()</a></td>
+        <td></td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="rules()">
+        <td><a href="app-models-ticket.html#rules()-detail">rules()</a></td>
+        <td></td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="runCommand()">
+        <td><a href="app-models-ticket.html#runCommand()-detail">runCommand()</a></td>
+        <td>Runs a command in the shell of the system.</td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr class="inherited" id="selectList()">
+        <td><a href="app-models-base.html#selectList()-detail">selectList()</a></td>
+        <td>Lists an attribute</td>
+        <td><a href="app-models-base.html">app\models\Base</a></td>
+    </tr>
+            <tr id="setStartTime()">
+        <td><a href="app-models-ticket.html#setStartTime()-detail">setStartTime()</a></td>
+        <td>Setter for the start time</td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="tableName()">
+        <td><a href="app-models-ticket.html#tableName()-detail">tableName()</a></td>
+        <td></td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="updateEvent()">
+        <td><a href="app-models-ticket.html#updateEvent()-detail">updateEvent()</a></td>
+        <td>When the ticket is updated, this function emits the events</td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+            <tr id="validateExam()">
+        <td><a href="app-models-ticket.html#validateExam()-detail">validateExam()</a></td>
+        <td>Returns all backups associated to the ticket</td>
+        <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+    </tr>
+    </table>
+</div>
+
+<a id="events"></a>
+
+<a id="constants"></a>
+<div class="summary doc-const">
+    <h2>Constants</h2>
+
+    <p><a href="#" class="toggle">Hide inherited constants</a></p>
+
+    <table class="summary-table table table-striped table-bordered table-hover">
+    <colgroup>
+        <col class="col-const" />
+        <col class="col-value" />
+        <col class="col-description" />
+        <col class="col-defined" />
+    </colgroup>
+    <tr>
+        <th>Constant</th><th>Value</th><th>Description</th><th>Defined By</th>
+    </tr>
+            <tr id="SCENARIO_DEFAULT">
+          <td id="SCENARIO_DEFAULT-detail">SCENARIO_DEFAULT</td>
+          <td>'default'</td>
+          <td>
+                        </td>
+          <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+        </tr>
+            <tr id="SCENARIO_DEV">
+          <td id="SCENARIO_DEV-detail">SCENARIO_DEV</td>
+          <td>'dev'</td>
+          <td>
+                        </td>
+          <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+        </tr>
+            <tr id="SCENARIO_DOWNLOAD">
+          <td id="SCENARIO_DOWNLOAD-detail">SCENARIO_DOWNLOAD</td>
+          <td>'download'</td>
+          <td>
+                        </td>
+          <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+        </tr>
+            <tr id="SCENARIO_FINISH">
+          <td id="SCENARIO_FINISH-detail">SCENARIO_FINISH</td>
+          <td>'finish'</td>
+          <td>
+                        </td>
+          <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+        </tr>
+            <tr id="SCENARIO_NOTIFY">
+          <td id="SCENARIO_NOTIFY-detail">SCENARIO_NOTIFY</td>
+          <td>'notify'</td>
+          <td>
+                        </td>
+          <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+        </tr>
+            <tr id="SCENARIO_SUBMIT">
+          <td id="SCENARIO_SUBMIT-detail">SCENARIO_SUBMIT</td>
+          <td>'submit'</td>
+          <td>
+                        </td>
+          <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+        </tr>
+            <tr id="STATE_CLOSED">
+          <td id="STATE_CLOSED-detail">STATE_CLOSED</td>
+          <td>2</td>
+          <td>
+                        </td>
+          <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+        </tr>
+            <tr id="STATE_OPEN">
+          <td id="STATE_OPEN-detail">STATE_OPEN</td>
+          <td>0</td>
+          <td>
+                        </td>
+          <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+        </tr>
+            <tr id="STATE_RUNNING">
+          <td id="STATE_RUNNING-detail">STATE_RUNNING</td>
+          <td>1</td>
+          <td>
+                        </td>
+          <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+        </tr>
+            <tr id="STATE_SUBMITTED">
+          <td id="STATE_SUBMITTED-detail">STATE_SUBMITTED</td>
+          <td>3</td>
+          <td>
+                        </td>
+          <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+        </tr>
+            <tr id="STATE_UNKNOWN">
+          <td id="STATE_UNKNOWN-detail">STATE_UNKNOWN</td>
+          <td>4</td>
+          <td>
+                        </td>
+          <td><a href="app-models-ticket.html">app\models\Ticket</a></td>
+        </tr>
+        </table>
+</div>
+
+<h2>Property Details</h2>
+
+<div class="property-doc">
+
+    <div class="detail-header h3" id="$state-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#$state-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $state        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>A value from 0 to 4 representing the state of the ticket.</p>
+
+        <p>See also <span class="broken-link">\app\models\ticket</span> state constants below.</p>    </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.integer">integer</a></span> <a href="app-models-ticket.html#$state-detail">$state</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">null</span></div>
+
+
+    <div class="detail-header h3" id="$tduration-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#$tduration-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $tduration        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"></span> <a href="app-models-ticket.html#$tduration-detail">$tduration</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">null</span></div>
+
+</div>
+<h2>Method Details</h2>
+
+<div class="method-doc">
+
+    <div class="detail-header h3" id="attributeHints()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#attributeHints()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        attributeHints()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-ticket.html#attributeHints()-detail">attributeHints</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="attributeLabels()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#attributeLabels()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        attributeLabels()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-ticket.html#attributeLabels()-detail">attributeLabels</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="attributesChanged()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#attributesChanged()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        attributesChanged()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Checks if attributes have changed</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.boolean">boolean</a></span> <strong><a href="app-models-ticket.html#attributesChanged()-detail">attributesChanged</a></strong> ( <span style="color: #0000BB">$attributes</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$attributes</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.array">array</a></td>
+                  <td class="param-desc-col"><ul>
+<li>a list of attributes to check</li>
+</ul>
+</td>
+                </tr>
+                                                </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="checkIfClosed()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#checkIfClosed()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        checkIfClosed()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Generates an error message when the ticket is in closed state</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-ticket.html#checkIfClosed()-detail">checkIfClosed</a></strong> ( <span style="color: #0000BB">$attribute</span>, <span style="color: #0000BB">$params</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$attribute</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"><ul>
+<li>the attribute</li>
+</ul>
+</td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$params</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.array">array</a></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                                                </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="deleteEvent()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#deleteEvent()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        deleteEvent()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>When the ticket is deleted, this function emits the events</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-ticket.html#deleteEvent()-detail">deleteEvent</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="find()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#find()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        find()
+        <span class="detail-header-tag small">
+            public                        static            method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public static</span> <span class="signature-type"><a href="app-models-ticketquery.html">app\models\TicketQuery</a></span> <strong><a href="app-models-ticket.html#find()-detail">find</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="app-models-ticketquery.html">app\models\TicketQuery</a></td>
+                  <td class="param-desc-col"><p>The active query used by this AR class.</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getAbandoned()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#getAbandoned()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getAbandoned()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Determine whether the ticket is abandoned or not. To be abandoned the ticket must satisfy all
+the following:</strong></p>
+
+        <ul>
+<li>be in the RUNNING/CLOSED or SUBMITTED state</li>
+<li>an IP address must be set</li>
+<li>a backup_interval &gt; 0 must be set</li>
+<li>no last backup existing</li>
+<li>if the computed abandon time is smaller than the no successfull backup time</li>
+</ul>
+<p>Notes:</p>
+<ol>
+<li><p>the "computed abandon time" (cat) is calculated according to the following table:
+ etl    ttl    at     cat
+ null   null   null   10800
+ null   null   &gt;0     abs(at)
+ null   &gt;0     null   10800
+ null   &gt;0     &gt;0     abs(at)
+ null   &gt;0     null   ttl
+ null   &gt;0     &gt;0     ttl
+ 0      null   null   10800
+ 0      null   &gt;0     abs(at)
+ 0      0      null   10800
+ 0      0      &gt;0     abs(at)
+ 0      &gt;0     null   ttl
+ 0      &gt;0     &gt;0     ttl
+ &gt;0     null   null   etl
+ &gt;0     null   &gt;0     etl
+ &gt;0     0      null   etl
+ &gt;0     0      &gt;0     etl
+ &gt;0     &gt;0     null   ttl
+ &gt;0     &gt;0     &gt;0     ttl</p>
+<p> where etl:   time limit from the exam</p>
+<pre><code class="hljs http">   <span class="hljs-attribute">ttl</span>: <span class="hljs-string">  time limit from the ticket</span>
+   <span class="hljs-attribute">at</span>: <span class="hljs-string">   abandon time from the configuration</span>
+   <span class="hljs-attribute">abs()</span>: <span class="hljs-string">the absolute value function</span>
+</code></pre>
+</li>
+<li><p>the "no (successfull) backup time" (nbt) is calculated according to the following table:
+ blt    bl     st     nbt
+ null   null   set    now-st
+ null   set    set    now-bl
+ set    null   set    blt-st
+ set    set    set    blt-bl</p>
+<p> where blt:   last backup try time</p>
+<pre><code class="hljs http">   <span class="hljs-attribute">bl</span>: <span class="hljs-string">   last successfull backup time</span>
+   <span class="hljs-attribute">st</span>: <span class="hljs-string">   ticket start time</span>
+</code></pre>
+</li>
+</ol>
+
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.boolean">boolean</a></span> <strong><a href="app-models-ticket.html#getAbandoned()-detail">getAbandoned</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getActivities()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#getActivities()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getActivities()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">\yii\db\ActiveQuery</span> <strong><a href="app-models-ticket.html#getActivities()-detail">getActivities</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getBackup()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#getBackup()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getBackup()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Returns if there is a backup</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.boolean">boolean</a></span> <strong><a href="app-models-ticket.html#getBackup()-detail">getBackup</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getBackups()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#getBackups()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getBackups()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Returns all backups associated to the ticket</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="app-models-backup.html">app\models\Backup</a>[]</span> <strong><a href="app-models-ticket.html#getBackups()-detail">getBackups</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getClassMap()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#getClassMap()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getClassMap()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Mapping of the different states and the color classes</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <strong><a href="app-models-ticket.html#getClassMap()-detail">getClassMap</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getConcerns()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#getConcerns()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getConcerns()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-ticket.html#getConcerns()-detail">getConcerns</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getDuration()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#getDuration()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getDuration()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Returns the duration of the test</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">\app\models\DateInterval</span> <strong><a href="app-models-ticket.html#getDuration()-detail">getDuration</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col">\app\models\DateInterval</td>
+                  <td class="param-desc-col"><p>Object|null</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getDurationInSecs()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#getDurationInSecs()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getDurationInSecs()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Returns the duration in seconds</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.integer">integer</a></span> <strong><a href="app-models-ticket.html#getDurationInSecs()-detail">getDurationInSecs</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.integer">integer</a></td>
+                  <td class="param-desc-col"><p>The amount of seconds</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getExam()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#getExam()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getExam()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">\yii\db\ActiveQuery</span> <strong><a href="app-models-ticket.html#getExam()-detail">getExam</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getExamName()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#getExamName()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getExamName()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-ticket.html#getExamName()-detail">getExamName</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getExamSubject()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#getExamSubject()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getExamSubject()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-ticket.html#getExamSubject()-detail">getExamSubject</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getLastBackupFailed()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#getLastBackupFailed()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getLastBackupFailed()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Determine whether the ticket's last backup has failed over time</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.boolean">boolean</a></span> <strong><a href="app-models-ticket.html#getLastBackupFailed()-detail">getLastBackupFailed</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getLimit()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#getLimit()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getLimit()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-ticket.html#getLimit()-detail">getLimit</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getName()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#getName()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getName()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-ticket.html#getName()-detail">getName</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getOwn()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#getOwn()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getOwn()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-ticket.html#getOwn()-detail">getOwn</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getRestores()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#getRestores()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getRestores()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">\yii\db\ActiveQuery</span> <strong><a href="app-models-ticket.html#getRestores()-detail">getRestores</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getResultName()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#getResultName()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getResultName()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-ticket.html#getResultName()-detail">getResultName</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getStartTime()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#getStartTime()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getStartTime()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Getter for the start time</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.integer">integer</a></span> <strong><a href="app-models-ticket.html#getStartTime()-detail">getStartTime</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getUserId()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#getUserId()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getUserId()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-ticket.html#getUserId()-detail">getUserId</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getValid()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#getValid()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getValid()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Just returns validity of the ticket.</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.boolean">boolean</a></span> <strong><a href="app-models-ticket.html#getValid()-detail">getValid</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getValidTime()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#getValidTime()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getValidTime()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Calulates the time the ticket will be valid as DateInterval.</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">\app\models\DateInterval|<a href="http://www.php.net/language.types.boolean">boolean</a></span> <strong><a href="app-models-ticket.html#getValidTime()-detail">getValidTime</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col">\app\models\DateInterval|<a href="http://www.php.net/language.types.boolean">boolean</a></td>
+                  <td class="param-desc-col"><ul>
+<li>Dateinterval object,<pre><code class="hljs bash">                      <span class="hljs-literal">false</span>, <span class="hljs-keyword">if</span> not valid,
+                      <span class="hljs-literal">true</span>, <span class="hljs-keyword">if</span> it cannot expire
+</code></pre>
+</li>
+</ul>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="init()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#init()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        init()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-ticket.html#init()-detail">init</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="rules()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#rules()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        rules()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-ticket.html#rules()-detail">rules</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="runCommand()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#runCommand()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        runCommand()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Runs a command in the shell of the system.</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <strong><a href="app-models-ticket.html#runCommand()-detail">runCommand</a></strong> ( <span style="color: #0000BB">$cmd</span>, <span style="color: #0000BB">$lc_all&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">"C"</span>, <span style="color: #0000BB">$timeout&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">30</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$cmd</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"><ul>
+<li>the command to run</li>
+</ul>
+</td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$lc_all</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"><ul>
+<li>the value of the LC_ALL environment variable</li>
+</ul>
+</td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$timeout</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.integer">integer</a></td>
+                  <td class="param-desc-col"><ul>
+<li>the SSH connection timeout</li>
+</ul>
+</td>
+                </tr>
+                                        <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.array">array</a></td>
+                  <td class="param-desc-col"><ul>
+<li>the first element contains the output (stdout and stderr),<pre><code class="hljs bash">          the second element contains the <span class="hljs-built_in">exit</span> code of the <span class="hljs-built_in">command</span>
+</code></pre>
+</li>
+</ul>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="setStartTime()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#setStartTime()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        setStartTime()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Setter for the start time</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-ticket.html#setStartTime()-detail">setStartTime</a></strong> ( <span style="color: #0000BB">$value</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$value</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.integer">integer</a></td>
+                  <td class="param-desc-col"><ul>
+<li>the start time</li>
+</ul>
+</td>
+                </tr>
+                                                </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="tableName()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#tableName()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        tableName()
+        <span class="detail-header-tag small">
+            public                        static            method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public static</span> <span class="signature-type">void</span> <strong><a href="app-models-ticket.html#tableName()-detail">tableName</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="updateEvent()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#updateEvent()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        updateEvent()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>When the ticket is updated, this function emits the events</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-ticket.html#updateEvent()-detail">updateEvent</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="validateExam()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-ticket.html#validateExam()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        validateExam()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Returns all backups associated to the ticket</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-ticket.html#validateExam()-detail">validateExam</a></strong> ( <span style="color: #0000BB">$attribute</span>, <span style="color: #0000BB">$params</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$attribute</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"><ul>
+<li>the attribute</li>
+</ul>
+</td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$params</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.array">array</a></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                                                </table>
+
+<!--	-->
+</div>
+        </div>
+</div>
+
+<script type="text/javascript">
+    /*<![CDATA[*/
+    $("a.toggle").on('click', function () {
+        var $this = $(this);
+        if ($this.hasClass('properties-hidden')) {
+            $this.text($this.text().replace(/Show/,'Hide'));
+            $this.parents(".summary").find(".inherited").show();
+            $this.removeClass('properties-hidden');
+        } else {
+            $this.text($this.text().replace(/Hide/,'Show'));
+            $this.parents(".summary").find(".inherited").hide();
+            $this.addClass('properties-hidden');
+        }
+
+        return false;
+    });
+    /*
+     $(".sourceCode a.show").toggle(function () {
+     $(this).text($(this).text().replace(/show/,'hide'));
+     $(this).parents(".sourceCode").find("div.code").show();
+     },function () {
+     $(this).text($(this).text().replace(/hide/,'show'));
+     $(this).parents(".sourceCode").find("div.code").hide();
+     });
+     $("a.sourceLink").click(function () {
+     $(this).attr('target','_blank');
+     });
+     */
+    /*]]>*/
+</script>
+
+
+</div>
+
+<footer class="footer">
+        <p class="pull-right"><small>Page generated on Fri, 21 Jun 2019 10:08:05 +0000</small></p>
+    Powered by <a href="http://www.yiiframework.com/" rel="external">Yii Framework</a></footer>
+
+<script>jQuery(function ($) {
+    var shiftWindow = function () { scrollBy(0, -50) };
+    if (location.hash) setTimeout(shiftWindow, 1);
+    window.addEventListener("hashchange", shiftWindow);
+var element = document.createElement("script");
+element.src = "./jssearch.index.js";
+document.body.appendChild(element);
+
+var searchBox = $('#searchbox');
+
+// search when typing in search field
+searchBox.on("keyup", function(event) {
+    var query = $(this).val();
+
+    if (query == '' || event.which == 27) {
+        $('#search-resultbox').hide();
+        return;
+    } else if (event.which == 13) {
+        var selectedLink = $('#search-resultbox a.selected');
+        if (selectedLink.length != 0) {
+            document.location = selectedLink.attr('href');
+            return;
+        }
+    } else if (event.which == 38 || event.which == 40) {
+        $('#search-resultbox').show();
+
+        var selected = $('#search-resultbox a.selected');
+        if (selected.length == 0) {
+            $('#search-results').find('a').first().addClass('selected');
+        } else {
+            var next;
+            if (event.which == 40) {
+                next = selected.parent().next().find('a').first();
+            } else {
+                next = selected.parent().prev().find('a').first();
+            }
+            if (next.length != 0) {
+                var resultbox = $('#search-results');
+                var position = next.position();
+
+//              TODO scrolling is buggy and jumps around
+//                resultbox.scrollTop(Math.floor(position.top));
+//                console.log(position.top);
+
+                selected.removeClass('selected');
+                next.addClass('selected');
+            }
+        }
+
+        return;
+    }
+    $('#search-resultbox').show();
+    $('#search-results').html('<li><span class="no-results">No results</span></li>');
+
+    var result = jssearch.search(query);
+
+    if (result.length > 0) {
+        var i = 0;
+        var resHtml = '';
+
+        for (var key in result) {
+            if (i++ > 20) {
+                break;
+            }
+            resHtml = resHtml +
+            '<li><a href="' + result[key].file.u.substr(3) +'"><span class="title">' + result[key].file.t + '</span>' +
+            '<span class="description">' + result[key].file.d + '</span></a></li>';
+        }
+        $('#search-results').html(resHtml);
+    }
+});
+
+// hide the search results on ESC
+$(document).on("keyup", function(event) { if (event.which == 27) { $('#search-resultbox').hide(); } });
+// hide search results on click to document
+$(document).bind('click', function (e) { $('#search-resultbox').hide(); });
+// except the following:
+searchBox.bind('click', function(e) { e.stopPropagation(); });
+$('#search-resultbox').bind('click', function(e) { e.stopPropagation(); });
+
+});</script></body>
+</html>

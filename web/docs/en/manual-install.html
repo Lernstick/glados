@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="language" content="en" />
+        <link href="./assets/1cf5ba7/css/bootstrap.css" rel="stylesheet">
+<link href="./assets/be3e053e/solarized_light.css" rel="stylesheet">
+<link href="./assets/1f2e89dd/style.css" rel="stylesheet">
+<script src="./assets/8261f971/jquery.js"></script>
+<script src="./assets/1cf5ba7/js/bootstrap.js"></script>
+<script src="./assets/ae8b5077/jssearch.js"></script>    <title>Manual Installation - Admin Manual - The Definitive Guide to Yii 2.0</title>
+</head>
+<body>
+
+<div class="wrap">
+    <nav id="w222" class="navbar-inverse navbar-fixed-top navbar"><div class="navbar-header"><button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#w222-collapse"><span class="sr-only">Toggle navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span></button><a class="navbar-brand" href="./index.html">The Definitive Guide to Yii 2.0</a></div><div id="w222-collapse" class="collapse navbar-collapse"><ul id="w223" class="navbar-nav nav"><li><a href="../api/index.html">Class reference</a></li>
+<li><a href="./README.html">Guide</a></li></ul><div class="navbar-form navbar-left" role="search">
+  <div class="form-group">
+    <input id="searchbox" type="text" class="form-control" placeholder="Search">
+  </div>
+</div>
+</div></nav>
+    <div id="search-resultbox" style="display: none;" class="modal-content">
+        <ul id="search-results">
+        </ul>
+    </div>
+
+    
+<div class="row">
+    <div class="col-md-2">
+                <div id="navigation" class="list-group"><a class="list-group-item" href="#navigation-220" data-toggle="collapse" data-parent="#navigation">User Manual <b class="caret"></b></a><div id="navigation-220" class="submenu panel-collapse collapse"><a class="list-group-item" href="./create-exam.html">Create an exam</a>
+<a class="list-group-item" href="./remote-backup-path.html">Remote Backup Path</a>
+<a class="list-group-item" href="./create-zip-exam-file.html">Create a zip-file as exam file</a>
+<a class="list-group-item" href="./create-squashfs-exam-file.html">Create a squashfs-filesystem as exam file</a>
+<a class="list-group-item" href="./exam-view.html">The exam view</a>
+<a class="list-group-item" href="./create-single-ticket.html">Create a single ticket</a>
+<a class="list-group-item" href="./create-multiple-tickets.html">Create multiple tickets</a>
+<a class="list-group-item" href="./ticket-view.html">The ticket view </a>
+<a class="list-group-item" href="./ticket-states.html">Ticket states</a>
+<a class="list-group-item" href="./take-exam.html">Taking an Exam</a>
+<a class="list-group-item" href="./generate-results.html">Generate results</a>
+<a class="list-group-item" href="./correct-exams.html">Correct the exams</a>
+<a class="list-group-item" href="./submit-results.html">Submit results back to the student</a>
+<a class="list-group-item" href="./get-exam-result.html">Get the exam result as a student</a>
+<a class="list-group-item" href="./client-crash.html">Client crashes during exam</a>
+<a class="list-group-item" href="./restore-specific-file.html">Restore a specific file</a>
+<a class="list-group-item" href="./example-exam-essay.html">Example exam: Essay</a></div>
+<a class="list-group-item active" href="#navigation-221" data-toggle="collapse" data-parent="#navigation">Admin Manual <b class="caret"></b></a><div id="navigation-221" class="submenu panel-collapse collapse in"><a class="list-group-item active" href="./manual-install.html">Manual Installation</a>
+<a class="list-group-item" href="./deb-install.html">Automatic Installation</a>
+<a class="list-group-item" href="./deb-update.html">Softwareupdate on Debian</a>
+<a class="list-group-item" href="./deb-8to9-upgrade.html">Upgrade from Debian 8 to 9</a>
+<a class="list-group-item" href="./config-files.html">Glados config files</a>
+<a class="list-group-item" href="./client-config.html">Exam client configuration</a>
+<a class="list-group-item" href="./network-config.html">Network configuration</a></div></div>    </div>
+    <div class="col-md-9 guide-content" role="main">
+        <h2>Installation Guide (From the sources) <span id="installation-guide-from-the-sources"></span><a href="#installation-guide-from-the-sources" class="hashlink">&para;</a></h2><p>This guide describes how to install GLaDOS from the source package.</p>
+<hr />
+<h3>Requirements <span id="requirements"></span><a href="#requirements" class="hashlink">&para;</a></h3><h4>Webserver <span id="webserver"></span><a href="#webserver" class="hashlink">&para;</a></h4><p>Since GLaDOS's interface is based entirely in your browser, you’ll need a web server (such as Apache, nginx) to install the files into.</p>
+<ul>
+<li>Apache needs <a href="http://httpd.apache.org/docs/current/mod/mod_rewrite.html">mod_rewrite</a> to be installed and enabled.</li>
+<li>Nginx needs PHP as an <a href="http://php.net/install.fpm">FPM SAPI</a>.</li>
+</ul>
+<h4>PHP <span id="php"></span><a href="#php" class="hashlink">&para;</a></h4><ul>
+<li>You should have PHP 5.4 or above. Ideally latest PHP 7. You should also install the <a href="http://www.php.net/manual/en/pdo.installation.php">PDO PHP Extension</a> and the corresponding database driver <code>pdo_mysql</code>.</li>
+<li>To support generating of ZIP files, you need the PHP <code>zip</code> extension.</li>
+<li>To support live data, you need the <a href="https://pecl.php.net/package/inotify/0.1.6">PECL inotify</a> extension version 0.1.6.</li>
+<li>To support creating thumbnails, you need the PHP <code>gd</code> extension.</li>
+<li>Yii2 needs the Multibyte-Strings <a href="http://php.net/manual/de/book.mbstring.php">mbstring</a> module for PHP.</li>
+</ul>
+<h4>Database <span id="database"></span><a href="#database" class="hashlink">&para;</a></h4><p>Currently only MySQL databases are supported. You need MySQL 5.5 or newer.</p>
+<h4>Miscellaneous <span id="miscellaneous"></span><a href="#miscellaneous" class="hashlink">&para;</a></h4><ul>
+<li>To fetch the exam backups, <a href="http://rdiff-backup.nongnu.org/">rdiff-backup</a> 1.2.8 or newer is needed.</li>
+<li><a href="https://www.openssh.com/">OpenSSH</a> client and its key generator <code>ssh-keygen</code> are needed to create a connection for rdiff-backup.</li>
+<li>To support squashfs files, <a href="http://squashfs.sourceforge.net/">Squashfs</a> is needed.</li>
+<li>To support auto discovery of the exam server, <a href="http://avahi.org/">avahi</a> is needed.</li>
+<li>For the manual installation <a href="https://getcomposer.org/download/">Composer</a> is needed. It can be removed subsequently.</li>
+</ul>
+<h4>Debian <span id="debian"></span><a href="#debian" class="hashlink">&para;</a></h4><p>In Debian, the packages needed from above can be installed by:</p>
+<pre><code class="hljs sql">apt-get <span class="hljs-operator"><span class="hljs-keyword">install</span> apache2 mysql-<span class="hljs-keyword">server</span> php5 php5-mysql php5-gd squashfs-tools rdiff-<span class="hljs-keyword">backup</span> avahi-daemon openssh-<span class="hljs-keyword">client</span>
+</span></code></pre>
+<h3>Installation <span id="installation"></span><a href="#installation" class="hashlink">&para;</a></h3><p>Composer can be installed to <code>/usr/local/bin</code> with the following commands (you need <a href="https://curl.haxx.se/">curl</a> for this to work):</p>
+<pre><code class="language-shell">cd /usr/src
+curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+</code></pre>
+<h4>Download the latest source package <span id="download-the-latest-source-package"></span><a href="#download-the-latest-source-package" class="hashlink">&para;</a></h4><p>Browse to the Github <a href="https://github.com/imedias/glados/releases">release page</a> and download the latest version of GLaDOS.</p>
+<pre><code class="hljs nginx"><span class="hljs-title">curl</span> -L -O <span class="hljs-url">https://github.com/imedias/glados/archive/<span class="hljs-variable">$version</span>.tar.gz</span>
+</code></pre>
+<p>Where <code>$version</code> is the latest version number.</p>
+<p>Unpack the source package:</p>
+<pre><code class="hljs nginx"><span class="hljs-title">tar</span> xfs <span class="hljs-variable">$version</span>.tar.gz
+</code></pre>
+<p>Create a new directory <code>/usr/share/glados</code> and copy all extracted files. Then cd into the created directory:</p>
+<pre><code class="language-shell">mkdir /usr/share/glados
+cp -rpv glados-1.0.3/* /usr/share/glados/
+cd /usr/share/glados
+</code></pre>
+<p>Install composer asset plugin (according to the <a href="https://github.com/yiisoft/yii2/blob/master/framework/README.md">Yii2 installation guide</a>):</p>
+<pre><code class="hljs php">composer <span class="hljs-keyword">global</span> <span class="hljs-keyword">require</span> <span class="hljs-string">"fxp/composer-asset-plugin:^1.4.1"</span>
+</code></pre>
+<p>Run composer (this will take a while, you also may need to create a <a href="https://github.com/blog/1509-personal-api-tokens">Github OAuth token</a> to go over the <a href="https://getcomposer.org/doc/articles/troubleshooting.md#api-rate-limit-and-oauth-tokens">API rate limit</a>):</p>
+<pre><code class="hljs nginx"><span class="hljs-title">composer</span> update
+</code></pre>
+<p>This will install all packages specified in <code>composer.json</code>.</p>
+<hr />
+<p>Create the following directories:</p>
+<pre><code class="hljs javascript">mkdir -p /<span class="hljs-keyword">var</span>/lib/glados/uploads
+mkdir -p /<span class="hljs-keyword">var</span>/lib/glados/backups
+mkdir -p /<span class="hljs-keyword">var</span>/lib/glados/results
+mkdir -p /<span class="hljs-keyword">var</span>/lib/glados/tmp
+mkdir -p /<span class="hljs-keyword">var</span>/lib/glados/.ssh
+mkdir -p /<span class="hljs-keyword">var</span>/log/glados
+</code></pre>
+<p>Some directories need to be writable by the user under which your webserver runs. Assuming the user is called <code>www-data</code>, adjust the following permissions:</p>
+<pre><code class="hljs javascript">chown www-data /<span class="hljs-keyword">var</span>/log/glados
+chown www-data:www-data /usr/share/glados/web/assets/
+chown -R www-data:www-data /<span class="hljs-keyword">var</span>/lib/glados
+</code></pre>
+<p>Next, set the environment variables. Edit <code>/usr/share/glados/web/index.php</code> and comment out lines 4 and 5:</p>
+<pre><code class="hljs bash">// comment out the following two lines when deployed to production
+//defined(<span class="hljs-string">'YII_DEBUG'</span>) or define(<span class="hljs-string">'YII_DEBUG'</span>, <span class="hljs-literal">true</span>);
+//defined(<span class="hljs-string">'YII_ENV'</span>) or define(<span class="hljs-string">'YII_ENV'</span>, <span class="hljs-string">'dev'</span>);
+</code></pre>
+<h4>MySQL setup <span id="mysql-setup"></span><a href="#mysql-setup" class="hashlink">&para;</a></h4><p>Once all dependencies are installed, you need to set up the database. The following example code, shows how to create a database called <code>glados</code>, with a database user called <code>glados</code> and password <code>mysqlpassword</code> with all permissions granted on that database.</p>
+<pre><code class="language-shell">mysql -u root -p
+Enter password:
+mysql&gt; create database glados;
+mysql&gt; grant usage on *.* to glados@localhost identified by 'mysqlpassword';
+mysql&gt; grant all privileges on glados.* to glados@localhost;
+mysql&gt; quit
+</code></pre>
+<p>Open the config file <code>/usr/share/glados/config/db.php</code> and provide the database name, the username and the password from above (see <a href="config-files.html">Config Files</a> for more information):</p>
+<pre><code class="hljs php language-php"><span class="hljs-keyword">return</span> [
+    <span class="hljs-string">'class'</span> =&gt; <span class="hljs-string">'yii\db\Connection'</span>,
+    <span class="hljs-string">'dsn'</span> =&gt; <span class="hljs-string">'mysql:host=localhost;dbname=glados'</span>,
+    <span class="hljs-string">'username'</span> =&gt; <span class="hljs-string">'glados'</span>,
+    <span class="hljs-string">'password'</span> =&gt; <span class="hljs-string">'mysqlpassword'</span>,
+    <span class="hljs-string">'charset'</span> =&gt; <span class="hljs-string">'utf8'</span>,
+];
+</code></pre>
+<p>Change into the directory <code>/usr/share/glados</code>. Install all RBAC tables:
+<code>`</code>shell
+./yii migrate --migrationPath=@yii/rbac/migrations --interactive=0
+<code>`</code></p>
+<p>RBAC initialization:
+<code>`</code>shell
+./yii rbac/init --interactive=0
+<code>`</code></p>
+<p>Database tables:
+<code>`</code>shell
+./yii migrate --interactive=0
+<code>`</code></p>
+<h4>PHP setup <span id="php-setup"></span><a href="#php-setup" class="hashlink">&para;</a></h4><p>Install PECL inotify (you need <a href="https://pear.php.net/">PEAR</a>, PHP5 module development files and a C-compiler for this to work):
+<code>`</code>shell
+pecl install inotify        //for PHP7
+pecl install inotify-0.1.6  //for PHP5
+<code>`</code></p>
+<p>Create a PHP ini file for inotify (example: <code>/etc/php/7.0/mods-available/inotify.ini</code> for PHP7 and <code>/etc/php5/mods-available/inotify.ini</code> for PHP5) with contents:
+<code>`</code>ini
+; configuration for php inotify module
+; priority=20
+extension=inotify.so
+<code>`</code></p>
+<blockquote><p>Make sure to enable the inotify module.</p>
+</blockquote>
+<h4>Avahi setup <span id="avahi-setup"></span><a href="#avahi-setup" class="hashlink">&para;</a></h4><p>Create an Avahi service file (<code>/etc/avahi/services/glados.service</code>) with contents:
+<code>`</code>xml
+&lt;?xml version="1.0" standalone='no'?&gt;
+&lt;!DOCTYPE service-group SYSTEM "avahi-service.dtd"&gt;
+&lt;service-group&gt;
+ <name replace-wildcards="yes">Glados on %h</name>
+  <service>
+   <type>_http._tcp</type>
+   <port>80</port>
+   &lt;txt-record&gt;type=Glados&lt;/txt-record&gt;
+   &lt;txt-record&gt;actionDownload='glados/index.php/ticket/download/{token}'&lt;/txt-record&gt;
+   &lt;txt-record&gt;actionFinish='glados/index.php/ticket/finish/{token}'&lt;/txt-record&gt;
+   &lt;txt-record&gt;actionNotify='glados/index.php/ticket/notify/{token}?state={state}'&lt;/txt-record&gt;
+   &lt;txt-record&gt;actionSSHKey='glados/index.php/ticket/ssh-key'&lt;/txt-record&gt;
+   &lt;txt-record&gt;actionMd5='glados/index.php/ticket/md5/{token}'&lt;/txt-record&gt;
+   &lt;txt-record&gt;actionConfig='glados/index.php/ticket/config/{token}'&lt;/txt-record&gt;
+  </service>
+&lt;/service-group&gt;
+<code>`</code></p>
+<p>Make sure that the file above contains the correct URLs (this depends on your webserver setup, see below). For example the download URL <code>actionDownload</code> will be made up of the hosts IP-address, the port, the protocol and the given relative path from the txt-record <code>actionDownload</code>, discovered by <code>avahi-browse</code>. The protocol is determined by the port number, <code>80</code> gives <code>http</code> and <code>443</code> gives <code>https</code>.</p>
+<pre><code class="language-shell">${gladosProto}://${gladosIp}:${gladosPort}/${actionDownload}
+</code></pre>
+<p>will then be</p>
+<pre><code class="language-shell">http://1.2.3.4:80/glados/index.php/ticket/download/{token}
+</code></pre>
+<p>If you use the Apache setup from below, you don't have to change the service file.</p>
+<p>Finally restart the avahi-daemon:</p>
+<pre><code class="hljs ">/etc/init.d/avahi-daemon restart
+</code></pre>
+<h4>Webserver setup <span id="webserver-setup"></span><a href="#webserver-setup" class="hashlink">&para;</a></h4><h5><strong>Apache</strong> <span id="apache"></span><a href="#apache" class="hashlink">&para;</a></h5><p>Use the following configuration in <a href="https://httpd.apache.org/">Apache's</a> <code>httpd.conf</code> file or within a virtual host configuration (example: <code>/etc/apache2/conf-available/glados.conf</code>).</p>
+<pre><code class="hljs apache language-apache"><span class="hljs-keyword">Alias</span> /glados /usr/share/glados/web
+
+<span class="hljs-tag">&lt;Directory /usr/share/glados/web&gt;</span>
+    <span class="hljs-keyword"><span class="hljs-common">Options</span></span> FollowSymLinks
+    <span class="hljs-keyword">DirectoryIndex</span> index.php
+
+    <span class="hljs-comment"># use mod_rewrite for pretty URL support</span>
+    <span class="hljs-keyword"><span class="hljs-common">RewriteEngine</span></span> <span class="hljs-literal">on</span>
+    <span class="hljs-comment"># If a directory or a file exists, use the request directly</span>
+    <span class="hljs-keyword"><span class="hljs-common">RewriteCond</span></span> <span class="hljs-cbracket">%{REQUEST_FILENAME}</span> !-f
+    <span class="hljs-keyword"><span class="hljs-common">RewriteCond</span></span> <span class="hljs-cbracket">%{REQUEST_FILENAME}</span> !-d
+    <span class="hljs-comment"># Otherwise forward the request to index.php</span>
+    <span class="hljs-keyword"><span class="hljs-common">RewriteRule</span></span> . index.php
+
+    <span class="hljs-comment"># ...other settings...</span>
+<span class="hljs-tag">&lt;/Directory&gt;</span>
+</code></pre>
+<blockquote><p>Make sure <code>mod_rewrite</code> is enabled and installed.</p>
+</blockquote>
+<p>Then restart apache:
+<code>`</code>shell
+/etc/init.d/apache2 restart
+<code>`</code></p>
+<h5><strong>Nginx</strong> <span id="nginx"></span><a href="#nginx" class="hashlink">&para;</a></h5><p>To use <a href="http://wiki.nginx.org/">Nginx</a>, you should install PHP as an <a href="http://php.net/install.fpm">FPM SAPI</a>. You may use the following Nginx configuration, replacing <code>glados.test</code> with the actual hostname to serve.</p>
+<pre><code class="hljs nginx language-nginx"><span class="hljs-title">server</span> {
+    <span class="hljs-title">charset</span> utf-<span class="hljs-number">8</span>;
+    <span class="hljs-title">client_max_body_size</span> <span class="hljs-number">128M</span>;
+
+    <span class="hljs-title">listen</span> <span class="hljs-number">80</span>; <span class="hljs-comment">## listen for ipv4</span>
+    <span class="hljs-comment">#listen [::]:80 default_server ipv6only=on; ## listen for ipv6</span>
+
+    <span class="hljs-title">server_name</span> glados.test;
+    <span class="hljs-title">root</span>        /usr/share/glados/web;
+    <span class="hljs-title">index</span>       index.php;
+
+    <span class="hljs-title">access_log</span>  /var/log/glados/access.log;
+    <span class="hljs-title">error_log</span>   /var/log/glados/error.log;
+
+    <span class="hljs-title">location</span> / {
+        <span class="hljs-comment"># Redirect everything that isn't a real file to index.php</span>
+        <span class="hljs-title">try_files</span> <span class="hljs-variable">$uri</span> <span class="hljs-variable">$uri</span>/ /index.php<span class="hljs-variable">$is_args</span><span class="hljs-variable">$args</span>;
+    }
+
+    <span class="hljs-comment"># uncomment to avoid processing of calls to non-existing static files by Yii</span>
+    <span class="hljs-comment">#location ~ \.(js|css|png|jpg|gif|swf|ico|pdf|mov|fla|zip|rar)$ {</span>
+    <span class="hljs-comment">#    try_files $uri =404;</span>
+    <span class="hljs-comment">#}</span>
+    <span class="hljs-comment">#error_page 404 /404.html;</span>
+
+    <span class="hljs-comment"># deny accessing php files for the /assets directory</span>
+    <span class="hljs-title">location</span> <span class="hljs-regexp">~ ^/assets/.*\.php$</span> {
+        <span class="hljs-title">deny</span> all;
+    }
+
+    <span class="hljs-title">location</span> <span class="hljs-regexp">~ \.php$</span> {
+        <span class="hljs-title">include</span> fastcgi_params;
+        <span class="hljs-title">fastcgi_param</span> SCRIPT_FILENAME <span class="hljs-variable">$document_root</span><span class="hljs-variable">$fastcgi_script_name</span>;
+        <span class="hljs-comment">#fastcgi_pass 127.0.0.1:9000;</span>
+        <span class="hljs-title">fastcgi_pass</span> <span class="hljs-url">unix:/var/run/php5-fpm.sock</span>;
+        <span class="hljs-title">try_files</span> <span class="hljs-variable">$uri</span> =<span class="hljs-number">404</span>;
+    }
+
+    <span class="hljs-title">location</span> <span class="hljs-regexp">~* /\.</span> {
+        <span class="hljs-title">deny</span> all;
+    }
+}
+</code></pre>
+<p>When using this configuration, you should also set <code>cgi.fix_pathinfo=0</code> in the <code>php.ini</code> file in order to avoid many unnecessary system <code>stat()</code> calls.</p>
+<p>Also note that when running an HTTPS server, you need to add <code>fastcgi_param HTTPS on;</code> so that Yii can properly detect if a connection is secure.</p>
+<h4>Check the installation <span id="check-the-installation"></span><a href="#check-the-installation" class="hashlink">&para;</a></h4><p>Hit <a href="http://localhost/glados/requirements.php">http://localhost/glados/requirements.php</a> to check if all requirements are met.</p>
+<p>Make sure you have set <code>upload_max_filesize</code> and <code>post_max_size</code> to a proper value in <code>php.ini</code>.</p>
+<blockquote><p>After checking all requirements, you can remove the <code>requirements.php</code> file located at <code>/usr/share/glados/web/requirements.php</code>.</p>
+</blockquote>
+<p>You can now access the webinterface by the URL <a href="http://localhost/glados">http://localhost/glados</a>.</p>
+<p>You may login with <strong>admin/admin</strong> or <strong>teacher/teacher</strong>.
+To modify the users, please login as <strong>admin</strong>.</p>
+<pre><code class="language-shell">:wq
+</code></pre>
+        <div class="toplink"><a href="#" class="h1" title="go to top"><span class="glyphicon glyphicon-arrow-up"></a></div>
+    </div>
+</div>
+
+
+</div>
+
+<footer class="footer">
+        <p class="pull-right"><small>Page generated on Fri, 21 Jun 2019 10:08:05 +0000</small></p>
+    Powered by <a href="http://www.yiiframework.com/" rel="external">Yii Framework</a></footer>
+
+<script>jQuery(function ($) {
+    var shiftWindow = function () { scrollBy(0, -50) };
+    if (location.hash) setTimeout(shiftWindow, 1);
+    window.addEventListener("hashchange", shiftWindow);
+var element = document.createElement("script");
+element.src = "./jssearch.index.js";
+document.body.appendChild(element);
+
+var searchBox = $('#searchbox');
+
+// search when typing in search field
+searchBox.on("keyup", function(event) {
+    var query = $(this).val();
+
+    if (query == '' || event.which == 27) {
+        $('#search-resultbox').hide();
+        return;
+    } else if (event.which == 13) {
+        var selectedLink = $('#search-resultbox a.selected');
+        if (selectedLink.length != 0) {
+            document.location = selectedLink.attr('href');
+            return;
+        }
+    } else if (event.which == 38 || event.which == 40) {
+        $('#search-resultbox').show();
+
+        var selected = $('#search-resultbox a.selected');
+        if (selected.length == 0) {
+            $('#search-results').find('a').first().addClass('selected');
+        } else {
+            var next;
+            if (event.which == 40) {
+                next = selected.parent().next().find('a').first();
+            } else {
+                next = selected.parent().prev().find('a').first();
+            }
+            if (next.length != 0) {
+                var resultbox = $('#search-results');
+                var position = next.position();
+
+//              TODO scrolling is buggy and jumps around
+//                resultbox.scrollTop(Math.floor(position.top));
+//                console.log(position.top);
+
+                selected.removeClass('selected');
+                next.addClass('selected');
+            }
+        }
+
+        return;
+    }
+    $('#search-resultbox').show();
+    $('#search-results').html('<li><span class="no-results">No results</span></li>');
+
+    var result = jssearch.search(query);
+
+    if (result.length > 0) {
+        var i = 0;
+        var resHtml = '';
+
+        for (var key in result) {
+            if (i++ > 20) {
+                break;
+            }
+            resHtml = resHtml +
+            '<li><a href="' + result[key].file.u.substr(3) +'"><span class="title">' + result[key].file.t + '</span>' +
+            '<span class="description">' + result[key].file.d + '</span></a></li>';
+        }
+        $('#search-results').html(resHtml);
+    }
+});
+
+// hide the search results on ESC
+$(document).on("keyup", function(event) { if (event.which == 27) { $('#search-resultbox').hide(); } });
+// hide search results on click to document
+$(document).bind('click', function (e) { $('#search-resultbox').hide(); });
+// except the following:
+searchBox.bind('click', function(e) { e.stopPropagation(); });
+$('#search-resultbox').bind('click', function(e) { e.stopPropagation(); });
+
+});</script></body>
+</html>

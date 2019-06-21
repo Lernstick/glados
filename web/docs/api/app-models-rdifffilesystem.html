@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="language" content="en" />
+        <link href="./assets/1cf5ba7/css/bootstrap.css" rel="stylesheet">
+<link href="./assets/be3e053e/solarized_light.css" rel="stylesheet">
+<link href="./assets/1f2e89dd/style.css" rel="stylesheet">
+<script src="./assets/8261f971/jquery.js"></script>
+<script src="./assets/1cf5ba7/js/bootstrap.js"></script>
+<script src="./assets/ae8b5077/jssearch.js"></script>    <title>RdiffFileSystem, app\models\RdiffFileSystem - Yii Framework 2.0 API Documentation</title>
+</head>
+<body>
+
+<div class="wrap">
+    <nav id="w250" class="navbar-inverse navbar-fixed-top navbar"><div class="navbar-header"><button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#w250-collapse"><span class="sr-only">Toggle navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span></button><a class="navbar-brand" href="./index.html">Yii Framework 2.0 API Documentation</a></div><div id="w250-collapse" class="collapse navbar-collapse"><ul id="w251" class="navbar-nav nav"><li><a href="./index.html">Class reference</a></li>
+<li><a href="../en/README.html">Guide</a></li></ul><div class="navbar-form navbar-left" role="search">
+  <div class="form-group">
+    <input id="searchbox" type="text" class="form-control" placeholder="Search">
+  </div>
+</div>
+</div></nav>
+    <div id="search-resultbox" style="display: none;" class="modal-content">
+        <ul id="search-results">
+        </ul>
+    </div>
+
+    
+<div class="row">
+    <div class="col-md-3">
+                <div id="navigation" class="list-group"><a class="list-group-item" href="#navigation-245" data-toggle="collapse" data-parent="#navigation">app\assets <b class="caret"></b></a><div id="navigation-245" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-assets-appasset.html">AppAsset</a>
+<a class="list-group-item" href="./app-assets-eventasset.html">EventAsset</a></div>
+<a class="list-group-item" href="#navigation-246" data-toggle="collapse" data-parent="#navigation">app\commands <b class="caret"></b></a><div id="navigation-246" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-commands-analyzecontroller.html">AnalyzeController</a>
+<a class="list-group-item" href="./app-commands-backupcontroller.html">BackupController</a>
+<a class="list-group-item" href="./app-commands-daemoncontroller.html">DaemonController</a>
+<a class="list-group-item" href="./app-commands-dbcleancontroller.html">DbcleanController</a>
+<a class="list-group-item" href="./app-commands-downloadcontroller.html">DownloadController</a>
+<a class="list-group-item" href="./app-commands-rbaccontroller.html">RbacController</a>
+<a class="list-group-item" href="./app-commands-restorecontroller.html">RestoreController</a>
+<a class="list-group-item" href="./app-commands-unlockcontroller.html">UnlockController</a></div>
+<a class="list-group-item" href="#navigation-247" data-toggle="collapse" data-parent="#navigation">app\components <b class="caret"></b></a><div id="navigation-247" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-components-accessrule.html">AccessRule</a>
+<a class="list-group-item" href="./app-components-activeeventfield.html">ActiveEventField</a>
+<a class="list-group-item" href="./app-components-activeeventfieldasset.html">ActiveEventFieldAsset</a>
+<a class="list-group-item" href="./app-components-editable.html">Editable</a>
+<a class="list-group-item" href="./app-components-file.html">File</a>
+<a class="list-group-item" href="./app-components-outputevent.html">OutputEvent</a>
+<a class="list-group-item" href="./app-components-shellcommand.html">ShellCommand</a>
+<a class="list-group-item" href="./app-components-squashfs.html">Squashfs</a>
+<a class="list-group-item" href="./app-components-zip.html">Zip</a></div>
+<a class="list-group-item" href="#navigation-248" data-toggle="collapse" data-parent="#navigation">app\controllers <b class="caret"></b></a><div id="navigation-248" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-controllers-activitycontroller.html">ActivityController</a>
+<a class="list-group-item" href="./app-controllers-backupcontroller.html">BackupController</a>
+<a class="list-group-item" href="./app-controllers-configcontroller.html">ConfigController</a>
+<a class="list-group-item" href="./app-controllers-daemoncontroller.html">DaemonController</a>
+<a class="list-group-item" href="./app-controllers-eventcontroller.html">EventController</a>
+<a class="list-group-item" href="./app-controllers-examcontroller.html">ExamController</a>
+<a class="list-group-item" href="./app-controllers-howtocontroller.html">HowtoController</a>
+<a class="list-group-item" href="./app-controllers-restorecontroller.html">RestoreController</a>
+<a class="list-group-item" href="./app-controllers-resultcontroller.html">ResultController</a>
+<a class="list-group-item" href="./app-controllers-screenshotcontroller.html">ScreenshotController</a>
+<a class="list-group-item" href="./app-controllers-sitecontroller.html">SiteController</a>
+<a class="list-group-item" href="./app-controllers-ticketcontroller.html">TicketController</a>
+<a class="list-group-item" href="./app-controllers-usercontroller.html">UserController</a></div>
+<a class="list-group-item active" href="#navigation-249" data-toggle="collapse" data-parent="#navigation">app\models <b class="caret"></b></a><div id="navigation-249" class="submenu panel-collapse collapse in"><a class="list-group-item" href="./app-models-activity.html">Activity</a>
+<a class="list-group-item" href="./app-models-activityquery.html">ActivityQuery</a>
+<a class="list-group-item" href="./app-models-activitysearch.html">ActivitySearch</a>
+<a class="list-group-item" href="./app-models-authassignment.html">AuthAssignment</a>
+<a class="list-group-item" href="./app-models-authitem.html">AuthItem</a>
+<a class="list-group-item" href="./app-models-backup.html">Backup</a>
+<a class="list-group-item" href="./app-models-backupsearch.html">BackupSearch</a>
+<a class="list-group-item" href="./app-models-base.html">Base</a>
+<a class="list-group-item" href="./app-models-config.html">Config</a>
+<a class="list-group-item" href="./app-models-daemon.html">Daemon</a>
+<a class="list-group-item" href="./app-models-daemoninterface.html">DaemonInterface</a>
+<a class="list-group-item" href="./app-models-daemonsearch.html">DaemonSearch</a>
+<a class="list-group-item" href="./app-models-eventitem.html">EventItem</a>
+<a class="list-group-item" href="./app-models-eventstream.html">EventStream</a>
+<a class="list-group-item" href="./app-models-exam.html">Exam</a>
+<a class="list-group-item" href="./app-models-examquery.html">ExamQuery</a>
+<a class="list-group-item" href="./app-models-examsearch.html">ExamSearch</a>
+<a class="list-group-item" href="./app-models-howto.html">Howto</a>
+<a class="list-group-item" href="./app-models-howtosearch.html">HowtoSearch</a>
+<a class="list-group-item" href="./app-models-loginform.html">LoginForm</a>
+<a class="list-group-item active" href="./app-models-rdifffilesystem.html">RdiffFileSystem</a>
+<a class="list-group-item" href="./app-models-restore.html">Restore</a>
+<a class="list-group-item" href="./app-models-restoresearch.html">RestoreSearch</a>
+<a class="list-group-item" href="./app-models-result.html">Result</a>
+<a class="list-group-item" href="./app-models-screenshot.html">Screenshot</a>
+<a class="list-group-item" href="./app-models-screenshotsearch.html">ScreenshotSearch</a>
+<a class="list-group-item" href="./app-models-stats.html">Stats</a>
+<a class="list-group-item" href="./app-models-ticket.html">Ticket</a>
+<a class="list-group-item" href="./app-models-ticketquery.html">TicketQuery</a>
+<a class="list-group-item" href="./app-models-ticketsearch.html">TicketSearch</a>
+<a class="list-group-item" href="./app-models-user.html">User</a>
+<a class="list-group-item" href="./app-models-usersearch.html">UserSearch</a></div></div>    </div>
+    <div class="col-md-9 api-content" role="main">
+        <h1>Class app\models\RdiffFileSystem</h1>
+<div class="top-nav">
+    <a href="index.html">All Classes</a>
+            | <a href="#properties">Properties</a>
+                | <a href="#methods">Methods</a>
+            </div>
+
+<table class="summaryTable docClass table table-bordered">
+    <colgroup>
+        <col class="col-name" />
+        <col class="col-value" />
+    </colgroup>
+            <tr><th>Inheritance</th><td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a> &raquo;
+yii\base\Model</td></tr>
+                                        </table>
+
+<div class="class-description">
+    <p><strong>This is the model class for the rdiff filesystem.</strong></p>
+    
+    </div>
+
+<a id="properties"></a>
+
+<div class="summary doc-property">
+<h2>Public Properties</h2>
+
+<p><a href="#" class="toggle">Hide inherited properties</a></p>
+
+<table class="summary-table table table-striped table-bordered table-hover">
+<colgroup>
+    <col class="col-property" />
+    <col class="col-type" />
+    <col class="col-description" />
+    <col class="col-defined" />
+</colgroup>
+<tr>
+  <th>Property</th><th>Type</th><th>Description</th><th>Defined By</th>
+</tr>
+        <tr id="$dateRegex">
+        <td><a href="app-models-rdifffilesystem.html#$dateRegex-detail">$dateRegex</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The regular expression to match rdiffbackup dates</td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="$excludeList">
+        <td><a href="app-models-rdifffilesystem.html#$excludeList-detail">$excludeList</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>A list of file or directory names to omit when reading a directory</td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="$excludePaths">
+        <td><a href="app-models-rdifffilesystem.html#$excludePaths-detail">$excludePaths</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>A list of file or directory paths to omit when reading a directory</td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="$options">
+        <td><a href="app-models-rdifffilesystem.html#$options-detail">$options</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="$restoreHost">
+        <td><a href="app-models-rdifffilesystem.html#$restoreHost-detail">$restoreHost</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td></td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="$restoreUser">
+        <td><a href="app-models-rdifffilesystem.html#$restoreUser-detail">$restoreUser</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td></td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="$root">
+        <td><a href="app-models-rdifffilesystem.html#$root-detail">$root</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td></td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+    </table>
+</div>
+
+<a id="methods"></a>
+
+<div class="summary doc-method">
+<h2>Public Methods</h2>
+
+<p><a href="#" class="toggle">Hide inherited methods</a></p>
+
+<table class="summary-table table table-striped table-bordered table-hover">
+<colgroup>
+    <col class="col-method" />
+    <col class="col-description" />
+    <col class="col-defined" />
+</colgroup>
+<tr>
+  <th>Method</th><th>Description</th><th>Defined By</th>
+</tr>
+        <tr id="getBasename()">
+        <td><a href="app-models-rdifffilesystem.html#getBasename()-detail">getBasename()</a></td>
+        <td></td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getContents()">
+        <td><a href="app-models-rdifffilesystem.html#getContents()-detail">getContents()</a></td>
+        <td>Getter for contents</td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getDeviceNum()">
+        <td><a href="app-models-rdifffilesystem.html#getDeviceNum()-detail">getDeviceNum()</a></td>
+        <td></td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getDisplayName()">
+        <td><a href="app-models-rdifffilesystem.html#getDisplayName()-detail">getDisplayName()</a></td>
+        <td>Getter for the file name to display in the webinterface</td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getGid()">
+        <td><a href="app-models-rdifffilesystem.html#getGid()-detail">getGid()</a></td>
+        <td></td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getGroup()">
+        <td><a href="app-models-rdifffilesystem.html#getGroup()-detail">getGroup()</a></td>
+        <td></td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getIncrementsPath()">
+        <td><a href="app-models-rdifffilesystem.html#getIncrementsPath()-detail">getIncrementsPath()</a></td>
+        <td></td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getIsOldestVersion()">
+        <td><a href="app-models-rdifffilesystem.html#getIsOldestVersion()-detail">getIsOldestVersion()</a></td>
+        <td>Returns whether the current version is the oldest</td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getIsWhiteout()">
+        <td><a href="app-models-rdifffilesystem.html#getIsWhiteout()-detail">getIsWhiteout()</a></td>
+        <td>Is it a whiteout or not</td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getIsWhiteoutAUFS()">
+        <td><a href="app-models-rdifffilesystem.html#getIsWhiteoutAUFS()-detail">getIsWhiteoutAUFS()</a></td>
+        <td></td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getIsWhiteoutOverlay()">
+        <td><a href="app-models-rdifffilesystem.html#getIsWhiteoutOverlay()-detail">getIsWhiteoutOverlay()</a></td>
+        <td></td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getLocalPath()">
+        <td><a href="app-models-rdifffilesystem.html#getLocalPath()-detail">getLocalPath()</a></td>
+        <td></td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getLocation()">
+        <td><a href="app-models-rdifffilesystem.html#getLocation()-detail">getLocation()</a></td>
+        <td>Getter for the location</td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getMode()">
+        <td><a href="app-models-rdifffilesystem.html#getMode()-detail">getMode()</a></td>
+        <td></td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getNewestBackupVersion()">
+        <td><a href="app-models-rdifffilesystem.html#getNewestBackupVersion()-detail">getNewestBackupVersion()</a></td>
+        <td></td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getPath()">
+        <td><a href="app-models-rdifffilesystem.html#getPath()-detail">getPath()</a></td>
+        <td></td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getRdiffBackupDataDir()">
+        <td><a href="app-models-rdifffilesystem.html#getRdiffBackupDataDir()-detail">getRdiffBackupDataDir()</a></td>
+        <td></td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getRealType()">
+        <td><a href="app-models-rdifffilesystem.html#getRealType()-detail">getRealType()</a></td>
+        <td></td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getRemotePath()">
+        <td><a href="app-models-rdifffilesystem.html#getRemotePath()-detail">getRemotePath()</a></td>
+        <td></td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getSize()">
+        <td><a href="app-models-rdifffilesystem.html#getSize()-detail">getSize()</a></td>
+        <td></td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getState()">
+        <td><a href="app-models-rdifffilesystem.html#getState()-detail">getState()</a></td>
+        <td>Getter for the state the current path</td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getType()">
+        <td><a href="app-models-rdifffilesystem.html#getType()-detail">getType()</a></td>
+        <td>Getter for the file type of the current path</td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getUid()">
+        <td><a href="app-models-rdifffilesystem.html#getUid()-detail">getUid()</a></td>
+        <td></td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getUser()">
+        <td><a href="app-models-rdifffilesystem.html#getUser()-detail">getUser()</a></td>
+        <td></td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getVersion()">
+        <td><a href="app-models-rdifffilesystem.html#getVersion()-detail">getVersion()</a></td>
+        <td>Getter for the current version</td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getVersions()">
+        <td><a href="app-models-rdifffilesystem.html#getVersions()-detail">getVersions()</a></td>
+        <td>Getter for the versions array</td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="getWasWhiteout()">
+        <td><a href="app-models-rdifffilesystem.html#getWasWhiteout()-detail">getWasWhiteout()</a></td>
+        <td>Returns whether the file was a whiteout in one of its versions</td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="init()">
+        <td><a href="app-models-rdifffilesystem.html#init()-detail">init()</a></td>
+        <td></td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="restore()">
+        <td><a href="app-models-rdifffilesystem.html#restore()-detail">restore()</a></td>
+        <td>Restores the current file to a temporary file and return its contents to the browser</td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="setLocation()">
+        <td><a href="app-models-rdifffilesystem.html#setLocation()-detail">setLocation()</a></td>
+        <td>Setter for location</td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="slash()">
+        <td><a href="app-models-rdifffilesystem.html#slash()-detail">slash()</a></td>
+        <td>Change the path of the current RdiffFileSystem instance</td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+            <tr id="versionAt()">
+        <td><a href="app-models-rdifffilesystem.html#versionAt()-detail">versionAt()</a></td>
+        <td>Switch the version of the current RdiffFileSystem instance</td>
+        <td><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+    </tr>
+    </table>
+</div>
+
+<a id="events"></a>
+
+<a id="constants"></a>
+
+<h2>Property Details</h2>
+
+<div class="property-doc">
+
+    <div class="detail-header h3" id="$dateRegex-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#$dateRegex-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $dateRegex        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>The regular expression to match rdiffbackup dates</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-models-rdifffilesystem.html#$dateRegex-detail">$dateRegex</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'/[0-9]{4}\-[0-9]{2}\-[0-9]{2}T[0-9]{2}\:[0-9]{2}\:[0-9]{2}\+[0-9]{2}\:[0-9]{2}/'</span></div>
+
+
+    <div class="detail-header h3" id="$excludeList-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#$excludeList-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $excludeList        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>A list of file or directory names to omit when reading a directory</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <a href="app-models-rdifffilesystem.html#$excludeList-detail">$excludeList</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;[</span><span style="color: #DD0000">'/^\.$/'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'/^\.\.$/'</span><span style="color: #007700">]</span></div>
+
+
+    <div class="detail-header h3" id="$excludePaths-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#$excludePaths-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $excludePaths        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>A list of file or directory paths to omit when reading a directory</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <a href="app-models-rdifffilesystem.html#$excludePaths-detail">$excludePaths</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;[</span><span style="color: #DD0000">'/^\/rdiff-backup-data$/'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'/^\/Screenshots$/'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'/^\/shutdown$/'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'/^\/Schreibtisch\/finish_exam.desktop$/'</span><span style="color: #007700">]</span></div>
+
+
+    <div class="detail-header h3" id="$options-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#$options-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $options        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"></span> <a href="app-models-rdifffilesystem.html#$options-detail">$options</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;[</span><span style="color: #DD0000">'showDotFiles'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">]</span></div>
+
+
+    <div class="detail-header h3" id="$restoreHost-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#$restoreHost-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $restoreHost        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-models-rdifffilesystem.html#$restoreHost-detail">$restoreHost</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'localhost'</span></div>
+
+
+    <div class="detail-header h3" id="$restoreUser-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#$restoreUser-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $restoreUser        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-models-rdifffilesystem.html#$restoreUser-detail">$restoreUser</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'root'</span></div>
+
+
+    <div class="detail-header h3" id="$root-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#$root-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $root        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-models-rdifffilesystem.html#$root-detail">$root</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'/'</span></div>
+
+</div>
+<h2>Method Details</h2>
+
+<div class="method-doc">
+
+    <div class="detail-header h3" id="getBasename()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getBasename()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getBasename()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-rdifffilesystem.html#getBasename()-detail">getBasename</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getContents()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getContents()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getContents()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Getter for contents</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a>|<a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a>[]</span> <strong><a href="app-models-rdifffilesystem.html#getContents()-detail">getContents</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a>|<a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a>[]</td>
+                  <td class="param-desc-col"><p>An array of RdiffFileSystem[] instances if the current path is a directory</p>
+<pre><code class="hljs nginx">                 <span class="hljs-title">RdiffFileSystem</span> instance if the current path is a file
+</code></pre>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getDeviceNum()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getDeviceNum()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getDeviceNum()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a>|<a href="http://www.php.net/language.types.null">null</a></span> <strong><a href="app-models-rdifffilesystem.html#getDeviceNum()-detail">getDeviceNum</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a>|<a href="http://www.php.net/language.types.null">null</a></td>
+                  <td class="param-desc-col"><p>The file type (Ex: c 0 0)</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getDisplayName()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getDisplayName()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getDisplayName()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Getter for the file name to display in the webinterface</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <strong><a href="app-models-rdifffilesystem.html#getDisplayName()-detail">getDisplayName</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"><ul>
+<li>the file name without the leading .wh. in case of a whiteout file</li>
+</ul>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getGid()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getGid()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getGid()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.integer">integer</a>|<a href="http://www.php.net/language.types.null">null</a></span> <strong><a href="app-models-rdifffilesystem.html#getGid()-detail">getGid</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.integer">integer</a>|<a href="http://www.php.net/language.types.null">null</a></td>
+                  <td class="param-desc-col"><p>Gid</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getGroup()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getGroup()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getGroup()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a>|<a href="http://www.php.net/language.types.null">null</a></span> <strong><a href="app-models-rdifffilesystem.html#getGroup()-detail">getGroup</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a>|<a href="http://www.php.net/language.types.null">null</a></td>
+                  <td class="param-desc-col"><p>Permissions of the file in octal notation</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getIncrementsPath()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getIncrementsPath()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getIncrementsPath()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-rdifffilesystem.html#getIncrementsPath()-detail">getIncrementsPath</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getIsOldestVersion()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getIsOldestVersion()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getIsOldestVersion()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Returns whether the current version is the oldest</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.boolean">boolean</a></span> <strong><a href="app-models-rdifffilesystem.html#getIsOldestVersion()-detail">getIsOldestVersion</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getIsWhiteout()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getIsWhiteout()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getIsWhiteout()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Is it a whiteout or not</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.boolean">boolean</a></span> <strong><a href="app-models-rdifffilesystem.html#getIsWhiteout()-detail">getIsWhiteout</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.boolean">boolean</a></td>
+                  <td class="param-desc-col"><ul>
+<li>whether the file is a whiteout or not</li>
+</ul>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getIsWhiteoutAUFS()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getIsWhiteoutAUFS()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getIsWhiteoutAUFS()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+        <p>See also <a href="http://aufs.sourceforge.net/aufs.html">http://aufs.sourceforge.net/aufs.html</a> for AUFS whiteout files.</p>    </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">\app\models\Is</span> <strong><a href="app-models-rdifffilesystem.html#getIsWhiteoutAUFS()-detail">getIsWhiteoutAUFS</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col">\app\models\Is</td>
+                  <td class="param-desc-col"><p>It an AUFS whiteout</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getIsWhiteoutOverlay()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getIsWhiteoutOverlay()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getIsWhiteoutOverlay()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+        <p>See also <a href="https://www.kernel.org/doc/Documentation/filesystems/overlayfs.txt">https://www.kernel.org/doc/Documentation/filesystems/overlayfs.txt</a> for overlayFS whiteout files.</p>    </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">\app\models\Is</span> <strong><a href="app-models-rdifffilesystem.html#getIsWhiteoutOverlay()-detail">getIsWhiteoutOverlay</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col">\app\models\Is</td>
+                  <td class="param-desc-col"><p>It an overlayFS whiteout</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getLocalPath()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getLocalPath()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getLocalPath()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-rdifffilesystem.html#getLocalPath()-detail">getLocalPath</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getLocation()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getLocation()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getLocation()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Getter for the location</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <strong><a href="app-models-rdifffilesystem.html#getLocation()-detail">getLocation</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getMode()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getMode()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getMode()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.integer">integer</a>|<a href="http://www.php.net/language.types.null">null</a></span> <strong><a href="app-models-rdifffilesystem.html#getMode()-detail">getMode</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.integer">integer</a>|<a href="http://www.php.net/language.types.null">null</a></td>
+                  <td class="param-desc-col"><p>Permissions of the file in octal notation</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getNewestBackupVersion()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getNewestBackupVersion()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getNewestBackupVersion()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a>|<a href="http://www.php.net/language.types.boolean">false</a></span> <strong><a href="app-models-rdifffilesystem.html#getNewestBackupVersion()-detail">getNewestBackupVersion</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a>|<a href="http://www.php.net/language.types.boolean">false</a></td>
+                  <td class="param-desc-col"><p>The newest backup version as RFC date</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getPath()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getPath()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getPath()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-rdifffilesystem.html#getPath()-detail">getPath</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getRdiffBackupDataDir()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getRdiffBackupDataDir()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getRdiffBackupDataDir()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-rdifffilesystem.html#getRdiffBackupDataDir()-detail">getRdiffBackupDataDir</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getRealType()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getRealType()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getRealType()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a>|<a href="http://www.php.net/language.types.null">null</a></span> <strong><a href="app-models-rdifffilesystem.html#getRealType()-detail">getRealType</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a>|<a href="http://www.php.net/language.types.null">null</a></td>
+                  <td class="param-desc-col"><p>The file type (reg, dir, sym, dev, None...)</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getRemotePath()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getRemotePath()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getRemotePath()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-rdifffilesystem.html#getRemotePath()-detail">getRemotePath</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getSize()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getSize()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getSize()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.integer">integer</a>|<a href="http://www.php.net/language.types.null">null</a></span> <strong><a href="app-models-rdifffilesystem.html#getSize()-detail">getSize</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.integer">integer</a>|<a href="http://www.php.net/language.types.null">null</a></td>
+                  <td class="param-desc-col"><p>The size of the file in bytes or null it ot cannot be determined</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getState()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getState()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getState()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Getter for the state the current path</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <strong><a href="app-models-rdifffilesystem.html#getState()-detail">getState</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"><ul>
+<li>the two states are: 'normal' if it's a normal file<pre><code class="hljs bash">                               <span class="hljs-string">'missing'</span> <span class="hljs-keyword">if</span> the file is a removed file
+</code></pre>
+</li>
+</ul>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getType()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getType()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getType()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Getter for the file type of the current path</strong></p>
+
+        
+        <p>See also <a href="http://php.net/manual/de/function.filetype.php">http://php.net/manual/de/function.filetype.php</a> for the different types.</p>    </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a>|<a href="http://www.php.net/language.types.boolean">false</a></span> <strong><a href="app-models-rdifffilesystem.html#getType()-detail">getType</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getUid()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getUid()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getUid()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.integer">integer</a>|<a href="http://www.php.net/language.types.null">null</a></span> <strong><a href="app-models-rdifffilesystem.html#getUid()-detail">getUid</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.integer">integer</a>|<a href="http://www.php.net/language.types.null">null</a></td>
+                  <td class="param-desc-col"><p>Uid</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getUser()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getUser()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getUser()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a>|<a href="http://www.php.net/language.types.null">null</a></span> <strong><a href="app-models-rdifffilesystem.html#getUser()-detail">getUser</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a>|<a href="http://www.php.net/language.types.null">null</a></td>
+                  <td class="param-desc-col"><p>Permissions of the file in octal notation</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getVersion()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getVersion()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getVersion()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Getter for the current version</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <strong><a href="app-models-rdifffilesystem.html#getVersion()-detail">getVersion</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getVersions()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getVersions()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getVersions()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Getter for the versions array</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <strong><a href="app-models-rdifffilesystem.html#getVersions()-detail">getVersions</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getWasWhiteout()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#getWasWhiteout()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getWasWhiteout()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Returns whether the file was a whiteout in one of its versions</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.boolean">boolean</a></span> <strong><a href="app-models-rdifffilesystem.html#getWasWhiteout()-detail">getWasWhiteout</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="init()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#init()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        init()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-rdifffilesystem.html#init()-detail">init</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="restore()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#restore()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        restore()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Restores the current file to a temporary file and return its contents to the browser</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">\app\models\data</span> <strong><a href="app-models-rdifffilesystem.html#restore()-detail">restore</a></strong> ( <span style="color: #0000BB">$inline&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">false</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$inline</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.boolean">boolean</a></td>
+                  <td class="param-desc-col"><ul>
+<li>whether to return the contents inline or as a download dialog</li>
+</ul>
+</td>
+                </tr>
+                                        <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col">\app\models\data</td>
+                  <td class="param-desc-col"><ul>
+<li>the contents of the restored file</li>
+</ul>
+</td>
+                </tr>
+                                        <tr>
+                  <th class="param-name-col">throws</th>
+                  <td class="param-type-col">\app\models\yii\web\NotFoundHttpException</td>
+                  <td class="param-desc-col"><p>if the file cannot be restored</p>
+</td>
+                </tr>
+                        </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="setLocation()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#setLocation()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        setLocation()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Setter for location</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-rdifffilesystem.html#setLocation()-detail">setLocation</a></strong> ( <span style="color: #0000BB">$value</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$value</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                                                </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="slash()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#slash()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        slash()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Change the path of the current RdiffFileSystem instance</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.null">null</a>|<a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></span> <strong><a href="app-models-rdifffilesystem.html#slash()-detail">slash</a></strong> ( <span style="color: #0000BB">$path&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'/'</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$path</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"><ul>
+<li>the relative path to go</li>
+</ul>
+</td>
+                </tr>
+                                        <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.null">null</a>|<a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+                  <td class="param-desc-col"><ul>
+<li>null if the path does not exist in the backup dir<pre><code class="hljs nginx">                         <span class="hljs-title">RdiffFileSystem</span> instance if it exists
+</code></pre>
+</li>
+</ul>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="versionAt()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-rdifffilesystem.html#versionAt()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        versionAt()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Switch the version of the current RdiffFileSystem instance</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.null">null</a>|<a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></span> <strong><a href="app-models-rdifffilesystem.html#versionAt()-detail">versionAt</a></strong> ( <span style="color: #0000BB">$date</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$date</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"><ul>
+<li>the version to switch to</li>
+</ul>
+</td>
+                </tr>
+                                        <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.null">null</a>|<a href="app-models-rdifffilesystem.html">app\models\RdiffFileSystem</a></td>
+                  <td class="param-desc-col"><ul>
+<li>null if the version does not exist in the backup directory<pre><code class="hljs nginx">                         <span class="hljs-title">RdiffFileSystem</span> instance if it exists
+</code></pre>
+</li>
+</ul>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+</div>
+        </div>
+</div>
+
+<script type="text/javascript">
+    /*<![CDATA[*/
+    $("a.toggle").on('click', function () {
+        var $this = $(this);
+        if ($this.hasClass('properties-hidden')) {
+            $this.text($this.text().replace(/Show/,'Hide'));
+            $this.parents(".summary").find(".inherited").show();
+            $this.removeClass('properties-hidden');
+        } else {
+            $this.text($this.text().replace(/Hide/,'Show'));
+            $this.parents(".summary").find(".inherited").hide();
+            $this.addClass('properties-hidden');
+        }
+
+        return false;
+    });
+    /*
+     $(".sourceCode a.show").toggle(function () {
+     $(this).text($(this).text().replace(/show/,'hide'));
+     $(this).parents(".sourceCode").find("div.code").show();
+     },function () {
+     $(this).text($(this).text().replace(/hide/,'show'));
+     $(this).parents(".sourceCode").find("div.code").hide();
+     });
+     $("a.sourceLink").click(function () {
+     $(this).attr('target','_blank');
+     });
+     */
+    /*]]>*/
+</script>
+
+
+</div>
+
+<footer class="footer">
+        <p class="pull-right"><small>Page generated on Fri, 21 Jun 2019 10:08:05 +0000</small></p>
+    Powered by <a href="http://www.yiiframework.com/" rel="external">Yii Framework</a></footer>
+
+<script>jQuery(function ($) {
+    var shiftWindow = function () { scrollBy(0, -50) };
+    if (location.hash) setTimeout(shiftWindow, 1);
+    window.addEventListener("hashchange", shiftWindow);
+var element = document.createElement("script");
+element.src = "./jssearch.index.js";
+document.body.appendChild(element);
+
+var searchBox = $('#searchbox');
+
+// search when typing in search field
+searchBox.on("keyup", function(event) {
+    var query = $(this).val();
+
+    if (query == '' || event.which == 27) {
+        $('#search-resultbox').hide();
+        return;
+    } else if (event.which == 13) {
+        var selectedLink = $('#search-resultbox a.selected');
+        if (selectedLink.length != 0) {
+            document.location = selectedLink.attr('href');
+            return;
+        }
+    } else if (event.which == 38 || event.which == 40) {
+        $('#search-resultbox').show();
+
+        var selected = $('#search-resultbox a.selected');
+        if (selected.length == 0) {
+            $('#search-results').find('a').first().addClass('selected');
+        } else {
+            var next;
+            if (event.which == 40) {
+                next = selected.parent().next().find('a').first();
+            } else {
+                next = selected.parent().prev().find('a').first();
+            }
+            if (next.length != 0) {
+                var resultbox = $('#search-results');
+                var position = next.position();
+
+//              TODO scrolling is buggy and jumps around
+//                resultbox.scrollTop(Math.floor(position.top));
+//                console.log(position.top);
+
+                selected.removeClass('selected');
+                next.addClass('selected');
+            }
+        }
+
+        return;
+    }
+    $('#search-resultbox').show();
+    $('#search-results').html('<li><span class="no-results">No results</span></li>');
+
+    var result = jssearch.search(query);
+
+    if (result.length > 0) {
+        var i = 0;
+        var resHtml = '';
+
+        for (var key in result) {
+            if (i++ > 20) {
+                break;
+            }
+            resHtml = resHtml +
+            '<li><a href="' + result[key].file.u.substr(3) +'"><span class="title">' + result[key].file.t + '</span>' +
+            '<span class="description">' + result[key].file.d + '</span></a></li>';
+        }
+        $('#search-results').html(resHtml);
+    }
+});
+
+// hide the search results on ESC
+$(document).on("keyup", function(event) { if (event.which == 27) { $('#search-resultbox').hide(); } });
+// hide search results on click to document
+$(document).bind('click', function (e) { $('#search-resultbox').hide(); });
+// except the following:
+searchBox.bind('click', function(e) { e.stopPropagation(); });
+$('#search-resultbox').bind('click', function(e) { e.stopPropagation(); });
+
+});</script></body>
+</html>
