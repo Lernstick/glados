@@ -12,4 +12,5 @@ cd $APIDOC_PATH
 # repeat this line for more languages
 # ./apidoc guide $GLADOS_PATH/howtos/de $GLADOS_PATH/web/docs/de --apiDocs=../api --guidePrefix= --interactive=0
 
+# adjust the permissions of the docs directory
 chown -R www-data:www-data "${OUTPUT}/web/docs"
