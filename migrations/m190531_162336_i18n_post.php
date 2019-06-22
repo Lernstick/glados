@@ -18,18 +18,27 @@ class m190531_162336_i18n_post extends Migration
     public $translationTable = 'translation';
     public $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
 
+    private function fieldTypes() {
+        return [
+            'description' => $this->string(255)->notNull(),
+            'client_state' => $this->string(255)->defaultValue('Client not seen yet'),
+            'backup_state' => $this->text() . ' NULL DEFAULT NULL',
+        ];
+    }
+
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        if ($this->db->schema->getTableSchema($this->activitiesTable, true)->getColumn('description_old') !== null) {
-            $this->dropColumn($this->activitiesTable, 'description_old');
-        }
+        // activity->description
+        $this->tableFieldUp($this->activitiesTable, 'description');
 
-        if ($this->db->schema->getTableSchema($this->ticketTable, true)->getColumn('client_state_old') !== null) {
-            $this->dropColumn($this->ticketTable, 'client_state_old');
-        }
+        // ticket->client_state
+        $this->tableFieldUp($this->ticketTable, 'client_state');
+
+        // ticket->backup_state
+        $this->tableFieldUp($this->ticketTable, 'backup_state');
     }
 
     /**
@@ -37,21 +46,41 @@ class m190531_162336_i18n_post extends Migration
      */
     public function safeDown()
     {
-        if ($this->db->schema->getTableSchema($this->activitiesTable, true)->getColumn('description_new') === null) {
-            $this->addColumn($this->activitiesTable, 'description_new', $this->string(1024)->defaultValue(null));
-        }
+        // activity->description
+        $this->tableFieldDown($this->activitiesTable, 'description');
 
-        if ($this->db->schema->getTableSchema($this->activitiesTable, true)->getColumn('description_id') !== null) {
-            $this->alterColumn($this->activitiesTable, 'description_id', $this->string(64)->notNull());
-        }
+        // ticket->client_state
+        $this->tableFieldDown($this->ticketTable, 'client_state');
 
-        if ($this->db->schema->getTableSchema($this->ticketTable, true)->getColumn('client_state_new') === null) {
-            $this->addColumn($this->ticketTable, 'client_state_new', $this->string(255)->defaultValue('Client not seen yet'));
-        }
-
-        if ($this->db->schema->getTableSchema($this->ticketTable, true)->getColumn('client_state_id') !== null) {
-            $this->alterColumn($this->ticketTable, 'client_state_id', $this->string(64)->notNull());
-        }
-
+        // ticket->backup_state
+        $this->tableFieldDown($this->ticketTable, 'backup_state');
     }
+
+    private function tableFieldUp($table, $field)
+    {
+        $oldField = $field . "_old";
+
+        // drop table->field_old
+        if ($this->db->schema->getTableSchema($table, true)->getColumn($oldField) !== null) {
+            $this->dropColumn($table, $oldField);
+        }
+    }
+
+    private function tableFieldDown($table, $field)
+    {
+        $newField = $field . "_new";
+        $idField = $field . "_id";
+        $type = $this->fieldTypes()[$field];
+
+        // create table->field_new
+        if ($this->db->schema->getTableSchema($table, true)->getColumn($newField) === null) {
+            $this->addColumn($table, $newField, $type);
+        }
+
+        // change table->field_id
+        if ($this->db->schema->getTableSchema($table, true)->getColumn($idField) !== null) {
+            $this->alterColumn($table, $idField, $this->string(64)->notNull());
+        }
+    }
+
 }

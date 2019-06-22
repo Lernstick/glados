@@ -65,6 +65,7 @@ class Ticket extends LiveActiveRecord
 
     /* db translated fields */
     public $client_state_db;
+    public $backup_state_db;
 
     /* scenario constants */
     const SCENARIO_DEFAULT = 'default';
@@ -117,6 +118,7 @@ class Ticket extends LiveActiveRecord
     {
         return [
             'client_state',
+            'backup_state',
         ];
     }
 

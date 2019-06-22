@@ -38,7 +38,11 @@ class TranslatedActiveRecord extends Base
         // return the translated value with data if the property is read directly:
         // echo $this->name;
         if (in_array($name, $this->getTranslatedFields())) {
-            return \Yii::t(null, $this->{$name . '_db'}, $this->{$name . '_params'}, 'xxx');
+            if ($this->{$name . "_id"} == 0) {
+                return null;
+            } else {
+                return \Yii::t(null, $this->{$name . '_db'}, $this->{$name . '_params'}, 'xxx');
+            }
         }
 
         if ($last == 'params' && !empty($pname) && in_array($pname, $this->translatedFields)) {

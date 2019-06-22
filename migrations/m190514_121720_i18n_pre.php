@@ -25,30 +25,18 @@ class m190514_121720_i18n_pre extends Migration
     public function safeUp()
     {
 
+        // create translation table
         if ($this->db->schema->getTableSchema($this->translationTable, true) === null) {
-
-            //the description table
             $this->createTable($this->translationTable, [
                 'id' => $this->primaryKey(),
                 'en' => $this->string(255)->notNull(),
                 'de' => $this->string(255),
                 //'foreign_id' => $this->integer(11),
             ], $this->tableOptions);
-
         }
 
         /* activity->description */
-        if ($this->db->schema->getTableSchema($this->activitiesTable, true)->getColumn('description_data') === null) {
-            $this->addColumn($this->activitiesTable, 'description_data', $this->string(1024)->defaultValue(null));
-        }
-
-        if ($this->db->schema->getTableSchema($this->activitiesTable, true)->getColumn('description_old') === null) {
-            $this->renameColumn($this->activitiesTable, 'description', 'description_old');
-        }
-
-        if ($this->db->schema->getTableSchema($this->activitiesTable, true)->getColumn('description_id') === null) {
-            $this->addColumn($this->activitiesTable, 'description_id', $this->integer(11)->notNull());
-        }
+        $this->tableFieldUp($this->activitiesTable, 'description');
 
         /*
          * Without changing these datatypes it would trow the following error:
@@ -60,19 +48,12 @@ class m190514_121720_i18n_pre extends Migration
         $this->alterColumn($this->ticketTable, 'restore_state', 'text');
 
         /* ticket->client_state */
-        if ($this->db->schema->getTableSchema($this->ticketTable, true)->getColumn('client_state_data') === null) {
-            $this->addColumn($this->ticketTable, 'client_state_data', $this->string(64)->defaultValue(null));
-        }
+        $this->tableFieldUp($this->ticketTable, 'client_state');
 
-        if ($this->db->schema->getTableSchema($this->ticketTable, true)->getColumn('client_state_old') === null) {
-            $this->renameColumn($this->ticketTable, 'client_state', 'client_state_old');
-        }
+        /* ticket->backup_state */
+        $this->tableFieldUp($this->ticketTable, 'backup_state');
 
-        if ($this->db->schema->getTableSchema($this->ticketTable, true)->getColumn('client_state_id') === null) {
-            $this->addColumn($this->ticketTable, 'client_state_id', $this->integer(11)->notNull());
-        }
-
-        /* event table */
+        /* adjust event table */
         if ($this->db->schema->getTableSchema($this->eventTable, true)->getColumn('category') === null) {
             $this->addColumn($this->eventTable, 'category', $this->string(64)->defaultValue(null));
         }
@@ -84,6 +65,7 @@ class m190514_121720_i18n_pre extends Migration
      */
     public function safeDown()
     {
+        // drop translation table
         if ($this->db->schema->getTableSchema($this->translationTable, true) !== null) {
 
             // truncate table
@@ -91,41 +73,16 @@ class m190514_121720_i18n_pre extends Migration
 
             // drop the table
             $this->dropTable($this->translationTable);
-
-            if ($this->db->schema->getTableSchema($this->activitiesTable, true)->getColumn('description_new') !== null) {
-                $this->renameColumn($this->activitiesTable, 'description_new', 'description');
-            }
-
-            if ($this->db->schema->getTableSchema($this->ticketTable, true)->getColumn('client_state_new') !== null) {
-                $this->renameColumn($this->ticketTable, 'client_state_new', 'client_state');
-            }
         }
 
         /* activity->description */
-        if ($this->db->schema->getTableSchema($this->activitiesTable, true)->getColumn('description_data') !== null) {
-            $this->dropColumn($this->activitiesTable, 'description_data');
-        }
-
-        if ($this->db->schema->getTableSchema($this->activitiesTable, true)->getColumn('description_id') !== null) {
-            $this->dropColumn($this->activitiesTable, 'description_id');
-        }
-
-        if ($this->db->schema->getTableSchema($this->activitiesTable, true)->getColumn('description_old') !== null) {
-            $this->renameColumn($this->activitiesTable, 'description_old', 'description');
-        }
+        $this->tableFieldDown($this->activitiesTable, 'description');
 
         /* ticket->client_state */
-        if ($this->db->schema->getTableSchema($this->ticketTable, true)->getColumn('client_state_data') !== null) {
-            $this->dropColumn($this->ticketTable, 'client_state_data');
-        }
+        $this->tableFieldDown($this->ticketTable, 'client_state');
 
-        if ($this->db->schema->getTableSchema($this->ticketTable, true)->getColumn('client_state_id') !== null) {
-            $this->dropColumn($this->ticketTable, 'client_state_id');
-        }
-
-        if ($this->db->schema->getTableSchema($this->ticketTable, true)->getColumn('client_state_old') !== null) {
-            $this->renameColumn($this->ticketTable, 'client_state_old', 'client_state');
-        }
+        /* ticket->backup_state */
+        $this->tableFieldDown($this->ticketTable, 'backup_state');
 
         $this->alterColumn($this->ticketTable, 'backup_state', 'string(10240)');
         $this->alterColumn($this->ticketTable, 'restore_state', 'string(10240)');
@@ -133,6 +90,57 @@ class m190514_121720_i18n_pre extends Migration
         /* event table */
         if ($this->db->schema->getTableSchema($this->eventTable, true)->getColumn('category') !== null) {
             $this->dropColumn($this->eventTable, 'category');
+        }
+    }
+
+
+    private function tableFieldUp($table, $field)
+    {
+        $dataField = $field . "_data";
+        $idField = $field . "_id";
+        $oldField = $field . "_old";
+
+        // create table->field_data
+        if ($this->db->schema->getTableSchema($table, true)->getColumn($dataField) === null) {
+            $this->addColumn($table, $dataField, $this->string(1024)->defaultValue(null));
+        }
+
+        // create table->field_id
+        if ($this->db->schema->getTableSchema($table, true)->getColumn($idField) === null) {
+            $this->addColumn($table, $idField, $this->integer(11)->notNull());
+        }
+
+        // rename table->field to table->field_old
+        if ($this->db->schema->getTableSchema($table, true)->getColumn($oldField) === null) {
+            $this->renameColumn($table, $field, $oldField);
+        }
+    }
+
+    private function tableFieldDown($table, $field)
+    {
+        $dataField = $field . "_data";
+        $idField = $field . "_id";
+        $oldField = $field . "_old";
+        $newField = $field . "_new";
+
+        // rename table->field_new to table->field
+        if ($this->db->schema->getTableSchema($table, true)->getColumn($newField) !== null) {
+            $this->renameColumn($table, $newField, $field);
+        }
+
+        // drop table->field_data
+        if ($this->db->schema->getTableSchema($table, true)->getColumn($dataField) !== null) {
+            $this->dropColumn($table, $dataField);
+        }
+
+        // drop table->field_id
+        if ($this->db->schema->getTableSchema($table, true)->getColumn($idField) !== null) {
+            $this->dropColumn($table, $idField);
+        }
+
+        // rename table->field_old to table->field
+        if ($this->db->schema->getTableSchema($table, true)->getColumn($oldField) !== null) {
+            $this->renameColumn($table, $oldField, $field);
         }
     }
 }
