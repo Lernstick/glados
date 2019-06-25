@@ -21,9 +21,10 @@ class EventController extends Controller
     public function actionStream($uuid)
     {
     
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
         $stream = $this->findModel($uuid);
 
-        $stream->timeLimit = YII_ENV_DEV ? 60 : 300;
+        $stream->timeLimit = YII_ENV_DEV ? 30 : 300;
 
         //$user_id = \Yii::$app->user->id;
         //$user_id = 1;
@@ -57,7 +58,7 @@ class EventController extends Controller
 
         $stream->start();
 
-        while($stream->onEvent() === true){
+        while ($stream->onEvent() === true) {
             $message = '';
             foreach($stream->events as $model){
 

@@ -111,7 +111,7 @@ class BackupController extends DaemonController implements DaemonInterface
                 }
                 
                 if ($this->ticket->bootup_lock == 1) {
-                    $this->ticket->backup_state = 'backup is locked during bootup.';
+                    $this->ticket->backup_state = yiit('ticket', 'backup is locked during bootup.');
                     $this->ticket->save(false);
                     $this->ticket = null;
                     return;
@@ -147,7 +147,8 @@ class BackupController extends DaemonController implements DaemonInterface
         $this->ticket = $ticket;
 
         if (!is_writable(\Yii::$app->params['backupPath'])) {
-            $this->ticket->backup_state = \Yii::$app->params['backupPath'] . ': No such file or directory or not writable.';
+            $this->ticket->backup_state = yiit('ticket', '{path}: No such file or directory or not writable.');
+            $this->ticket->backup_state_params = [ 'path' => \Yii::$app->params['backupPath'] ];
             $this->ticket->backup_last_try = new Expression('NOW()');
             #$this->ticket->backup_lock = 0;
             #$this->ticket->save(false);
@@ -160,11 +161,11 @@ class BackupController extends DaemonController implements DaemonInterface
         $this->logInfo('Processing ticket (backup): ' .
             ( empty($this->ticket->test_taker) ? $this->ticket->token : $this->ticket->test_taker) .
             ' (' . $this->ticket->ip . ')', true);
-        $this->ticket->backup_state = 'connecting to client...';
+        $this->ticket->backup_state = yiit('ticket', 'connecting to client...');
         $this->ticket->save(false);
 
         if ($this->checkPort(22, 3) === false) {
-            $this->ticket->backup_state = 'network error.';
+            $this->ticket->backup_state = yiit('ticket', 'network error.');
             $this->ticket->backup_last_try = new Expression('NOW()');
             $this->ticket->online = 1;
             #$this->ticket->backup_lock = 0;
@@ -182,7 +183,7 @@ class BackupController extends DaemonController implements DaemonInterface
 
         }else{
             $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? 1 : 0;
-            $this->ticket->backup_state = 'backup in progress...';
+            $this->ticket->backup_state = yiit('ticket', 'backup in progress...');
             if ($this->finishBackup == true) {
                 $this->ticket->runCommand('echo "backup in progress..." > /home/user/shutdown');
             }
@@ -218,8 +219,11 @@ class BackupController extends DaemonController implements DaemonInterface
             $retval = $cmd->run();
 
             if($retval != 0){
-                $this->ticket->backup_state = 'rdiff-backup failed (retval: ' . $retval . '), output: '
-                     . PHP_EOL . $output;
+                $this->ticket->backup_state = yiit('ticket', 'rdiff-backup failed (retval: {retval}), output: {output}');
+                $this->ticket->backup_state_data = [
+                    'retval' => $retval,
+                    'output' => $output,
+                ];
                 $this->logError($this->ticket->backup_state);
 
                 $act = new Activity([
@@ -237,7 +241,7 @@ class BackupController extends DaemonController implements DaemonInterface
                 }
             }else{
                 $this->ticket->backup_last = new Expression('NOW()');
-                $this->ticket->backup_state = 'backup successful.';
+                $this->ticket->backup_state = yiit('ticket', 'backup successful.');
 
                 # If it's the last backup, tell the client and set last_backup to 1
                 if ($this->finishBackup == true) {
@@ -277,7 +281,7 @@ class BackupController extends DaemonController implements DaemonInterface
     {
 
         if ($this->ticket != null) {
-            $this->ticket->backup_state = 'backup aborted.';
+            $this->ticket->backup_state = yiit('ticket', 'backup aborted.');
             $this->ticket->save(false, ['backup_state']);
 
             $act = new Activity([

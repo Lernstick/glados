@@ -39,7 +39,7 @@ class TicketSearch extends Ticket
     {
         return [
             [['exam_id'], 'integer'],
-            [['token', 'examId', 'examSubject', 'examName', 'userId', 'test_taker', 'state', 'abandoned', 'start', 'end', 'createdAt', 'client_state'], 'safe'],
+            [['token', 'examId', 'examSubject', 'examName', 'userId', 'test_taker', 'state', 'abandoned', 'start', 'end', 'createdAt', 'client_state', 'backup_state'], 'safe'],
         ];
     }
 
@@ -177,6 +177,7 @@ class TicketSearch extends Ticket
             ->andFilterHaving(['state' => $this->state]);
 
         $query->andFilterHaving(['like', 'client_state', $this->client_state]);
+        $query->andFilterHaving(['like', 'backup_state', $this->backup_state]);
 
         // filter by exam name, subject and user_id
         $query->joinWith(['exam' => function ($q) {

@@ -19,8 +19,10 @@
 return [
     'Activities' => 'Aktivitäten',
     'Backup failed: backup aborted.' => 'Backup fehlgeschlagen: Backup abgebrochen.',
+    'Backup failed: network error.' => 'Backup fehlgeschlagen: Netzwerk Fehler.',
     'Backup failed: rdiff-backup failed (retval: {retval})' => 'Backup fehlgeschlagen: rdiff-backup fehlgeschlagen (Rückgabewert: {retval})',
     'Client state changed: {client_state}' => 'Client hat Status geändert: {client_state}',
+    'Client state changed: {old} -> {new}' => 'Client hat Status geändert: {old} -> {new}',
     'Date' => 'Datum',
     'Description' => 'Bezeichnung',
     'Download failed: network error.' => 'Download fehlgeschlagen: Netzwerk Fehler.',
@@ -32,7 +34,6 @@ return [
     'new activities; click to load' => 'neue Aktivitäten; Klicken zum laden',
     '"Bootup successful" message was not recieved, but client is successfully booted up. Client is now unlocked.' => '',
     'Backup failed: leaving ticket in abandoned state.' => '',
-    'Backup failed: network error.' => 'Backup fehlgeschlagen: Netzwerk Fehler.',
     'Download failed: rsync failed (retval: {retval})' => '',
     'Exam download aborted (server side).' => '',
     'Exam download finished by {ip} from Ticket with token {token}.' => '',
@@ -46,5 +47,6 @@ return [
     'Restore failed: "{file}": No such file or directory.' => '',
     'Restore failed: network error.' => '',
     'Restore of {file} as it was as of {date} was successful.' => '',
-    'Client state changed: {old} -> {new}' => 'Client hat Status geändert: {old} -> {new}',
+    'backup aborted.' => '@@@@',
+    'backup successful.' => '@@@@',
 ];
