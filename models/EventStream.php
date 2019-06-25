@@ -452,13 +452,13 @@ class EventStream extends EventItem
     public function queryEvents($lost = false, $inotifyEvent = null)
     {
         $time = $this->queryTime != null ? $this->queryTime : $this->_resumeTime;
+        $this->queryTime = microtime(true);
 
         // search for events
         $this->events = EventItem::find()
             ->where(['event' => $this->_listenEvents])
             ->andWhere(['>', 'generated_at', $time])
             ->orderBy([ 'generated_at' => SORT_ASC ])->all();
-        $this->queryTime = microtime(true);
 
         if (!empty($this->events)) {
             foreach($this->events as $event){
