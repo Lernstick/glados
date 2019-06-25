@@ -56,11 +56,23 @@ class LiveActiveRecord extends TranslatedActiveRecord
             'priority' => 0,
             'data' => function ($field, $model) {
                 // default value is [key => value]
-                return [ $field => $this->{$field} ];
+                return in_array($field, $model->translatedFields)
+                    ? [ $field => $this->{$field . '_db'} ]
+                    : [ $field => $this->{$field} ];
+
             },
             'category' => function ($field, $model) {
                 // check whether the field is a translated field
                 return in_array($field, $model->translatedFields) ? $model->tableName() : null;
+            },
+            'translate_data' => function ($field, $model) {
+                // check whether the field is a translated field
+                $retval = null;
+                if (in_array($field, $model->translatedFields)) {
+                    $paramsField = $model->{$field . '_params'};
+                    $retval = $paramsField == [] ? null : [ $field => $paramsField ];
+                }
+                return $retval;
             },
         ];
     }

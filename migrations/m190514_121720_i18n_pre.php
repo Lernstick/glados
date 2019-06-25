@@ -58,6 +58,10 @@ class m190514_121720_i18n_pre extends Migration
             $this->addColumn($this->eventTable, 'category', $this->string(64)->defaultValue(null));
         }
 
+        if ($this->db->schema->getTableSchema($this->eventTable, true)->getColumn('translate_data') === null) {
+            $this->addColumn($this->eventTable, 'translate_data', $this->string(1024)->defaultValue(null));
+        }
+
     }
 
     /**
@@ -90,6 +94,10 @@ class m190514_121720_i18n_pre extends Migration
         /* event table */
         if ($this->db->schema->getTableSchema($this->eventTable, true)->getColumn('category') !== null) {
             $this->dropColumn($this->eventTable, 'category');
+        }
+
+        if ($this->db->schema->getTableSchema($this->eventTable, true)->getColumn('translate_data') !== null) {
+            $this->dropColumn($this->eventTable, 'translate_data');
         }
     }
 

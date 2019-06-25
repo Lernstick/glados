@@ -63,11 +63,15 @@ class EventController extends Controller
 
                 if (!in_array($model->id, $stream->sentIds)) {
 
-                    // translate all values in data if a translation category is set
+                    // translate all values in data set in translate_data if a translation category is set
                     if ($model->category != null) {
                         $data = json_decode($model->data, true);
+                        $translate_data = json_decode($model->translate_data, true);
                         foreach ($data as $key => $value) {
-                            $data[$key] = \Yii::t($model->category, $value);
+                            $params = isset($translate_data[$key])
+                                ? $translate_data[$key]
+                                : null;
+                            $data[$key] = \Yii::t($model->category, $value, $params);
                         }
                         $model->data = json_encode($data);
                     }

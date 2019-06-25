@@ -18,6 +18,7 @@
  */
 return [
     'Another instance is already running, multiple downloads are not allowed.' => 'Eine andere Instanz ist bereits am laufen, mehrfacher Download der Prüfung ist nicht erlaubt.',
+    'Client not seen yet' => 'Der Client wurde noch nicht gesehen',
     'The exam file is not valid.' => 'Die Prüfungsdatei ist nicht gültig.',
     'The ticket has expired.' => 'Das Ticket ist abgelaufen.',
     'Ticket not found.' => 'Ticket nicht gefunden.',
@@ -42,7 +43,6 @@ return [
     'Choose the exam this ticket has to be assigned to in the list below. Notice, only exams assigned to you will be shown underneath.' => '',
     'Choose the exam those tickets has to be assigned to in the list below. Notice, only exams assigned to you will be shown underneath.' => '',
     'Client State' => '',
-    'Client not seen yet' => 'Der Client wurde noch nicht gesehen',
     'Close' => '',
     'Confirm Restore' => '',
     'Create' => '',
@@ -154,6 +154,7 @@ return [
     'You\'re about to restore:' => '',
     'Your Tickets' => '',
     'Your Token' => '',
+    'bootup complete.' => '',
     'current' => '',
     'errors' => '',
     'expired' => '',
@@ -165,5 +166,6 @@ return [
     'not set' => '',
     'seconds' => '',
     'to the state as it was at <b id=\'confirmRestoreItemDate\'>date</b>' => '',
+    '{interface} reconnected ({count}).' => '{interface} hat erneut verbunden ({count}).',
     '{n} Open Tickets have been deleted successfully.' => '',
 ];

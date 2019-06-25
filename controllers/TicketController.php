@@ -622,9 +622,19 @@ class TicketController extends Controller
 
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         if($model !== null) {
-            $model->client_state = $state;
-            if ($state == "bootup complete.") {
+            if ($state == yiit('ticket', 'bootup complete.')) {
                 $model->bootup_lock = 0;
+            }
+
+            // split the state in params and string if it matches the below regex
+            if (preg_match('/^(.*?) reconnected \((.*?)\)\.$/', $state, $matches) == 1) {
+                $model->client_state = yiit('ticket', '{interface} reconnected ({count}).');
+                $model->client_state_params = [
+                    'interface' => $matches[1],
+                    'count' => $matches[2]
+                ];
+            } else {
+                $model->client_state = $state;
             }
             if ($model->save()) {
                 return [ 'code' => 200, 'msg' => 'Client state changed.' ];

@@ -366,7 +366,7 @@ class Ticket extends LiveActiveRecord
             $eventItem->generate();
         }*/
 
-        if($this->attributesChanged([ 'client_state_id', 'client_state_params' ])){
+        if($this->attributesChanged([ 'client_state_id', 'client_state_data' ])){
             /*$eventItem = new EventItem([
                 'event' => 'ticket/' . $this->id,
                 'priority' => 1,

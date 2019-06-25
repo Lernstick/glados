@@ -84,6 +84,11 @@ class m190531_162014_i18n_migrate extends Migration
                 0 => 'Backup failed: rdiff-backup failed (retval: {retval})',
                 1 => 'retval',
             ],
+            '/^(.*?) reconnected \((.*?)\)\.$/' => [
+                0 => '{interface} reconnected ({count}).',
+                1 => 'interface',
+                2 => 'count',
+            ],
         ]
     ];
 
@@ -114,7 +119,6 @@ class m190531_162014_i18n_migrate extends Migration
 
         // ticket->backup_state
         $this->migrateTableFieldUp($this->ticketTable, 'backup_state', $models, $nr);
-
     }
 
     /**
@@ -165,6 +169,7 @@ class m190531_162014_i18n_migrate extends Migration
 
                         $dummy_params = array_combine($keys, $vals);
                         $model->{$paramsField} = array_combine($keys, $matches);
+
                         break 1;
                     }
                 }
@@ -191,8 +196,10 @@ class m190531_162014_i18n_migrate extends Migration
             }
 
             // don't call events
+            // update field_id and field_data fields
             Yii::$app->db->createCommand()->update($table, [
                 $idField => $translationId,
+                $dataField => $model->{$dataField}
             ], ['id' => $model->id])->execute();
 
             $i = $i + 1;
