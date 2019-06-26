@@ -92,6 +92,7 @@ class EventController extends Controller
         }
 
         $stream->stop();
+        exit();
 
     }
 
