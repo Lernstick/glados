@@ -17,7 +17,7 @@ class TranslatedActivityQuery extends \yii\db\ActiveQuery
         $class = $this->modelClass;
         $c = \Yii::$app->language;
         
-        $this->joinWith($class::joinTranslationTables());
+        $this->joinWith($class::joinTranslationTables(), $class::EAGERLOADING);
 
         $select = array_map(function($value) use ($c) {
             // first the end-user language, then english (en) as fallback

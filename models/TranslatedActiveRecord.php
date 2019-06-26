@@ -13,6 +13,14 @@ class TranslatedActiveRecord extends Base
 {
 
     /**
+     * in joinWith() eagerLoading must be set to false, else an update will fail
+     * because of https://github.com/yiisoft/yii2/blob/master/framework/validators/UniqueValidator.php#L198
+     * In this line there is still $this->joinWith != null, but later
+     * in L193 a select is overwritten only with the id, without the join fields.
+     */
+    const EAGERLOADING = true;
+
+    /**
      * @inheritdoc
      */
     public function init()

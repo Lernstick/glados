@@ -67,6 +67,11 @@ class Ticket extends LiveActiveRecord
     public $client_state_db;
     public $backup_state_db;
 
+    /**
+     * @inheritdoc
+     */
+    const EAGERLOADING = false;
+
     /* scenario constants */
     const SCENARIO_DEFAULT = 'default';
     const SCENARIO_SUBMIT = 'submit';
