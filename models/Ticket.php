@@ -66,6 +66,7 @@ class Ticket extends LiveActiveRecord
     /* db translated fields */
     public $client_state_db;
     public $backup_state_db;
+    public $restore_state_db;
 
     /**
      * @inheritdoc
@@ -124,6 +125,7 @@ class Ticket extends LiveActiveRecord
         return [
             'client_state',
             'backup_state',
+            'restore_state',
         ];
     }
 
@@ -147,6 +149,7 @@ class Ticket extends LiveActiveRecord
             ],
             'backup_state' => [ 'priority' => 2 ],
             'restore_state' => [ 'priority' => 2 ],
+            'download_state' => [ 'priority' => 2 ],
             'backup_lock' => [ 'priority' => 0 ],
             'restore_lock' => [ 'priority' => 0 ],
             'online',
@@ -272,116 +275,8 @@ class Ticket extends LiveActiveRecord
             ]);
             $eventItem->generate();
         }
-        /*if($this->attributesChanged([ 'download_progress' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => round($this->download_progress*100) == 100 ? 0 : 2,
-                'data' => [
-                    'download_progress' => yii::$app->formatter->format($this->download_progress, 'percent')
-                ],
-            ]);
-            $eventItem->generate();
-        }*/
-
-        /*if($this->attributesChanged([ 'download_lock' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 0,
-                'data' => [
-                    'download_lock' => $this->download_lock,
-                ],
-            ]);
-            $eventItem->generate();
-        }*/
-
-        if($this->attributesChanged([ 'download_state' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 2,
-                'data' => [
-                    'download_state' => yii::$app->formatter->format($this->download_state, 'ntext'),
-                ],
-            ]);
-            $eventItem->generate();
-        }
-
-        /*if($this->attributesChanged([ 'backup_state' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 2,
-                'data' => [
-                    'backup_state' => yii::$app->formatter->format($this->backup_state, 'ntext'),
-                ],
-            ]);
-            $eventItem->generate();
-        }
-
-        if($this->attributesChanged([ 'restore_state' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 2,
-                'data' => [
-                    'restore_state' => yii::$app->formatter->format($this->restore_state, 'ntext'),
-                ],
-            ]);
-            $eventItem->generate();
-        }*/
-
-        /*if($this->attributesChanged([ 'backup_lock' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 0,
-                'data' => [
-                    'backup_lock' => $this->backup_lock,
-                ],
-            ]);
-            $eventItem->generate();
-        }
-
-        if($this->attributesChanged([ 'restore_lock' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 0,
-                'data' => [
-                    'restore_lock' => $this->restore_lock,
-                ],
-            ]);
-            $eventItem->generate();
-        }*/
-
-        /*if($this->attributesChanged([ 'online' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 2,
-                'data' => [
-                    'online' => $this->online,
-                ],
-            ]);
-            $eventItem->generate();
-        }
-
-        if($this->attributesChanged([ 'last_backup' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 2,
-                'data' => [
-                    'last_backup' => $this->last_backup,
-                ],
-            ]);
-            $eventItem->generate();
-        }*/
 
         if($this->attributesChanged([ 'client_state_id', 'client_state_data' ])){
-            /*$eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 1,
-                'data' => [
-                    'client_state' => $this->client_state,
-                ],
-                'translate' => true,
-            ]);
-            $eventItem->generate();*/
-
             $act = new Activity([
                 'ticket_id' => $this->id,
                 'description' => yiit('activity', 'Client state changed: {client_state}'),
@@ -392,7 +287,6 @@ class Ticket extends LiveActiveRecord
                 'severity' => Activity::SEVERITY_INFORMATIONAL,
             ]);
             $act->save();
-
         }
         return;
     }

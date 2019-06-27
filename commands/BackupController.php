@@ -220,7 +220,7 @@ class BackupController extends DaemonController implements DaemonInterface
 
             if($retval != 0){
                 $this->ticket->backup_state = yiit('ticket', 'rdiff-backup failed (retval: {retval}), output: {output}');
-                $this->ticket->backup_state_data = [
+                $this->ticket->backup_state_params = [
                     'retval' => $retval,
                     'output' => $output,
                 ];

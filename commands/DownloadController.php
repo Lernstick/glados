@@ -126,7 +126,7 @@ class DownloadController extends DaemonController implements DaemonInterface
             $this->ticket->scenario = Ticket::SCENARIO_DOWNLOAD;
             $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? 1 : 0;
 
-            $this->ticket->client_state = "download in progress";
+            $this->ticket->client_state = yiit('ticket', 'download in progress';
             $this->ticket->runCommand('echo "download in progress" > ' . $this->remotePath . '/state');
             $this->ticket->save(false);
 
@@ -219,7 +219,7 @@ class DownloadController extends DaemonController implements DaemonInterface
                 $act->save();
 
                 $this->ticket->download_progress = 1;
-                $this->ticket->client_state = "download finished";
+                $this->ticket->client_state = yiit('ticket', 'download finished');
                 $this->ticket->download_finished = new Expression('NOW()');
                 $this->unlockItem($this->ticket);
 
@@ -232,7 +232,7 @@ class DownloadController extends DaemonController implements DaemonInterface
                     $pid = $restoreDaemon->startRestore($this->ticket->id, '/', 'now', false, '/run/initramfs/backup/' . $this->ticket->exam->backup_path);
                 }
 
-                $this->ticket->client_state = "preparing system";
+                $this->ticket->client_state = yiit('ticket', 'preparing system');
                 $this->ticket->save();
 
                 /* run the prepare.sh script on the client */
@@ -259,7 +259,7 @@ class DownloadController extends DaemonController implements DaemonInterface
                     ],
                 ]);
                 $eventItem->generate();
-                $this->ticket->client_state = yiit('live_data', "setup complete");
+                $this->ticket->client_state = yiit('ticket', 'setup complete');
                 $this->ticket->save();
 
             }
@@ -280,8 +280,8 @@ class DownloadController extends DaemonController implements DaemonInterface
         if ($this->ticket != null) {
 
             $this->ticket->download_lock = 0;
-            $this->ticket->client_state = "aborted, waiting for download";
-            $this->ticket->save(false, ['client_state', 'download_lock']);
+            $this->ticket->client_state = yiit('ticket', 'aborted, waiting for download');
+            $this->ticket->save(false, ['client_state_id', 'client_state_data', 'download_lock']);
 
             $act = new Activity([
                 'ticket_id' => $this->ticket->id,
@@ -406,7 +406,5 @@ class DownloadController extends DaemonController implements DaemonInterface
         return null;
 
     }
-
-
 
 }

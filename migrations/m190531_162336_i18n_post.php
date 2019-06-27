@@ -23,6 +23,7 @@ class m190531_162336_i18n_post extends Migration
             'description' => $this->string(255)->notNull(),
             'client_state' => $this->string(255)->defaultValue('Client not seen yet'),
             'backup_state' => $this->text() . ' NULL DEFAULT NULL',
+            'restore_state' => $this->text() . ' NULL DEFAULT NULL',
         ];
     }
 
@@ -39,6 +40,10 @@ class m190531_162336_i18n_post extends Migration
 
         // ticket->backup_state
         $this->tableFieldUp($this->ticketTable, 'backup_state');
+
+        // ticket->restore_state
+        $this->tableFieldUp($this->ticketTable, 'restore_state');
+
     }
 
     /**
@@ -54,6 +59,10 @@ class m190531_162336_i18n_post extends Migration
 
         // ticket->backup_state
         $this->tableFieldDown($this->ticketTable, 'backup_state');
+
+        // ticket->restore_state
+        $this->tableFieldDown($this->ticketTable, 'restore_state');
+
     }
 
     private function tableFieldUp($table, $field)

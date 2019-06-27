@@ -16,7 +16,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div class="alert alert-success" role="alert">
         <span class="glyphicon glyphicon-alert"></span>
-        <span><?= \Yii::t('exams', 'For more information, please visit ') ?><?= Html::a('Manual / Create an exam', ['/howto/view', 'id' => 'create-exam.md'], ['class' => 'alert-link']) ?>.</span>
+        <span><?= \Yii::t('exams', 'For more information, please visit {link}.', [
+            'link' => Html::a(\Yii::t('exams', 'Manual / Create an exam'), ['/howto/view', 'id' => 'create-exam.md'], ['class' => 'alert-link'])
+        ]) ?></span>
     </div>
 
     <?= $this->render('_form', [

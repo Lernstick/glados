@@ -89,7 +89,8 @@ class m190531_162014_i18n_migrate extends Migration
                 1 => 'interface',
                 2 => 'count',
             ],
-        ]
+        ],
+        'restore_state' => [],
     ];
 
     /**
@@ -119,6 +120,10 @@ class m190531_162014_i18n_migrate extends Migration
 
         // ticket->backup_state
         $this->migrateTableFieldUp($this->ticketTable, 'backup_state', $models, $nr);
+
+        // ticket->restore_state
+        $this->migrateTableFieldUp($this->ticketTable, 'restore_state', $models, $nr);
+
     }
 
     /**
@@ -140,6 +145,12 @@ class m190531_162014_i18n_migrate extends Migration
         $models = Ticket::find()->where(['backup_state_new' => null])->all();
         $nr = Ticket::find()->where(['backup_state_new' => null])->count();
         $this->migrateTableFieldDown($this->ticketTable, 'backup_state', $models, $nr);
+
+        // ticket->restore_state
+        $models = Ticket::find()->where(['restore_state_new' => null])->all();
+        $nr = Ticket::find()->where(['restore_state_new' => null])->count();
+        $this->migrateTableFieldDown($this->ticketTable, 'restore_state', $models, $nr);
+
     }
 
     private function migrateTableFieldUp($table, $field, $models, $nr)

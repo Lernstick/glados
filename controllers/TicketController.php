@@ -115,6 +115,8 @@ class TicketController extends Controller
                     $out = $searchModel->selectList('client_state', $q, $page, $per_page);
                 } else if ($attr == 'backup_state') {
                     $out = $searchModel->selectList('backup_state', $q, $page, $per_page);
+                } else if ($attr == 'restore_state') {
+                    $out = $searchModel->selectList('restore_state', $q, $page, $per_page);
                 }
             }
             return $out;

@@ -17,6 +17,7 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
+    'Incorrect username or password.' => '',
     'Login' => '',
     'Please fill out the following fields to login:' => '',
     'To modify the users, please login as <strong>admin</strong>.' => '',

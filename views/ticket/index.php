@@ -314,7 +314,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 'filterInputOptions' => [
                     'placeholder' => \Yii::t('form', 'Any')
                 ],
-                'format'=>'raw'
+                'format'=>'raw',
+                'visible' => false
             ], 
             [
                 'attribute' => 'backup_interval',
@@ -377,13 +378,50 @@ $this->params['breadcrumbs'][] = $this->title;
                 'filterInputOptions' => [
                     'placeholder' => \Yii::t('form', 'Any')
                 ],
-                'format'=>'raw'
+                'format'=>'raw',
+                'visible' => false
             ], 
             [
                 'attribute' => 'restore_state',
-                'format' => 'raw',
+                'filterType' => GridView::FILTER_SELECT2,
+                'filterWidgetOptions' => [
+                    'pluginOptions' => [
+                        'dropdownAutoWidth' => true,
+                        'width' => 'auto',
+                        'allowClear' => true,
+                        'placeholder' => '',
+                        'ajax' => [
+                            'url' => \yii\helpers\Url::to(['ticket/index', 'mode' => 'list', 'attr' => 'restore_state']),
+                            'dataType' => 'json',
+                            'delay' => 250,
+                            'cache' => true,
+                            'data' => new JsExpression('function(params) {
+                                return {
+                                    q: params.term,
+                                    page: params.page,
+                                    per_page: 10
+                                };
+                            }'),
+                            'processResults' => new JsExpression('function(data, page) {
+                                return {
+                                    results: data.results,
+                                    pagination: {
+                                        more: data.results.length === 10 // If there are 10 matches, theres at least another page
+                                    }
+                                };
+                            }'),
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(q) { return q.text; }'),
+                        'templateSelection' => new JsExpression('function (q) { return q.text; }'),
+                    ],
+                ],
+                'filterInputOptions' => [
+                    'placeholder' => \Yii::t('form', 'Any')
+                ],
+                'format'=>'raw',
                 'visible' => false
-            ],
+            ], 
             [
                 'class' => 'yii\grid\ActionColumn',
                 'order' => DynaGrid::ORDER_FIX_RIGHT,
