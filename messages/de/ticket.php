@@ -147,6 +147,7 @@ return [
     'The screenshot does not exist.' => '',
     'The start time of the exam. This should not be manually edited.' => '',
     'There are no Open Tickets to delete.' => '',
+    'There are no Tickets to delete.' => '',
     'This directory does not exist in that version. Restoring it in this state will REMOVE the directory from the target machine.' => '',
     'This field shows how the names are parsed.' => '',
     'This file does not exist in that version. Restoring it in this state will REMOVE the file from the target machine.' => '',
@@ -186,6 +187,7 @@ return [
     'seconds' => '',
     'to the state as it was at <b id=\'confirmRestoreItemDate\'>date</b>' => '',
     '{n} Open Tickets have been deleted successfully.' => '',
+    '{n} Tickets have been deleted successfully.' => '',
     '{path}: No such file or directory or not writable.' => '',
     'rdiff-backup failed (retval: {retval}), output: HP_EO{output}' => '@@@@',
 ];

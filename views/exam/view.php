@@ -256,7 +256,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'label' => \Yii::t('exams', 'Libreoffice: Always create backup copy (to <code>{path}</code>)', [
-                    'path' => yii::$app->formatter->format($model->libre_autosave_path, 'text'),
+                    'path' => yii::$app->formatter->format($model->libre_createbackup_path, 'text'),
                 ]),
                 'value' => $model->libre_createbackup,
                 'format' => 'boolean'

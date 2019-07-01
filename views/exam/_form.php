@@ -290,7 +290,9 @@ $this->registerJs($js);
                                 'template' => '{label}<div class="input-group"><div class="input-group-addon">' . \Yii::t('exams', '...to the directory') . '</div>{input}</div>{hint}{error}'
                             ])->textInput(['disabled' => !$model->libre_autosave])->label(false); ?>
                             <?= $form->field($model, 'libre_autosave_interval', [
-                                'template' => '{label}<div class="input-group"><div class="input-group-addon">' . \Yii::t('exams', '...all') . '</div>{input}<span class="input-group-addon" id="basic-addon2">' . \Yii::t('exams', 'minutes.') . '</span></div>{hint}{error}'
+                                'template' => '{label}<div class="input-group"><div class="input-group-addon">' . \Yii::t('exams', '...all {n} minutes.', [
+                                        'n' => '</div>{input}<span class="input-group-addon" id="basic-addon2">'
+                                    ]) . '</span></div>{hint}{error}'
                             ])->textInput(['type' => 'number', 'disabled' => !$model->libre_autosave])->label(false); ?>
                         </div>
                     </div>
@@ -306,7 +308,7 @@ $this->registerJs($js);
                         </div>
                         <div class="panel-body">
                             <?= $form->field($model, 'libre_createbackup_path', [
-                                'template' => '{label}<div class="input-group"><div class="input-group-addon">...to the directory</div>{input}</div>{hint}{error}'
+                                'template' => '{label}<div class="input-group"><div class="input-group-addon">' . \Yii::t('exams', '...to the directory') . '</div>{input}</div>{hint}{error}'
                             ])->textInput(['disabled' => !$model->libre_createbackup])->label(false); ?>
                         </div>
                     </div>
