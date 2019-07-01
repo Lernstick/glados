@@ -131,19 +131,19 @@ $this->params['breadcrumbs'][] = $this->title;
                                                        ( $model->online === 0 ? 'danger' : 
                                                                                 'warning') )
                         ],
-                        'content' => ( $model->online === 1 ? 'Online' :
-                                     ( $model->online === 0 ? 'Offline' : 
-                                                              'Unknown') ),
+                        'content' => ( $model->online === 1 ? \Yii::t('ticket', 'Online') :
+                                     ( $model->online === 0 ? \Yii::t('ticket', 'Offline') : 
+                                                              \Yii::t('ticket', 'Unknown')) ),
                         'event' => 'ticket/' . $model->id,
                         'jsonSelector' => 'online',
                         'jsHandler' => 'function(d, s){
                             if(d == "1"){
-                                s.innerHTML = "Online";
+                                s.innerHTML = "' . \Yii::t('ticket', 'Online') . '";
                                 s.classList.add("label-success");
                                 s.classList.remove("label-danger");
                                 s.classList.remove("label-warning");
                             }else if(d == "0"){
-                                s.innerHTML = "Offline";
+                                s.innerHTML = "' . \Yii::t('ticket', 'Offline') . '";
                                 s.classList.add("label-danger");
                                 s.classList.remove("label-success");
                                 s.classList.remove("label-warning");

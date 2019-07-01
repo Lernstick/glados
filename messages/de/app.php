@@ -22,7 +22,7 @@ return [
     'hour{n,plural,=0{s} =1{} other{s}} spent in exams' => 'Stund{n,plural,=0{en} =1{e} other{en}} in Prüfungen verbracht',
     'new activit{n,plural,=0{ies} =1{y} other{ies}}' => 'neue Aktivität{n,plural,=0{en} =1{} other{en}}',
     'running exam{n,plural,=0{s} =1{} other{s}}' => 'laufende Pürfung{n,plural,=0{en} =1{} other{en}}',
-    '(not set)' => '',
+    '(not set)' => '(nicht gesetzt)',
     'Check your exam result!' => '',
     'Loading...' => '',
     'Login' => '',

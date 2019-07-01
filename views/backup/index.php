@@ -42,7 +42,7 @@ use app\components\Editable;
         [
             'attribute' => 'backup_interval',
             'value' => Editable::widget([
-                'content' => ($ticketModel->backup_interval == 0 ? 'No Backup' : yii::$app->formatter->format($ticketModel->backup_interval, 'duration')),
+                'content' => ($ticketModel->backup_interval == 0 ? \Yii::t('ticket', 'No Backup') : yii::$app->formatter->format($ticketModel->backup_interval, 'duration')),
                 'editUrl' => ['ticket/update', 'id' => $ticketModel->id, 'mode' => 'editable', 'attr' => 'backup_interval' ],
             ]),
             'format' => 'raw'
