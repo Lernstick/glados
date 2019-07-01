@@ -246,13 +246,21 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'template' => '<tr><th{captionOptions}>{value}</th><td{contentOptions}>{label}</td></tr>',
         'attributes' => [
-            'libre_autosave:boolean',
             [
-                'label' => \Yii::t('exams', 'Libreoffice Autosave Interval'),
-                'value' => $model->libre_autosave_interval*60, # in seconds
-                'format' => 'duration'
+                'label' => \Yii::t('exams', 'Libreoffice: Save AutoRecovery information (to <code>{path}</code> every <code>{interval}</code>)', [
+                    'path' => yii::$app->formatter->format($model->libre_autosave_path, 'text'),
+                    'interval' => yii::$app->formatter->format($model->libre_autosave_interval*60, 'duration'),
+                ]),
+                'value' => $model->libre_autosave,
+                'format' => 'boolean'
             ],
-            'libre_createbackup:boolean',
+            [
+                'label' => \Yii::t('exams', 'Libreoffice: Always create backup copy (to <code>{path}</code>)', [
+                    'path' => yii::$app->formatter->format($model->libre_autosave_path, 'text'),
+                ]),
+                'value' => $model->libre_createbackup,
+                'format' => 'boolean'
+            ],
         ],
     ]) ?>
 

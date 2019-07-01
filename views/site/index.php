@@ -53,9 +53,9 @@ $this->title = 'GLaDOS';
     <div class="col-md-6">
         <div class="well">
             <h1 class="text-center">
-            <?= yii::$app->formatter->format($completed_exams, 'shortNumber'); ?> / <?= yii::$app->formatter->format($total_tickets, 'shortNumber'); ?>
+            <?= yii::$app->formatter->format($completed_exams, 'shortNumber'); ?>
             <small><?= \Yii::t('app', 'exam{n,plural,=0{s} =1{} other{s}} completed', [
-                'n' => $total_tickets
+                'n' => $completed_exams
             ]); ?></small>
             </h1>
         </div>
@@ -64,9 +64,9 @@ $this->title = 'GLaDOS';
     <div class="col-md-6">
         <div class="well">
             <h1 class="text-center">
-            <?= yii::$app->formatter->format($total_duation, 'hours'); ?>
+            <?= yii::$app->formatter->format($total_duration, 'hours'); ?>
             <small><?= \Yii::t('app', 'hour{n,plural,=0{s} =1{} other{s}} spent in exams', [
-                'n' => $total_duation
+                'n' => $total_duration
             ]); ?></small>
             </h1>
         </div>

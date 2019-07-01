@@ -23,3 +23,4 @@ phpunit.phar
 /pwsafe.sublime-workspace
 /pwsafe.sublime-project
 #/web/assets
+/web/docs

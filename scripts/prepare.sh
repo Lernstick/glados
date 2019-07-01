@@ -121,7 +121,7 @@ cp -p "/etc/lernstick-firewall/lernstick-firewall.conf" "${initrd}/backup/etc/le
 cp -p "/etc/lernstickWelcome" "${initrd}/backup/etc/lernstickWelcome"
 sed -i 's/ShowNotUsedInfo=.*/ShowNotUsedInfo=false/g' "${initrd}/backup/etc/lernstickWelcome"
 sed -i 's/AutoStartInstaller=.*/AutoStartInstaller=false/g' "${initrd}/backup/etc/lernstickWelcome"
-echo "ShowExamInfo=true" >>"${initrd}/backup/etc/lernstickWelcome" #TODO: replace with sed
+#echo "ShowExamInfo=true" >>"${initrd}/backup/etc/lernstickWelcome" #TODO: replace with sed
 cp -p "/usr/share/applications/finish_exam.desktop" "${initrd}/backup/usr/share/applications/"
 chmod 644 "${initrd}/backup/usr/share/applications/finish_exam.desktop"
 chown user:user "${initrd}/backup/${desktop}/finish_exam.desktop"
@@ -186,14 +186,63 @@ chmod 755 "/lib/systemd/lernstick-shutdown"
 rm -f ${initrd}/newroot/usr/share/polkit-1/actions/ch.lernstick.welcome.policy
 
 # place finish_exam.desktop in "favorite apps" of Gnome3's dash
-if [ -e ${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps ]; then
+if [ -e "${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps" ]; then
   newvalue=$(awk -F'[\,,\[,\], ]' '{if($0~/^favorite-apps=/){ printf "favorite-apps=["; for(i = 2; i <= NF; i++) { if($i!="") {printf "%s, ", $i;} } printf "'\''finish_exam.desktop'\'']\n"; } else { print $0; } }' ${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps)
   echo "${newvalue}" > "${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps"
 else
   echo "[org/gnome/shell]
 favorite-apps=['finish_exam.desktop']" > "${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps"
 fi
+
+# this touch is needed, because dconf update is not rebuilding the database if the
+# directory containing the rules has the same mtime as before
+touch "${initrd}/newroot/etc/dconf/db/local.d"
 chroot ${initrd}/newroot dconf update
+
+# TODO
+cat <<EOF >"${initrd}/newroot/etc/xdg/autostart/show-info.desktop"
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Version=1.0
+Name=Lernstick Exam Client Startscript
+Name[de_DE]=Lernstick Exam Client Startscript
+Exec=show_info
+X-GNOME-Autostart-enabled=true
+EOF
+
+url="${gladosProto}://${gladosIp}:${gladosPort}/glados/index.php/howto/welcome-to-exam.md?mode=inline"
+
+cat <<EOF >"${initrd}/newroot/show_info.html"
+<!DOCTYPE html>
+<html lang='en-US'>
+    <head>
+        <meta charset='UTF-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+        <meta http-equiv='refresh' content='0;url=${url}' />
+    </head>
+    <body>
+    Please wait, redirecting...
+    </body>
+</html>
+EOF
+
+cat <<'EOF' >"${initrd}/newroot/usr/bin/show_info"
+#!/bin/bash
+
+/usr/bin/firefox -createprofile "showInfo /tmp/showInfo" -no-remote
+/usr/bin/firefox -P "showInfo" -width 850 -height 620 -chrome "/show_info.html"
+
+# remove the profile - also remove it from the profiles.ini file
+rm -R /tmp/showInfo
+ex -e - /home/user/.mozilla/firefox/profiles.ini <<@@@
+g/Name=showInfo/.-2,+2d
+wq
+@@@
+
+EOF
+
+chmod 755 "${initrd}/newroot/usr/bin/show_info"
 
 ###########################################
 # apply specific exam config if available #
@@ -334,16 +383,48 @@ EOF
     libre_autosave_interval="$(config_value "libre_autosave_interval")"
   fi
 
+  # config->libre_autosave_path
+  if [ "$(config_value "libre_autosave_path")" = "" ]; then
+    libre_autosave_path=""
+  else
+    libre_autosave_path="$(config_value "libre_autosave_path")"
+  fi
+
+  # config->libre_createbackup_path
+  if [ "$(config_value "libre_createbackup_path")" = "" ]; then
+    libre_createbackup_path=""
+  else
+    libre_createbackup_path="$(config_value "libre_createbackup_path")"
+  fi
+
   registry='<item oor:path="/org.openoffice.Office.Recovery/AutoSave"><prop oor:name="TimeIntervall" oor:op="fuse"><value>'${libre_autosave_interval}'</value></prop></item>
 <item oor:path="/org.openoffice.Office.Recovery/AutoSave"><prop oor:name="Enabled" oor:op="fuse"><value>'${libre_autosave}'</value></prop></item>
-<item oor:path="/org.openoffice.Office.Common/Save/Document"><prop oor:name="CreateBackup" oor:op="fuse"><value>'${libre_createbackup}'</value></prop></item>
+<item oor:path="/org.openoffice.Office.Common/Save/Document"><prop oor:name="CreateBackup" oor:op="fuse"><value>'${libre_createbackup}'</value></prop></item>'
+
+  if ! [ "${libre_autosave_path}" = "" ]; then
+    registry=${registry}'
+<item oor:path="/org.openoffice.Office.Common/Path/Current"><prop oor:name="Temp" oor:op="fuse"><value xsi:nil="true"/></prop></item>
+<item oor:path="/org.openoffice.Office.Paths/Paths/org.openoffice.Office.Paths:NamedPath['"'"'Temp'"'"']"><prop oor:name="WritePath" oor:op="fuse"><value>file://'${libre_autosave_path}'</value></prop></item>'
+  fi
+
+  if ! [ "${libre_createbackup_path}" = "" ]; then
+    registry=${registry}'
+<item oor:path="/org.openoffice.Office.Common/Path/Current"><prop oor:name="Backup" oor:op="fuse"><value xsi:nil="true"/></prop></item>
+<item oor:path="/org.openoffice.Office.Paths/Paths/org.openoffice.Office.Paths:NamedPath['"'"'Backup'"'"']"><prop oor:name="WritePath" oor:op="fuse"><value>file://'${libre_createbackup_path}'</value></prop></item>'
+  fi
+
+registry=${registry}'
 </oor:items>'
 
   # if the file exists, remove the xml entries
-  if [ -e '${initrd}/newroot/${home}/.config/libreoffice/4/user/registrymodifications.xcu' ]; then
+  if [ -e "${initrd}/newroot/${home}/.config/libreoffice/4/user/registrymodifications.xcu" ]; then
     sed -i -e '\#org.openoffice.Office.Recovery/AutoSave.*TimeIntervall#d' \
       -e '\#org.openoffice.Office.Recovery/AutoSave.*Enabled#d' \
       -e '\#org.openoffice.Office.Common/Save/Document.*CreateBackup#d' \
+      -e '\#org.openoffice.Office.Paths/Paths/org.openoffice.Office.Paths.*NamedPath.*Backup.*WritePath#d' \
+      -e '\#org.openoffice.Office.Paths/Paths/org.openoffice.Office.Paths.*NamedPath.*Temp.*WritePath#d' \
+      -e '\#org.openoffice.Office.Common/Path/Current.*Temp#d' \
+      -e '\#org.openoffice.Office.Common/Path/Current.*Backup#d' \
       -e '\#</oor:items>#d' \
       ${initrd}/newroot/${home}/.config/libreoffice/4/user/registrymodifications.xcu
   else

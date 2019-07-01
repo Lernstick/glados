@@ -15,6 +15,7 @@ use app\models\Screenshot;
 use app\models\ScreenshotSearch;
 use app\models\Exam;
 use app\models\EventItem;
+use app\models\Stats;
 use app\models\Daemon;
 use app\models\DaemonSearch;
 use app\models\RdiffFileSystem;
@@ -66,6 +67,7 @@ class TicketController extends Controller
                             'ssh-key',   // get public server ssh key
                             'notify',    // notify a new client status
                             'finish',    // finish exam
+                            'status',    // show the status of the exam
                         ],
                         'roles' => ['?', '@'],
                     ],
@@ -443,25 +445,40 @@ class TicketController extends Controller
             Yii::$app->session->addFlash('danger', Yii::t('ticket', 'The Ticket has been deleted successfully.'));
 
             return $this->redirect(Yii::$app->session['ticketViewReturnURL']);
-        }else if ($mode == 'many') {
+        }else if ($mode == 'manyOpen' || $mode == 'many') {
             $query = Ticket::find()->where(['exam_id' => $exam_id]);
             Yii::$app->user->can('ticket/delete/all') ?: $query->own();
             $models = $query->all();
 
             $c = 0;
-            foreach ($models as $key => $model){
-                if($model->state == Ticket::STATE_OPEN){
+            if ($mode == 'manyOpen'){
+                foreach ($models as $key => $model){
+                    if ($model->state == Ticket::STATE_OPEN){
+                        $model->delete() ? $c++ : null;
+                    }
+                }
+            } else if ($mode == 'many'){
+                foreach ($models as $key => $model){
                     $model->delete() ? $c++ : null;
                 }
             }
 
+
             #TODO: errors?
             if($c == 0){
-                Yii::$app->session->addFlash('danger', Yii::t('ticket', 'There are no Open Tickets to delete.'));
+                if ($mode == 'manyOpen') {
+                    Yii::$app->session->addFlash('danger', Yii::t('ticket', 'There are no Open Tickets to delete.'));
+                } else if ($mode == 'many'){
+                    Yii::$app->session->addFlash('danger', Yii::t('ticket', 'There are no Tickets to delete.'));
+                }
                 return $this->redirect(['exam/view', 'id' => $exam_id]);
             }
 
-            Yii::$app->session->addFlash('danger', Yii::t('ticket', '{n} Open Tickets have been deleted successfully.', ['n' => $c]));
+            if ($mode == 'manyOpen') {
+                Yii::$app->session->addFlash('danger', Yii::t('ticket', '{n} Open Tickets have been deleted successfully.', ['n' => $c]));
+            } else if ($mode == 'many'){
+                Yii::$app->session->addFlash('danger', Yii::t('ticket', '{n} Tickets have been deleted successfully.', ['n' => $c]));
+            }
             return $this->redirect(['exam/view', 'id' => $exam_id]);
         }
     }
@@ -507,8 +524,10 @@ class TicketController extends Controller
                     'screenshots' => boolval($model->exam->{"screenshots"}),
                     'screenshots_interval' => intval($model->exam->{"screenshots_interval"}),
                     'libre_autosave' => boolval($model->exam->{"libre_autosave"}),
+                    'libre_autosave_path' => $model->exam->{"libre_autosave_path"},
                     'libre_autosave_interval' => intval($model->exam->{"libre_autosave_interval"}),
                     'libre_createbackup' => boolval($model->exam->{"libre_createbackup"}),
+                    'libre_createbackup_path' => $model->exam->{"libre_createbackup_path"},
                     'url_whitelist' => implode(PHP_EOL, preg_split("/\r\n|\n|\r/", $model->exam->{"url_whitelist"}, null, PREG_SPLIT_NO_EMPTY)),
                     'max_brightness' => intval($model->exam->{"max_brightness"}),
                 ]
@@ -612,7 +631,23 @@ class TicketController extends Controller
                 'model' => $model,
             ]);
         }
+    }
 
+    /**
+     * TODO.
+     *
+     * @param string $token
+     * @return mixed 
+     */
+    public function actionStatus($token)
+    {
+        $this->layout = 'client';
+        $model = Ticket::findOne(['token' => $token]);
+
+        return $this->render('/result/_view', [
+            'title' => 'Exam Status',
+            'model' => $model,
+        ]);
     }
 
     /**
@@ -675,6 +710,15 @@ class TicketController extends Controller
         $model->last_backup = 0;
         $model->save();
 
+        // increment the stats for total duration and total completed exams
+        // but count only exams whose duration is less or equal than 8 hours and more
+        // or equal than 15 minutes.
+        $model->refresh();
+        if ($model->durationInSecs <= 28800 && $model->durationInSecs >= 900) {
+            Stats::increment('total_duration', $model->durationInSecs);
+            Stats::increment('completed_exams'); // +1
+        }
+  
         if ($model->test_taker) {
             $act = new Activity([
                 'ticket_id' => $model->id,
