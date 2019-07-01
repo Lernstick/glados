@@ -55,7 +55,7 @@ class m190531_162014_i18n_migrate extends Migration
             '/^Exam download successfully requested by (.*?) from (.*?)\./' => [
                 0 => 'Exam download successfully requested by {ip} from {test_taker}.',
                 1 => 'ip',
-                2 => 'token',
+                2 => 'test_taker',
             ],
             '/^Exam finished by Ticket with token (.*?)\./' => [
                 0 => 'Exam finished by Ticket with token {token}.',

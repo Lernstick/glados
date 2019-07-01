@@ -197,7 +197,7 @@ if ($model->state == Ticket::STATE_CLOSED){
                         'token',
                         'exam.name',
                         'start:timeago',
-                        'e  nd:timeago',
+                        'end:timeago',
                         'duration:duration',
                         'test_taker',
                     ],
