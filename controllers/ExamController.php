@@ -123,7 +123,7 @@ class ExamController extends Controller
             } else if ($type == "zip") {
                 $file_list = Yii::$app->zip->set($model->file2)->fileList;
             } else {
-                throw new NotFoundHttpException('The requested file has not a valid extension (zip, squashfs).');
+                throw new NotFoundHttpException(\Yii::t('exams', 'The requested file has not a valid extension (zip, squashfs).'));
             }
 
             $dataProvider = new ArrayDataProvider([
@@ -140,13 +140,13 @@ class ExamController extends Controller
                 if (Yii::$app->file->set($model->file)->exists) {
                     return \Yii::$app->response->sendFile($model->file);
                 } else {
-                    throw new NotFoundHttpException('The requested file does not exist.');
+                    throw new NotFoundHttpException(\Yii::t('exams', 'The requested file does not exist.'));
                 }
             } else if ($type == 'zip') {
                 if (Yii::$app->file->set($model->file2)->exists) {
                     return \Yii::$app->response->sendFile($model->file2);
                 } else {
-                    throw new NotFoundHttpException('The requested file does not exist.');
+                    throw new NotFoundHttpException(\Yii::t('exams', 'The requested file does not exist.'));
                 }
             }
         } else if ($mode == "monitor"){
@@ -193,7 +193,7 @@ class ExamController extends Controller
         } else if ($mode == 'report') {
             $models = Ticket::findAll(['exam_id' => $id, 'start' => null, 'end' => null]);
             if(!$models){
-                Yii::$app->session->addFlash('danger', 'There are no Tickets to generate PDFs.');
+                Yii::$app->session->addFlash('danger', \Yii::t('exams', 'There are no Tickets to generate PDFs.'));
                 return $this->redirect(['view', 'id' => $id]); 
             }
 
@@ -206,7 +206,10 @@ class ExamController extends Controller
             }
 
             $content = implode('<pagebreak />', $contents);
-            $title = 'Ticket for "' . $model->exam->subject . ' - ' . $model->exam->name . '"';
+            $title = \Yii::t('exams', 'Ticket for "{exam} - {subject}"', [
+                'exam' => $model->exam->subject,
+                'subject' => $model->exam->name
+            ]);
 
             $pdf = new Pdf([
                 'mode' => Pdf::MODE_UTF8,
@@ -261,7 +264,9 @@ class ExamController extends Controller
 
         if ($mode === 'default') {
             if ($model->runningTicketCount != 0){
-                Yii::$app->session->addFlash('danger', 'Exam edit is disabled while there are ' . $model->runningTicketCount . ' tickets in "Running" state.');
+                Yii::$app->session->addFlash('danger', \Yii::t('exams', 'Exam edit is disabled while there {n,plural,=1{is one ticket} other{are # tickets}} in "Running" state.',
+                    [ 'n' => $model->runningTicketCount ]
+                ));
                 return $this->redirect(['view', 'id' => $model->id]);
             }
 
@@ -292,31 +297,31 @@ class ExamController extends Controller
              * @see http://php.net/manual/en/features.file-upload.errors.php
              */
             $phpErrors = [
-                0 => 'There is no error, the file uploaded with success',
-                1 => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
-                2 => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form',
-                3 => 'The uploaded file was only partially uploaded',
-                4 => 'No file was uploaded',
-                6 => 'Missing a temporary folder',
-                7 => 'Failed to write file to disk.',
-                8 => 'A PHP extension stopped the file upload.',
+                0 => \Yii::t('fileUpload', 'There is no error, the file uploaded with success'),
+                1 => \Yii::t('fileUpload', 'The uploaded file exceeds the upload_max_filesize directive in php.ini'),
+                2 => \Yii::t('fileUpload', 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form'),
+                3 => \Yii::t('fileUpload', 'The uploaded file was only partially uploaded'),
+                4 => \Yii::t('fileUpload', 'No file was uploaded'),
+                6 => \Yii::t('fileUpload', 'Missing a temporary folder'),
+                7 => \Yii::t('fileUpload', 'Failed to write file to disk.'),
+                8 => \Yii::t('fileUpload', 'A PHP extension stopped the file upload.'),
             ];
 
             if ($file !== null) {
-                $fileError = $phpErrors[$file->error] ? $phpErrors[$file->error] : 'Unknown PHP File Upload Error: ' . $file->error;
+                $fileError = $phpErrors[$file->error] ? $phpErrors[$file->error] : \Yii::t('fileUpload', 'Unknown PHP File Upload Error: {error}', [ 'error' => $file->error ]);
             } else {
-                $fileError = 'Unknown File Upload Error';
+                $fileError = \Yii::t('fileUpload', 'Unknown File Upload Error');
             }
 
             if (!is_dir(\Yii::$app->params['uploadPath'])) {
-                $fileError = 'The upload directory (' . \Yii::$app->params['uploadPath'] . ') does not exist.';
+                $fileError = \Yii::t('fileUpload', 'The upload directory ({dir}) does not exist.', [ 'dir'=> \Yii::$app->params['uploadPath'] ]);
                 @unlink($file);
                 return [ 'files' => [[
                     'name' => basename($file),
                     'error' => $fileError,
                 ]]];                
             } else if (!is_writable(\Yii::$app->params['uploadPath'])) {
-                $fileError = 'The upload directory (' . \Yii::$app->params['uploadPath'] . ') is not writable.';
+                $fileError = \Yii::t('fileUpload', 'The upload directory ({dir}) is not writable.', [ 'dir' => \Yii::$app->params['uploadPath'] ]);
                 @unlink($file);
                 return [ 'files' => [[
                     'name' => basename($file),
@@ -371,11 +376,12 @@ class ExamController extends Controller
 
         if ($mode === 'exam') {
             if($model->ticketCount != 0){
-                Yii::$app->session->addFlash('danger', 'The exam cannot be deleted, since there are ' . $model->ticketCount . ' tickets associated to it.');
+                Yii::$app->session->addFlash('danger', \Yii::t('exams', 'The exam cannot be deleted, since there are {n} tickets associated to it.', ['n' => $model->ticketCount]));
+
                 return $this->redirect(['view', 'id' => $model->id]);
             }
             $model->delete();
-            Yii::$app->session->addFlash('danger', 'The Exam has been deleted successfully.');
+            Yii::$app->session->addFlash('danger', \Yii::t('exams', 'The Exam has been deleted successfully.'));
 
             return $this->redirect(Yii::$app->session['examViewReturnURL']);
         }else if ($mode === 'file') {
@@ -409,10 +415,12 @@ class ExamController extends Controller
             if(Yii::$app->user->can($r . '/all') || $model->user_id == Yii::$app->user->id){
                 return $model;
             }else{
-                throw new ForbiddenHttpException('You are not allowed to ' . \Yii::$app->controller->action->id . 
-                    ' this ' . \Yii::$app->controller->id . '.');
+                throw new ForbiddenHttpException(\Yii::t('app', 'You are not allowed to {action} this {item}.', [
+                    'action' => \Yii::$app->controller->action->id,
+                    'item' => \Yii::$app->controller->id
+                ]));
             }
         }
-        throw new NotFoundHttpException('The requested page does not exist.');
+        throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
     }
 }

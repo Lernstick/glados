@@ -7,8 +7,8 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\helpers\Markdown;
 
-$this->title = 'Howto: ' . $model->title;
-$this->params['breadcrumbs'][] = ['label' => 'Howtos', 'url' => ['index']];
+$this->title = \Yii::t('help', 'Howto') . ': ' . $model->title;
+$this->params['breadcrumbs'][] = ['label' => \Yii::t('help', 'Howtos'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->title, 'url' => ['view', 'id' => $model->id]];
 $title = $model->title;
 ?>
@@ -35,7 +35,7 @@ $title = $model->title;
             'layout' => '{items} {pager}',
             'columns' => [
                 [
-                    'label' => 'Navigation',
+                    'label' => \Yii::t('help', 'Navigation'),
                     'format' => 'raw',
                     'value'=> function ($model) use ($title) {
                         $a = $model->title == $title ? '<b>' . $model->title . '</b>' : $model->title;

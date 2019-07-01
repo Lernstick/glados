@@ -21,9 +21,10 @@ class EventController extends Controller
     public function actionStream($uuid)
     {
     
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
         $stream = $this->findModel($uuid);
 
-        $stream->timeLimit = YII_ENV_DEV ? 60 : 300;
+        $stream->timeLimit = YII_ENV_DEV ? 30 : 300;
 
         //$user_id = \Yii::$app->user->id;
         //$user_id = 1;
@@ -34,52 +35,76 @@ class EventController extends Controller
         );
         $stream->pathPrefixes = $pathPrefixes;
 
-        $stream->on(EventStream::EVENT_STREAM_STARTED, function() {
+        $stream->on(EventStream::EVENT_STREAM_STARTED, function() use ($uuid) {
             $event = new EventItem(['event' => 'meta', 'data' => json_encode(['state' => 'event stream started'])]);
             $this->sendMessage($this->renderPartial('/event/message', [
                 'model' => $event,
-            ]));
+            ]), $uuid);
         });
 
-        $stream->on(EventStream::EVENT_STREAM_STOPPED, function() {
+        $stream->on(EventStream::EVENT_STREAM_STOPPED, function() use ($uuid) {
             $event = new EventItem(['event' => 'meta', 'data' => json_encode(['state' => 'event stream finished']), 'retry' => 1000]);
             $this->sendMessage($this->renderPartial('/event/message', [
                 'model' => $event,
-            ]));
+            ]), $uuid);
         });
 
-        $stream->on(EventStream::EVENT_STREAM_RESUMED, function() {
+        $stream->on(EventStream::EVENT_STREAM_RESUMED, function() use ($uuid) {
             $event = new EventItem(['event' => 'meta', 'data' => json_encode(['state' => 'event stream resumed'])]);
             $this->sendMessage($this->renderPartial('/event/message', [
                 'model' => $event,
-            ]));
+            ]), $uuid);
         });
 
         $stream->start();
 
-        while($stream->onEvent() === true){
+        while ($stream->onEvent() === true) {
             $message = '';
             foreach($stream->events as $model){
-                $message .= $this->renderPartial('/event/message', [
-                    'model' => $model,
-                ]);
+
+                if (!in_array($model->id, $stream->sentIds)) {
+
+                    // translate all values in data set in translate_data if a translation category is set
+                    if ($model->category != null) {
+                        $data = json_decode($model->data, true);
+                        $translate_data = json_decode($model->translate_data, true);
+                        foreach ($data as $key => $value) {
+                            $params = isset($translate_data[$key])
+                                ? $translate_data[$key]
+                                : null;
+                            $data[$key] = \Yii::t($model->category, $value, $params);
+                        }
+                        $model->data = json_encode($data);
+                    }
+
+                    $message .= $this->renderPartial('/event/message', [
+                        'model' => $model,
+                    ]);
+
+                    // add the id of the event to the sentIds array
+                    array_push($stream->sentIds, $model->id);
+                }
             }
 
             if(!empty($message)){
-                $this->sendMessage($message);
+                $this->sendMessage($message, $uuid);
             }
         }
 
         $stream->stop();
+        exit();
 
     }
 
 
-    public function sendMessage($message)
+    public function sendMessage($message, $uuid)
     {
         echo $message;
         ob_flush();
         flush();
+        if (YII_ENV_DEV) {
+            file_put_contents('/var/log/glados/debug-stream-uuid=' . $uuid, $message, FILE_APPEND);
+        }
     }
 
     /**

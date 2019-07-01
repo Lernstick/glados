@@ -21,7 +21,7 @@ if ($model->client_state == 'setup complete') {
         <div class="panel-heading">
             <div class="row">
                 <div class="col-xs-8">
-                    <span>Please wait, while your system is prepared</span>
+                    <span><?= \Yii::t('client', 'Please wait, while your system is prepared') ?></span>
                 </div>
                 <div class="col-xs-4">
                     <div class="dropdown pull-right">
@@ -31,21 +31,21 @@ if ($model->client_state == 'setup complete') {
                         <ul class="dropdown-menu">
                             <li>
                                 <?= Html::a(
-                                    '<span class="glyphicon glyphicon-backward"></span> Back to token submission',
+                                    '<span class="glyphicon glyphicon-backward"></span> ' . \Yii::t('client', 'Back to token submission'),
                                     ['download', 'token' => $model->token, 'step' => 1],
                                     ['id' => 'backup-now']
                                 ) ?>
                             </li>            
                             <li>
                                 <?= Html::a(
-                                    '<span class="glyphicon glyphicon-retweet"></span> Request download again',
+                                    '<span class="glyphicon glyphicon-retweet"></span> ' . \Yii::t('client', 'Request download again'),
                                     ['download', 'token' => $model->token, 'step' => 2],
                                     ['id' => 'backup-now']
                                 ) ?>
                             </li>
                             <li>
                                 <?= Html::a(
-                                    '<span class="glyphicon glyphicon-question-sign"></span> Help',
+                                    '<span class="glyphicon glyphicon-question-sign"></span> ' . \Yii::t('client', 'Help'),
                                     ['howto/view', 'id' => 'token-request-help.md', 'mode' => 'inline'],
                                     ['onclick' => 'window.open("' . Url::to(['howto/view', 'id' => 'token-request-help.md', 'mode' => 'inline']) . '", "Help", "titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,width=800,height=800"); return false;']
                                 ) ?>
@@ -164,11 +164,11 @@ if ($model->client_state == 'setup complete') {
 
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                    <h4>Continue</h4>
+                    <h4><?= \Yii::t('client', 'Continue') ?></h4>
                 </div>
 
                 <div class="modal-body">
-                    <p>The system setup is done. You can close this window now.</p>
+                    <p><?= \Yii::t('client', 'The system setup is done. You can close this window now.') ?></p>
                 </div>
 
             </div>

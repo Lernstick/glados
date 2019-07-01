@@ -14,7 +14,7 @@ use yii\web\JsExpression;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $preSelect array */
 
-$this->title = 'Tickets';
+$this->title = \Yii::t('ticket', 'Tickets');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="ticket-index">
@@ -34,7 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'timeago',
                 'filterType' => GridView::FILTER_DATE,
                 'filterWidgetOptions' => [
-                    'options' => ['placeholder' => 'Enter day...'],
+                    'options' => ['placeholder' => \Yii::t('form', 'Enter day...')],
                     'pluginOptions' => [
                        'format' => 'yyyy-mm-dd',
                        'todayHighlight' => true,
@@ -91,7 +91,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                 ],
                 'filterInputOptions' => [
-                    'placeholder' => 'Any'
+                    'placeholder' => \Yii::t('form', 'Any')
                 ],
                 'format'=>'raw'
             ],
@@ -131,7 +131,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                 ],
                 'filterInputOptions' => [
-                    'placeholder' => 'Any'
+                    'placeholder' => \Yii::t('form', 'Any')
                 ],
                 'format'=>'raw'
             ],
@@ -175,7 +175,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                 ],
                 'filterInputOptions' => [
-                    'placeholder' => 'Any'
+                    'placeholder' => \Yii::t('form', 'Any')
                 ],
                 'format' => 'raw'
             ],          
@@ -186,7 +186,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'timeago',
                 'filterType' => GridView::FILTER_DATE,
                 'filterWidgetOptions' => [
-                    'options' => ['placeholder' => 'Enter day...'],
+                    'options' => ['placeholder' => \Yii::t('form', 'Enter day...')],
                     'pluginOptions' => [
                        'format' => 'yyyy-mm-dd',
                        'todayHighlight' => true,
@@ -199,7 +199,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'timeago',
                 'filterType' => GridView::FILTER_DATE,
                 'filterWidgetOptions' => [
-                    'options' => ['placeholder' => 'Enter day...'],
+                    'options' => ['placeholder' => \Yii::t('form', 'Enter day...')],
                     'pluginOptions' => [
                        'format' => 'yyyy-mm-dd',
                        'todayHighlight' => true,
@@ -212,14 +212,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'abandoned',
                 'format' => 'boolean',
                 'filter' => array(
-                    'Yes' => 'Yes',
-                    'No' => 'No',
+                    'Yes' => \Yii::t('ticket', 'Yes'),
+                    'No' => \Yii::t('ticket', 'No'),
                 ),
             ],            
             [
-                'attribute'=>'test_taker',
-                'filterType'=>GridView::FILTER_SELECT2,
-                'filterWidgetOptions'=>[
+                'attribute' => 'test_taker',
+                'filterType' => GridView::FILTER_SELECT2,
+                'filterWidgetOptions' => [
                     'pluginOptions' => [
                         'dropdownAutoWidth' => true,
                         'width' => 'auto',
@@ -252,7 +252,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                 ],
                 'filterInputOptions' => [
-                    'placeholder' => 'Any'
+                    'placeholder' => \Yii::t('form', 'Any')
                 ],
                 'format'=>'raw'
             ],             
@@ -278,14 +278,50 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'client_state',
-                'format' => 'raw',
+                'filterType' => GridView::FILTER_SELECT2,
+                'filterWidgetOptions' => [
+                    'pluginOptions' => [
+                        'dropdownAutoWidth' => true,
+                        'width' => 'auto',
+                        'allowClear' => true,
+                        'placeholder' => '',
+                        'ajax' => [
+                            'url' => \yii\helpers\Url::to(['ticket/index', 'mode' => 'list', 'attr' => 'client_state']),
+                            'dataType' => 'json',
+                            'delay' => 250,
+                            'cache' => true,
+                            'data' => new JsExpression('function(params) {
+                                return {
+                                    q: params.term,
+                                    page: params.page,
+                                    per_page: 10
+                                };
+                            }'),
+                            'processResults' => new JsExpression('function(data, page) {
+                                return {
+                                    results: data.results,
+                                    pagination: {
+                                        more: data.results.length === 10 // If there are 10 matches, theres at least another page
+                                    }
+                                };
+                            }'),
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(q) { return q.text; }'),
+                        'templateSelection' => new JsExpression('function (q) { return q.text; }'),
+                    ],
+                ],
+                'filterInputOptions' => [
+                    'placeholder' => \Yii::t('form', 'Any')
+                ],
+                'format'=>'raw',
                 'visible' => false
-            ],
+            ], 
             [
                 'attribute' => 'backup_interval',
                 'format' => 'raw',
                 'value' =>  function($model) {
-                    return $model->backup_interval == 0 ? 'No Backup' : yii::$app->formatter->format($model->backup_interval, 'duration');
+                    return $model->backup_interval == 0 ? \Yii::t('ticket', 'No Backup') : yii::$app->formatter->format($model->backup_interval, 'duration');
                 },
                 'visible' => false
             ],
@@ -306,14 +342,86 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'backup_state',
-                'format' => 'raw',
+                'filterType' => GridView::FILTER_SELECT2,
+                'filterWidgetOptions' => [
+                    'pluginOptions' => [
+                        'dropdownAutoWidth' => true,
+                        'width' => 'auto',
+                        'allowClear' => true,
+                        'placeholder' => '',
+                        'ajax' => [
+                            'url' => \yii\helpers\Url::to(['ticket/index', 'mode' => 'list', 'attr' => 'backup_state']),
+                            'dataType' => 'json',
+                            'delay' => 250,
+                            'cache' => true,
+                            'data' => new JsExpression('function(params) {
+                                return {
+                                    q: params.term,
+                                    page: params.page,
+                                    per_page: 10
+                                };
+                            }'),
+                            'processResults' => new JsExpression('function(data, page) {
+                                return {
+                                    results: data.results,
+                                    pagination: {
+                                        more: data.results.length === 10 // If there are 10 matches, theres at least another page
+                                    }
+                                };
+                            }'),
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(q) { return q.text; }'),
+                        'templateSelection' => new JsExpression('function (q) { return q.text; }'),
+                    ],
+                ],
+                'filterInputOptions' => [
+                    'placeholder' => \Yii::t('form', 'Any')
+                ],
+                'format'=>'raw',
                 'visible' => false
-            ],
+            ], 
             [
                 'attribute' => 'restore_state',
-                'format' => 'raw',
+                'filterType' => GridView::FILTER_SELECT2,
+                'filterWidgetOptions' => [
+                    'pluginOptions' => [
+                        'dropdownAutoWidth' => true,
+                        'width' => 'auto',
+                        'allowClear' => true,
+                        'placeholder' => '',
+                        'ajax' => [
+                            'url' => \yii\helpers\Url::to(['ticket/index', 'mode' => 'list', 'attr' => 'restore_state']),
+                            'dataType' => 'json',
+                            'delay' => 250,
+                            'cache' => true,
+                            'data' => new JsExpression('function(params) {
+                                return {
+                                    q: params.term,
+                                    page: params.page,
+                                    per_page: 10
+                                };
+                            }'),
+                            'processResults' => new JsExpression('function(data, page) {
+                                return {
+                                    results: data.results,
+                                    pagination: {
+                                        more: data.results.length === 10 // If there are 10 matches, theres at least another page
+                                    }
+                                };
+                            }'),
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(q) { return q.text; }'),
+                        'templateSelection' => new JsExpression('function (q) { return q.text; }'),
+                    ],
+                ],
+                'filterInputOptions' => [
+                    'placeholder' => \Yii::t('form', 'Any')
+                ],
+                'format'=>'raw',
                 'visible' => false
-            ],
+            ], 
             [
                 'class' => 'yii\grid\ActionColumn',
                 'order' => DynaGrid::ORDER_FIX_RIGHT,
@@ -326,7 +434,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'report' => function ($url) {
                         return Html::a('<span class="glyphicon glyphicon-save-file"></span>', $url,
                             [
-                                'title' => 'Generate PDF Report',
+                                'title' => \Yii::t('ticket', 'Generate PDF Report'),
                                 'data-pjax' => '0',
                             ]
                         );
@@ -345,15 +453,15 @@ $this->params['breadcrumbs'][] = $this->title;
         'gridOptions' => [
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
-            'panel' => ['heading' => '<h3 class="panel-title">Your Tickets</h3>'],
+            'panel' => ['heading' => '<h3 class="panel-title">' . \Yii::t('ticket', 'Your Tickets') . '</h3>'],
             'rowOptions' => function($model) {
                 return array_key_exists($model->state, $model->classMap) ? ['class' => $model->classMap[$model->state]] : null;
             },            
             'toolbar' =>  [
                 ['content' =>
-                    Html::a('<i class="glyphicon glyphicon-plus"></i>', ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => 'Create Ticket']) . ' ' .
-                    Html::a('<i class="glyphicon glyphicon-envelope"></i>', ['update', 'mode' => 'submit'], ['data-pjax' => 0, 'class' => 'btn btn-info', 'title' => 'Submit Ticket']) . ' ' .
-                    Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/ticket/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => 'Reset Grid'])
+                    Html::a('<i class="glyphicon glyphicon-plus"></i>', ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => \Yii::t('ticket', 'Create Ticket')]) . ' ' .
+                    Html::a('<i class="glyphicon glyphicon-envelope"></i>', ['update', 'mode' => 'submit'], ['data-pjax' => 0, 'class' => 'btn btn-info', 'title' => \Yii::t('ticket', 'Submit Ticket')]) . ' ' .
+                    Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/ticket/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => \Yii::t('ticket', 'Reset Grid')])
                 ],
                 ['content' => '{dynagridFilter}{dynagridSort}{dynagrid}'],
                 '{export}',

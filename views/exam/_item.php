@@ -25,12 +25,12 @@ use app\components\ActiveEventField;
             </span>
         </div>
 
-        <div class="col-sm-4">Token: </div>
+        <div class="col-sm-4"><?= \Yii::t('exams', 'Token') ?>: </div>
         <div class="col-sm-8">
             <?= yii::$app->formatter->format($model->token, 'text'); ?>
         </div>
 
-        <div class="col-sm-4">Client State: </div>
+        <div class="col-sm-4"><?= \Yii::t('exams', 'Client State') ?>: </div>
         <?= ActiveEventField::widget([
             'content' => yii::$app->formatter->format(StringHelper::truncate($model->client_state, 30), 'text'),
             'event' => 'ticket/' . $model->id,
@@ -47,17 +47,17 @@ use app\components\ActiveEventField;
         ]); ?>
 
 
-        <div class="col-sm-4">IP Address: </div>
+        <div class="col-sm-4"><?= \Yii::t('exams', 'IP Address') ?>: </div>
         <div class="col-sm-8">
             <?= yii::$app->formatter->format($model->ip, 'text'); ?>
         </div>
 
-        <div class="col-sm-4">Test Taker: </div>
+        <div class="col-sm-4"><<?= \Yii::t('exams', 'Test Taker') ?>: </div>
         <div class="col-sm-8">
             <?= yii::$app->formatter->format(StringHelper::truncate($model->test_taker, 30), 'text'); ?>&nbsp;
         </div>
 
-        <div class="col-sm-4">Backup:
+        <div class="col-sm-4"><?= \Yii::t('exams', 'Backup') ?>:
             <?= ActiveEventField::widget([
                 'event' => 'ticket/' . $model->id,
                 'marker' => 'monitor',
@@ -91,7 +91,7 @@ use app\components\ActiveEventField;
             'options' => [ 'class' => 'col-sm-8' ],
         ]); ?>
 
-        <div class="col-sm-4">Download: </div>
+        <div class="col-sm-4"><?= \Yii::t('exams', 'Download') ?>: </div>
         <div class="col-sm-8">
             <div class="progress">
                 <?php ActiveEventField::begin([

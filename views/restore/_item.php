@@ -14,24 +14,24 @@ use yii\widgets\DetailView;
 <div class="panel-heading">
 	<h4 class="panel-title">
     	<a data-toggle="collapse" data-parent="#restores-accordion" href="#restores-collapse<?= $index + 1 ?>">
-        	Restore #<?= $key . ' - ' . yii::$app->formatter->format($model->finishedAt, 'timeago') ?>
+        	<?= \Yii::t('ticket', 'Restore') ?> #<?= $key . ' - ' . yii::$app->formatter->format($model->finishedAt, 'timeago') ?>
 		</a>
         <div class="pull-right">
             <div class="btn-group">
               <a href="#" class="dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="glyphicon glyphicon-list-alt"></span> Actions<span class="caret"></span>
+                <span class="glyphicon glyphicon-list-alt"></span> <?= \Yii::t('ticket', 'Actions') ?><span class="caret"></span>
               </a>            
               <ul class="dropdown-menu dropdown-menu-right">
                 <li>
                      <?= Html::a(
-                        '<span class="glyphicon glyphicon-paperclip"></span> Show Log File',
+                        '<span class="glyphicon glyphicon-paperclip"></span> '. \Yii::t('ticket', 'Show Log File'),
                         Url::to([
                             'restore/log',
                             'id' => $model->id,
                         ]),
                         [
                             'id' => 'restore-log-show' . $key,
-                            'title' => 'Show restore log'
+                            'title' => \Yii::t('ticket', 'Show restore log')
                         ]
                     ); ?>
                 </li>

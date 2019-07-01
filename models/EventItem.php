@@ -35,7 +35,6 @@ class EventItem extends \yii\db\ActiveRecord
      */
     public $concerns = [];
 
-    public $oldData;
     public $jsonData;
     public $retry; //TODO
     public $sent_at;
@@ -82,8 +81,10 @@ class EventItem extends \yii\db\ActiveRecord
      */
     public function generate()
     {
-        $this->oldData = $this->data;
-        $this->data = json_encode($this->oldData);
+        $oldData = $this->data;
+        $this->data = json_encode($oldData);
+        $translate_data = $this->translate_data;
+        $this->translate_data = json_encode($translate_data);
         $this->generated_at = microtime(true);
         $this->broadcast = (array_key_exists('users', $this->concerns) && in_array('ALL', $this->concerns['users']))
             ? 1 : 0;

@@ -15,7 +15,9 @@ use yii\widgets\Pjax;
 
 <div class="alert alert-info" role="alert">
     <span class="glyphicon glyphicon-alert"></span>
-    <span>Do you want to restore a file? Then please visit <?= Html::a('Manual / Restore a specific file', ['/howto/view', 'id' => 'restore-specific-file.md'], ['class' => 'alert-link']) ?>.</span>
+    <span><?= \Yii::t('ticket', 'Do you want to restore a file? Then please visit {link}.', [
+        'link' => Html::a('Manual / Restore a specific file', ['/howto/view', 'id' => 'restore-specific-file.md'], ['class' => 'alert-link'])
+    ]) ?></span>
 </div>
 
 <?= DetailView::widget([
@@ -66,7 +68,7 @@ use yii\widgets\Pjax;
     'options' => ['id' => 'restores-accordion', 'class' => 'panel-group'],
     'itemOptions' => ['class' => 'panel panel-default'],
     'itemView' => '_item',
-    'emptyText' => 'No restores found.',
+    'emptyText' => \Yii::t('ticket', 'No restores found.'),
     'layout' => '{items} <br>{summary} {pager}',
 ]); ?>
 
@@ -74,8 +76,8 @@ use yii\widgets\Pjax;
 
 Modal::begin([
     'id' => 'restoreLogModal',
-    'header' => '<h4>Restore Log</h4>',
-    'footer' => Html::Button('Close', ['data-dismiss' => 'modal', 'class' => 'btn btn-default']),
+    'header' => '<h4>' . \Yii::t('ticket', 'Restore Log') . '</h4>',
+    'footer' => Html::Button(\Yii::t('ticket', 'Close'), ['data-dismiss' => 'modal', 'class' => 'btn btn-default']),
     'size' => \yii\bootstrap\Modal::SIZE_LARGE
 ]);
 

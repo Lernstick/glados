@@ -56,8 +56,17 @@ class Backup extends Model
     public function attributeLabels()
     {
         return [
-            'date' => 'Date',
-            'token' => 'Token',
+            'date' => Yii::t('backups', 'Date'),
+            'token' => Yii::t('backups', 'Token'),
+            'elapsedTime' => Yii::t('backups', 'Elapsed Time'),
+            'sourceFiles' => Yii::t('backups', 'Source Files'),
+            'mirrorFiles' => Yii::t('backups', 'Mirror Files'),
+            'deletedFiles' => Yii::t('backups', 'Deleted Files'),
+            'changedFiles' => Yii::t('backups', 'Changed Files'),
+            'incrementFiles' => Yii::t('backups', 'Increment Files'),
+            'totalDestinationSizeChange' => Yii::t('backups', 'Total Destination Size Change'),
+            'errors' => Yii::t('backups', 'Errors'),
+
         ];
     }
 

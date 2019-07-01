@@ -59,7 +59,7 @@ if ($model->type == 'dir') {
     echo "&nbsp;&nbsp;&nbsp;";
     echo "<span class='backup-browse-options'>";
     echo Html::a(
-        '<span class="glyphicon glyphicon-list-alt"></span> View all versions',
+        '<span class="glyphicon glyphicon-list-alt"></span> ' . \Yii::t('ticket', 'View all versions'),
         Url::to([
             false,
             'id' => $ticket->id,
@@ -70,7 +70,7 @@ if ($model->type == 'dir') {
     );
     echo " ";
     echo Html::a(
-        '<span class="glyphicon glyphicon-tasks"></span> Restore this state of the file',
+        '<span class="glyphicon glyphicon-tasks"></span> ' . \Yii::t('ticket', 'Restore this state of the file'),
         Url::to([
             'ticket/restore',
             'id' => $ticket->id,
@@ -99,15 +99,15 @@ if ($model->type == 'dir') {
 echo '<div class="pull-right">';
 if ($model->type == 'dir') {
     if ($model->state == 'missing') {
-        echo '<span class="text-muted">' . yii::$app->formatter->format($model->version, 'backupVersion') . ', <abbr title="This directory does not exist in that version. Restoring it in this state will REMOVE the directory from the target machine.">' . $model->state . '</abbr></span>';
+        echo '<span class="text-muted">' . yii::$app->formatter->format($model->version, 'backupVersion') . ', <abbr title="' . \Yii::t('ticket', 'This directory does not exist in that version. Restoring it in this state will REMOVE the directory from the target machine.') . '">' . $model->state . '</abbr></span>';
     }
 } else {
     if ($model->state != 'missing') {
-        echo '<span class="text-muted">' . ($model->version == $model->newestBackupVersion ? '(current) ' : null) . yii::$app->formatter->format($model->version, 'backupVersion') . ', ' . yii::$app->formatter->format($model->mode, 'text') . ', ' . yii::$app->formatter->format($model->size, 'shortSize') . '</span>';
+        echo '<span class="text-muted">' . ($model->version == $model->newestBackupVersion ? '(' . \Yii::t('ticket', 'current') . ') ' : null) . yii::$app->formatter->format($model->version, 'backupVersion') . ', ' . yii::$app->formatter->format($model->mode, 'text') . ', ' . yii::$app->formatter->format($model->size, 'shortSize') . '</span>';
     } else {
         echo '<span class="text-muted">' . yii::$app->formatter->format($model->version, 'backupVersion');
         if (!($model->wasWhiteout == true && $model->isOldestVersion)) {
-            echo ', <abbr title="This file does not exist in that version. Restoring it in this state will REMOVE the file from the target machine.">' . $model->state . '</abbr>';
+            echo ', <abbr title="' . \Yii::t('ticket', 'This file does not exist in that version. Restoring it in this state will REMOVE the file from the target machine.') . '">' . $model->state . '</abbr>';
         }
         echo '</span>';
     }

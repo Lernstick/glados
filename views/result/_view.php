@@ -63,11 +63,11 @@ if (file_exists($model->result)) {
     $this->registerJs("$('#pb-sub').width('17.5%');");
     $this->registerJs("$('#pb-run').width('65%');");
     echo '<div class="jumbotron">' . 
-        '<h1>Hello ' . ($model->test_taker ? $model->test_taker : $model->token) . '</h1>' . 
-        '<p>Your exam result is handed in, check it out!</p>' . 
+        '<h1>' . \Yii::t('results', 'Hello {student}', ['student' => ($model->test_taker ? $model->test_taker : $model->token)]) . '</h1>' . 
+        '<p>' . \Yii::t('results', 'Your exam result is handed in, check it out!') . '</p>' . 
         '<p>' . 
         Html::a(
-            '<span class="glyphicon glyphicon-save-file"></span> Download my result',
+            '<span class="glyphicon glyphicon-save-file"></span> ' . \Yii::t('results', 'Download my result'),
             ['result/download', 'token' => $model->token],
             ['data-pjax' => 0, 'class' => 'btn btn-primary btn-lg', 'role' => 'button']
         ) . 
@@ -110,22 +110,22 @@ if ($model->state == Ticket::STATE_CLOSED){
 <div class="row">
     <div class="col-md-7 col-xs-7">
         <p class="text-left text-<?= !$started ? 'danger' : 'success' ?>">
-            <span class="glyphicon glyphicon-triangle-top"></span><br>started
+            <span class="glyphicon glyphicon-triangle-top"></span> <?= \Yii::t('results', 'started') ?>
         </p>
     </div>
-    <div class="col-md-1 col-xs-1">
-        <p class="text-right text-<?= !$finished ? 'danger' : 'success' ?>">
-            <span class="glyphicon glyphicon-triangle-top"></span><br>finished
+    <div class="col-md-1">
+        <p class="text-left text-<?= !$finished ? 'danger' : 'success' ?>">
+            <?= \Yii::t('results', 'finished') ?> <span class="glyphicon glyphicon-triangle-top"></span>
         </p>
     </div>        
     <div class="col-md-2 col-xs-2">
         <p class="text-right text-<?= !$submitted ? 'danger' : 'success' ?>">
-            <span class="glyphicon glyphicon-triangle-top"></span><br>submitted
+            <?= \Yii::t('results', 'submitted') ?> <span class="glyphicon glyphicon-triangle-top"></span>
         </p>
     </div>
     <div class="col-md-2 col-xs-2">
         <p class="text-right text-<?= !$result ? 'danger' : 'success' ?>">
-            <span class="glyphicon glyphicon-triangle-top"></span><br>result handed in
+            <?= \Yii::t('results', 'result handed in') ?> <span class="glyphicon glyphicon-triangle-top"></span>
         </p>
     </div>
 </div>
@@ -180,8 +180,8 @@ if ($model->state == Ticket::STATE_CLOSED){
             </div>
         </div>
     </div>
-    <div class="panel-body">
 
+    <div class="panel-body">
         <div class="row">
             <div class="col-md-8 col-xs-12">
                 <?= DetailView::widget([
@@ -195,15 +195,15 @@ if ($model->state == Ticket::STATE_CLOSED){
                             'format' => 'html',
                         ],
                         'token',
-                        //'exam.name',
+                        'exam.name',
                         'start:timeago',
-                        'end:timeago',
+                        'e  nd:timeago',
                         'duration:duration',
                         'test_taker',
-                        'backup_state',
                     ],
                 ]); ?>
             </div>
+        
             <div class="col-md-4 col-xs-12">
                 <div class="well">
                     <h1 class="text-center">
@@ -211,16 +211,16 @@ if ($model->state == Ticket::STATE_CLOSED){
                     <?php
                         if ($model->state == Ticket::STATE_RUNNING) {
                             if ($model->validTime === false) {
-                                echo "Time is up.";
+                                echo \Yii::t('results', 'Time is up.');
                             } else if ($model->validTime === true) {
-                                echo "There is no time limit.";
+                                echo \Yii::t('results', 'There is no time limit.');
                             } else {
                                 $date = new DateTime('now');
                                 $date->add($model->validTime);
                                 ##$date->modify('+30 seconds');
                                 echo \russ666\widgets\Countdown::widget([
                                     'datetime' => $date->format('Y-m-d H:i:s O'),
-                                    'format' => 'The world might end in...<br> %-N %!N:minute,minutes; %-S %!S:second,seconds;',
+                                    'format' => \Yii::t('results', 'The world might end in...') . '<br> %-N %!N:minute,minutes; %-S %!S:second,seconds;',
                                     'events' => [
                                         'finish' => 'function(){
                                             this.innerHTML = "Time is up.";
@@ -238,17 +238,16 @@ if ($model->state == Ticket::STATE_CLOSED){
                                 ]);
                             }
                         } else if ($model->state == Ticket::STATE_OPEN) {
-                            echo "The exam has not started yet.";
+                            echo \Yii::t('results', 'The exam has not started yet.');
                         } else {
-                            echo "The exam is over.";                    
+                            echo \Yii::t('results', 'The exam is over.');
                         }
                     ?>
                     </small>
                     </h1>
-                </div>            
+                </div>
             </div>
         </div>
-
     </div>    
 </div>
 

@@ -27,7 +27,7 @@ use app\components\ActiveEventField;
                 s.innerHTML = eval(s.innerHTML + d);
                 s.parentNode.parentNode.classList.remove("hidden");
             }',       
-        ]) . '&nbsp;new activities; click to load',
+        ]) . '&nbsp;' . \Yii::t('activity', 'new activities; click to load'),
         isset($ticket) ? ['view', 'id' => $ticket->id] : ['index'],
         [
             'class' => 'alert-link',
@@ -42,26 +42,12 @@ use app\components\ActiveEventField;
         return $model->date < $model->lastvisited ? null : ['class' => 'warning' ];
     },
     'columns' => [
-
         'date:timeago',
-        [
-            'attribute' => 'description',
-            'format' => 'raw',
-            'value' => function($model) {
-                return 'Ticket ' .
-                    Html::a(
-                        $model->ticket->id,
-                        ['ticket/view', 'id' => $model->ticket->id],
-                        ['data-pjax' => 0]
-                    ) .
-                    ': ' . $model->description;
-            },
-        ],
-
+        'description',
     ],
     'layout' => '{items} {pager}',
     'headerRowOptions' => [ 'style' => 'width:0%; display:none' ],
-    'emptyText' => 'No activities found.',
+    'emptyText' => \Yii::t('activity', 'No activities found.'),
 ]); ?>
 
 <?php GridView::end() ?>

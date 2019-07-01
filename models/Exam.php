@@ -95,39 +95,39 @@ class Exam extends Base
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'createdAt' => 'Created At',
-            'name' => 'Name',
-            'subject' => 'Subject',
-            'file' => 'Exam Image File (squashfs)',
-            'fileInfo' => 'Squashfs File Info',
-            'fileSize' => 'Squashfs File Size',
-            'file2' => 'Exam Zip File',
-            'file2Info' => 'Zip File Info',
-            'file2Size' => 'Zip File Size',
-            'md5' => 'MD5 Checksum',
-            'file_list' => 'File List',
-            'user_id' => 'User ID',
-            'grp_netdev' => 'User can edit network connections',
-            'allow_sudo' => 'User can gain root privileges by sudo',
-            'allow_mount' => 'User has access to external filesystems such as USB Sticks',
-            'firewall_off' => 'Disable Firewall',
-            'screenshots' => 'Take Screenshots',
-            'url_whitelist' => 'HTTP URL Whitelist',
-            'time_limit' => 'Time Limit',
-            'backup_path' => 'Remote Backup Path',
-            'ticketInfo' => 'Related Tickets',
-            'ticketCount' => '# Tickets',
-            'openTicketCount' => 'Open Tickets',
-            'runningTicketCount' => 'Running Tickets',
-            'closedTicketCount' => 'Closed Tickets',
-            'submittedTicketCount' => 'Submitted Tickets',
-            'libre_autosave' => 'Libreoffice: Save AutoRecovery information',
-            'libre_autosave_interval' => 'Libreoffice: Save AutoRecovery information interval',
-            'libre_autosave_path' => 'Libreoffice: Save AutoRecovery information path',
-            'libre_createbackup' => 'Libreoffice: Always create backup copy',
-            'libre_createbackup_path' => 'Libreoffice: Always create backup copy path',
-            'max_brightness' => 'Maximum brightness'
+            'id' => \Yii::t('exams', 'ID'),
+            'createdAt' => \Yii::t('exams', 'Created At'),
+            'name' => \Yii::t('exams', 'Name'),
+            'subject' => \Yii::t('exams', 'Subject'),
+            'file' => \Yii::t('exams', 'Exam Image File (squashfs)'),
+            'fileInfo' => \Yii::t('exams', 'Squashfs File Info'),
+            'fileSize' => \Yii::t('exams', 'Squashfs File Size'),
+            'file2' => \Yii::t('exams', 'Exam Zip File'),
+            'file2Info' => \Yii::t('exams', 'Zip File Info'),
+            'file2Size' => \Yii::t('exams', 'Zip File Size'),
+            'md5' => \Yii::t('exams', 'MD5 Checksum'),
+            'file_list' => \Yii::t('exams', 'File List'),
+            'user_id' => \Yii::t('exams', 'User ID'),
+            'grp_netdev' => \Yii::t('exams', 'User can edit network connections'),
+            'allow_sudo' => \Yii::t('exams', 'User can gain root privileges by sudo'),
+            'allow_mount' => \Yii::t('exams', 'User has access to external filesystems such as USB Sticks'),
+            'firewall_off' => \Yii::t('exams', 'Disable Firewall'),
+            'screenshots' => \Yii::t('exams', 'Take Screenshots'),
+            'url_whitelist' => \Yii::t('exams', 'HTTP URL Whitelist'),
+            'time_limit' => \Yii::t('exams', 'Time Limit'),
+            'backup_path' => \Yii::t('exams', 'Remote Backup Path'),
+            'ticketInfo' => \Yii::t('exams', 'Related Tickets'),
+            'ticketCount' => \Yii::t('exams', '# Tickets'),
+            'openTicketCount' => \Yii::t('exams', 'Open Tickets'),
+            'runningTicketCount' => \Yii::t('exams', 'Running Tickets'),
+            'closedTicketCount' => \Yii::t('exams', 'Closed Tickets'),
+            'submittedTicketCount' => \Yii::t('exams', 'Submitted Tickets'),
+            'libre_autosave' => \Yii::t('exams', 'Libreoffice: Save AutoRecovery information'),
+            'libre_autosave_interval' => \Yii::t('exams', 'Libreoffice: Save AutoRecovery information interval'),
+            'libre_autosave_path' => \Yii::t('exams', 'Libreoffice: Save AutoRecovery information path'),
+            'libre_createbackup' => \Yii::t('exams', 'Libreoffice: Always create backup copy'),
+            'libre_createbackup_path' => \Yii::t('exams', 'Libreoffice: Always create backup copy path'),
+            'max_brightness' => \Yii::t('exams', 'Maximum brightness')
         ];
     }
 
@@ -137,21 +137,21 @@ class Exam extends Base
     public function attributeHints()
     {
         return [
-            'name' => 'The name of the exam. This value may not be unique, but it should be used to <b>identify the exam</b>.',
-            'subject' => 'The school subject.',
-            'time_limit' => 'If this value (in minutes) is set, the exam status view of the student will show the time left. This has <b>NO indication</b> elsewhere. It is just of informative purpose. Set to <code>0</code> or leave empty for no time limit.',
-            'grp_netdev' => 'If set, the exam student will be in the network group <code>netdev</code>. Members of this group can manage network interfaces through the network manager and wicd. Notice, that the student will be able to leave the exam network. <b>This should not be set, unless you know what you are doing.</b>',
-            'allow_sudo' => 'If set, the exam student will be able to switch to the root user <b>without password</b>. <b>This should not be set, unless you know what you are doing.</b>',
-            'allow_mount' => 'If set, the exam student will be able to mount external filesystems such as USB Sticks, Harddrives or Smartcard. <b>This should not be set, unless you know what you are doing.</b>',
-            'firewall_off' => 'If set, disables the Firewall and access to all network resourses is given. <b>This should not be set, unless you know what you are doing.</b>',
-            'screenshots' => 'If set, the system will <b>create screenshots every n minutes</b>. The Interval can be set in minutes. Those screenshots will appear in the Ticket view under the register "Screenshots". When generating exam results, they can also be included.',
-            'url_whitelist' => 'URLs given in this list will be allowed to visit by the exam student during the exam. Notice, due to this date, only URLs starting with <code>http://</code> are supported, therefore https://</code> URLs will be ignored. The URLs should be provided newline separated. The provided URLs are allowed even if the Firewall is enabled.',
-            'backup_path' => 'Specifies the <b>directory to backup</b> at the target machine. This should be an absolute path. Mostly this is set to <code>/home/user</code>, which is the home directory of the user under which the exam is taken. The exam server will then backup the ALL files in <code>/home/user</code> that have changed since the exam started. For more information please visit <code>Manual / Remote Backup Path</code>',
-            'file' => 'Use a <b>squashfs-Filesystem or a ZIP-File</b> for the exam. Squashfs is a highly compressed read-only filesystem for Linux. This file contains all files, settings and applications for the exam (all changes made on the original machine). These changes are applied to the exam system as soon as the exam starts. See <b>Help</b> for more information on how to create those files.',
-            'libre_createbackup' => 'If the <b>Always create backup copy</b> option is selected, the old version of the file is saved to the backup directory whenever you save the current version of the file. The backup copy has the same name as the document, but the extension is <code>.BAK</code>. If the backup folder (default location: <code>/home/user/.config/libreoffice/4/backup</code>) already contains such a file, it will be overwritten without warning. (See <a target="_blank" href="https://help.libreoffice.org/Common/Saving_Documents_Automatically">LibreOffice Help</a>)',
-            'libre_autosave' => 'Check to <b>save recovery information automatically every <code>n</code> minutes</b>. This command saves the information necessary to restore the current document in case of a crash (default location: <code>/home/user/.config/libreoffice/4/tmp</code>). Additionally, in case of a crash LibreOffice tries automatically to save AutoRecovery information for all open documents, if possible. (See <a target="_blank" href="https://help.libreoffice.org/Common/Saving_Documents_Automatically">LibreOffice Help</a>)',
-            'max_brightness' => 'Maximum screen brightness in percent. Notice that some devices have buttons to adjust screen brightness on hardware level. This cannot be controlled by this setting.',
-            'ticketInfo' => 'Related Tickets (# open, # running, # closed, # submitted)/# total tickets'
+            'name' => \Yii::t('exams', 'The name of the exam. This value may not be unique, but it should be used to <b>identify the exam</b>.'),
+            'subject' => \Yii::t('exams', 'The school subject.'),
+            'time_limit' => \Yii::t('exams', 'If this value (in minutes) is set, the exam status view of the student will show the time left. This has <b>NO indication</b> elsewhere. It is just of informative purpose. Set to <code>0</code> or leave empty for no time limit.'),
+            'grp_netdev' => \Yii::t('exams', 'If set, the exam student will be in the network group <code>netdev</code>. Members of this group can manage network interfaces through the network manager and wicd. Notice, that the student will be able to leave the exam network. <b>This should not be set, unless you know what you are doing.</b>'),
+            'allow_sudo' => \Yii::t('exams', 'If set, the exam student will be able to switch to the root user <b>without password</b>. <b>This should not be set, unless you know what you are doing.</b>'),
+            'allow_mount' => \Yii::t('exams', 'If set, the exam student will be able to mount external filesystems such as USB Sticks, Harddrives or Smartcard. <b>This should not be set, unless you know what you are doing.</b>'),
+            'firewall_off' => \Yii::t('exams', 'If set, disables the Firewall and access to all network resourses is given. <b>This should not be set, unless you know what you are doing.</b>'),
+            'screenshots' => \Yii::t('exams', 'If set, the system will <b>create screenshots every n minutes</b>. The Interval can be set in minutes. Those screenshots will appear in the Ticket view under the register "Screenshots". When generating exam results, they can also be included.'),
+            'url_whitelist' => \Yii::t('exams', 'URLs given in this list will be allowed to visit by the exam student during the exam. Notice, due to this date, only URLs starting with <code>http://</code> are supported, therefore https://</code> URLs will be ignored. The URLs should be provided newline separated. The provided URLs are allowed even if the Firewall is enabled.'),
+            'backup_path' => \Yii::t('exams', 'Specifies the <b>directory to backup</b> at the target machine. This should be an absolute path. Mostly this is set to <code>/home/user</code>, which is the home directory of the user under which the exam is taken. The exam server will then backup the ALL files in <code>/home/user</code> that have changed since the exam started. For more information please visit <code>Manual / Remote Backup Path</code>'),
+            'file' => \Yii::t('exams', 'Use a <b>squashfs-Filesystem or a ZIP-File</b> for the exam. Squashfs is a highly compressed read-only filesystem for Linux. This file contains all files, settings and applications for the exam (all changes made on the original machine). These changes are applied to the exam system as soon as the exam starts. See <b>Help</b> for more information on how to create those files.'),
+            'libre_createbackup' => \Yii::t('exams', 'If the <b>Always create backup copy</b> option is selected, the old version of the file is saved to the backup directory whenever you save the current version of the file. The backup copy has the same name as the document, but the extension is <code>.BAK</code>. If the backup folder (default location: <code>/home/user/.config/libreoffice/4/backup</code>) already contains such a file, it will be overwritten without warning. (See <a target="_blank" href="https://help.libreoffice.org/Common/Saving_Documents_Automatically">LibreOffice Help</a>)'),
+            'libre_autosave' => \Yii::t('exams', 'Check to <b>save recovery information automatically every <code>n</code> minutes</b>. This command saves the information necessary to restore the current document in case of a crash (default location: <code>/home/user/.config/libreoffice/4/tmp</code>). Additionally, in case of a crash LibreOffice tries automatically to save AutoRecovery information for all open documents, if possible. (See <a target="_blank" href="https://help.libreoffice.org/Common/Saving_Documents_Automatically">LibreOffice Help</a>)'),
+            'max_brightness' => \Yii::t('exams', 'Maximum screen brightness in percent. Notice that some devices have buttons to adjust screen brightness on hardware level. This cannot be controlled by this setting.'),
+            'ticketInfo' => \Yii::t('exams', 'Related Tickets (# open, # running, # closed, # submitted)/# total tickets')
         ];
     }
 
@@ -358,7 +358,7 @@ class Exam extends Base
             ], [
                 'data-pjax' => 0,
                 'class' => 'bg-success text-success',
-                'title' => 'Number of Tickets in open state'
+                'title' => \Yii::t('exams', 'Number of Tickets in open state')
             ]) : null;
         $this->runningTicketCount != 0 ?
             $a[] = Html::a($this->runningTicketCount, [
@@ -368,7 +368,7 @@ class Exam extends Base
             ], [
                 'data-pjax' => 0,
                 'class' => 'bg-info text-info',
-                'title' => 'Number of Tickets in running state'
+                'title' => \Yii::t('exams', 'Number of Tickets in running state')
             ]) : null;
         $this->closedTicketCount != 0 ?
             $a[] = Html::a($this->closedTicketCount, [
@@ -378,7 +378,7 @@ class Exam extends Base
             ], [
                 'data-pjax' => 0,
                 'class' => 'bg-danger text-danger',
-                'title' => 'Number of Tickets in closed state'
+                'title' => \Yii::t('exams', 'Number of Tickets in closed state')
             ]) : null;
         $this->submittedTicketCount != 0 ? 
             $a[] = Html::a($this->submittedTicketCount, [
@@ -388,7 +388,7 @@ class Exam extends Base
             ], [
                 'data-pjax' => 0,
                 'class' => 'bg-warning text-warning',
-                'title' => 'Number of Tickets in submitted state'
+                'title' => \Yii::t('exams', 'Number of Tickets in submitted state')
             ]) : null;
 
         return ( count($a) == 0 ? 
@@ -405,7 +405,7 @@ class Exam extends Base
                 ], [
                     'data-pjax' => 0,
                     'class' => 'text-muted',
-                    'title' => 'Total number of Tickets'
+                    'title' => \Yii::t('exams', 'Total number of Tickets')
                 ]) : 
                 $this->ticketCount );
     }  
@@ -423,7 +423,9 @@ class Exam extends Base
 
     public function validateRunningTickets($attribute, $params)
     {
-        $this->runningTicketCount != 0 ? $this->addError($attribute, 'Exam edit is disabled while there are ' . $this->runningTicketCount . ' tickets in "Running" state.') : null;
+        $this->runningTicketCount != 0 ? $this->addError($attribute, \Yii::t('exams', 'Exam edit is disabled while there {n,plural,=1{is one ticket} other{are # tickets}} in "Running" state.',
+            [ 'n' => $this->runningTicketCount ]
+        )) : null;
     }
 
     /**

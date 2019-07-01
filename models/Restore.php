@@ -48,12 +48,12 @@ class Restore extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'startedAt' => 'Started At',
-            'finishedAt' => 'Finished At',
-            'ticket_id' => 'Ticket ID',
-            'file' => 'File',
-            'restoreDate' => 'Restore Version',
+            'id' => \Yii::t('restores', 'ID'),
+            'startedAt' => \Yii::t('restores', 'Started At'),
+            'finishedAt' => \Yii::t('restores', 'Finished At'),
+            'ticket_id' => \Yii::t('restores', 'Ticket ID'),
+            'file' => \Yii::t('restores', 'File'),
+            'restoreDate' => \Yii::t('restores', 'Restore Version'),
         ];
     }
 

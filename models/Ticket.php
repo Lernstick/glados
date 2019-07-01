@@ -5,6 +5,7 @@ namespace app\models;
 use Yii;
 use app\models\Base;
 use yii\helpers\ArrayHelper;
+use app\models\Translation;
 use yii\web\ConflictHttpException;
 use yii\base\Event;
 use app\models\Backup;
@@ -51,7 +52,7 @@ use app\models\EventItem;
  * @property Exam $exam
  * @property Exam $exam
  */
-class Ticket extends Base
+class Ticket extends LiveActiveRecord
 {
 
     /**
@@ -62,10 +63,15 @@ class Ticket extends Base
 
     public $tduration;
 
+    /* db translated fields */
+    public $client_state_db;
+    public $backup_state_db;
+    public $restore_state_db;
+
     /**
-     * @var array An array holding the values of the record before changing
+     * @inheritdoc
      */
-    private $presaveAttributes;
+    const EAGERLOADING = false;
 
     /* scenario constants */
     const SCENARIO_DEFAULT = 'default';
@@ -87,19 +93,21 @@ class Ticket extends Base
      */
     public function init()
     {
-        $instance = $this;
-        $this->on(self::EVENT_BEFORE_UPDATE, function($instance){
-            $this->presaveAttributes = $this->getOldAttributes();
-        });
-        $this->on(self::EVENT_AFTER_UPDATE, [$this, 'updateEvent']);
+        $this->on(self::EVENT_AFTER_UPDATE, [$this, 'updateEvent_old']);
         $this->on(self::EVENT_AFTER_DELETE, [$this, 'deleteEvent']);
 
         /* generate the token if it's a new record */
         $this->token = $this->isNewRecord ? bin2hex(openssl_random_pseudo_bytes(\Yii::$app->params['tokenLength']/2)) : $this->token;
 
-        $this->backup_interval = $this->isNewRecord ? 300 : $this->backup_interval;
-    }
+        // set default values, but only in this context, not in TicketSearch context
+        // this would overwrite values to search
+        if ($this->isNewRecord && get_called_class() == 'app\models\Ticket') {
+            $this->backup_interval = 300;
+            $this->client_state = yiit('ticket', 'Client not seen yet');
+        }
 
+        parent::init();
+    }
 
     /**
      * @inheritdoc
@@ -112,23 +120,62 @@ class Ticket extends Base
     /**
      * @inheritdoc
      */
+    public function getTranslatedFields()
+    {
+        return [
+            'client_state',
+            'backup_state',
+            'restore_state',
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getLiveFields()
+    {
+        return [
+            'client_state' => [ 'priority' => 1 ],
+            'download_lock' => [ 'priority' => 0 ],
+            'download_progress' => [
+                'priority' => function ($field, $model) {
+                    return round($field*100) == 100 ? 0 : 2;
+                },
+                'data' => function ($field, $model) {
+                    return [
+                        'download_progress' => yii::$app->formatter->format($model->{$field}, 'percent')
+                    ];
+                }
+            ],
+            'backup_state' => [ 'priority' => 2 ],
+            'restore_state' => [ 'priority' => 2 ],
+            'download_state' => [ 'priority' => 2 ],
+            'backup_lock' => [ 'priority' => 0 ],
+            'restore_lock' => [ 'priority' => 0 ],
+            'online',
+            'last_backup',
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function rules()
     {
         return [
-            [['exam_id', 'token', 'backup_interval'], 'required'],
-            [['exam_id', 'token', 'backup_interval'], 'required', 'on' => self::SCENARIO_DEFAULT],
+            [['exam_id', 'token', 'backup_interval'], 'required', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['token', 'test_taker'], 'required', 'on' => self::SCENARIO_SUBMIT],
             [['start', 'ip'], 'required', 'on' => self::SCENARIO_DOWNLOAD],
             [['end'], 'required', 'on' => self::SCENARIO_FINISH],
-            [['client_state'], 'required', 'on' => self::SCENARIO_NOTIFY],
-            [['exam_id'], 'integer'],
-            [['backup_interval'], 'integer', 'min' => 0],
-            [['time_limit'], 'integer', 'min' => 0],
-            [['exam_id'], 'validateExam', 'skipOnEmpty' => false, 'skipOnError' => false, 'on' => self::SCENARIO_DEFAULT],
-            [['start', 'end', 'test_taker', 'ip', 'state', 'download_lock'], 'safe'],
+            [['token', 'client_state'], 'required', 'on' => self::SCENARIO_NOTIFY],
+            [['exam_id'], 'integer', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
+            [['backup_interval'], 'integer', 'min' => 0, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
+            [['time_limit'], 'integer', 'min' => 0, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
+            [['exam_id'], 'validateExam', 'skipOnEmpty' => false, 'skipOnError' => false, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
+            [['start', 'end', 'test_taker', 'ip', 'state', 'download_lock'], 'safe', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['start', 'end', 'test_taker', 'ip', 'state', 'download_lock', 'backup_lock', 'restore_lock', 'bootup_lock'], 'safe', 'on' => self::SCENARIO_DEV],
-            [['token'], 'unique'],
-            [['token'], 'string', 'max' => 32],
+            [['token'], 'unique', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
+            [['token'], 'string', 'max' => 32, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['token'], 'checkIfClosed', 'on' => self::SCENARIO_SUBMIT],
         ];
     }
@@ -139,29 +186,29 @@ class Ticket extends Base
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'state' => 'State',
-            'token' => 'Token',
-            'exam.name' => 'Exam Name',
-            'exam.subject' => 'Exam Subject',
-            'exam_id' => 'Exam',
-            'valid' => 'Valid',
-            'validTime' => 'Valid for',
-            'start' => 'Started',
-            'end' => 'Finished',
-            'duration' => 'Duration',
-            'result' => 'Result',
-            'time_limit' => 'Time Limit',
-            'download_progress' => 'Exam Download Progress',
-            'client_state' => 'Client State',
-            'ip' => 'IP Address',
-            'test_taker' => 'Test Taker',
-            'backup' => 'Backup',
-            'backup_last' => 'Last Backup',
-            'backup_last_try' => 'Last Backup Try',
-            'backup_state' => 'Backup State',
-            'backup_interval' => 'Backup Interval',
-            'backup_size' => 'Current Backup Size',
+            'id' => \Yii::t('ticket', 'ID'),
+            'state' => \Yii::t('ticket', 'State'),
+            'token' => \Yii::t('ticket', 'Token'),
+            'exam.name' => \Yii::t('ticket', 'Exam Name'),
+            'exam.subject' => \Yii::t('ticket', 'Exam Subject'),
+            'exam_id' => \Yii::t('ticket', 'Exam'),
+            'valid' => \Yii::t('ticket', 'Valid'),
+            'validTime' => \Yii::t('ticket', 'Valid for'),
+            'start' => \Yii::t('ticket', 'Started'),
+            'end' => \Yii::t('ticket', 'Finished'),
+            'duration' => \Yii::t('ticket', 'Duration'),
+            'result' => \Yii::t('ticket', 'Result'),
+            'time_limit' => \Yii::t('ticket', 'Time Limit'),
+            'download_progress' => \Yii::t('ticket', 'Exam Download Progress'),
+            'client_state' => \Yii::t('ticket', 'Client State'),
+            'ip' => \Yii::t('ticket', 'IP Address'),
+            'test_taker' => \Yii::t('ticket', 'Test Taker'),
+            'backup' => \Yii::t('ticket', 'Backup'),
+            'backup_last' => \Yii::t('ticket', 'Last Backup'),
+            'backup_last_try' => \Yii::t('ticket', 'Last Backup Try'),
+            'backup_state' => \Yii::t('ticket', 'Backup State'),
+            'backup_interval' => \Yii::t('ticket', 'Backup Interval'),
+            'backup_size' => \Yii::t('ticket', 'Current Backup Size'),
         ];
     }
 
@@ -171,30 +218,16 @@ class Ticket extends Base
     public function attributeHints()
     {
         return [
-            'token' => 'This is a randomly generated, unique token to <b>identify the ticket</b>. The test taker has to provide this token to gain access to his exam.',
-            'backup_interval' => 'This value (in seconds) sets the <b>interval to create automatic backups</b> of the exam system. Set to <code>0</code> to disable automatic backup.',
-            'time_limit' => 'If this value (in minutes) is set, the exam status view of the student will show the time left. This has the same effect as the value in the exam. Leave empty to inherit the value configured in the exam' . (isset($this->exam) ? ' (' . yii::$app->formatter->format($this->exam->time_limit, 'timeLimit') . ')' : '') . '. Set to <code>0</code> for no time limit. Notice, this will <b>override the setting in the exam</b>.',
-            'exam_id' => 'Choose the exam this ticket has to be assigned to in the list below. Notice, only exams assigned to you will be shown underneath.',
-            'test_taker' => 'Here you can <b>assign the ticket to a student</b>. If left empty, this can also be done later (even when the exam has finished), but it is recommended to set this value as soon as possible, to keep track of the tickets. If not set the ticket will be unassigned/anonymous.',
-            'start' => 'The start time of the exam. This should not be manually edited.',
-            'end' => 'The finish time of the exam. This should not be manually edited.',
+            'token' => \Yii::t('ticket', 'This is a randomly generated, unique token to <b>identify the ticket</b>. The test taker has to provide this token to gain access to his exam.'),
+            'backup_interval' => \Yii::t('ticket', 'This value (in seconds) sets the <b>interval to create automatic backups</b> of the exam system. Set to <code>0</code> to disable automatic backup.'),
+            'time_limit' => \Yii::t('ticket', 'If this value (in minutes) is set, the exam status view of the student will show the time left. This has the same effect as the value in the exam. Leave empty to inherit the value configured in the exam{x}. Set to <code>0</code> for no time limit. Notice, this will <b>override the setting in the exam</b>.', [
+                'x' => (isset($this->exam) ? ' (' . yii::$app->formatter->format($this->exam->time_limit, 'timeLimit') . ')' : '')
+            ]),
+            'exam_id' => \Yii::t('ticket', 'Choose the exam this ticket has to be assigned to in the list below. Notice, only exams assigned to you will be shown underneath.'),
+            'test_taker' => \Yii::t('ticket', 'Here you can <b>assign the ticket to a student</b>. If left empty, this can also be done later (even when the exam has finished), but it is recommended to set this value as soon as possible, to keep track of the tickets. If not set the ticket will be unassigned/anonymous.'),
+            'start' => \Yii::t('ticket', 'The start time of the exam. This should not be manually edited.'),
+            'end' => \Yii::t('ticket', 'The finish time of the exam. This should not be manually edited.'),
         ];
-    }
-
-    /**
-     * Checks if attributes have changed
-     * 
-     * @param array $attributes A list of attributes to check
-     * @return bool Whether the attributes have changed or not
-     */
-    public function attributesChanged($attributes)
-    {
-        foreach($attributes as $attribute){
-            if($this->presaveAttributes[$attribute] != $this->attributes[$attribute]){
-                return true;
-            }
-        }
-        return false;
     }
 
     public function getOwn()
@@ -221,7 +254,7 @@ class Ticket extends Base
 
     public function getResultName()
     {
-        return ($this->test_taker ? $this->test_taker . ' - ' . $this->token : '_NoName - ' . $this->token) . ($this->result != null && file_exists($this->result) ? ' - Result already generated.' : ' - No result yet.');
+        return ($this->test_taker ? $this->test_taker . ' - ' . $this->token : '_NoName - ' . $this->token) . ($this->result != null && file_exists($this->result) ? ' - ' . \Yii::t('ticket', 'Result already generated.') : ' - ' . \Yii::t('ticket', 'No result yet.'));
     }
 
     /**
@@ -229,7 +262,7 @@ class Ticket extends Base
      * 
      * @return void
      */
-    public function updateEvent()
+    public function updateEvent_old()
     {
         if($this->attributesChanged([ 'start', 'end', 'test_taker', 'result' ])){
             $eventItem = new EventItem([
@@ -242,123 +275,18 @@ class Ticket extends Base
             ]);
             $eventItem->generate();
         }
-        if($this->attributesChanged([ 'download_progress' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => round($this->download_progress*100) == 100 ? 0 : 2,
-                'data' => [
-                    'download_progress' => yii::$app->formatter->format($this->download_progress, 'percent')
-                ],
-            ]);
-            $eventItem->generate();
-        }
 
-        if($this->attributesChanged([ 'download_lock' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 0,
-                'data' => [
-                    'download_lock' => $this->download_lock,
-                ],
-            ]);
-            $eventItem->generate();
-        }
-
-        if($this->attributesChanged([ 'download_state' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 2,
-                'data' => [
-                    'download_state' => yii::$app->formatter->format($this->download_state, 'ntext'),
-                ],
-            ]);
-            $eventItem->generate();
-        }
-
-        if($this->attributesChanged([ 'backup_state' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 2,
-                'data' => [
-                    'backup_state' => yii::$app->formatter->format($this->backup_state, 'ntext'),
-                ],
-            ]);
-            $eventItem->generate();
-        }
-
-        if($this->attributesChanged([ 'restore_state' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 2,
-                'data' => [
-                    'restore_state' => yii::$app->formatter->format($this->restore_state, 'ntext'),
-                ],
-            ]);
-            $eventItem->generate();
-        }
-
-        if($this->attributesChanged([ 'backup_lock' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 2,
-                'data' => [
-                    'backup_lock' => $this->backup_lock,
-                ],
-            ]);
-            $eventItem->generate();
-        }
-
-        if($this->attributesChanged([ 'restore_lock' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 2,
-                'data' => [
-                    'restore_lock' => $this->restore_lock,
-                ],
-            ]);
-            $eventItem->generate();
-        }
-
-        if($this->attributesChanged([ 'online' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 2,
-                'data' => [
-                    'online' => $this->online,
-                ],
-            ]);
-            $eventItem->generate();
-        }
-
-        if($this->attributesChanged([ 'last_backup' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 2,
-                'data' => [
-                    'last_backup' => $this->last_backup,
-                ],
-            ]);
-            $eventItem->generate();
-        }
-
-        if($this->attributesChanged([ 'client_state' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 1,
-                'data' => [
-                    'client_state' => $this->client_state,
-                ],
-            ]);
-            $eventItem->generate();
-
+        if($this->attributesChanged([ 'client_state_id', 'client_state_data' ])){
             $act = new Activity([
                 'ticket_id' => $this->id,
-                'description' => 'Client state changed: ' .
-                $this->presaveAttributes['client_state'] . ' -> ' . $this->client_state,
+                'description' => yiit('activity', 'Client state changed: {client_state}'),
+                'description_params' => [
+                    //'old' => Translation::findOne($this->presaveAttributes['client_state_id'])->en,
+                    'client_state' => $this->client_state,
+                ],
                 'severity' => Activity::SEVERITY_INFORMATIONAL,
             ]);
             $act->save();
-
         }
         return;
     }
@@ -724,10 +652,10 @@ class Ticket extends Base
 
         if(Yii::$app->user->can('ticket/create/all') || $this->own == true){
             if (!$exam->fileConsistency){
-                $this->addError($attribute, 'As long as the exam file is not valid, no tickets can be created for this exam.');
+                $this->addError($attribute, \Yii::t('ticket', 'As long as the exam file is not valid, no tickets can be created for this exam.'));
             }
         }else{
-            $this->addError($attribute, 'You are not allowed to perform this action on this exam.');
+            $this->addError($attribute, \Yii::t('ticket', 'You are not allowed to perform this action on this exam.'));
         }
 
     }
@@ -742,7 +670,7 @@ class Ticket extends Base
     public function checkIfClosed($attribute, $params)
     {
         if ($this->state != self::STATE_CLOSED) {
-            $this->addError($attribute, 'This ticket is not in closed state.');
+            $this->addError($attribute, \Yii::t('ticket', 'This ticket is not in closed state.'));
         }
     }
 
@@ -753,7 +681,7 @@ class Ticket extends Base
      */
     public static function find()
     {
-        //$query = parent::find();
+        $c = \Yii::$app->language;
         $query = new TicketQuery(get_called_class());
 
         $query->addSelect(['`ticket`.*', new \yii\db\Expression('(case

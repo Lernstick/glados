@@ -4,9 +4,12 @@ namespace app\models;
 
 use Yii;
 use yii\base\Event;
+use app\models\Translation;
 use app\models\EventItem;
 use app\models\User;
+use app\models\Ticket;
 use yii\db\ActiveRecord;
+use yii\helpers\Json;
 
 /**
  * This is the model class for table "activity".
@@ -15,7 +18,7 @@ use yii\db\ActiveRecord;
  * @property string $date
  * @property string $description
  */
-class Activity extends Base
+class Activity extends TranslatedActiveRecord
 {
 
     /* activity severity constants */
@@ -26,15 +29,17 @@ class Activity extends Base
     const SEVERITY_INFORMATIONAL = 6;
     const SEVERITY_SUCCESS = 7;
 
+    /* db translated fields */
+    public $description_db;
+
     /**
      * @inheritdoc
      */
     public function init()
     {
-//        Event::on(ActiveRecord::className(), ActiveRecord::EVENT_AFTER_INSERT, function ($event) {
-//            file_put_contents('/tmp/file', '+1');
-//        });
         $this->on(self::EVENT_AFTER_INSERT, [$this, 'eventNewActivities']);
+
+        parent::init();
     }
 
     /**
@@ -48,12 +53,32 @@ class Activity extends Base
     /**
      * @inheritdoc
      */
+    public function getTranslatedFields()
+    {
+        return [
+            'description',
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function joinTables()
+    {
+        return [
+            Ticket::tableName(),
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function rules()
     {
         return [
             [['date'], 'safe'],
-            [['description'], 'required'],
-            [['description'], 'string', 'max' => 254]
+            //[['description'], 'required'],
+            //[['description'], 'string', 'max' => 254]
         ];
     }
 
@@ -63,11 +88,11 @@ class Activity extends Base
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'token' => 'Ticket',
-            'date' => 'Date',
-            'description' => 'Description',
-            'severity' => 'Severity',
+            'id' => \Yii::t('activity', 'ID'),
+            'token' => \Yii::t('activity', 'Ticket'),
+            'date' => \Yii::t('activity', 'Date'),
+            'description' => \Yii::t('activity', 'Description'),
+            'severity' => \Yii::t('activity', 'Severity'),
         ];
     }
 
@@ -165,9 +190,11 @@ class Activity extends Base
      */ 
     public static function find() 
     { 
-        return new ActivityQuery(get_called_class()); 
-    } 
-
+        
+        $query = new ActivityQuery(get_called_class());
+        $query->joinWith(Activity::joinTables());
+        return $query;
+    }
 
     public function getLastvisited()
     {

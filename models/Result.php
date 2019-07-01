@@ -72,12 +72,12 @@ class Result extends Model
     public function attributeLabels()
     {
         return [
-            'inc_dotfiles' => 'Include hidden files (dot-files)',
-            'inc_screenshots' => 'Include Screenshots',
-            'inc_pattern' => 'Include only files of type (will include all files if nothing is selected)',
-            'inc_ids' => 'Tickets',
-            'inc_emptydirs' => 'Include empty directories',
-            'path' => 'Path',
+            'inc_dotfiles' => \Yii::t('results', 'Include hidden files (dot-files)'),
+            'inc_screenshots' => \Yii::t('results', 'Include Screenshots'),
+            'inc_pattern' => \Yii::t('results', 'Include only files of type (will include all files if nothing is selected)'),
+            'inc_ids' => \Yii::t('results', 'Tickets'),
+            'inc_emptydirs' => \Yii::t('results', 'Include empty directories'),
+            'path' => \Yii::t('results', 'Path'),
         ];
     }
 
@@ -87,12 +87,12 @@ class Result extends Model
     public function attributeHints()
     {
         return [
-            'path' => 'This specifies the <b>path in the backup to include</b>. In most cases this may not be filled out, thus leave it empty to include all files.<br>If all students placed their result in a specific directory - say <code>Desktop/Hand-in</code> relative to the <i>Remote Backup Path</i> - you can provide this path here, to just include the relevant parts of the result.',
-            'inc_dotfiles' => 'If set, files with names starting with a dot (dot-files, Ex. <code>.bashrc</code>) will be included in the generated result. These files are mostly related to the <b>system configuration or user profile settings</b>. In most cases this is not needed, unless the student itself creates dot-files which are part of his exam result. Notice that, if enabled, this can massively increase the size if the resulting ZIP-file.',
-            'inc_screenshots' => 'If <i>Screenshots</i> are enabled (see exam configuration), this will <b>include all screenshots</b> taken in a separate directory to the exam result. Notice screenshots can also be viewed in the ticket view under "Screenshots".',
-            'inc_pattern' => 'This is to <b>include only several types of files</b> to the exam result. The file name is then tested against the endings listed underneath. Multiple items can be selected. If no item is selected, all types of files will be included (except hidden files, if set).',
-            'inc_ids' => 'Select a list of <b>tickets to include</b> in the result file. The more tickets selected, the bigger the size of the ZIP-file. By default, all closed or submitted tickets with no result handed back are preselected.',
-            'inc_emptydirs' => 'Directories are included, even if they are empty.',
+            'path' => \Yii::t('results', 'This specifies the <b>path in the backup to include</b>. In most cases this may not be filled out, thus leave it empty to include all files.<br>If all students placed their result in a specific directory - say <code>Desktop/Hand-in</code> relative to the <i>Remote Backup Path</i> - you can provide this path here, to just include the relevant parts of the result.'),
+            'inc_dotfiles' => \Yii::t('results', 'If set, files with names starting with a dot (dot-files, Ex. <code>.bashrc</code>) will be included in the generated result. These files are mostly related to the <b>system configuration or user profile settings</b>. In most cases this is not needed, unless the student itself creates dot-files which are part of his exam result. Notice that, if enabled, this can massively increase the size if the resulting ZIP-file.'),
+            'inc_screenshots' => \Yii::t('results', 'If <i>Screenshots</i> are enabled (see exam configuration), this will <b>include all screenshots</b> taken in a separate directory to the exam result. Notice screenshots can also be viewed in the ticket view under "Screenshots".'),
+            'inc_pattern' => \Yii::t('results', 'This is to <b>include only several types of files</b> to the exam result. The file name is then tested against the endings listed underneath. Multiple items can be selected. If no item is selected, all types of files will be included (except hidden files, if set).'),
+            'inc_ids' => \Yii::t('results', 'Select a list of <b>tickets to include</b> in the result file. The more tickets selected, the bigger the size of the ZIP-file. By default, all closed or submitted tickets with no result handed back are preselected.'),
+            'inc_emptydirs' => \Yii::t('results', 'Directories are included, even if they are empty.'),
         ];
     }
 
@@ -130,13 +130,13 @@ class Result extends Model
             $res = $zip->open($zipFile, \ZIPARCHIVE::CREATE | \ZIPARCHIVE::OVERWRITE);
 
             $comment = $this->exam->name . ' - ' . $this->exam->subject . PHP_EOL . PHP_EOL;
-            $comment .= 'Generated at: ' . date('c') . PHP_EOL;
-            $comment .= 'Options:' . PHP_EOL;
-            $comment .= '  Path: ' . $this->path . PHP_EOL;
-            $comment .= '  Include dotfiles: ' . ($this->inc_dotfiles ? 'true' : 'false') . PHP_EOL;
-            $comment .= '  Include screenshots: ' . ($this->inc_screenshots ? 'true' : 'false') . PHP_EOL;
-            $comment .= '  Include empty directories: ' . ($this->inc_emptydirs ? 'true' : 'false') . PHP_EOL;
-            $comment .= '  Include file types: ' . (is_array($this->inc_pattern) ? implode(', ', $this->inc_pattern) : '') . PHP_EOL;
+            $comment .= \Yii::t('results', 'Generated at') . ': ' . date('c') . PHP_EOL;
+            $comment .= \Yii::t('results', 'Options') . ':' . PHP_EOL;
+            $comment .= '  ' . \Yii::t('results', 'Path') . ': ' . $this->path . PHP_EOL;
+            $comment .= '  ' . \Yii::t('results', 'Include dotfiles') . ': ' . ($this->inc_dotfiles ? 'true' : 'false') . PHP_EOL;
+            $comment .= '  ' . \Yii::t('results', 'Include screenshots') . ': ' . ($this->inc_screenshots ? 'true' : 'false') . PHP_EOL;
+            $comment .= '  ' . \Yii::t('results', 'Include empty directories') . ': ' . ($this->inc_emptydirs ? 'true' : 'false') . PHP_EOL;
+            $comment .= '  ' . \Yii::t('results', 'Include file types') . ': ' . (is_array($this->inc_pattern) ? implode(', ', $this->inc_pattern) : '') . PHP_EOL;
             $comment .= PHP_EOL;
 
             if ($res === TRUE) {
@@ -324,7 +324,7 @@ class Result extends Model
 
                 $act = new Activity([
                     'ticket_id' => $ticket->id,
-                    'description' => 'Exam result handed in.',
+                    'description' => yiit('activity', 'Exam result handed in.'),
                     'severity' => Activity::SEVERITY_INFORMATIONAL,
                 ]);
                 $act->save();
@@ -401,7 +401,7 @@ class Result extends Model
         $path = FileHelper::normalizePath($this->exam->backup_path . '/' . $this->$attribute);
         $backup_path = FileHelper::normalizePath($this->exam->backup_path);
         if (strpos($path, $backup_path) !== 0) {
-            $this->addError($attribute, 'This path is invalid. You can only include files within the Remote Backup Path.');
+            $this->addError($attribute, \Yii::t('results', 'This path is invalid. You can only include files within the "Remote Backup Path".'));
         }
     }
 

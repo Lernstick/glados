@@ -42,7 +42,7 @@ use app\components\Editable;
         [
             'attribute' => 'backup_interval',
             'value' => Editable::widget([
-                'content' => ($ticketModel->backup_interval == 0 ? 'No Backup' : yii::$app->formatter->format($ticketModel->backup_interval, 'duration')),
+                'content' => ($ticketModel->backup_interval == 0 ? \Yii::t('ticket', 'No Backup') : yii::$app->formatter->format($ticketModel->backup_interval, 'duration')),
                 'editUrl' => ['ticket/update', 'id' => $ticketModel->id, 'mode' => 'editable', 'attr' => 'backup_interval' ],
             ]),
             'format' => 'raw'
@@ -50,7 +50,7 @@ use app\components\Editable;
         [
             'attribute' => 'backup_last',
             'format' => 'raw',
-            'value' => yii::$app->formatter->format($ticketModel->backup_last, 'timeago') . ' (<b>last try</b>: ' . yii::$app->formatter->format($ticketModel->backup_last_try, 'timeago') . ')',
+            'value' => yii::$app->formatter->format($ticketModel->backup_last, 'timeago') . ' (<b>' . \Yii::t('ticket', 'last try') . '</b>: ' . yii::$app->formatter->format($ticketModel->backup_last_try, 'timeago') . ')',
         ],        
         'backup_size:shortSize',
         [
@@ -87,7 +87,7 @@ use app\components\Editable;
     'options' => ['id' => 'backups-accordion', 'class' => 'panel-group'],
     'itemOptions' => ['class' => 'panel panel-default'],
     'itemView' => '_item',
-    'emptyText' => 'No backups found.',
+    'emptyText' => \Yii::t('ticket', 'No backups found.'),
     'layout' => '{items} <br>{summary} {pager}',
 ]); ?>
 
@@ -95,8 +95,8 @@ use app\components\Editable;
 
 Modal::begin([
     'id' => 'backupLogModal',
-    'header' => '<h4>Backup Log</h4>',
-    'footer' => Html::Button('Close', ['data-dismiss' => 'modal', 'class' => 'btn btn-default']),
+    'header' => '<h4>' . \Yii::t('ticket', 'Backup Log') . '</h4>',
+    'footer' => Html::Button(\Yii::t('ticket', 'Close'), ['data-dismiss' => 'modal', 'class' => 'btn btn-default']),
     'size' => \yii\bootstrap\Modal::SIZE_LARGE
 ]);
 

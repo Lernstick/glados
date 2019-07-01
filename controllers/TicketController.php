@@ -113,6 +113,12 @@ class TicketController extends Controller
                     $out = $searchModel->selectList('test_taker', $q, $page, $per_page);
                 } else if ($attr == 'token') {
                     $out = $searchModel->selectList('token', $q, $page, $per_page);
+                } else if ($attr == 'client_state') {
+                    $out = $searchModel->selectList('client_state', $q, $page, $per_page);
+                } else if ($attr == 'backup_state') {
+                    $out = $searchModel->selectList('backup_state', $q, $page, $per_page);
+                } else if ($attr == 'restore_state') {
+                    $out = $searchModel->selectList('restore_state', $q, $page, $per_page);
                 }
             }
             return $out;
@@ -137,9 +143,10 @@ class TicketController extends Controller
 
             $lastState = $session['ticketLastState' . $model->id];
             if(isset($lastState) && $lastState != $model->state){
-                $session->addFlash('info', 'The Ticket state has changed from ' . 
-                    Yii::$app->formatter->format($lastState, 'state') . ' to ' . 
-                    Yii::$app->formatter->format($model->state, 'state'));
+                $session->addFlash('info', Yii::t('ticket', 'The Ticket state has changed from {from} to {to}', [
+                    'from' => Yii::$app->formatter->format($lastState, 'state'),
+                    'to' => Yii::$app->formatter->format($model->state, 'state')
+                ]));
             }
             $session['ticketLastState' . $model->id] = $model->state;
 
@@ -234,7 +241,10 @@ class TicketController extends Controller
                 'model' => $model,
             ]);
 
-            $title = 'Ticket for "' . $model->exam->subject . ' - ' . $model->exam->name . '"';
+            $title = \Yii::t('exams', 'Ticket for "{exam} - {subject}"', [
+                'exam' => $model->exam->subject,
+                'subject' => $model->exam->name
+            ]);
 
             $pdf = new Pdf([
                 'mode' => Pdf::MODE_UTF8, 
@@ -291,7 +301,7 @@ class TicketController extends Controller
                 }
 
                 if ($count == $c) {
-                    Yii::$app->session->addFlash('success', 'You have successfully created ' . $count . ' new Tickets.');
+                    Yii::$app->session->addFlash('success', Yii::t('ticket', 'You have successfully created {n} new Tickets.', ['n' => $count]));
                     return $this->redirect(['exam/view', 'id' => $exam_id]);
                 } else {
                     foreach ($model->getErrors() as $attribute => $value){
@@ -323,7 +333,7 @@ class TicketController extends Controller
 
                     if(count($names) != 0) {
                         if ($c == count($names)) {
-                            Yii::$app->session->addFlash('success', 'You have successfully created ' . $c . ' new Tickets.');
+                            Yii::$app->session->addFlash('success', Yii::t('ticket', 'You have successfully created {n} new Tickets.', ['n' => $c]));
                             return $this->redirect(['exam/view', 'id' => $model->exam_id]);
                         }else{
                             foreach ($ticket->getErrors() as $attribute => $value){
@@ -393,7 +403,7 @@ class TicketController extends Controller
             if (($model = Ticket::findOne(['token' => $token])) === null) {
                 $model = new Ticket(['scenario' => Ticket::SCENARIO_SUBMIT]);
                 $model->token = $token;
-                $model->token != null ? $model->addError('token', 'Ticket not found.') : null;
+                $model->token != null ? $model->addError('token', Yii::t('ticket', 'Ticket not found.')) : null;
 
                 return $this->render('submit', [
                     'model' => $model,
@@ -432,7 +442,7 @@ class TicketController extends Controller
     {
         if ($mode == 'single') {
             $this->findModel($id)->delete();
-            Yii::$app->session->addFlash('danger', 'The Ticket has been deleted successfully.');
+            Yii::$app->session->addFlash('danger', Yii::t('ticket', 'The Ticket has been deleted successfully.'));
 
             return $this->redirect(Yii::$app->session['ticketViewReturnURL']);
         }else if ($mode == 'manyOpen' || $mode == 'many') {
@@ -455,12 +465,20 @@ class TicketController extends Controller
 
 
             #TODO: errors?
-            if ($c == 0){
-                Yii::$app->session->addFlash('danger', 'There are no ' . ( $mode == 'manyOpen' ? 'Open' : '' ) . 'Tickets to delete.');
+            if($c == 0){
+                if ($mode == 'manyOpen') {
+                    Yii::$app->session->addFlash('danger', Yii::t('ticket', 'There are no Open Tickets to delete.'));
+                } else if ($mode == 'many'){
+                    Yii::$app->session->addFlash('danger', Yii::t('ticket', 'There are no Tickets to delete.'));
+                }
                 return $this->redirect(['exam/view', 'id' => $exam_id]);
             }
 
-            Yii::$app->session->addFlash('danger', $c . ' '  . ( $mode == 'manyOpen' ? 'Open' : '' ) . ' Tickets have been deleted successfully.');
+            if ($mode == 'manyOpen') {
+                Yii::$app->session->addFlash('danger', Yii::t('ticket', '{n} Open Tickets have been deleted successfully.', ['n' => $c]));
+            } else if ($mode == 'many'){
+                Yii::$app->session->addFlash('danger', Yii::t('ticket', '{n} Tickets have been deleted successfully.', ['n' => $c]));
+            }
             return $this->redirect(['exam/view', 'id' => $exam_id]);
         }
     }
@@ -476,7 +494,7 @@ class TicketController extends Controller
 
         $model = Ticket::findOne(['token' => $token]);
         if (!$model) {
-            throw new NotFoundHttpException('The requested page does not exist.');
+            throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
         } else {
             echo $model->exam->md5;
             return;
@@ -494,7 +512,7 @@ class TicketController extends Controller
 
         $model = Ticket::findOne(['token' => $token]);
         if (!$model) {
-            throw new NotFoundHttpException('The requested page does not exist.');
+            throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
         } else {
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             return [
@@ -531,7 +549,7 @@ class TicketController extends Controller
         if ($step == 1) {
             if ($model === null) {
                 $model = new Ticket(['scenario' => Ticket::SCENARIO_DEFAULT]);
-                !empty($token) ? $model->addError('token', 'Ticket not found.') : null;
+                !empty($token) ? $model->addError('token', \Yii::t('ticket', 'Ticket not found.')) : null;
                 $model->token = $token;
             }
             return $this->render('token-request', [
@@ -540,35 +558,50 @@ class TicketController extends Controller
         } else if ($step == 2) {
             if ($model === null) {
                 $model = new Ticket(['scenario' => Ticket::SCENARIO_DEFAULT]);
-                $token !== null ? $model->addError('token', 'Ticket not found.') : null;
+                $token !== null ? $model->addError('token', \Yii::t('ticket', 'Ticket not found.')) : null;
                 $model->token = $token;
                 return $this->render('token-request', [
                     'model' => $model,
                 ]);                
             } else if (!$model->valid) {
-                $model->addError('token', 'The ticket has expired.');
+                $model->addError('token', \Yii::t('ticket', 'The ticket has expired.'));
                 return $this->render('token-request', [
                     'model' => $model,
                 ]);                
             } else if (!$model->exam->fileConsistency) {
-                $model->addError('token', 'The exam file is not valid.');
+                $model->addError('token', \Yii::t('ticket', 'The exam file is not valid.'));
                 return $this->render('token-request', [
                     'model' => $model,
                 ]);                
             } else if ($model->download_lock != 0) {
-                $model->addError('token', 'Another instance is already running, '
-                                        . 'multiple downloads are not allowed.');
+                $model->addError('token', \Yii::t('ticket', 'Another instance is already running, '
+                                        . 'multiple downloads are not allowed.'));
                 return $this->render('token-request', [
                     'model' => $model,
                 ]);                
             } else {
-                $act = new Activity([
-                    'ticket_id' => $model->id,
-                    'description' => 'Exam download successfully requested by ' . 
-                    $model->ip . ' from ' . ( $model->test_taker ? $model->test_taker :
-                    'Ticket with token ' . $model->token ) . '.',
-                    'severity' => Activity::SEVERITY_SUCCESS,
-                ]);
+
+                if ($model->test_taker) {
+                    $act = new Activity([
+                        'ticket_id' => $model->id,
+                        'description' => yiit('activity', 'Exam download successfully requested by {ip} from {test_taker}.'),
+                        'description_params' => [
+                            'ip' => $model->ip,
+                            'test_taker' => $model->test_taker,
+                        ],
+                        'severity' => Activity::SEVERITY_SUCCESS,
+                    ]);
+                } else {
+                    $act = new Activity([
+                        'ticket_id' => $model->id,
+                        'description' => yiit('activity', 'Exam download successfully requested by {ip} from Ticket with token {token}.'),
+                        'description_params' => [
+                            'ip' => $model->ip,
+                            'token' => $model->token,
+                        ],
+                        'severity' => Activity::SEVERITY_SUCCESS,
+                    ]);
+                }
                 $act->save();
 
                 $model->scenario = Ticket::SCENARIO_DOWNLOAD;
@@ -618,167 +651,6 @@ class TicketController extends Controller
     }
 
     /**
-     * Downloads an exam file after checking ticket validity. (deprecated)
-     *
-     * @param string $token
-     * @return mixed The response object or an array with the error description
-     */
-    public function actionDownload2($token)
-    {
-
-        $model = Ticket::findOne(['token' => $token]);
-
-        if (!$model || !$model->valid){
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            #throw new \yii\web\HttpException(403, 'The provided ticket is invalid.');
-            return [ 'code' => 403, 'msg' => 'The provided ticket is invalid.' ];
-        }
-
-        if (!Yii::$app->file->set($model->exam->file)->exists){
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            #throw new \yii\web\HttpException(404, 'The exam file cannot be found.');
-            return [ 'code' => 404, 'msg' => 'The exam file cannot be found.' ];
-        }
-
-        if($model->download_lock != 0) {
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            #throw new \yii\web\HttpException(404, 'Another instance is already running; ' .
-            #                                      'multiple downloads are not allowed.');
-            return [ 'code' => 403, 'msg' => 'Another instance is already running; ' .
-                                             'multiple downloads are not allowed.' ];
-        }
-
-        $query = Ticket::find()
-            ->where(['not', ['start' => null]])
-            ->andWhere(['end' => null])
-            ->andWhere(['download_lock' => 1]);
-
-        $concurrentExamDownloads = 10;
-        if ($concurrentExamDownloads != 0) {
-            if(intval($query->count()) >= $concurrentExamDownloads){
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                #$headers = Yii::$app->response->headers;
-                #$headers->add('Retry-After', 20);                
-                #throw new \yii\web\HttpException(509, 'The server is busy, please wait. Retry in {i} seconds.');
-                return [
-                    'code' => 509,
-                    'msg' => 'The server is busy, please wait. Retry in {i} seconds.',
-                    'wait' => 20,
-                ];
-            }
-        }
-
-        $model->scenario = Ticket::SCENARIO_DOWNLOAD;
-
-        $model->bootup_lock = 1;
-        $model->download_lock = 1;
-        $model->start = $model->state == 0 ? new Expression('NOW()') : $model->start;
-        $model->ip = Yii::$app->request->userIp;
-        $model->save();
-
-        ignore_user_abort(true);
-        \Yii::$app->response->bandwidth = 10 * 1024 * 1024; // 10MB per second, set 0 for no limit
-
-        # log activity before [[send()]] is called upon the request.
-        \Yii::$app->response->on(\app\components\customResponse::EVENT_BEFORE_SEND, function($event) {
-            $ticket = Ticket::findOne($event->data->id);
-            $ticket->scenario = Ticket::SCENARIO_DOWNLOAD;
-            $ticket->download_progress = 0;
-            $ticket->client_state = "download in progress";
-            $ticket->save();
-
-            $act = new Activity([
-                'ticket_id' => $event->data->id,
-                'description' => 'Exam download successfully requested by ' . 
-                $event->data->ip . ' from ' . ( $event->data->test_taker ? $event->data->test_taker :
-                'Ticket with token ' . $event->data->token ) . '.',
-                'severity' => Activity::SEVERITY_SUCCESS,
-            ]);
-            $act->save();
-        }, $model);
-       
-        # calculate the percentage, write it to the database and look if the client side aborted the download 
-        \Yii::$app->response->on(\app\components\customResponse::EVENT_WHILE_SEND, function($event) {
-            $ticket = Ticket::findOne($event->data->id);
-            $ticket->scenario = Ticket::SCENARIO_DOWNLOAD;
-
-            if(connection_aborted()){
-                $ticket->download_lock = 0;
-                $ticket->client_state = "aborted, waiting for download";
-                $ticket->save();
-
-                $act = new Activity([
-                    'ticket_id' => $event->data->id,
-                    'description' => 'Exam download aborted by ' . $event->data->ip . 
-                    ' from ' . ( $event->data->test_taker ? $event->data->test_taker :
-                    'Ticket with token ' . $event->data->token ) . ' (client side).',
-                    'severity' => Activity::SEVERITY_WARNING,
-                ]);
-                $act->save();
-                die();
-            }
-
-            $ticket->download_progress = $event->sender->progress/filesize($event->data->exam->file);
-
-            /*if ($ticket->download_progress > 0.5) {
-                $ticket->download_lock = 0;
-                $ticket->save();
-                die();
-            }*/
-            $ticket->download_lock = 1;
-            $ticket->client_state = "download in progress";
-            $ticket->save();
-
-        }, $model);
-
-        # log that the [[send()]] process ended. TODO: success or not?
-        \Yii::$app->response->on(\app\components\customResponse::EVENT_AFTER_SEND, function($event) {
-            $ticket = Ticket::findOne($event->data->id);
-            $ticket->scenario = Ticket::SCENARIO_DOWNLOAD;
-            $ticket->download_progress = 1;
-            $ticket->download_lock = 0;
-            $ticket->client_state = "download finished";
-            $ticket->save();
-
-            $act = new Activity([
-                'ticket_id' => $event->data->id,
-                'description' => 'Exam download finished by ' . $event->data->ip .
-                ' from ' . ( $event->data->test_taker ? $event->data->test_taker :
-                'Ticket with token ' . $event->data->token ) . '.',
-                'severity' => Activity::SEVERITY_SUCCESS,
-            ]);
-            $act->save();
-
-            /* if there is a backup available, restore the latest */
-            $backupSearchModel = new BackupSearch();
-            $backupDataProvider = $backupSearchModel->search($ticket->token);
-            if ($backupDataProvider->totalCount > 0) {
-                $restoreDaemon = new Daemon();
-                /* run the restore daemon in the foreground */
-                $pid = $restoreDaemon->startRestore($ticket->id, '/', 'now', false, '/run/initramfs/backup/' . $ticket->exam->backup_path);
-            }
-            //$ticket->continueBootup();
-            $ticket->runCommand('echo 0 > /run/initramfs/restore');
-            //$ticket->bootup_lock = 0;
-            $ticket->save();
-
-        }, $model);
-
-        /* Start a new backup Daemon on the background */
-        $searchModel = new DaemonSearch();
-        if($searchModel->search([])->totalCount < 3){
-            $backupDaemon = new Daemon();
-            $backupDaemon->startBackup();
-        }
-        if($searchModel->search([])->totalCount < 3){
-            $backupDaemon = new Daemon();
-            $backupDaemon->startBackup();
-        }
-
-        return \Yii::$app->response->sendFile($model->exam->file);
-    }
-
-    /**
      * Changes the state of a client.
      *
      * @param string $token
@@ -791,9 +663,19 @@ class TicketController extends Controller
 
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         if($model !== null) {
-            $model->client_state = $state;
-            if ($state == "bootup complete.") {
+            if ($state == yiit('ticket', 'bootup complete.')) {
                 $model->bootup_lock = 0;
+            }
+
+            // split the state in params and string if it matches the below regex
+            if (preg_match('/^(.*?) reconnected \((.*?)\)\.$/', $state, $matches) == 1) {
+                $model->client_state = yiit('ticket', '{interface} reconnected ({count}).');
+                $model->client_state_params = [
+                    'interface' => $matches[1],
+                    'count' => $matches[2]
+                ];
+            } else {
+                $model->client_state = $state;
             }
             if ($model->save()) {
                 return [ 'code' => 200, 'msg' => 'Client state changed.' ];
@@ -836,13 +718,22 @@ class TicketController extends Controller
             Stats::increment('total_duration', $model->durationInSecs);
             Stats::increment('completed_exams'); // +1
         }
-
-        $act = new Activity([
-            'ticket_id' => $model->id,
-            'description' => 'Exam finished by ' . ( $model->test_taker ?
-            $model->test_taker : 'Ticket with token ' . $token ) . '.',
-            'severity' => Activity::SEVERITY_INFORMATIONAL,
-        ]);
+  
+        if ($model->test_taker) {
+            $act = new Activity([
+                'ticket_id' => $model->id,
+                'description' => yiit('activity', 'Exam finished by {test_taker}.'),
+                'description_params' => [ 'test_taker' => $model->test_taker ],
+                'severity' => Activity::SEVERITY_INFORMATIONAL,
+            ]);
+        } else {
+            $act = new Activity([
+                'ticket_id' => $model->id,
+                'description' => yiit('activity', 'Exam finished by Ticket with token {token}.'),
+                'description_params' => [ 'token' => $token ],
+                'severity' => Activity::SEVERITY_INFORMATIONAL,
+            ]);
+        }
         $act->save();
 
         /* Start a new backup Daemon on the background */
@@ -893,7 +784,7 @@ class TicketController extends Controller
         $daemon = new Daemon();
         $pid = $daemon->startRestore($id, $file, $date);
 
-        Yii::$app->session->addFlash('info', 'Restore started.');
+        Yii::$app->session->addFlash('info', \Yii::t('ticket', 'Restore started.'));
 
         if(Yii::$app->request->isAjax){
             return $this->runAction('view', ['id' => $id]);
@@ -930,7 +821,7 @@ class TicketController extends Controller
         if (file_exists($pubKeyFile)) {
             return file_get_contents($pubKeyFile);
         } else {
-            throw new ServerErrorHttpException('The public key could not be generated.');
+            throw new ServerErrorHttpException(\Yii::t('ticket', 'The public key could not be generated.'));
         }
     }
 
@@ -949,7 +840,7 @@ class TicketController extends Controller
                 return $model;
             }
         }
-        throw new NotFoundHttpException('The requested page does not exist.');
+        throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
     }
 
     /**
@@ -965,8 +856,10 @@ class TicketController extends Controller
         if(Yii::$app->user->can($r . '/all') || $model->exam->user_id == Yii::$app->user->id){
             return true;
         }else{
-            throw new ForbiddenHttpException('You are not allowed to ' . \Yii::$app->controller->action->id . 
-                    ' this ' . \Yii::$app->controller->id . '.');
+            throw new ForbiddenHttpException(\Yii::t('app', 'You are not allowed to {action} this {item}.', [
+                'action' => \Yii::$app->controller->action->id,
+                'item' => \Yii::$app->controller->id
+            ]));
             return false;
         }
     }

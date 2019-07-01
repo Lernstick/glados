@@ -37,4 +37,15 @@ function nullif($expr1, $expr2){
 	return $expr1 == $expr2 ? null : $expr1;
 }
 
+/**
+ * Dummy translate function to mark text to be extracted by the "yii message" command.
+ * It does nothing but returning the message.
+ * @see https://www.yiiframework.com/doc/api/2.0/yii-baseyii#t()-detail
+ * 
+ * @return string
+ */
+function yiit($category, $message, $params = [], $language = null) {
+	return $message;
+}
+
 ?>
