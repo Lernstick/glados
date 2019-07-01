@@ -90,6 +90,13 @@ class m190531_162014_i18n_migrate extends Migration
                 2 => 'count',
             ],
         ],
+        'backup_state' => [
+            '/^rdiff-backup failed \(retval: (.*?)\), output: (.*?)$/' => [
+                0 => 'rdiff-backup failed (retval: {retval}), output: {output}',
+                1 => 'retval',
+                2 => 'output',
+            ],
+        ],
         'restore_state' => [],
     ];
 
@@ -123,7 +130,6 @@ class m190531_162014_i18n_migrate extends Migration
 
         // ticket->restore_state
         $this->migrateTableFieldUp($this->ticketTable, 'restore_state', $models, $nr);
-
     }
 
     /**
@@ -132,8 +138,8 @@ class m190531_162014_i18n_migrate extends Migration
     public function safeDown()
     {
         // activity->description
-        $models = Activity::find()->where(['description_new' => null])->all();
-        $nr = Activity::find()->where(['description_new' => null])->count();
+        $models = Activity::find()->where(['description_new' => ''])->all();
+        $nr = Activity::find()->where(['description_new' => ''])->count();
         $this->migrateTableFieldDown($this->activitiesTable, 'description', $models, $nr);
 
         // ticket->client_state
@@ -150,7 +156,6 @@ class m190531_162014_i18n_migrate extends Migration
         $models = Ticket::find()->where(['restore_state_new' => null])->all();
         $nr = Ticket::find()->where(['restore_state_new' => null])->count();
         $this->migrateTableFieldDown($this->ticketTable, 'restore_state', $models, $nr);
-
     }
 
     private function migrateTableFieldUp($table, $field, $models, $nr)
@@ -162,7 +167,7 @@ class m190531_162014_i18n_migrate extends Migration
 
         $i = 1;
         foreach ($models as $model) {
-            echo "Table " . $table . ": Migrating database record " . $i . "/" . $nr . "\r";
+            echo "Table " . $table . " - " . $field . ": Migrating database record " . $i . "/" . $nr . "\r";
 
             $en = $model->{$oldField};
             $dummy_params = [];
@@ -225,7 +230,7 @@ class m190531_162014_i18n_migrate extends Migration
 
         $i = 1;
         foreach ($models as $model) {
-            echo "Table " . $table . ": Migrating database record " . $i . "/" . $nr . " down\r";
+            echo "Table " . $table . " - " . $field . ": Migrating database record " . $i . "/" . $nr . " down\r";
 
             // don't call events
             $en = \Yii::t($table, $model->{$field}, $model->{$paramsField}, 'en');

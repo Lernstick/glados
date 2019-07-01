@@ -102,7 +102,9 @@ class Base extends \yii\db\ActiveRecord
             $out['results'][] = [
                 'id' => $value[$id],
                 // highlight the matching part
-                'text' => $q == null ? $value[$attr] : preg_replace('/'.$q.'/i', '<b>$0</b>', $value[$attr])
+                'text' => $q == null ?
+                    $value[$attr] :
+                    preg_replace('/'.$q.'/i', '<b>$0</b>', $value[$attr])
             ];
         }
         return $out;
