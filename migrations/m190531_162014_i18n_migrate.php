@@ -91,13 +91,21 @@ class m190531_162014_i18n_migrate extends Migration
             ],
         ],
         'backup_state' => [
-            '/^rdiff-backup failed \(retval: (.*?)\), output: (.*?)$/' => [
+            // With modifier s (PCRE_DOTALL) a dot metacharacter in the pattern
+            // matches all characters, including newlines
+            '/^rdiff-backup failed \(retval: (.*?)\), output: \n(.*?)$/s' => [
                 0 => 'rdiff-backup failed (retval: {retval}), output: {output}',
                 1 => 'retval',
                 2 => 'output',
             ],
         ],
-        'restore_state' => [],
+        'restore_state' => [
+            '/^rdiff-backup failed \(retval: (.*?)\), output: \n(.*?)$/s' => [
+                0 => 'rdiff-backup failed (retval: {retval}), output: {output}',
+                1 => 'retval',
+                2 => 'output',
+            ],
+        ],
     ];
 
     /**
