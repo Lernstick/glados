@@ -116,6 +116,10 @@ class m190531_162014_i18n_migrate extends Migration
         // for backward compatibility
         yiit('activity', 'Client state changed: {old} -> {new}');
         yiit('ticket', 'Client not seen yet');
+        yiit('activity', 'Download failed: rsync failed (retval: {retval})');
+        yiit('activity', 'Exam download aborted (server side).');
+        yiit('activity', 'Exam download finished by {ip} from Ticket with token {token}.');
+        yiit('activity', 'Exam download finished by {ip} from {test_taker}.');
     }
 
     /**
