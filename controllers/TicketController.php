@@ -581,6 +581,15 @@ class TicketController extends Controller
                 ]);                
             } else {
 
+                $model->scenario = Ticket::SCENARIO_DOWNLOAD;
+                $model->bootup_lock = 1;
+                $model->download_request = new Expression('NOW()');
+                $model->start = $model->state == 0 ? new Expression('NOW()') : $model->start;
+                $model->ip = Yii::$app->request->userIp;
+                $model->client_state = 'exam requested sccessfully';
+                $model->download_progress = 0;
+                $model->save();
+
                 if ($model->test_taker) {
                     $act = new Activity([
                         'ticket_id' => $model->id,
@@ -603,15 +612,6 @@ class TicketController extends Controller
                     ]);
                 }
                 $act->save();
-
-                $model->scenario = Ticket::SCENARIO_DOWNLOAD;
-                $model->bootup_lock = 1;
-                $model->download_request = new Expression('NOW()');
-                $model->start = $model->state == 0 ? new Expression('NOW()') : $model->start;
-                $model->ip = Yii::$app->request->userIp;
-                $model->client_state = 'exam requested sccessfully';
-                $model->download_progress = 0;
-                $model->save();
 
                 # saerch for running daemons
                 $daemonSearchModel = new DaemonSearch();
