@@ -130,6 +130,8 @@ class LiveActiveRecord extends TranslatedActiveRecord
             $config = $event->data[1];
 
             if ($this->attributesChanged($this->triggerAttributes($field))) {
+
+                // merge the default config with the provided one
                 $realConfig = array_merge($this->defaultConfig(), $config);
 
                 // evaluate the anonymous functions

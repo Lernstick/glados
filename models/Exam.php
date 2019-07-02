@@ -5,6 +5,7 @@ namespace app\models;
 use Yii;
 use app\models\Base;
 use yii\helpers\Html;
+use app\components\HistoryBehavior;
 
 /**
  * This is the model class for table "exam".
@@ -70,6 +71,41 @@ class Exam extends Base
         $this->libre_autosave_path = $this->isNewRecord ? '/home/user/.config/libreoffice/4/user/tmp' : $this->libre_autosave_path;
         $this->libre_createbackup_path = $this->isNewRecord ? '/home/user/.config/libreoffice/4/user/backup' : $this->libre_createbackup_path;
         $this->max_brightness = $this->isNewRecord ? 100 : $this->max_brightness;
+    }
+
+    /**
+     * @inheritdoc 
+     */
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => HistoryBehavior::className(),
+                'attributes' => [
+                    \yii\db\ActiveRecord::EVENT_AFTER_UPDATE => [
+                        'name',
+                        'subject',
+                        'file',
+                        'file2',
+                        'grp_netdev',
+                        'allow_sudo',
+                        'allow_mount',
+                        'firewall_off',
+                        'screenshots',
+                        'url_whitelist',
+                        'backup_path',
+                        'time_limit',
+                        'screenshots_interval',
+                        'libre_autosave',
+                        'libre_autosave_interval',
+                        'libre_autosave_path',
+                        'libre_createbackup',
+                        'libre_createbackup_path',
+                        'max_brightness',
+                    ],
+                ],
+            ],
+        ];
     }
 
     /**

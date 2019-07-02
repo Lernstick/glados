@@ -181,7 +181,7 @@ class BackupController extends DaemonController implements DaemonInterface
 
             $this->backup_failed();
 
-        }else{
+        } else {
             $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? 1 : 0;
             $this->ticket->backup_state = yiit('ticket', 'backup in progress...');
             if ($this->finishBackup == true) {
