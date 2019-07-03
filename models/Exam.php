@@ -79,30 +79,28 @@ class Exam extends Base
     public function behaviors()
     {
         return [
-            [
+            'HistoryBehavior' => [
                 'class' => HistoryBehavior::className(),
                 'attributes' => [
-                    \yii\db\ActiveRecord::EVENT_AFTER_UPDATE => [
-                        'name',
-                        'subject',
-                        'file',
-                        'file2',
-                        'grp_netdev',
-                        'allow_sudo',
-                        'allow_mount',
-                        'firewall_off',
-                        'screenshots',
-                        'url_whitelist',
-                        'backup_path',
-                        'time_limit',
-                        'screenshots_interval',
-                        'libre_autosave',
-                        'libre_autosave_interval',
-                        'libre_autosave_path',
-                        'libre_createbackup',
-                        'libre_createbackup_path',
-                        'max_brightness',
-                    ],
+                    'name' => 'text',
+                    'subject' => 'text',
+                    'file' => 'text',
+                    'file2' => 'text',
+                    'grp_netdev' => 'boolean',
+                    'allow_sudo' => 'boolean',
+                    'allow_mount' => 'boolean',
+                    'firewall_off' => 'boolean',
+                    'screenshots' => 'boolean',
+                    'url_whitelist' => 'text',
+                    'backup_path' => 'text',
+                    'time_limit' => 'text',
+                    'screenshots_interval' => 'text',
+                    'libre_autosave' => 'boolean',
+                    'libre_autosave_interval' => 'text',
+                    'libre_autosave_path' => 'text',
+                    'libre_createbackup' => 'boolean',
+                    'libre_createbackup_path' => 'text',
+                    'max_brightness' => 'text',
                 ],
             ],
         ];
@@ -245,7 +243,7 @@ class Exam extends Base
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
 
-    /* Getter for exam name */
+    /* Getter for user name */
     public function getUserName()
     {
         return $this->user->username;

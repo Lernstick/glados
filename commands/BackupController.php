@@ -167,7 +167,7 @@ class BackupController extends DaemonController implements DaemonInterface
         if ($this->checkPort(22, 3) === false) {
             $this->ticket->backup_state = yiit('ticket', 'network error.');
             $this->ticket->backup_last_try = new Expression('NOW()');
-            $this->ticket->online = 1;
+            $this->ticket->online = 0;
             #$this->ticket->backup_lock = 0;
             #$this->ticket->save(false);
             $this->unlockItem($this->ticket);

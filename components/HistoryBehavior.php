@@ -8,15 +8,17 @@ use app\models\History;
 
 class HistoryBehavior extends Behavior
 {
+
     /**
      * @var array list of attributes that are to be tracked in the history table.
-     * The array keys are the ActiveRecord events upon which the attributes are to be tracked,
-     * and the array values are the corresponding attribute(s) to be tracked. For example,
+     * The array keys are the corresponding attribute name(s) and the values are
+     * the format of the attribute to be tracked. For example,
      *
      * ```php
      * [
-     *     ActiveRecord::EVENT_BEFORE_INSERT => ['attribute1', 'attribute2'],
-     *     ActiveRecord::EVENT_BEFORE_UPDATE => 'attribute2',
+     *     'attribute1' => 'text',
+     *     'attribute2' => 'duration'],
+     *     ...
      * ]
      * ```
      */
@@ -28,7 +30,7 @@ class HistoryBehavior extends Behavior
     public function events()
     {
         return array_fill_keys(
-            array_keys($this->attributes),
+            [\yii\db\ActiveRecord::EVENT_AFTER_UPDATE],
             'historyEntry'
         );
     }
@@ -40,9 +42,9 @@ class HistoryBehavior extends Behavior
     public function historyEntry($event)
     {
 
-        if (!empty($this->attributes[$event->name])) {
+        if (!empty($this->attributes[$event->name]) || $event->name == \yii\db\ActiveRecord::EVENT_AFTER_UPDATE) {
 
-            $attributes = (array) $this->attributes[$event->name];
+            $attributes = (array) array_keys($this->attributes);
             $date = microtime(true);
             $table = $this->owner->tableName();
             $row = $this->owner->id;
@@ -66,7 +68,6 @@ class HistoryBehavior extends Behavior
 
             // create history entries for all attributes that have been changed
             foreach ($attributes as $attribute) {
-                // ignore attribute names which are not string (e.g. when set by TimestampBehavior::updatedAtAttribute)
 
                 //$old_value = $this->owner->oldAttributes[$attribute];
                 $new_value = $this->owner->$attribute;
@@ -105,6 +106,35 @@ class HistoryBehavior extends Behavior
             return \Yii::$app->user->id;
         } else {
             return -1;
+        }
+    }
+
+    /**
+     * @TODO
+     */
+    public function formatOf($column, $default = 'text')
+    {
+        return array_key_exists($column, $this->attributes)
+            ? $this->attributes[$column]
+            : $default;
+    }
+
+    /**
+     * @TODO
+     */
+    public function iconOf($model)
+    {
+
+        if ($model->new_value == '') {
+            return '<i class="glyphicon glyphicon-log-out"></i>';
+        } else if ($model->old_value == '') {
+            return '<i class="glyphicon glyphicon-log-in"></i>';
+        } else if ($this->formatOf($model->column) == 'boolean' && $model->new_value == 1) {
+            return '<i class="glyphicon glyphicon-check"></i>';
+        } else if ($this->formatOf($model->column) == 'boolean' && $model->new_value == 0) {
+            return '<i class="glyphicon glyphicon-unchecked"></i>';
+        } else {
+            return '<i class="glyphicon glyphicon-edit"></i>';
         }
     }
 

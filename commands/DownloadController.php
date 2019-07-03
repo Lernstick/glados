@@ -111,7 +111,7 @@ class DownloadController extends DaemonController implements DaemonInterface
         $this->ticket->save(false);
 
         if ($this->checkPort(22, 3) === false) {
-            $this->ticket->online = 1;
+            $this->ticket->online = 0;
             $this->ticket->download_state = 'download failed: network error.';
             $this->unlockItem($this->ticket);
 
@@ -122,7 +122,7 @@ class DownloadController extends DaemonController implements DaemonInterface
             ]);
             $act->save();
 
-        }else{
+        } else {
             $this->ticket->scenario = Ticket::SCENARIO_DOWNLOAD;
             $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? 1 : 0;
 

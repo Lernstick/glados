@@ -18,8 +18,10 @@ use app\components\Editable;
 /* @var $backupDataProvider yii\data\ArrayDataProvider */
 /* @var $screenshotSearchModel app\models\ScreenshotSearch */
 /* @var $screenshotDataProvider yii\data\ArrayDataProvider */
-/* @var $restoreSearchModel app\models\ScreenshotSearch */
+/* @var $restoreSearchModel app\models\restoreSearch */
 /* @var $restoreDataProvider yii\data\ActiveDataProvider */
+/* @var $historySearchModel app\models\HistorySearch */
+/* @var $historyDataProvider yii\data\ActiveDataProvider */
 /* @var $date string the date */
 /* @var $options array RdiffbackupFilesystem options array */
 
@@ -393,6 +395,18 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php $_GET = array_merge($_GET, ['#' => 'tab_result']); ?>
         <?= $this->render('/result/_view', [
             'model' => $model,
+        ]); ?>
+    <?php Pjax::end() ?>
+
+    <?php Pjax::begin([
+        'id' => 'history',
+        'options' => ['class' => 'tab-pane fade'],
+    ]); ?>
+        <?php $_GET = array_merge($_GET, ['#' => 'tab_history']); ?>
+        <?= $this->render('/history/index', [
+            'model' => $model,
+            'searchModel' => $historySearchModel,
+            'dataProvider' => $historyDataProvider,
         ]); ?>
     <?php Pjax::end() ?>
 

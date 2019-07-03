@@ -92,6 +92,7 @@ class RestoreController extends DaemonController
         $this->ticket->save(false);
 
         if ($this->checkPort(22, 3) === false) {
+            $this->ticket->online = 0;
             $this->ticket->restore_state = yiit('ticket', 'network error.');
             $this->ticket->restore_lock = 0;
             $this->ticket->save(false);
@@ -103,6 +104,9 @@ class RestoreController extends DaemonController
             ]);
             $act->save();
             return;
+        } else {
+            $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? 1 : 0;
+            $this->ticket->save(false);
         }
 
         $this->remotePath = FileHelper::normalizePath($this->remotePath . '/' . $this->ticket->exam->backup_path);

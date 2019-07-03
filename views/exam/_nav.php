@@ -54,6 +54,13 @@ $this->registerJs($active_tabs);
     </li>
     <li>
         <?= Html::a(
+            '<i class="glyphicon glyphicon-book"></i> ' . \Yii::t('ticket', 'History'),
+            Url::to(['exam/view', 'id' => $model->id, '#' => 'history']),
+            ['data-toggle' => 'tab']
+        ); ?>
+    </li>
+    <li>
+        <?= Html::a(
             '<i class="glyphicon glyphicon-stats"></i> ' . \Yii::t('exams', 'Chart'),
             Url::to(['exam/view', 'id' => $model->id, '#' => 'chart']),
             ['data-toggle' => '']

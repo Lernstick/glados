@@ -80,6 +80,13 @@ $this->registerJs($active_tabs);
             ['data-toggle' => 'tab']
         ); ?>
     </li>
+    <li>
+        <?= Html::a(
+            '<i class="glyphicon glyphicon-book"></i> ' . \Yii::t('ticket', 'History'),
+            Url::to(['ticket/view', 'id' => $model->id, '#' => 'history']),
+            ['data-toggle' => 'tab']
+        ); ?>
+    </li>
     <li class="dropdown">
         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
             <i class="glyphicon glyphicon-list-alt"></i>

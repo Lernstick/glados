@@ -167,27 +167,27 @@ class Ticket extends LiveActiveRecord
     public function behaviors()
     {
         return [
-            [
+            'HistoryBehavior' => [
                 'class' => HistoryBehavior::className(),
                 'attributes' => [
-                    \yii\db\ActiveRecord::EVENT_AFTER_UPDATE => [
-                        'token',
-                        'exam_id',
-                        'start',
-                        'end',
-                        'ip',
-                        'test_taker',
-                        'backup_interval',
-                        'online',
-                        'backup_size',
-                        'time_limit',
-                        'download_request',
-                        'download_finished',
-                        'last_backup',
-                        'client_state',
-                        'backup_state',
-                        'restore_state',
-                    ],
+                    'token' => 'text',
+                    'exam_id' => 'text',
+                    'start' => 'timeago',
+                    'end' => 'timeago',
+                    'ip' => 'text',
+                    'test_taker' => 'text',
+                    'backup_interval' => 'duration',
+                    'online' => 'boolean',
+                    'backup_lock' => 'boolean',
+                    'restore_lock' => 'boolean',
+                    'backup_size' => 'size',
+                    'time_limit' => 'text',
+                    'download_request' => 'boolean',
+                    'download_finished' => 'boolean',
+                    'last_backup' => 'timeago',
+                    'client_state' => 'text',
+                    'backup_state' => 'text',
+                    'restore_state' => 'text',
                 ],
             ],
         ];
