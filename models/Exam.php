@@ -91,7 +91,7 @@ class Exam extends Base
                     'allow_mount' => 'boolean',
                     'firewall_off' => 'boolean',
                     'screenshots' => 'boolean',
-                    'url_whitelist' => 'text',
+                    'url_whitelist' => 'ntext',
                     'backup_path' => 'text',
                     'time_limit' => 'text',
                     'screenshots_interval' => 'text',

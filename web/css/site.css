@@ -307,11 +307,6 @@ ul.timeline li {
     border-bottom: 1px solid #e8e8e8;
     clear: both
 }
-ul.timeline li.append {
-    position: relative;
-    border-bottom: 0px;
-    clear: both
-}
 .timeline .block {
     margin: 0;
     border-left: 3px solid #e8e8e8;
@@ -350,19 +345,8 @@ ul.timeline li.append {
     font-size: 16px;
     margin: 0
 }
-.timeline li.first h2.title:before {
-    content: "";
-    position: absolute;
-    left: -23px;
-    top: 3px;
-    display: block;
-    width: 14px;
-    height: 14px;
-    border: 3px solid #d2d3d2;
-    border-radius: 14px;
-    background: #f9f9f9
-}
 .timeline h2.title:before {
+    content: "";
     position: absolute;
     left: -23px;
     top: 3px;

@@ -16,6 +16,9 @@ use yii\db\ActiveRecord;
  * @property integer $changed_by
  * @property string $old_value
  * @property string $new_value
+ * @property string $columns
+ * @property string $new_values
+ * @property string $old_values
  *
  * @property User $user
  * @property string $userName
@@ -23,6 +26,14 @@ use yii\db\ActiveRecord;
 class History extends \yii\db\ActiveRecord
 {
 
+    public $columns;
+    public $old_values;
+    public $new_values;
+
+    /**
+     * \var string separator of the `GROUP_CONCAT()` query
+     */
+    const SEPARATOR = '::';
 
     /**
      * @inheritdoc
@@ -78,12 +89,36 @@ class History extends \yii\db\ActiveRecord
         if ($this->changed_by == 0) {
             return \Yii::t('history', 'System');
         } else if ($this->changed_by == -1) {
-            return '<span class="not-set">' . \Yii::t('history', '(unknown user)') . '</span>';
+            return \Yii::t('history', 'Client');
+        } else if ($this->changed_by == -2) {
+            return '<span class="not-set">' . \Yii::t('history', '(unknown)') . '</span>';
         } else if ($this->user == null) {
             return '<span class="not-set">' . \Yii::t('history', '(user removed)') . '</span>';
         } else {
             return $this->user->username;
         }
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @return Query the active query used by this AR class.
+     */
+    public static function find()
+    {
+        $query = new \yii\db\ActiveQuery(get_called_class());
+
+        $query->select([
+            '`history`.*',
+            //'`id`, `changed_at`, `changed_by`',
+            new \yii\db\Expression('
+                GROUP_CONCAT(`column` ORDER BY `id` DESC SEPARATOR "' . History::SEPARATOR . '") as `columns`,
+                GROUP_CONCAT(IFNULL(`new_value`, "") ORDER BY `id` DESC SEPARATOR "' . History::SEPARATOR . '") as `new_values`,
+                GROUP_CONCAT(IFNULL(`old_value`, "") ORDER BY `id` DESC SEPARATOR "' . History::SEPARATOR . '") as `old_values`')
+        ])->groupBy('hash')
+        ->orderBy(['changed_at' => SORT_DESC]);
+
+        return $query;
     }
 
 }
