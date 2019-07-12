@@ -26,9 +26,9 @@ use yii\db\ActiveRecord;
 class History extends \yii\db\ActiveRecord
 {
 
-    public $columns;
-    public $old_values;
-    public $new_values;
+    public $columns_db;
+    public $old_values_db;
+    public $new_values_db;
 
     /**
      * \var string separator of the `GROUP_CONCAT()` query
@@ -48,8 +48,7 @@ class History extends \yii\db\ActiveRecord
      */
     public function rules()
     {
-        return [
-        ];
+        return [];
     }
 
     /**
@@ -100,6 +99,64 @@ class History extends \yii\db\ActiveRecord
     }
 
     /**
+     * Getter the new_values array
+     *
+     * @return array 
+     */
+    public function getNew_values()
+    {
+        return explode(History::SEPARATOR, $this->new_values_db);
+    }
+
+    /**
+     * Getter the old_values array
+     *
+     * @return array 
+     */
+    public function getOld_values()
+    {
+        return explode(History::SEPARATOR, $this->old_values_db);
+    }
+
+    /**
+     * Getter the columns array
+     *
+     * @return array 
+     */
+    public function getColumns()
+    {
+        return explode(History::SEPARATOR, $this->columns_db);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    private function diff()
+    {
+        return self::find()
+            ->andWhere(['<', 'changed_at', $this->changed_at])
+            ->andWhere([
+                'table' => $this->table,
+                'row' => $this->row
+            ])
+            ->orderBy(['changed_at' => SORT_DESC]);
+    }
+
+
+    /**
+     * @return integer
+     */
+    public function getDiffToLast()
+    {
+        $pre = $this->diff()->one();
+        if ($pre !== null) {
+            return floatval($this->changed_at) - floatval($pre->changed_at);
+        } else {
+            return -1;
+        }
+    }
+
+    /**
      * @inheritdoc
      *
      * @return Query the active query used by this AR class.
@@ -110,11 +167,10 @@ class History extends \yii\db\ActiveRecord
 
         $query->select([
             '`history`.*',
-            //'`id`, `changed_at`, `changed_by`',
             new \yii\db\Expression('
-                GROUP_CONCAT(`column` ORDER BY `id` DESC SEPARATOR "' . History::SEPARATOR . '") as `columns`,
-                GROUP_CONCAT(IFNULL(`new_value`, "") ORDER BY `id` DESC SEPARATOR "' . History::SEPARATOR . '") as `new_values`,
-                GROUP_CONCAT(IFNULL(`old_value`, "") ORDER BY `id` DESC SEPARATOR "' . History::SEPARATOR . '") as `old_values`')
+                GROUP_CONCAT(`column` ORDER BY `id` DESC SEPARATOR "' . History::SEPARATOR . '") as `columns_db`,
+                GROUP_CONCAT(IFNULL(`new_value`, "") ORDER BY `id` DESC SEPARATOR "' . History::SEPARATOR . '") as `new_values_db`,
+                GROUP_CONCAT(IFNULL(`old_value`, "") ORDER BY `id` DESC SEPARATOR "' . History::SEPARATOR . '") as `old_values_db`'),
         ])->groupBy('hash')
         ->orderBy(['changed_at' => SORT_DESC]);
 

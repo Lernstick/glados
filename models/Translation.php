@@ -22,4 +22,16 @@ class Translation extends Base
     {
         return 'translation';
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'en' => 'English',
+            'de' => 'German',
+        ];
+    }
 }

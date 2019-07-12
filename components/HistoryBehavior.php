@@ -53,7 +53,7 @@ class HistoryBehavior extends Behavior
             $hash = bin2hex(openssl_random_pseudo_bytes(8));
 
             // if it's a translated field remove the attribute, but add the 
-            // two real attributes attribute_id and attribute_data
+            // two real attributes "attribute_id" and "attribute_data"
             $inc = 0;
             foreach ($attributes as $key => $attribute) {
                 if ($this->owner->hasMethod('getTranslatedFields')
@@ -67,7 +67,7 @@ class HistoryBehavior extends Behavior
                 }
             }
 
-            // intersection of both arrays are attributes with history entry and
+            // intersection of both arrays are attributes with history entry
             // are changed according to $event->changedAttributes
             $changedAttr = array_intersect($attributes, array_keys($event->changedAttributes));
 
