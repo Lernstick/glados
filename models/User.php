@@ -32,6 +32,7 @@ class User extends Base implements IdentityInterface
     const SCENARIO_CREATE = 'create';
     const SCENARIO_UPDATE = 'update';
     const SCENARIO_PASSWORD_RESET = 'password_reset';
+    const SCENARIO_EXTERNAL = 'external';
     public $password_repeat;
     private $_role;
 
@@ -66,6 +67,7 @@ class User extends Base implements IdentityInterface
     {
         return [
             self::SCENARIO_CREATE => ['username', 'password', 'password_repeat', 'role', 'change_password'],
+            self::SCENARIO_EXTERNAL => ['username', 'role', 'type', 'identifier'],
             self::SCENARIO_UPDATE => ['username', 'role', 'change_password'],
             self::SCENARIO_PASSWORD_RESET => ['password', 'password_repeat', 'change_password'],
         ];
@@ -77,8 +79,9 @@ class User extends Base implements IdentityInterface
     public function rules()
     {
         return [
-            [['username', 'password', 'password_repeat', 'role', 'activities_last_visited'], 'safe'],
+            [['username', 'password', 'password_repeat', 'role', 'activities_last_visited', 'type'], 'safe'],
             [['username', 'password', 'password_repeat', 'role'], 'required', 'on' => self::SCENARIO_CREATE],
+            [['username', 'role', 'type', 'identifier'], 'required', 'on' => self::SCENARIO_EXTERNAL],
             [['username', 'role'], 'required', 'on' => self::SCENARIO_UPDATE],
             [['password', 'password_repeat'], 'required', 'on' => self::SCENARIO_PASSWORD_RESET],
             [['username'], 'unique'], 
@@ -185,7 +188,7 @@ class User extends Base implements IdentityInterface
      */
     public static function findByUsername($username)
     {
-        return static::findOne(['username' => $username]);
+        return static::findOne(['username' => $username, 'type' => 'local']);
     }
 
     /**
@@ -229,7 +232,7 @@ class User extends Base implements IdentityInterface
     public function beforeSave($insert)
     {
         if (parent::beforeSave($insert)) {
-            if ($this->isNewRecord) {
+            if ($this->isNewRecord && $this->scenario != self::SCENARIO_EXTERNAL) {
                 $this->auth_key = \Yii::$app->security->generateRandomString();
                 $this->password = Yii::$app->getSecurity()->generatePasswordHash($this->password);
             }
@@ -256,5 +259,4 @@ class User extends Base implements IdentityInterface
         $auth->revokeAll($this->id);
         $auth->assign($role, $this->id);
     }
-
 }

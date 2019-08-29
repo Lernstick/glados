@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\base\Model;
+use app\models\UserAd;
 
 /**
  * LoginForm is the model behind the login form.
@@ -27,8 +28,8 @@ class LoginForm extends Model
             [['username', 'password'], 'required'],
             // rememberMe must be a boolean value
             ['rememberMe', 'boolean'],
-            // password is validated by validatePassword()
-            ['password', 'validatePassword'],
+            // password is validated by authenticate()
+            ['password', 'authenticate'],
         ];
     }
 
@@ -39,12 +40,22 @@ class LoginForm extends Model
      * @param string $attribute the attribute currently being validated
      * @param array $params the additional name-value pairs given in the rule
      */
-    public function validatePassword($attribute, $params)
+    public function authenticate($attribute, $params)
     {
         if (!$this->hasErrors()) {
             $user = $this->getUser();
 
             if (!$user || !$user->validatePassword($this->password)) {
+                // If the user could not be authenticated locally via database
+                // try to authenticate via AD
+                if (\Yii::$app->params['ad'] === true) {
+                    $user = $this->getUserAd();
+
+                    if (!$user) {
+                        $this->addError($attribute, \Yii::t('login', 'AD: Incorrect username or password.'));
+                    }
+                    return;
+                }
                 $this->addError($attribute, \Yii::t('login', 'Incorrect username or password.'));
             }
         }
@@ -75,4 +86,19 @@ class LoginForm extends Model
 
         return $this->_user;
     }
+
+    /**
+     * Finds user by [[username]]
+     *
+     * @return User|null
+     */
+    public function getUserAd()
+    {
+        if ($this->_user === null) {
+            $this->_user = UserAd::findByCredentials($this->username, $this->password);
+        }
+
+        return $this->_user;
+    }
+
 }
