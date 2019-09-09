@@ -134,7 +134,7 @@ class TranslatedActiveRecord extends Base
      *          @param array Array of key value pair to replace the placeholders with
      *          @return void
      *   - obj->getDescription_translation @return \yii\db\ActiveQuery The relation to the translaton table
-     *   - obj->getDescription_db @return string The string from directly from the database
+     *   - obj->getDescription_db @return string The string directly from the database
      */
     public function getTranslatedFields()
     {
@@ -172,16 +172,19 @@ class TranslatedActiveRecord extends Base
                 'en' => \Yii::t($category, $this->{$field . '_db'}, $params, 'en')
             ])->one();
             
-            if ($tr === null || $tr === false) {
-                // TODO: loop through all languages
-                $translation = new Translation([
-                    'en' => \Yii::t($category, $this->{$field . '_db'}, $params, 'en'),
-                    'de' => \Yii::t($category, $this->{$field . '_db'}, $params, 'de'),
-                ]);
-                $translation->save();
-                $this->{$field . '_id'} = $translation->id;
-            } else {
-                $this->{$field . '_id'} = $tr->id;
+            if ($this->{$field . '_db'} !== null) {
+                if ($tr === null || $tr === false) {
+                    // TODO: loop through all languages
+                    $translation = new Translation([
+                        'en' => \Yii::t($category, $this->{$field . '_db'}, $params, 'en'),
+                        'de' => \Yii::t($category, $this->{$field . '_db'}, $params, 'de'),
+                    ]);
+                    die();
+                    $translation->save();
+                    $this->{$field . '_id'} = $translation->id;
+                } else {
+                    $this->{$field . '_id'} = $tr->id;
+                }
             }
         }
     }

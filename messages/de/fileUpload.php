@@ -17,16 +17,16 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    'A PHP extension stopped the file upload.' => '',
-    'Failed to write file to disk.' => '',
-    'Missing a temporary folder' => '',
-    'No file was uploaded' => '',
-    'The upload directory ({dir}) does not exist.' => '',
-    'The upload directory ({dir}) is not writable.' => '',
-    'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form' => '',
-    'The uploaded file exceeds the upload_max_filesize directive in php.ini' => '',
-    'The uploaded file was only partially uploaded' => '',
-    'There is no error, the file uploaded with success' => '',
-    'Unknown File Upload Error' => '',
-    'Unknown PHP File Upload Error: {error}' => '',
+    'A PHP extension stopped the file upload.' => 'Eine PHP Erweiterung hat den Dateiupload gestoppt.',
+    'Failed to write file to disk.' => 'Datei auf die Festplatte schreiben fehlgeschlagen.',
+    'Missing a temporary folder' => 'Temporäres Verzeichnis fehlt',
+    'No file was uploaded' => 'Datei wurde nicht hochgeladen',
+    'The upload directory ({dir}) does not exist.' => 'Das Upload Verzeichnis ({dir}) existiert nicht.',
+    'The upload directory ({dir}) is not writable.' => 'Das Upload Verzeichnis ({dir}) ist nicht schreibbar.',
+    'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form' => 'Die hochgeladene Datei überschreitet die MAX_FILE_SIZE Direktive, die im HTML Formular angegeben wurde',
+    'The uploaded file exceeds the upload_max_filesize directive in php.ini' => 'Die hochgeladene Datei überschreitet die upload_max_filesize Direktive der php.ini Datei',
+    'The uploaded file was only partially uploaded' => 'Die hochgeladene Datei wurde nur teilweise hochgeladen',
+    'There is no error, the file uploaded with success' => 'Kein Fehler, die Datei wurde erfolgreich hochgeladen',
+    'Unknown File Upload Error' => 'Unbekannter Dateiupload Fehler',
+    'Unknown PHP File Upload Error: {error}' => 'Unbekannter PHP Dateiupload Fehler: {error}',
 ];
