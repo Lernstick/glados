@@ -12,18 +12,41 @@ use yii\base\Model;
 class Auth extends Model
 {
 
-    public $configPath = __DIR__ . '/../config';
+    //public $configPath = __DIR__ . '/../config';
+    const PATH = __DIR__ . '/../config';
 
-    public $dirtyAttributes;
-    public $isNewRecord;
+    /* scenario constants */
+    const SCENARIO_AD = 'ad';
+    const SCENARIO_LDAP = 'ldap';
 
+    public $dirtyAttributes; //TODO
+    public $isNewRecord; //TODO
 
-    public $class;
-    public $config;
-    public $name;
+    public $configArray;
     public $id;
 
+
+    public $name;
+    public $domain;
+    public $mapping;
+    public $ldap_uri;
+    public $loginScheme;
+    public $bindScheme;
+    public $searchFilter;
+
     private $_fileConfig = null;
+
+    /**
+     * @inheritdoc
+     */
+    public function scenarios()
+    {
+        return [
+            self::SCENARIO_AD => ['name', 'class', 'domain', 'mapping'],
+            self::SCENARIO_LDAP => ['name', 'class', 'ldap_uri', 'mapping'],
+        ];
+    }
+
 
     /**
      * @return array the validation rules.
@@ -31,7 +54,8 @@ class Auth extends Model
     public function rules()
     {
         return [
-            [['name', 'class', 'config'], 'required'],
+            [['name', 'class', 'domain', 'mapping'], 'required', 'on' => [self::SCENARIO_AD]],
+            [['name', 'class', 'ldap_uri', 'mapping'], 'required', 'on' => [self::SCENARIO_LDAP]],
         ];
     }
 
@@ -51,10 +75,11 @@ class Auth extends Model
      */
     public function getFileConfig()
     {
-        if ($this->_fileConfig === null) {
+        return require(self::PATH . '/auth.php');
+        /*if ($this->_fileConfig === null) {
             $this->_fileConfig = require($this->configPath . '/auth.php');
         }
-        return $this->_fileConfig;
+        return $this->_fileConfig;*/
     }
 
     /**
@@ -63,6 +88,11 @@ class Auth extends Model
     public function setFileConfig($config)
     {
         return;
+    }
+
+    public function getConfig()
+    {
+        return json_encode($this->configArray);
     }
 
     /**
@@ -122,15 +152,15 @@ class Auth extends Model
      * 
      * @return Auth[] All Authentication elements
      */
-    public function findAll($params)
+    public function findAll($params = null)
     {
         $models = [];
-        foreach ($this->fileConfig as $id => $config) {
-            //var_dump($config);die();
+        foreach ($this->fileConfig as $id => $configArray) {
+            //var_dump($configArray);die();
             $model = new Auth();
-            $model->config = $config;
+            $model->configArray = $configArray;
             $model->id = $id;
-            $model->name = $config['name'];
+            $model->name = $configArray['name'];
             $models[] = $model;
         }
         return $models;
@@ -142,10 +172,11 @@ class Auth extends Model
      */
     public function findOne($id)
     {
-        if (array_key_exists($id, $this->fileConfig)) {
+        $configArray = self::getFileConfig();
+        if (array_key_exists($id, $configArray)) {
             $model = new Auth();
-            $model->config = $this->fileConfig[$id];
-            $model->name = $this->fileConfig[$id]['name'];
+            $model->configArray = $configArray[$id];
+            $model->name = $configArray[$id]['name'];
             $model->id = $id;
             return $model;
         } else {

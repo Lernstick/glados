@@ -31,7 +31,9 @@ class AuthSearch extends Auth
      */
     public function search($params)
     {
-        $models = Auth::findAll($params);
+        $this->load($params);
+
+        $models = Auth::findAll();
 
         $dataProvider = new ArrayDataProvider([
             'allModels' => $models,
