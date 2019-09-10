@@ -52,7 +52,7 @@ class LoginForm extends Model
                     $user = $this->getUserAd();
 
                     if (!$user) {
-                        $this->addError($attribute, \Yii::t('login', 'AD: Incorrect username or password.'));
+                        $this->addError($attribute, \Yii::t('login', Yii::$app->ad->name . ': Incorrect username or password.'));
                     }
                     return;
                 }
