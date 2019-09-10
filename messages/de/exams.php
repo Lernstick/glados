@@ -32,7 +32,7 @@ return [
     'Change' => 'Ändern',
     'Chart' => 'Diagramm',
     'Check to <b>save recovery information automatically every <code>n</code> minutes</b>. This command saves the information necessary to restore the current document in case of a crash (default location: <code>/home/user/.config/libreoffice/4/tmp</code>). Additionally, in case of a crash LibreOffice tries automatically to save AutoRecovery information for all open documents, if possible. (See <a target="_blank" href="https://help.libreoffice.org/Common/Saving_Documents_Automatically">LibreOffice Help</a>)' => 'Aktivieren um <b>Wiederherstellungsinformationen automatisch alle <code>n</code> Minuten abzuspeichern<b>. Diese Kommando speichert Informationen notwendig zur Wiederherstellung des aktuellen Dokuments im Falle eines Absturzes (Standardpfad: <code>/home/user/.config/libreoffice/4/tmp</code>). Zusätzlich versucht LibreOffice automatisch im Falle eines Absturzes AutoRecovery Informationen für alle offenen Dokumente abzuspeichern, falls möglich. (Siehe <a target="_blank" href="https://help.libreoffice.org/Common/Saving_Documents_Automatically/de">LibreOffice Hilfe</a>)',
-    'Client State' => 'Klient Status',
+    'Client State' => 'Client Status',
     'Closed' => 'Geschlossen',
     'Closed Tickets' => 'Geschlossene Tickets',
     'Consistency' => 'Konsistenz',

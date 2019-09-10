@@ -32,7 +32,7 @@ return [
     'Severity' => 'Fehlerstufe',
     'Ticket' => 'Ticket',
     'new activities; click to load' => 'neue Aktivitäten; Klicken zum laden',
-    '"Bootup successful" message was not recieved, but client is successfully booted up. Client is now unlocked.' => 'Die "Booten abgeschlossen" Nachricht wurde nicht empfangen, aber der Klient hat erfolgreich gestartet. Der Klient wurde entsperrt.',
+    '"Bootup successful" message was not recieved, but client is successfully booted up. Client is now unlocked.' => 'Die "Booten abgeschlossen" Nachricht wurde nicht empfangen, aber der Client hat erfolgreich gestartet. Der Client wurde entsperrt.',
     'Backup failed: leaving ticket in abandoned state.' => 'Backup fehlgeschlagen: Ticket wird fallengelassen.',
     'Exam download successfully requested by {ip} from Ticket with token {token}.' => 'Prüfung wurde erfolgreich angefordert von {ip} des Tickets mit Token {token}.',
     'Exam download successfully requested by {ip} from {test_taker}.' => 'Prüfung wurde erfolgreich angefordert von {ip} von {test_taker}.',

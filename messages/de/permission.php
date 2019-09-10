@@ -17,8 +17,8 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    'Backup clients of tickets of all exams' => 'Klients aller Tickets sichern',
-    'Backup clients of tickets of own exams' => 'Klients eigener Tickets sichern',
+    'Backup clients of tickets of all exams' => 'Clients aller Tickets sichern',
+    'Backup clients of tickets of own exams' => 'Clients eigener Tickets sichern',
     'Create a live screenshot' => 'Ein Live Bildschirmfoto anlegen',
     'Create a ticket for all exams' => 'Ticket für alle Prüfungen erstellen',
     'Create a ticket for own exams' => 'Ticket für eigene Prüfungen erstellen',
@@ -41,8 +41,8 @@ return [
     'Kill backup daemons' => 'Backup Prozesse töten',
     'Reset password for all users' => 'Passwort aller Benutzer zurücksetzen',
     'Reset password for own user' => 'Passwort des eigenen Benutzers zurücksetzen',
-    'Restore data to clients of tickets of all exams' => 'Datenwiederherstellung auf Klients von Tickets aller Prüfungen',
-    'Restore data to clients of tickets of own exams' => 'Datenwiederherstellung auf Klients von Tickets eigener Prüfungen',
+    'Restore data to clients of tickets of all exams' => 'Datenwiederherstellung auf Clients von Tickets aller Prüfungen',
+    'Restore data to clients of tickets of own exams' => 'Datenwiederherstellung auf Clients von Tickets eigener Prüfungen',
     'Start a new backup daemon' => 'Starte einen neuen Backup Prozess',
     'Stop backup daemons' => 'Stoppe einen Backup Prozess',
     'Update all exams' => 'Bearbeiten aller Prüfungen',
