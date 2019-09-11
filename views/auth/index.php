@@ -23,10 +23,10 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DynaGrid::widget([
         'showPersonalize' => true,
         'columns' => [
-            ['class' => 'kartik\grid\SerialColumn', 'order' => DynaGrid::ORDER_FIX_LEFT],
 
             'id',
             'name',
+            'description',
 
             [
                 'class' => 'yii\grid\ActionColumn',

@@ -61,9 +61,56 @@ class AuthController extends Controller
      */
     public function actionView($id)
     {
-        return $this->render('/auth/view', [
-            'model' => $this->findModel($id),
+        $model = $this->findModel($id);
+        return $this->render('/auth/' . $model->view, [
+            'model' => $model,
         ]);
+    }
+
+    /**
+     * Creates a new Auth model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionCreate()
+    {
+        $model = new Auth();
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        } else if (isset(\Yii::$app->request->post()['Auth']['class'])) { 
+            $class = \Yii::$app->request->post()['Auth']['class'];
+            $model = new $class();
+            return $this->render('create', [
+                'model' => $model,
+                'step' => 2,
+            ]);
+        } else {
+            return $this->render('create', [
+                'model' => $model,
+                'step' => 1,
+            ]);
+        }
+    }
+
+    /**
+     * Updates an existing Auth model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionUpdate($id)
+    {
+        $model = $this->findModel($id);
+        $model->scenario = $model->obj->type;
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        } else {
+            return $this->render('update', [
+                'model' => $model,
+            ]);
+        }
     }
 
     /**

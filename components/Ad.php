@@ -11,7 +11,7 @@ use yii\base\InvalidConfigException;
  *
  * @property bool $isActive Whether the AD connection is established. This property is read-only.
  */
-class Ad extends Auth
+class Ad extends \app\models\Auth
 {
 
     /**
@@ -35,14 +35,30 @@ class Ad extends Auth
     public $error = null;
 
     /**
-     * @var string A name for the current authentication type.
+     * @inheritdoc
      */
-    public $type = Auth::ACTIVE_DIRECTORY;
+    public $type = \app\models\Auth::ACTIVE_DIRECTORY;
 
     /**
-     * @var string A name for the current authentication type.
+     * @inheritdoc
      */
-    public $name = 'LDAP';
+    public $view = 'view_ad';
+
+    /**
+     * @inheritdoc
+     */
+    public $form = '_form_ad';
+
+    /**
+     * @inheritdoc
+     */
+    public $name = 'AD';
+
+    /**
+     * @inheritdoc
+     */
+    public $description = 'Active Directory Authentication Method';
+
 
     /**
      * @var string This is the identifier value that is written in the user entry in the database later.
@@ -164,6 +180,57 @@ class Ad extends Auth
     }
 
     /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return array_merge(parent::rules(), [
+            [['domain'], 'required'],
+        ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return array_merge(parent::attributeLabels(), [
+            'domain' => Yii::t('auth', 'Domain'),
+            'netbiosDomain' => Yii::t('auth', 'Netbios Domain'),
+            'base' => Yii::t('auth', 'Base DN'),
+            'ldap_uri' => Yii::t('auth', 'LDAP URI'),
+            'ldap_port' => Yii::t('auth', 'LDAP Port'),
+            'ldap_scheme' => Yii::t('auth', 'LDAP Scheme'),
+            'ldap_options' => Yii::t('auth', 'LDAP Options'),
+            'loginScheme' => \Yii::t('auth', 'Login Scheme'),
+            'bindScheme' => \Yii::t('auth', 'Bind Scheme'),
+            'searchFilter' => \Yii::t('auth', 'Search Filter'),
+            'mapping' => \Yii::t('auth', 'Group Mapping'),
+            'query_login' => \Yii::t('auth', 'Query Credentials'),
+            'query_username' => \Yii::t('auth', 'Username'),
+            'query_password' => \Yii::t('auth', 'Password'),
+        ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeHints()
+    {
+        return array_merge(parent::attributeHints(), [
+            'domain' => \Yii::t('auth', 'The full name of the Active Directory Domain. For Exampe <code>test.local</code>.'),
+            'ldap_uri' => Yii::t('auth', 'A full LDAP URI of the form <code>ldap://hostname:port</code> or <code>ldaps://hostname:port</code> for SSL encryption. You can also provide multiple LDAP-URIs separated by a space as one string. Note that <code>hostname:port</code> is not a supported LDAP URI as the schema is missing. See <a target="_blank" href="https://www.php.net/manual/en/function.ldap-connect.php">ldap_connect()</a>
+                under <code>ldap_uri</code>.'),
+            'ldap_options' => Yii::t('auth', 'For all possible options please visit <a target="_blank" href="https://www.php.net/manual/en/function.ldap-set-option.php">ldap_set_option()</a>'),
+            'loginScheme' => \Yii::t('auth', 'The pattern to test the given login credentials against a login over AD will only be performed if the given username matches the provided pattern. This is used to manage multiple ADs. {username} is extracted from the username given in the login form. Later in the authentication {username} is replaced by the extracted one from here (see <code>bindScheme</code> and <code>searchFilter</code>).<br>Examples:<br><ul><li><code>{username}</code>: no special testing, all usernames provided are authenticated against the AD.</li><li><code>{username}@foo</code>: only usernames ending with @foo are considered and authenticated agaist the AD.</li><li><code>{username}@{domain}</code>: only usernames ending with @{domain} are considered and authenticated agaist the AD. {domain} is replaced with the given <code>domain</code> configuration variable.</li><li><code>foo\{username}</code>: only usernames starting with foo\ are considered and authenticated agaist the AD.</li></ul>The placeholders that are replaced by the values given are: <code>{domain}</code>, <code>{netbiosDomain}</code>, <code>{base}</code>.'),
+            'bindScheme' => \Yii::t('auth', 'TODO'),
+            'searchFilter' => \Yii::t('auth', 'TODO'),
+            'mapping' => \Yii::t('auth', 'The direct assignment of Active Diretory groups to user roles. You can map multiple Active Diretory groups to the same role. Goups need not to be assigned to all roles.'),
+            'query_login' => \Yii::t('auth', 'Username and password to query the Active Diretory servers given above for group names. This information is only needed to specify the group mapping. Login credentials are not saved anywhere.'),
+        ]);
+    }
+
+    /**
      * Returns a value indicating whether the AD connection is established.
      * @return bool whether the AD connection is established
      */
@@ -280,7 +347,7 @@ class Ad extends Auth
             throw new InvalidConfigException('Ad::domain cannot be empty.');
         }
 
-        Yii::info('Opening AD connection: ' . $this->domain, __METHOD__);
+        Yii::debug('AD: Opening AD connection: ' . $this->domain, __METHOD__);
         $this->connection = ldap_connect($this->ldap_uri);
 
         if ($this->connection === false) {
@@ -306,10 +373,14 @@ class Ad extends Auth
     public function authenticate($username, $password)
     {
 
+        $this->inittialize();
+
         if ($user = $this->getRealUsername($username)) {
             $bindUser = $this->getBindUsername($user);
+            Yii::debug('AD: Username matches Ad::loginScheme. Proceeding with bind username: ' . $bindUser, __METHOD__);
         } else {
-            $this->error = 'Username does not match Ad::loginScheme.';
+            $this->error = 'AD: Username does not match Ad::loginScheme: ' . $this->loginScheme;
+            Yii::debug($this->error, __METHOD__);
             return false;
         }
 
@@ -317,6 +388,8 @@ class Ad extends Auth
         $this->bind = @ldap_bind($this->connection, $bindUser, $password);
 
         if ($this->bind) {
+
+            Yii::debug('AD: Bind successful', __METHOD__);
 
             $searchFilter = substitute($this->searchFilter, [
                 'domain' => $this->domain,
@@ -335,17 +408,23 @@ class Ad extends Auth
 
                     if ($this->role = $this->determineRole($groups)) {
                         $this->close();
+                        Yii::debug('AD: role=' . $this->role . ', identifier=' . $this->identifier, __METHOD__);
+                        Yii::debug('AD: Authentication was successful.', __METHOD__);
                         return true;
                     } else {
-                        $this->error = 'No role found, check Ad::roleOrder and Ad:mapping.';
+                        $this->error = 'AD: No role found, check Ad::roleOrder and Ad:mapping.';
+                        Yii::debug($this->error, __METHOD__);
+                        $this->close();
                         return false;
                     }
                 } else {
-                    $this->error = 'No result found, check Ad::searchFilter.';
+                    $this->error = 'AD: No result found, check Ad::searchFilter.';
+                    Yii::debug($this->error, __METHOD__);
                     return false;
                 }
             } else {
                 $this->error = ldap_error($this->connection);
+                Yii::debug('AD: recieving entries failed: ' . $this->error, __METHOD__);
                 return false;
             }
 
@@ -355,6 +434,7 @@ class Ad extends Auth
             if (!empty($extended_error)) {
                 $this->error .= ", Detailed error message: " . $extended_error;
             }
+            Yii::debug('AD: Bind failed: ' . $this->error, __METHOD__);
             $this->close();
             return false;
         }
@@ -373,7 +453,7 @@ class Ad extends Auth
     public function close()
     {
         if ($this->connection !== null) {
-            Yii::debug('Closing AD connection: ' . $this->domain, __METHOD__);
+            Yii::debug('AD: Closing AD connection: ' . $this->domain, __METHOD__);
             @ldap_close($this->connection);
         }
     }

@@ -40,6 +40,7 @@ class UserAuth extends User implements IdentityInterface
                 if ($user->save()) {
                     return $user;
                 } else {
+                    Yii::debug('Auth: save() failed: ' . json_encode($user->getErrors()), __METHOD__);
                     return null;
                 }
             }
