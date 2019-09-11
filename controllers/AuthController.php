@@ -7,9 +7,35 @@ use yii\web\Controller;
 use app\models\Auth;
 use app\models\AuthSearch;
 use yii\web\NotFoundHttpException;
+use yii\filters\VerbFilter;
+use app\components\AccessRule;
 
 class AuthController extends Controller
 {
+
+    public function behaviors()
+    {
+        return [
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['post'],
+                ],
+            ],
+            'access' => [
+                'class' => \yii\filters\AccessControl::className(),
+                'ruleConfig' => [
+                    'class' => AccessRule::className(),
+                ],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['rbac'],
+                    ],
+                ],
+            ],
+        ];
+    }
 
     /**
      * Lists all Auth models.

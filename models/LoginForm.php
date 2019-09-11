@@ -4,7 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\base\Model;
-use app\models\UserAd;
+use app\models\UserAuth;
 
 /**
  * LoginForm is the model behind the login form.
@@ -46,17 +46,21 @@ class LoginForm extends Model
             $user = $this->getUser();
 
             if (!$user || !$user->validatePassword($this->password)) {
-                // If the user could not be authenticated locally via database
-                // try to authenticate via AD
-                if (\Yii::$app->params['ad'] === true) {
-                    $user = $this->getUserAd();
+                $this->addError($attribute, \Yii::t('login', 'Incorrect username or password.'));
+
+                // If the user can not be authenticated locally via database
+                // try to authenticate over special authentication methods
+                if (\Yii::$app->params['auth'] === true) {
+                    $this->_user = false;
+                    $user = $this->getUserAuth();
 
                     if (!$user) {
-                        $this->addError($attribute, \Yii::t('login', Yii::$app->ad->name . ': Incorrect username or password.'));
+                        $this->addError($attribute, \Yii::t('login', Yii::$app->auth->name . ': Incorrect username or password.'));
+                    } else {
+                        $this->clearErrors($attribute);
                     }
                     return;
                 }
-                $this->addError($attribute, \Yii::t('login', 'Incorrect username or password.'));
             }
         }
     }
@@ -88,14 +92,14 @@ class LoginForm extends Model
     }
 
     /**
-     * Finds user by [[username]]
+     * Finds user by [[username]] and [[password]]
      *
      * @return User|null
      */
-    public function getUserAd()
+    public function getUserAuth()
     {
-        if ($this->_user === null) {
-            $this->_user = UserAd::findByCredentials($this->username, $this->password);
+        if ($this->_user === false) {
+            $this->_user = UserAuth::findByCredentials($this->username, $this->password);
         }
 
         return $this->_user;

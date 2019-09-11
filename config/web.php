@@ -111,7 +111,7 @@ $config = [
             ],
         ],
         'db' => require(__DIR__ . '/db.php'),
-        'ad' => require(__DIR__ . '/ad.php'),
+        'auth' => require(__DIR__ . '/auth.php'),
     ],
     'params' => $params,
     'runtimePath' => '/var/lib/glados/runtime',

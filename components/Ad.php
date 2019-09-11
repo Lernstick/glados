@@ -11,7 +11,7 @@ use yii\base\InvalidConfigException;
  *
  * @property bool $isActive Whether the AD connection is established. This property is read-only.
  */
-class Ad extends Component
+class Ad extends Auth
 {
 
     /**
@@ -29,9 +29,15 @@ class Ad extends Component
     public $ldap_options = [
         LDAP_OPT_PROTOCOL_VERSION => 3,
         LDAP_OPT_REFERRALS => 0,
+        LDAP_OPT_NETWORK_TIMEOUT => 5,
     ];
     public $base = null;
     public $error = null;
+
+    /**
+     * @var string A name for the current authentication type.
+     */
+    public $type = Auth::ACTIVE_DIRECTORY;
 
     /**
      * @var string A name for the current authentication type.
