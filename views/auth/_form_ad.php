@@ -19,7 +19,7 @@ $(function () {
 $('.hint-block').each(function () {
     var $hint = $(this);
 
-    $hint.parent().find('label').append('&nbsp<a tabindex="0" role="button" class="hint glyphicon glyphicon-question-sign"></a>');
+    $hint.parent().find('label').after('&nbsp<a tabindex="0" role="button" class="hint glyphicon glyphicon-question-sign"></a>');
 
     $hint.parent().find('a.hint').popover({
         html: true,
