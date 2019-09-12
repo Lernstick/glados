@@ -205,6 +205,8 @@ class Ad extends \app\models\Auth
             'loginScheme' => \Yii::t('auth', 'Login Scheme'),
             'bindScheme' => \Yii::t('auth', 'Bind Scheme'),
             'searchFilter' => \Yii::t('auth', 'Search Filter'),
+            'uniqueIdentifier' => \Yii::t('auth', 'User Identifier Attribute'),
+            'groupIdentifier' => \Yii::t('auth', 'Group Identifier Attribute'),
             'mapping' => \Yii::t('auth', 'Group Mapping'),
             'query_login' => \Yii::t('auth', 'Query Credentials'),
             'query_username' => \Yii::t('auth', 'Username'),
@@ -237,6 +239,57 @@ class Ad extends \app\models\Auth
     public function getIsActive()
     {
         return $this->connection !== null;
+    }
+
+    /**
+     * Mapping of the different [[ldap_options]] to their names
+     *
+     * @return array Array whose keys are the ldap_options and values are names.
+     */
+    public function getLdap_options_name_map()
+    {
+
+        /**
+         * All possible ldap constants according to php manual
+         * @see https://www.php.net/manual/en/function.ldap-get-option.php
+         */
+        $ldap_constants = [
+            'LDAP_OPT_DEREF',
+            'LDAP_OPT_SIZELIMIT',
+            'LDAP_OPT_TIMELIMIT',
+            'LDAP_OPT_NETWORK_TIMEOUT',
+            'LDAP_OPT_PROTOCOL_VERSION',
+            'LDAP_OPT_ERROR_NUMBER',
+            'LDAP_OPT_REFERRALS',
+            'LDAP_OPT_RESTART',
+            'LDAP_OPT_HOST_NAME',
+            'LDAP_OPT_ERROR_STRING',
+            'LDAP_OPT_DIAGNOSTIC_MESSAGE',
+            'LDAP_OPT_MATCHED_DN',
+            'LDAP_OPT_SERVER_CONTROLS',
+            'LDAP_OPT_CLIENT_CONTROLS',
+            'LDAP_OPT_X_KEEPALIVE_IDLE',
+            'LDAP_OPT_X_KEEPALIVE_PROBES',
+            'LDAP_OPT_X_KEEPALIVE_INTERVAL',
+            'LDAP_OPT_X_TLS_CACERTDIR',
+            'LDAP_OPT_X_TLS_CACERTFILE',
+            'LDAP_OPT_X_TLS_CERTFILE',
+            'LDAP_OPT_X_TLS_CIPHER_SUITE',
+            'LDAP_OPT_X_TLS_CRLCHECK',
+            'LDAP_OPT_X_TLS_CRLFILE',
+            'LDAP_OPT_X_TLS_DHFILE',
+            'LDAP_OPT_X_TLS_KEYFILE',
+            'LDAP_OPT_X_TLS_PROTOCOL_MIN',
+            'LDAP_OPT_X_TLS_RANDOM_FILE',
+            'LDAP_OPT_X_TLS_REQUIRE_CERT',
+        ];
+        $retval = [];
+        foreach ($ldap_constants as $key => $const) {
+            if (defined($const) && array_key_exists(constant($const), $this->ldap_options)) {
+                $retval[constant($const)] = $const;
+            }
+        }
+        return $retval;
     }
 
     /**

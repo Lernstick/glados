@@ -6,6 +6,7 @@ use Yii;
 use yii\web\Controller;
 use app\models\Auth;
 use app\models\AuthSearch;
+use app\models\UserSearch;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\components\AccessRule;
@@ -75,6 +76,7 @@ class AuthController extends Controller
     public function actionCreate()
     {
         $model = new Auth();
+        $searchModel = new UserSearch();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -83,11 +85,13 @@ class AuthController extends Controller
             $model = new $class();
             return $this->render('create', [
                 'model' => $model,
+                'searchModel' => $searchModel,
                 'step' => 2,
             ]);
         } else {
             return $this->render('create', [
                 'model' => $model,
+                'searchModel' => $searchModel,
                 'step' => 1,
             ]);
         }
@@ -102,6 +106,7 @@ class AuthController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $searchModel = new UserSearch();
         $model->scenario = $model->obj->type;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -109,6 +114,7 @@ class AuthController extends Controller
         } else {
             return $this->render('update', [
                 'model' => $model,
+                'searchModel' => $searchModel,
             ]);
         }
     }

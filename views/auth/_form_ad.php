@@ -8,6 +8,7 @@ use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Auth */
+/* @var $searchModel app\models\UserSearch */
 /* @var $form yii\widgets\ActiveForm */
 
 $js = <<< 'SCRIPT'
@@ -147,63 +148,42 @@ $this->registerJs($active_tabs);
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-md-12 form-group">
-                    <?= Select2::widget([
-                        'name' => 'todo',
-                        'options' => [
-                            'placeholder' => \Yii::t('auth', 'Choose Active Directory Groups ...'),
-                            'multiple' => true,
-                        ],
-                        //'data' => ['test' => 'testlabel'],
-                        'value' => array_keys($model->mapping, "admin"),
-                        'data' => array_combine(array_keys($model->mapping, "admin"), array_keys($model->mapping, "admin")),
-                        'maintainOrder' => true,
-                        'showToggleAll' => true,
-                        'addon' => [
-                            'prepend' => ['content' => 'AD Groups'],
-                            'append' => ['content' => '<i class="glyphicon glyphicon-arrow-right"></i>'
-                                . \Yii::t('auth', '{groups} should be mapped to the role <code>{role}</code>', [
-                                        'groups' => '',
-                                        'role' => 'admin'
-                                    ])]
-                        ],
-                        'pluginOptions' => [
-                            'tags' => true,
-                            'allowClear' => true,
-                        ],
-                    ]); ?>
-                </div>
-            </div>
+            <?php
+            foreach (array_keys($searchModel->roleList) as $key => $role) {
 
-            <div class="row">
-                <div class="col-md-12 form-group">
-                    <?= Select2::widget([
-                        'name' => 'todo',
-                        'options' => [
-                            'placeholder' => \Yii::t('auth', 'Choose Active Directory Groups ...'),
-                            'multiple' => true,
-                        ],
-                        //'data' => ['test' => 'testlabel'],
-                        'value' => array_keys($model->mapping, "teacher"),
-                        'data' => array_combine(array_keys($model->mapping, "teacher"), array_keys($model->mapping, "teacher")),
-                        'maintainOrder' => true,
-                        'showToggleAll' => true,
-                        'addon' => [
-                            'prepend' => ['content' => 'AD Groups'],
-                            'append' => ['content' => '<i class="glyphicon glyphicon-arrow-right"></i>'
-                                . \Yii::t('auth', '{groups} should be mapped to the role <code>{role}</code>', [
-                                        'groups' => '',
-                                        'role' => 'teacher'
-                                    ])]
-                        ],
-                        'pluginOptions' => [
-                            'tags' => true,
-                            'allowClear' => true,
-                        ],
-                    ]); ?>
-                </div>
-            </div>
+                ?><div class="row">
+                    <div class="col-md-12 form-group">
+                        <?= Select2::widget([
+                            'name' => 'todo',
+                            'options' => [
+                                'placeholder' => \Yii::t('auth', 'Choose Active Directory Groups ...'),
+                                'multiple' => true,
+                            ],
+                            //'data' => ['test' => 'testlabel'],
+                            'value' => array_keys($model->mapping, $role),
+                            'data' => array_combine(array_keys($model->mapping), array_keys($model->mapping)),
+                            'maintainOrder' => true,
+                            'showToggleAll' => true,
+                            'addon' => [
+                                'prepend' => ['content' => 'AD Groups'],
+                                'append' => ['content' => '<i class="glyphicon glyphicon-arrow-right"></i>'
+                                    . \Yii::t('auth', '{groups} will be mapped to the role {role}', [
+                                            'groups' => '',
+                                            'role' => ''
+                                        ])],
+                                'contentAfter' => '<span class="input-group-addon" style="background-color:white; width:100px;">' . $role . '</span>',
+                            ],
+                            'pluginOptions' => [
+                                'tags' => true,
+                                'allowClear' => true,
+                            ],
+                        ]); ?>
+                    </div>
+                </div><?php
+
+            }
+
+            ?>
 
         </div>
     </div>

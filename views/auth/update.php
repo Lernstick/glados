@@ -4,6 +4,7 @@ use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Auth */
+/* @var $searchModel app\models\UserSearch */
 
 $this->title = \Yii::t('auth', 'Edit Authentication Method Nr. {id} of type {type}', [
 	'id' => $model->id,
@@ -20,6 +21,7 @@ $this->params['breadcrumbs'][] = \Yii::t('auth', 'Edit');
 
     <?= $this->render($model->obj->form, [
         'model' => $model,
+        'searchModel' => $searchModel,
     ]) ?>
 
 </div>

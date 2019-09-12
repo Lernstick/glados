@@ -13,6 +13,15 @@ $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => \Yii::t('auth', 'Authentication Methods'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
+$options = [];
+foreach ($model->ldap_options_name_map as $key => $value) {
+    if (array_key_exists($key, $model->ldap_options)) {
+        $options[$value] = is_array($model->ldap_options[$key])
+            ? json_encode($model->ldap_options[$key])
+            : $model->ldap_options[$key];
+    }
+}
+
 $active_tabs = <<<JS
 // Change hash for page-reload
 $('.nav-tabs a').on('shown.bs.tab', function (e) {
@@ -136,10 +145,13 @@ $this->registerJs($active_tabs);
                                 \Yii::t('auth', 'Value')
                             ]
                         ],
+                        'value' => $options,
                     ],
                     'loginScheme',
                     'bindScheme',
                     'searchFilter',
+                    'uniqueIdentifier',
+                    'groupIdentifier',
                 ],
             ]) ?>
 

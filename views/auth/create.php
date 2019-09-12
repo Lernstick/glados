@@ -5,6 +5,7 @@ use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Auth */
+/* @var $searchModel app\models\UserSearch */
 
 $this->title = \Yii::t('auth', 'Create new Authentication Method - Step {step}', [
 	'step' => $step,
@@ -18,6 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= $this->render($model->obj->form, [
         'model' => $model,
+        'searchModel' => $searchModel,
     ]) ?>
 
 </div>
