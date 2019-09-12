@@ -59,10 +59,10 @@ class m190829_075244_ldap extends Migration
         $auth = Yii::$app->authManager;
 
         $indexAuth = $auth->getPermission('auth/index');
-        $indexAuth = $auth->getPermission('auth/create');
-        $indexAuth = $auth->getPermission('auth/view');
-        $indexAuth = $auth->getPermission('auth/update');
-        $indexAuth = $auth->getPermission('auth/delete');
+        $createAuth = $auth->getPermission('auth/create');
+        $viewAuth = $auth->getPermission('auth/view');
+        $updateAuth = $auth->getPermission('auth/update');
+        $deleteAuth = $auth->getPermission('auth/delete');
 
         $admin = $auth->getRole('admin');
         $auth->removeChild($admin, $indexAuth);
