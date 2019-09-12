@@ -210,6 +210,30 @@ $this->registerJs($active_tabs);
                 <div class="col-md-6">
                     <?= $form->field($model, 'searchFilter')->textInput(['maxlength' => true]) ?>
                 </div>
+                <div class="col-md-6">
+                    <?= $form->field($model, 'groupIdentifier')->widget(Select2::classname(), [
+                        'data' => array_merge([$model->groupIdentifier => $model->groupIdentifier], array_combine($model->groupIdentifierAttributes, $model->groupIdentifierAttributes)),
+                        'options' => [
+                            'placeholder' => \Yii::t('auth', 'Select an attribute ...'),
+                        ],
+                        'pluginOptions' => [
+                            'tags' => true,
+                            'allowClear' => false
+                        ],
+                    ]); ?>
+                </div>
+                <div class="col-md-6">
+                    <?= $form->field($model, 'groupSearchFilter')->widget(Select2::classname(), [
+                        'data' => array_merge([$model->groupSearchFilter => $model->groupSearchFilter], $model->groupSearchFilterList),
+                        'options' => [
+                            'placeholder' => \Yii::t('auth', 'Select an search filter ...'),
+                        ],
+                        'pluginOptions' => [
+                            'tags' => true,
+                            'allowClear' => false
+                        ],
+                    ]); ?>
+                </div>
             </div>
         </div>
     </div>

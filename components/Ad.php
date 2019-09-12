@@ -119,6 +119,17 @@ class Ad extends \app\models\Auth
     public $groupIdentifier = 'sAMAccountName';
 
     /**
+     * @var array Array of AD group identifier attribute names for the select list of [[groupIdentifier]].
+     */
+    public $groupIdentifierAttributes = [
+        'sAMAccountName',
+        'distinguishedName',
+        'cn',
+        'name',
+        'objectGUID'
+    ];
+
+    /**
      * @var string The pattern to test the given login credentials against
      * A login over AD will only be performed if the given username matches the provided
      * pattern. This is used to manage multiple ADs. {username} is extracted from the username given in the
@@ -173,6 +184,16 @@ class Ad extends \app\models\Auth
     public $groupSearchFilter = '(objectCategory=group)';
 
     /**
+     * @var array Array of common search filters to use for group probing for the select list of [[groupSearchFilter]].
+     */
+    public $groupSearchFilterList = [
+        '(objectCategory=group)' => '(objectCategory=group)',
+        '(& (objectCategory=group) (sAMAccountType=268435456))' => '(& (objectCategory=group) (sAMAccountType=268435456=GROUP_OBJECT))',
+        '(& (objectCategory=group) (sAMAccountType=536870912))' => '(& (objectCategory=group) (sAMAccountType=536870912=ALIAS_OBJECT))',
+        '(& (objectCategory=group) (sAMAccountType=268435457))' => '(& (objectCategory=group) (sAMAccountType=268435457=NON_SECURITY_GROUP_OBJECT))',
+    ];
+
+    /**
      * @var array Array of AD groups for the select list for the role mapping.
      */
     public $groups = [];
@@ -207,7 +228,7 @@ class Ad extends \app\models\Auth
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['domain', 'ldap_uri', 'loginScheme', 'bindScheme', 'searchFilter'], 'safe'],
+            [['domain', 'ldap_uri', 'loginScheme', 'bindScheme', 'searchFilter', 'groupIdentifier', 'groupSearchFilter'], 'safe'],
             [['domain'], 'required'],
         ]);
     }
@@ -230,6 +251,7 @@ class Ad extends \app\models\Auth
             'searchFilter' => \Yii::t('auth', 'Search Filter'),
             'uniqueIdentifier' => \Yii::t('auth', 'User Identifier Attribute'),
             'groupIdentifier' => \Yii::t('auth', 'Group Identifier Attribute'),
+            'groupSearchFilter' => \Yii::t('auth', 'Group Search Filter'),
             'mapping' => \Yii::t('auth', 'Group Mapping'),
             'query_login' => \Yii::t('auth', 'Query Credentials'),
             'query_username' => \Yii::t('auth', 'Username'),
@@ -250,6 +272,8 @@ class Ad extends \app\models\Auth
             'loginScheme' => \Yii::t('auth', 'The pattern to test the given login credentials against a login over AD will only be performed if the given username matches the provided pattern. This is used to manage multiple ADs. {username} is extracted from the username given in the login form. Later in the authentication {username} is replaced by the extracted one from here (see <code>bindScheme</code> and <code>searchFilter</code>).<br>Examples:<br><ul><li><code>{username}</code>: no special testing, all usernames provided are authenticated against the AD.</li><li><code>{username}@foo</code>: only usernames ending with @foo are considered and authenticated agaist the AD.</li><li><code>{username}@{domain}</code>: only usernames ending with @{domain} are considered and authenticated agaist the AD. {domain} is replaced with the given <code>domain</code> configuration variable.</li><li><code>foo\{username}</code>: only usernames starting with foo\ are considered and authenticated agaist the AD.</li></ul>The placeholders that are replaced by the values given are: <code>{domain}</code>, <code>{netbiosDomain}</code>, <code>{base}</code>.'),
             'bindScheme' => \Yii::t('auth', 'TODO'),
             'searchFilter' => \Yii::t('auth', 'TODO'),
+            'groupIdentifier' => \Yii::t('auth', 'TODO'),
+            'groupSearchFilter' => \Yii::t('auth', 'TODO'),
             'mapping' => \Yii::t('auth', 'The direct assignment of Active Diretory groups to user roles. You can map multiple Active Diretory groups to the same role. Goups need not to be assigned to all roles.'),
             'query_login' => \Yii::t('auth', 'Username and password to query the Active Diretory servers given above for group names. This information is only needed to specify the group mapping. Login credentials are not saved anywhere.'),
         ]);
@@ -277,6 +301,7 @@ class Ad extends \app\models\Auth
          * @see https://www.php.net/manual/en/function.ldap-get-option.php
          */
         $ldap_constants = [
+            'LDAP_OPT_DEBUG_LEVEL',
             'LDAP_OPT_DEREF',
             'LDAP_OPT_SIZELIMIT',
             'LDAP_OPT_TIMELIMIT',
@@ -505,7 +530,13 @@ class Ad extends \app\models\Auth
 
             if ($userInfo = ldap_get_entries($this->connection, $result)) {
                 if($userInfo['count'] != 0) {
-                    $this->identifier = $this->convertGUIDToHex($userInfo[0][strtolower($this->uniqueIdentifier)][0]);
+
+                    $this->identifier = $userInfo[0][strtolower($this->uniqueIdentifier)][0];
+
+                    // convert binary data to hex if the identifier is objectGUID
+                    if ($this->uniqueIdentifier == 'objectGUID') {
+                        $this->identifier = $this->convertGUIDToHex($this->identifier);
+                    }
                     $memberOf = $userInfo[0][strtolower('memberOf')];
                     $groups = $this->getGroupNames($memberOf);
 
@@ -560,9 +591,16 @@ class Ad extends \app\models\Auth
         if ($groupInfo = ldap_get_entries($this->connection, $result)) {
             if($groupInfo['count'] != 0) {
                 $this->success = 'AD: Retrieving ' . $groupInfo['count'] . ' group entries.';
-                $groupName = $groupInfo[0][strtolower($this->groupIdentifier)];
+                //$groupName = $groupInfo[0][strtolower($this->groupIdentifier)];
                 $groups = array_column($groupInfo, strtolower($this->groupIdentifier));
                 $groups = array_column($groups, 0);
+
+                // convert binary data to hex if the identifier is objectGUID
+                if ($this->groupIdentifier == 'objectGUID') {
+                    array_walk($groups, function(&$group){
+                        $group = $this->convertGUIDToHex($group);
+                    });
+                }
                 $groups = array_combine($groups, $groups);
                 //$this->debug[] = print_r($groups, true);
                 //var_dump($groups);
