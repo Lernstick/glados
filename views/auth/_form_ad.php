@@ -8,6 +8,7 @@ use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Auth */
+/* @var $query_model app\models\AuthLdapQueryForm */
 /* @var $searchModel app\models\UserSearch */
 /* @var $form yii\widgets\ActiveForm */
 
@@ -116,35 +117,30 @@ $this->registerJs($active_tabs);
                             <div class="hint-block"><?= $model->attributeHints()['query_login']; ?></div>
                         </div>
                         <div class="panel-body">
-                            <div class="form-group">
-                                <?= Html::label($model->attributeLabels()['query_username'], 'query_username', [
-                                    'class' => 'col-lg-4 control-label',
-                                ]); ?>
-                                <div class="col-lg-8">
-                                    <?= Html::textInput('query_username', null, ['class' => 'form-control']); ?>
-                                </div>
-                                <div class="col-lg-4"></div>
-                                <div class="col-lg-8"><p class="help-block help-block-error"></p></div>
-                            </div>
+                            <?= $form->field($query_model, 'username', [
+                                'template' => "{label}\n<div class='col-lg-8'>{input}</div>\n<div class='col-lg-4'></div>{hint}\n{error}",
+                                'labelOptions' => ['class' => 'col-lg-4 control-label'],
+                                'errorOptions' => ['class' => 'col-lg-8 help-block'],
+                            ]) ?>
 
-                            <div class="form-group">
-                                <?= Html::label($model->attributeLabels()['query_password'], 'query_password', [
-                                    'class' => 'col-lg-4 control-label',
-                                ]); ?>
-                                <div class="col-lg-8">
-                                    <?= Html::textInput('query_password', null, ['class' => 'form-control']); ?>
-                                </div>
-                                <div class="col-lg-4"></div>
-                                <div class="col-lg-8"><p class="help-block help-block-error"></p></div>
-                            </div>
+                            <?= $form->field($query_model, 'password', [
+                                'template' => "{label}\n<div class='col-lg-8'>{input}</div>\n<div class='col-lg-4'></div>{hint}\n{error}",
+                                'labelOptions' => ['class' => 'col-lg-4 control-label'],
+                                'errorOptions' => ['class' => 'col-lg-8 help-block'],
+                            ])->passwordInput() ?>
 
                             <div class="form-group">
                                 <div class="col-lg-offset-1 col-lg-11">
-                                    <?= Html::submitButton(\Yii::t('auth', 'Test'), ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+                                    <?= Html::submitButton(\Yii::t('auth', 'Retrieve AD Groups'), ['class' => 'btn btn-primary', 'name' => 'test-auth-button']) ?>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="help-block"><?= implode("<br>", $model->debug); ?></div>
+                    <div class="has-error"><div class="help-block"><?= $model->error; ?></div></div>
+                    <div class="has-success"><div class="help-block"><?= $model->success; ?></div></div>
                 </div>
             </div>
 
@@ -154,14 +150,14 @@ $this->registerJs($active_tabs);
                 ?><div class="row">
                     <div class="col-md-12 form-group">
                         <?= Select2::widget([
-                            'name' => 'todo',
+                            'name' => 'Ad[mapping][' . $role . ']',
                             'options' => [
                                 'placeholder' => \Yii::t('auth', 'Choose Active Directory Groups ...'),
                                 'multiple' => true,
                             ],
-                            //'data' => ['test' => 'testlabel'],
                             'value' => array_keys($model->mapping, $role),
-                            'data' => array_combine(array_keys($model->mapping), array_keys($model->mapping)),
+                            //'data' => array_combine(array_keys($model->mapping), array_keys($model->mapping)),
+                            'data' => $query_model->auth_model->groups,
                             'maintainOrder' => true,
                             'showToggleAll' => true,
                             'addon' => [
@@ -222,9 +218,10 @@ $this->registerJs($active_tabs);
 
     </div>
     <hr>
+    <?= $form->field(new \app\models\Auth(['class' => $model->class]), 'class')->hiddenInput()->label(false)->hint(false) ?>
 
     <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? \Yii::t('auth', 'Create') : \Yii::t('auth', 'Apply'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::submitButton($model->isNewRecord ? \Yii::t('auth', 'Create') : \Yii::t('auth', 'Apply'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary', 'name' => 'submit-button']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

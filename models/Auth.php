@@ -65,6 +65,21 @@ class Auth extends Model
      */
     public $description;
 
+    /**
+     * @var array An array of debug messages to test the connection.
+     */
+    public $debug = [];
+
+    /**
+     * @var string A string holding the last error message.
+     */
+    public $error = null;
+
+    /**
+     * @var string A string holding the last success message.
+     */
+    public $success = null;
+
     private $_obj = null;
     private $_configArray = null;
 
@@ -74,7 +89,7 @@ class Auth extends Model
     public function rules()
     {
         return [
-            [['class'], 'safe'],
+            [['name', 'description', 'class'], 'safe'],
             [['name', 'class'], 'required'],
         ];
     }

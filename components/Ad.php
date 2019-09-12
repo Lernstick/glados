@@ -19,20 +19,23 @@ class Ad extends \app\models\Auth
      */
     const LDAP_OPT_DIAGNOSTIC_MESSAGE = 0x0032;
 
-    public $ldap_uri = null;
+    public $ldap_uri = '';
     public $ldap_scheme = 'ldap';
     public $ldap_port = 389;
-    public $domain;
-    public $netbiosDomain = null;
-    public $connection;
-    public $bind;
+    public $domain = '';
+    public $netbiosDomain = '';
+
     public $ldap_options = [
         LDAP_OPT_PROTOCOL_VERSION => 3,
         LDAP_OPT_REFERRALS => 0,
         LDAP_OPT_NETWORK_TIMEOUT => 5,
     ];
-    public $base = null;
-    public $error = null;
+    public $base = '';
+
+    /**
+     * @inheritdoc
+     */
+    public $class = 'app\components\Ad';
 
     /**
      * @inheritdoc
@@ -79,6 +82,9 @@ class Ad extends \app\models\Auth
         'admin',
         'teacher'
     ];
+
+    public $connection;
+    public $bind;
 
     /**
      * @var array key value pairs for mapping of AD groups (defaultly by sAMAccountName) to roles
@@ -162,18 +168,34 @@ class Ad extends \app\models\Auth
     public $searchFilter = '(sAMAccountName={username})';
 
     /**
+     * @var string The search filter to query the AD for all group objects
+     */
+    public $groupSearchFilter = '(objectCategory=group)';
+
+    /**
+     * @var array Array of AD groups for the select list for the role mapping.
+     */
+    public $groups = [];
+
+    /**
      * @inheritdoc
      */
     public function init()
     {
-        if($this->netbiosDomain === null) {
-            $this->netbiosDomain = substr($this->domain, 0, strrpos($this->domain, '.'));
+        if ($this->domain !== '') {
+            if ($this->netbiosDomain === '') {
+                $this->netbiosDomain = substr($this->domain, 0, strrpos($this->domain, '.'));
+            }
+            if ($this->ldap_uri === '') {
+                $this->ldap_uri = $this->ldap_scheme . '://' . $this->domain . ':' . $this->ldap_port;
+            }
+            if ($this->base === '') {
+                $this->base = "dc=" . implode(",dc=", explode(".", $this->domain));
+            }
         }
-        if($this->ldap_uri === null) {
-            $this->ldap_uri = $this->ldap_scheme . '://' . $this->domain . ':' . $this->ldap_port;
-        }
-        if($this->base === null) {
-            $this->base = "dc=" . implode(",dc=", explode(".", $this->domain));
+
+        if ($this->groups === []) {
+            $this->groups = array_combine(array_keys($this->mapping), array_keys($this->mapping));
         }
 
         parent::init();
@@ -185,6 +207,7 @@ class Ad extends \app\models\Auth
     public function rules()
     {
         return array_merge(parent::rules(), [
+            [['domain', 'ldap_uri', 'loginScheme', 'bindScheme', 'searchFilter'], 'safe'],
             [['domain'], 'required'],
         ]);
     }
@@ -400,7 +423,8 @@ class Ad extends \app\models\Auth
             throw new InvalidConfigException('Ad::domain cannot be empty.');
         }
 
-        Yii::debug('AD: Opening AD connection: ' . $this->domain, __METHOD__);
+        Yii::debug('AD: Opening AD connection: ' . $this->ldap_uri, __METHOD__);
+        $this->debug[] = 'AD: Opening AD connection: ' . $this->ldap_uri;
         $this->connection = ldap_connect($this->ldap_uri);
 
         if ($this->connection === false) {
@@ -412,7 +436,49 @@ class Ad extends \app\models\Auth
             if(!ldap_set_option($this->connection, $option, $value)) {
                 $this->error = 'Unable to set ' . $option . ' to ' . $value . '.';
                 throw new NotSupportedException('Unable to set ' . $option . ' to ' . $value . '.');
+            } else {
+                Yii::debug('AD: Setting ' . $this->ldap_options_name_map[$option] . ' to ' . $value . '.', __METHOD__);
+                $this->debug[] = 'AD: Setting ' . $this->ldap_options_name_map[$option] . ' to ' . $value . '.';
             }
+        }
+    }
+
+    /**
+     * Bind to the Active Directory.
+     * 
+     * @param string $username the username given from the login form
+     * @param string $password the password given from the login form
+     * @return bool|string bind failure or the username
+     */
+    public function bindAd($username, $password)
+    {
+        $this->init();
+        if ($user = $this->getRealUsername($username)) {
+            $bindUser = $this->getBindUsername($user);
+            Yii::debug('AD: Username matches Ad::loginScheme. Proceeding with bind username: ' . $bindUser, __METHOD__);
+            $this->debug[] = 'AD: Username matches Ad::loginScheme. Proceeding with bind username: ' . $bindUser;
+        } else {
+            $this->error = 'AD: Username "' . $username . '" does not match Ad::loginScheme: "' . $this->loginScheme . '"';
+            Yii::debug($this->error, __METHOD__);
+            return false;
+        }
+
+        $this->open();
+        $this->bind = @ldap_bind($this->connection, $bindUser, $password);
+
+        if ($this->bind) {
+            Yii::debug('AD: Bind successful', __METHOD__);
+            $this->debug[] = 'AD: Bind successful';
+            return $user;
+        } else {
+            $this->error = 'AD: Bind failed: ' . ldap_error($this->connection);
+            ldap_get_option($this->connection, Ad::LDAP_OPT_DIAGNOSTIC_MESSAGE, $extended_error);
+            if (!empty($extended_error)) {
+                $this->error .= ", Detailed error message: " . $extended_error;
+            }
+            Yii::debug($this->error, __METHOD__);
+            $this->close();
+            return false;
         }
     }
 
@@ -426,23 +492,7 @@ class Ad extends \app\models\Auth
     public function authenticate($username, $password)
     {
 
-        $this->inittialize();
-
-        if ($user = $this->getRealUsername($username)) {
-            $bindUser = $this->getBindUsername($user);
-            Yii::debug('AD: Username matches Ad::loginScheme. Proceeding with bind username: ' . $bindUser, __METHOD__);
-        } else {
-            $this->error = 'AD: Username does not match Ad::loginScheme: ' . $this->loginScheme;
-            Yii::debug($this->error, __METHOD__);
-            return false;
-        }
-
-        $this->open();
-        $this->bind = @ldap_bind($this->connection, $bindUser, $password);
-
-        if ($this->bind) {
-
-            Yii::debug('AD: Bind successful', __METHOD__);
+        if (($user = $this->bindAd($username, $password)) !== false) {
 
             $searchFilter = substitute($this->searchFilter, [
                 'domain' => $this->domain,
@@ -480,15 +530,7 @@ class Ad extends \app\models\Auth
                 Yii::debug('AD: recieving entries failed: ' . $this->error, __METHOD__);
                 return false;
             }
-
         } else {
-            $this->error = ldap_error($this->connection);
-            ldap_get_option($this->connection, Ad::LDAP_OPT_DIAGNOSTIC_MESSAGE, $extended_error);
-            if (!empty($extended_error)) {
-                $this->error .= ", Detailed error message: " . $extended_error;
-            }
-            Yii::debug('AD: Bind failed: ' . $this->error, __METHOD__);
-            $this->close();
             return false;
         }
     }
@@ -497,6 +539,45 @@ class Ad extends \app\models\Auth
     {
         $unpacked = unpack('Va/v2b/n2c/Nd', $guid);
         return strtolower(sprintf('%08X-%04X-%04X-%04X-%04X%08X', $unpacked['a'], $unpacked['b1'], $unpacked['b2'], $unpacked['c1'], $unpacked['c2'], $unpacked['d']));
+    }
+
+    /**
+     * Query Groups for the mapping
+     * 
+     * @return bool 
+     */
+    public function query_groups()
+    {
+        $this->debug[] = 'AD: Querying AD with search filter "' . $this->groupSearchFilter . '" and base dn "' . $this->base . '" for the attribute "' . $this->groupIdentifier . '"';
+        $result = @ldap_search($this->connection, $this->base, $this->groupSearchFilter, array($this->groupIdentifier), 0, 0);
+
+        if ($result === false) {
+            $this->error = 'AD: search failed:' . ldap_error($this->connection);
+            Yii::debug($this->error, __METHOD__);
+            return false;
+        }
+
+        if ($groupInfo = ldap_get_entries($this->connection, $result)) {
+            if($groupInfo['count'] != 0) {
+                $this->success = 'AD: Retrieving ' . $groupInfo['count'] . ' group entries.';
+                $groupName = $groupInfo[0][strtolower($this->groupIdentifier)];
+                $groups = array_column($groupInfo, strtolower($this->groupIdentifier));
+                $groups = array_column($groups, 0);
+                $groups = array_combine($groups, $groups);
+                //$this->debug[] = print_r($groups, true);
+                //var_dump($groups);
+                $this->groups = $groups;
+                return true;
+            } else {
+                $this->error = 'AD: No result found, check Ad::groupSearchFilter.';
+                Yii::debug($this->error, __METHOD__);
+                return false;
+            }
+        } else {
+            $this->error = 'AD: recieving group entries failed: ' . ldap_error($this->connection);
+            Yii::debug($this->error, __METHOD__);
+            return false;
+        }
     }
 
     /**
