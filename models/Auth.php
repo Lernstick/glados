@@ -4,6 +4,8 @@ namespace app\models;
 
 use Yii;
 use yii\base\Model;
+use yii\base\ErrorException;
+use yii\web\UnprocessableEntityHttpException;
 
 /**
  * This is the model class for the Auth class.
@@ -14,17 +16,16 @@ use yii\base\Model;
 class Auth extends Model
 {
 
+    const SCENARIO_CREATE = 'create';
+
     /* authentication type constants */
     const LDAP = 0;
     const ACTIVE_DIRECTORY = 1;
     
-    public $methods = [];
-
     //public $configPath = __DIR__ . '/../config';
     const PATH = __DIR__ . '/../config';
 
-    public $dirtyAttributes; //TODO
-    public $isNewRecord; //TODO
+    //public $dirtyAttributes; //TODO
 
     public $id;
 
@@ -46,6 +47,11 @@ class Auth extends Model
     public $type;
 
     /**
+     * @var string The authentication type in human readable form
+     */
+    public $typeName = 'Unknown Authentication Method';
+
+    /**
      * @var string The view for the current authentication type.
      */
     public $view = 'view';
@@ -64,6 +70,11 @@ class Auth extends Model
      * @var string A description for the current authentication type.
      */
     public $description;
+
+    /**
+     * @var array Array of authentications methods.
+     */
+    public $methods;
 
     /**
      * @var array An array of debug messages to test the connection.
@@ -89,9 +100,25 @@ class Auth extends Model
     public function rules()
     {
         return [
-            [['name', 'description', 'class'], 'safe'],
-            [['name', 'class'], 'required'],
+            [['name', 'description', 'class'], 'safe', 'on' => self::SCENARIO_DEFAULT],
+            [['name', 'class'], 'required', 'on' => self::SCENARIO_DEFAULT],
+            [['class'], 'required', 'on' => self::SCENARIO_CREATE],
+            ['class', 'in', 'range' => array_keys($this->authList), 'on' => [self::SCENARIO_CREATE, self::SCENARIO_DEFAULT]],
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function scenarios()
+    {
+        return [
+            self::SCENARIO_DEFAULT => ['class', 'name', 'description'],
+            self::SCENARIO_CREATE => ['class'],
+        ];
+        /*$scenarios = parent::scenarios();
+        $scenarios[self::SCENARIO_DEFAULT] = ['class', 'name', 'description'];
+        return $scenarios;*/
     }
 
     /**
@@ -119,20 +146,7 @@ class Auth extends Model
     }
 
     /**
-     * Mapping of the different types and names
-     *
-     * @return array Array whose keys are the types and values are names.
-     */
-    public function getTypeMap()
-    {
-        return [
-            0 => 'LDAP',
-            1 => 'Active Directory',
-        ];
-    }
-
-    /**
-     * Getter
+     * Getter @todo remove
      */
     public function getConfigArray()
     {
@@ -150,7 +164,7 @@ class Auth extends Model
     }
 
     /**
-     * Setter
+     * Setter @todo remove
      */
     public function setConfigArray($array)
     {
@@ -158,7 +172,7 @@ class Auth extends Model
     }
 
     /**
-     * Getter
+     * Getter for the list of authentication methods and their names
      */
     public function getAuthList()
     {
@@ -170,7 +184,7 @@ class Auth extends Model
 
 
     /**
-     *
+     * Getter for the configuration as it is in the config file
      */
     public function getFileConfig()
     {
@@ -181,6 +195,68 @@ class Auth extends Model
     }
 
     /**
+     * Saves the new config in file auth.php.
+     * A temporary file called auth.php in tmpPath (@see [[params]]) is created first and required as
+     * sanity check. If no exceptions are thrown, the original auth.php contents are moved to a backup
+     * file called auth.php.bak and the contents of auth.php are replaced with the new generated file 
+     * contents.
+     *
+     * @throws UnprocessableEntityHttpException if the temporary file could not be parsed without error
+     * @return bool whether the saving succeeded.
+     */
+    public function saveFileConfig($config)
+    {
+        $prepend = '<?php
+
+/**
+ * Please to not edit this file.
+ * This file was automatically generated using the web interface.
+ */
+return [
+  \'class\' => \'app\models\Auth\',
+  \'methods\' => 
+';
+        $append = "
+];";
+        $prefix = "    ";
+
+        $newConfig = $prepend . preg_replace('/^/m', $prefix, var_export($config, true)) . $append;
+
+        if (file_put_contents(\Yii::$app->params['tmpPath'] . '/auth.php', $newConfig)) {
+            try {
+                require(\Yii::$app->params['tmpPath'] . '/auth.php');
+            } catch (\ParseError $e) {
+                $err = \Yii::t('auth', 'Failed to write auth.php config file: ParseError: {error} in file {file} at line {line}.', [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ]);
+                Yii::error($err);
+                throw new UnprocessableEntityHttpException($err);
+            } catch (\yii\base\Exception $e) {
+                $err = \Yii::t('auth', 'Failed to write auth.php config file: Exception: {error} in file {file} at line {line}.', [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ]);
+                Yii::error($err);
+                throw new UnprocessableEntityHttpException($err);
+            }
+            $oldConfig = file_get_contents(self::PATH . '/auth.php');
+            file_put_contents(self::PATH . '/auth.php.bak', $oldConfig);
+
+            // write the new config file
+            file_put_contents(self::PATH . '/auth.php', $newConfig);
+            //file_put_contents(self::PATH . '/auth.php.bak', $newConfig);
+
+            // @todo populte the new file config array
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @todo remove
      * Getter for the instantiated object of app\components\Auth_type
      * Possible objects are:
      *  * app\models\Auth
@@ -197,17 +273,19 @@ class Auth extends Model
         return $this->_obj;
     }
 
-    /**
-     *
-     */
-    public function setFileConfig($config)
-    {
-        return;
-    }
-
+    // @todo remove
     public function getConfig()
     {
         return json_encode($this->configArray);
+    }
+
+    /**
+     * Whether the record is new and should be inserted when calling [[save()]].
+     * @return bool
+     */
+    public function getIsNewRecord()
+    {
+        return !array_key_exists($this->id, $this->fileConfig);
     }
 
     /**
@@ -223,39 +301,64 @@ class Auth extends Model
      *
      * @return void
      */
-    public function deleteAll()
+    public function insert($runValidation = true, $attributeNames = null)
     {
-        return;
+        if ($runValidation && !$this->validate($attributeNames)) {
+            Yii::info('Model not inserted due to validation error.', __METHOD__);
+            return false;
+        }
+        $this->id = max(array_keys($this->fileConfig)) + 1;
+        $configItem = $this->getAttributes($this->activeAttributes());
+        $fileConfig = $this->fileConfig;
+        $fileConfig[$this->id] = $configItem;
+        if (($this->saveFileConfig($fileConfig)) === true) {
+            return true;
+        };
+        return false;
     }
 
     /**
      *
      * @return void
      */
-    public function update()
+    public function update($runValidation = true, $attributeNames = null)
     {
-        return;
+        if ($runValidation && !$this->validate($attributeNames)) {
+            Yii::info('Model not updated due to validation error.', __METHOD__);
+            return false;
+        }
+        $configItem = $this->getAttributes($this->activeAttributes());
+        $fileConfig = $this->fileConfig;
+        $fileConfig[$this->id] = $configItem;
+        if (($this->saveFileConfig($fileConfig)) === true) {
+            return true;
+        };
+        return false;
     }
 
     /**
+     * Saves the current record.
      *
-     * @return void
-     */
-    public function updateAll()
-    {
-        return;
-    }
-
-    /**
+     * This method will call [[insert()]] when [[isNewRecord]] is `true`, or [[update()]]
+     * when [[isNewRecord]] is `false`.
      *
-     * @return bool
+     * @param bool $runValidation whether to perform validation (calling [[validate()]])
+     * before saving the record. Defaults to `true`. If the validation fails, the record
+     * will not be saved to the config file and this method will return `false`.
+     * @param array $attributeNames list of attribute names that need to be saved. Defaults to null,
+     * meaning all attributes that are loaded from the config file will be saved.
+     * @return bool whether the saving succeeded (i.e. no validation errors occurred).
      */
-    public function save()
+    public function save($runValidation = true, $attributeNames = null)
     {
-        return;
+        if ($this->getIsNewRecord()) {
+            return $this->insert($runValidation, $attributeNames);
+        }
+        return $this->update($runValidation, $attributeNames) !== false;
     }
 
     /**
+     * @todo remove
      * @return Auth
      */
     public function find()
@@ -276,7 +379,7 @@ class Auth extends Model
             $model->configArray = $configArray;
             //$model->id = $id;
             //$model->name = $configArray['name'];
-            $model->obj->id = $id;
+            $model->obj->id = intval($id);
             $models[] = $model->obj;
         }
         return $models;
@@ -294,7 +397,7 @@ class Auth extends Model
             $model->configArray = $configArray[$id];
             //$model->name = $configArray[$id]['name'];
             //$model->id = $id;
-            $model->obj->id = $id;
+            $model->obj->id = intval($id);
             return $model->obj;
         } else {
             return null;

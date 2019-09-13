@@ -8,7 +8,6 @@ use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Auth */
-/* @var $query_model app\models\AuthLdapQueryForm */
 /* @var $searchModel app\models\UserSearch */
 /* @var $form yii\widgets\ActiveForm */
 
@@ -55,11 +54,26 @@ $(window).bind('hashchange', function() {
 JS;
 $this->registerJs($active_tabs);
 
+$js = <<< JS
+// set the scenario and reset the form errors
+$('#submit-button').on('click', function(e) {
+    $('#ad-scenario').val('default');
+    $("#ad_form").yiiActiveForm('resetForm');
+});
+
+$('#query-groups-button').on('click', function(e) {
+    $('#ad-scenario').val('query_groups');
+    $("#ad_form").yiiActiveForm('resetForm');
+});
+JS;
+
+$this->registerJs($js);
+
 ?>
 
 <div class="auth-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin(['id' => 'ad_form']); ?>
 
     <ul class="nav nav-tabs">
         <li class="active"><a data-toggle="tab" href="#general">
@@ -117,13 +131,13 @@ $this->registerJs($active_tabs);
                             <div class="hint-block"><?= $model->attributeHints()['query_login']; ?></div>
                         </div>
                         <div class="panel-body">
-                            <?= $form->field($query_model, 'username', [
+                            <?= $form->field($model, 'query_username', [
                                 'template' => "{label}\n<div class='col-lg-8'>{input}</div>\n<div class='col-lg-4'></div>{hint}\n{error}",
                                 'labelOptions' => ['class' => 'col-lg-4 control-label'],
                                 'errorOptions' => ['class' => 'col-lg-8 help-block'],
                             ]) ?>
 
-                            <?= $form->field($query_model, 'password', [
+                            <?= $form->field($model, 'query_password', [
                                 'template' => "{label}\n<div class='col-lg-8'>{input}</div>\n<div class='col-lg-4'></div>{hint}\n{error}",
                                 'labelOptions' => ['class' => 'col-lg-4 control-label'],
                                 'errorOptions' => ['class' => 'col-lg-8 help-block'],
@@ -131,7 +145,7 @@ $this->registerJs($active_tabs);
 
                             <div class="form-group">
                                 <div class="col-lg-offset-1 col-lg-11">
-                                    <?= Html::submitButton(\Yii::t('auth', 'Retrieve AD Groups'), ['class' => 'btn btn-primary', 'name' => 'test-auth-button']) ?>
+                                    <?= Html::submitButton(\Yii::t('auth', 'Retrieve AD Groups'), ['class' => 'btn btn-primary', 'name' => 'query-groups-button', 'id' => 'query-groups-button']) ?>
                                 </div>
                             </div>
                         </div>
@@ -157,7 +171,7 @@ $this->registerJs($active_tabs);
                             ],
                             'value' => array_keys($model->mapping, $role),
                             //'data' => array_combine(array_keys($model->mapping), array_keys($model->mapping)),
-                            'data' => $query_model->auth_model->groups,
+                            'data' => $model->groups,
                             'maintainOrder' => true,
                             'showToggleAll' => true,
                             'addon' => [
@@ -243,9 +257,10 @@ $this->registerJs($active_tabs);
     </div>
     <hr>
     <?= $form->field(new \app\models\Auth(['class' => $model->class]), 'class')->hiddenInput()->label(false)->hint(false) ?>
+    <?= $form->field($model, 'scenario')->hiddenInput()->label(false)->hint(false) ?>
 
     <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? \Yii::t('auth', 'Create') : \Yii::t('auth', 'Apply'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary', 'name' => 'submit-button']) ?>
+        <?= Html::submitButton($model->isNewRecord ? \Yii::t('auth', 'Create') : \Yii::t('auth', 'Apply'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary', 'id' => 'submit-button', 'name' => 'submit-button']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

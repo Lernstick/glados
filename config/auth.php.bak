@@ -78,10 +78,10 @@ return [
       4 => 
       array (
         'class' => 'app\\components\\Ad',
-        'name' => 'ADTEST',
-        'description' => 'balbla',
+        'name' => 'AD',
+        'description' => 'Active Directory Authentication Method',
         'domain' => 'test2.local',
-        'ldap_uri' => 'ldap://test2.local:389',
+        'ldap_uri' => '',
         'loginScheme' => '{username}',
         'bindScheme' => '{username}@{domain}',
         'searchFilter' => '(sAMAccountName={username})',

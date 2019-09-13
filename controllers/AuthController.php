@@ -76,37 +76,42 @@ class AuthController extends Controller
      */
     public function actionCreate()
     {
+
         $model = new Auth();
-        $query_model = new AuthLdapQueryForm();
         $searchModel = new UserSearch();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else if (isset(\Yii::$app->request->post()['Auth']['class'])) { 
+        if (isset(\Yii::$app->request->post()['Auth']['class'])) {
             $class = \Yii::$app->request->post()['Auth']['class'];
             $model = new $class();
-            $query_model->auth_model = $model;
 
             if (Yii::$app->request->post('submit-button') !== null) {
                 //submitted
-            } else if (Yii::$app->request->post('test-auth-button') !== null) {
+                $model->scenario = $model->class::SCENARIO_DEFAULT;
+                if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                    return $this->redirect(['view', 'id' => $model->id]);
+                } else {
+                    return $this->render('create', [
+                        'model' => $model,
+                        'searchModel' => $searchModel,
+                        'step' => 2,
+                    ]);
+                }
+            } else if (Yii::$app->request->post('query-groups-button') !== null) {
                 // populate the $model->groups property with all AD groups found
+                $model->scenario = $model->class::SCENARIO_QUERY_GROUPS;
                 $model->load(Yii::$app->request->post());
-                $query_model->load(Yii::$app->request->post());
-                $query_model->auth_model = $model;
-                $query_model->browse_ldap_for_groups();
+                $model->validate();
             }
 
             return $this->render('create', [
                 'model' => $model,
-                'query_model' => $query_model,
                 'searchModel' => $searchModel,
                 'step' => 2,
             ]);
         } else {
+            $model->scenario = Auth::SCENARIO_CREATE;
             return $this->render('create', [
                 'model' => $model,
-                'query_model' => $query_model,
                 'searchModel' => $searchModel,
                 'step' => 1,
             ]);
@@ -122,30 +127,46 @@ class AuthController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $query_model = new AuthLdapQueryForm();
         $searchModel = new UserSearch();
 
         if (Yii::$app->request->post('submit-button') !== null) {
             //submitted
-        } else if (Yii::$app->request->post('test-auth-button') !== null) {
+            $model->scenario = $model->class::SCENARIO_DEFAULT;
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            } else {
+                return $this->render('update', [
+                    'model' => $model,
+                    'searchModel' => $searchModel,
+                ]);
+            }
+        } else if (Yii::$app->request->post('query-groups-button') !== null) {
             // populate the $model->groups property with all AD groups found
+            $model->scenario = $model->class::SCENARIO_QUERY_GROUPS;
             $model->load(Yii::$app->request->post());
-            $query_model->load(Yii::$app->request->post());
-            $query_model->auth_model = $model;
-            $query_model->browse_ldap_for_groups();
-        } else {
-            $query_model->auth_model = $model;
+            $model->validate();
         }
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-                'query_model' => $query_model,
-                'searchModel' => $searchModel,
-            ]);
-        }
+        return $this->render('update', [
+            'model' => $model,
+            'searchModel' => $searchModel,
+        ]);
+    }
+
+    /**
+     * Tests an existing Auth model.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionTest($id)
+    {
+        $model = $this->findModel($id);
+        $model->scenario = $model->class::SCENARIO_AUTH_TEST;
+        $model->load(Yii::$app->request->post()) && $model->validate();
+
+        return $this->render('test', [
+            'model' => $model,
+        ]);
     }
 
     /**

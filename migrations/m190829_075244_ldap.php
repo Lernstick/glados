@@ -39,6 +39,10 @@ class m190829_075244_ldap extends Migration
         $deleteAuth->description = yiit('permission', 'Delete all authentication methods');
         $auth->add($deleteAuth);
 
+        $testAuth = $auth->createPermission('auth/test');
+        $testAuth->description = yiit('permission', 'Test all authentication methods');
+        $auth->add($testAuth);
+
         /* Assign permissions */
         $admin = $auth->getRole('admin');
         $auth->addChild($admin, $indexAuth);
@@ -46,6 +50,7 @@ class m190829_075244_ldap extends Migration
         $auth->addChild($admin, $viewAuth);
         $auth->addChild($admin, $updateAuth);
         $auth->addChild($admin, $deleteAuth);
+        $auth->addChild($admin, $testAuth);
     }
 
     /**
@@ -63,6 +68,7 @@ class m190829_075244_ldap extends Migration
         $viewAuth = $auth->getPermission('auth/view');
         $updateAuth = $auth->getPermission('auth/update');
         $deleteAuth = $auth->getPermission('auth/delete');
+        $testAuth = $auth->getPermission('auth/test');
 
         $admin = $auth->getRole('admin');
         $auth->removeChild($admin, $indexAuth);
@@ -70,11 +76,13 @@ class m190829_075244_ldap extends Migration
         $auth->removeChild($admin, $viewAuth);
         $auth->removeChild($admin, $updateAuth);
         $auth->removeChild($admin, $deleteAuth);
+        $auth->removeChild($admin, $testAuth);
 
         $auth->remove($indexAuth);
         $auth->remove($createAuth);
         $auth->remove($viewAuth);
         $auth->remove($updateAuth);
         $auth->remove($deleteAuth);
+        $auth->remove($testAuth);
     }
 }

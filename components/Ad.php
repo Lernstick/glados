@@ -14,6 +14,9 @@ use yii\base\InvalidConfigException;
 class Ad extends \app\models\Auth
 {
 
+    const SCENARIO_QUERY_GROUPS = 'query_groups';
+    const SCENARIO_AUTH_TEST = 'auth_test';
+
     /**
      * @const int extended error output
      */
@@ -41,6 +44,11 @@ class Ad extends \app\models\Auth
      * @inheritdoc
      */
     public $type = \app\models\Auth::ACTIVE_DIRECTORY;
+
+    /**
+     * @inheritdoc
+     */
+    public $typeName = 'Active Directory';
 
     /**
      * @inheritdoc
@@ -92,9 +100,9 @@ class Ad extends \app\models\Auth
      * 
      * Example:
      *  $mapping = [
-     *      'AD-Admin-Group'            => 'admin'
-     *      'AD-Teacher-Group'          => 'teacher'
-     *      'Another-AD-Teacher-Group'  => 'teacher'
+     *      'AD-Admin-Group'            => 'admin',
+     *      'AD-Teacher-Group'          => 'teacher',
+     *      'Another-AD-Teacher-Group'  => 'teacher',
      *  ];
      * 
      * For the example above, if a user is in multiple groups appearing in the mapping, the highest
@@ -198,6 +206,9 @@ class Ad extends \app\models\Auth
      */
     public $groups = [];
 
+    public $query_username;
+    public $query_password;
+
     /**
      * @inheritdoc
      */
@@ -228,9 +239,44 @@ class Ad extends \app\models\Auth
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['domain', 'ldap_uri', 'loginScheme', 'bindScheme', 'searchFilter', 'groupIdentifier', 'groupSearchFilter'], 'safe'],
-            [['domain'], 'required'],
+            [['domain'], 'required', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_QUERY_GROUPS]],
+
+            ['mapping', 'filter', 'filter' => [$this, 'processMapping'], 'on' => self::SCENARIO_DEFAULT],
+
+            [['domain', 'ldap_uri', 'loginScheme', 'bindScheme', 'searchFilter', 'groupIdentifier', 'groupSearchFilter', 'query_username', 'query_password'], 'safe', 'on' => self::SCENARIO_QUERY_GROUPS],
+
+            [
+                ['query_username', 'query_password'],
+                'required',
+                'when' => function($model) {return $model->scenario == self::SCENARIO_QUERY_GROUPS;},
+                'whenClient' => "function (attribute, value) {
+                    return $('#ad-scenario').val() == 'query_groups';
+                }",
+                'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_QUERY_GROUPS]
+            ],
+            [
+                'query_password',
+                'getAllAdGroups',
+                'when' => function($model) {return !empty($model->domain);},
+                'on' => self::SCENARIO_QUERY_GROUPS
+            ],
+
+            [['query_username', 'query_password'], 'safe', 'on' => self::SCENARIO_AUTH_TEST],
+            [['query_username', 'query_password'], 'required', 'on' => self::SCENARIO_AUTH_TEST],
+            ['query_password', 'authenticateTest', 'on' => self::SCENARIO_AUTH_TEST],
         ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios[self::SCENARIO_DEFAULT] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'ldap_uri', 'loginScheme', 'bindScheme', 'searchFilter', 'groupIdentifier', 'groupSearchFilter', 'mapping']);
+        $scenarios[self::SCENARIO_QUERY_GROUPS] = ['domain', 'ldap_uri', 'loginScheme', 'bindScheme', 'searchFilter', 'groupIdentifier', 'groupSearchFilter', 'query_username', 'query_password'];
+        $scenarios[self::SCENARIO_AUTH_TEST] = ['query_username', 'query_password'];
+        return $scenarios;
     }
 
     /**
@@ -253,7 +299,9 @@ class Ad extends \app\models\Auth
             'groupIdentifier' => \Yii::t('auth', 'Group Identifier Attribute'),
             'groupSearchFilter' => \Yii::t('auth', 'Group Search Filter'),
             'mapping' => \Yii::t('auth', 'Group Mapping'),
-            'query_login' => \Yii::t('auth', 'Query Credentials'),
+            'query_login' => $this->scenario == self::SCENARIO_AUTH_TEST
+                ? \Yii::t('auth', 'Test Credentials')
+                : \Yii::t('auth', 'Query Credentials'),
             'query_username' => \Yii::t('auth', 'Username'),
             'query_password' => \Yii::t('auth', 'Password'),
         ]);
@@ -275,7 +323,9 @@ class Ad extends \app\models\Auth
             'groupIdentifier' => \Yii::t('auth', 'TODO'),
             'groupSearchFilter' => \Yii::t('auth', 'TODO'),
             'mapping' => \Yii::t('auth', 'The direct assignment of Active Diretory groups to user roles. You can map multiple Active Diretory groups to the same role. Goups need not to be assigned to all roles.'),
-            'query_login' => \Yii::t('auth', 'Username and password to query the Active Diretory servers given above for group names. This information is only needed to specify the group mapping. Login credentials are not saved anywhere.'),
+            'query_login' => $this->scenario == self::SCENARIO_AUTH_TEST
+                ? \Yii::t('auth', 'Username and password to login to the Active Diretory servers. Login credentials are not saved anywhere.')
+                : \Yii::t('auth', 'Username and password to query the Active Diretory servers given above for group names. This information is only needed to specify the group mapping. Login credentials are not saved anywhere.'),
         ]);
     }
 
@@ -338,6 +388,23 @@ class Ad extends \app\models\Auth
             }
         }
         return $retval;
+    }
+
+    /**
+     * Compute the mapping array
+     * @param array arr the array from the POST request
+     *
+     * @return array the new mapping array in the format of [[mapping]]
+     */
+    public function processMapping ($arr) {
+       // compute the new mapping array here
+        $mapping = [];
+        foreach ($arr as $role => $array_of_groups) {
+            foreach ($array_of_groups as $key => $group) {
+                $mapping[$group] = $role;
+            }
+        }
+        return $mapping;
     }
 
     /**
@@ -526,26 +593,40 @@ class Ad extends \app\models\Auth
                 'username' => $user,
             ]);
 
-            $result = ldap_search($this->connection, $this->base, $searchFilter, array($this->uniqueIdentifier, 'memberOf'), 0, 1);
+            $this->debug[] = 'AD: Querying AD with search filter "' . $this->searchFilter . '" and base dn "' . $this->base . '" for the attribute "' . $this->uniqueIdentifier . '"';
+            $result = @ldap_search($this->connection, $this->base, $searchFilter, array($this->uniqueIdentifier, 'memberOf'), 0, 1);
+
+            if ($result === false) {
+                $this->error = 'AD: search failed:' . ldap_error($this->connection);
+                Yii::debug($this->error, __METHOD__);
+                return false;
+            }
 
             if ($userInfo = ldap_get_entries($this->connection, $result)) {
                 if($userInfo['count'] != 0) {
 
+                    $this->debug[] = 'AD: Retrieving ' . $userInfo['count'] . ' user entries.';
                     $this->identifier = $userInfo[0][strtolower($this->uniqueIdentifier)][0];
 
                     // convert binary data to hex if the identifier is objectGUID
                     if ($this->uniqueIdentifier == 'objectGUID') {
                         $this->identifier = $this->convertGUIDToHex($this->identifier);
                     }
+
+                    $this->debug[] = 'AD: User identifier set to ' . $this->identifier . '.';
                     $memberOf = $userInfo[0][strtolower('memberOf')];
                     $groups = $this->getGroupNames($memberOf);
 
                     if ($this->role = $this->determineRole($groups)) {
                         $this->close();
+                        $this->debug[] = 'AD: User role set to ' . $this->role . '.';
+                        $this->success = 'AD: Authentication was successful.';
                         Yii::debug('AD: role=' . $this->role . ', identifier=' . $this->identifier, __METHOD__);
                         Yii::debug('AD: Authentication was successful.', __METHOD__);
                         return true;
                     } else {
+                        $this->debug[] = 'AD: User group membership: ' . json_encode($groups) . '.';
+                        $this->debug[] = 'AD: Ad:mapping: ' . json_encode($this->mapping) . '.';
                         $this->error = 'AD: No role found, check Ad::roleOrder and Ad:mapping.';
                         Yii::debug($this->error, __METHOD__);
                         $this->close();
@@ -616,6 +697,36 @@ class Ad extends \app\models\Auth
             Yii::debug($this->error, __METHOD__);
             return false;
         }
+    }
+
+    /**
+     * @param string $attribute the attribute currently being validated
+     * @param mixed $params the value of the "params" given in the rule
+     * @param \yii\validators\InlineValidator $validator related InlineValidator instance.
+     * This parameter is available since version 2.0.11.
+     */
+    public function getAllAdGroups ($attribute, $params, $validator)
+    {
+        if ($this->bindAd($this->query_username, $this->query_password)) {
+            if($this->query_groups()) {
+                return;
+            }
+        }
+        $this->addError($attribute, \Yii::t('auth', 'Incorrect username or password.'));
+    }
+
+    /**
+     * @param string $attribute the attribute currently being validated
+     * @param mixed $params the value of the "params" given in the rule
+     * @param \yii\validators\InlineValidator $validator related InlineValidator instance.
+     * This parameter is available since version 2.0.11.
+     */
+    public function authenticateTest ($attribute, $params, $validator)
+    {
+        if ($this->authenticate($this->query_username, $this->query_password)) {
+            return;
+        }
+        $this->addError($attribute, \Yii::t('auth', 'Login failed.'));
     }
 
     /**

@@ -80,6 +80,13 @@ $this->registerJs($active_tabs);
                         ]
                     ) ?>
                 </li>
+                <li>
+                    <?= Html::a(
+                        '<span class="glyphicon glyphicon-user"></span> '. \Yii::t('auth', 'Test Login'),
+                        ['test', 'id' => $model->id],
+                        ['data-pjax' => 0]
+                    ) ?>
+                </li>
             </ul>            
         </li>
 
@@ -96,12 +103,7 @@ $this->registerJs($active_tabs);
                 'model' => $model,
                 'attributes' => [
                     'id',
-                    [
-                        'attribute' => 'type',
-                        'value' => array_key_exists($model->type, $model->typeMap)
-                            ? $model->typeMap[$model->type]
-                            : 'unknown',
-                    ],
+                    'typeName',
                     //'config',
                     'name',
                     'description',
