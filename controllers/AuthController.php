@@ -154,6 +154,19 @@ class AuthController extends Controller
     }
 
     /**
+     * Deletes an existing Auth model.
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionDelete($id)
+    {
+        $this->findModel($id)->delete();
+
+        return $this->redirect(['index']);
+    }
+
+    /**
      * Tests an existing Auth model.
      * @param integer $id
      * @return mixed
@@ -165,6 +178,43 @@ class AuthController extends Controller
         $model->load(Yii::$app->request->post()) && $model->validate();
 
         return $this->render('test', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
+     * Migrates existing app\models\User models to app\models\UserAuth models 
+     * associated to an existing Auth model.
+     * @param integer $id the Auth model
+     * @return mixed
+     */
+    public function actionMigrate($id)
+    {
+        $model = $this->findModel($id);
+
+        if (Yii::$app->request->post('submit-button') !== null) {
+            //submitted
+            $model->scenario = $model->class::SCENARIO_MIGRATE;
+            $model->load(Yii::$app->request->post()) && $model->validate();
+
+            var_dump($model->errors);
+            var_dump(false);die();
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            } else {
+                return $this->render('migrate', [
+                    'model' => $model,
+                ]);
+            }
+        } else if (Yii::$app->request->post('query-users-button') !== null) {
+            // populate the $model->users property with all AD users found
+            $model->scenario = $model->class::SCENARIO_QUERY_USERS;
+            var_dump($model->scenario);
+            $model->load(Yii::$app->request->post());
+            $model->validate();
+        }
+
+        return $this->render('migrate', [
             'model' => $model,
         ]);
     }

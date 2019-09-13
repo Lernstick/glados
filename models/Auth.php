@@ -11,12 +11,13 @@ use yii\web\UnprocessableEntityHttpException;
  * This is the model class for the Auth class.
  *
  * @property app\components\Ad|null $obj The instantiated configuration object of the authentication type. This property is read-only.
- * @property array $configArray
+ * @property array $configArray @todo: remove
  */
 class Auth extends Model
 {
 
     const SCENARIO_CREATE = 'create';
+    const SCENARIO_MIGRATE = 'migrate';
 
     /* authentication type constants */
     const LDAP = 0;
@@ -25,16 +26,10 @@ class Auth extends Model
     //public $configPath = __DIR__ . '/../config';
     const PATH = __DIR__ . '/../config';
 
-    //public $dirtyAttributes; //TODO
-
     public $id;
 
-    public $domain;
-    public $mapping;
-    public $ldap_uri;
     public $loginScheme;
-    public $bindScheme;
-    public $searchFilter;
+    public $bindScheme; // @todo: evtl. remove
 
     /**
      * @var string The class of the current authentication type.
@@ -91,8 +86,8 @@ class Auth extends Model
      */
     public $success = null;
 
-    private $_obj = null;
-    private $_configArray = null;
+    private $_obj = null; // @todo: remove
+    private $_configArray = null; // @todo: remove
 
     /**
      * @return array the validation rules.
@@ -115,6 +110,7 @@ class Auth extends Model
         return [
             self::SCENARIO_DEFAULT => ['class', 'name', 'description'],
             self::SCENARIO_CREATE => ['class'],
+            self::SCENARIO_MIGRATE => ['class'],
         ];
         /*$scenarios = parent::scenarios();
         $scenarios[self::SCENARIO_DEFAULT] = ['class', 'name', 'description'];
@@ -127,6 +123,7 @@ class Auth extends Model
     public function attributeLabels()
     {
         return [
+            'id' => Yii::t('auth', 'Order'),
             'class' => Yii::t('auth', 'Method'),
             'name' => Yii::t('auth', 'Name'),
             'description' => Yii::t('auth', 'Description'),
@@ -249,7 +246,7 @@ return [
             file_put_contents(self::PATH . '/auth.php', $newConfig);
             //file_put_contents(self::PATH . '/auth.php.bak', $newConfig);
 
-            // @todo populte the new file config array
+            // @todo populate the new file config array
             return true;
         }
         return false;
@@ -289,12 +286,18 @@ return [
     }
 
     /**
+     * Deletes the config element corresponding to this model.
      *
-     * @return void
+     * @return int|false the number of elements deleted, or `false` if the deletion is unsuccessful for some reason.
      */
     public function delete()
     {
-        return;
+        $fileConfig = $this->fileConfig;
+        unset($fileConfig[$this->id]);
+        if (($this->saveFileConfig($fileConfig)) === true) {
+            return 1;
+        };
+        return false;
     }
 
     /**

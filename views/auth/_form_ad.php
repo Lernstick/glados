@@ -175,7 +175,7 @@ $this->registerJs($js);
                             'maintainOrder' => true,
                             'showToggleAll' => true,
                             'addon' => [
-                                'prepend' => ['content' => 'AD Groups'],
+                                'prepend' => ['content' => \Yii::t('auth', 'AD Groups')],
                                 'append' => ['content' => '<i class="glyphicon glyphicon-arrow-right"></i>'
                                     . \Yii::t('auth', '{groups} will be mapped to the role {role}', [
                                             'groups' => '',
@@ -186,6 +186,9 @@ $this->registerJs($js);
                             'pluginOptions' => [
                                 'tags' => true,
                                 'allowClear' => true,
+                                'language' => [
+                                    'noResults' => new JsExpression('function (params) { return "' . \Yii::t('auth', 'No groups found, provide credentials to fill this dropdown list.') . '"; }'),
+                                ],
                             ],
                         ]); ?>
                     </div>
@@ -196,6 +199,14 @@ $this->registerJs($js);
             ?>
 
         </div>
+    </div>
+
+    <hr>
+    <?= $form->field(new \app\models\Auth(['class' => $model->class]), 'class')->hiddenInput()->label(false)->hint(false) ?>
+    <?= $form->field($model, 'scenario')->hiddenInput()->label(false)->hint(false) ?>
+
+    <div class="form-group">
+        <?= Html::submitButton($model->isNewRecord ? \Yii::t('auth', 'Create') : \Yii::t('auth', 'Apply'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary', 'id' => 'submit-button', 'name' => 'submit-button']) ?>
     </div>
 
     <?php Pjax::end(); ?>
@@ -226,7 +237,7 @@ $this->registerJs($js);
                 </div>
                 <div class="col-md-6">
                     <?= $form->field($model, 'groupIdentifier')->widget(Select2::classname(), [
-                        'data' => array_merge([$model->groupIdentifier => $model->groupIdentifier], array_combine($model->groupIdentifierAttributes, $model->groupIdentifierAttributes)),
+                        'data' => array_merge([$model->groupIdentifier => $model->groupIdentifier], array_combine($model->identifierAttributes, $model->identifierAttributes)),
                         'options' => [
                             'placeholder' => \Yii::t('auth', 'Select an attribute ...'),
                         ],
@@ -240,7 +251,7 @@ $this->registerJs($js);
                     <?= $form->field($model, 'groupSearchFilter')->widget(Select2::classname(), [
                         'data' => array_merge([$model->groupSearchFilter => $model->groupSearchFilter], $model->groupSearchFilterList),
                         'options' => [
-                            'placeholder' => \Yii::t('auth', 'Select an search filter ...'),
+                            'placeholder' => \Yii::t('auth', 'Select a search filter ...'),
                         ],
                         'pluginOptions' => [
                             'tags' => true,
@@ -254,13 +265,6 @@ $this->registerJs($js);
 
     <?php Pjax::end(); ?>
 
-    </div>
-    <hr>
-    <?= $form->field(new \app\models\Auth(['class' => $model->class]), 'class')->hiddenInput()->label(false)->hint(false) ?>
-    <?= $form->field($model, 'scenario')->hiddenInput()->label(false)->hint(false) ?>
-
-    <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? \Yii::t('auth', 'Create') : \Yii::t('auth', 'Apply'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary', 'id' => 'submit-button', 'name' => 'submit-button']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

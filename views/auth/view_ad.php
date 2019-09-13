@@ -87,10 +87,19 @@ $this->registerJs($active_tabs);
                         ['data-pjax' => 0]
                     ) ?>
                 </li>
+                <li>
+                    <?= Html::a(
+                        '<span class="glyphicon glyphicon-retweet"></span> '. \Yii::t('auth', 'Migrate Local Users'),
+                        ['migrate', 'id' => $model->id],
+                        ['data-pjax' => 0]
+                    ) ?>
+                </li>
             </ul>            
         </li>
 
     </ul>
+
+    <p></p>
 
     <div class="tab-content">
 
@@ -166,7 +175,7 @@ $this->registerJs($active_tabs);
 
             <?php $_GET = array_merge($_GET, ['#' => 'tab_raw']); ?>
 
-            <code><?= JSON::encode($model->configArray) ?></code>
+            <pre><?= var_export($model->fileConfig[$model->id], true) ?></pre>
 
         <?php Pjax::end(); ?>
 

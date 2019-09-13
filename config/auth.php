@@ -8,22 +8,6 @@ return [
   'class' => 'app\models\Auth',
   'methods' => 
     array (
-      0 => 
-      array (
-        'class' => 'app\\components\\Ad',
-        'name' => 'KSZ',
-        'description' => 'KSZ description',
-        'domain' => 'kszofingen.local',
-        'ldap_uri' => 'ldap://172.10.0.4:389 ldap://172.10.0.15:389',
-        'mapping' => 
-        array (
-          'Administratoren' => 'admin',
-          'Teacher' => 'teacher',
-        ),
-        'loginScheme' => '{username}@ksz',
-        'bindScheme' => '{username}@{domain}',
-        'searchFilter' => '(sAMAccountName={username})',
-      ),
       1 => 
       array (
         'class' => 'app\\components\\Ad',
@@ -51,14 +35,16 @@ return [
         'description' => 'Test Active Directory connection 1',
         'domain' => 'test.local',
         'ldap_uri' => 'ldap://192.168.0.67:389',
+        'loginScheme' => '{username}',
+        'bindScheme' => '{username}@{domain}',
+        'searchFilter' => '(sAMAccountName={username})',
+        'groupIdentifier' => 'sAMAccountName',
+        'groupSearchFilter' => '(objectCategory=group)',
         'mapping' => 
         array (
           'admins' => 'admin',
           'teachers' => 'teacher',
         ),
-        'loginScheme' => '{username}',
-        'bindScheme' => '{username}@{domain}',
-        'searchFilter' => '(sAMAccountName={username})',
       ),
       3 => 
       array (
@@ -78,10 +64,10 @@ return [
       4 => 
       array (
         'class' => 'app\\components\\Ad',
-        'name' => 'ADTEST',
-        'description' => 'balbla',
-        'domain' => 'test2.local',
-        'ldap_uri' => 'ldap://test2.local:389',
+        'name' => 'ADtest',
+        'description' => 'Active Directory Authentication Method',
+        'domain' => 'asdasd',
+        'ldap_uri' => '',
         'loginScheme' => '{username}',
         'bindScheme' => '{username}@{domain}',
         'searchFilter' => '(sAMAccountName={username})',
@@ -89,8 +75,6 @@ return [
         'groupSearchFilter' => '(objectCategory=group)',
         'mapping' => 
         array (
-          'test' => 'admin',
-          'testteach' => 'teacher',
         ),
       ),
     )

@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\Pjax;
 use kartik\grid\GridView;
+use \yii\helpers\Url;
 use kartik\dynagrid\DynaGrid;
 use kartik\select2\Select2;
 use yii\web\JsExpression;
@@ -26,8 +27,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'id',
             'name',
+            'typeName',
             'description',
-
+            [
+                'attribute' => 'loginScheme',
+                'visible' => false
+            ],
             [
                 'class' => 'yii\grid\ActionColumn',
                 'order' => DynaGrid::ORDER_FIX_RIGHT,
@@ -35,6 +40,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     'class' => 'text-nowrap',
                     'style' => 'width:10px;',
                 ],
+                'urlCreator' => function ($action, $model, $key, $index) {
+                    return Url::to([$action, 'id' => $model->id]);
+                },
             ],
         ],
         'storage' => DynaGrid::TYPE_COOKIE,

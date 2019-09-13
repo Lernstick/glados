@@ -4,6 +4,7 @@ namespace app\components;
  
 use Yii;
 use yii\base\Component;
+use app\models\User;
 use yii\base\InvalidConfigException;
 
 /**
@@ -15,6 +16,7 @@ class Ad extends \app\models\Auth
 {
 
     const SCENARIO_QUERY_GROUPS = 'query_groups';
+    const SCENARIO_QUERY_USERS = 'query_users';
     const SCENARIO_AUTH_TEST = 'auth_test';
 
     /**
@@ -125,15 +127,17 @@ class Ad extends \app\models\Auth
      * @see [[mapping]]
      */
     public $groupIdentifier = 'sAMAccountName';
+    public $userIdentifier = 'sAMAccountName';
 
     /**
-     * @var array Array of AD group identifier attribute names for the select list of [[groupIdentifier]].
+     * @var array Array of AD group/user identifier attribute names for the select list of [[groupIdentifier]] and [[userIdentifier]].
      */
-    public $groupIdentifierAttributes = [
+    public $identifierAttributes = [
         'sAMAccountName',
         'distinguishedName',
         'cn',
         'name',
+        'mail',
         'objectGUID'
     ];
 
@@ -202,12 +206,31 @@ class Ad extends \app\models\Auth
     ];
 
     /**
+     * @var string The search filter to query the AD for all user objects
+     */
+    public $userSearchFilter = '(objectCategory=person)';
+
+    /**
+     * @var array Array of common search filters to use for group probing for the select list of [[groupSearchFilter]].
+     */
+    public $userSearchFilterList = [
+        '(objectCategory=person)' => '(objectCategory=person)',
+    ];
+
+    /**
      * @var array Array of AD groups for the select list for the role mapping.
      */
     public $groups = [];
 
+    /**
+     * @var array Array of AD users for the select list of the migration form.
+     */
+    public $users = [];
+
     public $query_username;
     public $query_password;
+
+    public $migrate = [];
 
     /**
      * @inheritdoc
@@ -245,6 +268,8 @@ class Ad extends \app\models\Auth
 
             [['domain', 'ldap_uri', 'loginScheme', 'bindScheme', 'searchFilter', 'groupIdentifier', 'groupSearchFilter', 'query_username', 'query_password'], 'safe', 'on' => self::SCENARIO_QUERY_GROUPS],
 
+            [['loginScheme', 'bindScheme', 'searchFilter', 'userIdentifier', 'userSearchFilter', 'query_username', 'query_password'], 'safe', 'on' => self::SCENARIO_QUERY_USERS],
+
             [
                 ['query_username', 'query_password'],
                 'required',
@@ -264,6 +289,18 @@ class Ad extends \app\models\Auth
             [['query_username', 'query_password'], 'safe', 'on' => self::SCENARIO_AUTH_TEST],
             [['query_username', 'query_password'], 'required', 'on' => self::SCENARIO_AUTH_TEST],
             ['query_password', 'authenticateTest', 'on' => self::SCENARIO_AUTH_TEST],
+
+            [['query_username', 'query_password'], 'required',
+                'when' => function($model) {return $model->scenario == self::SCENARIO_QUERY_USERS;},
+                'whenClient' => "function (attribute, value) {
+                    return $('#ad-scenario').val() == 'query_users';
+                }",
+                'on' => [self::SCENARIO_MIGRATE, self::SCENARIO_QUERY_USERS]
+            ],
+            ['query_password', 'queryUsers', 'on' => self::SCENARIO_QUERY_USERS],
+
+            [['migrate'], 'safe', 'on' => self::SCENARIO_MIGRATE],
+            [['migrate'], 'required', 'on' => self::SCENARIO_MIGRATE],
         ]);
     }
 
@@ -276,6 +313,8 @@ class Ad extends \app\models\Auth
         $scenarios[self::SCENARIO_DEFAULT] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'ldap_uri', 'loginScheme', 'bindScheme', 'searchFilter', 'groupIdentifier', 'groupSearchFilter', 'mapping']);
         $scenarios[self::SCENARIO_QUERY_GROUPS] = ['domain', 'ldap_uri', 'loginScheme', 'bindScheme', 'searchFilter', 'groupIdentifier', 'groupSearchFilter', 'query_username', 'query_password'];
         $scenarios[self::SCENARIO_AUTH_TEST] = ['query_username', 'query_password'];
+        $scenarios[self::SCENARIO_QUERY_USERS] = ['loginScheme', 'bindScheme', 'searchFilter', 'userIdentifier', 'userSearchFilter', 'query_username', 'query_password'];
+        $scenarios[self::SCENARIO_MIGRATE] = ['migrate'];
         return $scenarios;
     }
 
@@ -700,6 +739,67 @@ class Ad extends \app\models\Auth
     }
 
     /**
+     * Query Users for the user migration
+     * 
+     * @return bool 
+     */
+    public function query_users($users)
+    {
+        $this->debug[] = 'AD: Querying AD for existing local users with search filter "' . $this->userSearchFilter . '" and base dn "' . $this->base . '" for the attribute "' . $this->uniqueIdentifier . '" and "' . $this->userIdentifier . '"';
+
+        $searchFilter = '(& ' . $this->userSearchFilter . ' (| (' . $this->userIdentifier . '=' . (
+            empty($users)
+            ? '*'
+            : implode(') (' . $this->userIdentifier . '=', $users)
+        ) . ') ) )';
+
+        $result = @ldap_search($this->connection, $this->base, $searchFilter, array($this->uniqueIdentifier, $this->userIdentifier), 0, 0);
+
+        if ($result === false) {
+            $this->error = 'AD: search failed:' . ldap_error($this->connection);
+            Yii::debug($this->error, __METHOD__);
+            return false;
+        }
+
+        if ($userInfo = ldap_get_entries($this->connection, $result)) {
+            if($userInfo['count'] != 0) {
+                $this->success = 'AD: Retrieving ' . $userInfo['count'] . ' user entries.';
+                $users = array_column($userInfo, strtolower($this->userIdentifier));
+                $identifier = array_column($userInfo, strtolower($this->uniqueIdentifier));
+                $users = array_column($users, 0);
+                $identifier = array_column($identifier, 0);
+
+                // convert binary data to hex if the identifier is objectGUID
+                if ($this->userIdentifier == 'objectGUID') {
+                    array_walk($users, function(&$user){
+                        $user = $this->convertGUIDToHex($user);
+                    });
+                }
+
+                if ($this->uniqueIdentifier == 'objectGUID') {
+                    array_walk($identifier, function(&$id){
+                        $id = $this->convertGUIDToHex($id);
+                    });
+                }
+
+                $users = array_combine($identifier, $users);
+                //$this->debug[] = print_r($users, true);
+                //var_dump($users);
+                $this->users = $users;
+                return true;
+            } else {
+                $this->error = 'AD: No result found, check Ad::userSearchFilter.';
+                Yii::debug($this->error, __METHOD__);
+                return false;
+            }
+        } else {
+            $this->error = 'AD: recieving group entries failed: ' . ldap_error($this->connection);
+            Yii::debug($this->error, __METHOD__);
+            return false;
+        }
+    }
+
+    /**
      * @param string $attribute the attribute currently being validated
      * @param mixed $params the value of the "params" given in the rule
      * @param \yii\validators\InlineValidator $validator related InlineValidator instance.
@@ -727,6 +827,33 @@ class Ad extends \app\models\Auth
             return;
         }
         $this->addError($attribute, \Yii::t('auth', 'Login failed.'));
+    }
+
+    /**
+     * @param string $attribute the attribute currently being validated
+     * @param mixed $params the value of the "params" given in the rule
+     * @param \yii\validators\InlineValidator $validator related InlineValidator instance.
+     * This parameter is available since version 2.0.11.
+     */
+    public function queryUsers ($attribute, $params, $validator)
+    {
+        $models = User::find()
+            ->where(['identifier' => null])
+            ->andWhere(['not', ['id' => 0]])
+            ->all();
+
+        $users = [];
+        foreach ($models as $model) {
+            $users[] = $model->username;
+        }
+        unset($models);
+
+        if ($this->bindAd($this->query_username, $this->query_password)) {
+            if($this->query_users($users)) {
+                return;
+            }
+        }
+        $this->addError($attribute, \Yii::t('auth', 'Incorrect username or password.'));
     }
 
     /**
