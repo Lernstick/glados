@@ -53,13 +53,16 @@ return [
         'description' => 'Test Active Directory connection 2',
         'domain' => 'test.local',
         'ldap_uri' => 'ldap://192.168.0.67:389',
-        'mapping' => 
-        array (
-          'teachers' => 'teacher',
-        ),
-        'loginScheme' => '{username}@teacher',
+        'loginScheme' => '{username}@{domain}',
         'bindScheme' => '{username}@{domain}',
         'searchFilter' => '(sAMAccountName={username})',
+        'groupIdentifier' => 'sAMAccountName',
+        'groupSearchFilter' => '(objectCategory=group)',
+        'mapping' => 
+        array (
+          'admins' => 'admin',
+          'teachers' => 'teacher',
+        ),
       ),
       4 => 
       array (
@@ -75,6 +78,24 @@ return [
         'groupSearchFilter' => '(objectCategory=group)',
         'mapping' => 
         array (
+        ),
+      ),
+      5 => 
+      array (
+        'class' => 'app\\components\\Ad',
+        'name' => 'OpenLDAP',
+        'description' => 'Local LDAP',
+        'domain' => 'example.com',
+        'ldap_uri' => 'ldap://localhost:389',
+        'loginScheme' => 'cn={username},{base}',
+        'bindScheme' => 'cn={username},{base}',
+        'searchFilter' => '(cn={username})',
+        'groupIdentifier' => 'cn',
+        'groupSearchFilter' => '(objectClass=posixGroup)',
+        'mapping' => 
+        array (
+          'group2' => 'admin',
+          'group' => 'teacher',
         ),
       ),
     )

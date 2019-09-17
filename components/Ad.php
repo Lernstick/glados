@@ -139,7 +139,9 @@ class Ad extends \app\models\Auth
         'cn',
         'name',
         'mail',
-        'objectGUID'
+        'objectGUID',
+        'uid', //LDAP
+        'gidNumber', //LDAP
     ];
 
     /**
@@ -201,21 +203,10 @@ class Ad extends \app\models\Auth
      */
     public $groupSearchFilterList = [
         '(objectCategory=group)' => '(objectCategory=group)',
+        '(objectClass=posixGroup)' => '(objectClass=posixGroup)', //LDAP
         '(& (objectCategory=group) (sAMAccountType=268435456))' => '(& (objectCategory=group) (sAMAccountType=268435456=GROUP_OBJECT))',
         '(& (objectCategory=group) (sAMAccountType=536870912))' => '(& (objectCategory=group) (sAMAccountType=536870912=ALIAS_OBJECT))',
         '(& (objectCategory=group) (sAMAccountType=268435457))' => '(& (objectCategory=group) (sAMAccountType=268435457=NON_SECURITY_GROUP_OBJECT))',
-    ];
-
-    /**
-     * @var string The search filter to query the AD for user objects
-     */
-    public $userSearchFilter = '(objectCategory=person)';
-
-    /**
-     * @var array Array of common search filters to use for group probing for the select list of [[groupSearchFilter]].
-     */
-    public $userSearchFilterList = [
-        '(objectCategory=person)' => '(objectCategory=person)',
     ];
 
     /**
@@ -227,7 +218,7 @@ class Ad extends \app\models\Auth
      * @var string The search filter to query the AD for user objects
      * The placeholders that are replaced by the values given are: {domain}, {netbiosDomain}, {base}, {userIdentifier}.
      */
-    public $migrateUserSearchFilter = '({userIdentifier}={username})';
+    public $migrateUserSearchFilter = '(& (objectCategory=person) ({userIdentifier}={username}) )';
 
     /**
      * @var string A search scheme for the username of local users to migrate
@@ -280,7 +271,7 @@ class Ad extends \app\models\Auth
 
             [['domain', 'ldap_uri', 'loginScheme', 'bindScheme', 'searchFilter', 'groupIdentifier', 'groupSearchFilter', 'query_username', 'query_password'], 'safe', 'on' => self::SCENARIO_QUERY_GROUPS],
 
-            [['migrateSearchScheme', 'userIdentifier', 'userSearchFilter', 'migrateUserSearchFilter', 'query_username', 'query_password'], 'safe', 'on' => self::SCENARIO_QUERY_USERS],
+            [['migrateSearchScheme', 'userIdentifier', 'migrateUserSearchFilter', 'query_username', 'query_password'], 'safe', 'on' => self::SCENARIO_QUERY_USERS],
 
             [
                 ['query_username', 'query_password'],
@@ -325,7 +316,7 @@ class Ad extends \app\models\Auth
         $scenarios[self::SCENARIO_DEFAULT] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'ldap_uri', 'loginScheme', 'bindScheme', 'searchFilter', 'groupIdentifier', 'groupSearchFilter', 'mapping']);
         $scenarios[self::SCENARIO_QUERY_GROUPS] = ['domain', 'ldap_uri', 'loginScheme', 'bindScheme', 'searchFilter', 'groupIdentifier', 'groupSearchFilter', 'query_username', 'query_password'];
         $scenarios[self::SCENARIO_AUTH_TEST] = ['query_username', 'query_password'];
-        $scenarios[self::SCENARIO_QUERY_USERS] = ['migrateSearchScheme', 'migrateUserSearchFilter', 'userIdentifier', 'userSearchFilter', 'query_username', 'query_password'];
+        $scenarios[self::SCENARIO_QUERY_USERS] = ['migrateSearchScheme', 'migrateUserSearchFilter', 'userIdentifier', 'query_username', 'query_password'];
         $scenarios[self::SCENARIO_MIGRATE] = ['migrate'];
         return $scenarios;
     }
@@ -577,8 +568,11 @@ class Ad extends \app\models\Auth
             throw new InvalidConfigException('Ad::domain cannot be empty.');
         }
 
-        Yii::debug('AD: Opening AD connection: ' . $this->ldap_uri, __METHOD__);
-        $this->debug[] = 'AD: Opening AD connection: ' . $this->ldap_uri;
+        Yii::debug('Opening AD connection: ' . $this->ldap_uri, __METHOD__);
+        //$this->debug[] = 'Opening AD connection: ' . $this->ldap_uri;
+        $this->debug[] = Yii::t('auth', 'Opening AD connection: <code>{uri}</code>.', [
+            'uri' => $this->ldap_uri
+        ]);
         $this->connection = ldap_connect($this->ldap_uri);
 
         if ($this->connection === false) {
@@ -591,8 +585,11 @@ class Ad extends \app\models\Auth
                 $this->error = 'Unable to set ' . $option . ' to ' . $value . '.';
                 throw new NotSupportedException('Unable to set ' . $option . ' to ' . $value . '.');
             } else {
-                Yii::debug('AD: Setting ' . $this->ldap_options_name_map[$option] . ' to ' . $value . '.', __METHOD__);
-                $this->debug[] = 'AD: Setting ' . $this->ldap_options_name_map[$option] . ' to ' . $value . '.';
+                Yii::debug('Setting ' . $this->ldap_options_name_map[$option] . ' to ' . $value . '.', __METHOD__);
+                $this->debug[] = Yii::t('auth', 'Setting <code>{option}</code> to <code>{value}</code>.', [
+                    'option' => $this->ldap_options_name_map[$option],
+                    'value' => $value,
+                ]);
             }
         }
     }
@@ -609,10 +606,21 @@ class Ad extends \app\models\Auth
         $this->init();
         if ($user = $this->getRealUsername($username)) {
             $bindUser = $this->getBindUsername($user);
-            Yii::debug('AD: Username matches Ad::loginScheme. Proceeding with bind username: ' . $bindUser, __METHOD__);
-            $this->debug[] = 'AD: Username matches Ad::loginScheme. Proceeding with bind username: ' . $bindUser;
+            Yii::debug('Username matches Ad::loginScheme. Proceeding with bind username: ' . $bindUser, __METHOD__);
+            $this->debug[] = Yii::t('auth', 'Username <code>{username}</code> matches loginScheme <code>{loginScheme}</code>.', [
+                'username' => $username,
+                'loginScheme' => $this->loginScheme,
+            ]);
+            $this->debug[] = Yii::t('auth', 'Proceeding with bind username <code>{bindUser}</code> according to bindScheme <code>{bindScheme}</code>.', [
+                'bindUser' => $bindUser,
+                'bindScheme' => $this->bindScheme,
+            ]);
         } else {
-            $this->error = 'AD: Username "' . $username . '" does not match Ad::loginScheme: "' . $this->loginScheme . '"';
+            $this->error = Yii::t('auth', 'Username <code>{username}</code> does not match loginScheme <code>{loginScheme}</code> of authentication method <code>{name}</code>.', [
+                'username' => $username,
+                'loginScheme' => $this->loginScheme,
+                'name' => $this->name,
+            ]);
             Yii::debug($this->error, __METHOD__);
             return false;
         }
@@ -621,11 +629,11 @@ class Ad extends \app\models\Auth
         $this->bind = @ldap_bind($this->connection, $bindUser, $password);
 
         if ($this->bind) {
-            Yii::debug('AD: Bind successful', __METHOD__);
-            $this->debug[] = 'AD: Bind successful';
+            Yii::debug('Bind successful', __METHOD__);
+            $this->debug[] = 'Bind successful';
             return $user;
         } else {
-            $this->error = 'AD: Bind failed: ' . ldap_error($this->connection);
+            $this->error = 'Bind failed: ' . ldap_error($this->connection);
             ldap_get_option($this->connection, Ad::LDAP_OPT_DIAGNOSTIC_MESSAGE, $extended_error);
             if (!empty($extended_error)) {
                 $this->error .= ", Detailed error message: " . $extended_error;
@@ -655,11 +663,15 @@ class Ad extends \app\models\Auth
                 'username' => $user,
             ]);
 
-            $this->debug[] = 'AD: Querying AD with search filter "' . $this->searchFilter . '" and base dn "' . $this->base . '" for the attribute "' . $this->uniqueIdentifier . '"';
+            $this->debug[] = Yii::t('auth', 'Querying AD with search filter <code>{searchFilter}</code> and base dn <code>{base}</code> for the attribute <code>{attribute}</code>.', [
+                'searchFilter' => $searchFilter,
+                'base' => $this->base,
+                'attribute' => $this->uniqueIdentifier,
+            ]);
             $result = @ldap_search($this->connection, $this->base, $searchFilter, array($this->uniqueIdentifier, 'memberOf'), 0, 1);
 
             if ($result === false) {
-                $this->error = 'AD: search failed:' . ldap_error($this->connection);
+                $this->error = 'Search failed: ' . ldap_error($this->connection);
                 Yii::debug($this->error, __METHOD__);
                 return false;
             }
@@ -667,7 +679,9 @@ class Ad extends \app\models\Auth
             if ($userInfo = ldap_get_entries($this->connection, $result)) {
                 if($userInfo['count'] != 0) {
 
-                    $this->debug[] = 'AD: Retrieving ' . $userInfo['count'] . ' user entries.';
+                    $this->debug[] = Yii::t('auth', 'Retrieving {n} user entries.', [
+                        'n' => $userInfo['count'],
+                    ]);
                     $this->identifier = $userInfo[0][strtolower($this->uniqueIdentifier)][0];
 
                     // convert binary data to hex if the identifier is objectGUID
@@ -675,33 +689,42 @@ class Ad extends \app\models\Auth
                         $this->identifier = $this->convertGUIDToHex($this->identifier);
                     }
 
-                    $this->debug[] = 'AD: User identifier set to ' . $this->identifier . '.';
+                    $this->debug[] = Yii::t('auth', 'User identifier set to <code>{identifier}</code>.', [
+                        'identifier' => $this->identifier
+                    ]);
                     $memberOf = $userInfo[0][strtolower('memberOf')];
                     $groups = $this->getGroupNames($memberOf);
 
                     if ($this->role = $this->determineRole($groups)) {
                         $this->close();
-                        $this->debug[] = 'AD: User role set to ' . $this->role . '.';
-                        $this->success = 'AD: Authentication was successful.';
-                        Yii::debug('AD: role=' . $this->role . ', identifier=' . $this->identifier, __METHOD__);
-                        Yii::debug('AD: Authentication was successful.', __METHOD__);
+                        $this->debug[] = Yii::t('auth', 'User role set to <code>{role}</code>.', [
+                            'role' => $this->role
+                        ]);
+
+                        $this->success = Yii::t('auth', 'Authentication was successful.');
+                        Yii::debug('role=' . $this->role . ', identifier=' . $this->identifier, __METHOD__);
+                        Yii::debug('Authentication was successful.', __METHOD__);
                         return true;
                     } else {
-                        $this->debug[] = 'AD: User group membership: ' . json_encode($groups) . '.';
-                        $this->debug[] = 'AD: Ad:mapping: ' . json_encode($this->mapping) . '.';
-                        $this->error = 'AD: No role found, check Ad::roleOrder and Ad:mapping.';
+                        $this->debug[] = Yii::t('auth', 'User group membership: <code>{membership}</code>.', [
+                            'membership' => json_encode($groups),
+                        ]);
+                        $this->debug[] = Yii::t('auth', 'Mapping: <code>{mapping}</code>.', [
+                            'mapping' => json_encode($this->mapping),
+                        ]);
+                        $this->error = 'No role found, check <code>roleOrder</code> and <code>mapping</code>.';
                         Yii::debug($this->error, __METHOD__);
                         $this->close();
                         return false;
                     }
                 } else {
-                    $this->error = 'AD: No result found, check Ad::searchFilter.';
+                    $this->error = 'No result found, check <code>searchFilter</code>.';
                     Yii::debug($this->error, __METHOD__);
                     return false;
                 }
             } else {
                 $this->error = ldap_error($this->connection);
-                Yii::debug('AD: recieving entries failed: ' . $this->error, __METHOD__);
+                Yii::debug('Recieving entries failed: ' . $this->error, __METHOD__);
                 return false;
             }
         } else {
@@ -722,18 +745,24 @@ class Ad extends \app\models\Auth
      */
     public function query_groups()
     {
-        $this->debug[] = 'AD: Querying AD with search filter "' . $this->groupSearchFilter . '" and base dn "' . $this->base . '" for the attribute "' . $this->groupIdentifier . '"';
+
+        $this->debug[] = Yii::t('auth', 'Querying AD with search filter <code>{searchFilter}</code> and base dn <code>{base}</code> for the attribute <code>{attribute}</code>.', [
+            'searchFilter' => $this->groupSearchFilter,
+            'base' => $this->base,
+            'attribute' => $this->groupIdentifier,
+        ]);
+
         $result = @ldap_search($this->connection, $this->base, $this->groupSearchFilter, array($this->groupIdentifier), 0, 0);
 
         if ($result === false) {
-            $this->error = 'AD: search failed:' . ldap_error($this->connection);
+            $this->error = 'Search failed:' . ldap_error($this->connection);
             Yii::debug($this->error, __METHOD__);
             return false;
         }
 
         if ($groupInfo = ldap_get_entries($this->connection, $result)) {
             if($groupInfo['count'] != 0) {
-                $this->success = 'AD: Retrieving ' . $groupInfo['count'] . ' group entries.';
+                $this->success = 'Retrieving ' . $groupInfo['count'] . ' group entries.';
                 //$groupName = $groupInfo[0][strtolower($this->groupIdentifier)];
                 $groups = array_column($groupInfo, strtolower($this->groupIdentifier));
                 $groups = array_column($groups, 0);
@@ -750,12 +779,12 @@ class Ad extends \app\models\Auth
                 $this->groups = $groups;
                 return true;
             } else {
-                $this->error = 'AD: No result found, check Ad::groupSearchFilter.';
+                $this->error = 'No result found, check <code>groupSearchFilter</code>.';
                 Yii::debug($this->error, __METHOD__);
                 return false;
             }
         } else {
-            $this->error = 'AD: recieving group entries failed: ' . ldap_error($this->connection);
+            $this->error = 'recieving group entries failed: ' . ldap_error($this->connection);
             Yii::debug($this->error, __METHOD__);
             return false;
         }
@@ -770,74 +799,82 @@ class Ad extends \app\models\Auth
      */
     public function query_users($users)
     {
-        array_walk($users, function(&$item, $key, $self){
-            $item = substitute($self->migrateUserSearchFilter, [
-                'domain' => $self->domain,
-                'netbiosDomain' => $self->netbiosDomain,
-                'base' => $self->base,
-                'userIdentifier' => $self->userIdentifier,
-                'username' => $self->getRealUsernameByScheme($item, $self->migrateSearchScheme),
+        $c = 0;
+        $N = count($users);
+        if ($N != 0) {
+            $this->debug[] = Yii::t('auth', 'Querying AD for existing local users with base dn <code>{base}</code> for the attributes <code>{attribute1}</code> and <code>{attribute2}</code>.', [
+                'base' => $this->base,
+                'attribute1' => $this->uniqueIdentifier,
+                'attribute2' => $this->userIdentifier,
             ]);
-        }, $this);
-
-        $searchFilter = '(& ' . $this->userSearchFilter . ' (| ' . (
-            empty($users) ? ' ' : implode(' ', $users)
-        ) . ' ) )';
-
-        $this->debug[] = 'AD: Querying AD for existing local users with search filter "' . \yii\helpers\StringHelper::truncate($searchFilter, 80) . '" and base dn "' . $this->base . '" for the attributes "' . $this->uniqueIdentifier . '" and "' . $this->userIdentifier . '"';
-
-        $result = @ldap_search($this->connection, $this->base, $searchFilter, array($this->uniqueIdentifier, $this->userIdentifier), 0, 0);
-
-        if ($result === false) {
-            $this->error = 'AD: search failed:' . ldap_error($this->connection);
-            Yii::debug($this->error, __METHOD__);
-            return false;
         }
+        foreach ($users as $key => $usernameFromDb) {
+            $usernameReal = $this->getRealUsernameByScheme($usernameFromDb, $this->migrateSearchScheme);
 
-        if ($userInfo = ldap_get_entries($this->connection, $result)) {
-            if($userInfo['count'] != 0) {
-                $this->success = 'AD: Retrieving ' . $userInfo['count'] . ' user entries.';
-                $users = array_column($userInfo, strtolower($this->userIdentifier));
-                $identifier = array_column($userInfo, strtolower($this->uniqueIdentifier));
-                $users = array_column($users, 0);
-                $identifier = array_column($identifier, 0);
+            $searchFilter = substitute($this->migrateUserSearchFilter, [
+                'domain' => $this->domain,
+                'netbiosDomain' => $this->netbiosDomain,
+                'base' => $this->base,
+                'userIdentifier' => $this->userIdentifier,
+                'username' => $usernameReal,
+            ]);
 
-                // convert binary data to hex if the identifier is objectGUID
-                if ($this->userIdentifier == 'objectGUID') {
-                    array_walk($users, function(&$user){
-                        $user = $this->convertGUIDToHex($user);
-                    });
-                }
 
-                array_walk($users, function(&$item, $key, $self){
-                    $item = substitute($self->migrateSearchScheme, [
-                        'domain' => $self->domain,
-                        'netbiosDomain' => $self->netbiosDomain,
-                        'base' => $self->base,
-                        'username' => $item,
-                    ]);
-                }, $this);
+            $this->debug[] = Yii::t('auth', '{c}/{N}: Querying AD for <code>{user}</code> with search filter <code class="show_more">{searchFilter}</code>.', [
+                'c' => $key+1,
+                'N' => $N,
+                'user' => $usernameFromDb,
+                'searchFilter' => $searchFilter,
+            ]);
 
-                if ($this->uniqueIdentifier == 'objectGUID') {
-                    array_walk($identifier, function(&$id){
-                        $id = $this->convertGUIDToHex($id);
-                    });
-                }
+            $result = @ldap_search($this->connection, $this->base, $searchFilter, array($this->uniqueIdentifier, $this->userIdentifier), 0, 0);
 
-                $users = array_combine($identifier, $users);
-                //$this->debug[] = print_r($users, true);
-                //var_dump($users);
-                $this->migrateUsers = $users;
-                return true;
-            } else {
-                $this->error = 'AD: No result found, check Ad::userSearchFilter.';
+            if ($result === false) {
+                $this->error = 'search failed:' . ldap_error($this->connection);
                 Yii::debug($this->error, __METHOD__);
                 return false;
             }
+
+            if ($userInfo = ldap_get_entries($this->connection, $result)) {
+                if($userInfo['count'] != 0) {
+                    $usernameFromLdap = $userInfo[0][strtolower($this->userIdentifier)][0];
+                    $identifier = $userInfo[0][strtolower($this->uniqueIdentifier)][0];
+
+                    // convert binary data to hex if the identifier is objectGUID
+                    if ($this->userIdentifier == 'objectGUID') {
+                        $usernameFromLdap = $this->convertGUIDToHex($usernameFromLdap);
+                    }
+
+                    if ($this->uniqueIdentifier == 'objectGUID') {
+                        $identifier = $this->convertGUIDToHex($identifier);
+                    }
+
+                    //$users = array_combine($identifier, $users);
+                    $this->migrateUsers[$identifier] = $usernameFromDb;
+                    $c = $c + 1;
+
+                    $this->debug[] = Yii::t('auth', 'Found {n} users - taking the first one with <code>{uniqueIdentifier}={identifier}</code>.', [
+                        'n' => $userInfo['count'],
+                        'uniqueIdentifier' => $this->uniqueIdentifier,
+                        'identifier' => $identifier,
+                    ]);
+                } else {
+                    $this->debug[] = Yii::t('auth', 'No user found.');
+                }
+            } else {
+                $this->error = 'recieving user entries failed: ' . ldap_error($this->connection);
+                Yii::debug($this->error, __METHOD__);
+            }
+        }
+
+        if ($c != 0) {
+            $this->success = Yii::t('auth', 'Retrieving {n} user entries.', [
+                'n' => $c,
+            ]);
+            return true;
         } else {
-            $this->error = 'AD: recieving group entries failed: ' . ldap_error($this->connection);
+            $this->error = 'No result found, check <code>migrateUserSearchFilter</code>.';
             Yii::debug($this->error, __METHOD__);
-            return false;
         }
     }
 
@@ -891,12 +928,30 @@ class Ad extends \app\models\Auth
             ])])
             ->all();
 
-        $localUsers = [];
-        foreach ($models as $model) {
-            $localUsers[] = $model->username;
-        }
+        $localUsers = array_column($models, 'username');
+        $c = count($localUsers);
 
-        $this->debug[] = 'AD: found ' . count($localUsers) . ' local usernames matching migrate search scheme "' . $this->migrateSearchScheme . '".';
+        if ($c == 0) {
+            $this->error = Yii::t('auth', 'Found no local usernames matching search pattern <code>{migrateSearchScheme}</code>.', [
+                'migrateSearchScheme' => substitute($this->migrateSearchScheme, [
+                    'domain' => $this->domain,
+                    'netbiosDomain' => $this->netbiosDomain,
+                    'base' => $this->base,
+                ]),
+            ]);
+            Yii::debug($this->error, __METHOD__);
+            return false;
+        } else {
+            $this->debug[] = Yii::t('auth', 'Found {n} local usernames matching search pattern for local usernames <code>{migrateSearchScheme}</code>: <span class="show_more">{users}</span>', [
+                'n' => $c,
+                'migrateSearchScheme' => substitute($this->migrateSearchScheme, [
+                    'domain' => $this->domain,
+                    'netbiosDomain' => $this->netbiosDomain,
+                    'base' => $this->base,
+                ]),
+                'users' => $c == 0 ? '' : '<code>' . implode('</code>, <code>', $localUsers) . '</code>',
+            ]);
+        }
         unset($models);
 
         if ($this->bindAd($this->query_username, $this->query_password)) {
@@ -914,7 +969,7 @@ class Ad extends \app\models\Auth
     public function close()
     {
         if ($this->connection !== null) {
-            Yii::debug('AD: Closing AD connection: ' . $this->domain, __METHOD__);
+            Yii::debug('Closing AD connection: ' . $this->domain, __METHOD__);
             @ldap_close($this->connection);
         }
     }

@@ -125,7 +125,7 @@ $this->registerJs($js);
             </div>
         </div>
         <div class="col-lg-7">
-            <div class="help-block"><?= implode("<br>", $model->debug); ?></div>
+            <div class="help-block" style="height:200px; overflow: auto;"><?= implode("<br>", $model->debug); ?></div>
             <div class="has-error"><div class="help-block"><?= $model->error; ?></div></div>
             <div class="has-success"><div class="help-block"><?= $model->success; ?></div></div>
         </div>
@@ -201,18 +201,6 @@ $this->registerJs($js);
                         'data' => array_merge([$model->userIdentifier => $model->userIdentifier], array_combine($model->identifierAttributes, $model->identifierAttributes)),
                         'options' => [
                             'placeholder' => \Yii::t('auth', 'Select an attribute ...'),
-                        ],
-                        'pluginOptions' => [
-                            'tags' => true,
-                            'allowClear' => false
-                        ],
-                    ]); ?>
-                </div>
-                <div class="col-md-6">
-                    <?= $form->field($model, 'userSearchFilter')->widget(Select2::classname(), [
-                        'data' => array_merge([$model->userSearchFilter => $model->userSearchFilter], $model->userSearchFilterList),
-                        'options' => [
-                            'placeholder' => \Yii::t('auth', 'Select a search filter ...'),
                         ],
                         'pluginOptions' => [
                             'tags' => true,

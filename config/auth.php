@@ -61,7 +61,6 @@ return [
         'mapping' => 
         array (
           'admins' => 'admin',
-          'teachers' => 'teacher',
         ),
       ),
       4 => 
@@ -78,6 +77,24 @@ return [
         'groupSearchFilter' => '(objectCategory=group)',
         'mapping' => 
         array (
+        ),
+      ),
+      5 => 
+      array (
+        'class' => 'app\\components\\Ad',
+        'name' => 'OpenLDAP',
+        'description' => 'Local LDAP',
+        'domain' => 'example.com',
+        'ldap_uri' => 'ldap://localhost:389',
+        'loginScheme' => 'cn={username},{base}',
+        'bindScheme' => 'cn={username},{base}',
+        'searchFilter' => '(cn={username})',
+        'groupIdentifier' => 'cn',
+        'groupSearchFilter' => '(objectClass=posixGroup)',
+        'mapping' => 
+        array (
+          'group2' => 'admin',
+          'group' => 'teacher',
         ),
       ),
     )
