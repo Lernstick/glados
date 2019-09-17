@@ -209,7 +209,6 @@ class AuthController extends Controller
         } else if (Yii::$app->request->post('query-users-button') !== null) {
             // populate the $model->users property with all AD users found
             $model->scenario = $model->class::SCENARIO_QUERY_USERS;
-            var_dump($model->scenario);
             $model->load(Yii::$app->request->post());
             $model->validate();
         }

@@ -132,6 +132,14 @@ $this->registerJs($js);
     </div>
 
     <div class="row">
+        <div class="col-md-12 help-block">
+            <?= \Yii::t('auth', 'The following local users where also found in the Active Directory. Selected users will be migrated from local to the authentication method {method}.', [
+                'method' => $model->name,
+            ]); ?>
+        </div>
+    </div>
+
+    <div class="row">
         <div class="col-md-12 form-group">
             <?= Select2::widget([
                 'name' => 'migrate',
@@ -139,8 +147,8 @@ $this->registerJs($js);
                     'placeholder' => \Yii::t('auth', 'Choose Local Users to migrate ...'),
                     'multiple' => true,
                 ],
-                'value' => array_keys($model->users),
-                'data' => $model->users,
+                'value' => array_keys($model->migrateUsers),
+                'data' => $model->migrateUsers,
                 'maintainOrder' => true,
                 'showToggleAll' => true,
                 'addon' => [
@@ -184,18 +192,13 @@ $this->registerJs($js);
         </div>
         <div class="panel-body">
             <div class="row">
+
                 <div class="col-md-6">
-                    <?= $form->field($model, 'loginScheme')->textInput(['maxlength' => true]) ?>
-                </div>
-                <div class="col-md-6">
-                    <?= $form->field($model, 'bindScheme')->textInput(['maxlength' => true]) ?>
-                </div>
-                <div class="col-md-6">
-                    <?= $form->field($model, 'searchFilter')->textInput(['maxlength' => true]) ?>
+                    <?= $form->field($model, 'migrateSearchScheme')->textInput(['maxlength' => true]) ?>
                 </div>
                 <div class="col-md-6">
                     <?= $form->field($model, 'userIdentifier')->widget(Select2::classname(), [
-                        'data' => array_merge([$model->groupIdentifier => $model->groupIdentifier], array_combine($model->identifierAttributes, $model->identifierAttributes)),
+                        'data' => array_merge([$model->userIdentifier => $model->userIdentifier], array_combine($model->identifierAttributes, $model->identifierAttributes)),
                         'options' => [
                             'placeholder' => \Yii::t('auth', 'Select an attribute ...'),
                         ],
@@ -216,6 +219,9 @@ $this->registerJs($js);
                             'allowClear' => false
                         ],
                     ]); ?>
+                </div>
+                <div class="col-md-6">
+                    <?= $form->field($model, 'migrateUserSearchFilter')->textInput(['maxlength' => true]) ?>
                 </div>
             </div>
         </div>

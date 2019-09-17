@@ -135,6 +135,7 @@ class Ad extends \app\models\Auth
     public $identifierAttributes = [
         'sAMAccountName',
         'distinguishedName',
+        'userPrincipalName',
         'cn',
         'name',
         'mail',
@@ -206,7 +207,7 @@ class Ad extends \app\models\Auth
     ];
 
     /**
-     * @var string The search filter to query the AD for all user objects
+     * @var string The search filter to query the AD for user objects
      */
     public $userSearchFilter = '(objectCategory=person)';
 
@@ -223,9 +224,20 @@ class Ad extends \app\models\Auth
     public $groups = [];
 
     /**
+     * @var string The search filter to query the AD for user objects
+     * The placeholders that are replaced by the values given are: {domain}, {netbiosDomain}, {base}, {userIdentifier}.
+     */
+    public $migrateUserSearchFilter = '({userIdentifier}={username})';
+
+    /**
+     * @var string A search scheme for the username of local users to migrate
+     */
+    public $migrateSearchScheme = '{username}';
+
+    /**
      * @var array Array of AD users for the select list of the migration form.
      */
-    public $users = [];
+    public $migrateUsers = [];
 
     public $query_username;
     public $query_password;
@@ -268,7 +280,7 @@ class Ad extends \app\models\Auth
 
             [['domain', 'ldap_uri', 'loginScheme', 'bindScheme', 'searchFilter', 'groupIdentifier', 'groupSearchFilter', 'query_username', 'query_password'], 'safe', 'on' => self::SCENARIO_QUERY_GROUPS],
 
-            [['loginScheme', 'bindScheme', 'searchFilter', 'userIdentifier', 'userSearchFilter', 'query_username', 'query_password'], 'safe', 'on' => self::SCENARIO_QUERY_USERS],
+            [['migrateSearchScheme', 'userIdentifier', 'userSearchFilter', 'migrateUserSearchFilter', 'query_username', 'query_password'], 'safe', 'on' => self::SCENARIO_QUERY_USERS],
 
             [
                 ['query_username', 'query_password'],
@@ -313,7 +325,7 @@ class Ad extends \app\models\Auth
         $scenarios[self::SCENARIO_DEFAULT] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'ldap_uri', 'loginScheme', 'bindScheme', 'searchFilter', 'groupIdentifier', 'groupSearchFilter', 'mapping']);
         $scenarios[self::SCENARIO_QUERY_GROUPS] = ['domain', 'ldap_uri', 'loginScheme', 'bindScheme', 'searchFilter', 'groupIdentifier', 'groupSearchFilter', 'query_username', 'query_password'];
         $scenarios[self::SCENARIO_AUTH_TEST] = ['query_username', 'query_password'];
-        $scenarios[self::SCENARIO_QUERY_USERS] = ['loginScheme', 'bindScheme', 'searchFilter', 'userIdentifier', 'userSearchFilter', 'query_username', 'query_password'];
+        $scenarios[self::SCENARIO_QUERY_USERS] = ['migrateSearchScheme', 'migrateUserSearchFilter', 'userIdentifier', 'userSearchFilter', 'query_username', 'query_password'];
         $scenarios[self::SCENARIO_MIGRATE] = ['migrate'];
         return $scenarios;
     }
@@ -447,16 +459,16 @@ class Ad extends \app\models\Auth
     }
 
     /**
-     * Decides whether the username provided by the user matches the pattern to authenticate over AD.
-     * @param string username the username that was provided to the login form by the user attempting to login
+     * Decides whether the username provided by the user matches the pattern to authenticate.
+     * @param string $username the username that was provided to the login form by the user attempting to login
+     * @param string $scheme the login scheme
      *
      * @return bool whether the provided username matches the pattern or not
      */
-    public function getRealUsername($username)
-    {
+    private function getRealUsernameByScheme($username, $scheme) {
         //$regex = '([^\"\/\\\[\]\:\;\|\=\,\+\*\?\<\>]+)';
         $regex = '(.+)';
-        $pattern = substitute($this->loginScheme, [
+        $pattern = substitute($scheme, [
             'domain' => $this->domain,
             'netbiosDomain' => $this->netbiosDomain,
             'base' => $this->base,
@@ -471,6 +483,17 @@ class Ad extends \app\models\Auth
             return $matches[1];
         }
         return false;
+    }
+
+    /**
+     * Decides whether the username provided by the user matches the pattern to authenticate over AD.
+     * @param string username the username that was provided to the login form by the user attempting to login
+     *
+     * @return bool whether the provided username matches the pattern or not
+     */
+    public function getRealUsername($username)
+    {
+        return $this->getRealUsernameByScheme($username, $this->loginScheme);
     }
 
     /**
@@ -740,18 +763,28 @@ class Ad extends \app\models\Auth
 
     /**
      * Query Users for the user migration
+     * @param array $users array of local users after which the server should be 
+     * queried.
      * 
      * @return bool 
      */
     public function query_users($users)
     {
-        $this->debug[] = 'AD: Querying AD for existing local users with search filter "' . $this->userSearchFilter . '" and base dn "' . $this->base . '" for the attribute "' . $this->uniqueIdentifier . '" and "' . $this->userIdentifier . '"';
+        array_walk($users, function(&$item, $key, $self){
+            $item = substitute($self->migrateUserSearchFilter, [
+                'domain' => $self->domain,
+                'netbiosDomain' => $self->netbiosDomain,
+                'base' => $self->base,
+                'userIdentifier' => $self->userIdentifier,
+                'username' => $self->getRealUsernameByScheme($item, $self->migrateSearchScheme),
+            ]);
+        }, $this);
 
-        $searchFilter = '(& ' . $this->userSearchFilter . ' (| (' . $this->userIdentifier . '=' . (
-            empty($users)
-            ? '*'
-            : implode(') (' . $this->userIdentifier . '=', $users)
-        ) . ') ) )';
+        $searchFilter = '(& ' . $this->userSearchFilter . ' (| ' . (
+            empty($users) ? ' ' : implode(' ', $users)
+        ) . ' ) )';
+
+        $this->debug[] = 'AD: Querying AD for existing local users with search filter "' . \yii\helpers\StringHelper::truncate($searchFilter, 80) . '" and base dn "' . $this->base . '" for the attributes "' . $this->uniqueIdentifier . '" and "' . $this->userIdentifier . '"';
 
         $result = @ldap_search($this->connection, $this->base, $searchFilter, array($this->uniqueIdentifier, $this->userIdentifier), 0, 0);
 
@@ -776,6 +809,15 @@ class Ad extends \app\models\Auth
                     });
                 }
 
+                array_walk($users, function(&$item, $key, $self){
+                    $item = substitute($self->migrateSearchScheme, [
+                        'domain' => $self->domain,
+                        'netbiosDomain' => $self->netbiosDomain,
+                        'base' => $self->base,
+                        'username' => $item,
+                    ]);
+                }, $this);
+
                 if ($this->uniqueIdentifier == 'objectGUID') {
                     array_walk($identifier, function(&$id){
                         $id = $this->convertGUIDToHex($id);
@@ -785,7 +827,7 @@ class Ad extends \app\models\Auth
                 $users = array_combine($identifier, $users);
                 //$this->debug[] = print_r($users, true);
                 //var_dump($users);
-                $this->users = $users;
+                $this->migrateUsers = $users;
                 return true;
             } else {
                 $this->error = 'AD: No result found, check Ad::userSearchFilter.';
@@ -837,19 +879,28 @@ class Ad extends \app\models\Auth
      */
     public function queryUsers ($attribute, $params, $validator)
     {
+        // search for local usernames matching [[migrateSearchScheme]]
         $models = User::find()
             ->where(['identifier' => null])
-            ->andWhere(['not', ['id' => 0]])
+            ->andWhere(['not', ['id' => 1]])
+            ->andWhere(['like', 'username', substitute($this->migrateSearchScheme, [
+                'domain' => $this->domain,
+                'netbiosDomain' => $this->netbiosDomain,
+                'base' => $this->base,
+                'username' => '',
+            ])])
             ->all();
 
-        $users = [];
+        $localUsers = [];
         foreach ($models as $model) {
-            $users[] = $model->username;
+            $localUsers[] = $model->username;
         }
+
+        $this->debug[] = 'AD: found ' . count($localUsers) . ' local usernames matching migrate search scheme "' . $this->migrateSearchScheme . '".';
         unset($models);
 
         if ($this->bindAd($this->query_username, $this->query_password)) {
-            if($this->query_users($users)) {
+            if($this->query_users($localUsers)) {
                 return;
             }
         }

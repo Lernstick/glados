@@ -53,13 +53,16 @@ return [
         'description' => 'Test Active Directory connection 2',
         'domain' => 'test.local',
         'ldap_uri' => 'ldap://192.168.0.67:389',
-        'mapping' => 
-        array (
-          'teachers' => 'teacher',
-        ),
-        'loginScheme' => '{username}@teacher',
+        'loginScheme' => '{username}@{domain}',
         'bindScheme' => '{username}@{domain}',
         'searchFilter' => '(sAMAccountName={username})',
+        'groupIdentifier' => 'sAMAccountName',
+        'groupSearchFilter' => '(objectCategory=group)',
+        'mapping' => 
+        array (
+          'admins' => 'admin',
+          'teachers' => 'teacher',
+        ),
       ),
       4 => 
       array (

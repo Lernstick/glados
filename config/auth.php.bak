@@ -77,21 +77,5 @@ return [
         array (
         ),
       ),
-      5 => 
-      array (
-        'class' => 'app\\components\\Ad',
-        'name' => 'AD',
-        'description' => 'Active Directory Authentication Method',
-        'domain' => 'dsffsd',
-        'ldap_uri' => '',
-        'loginScheme' => '{username}',
-        'bindScheme' => '{username}@{domain}',
-        'searchFilter' => '(sAMAccountName={username})',
-        'groupIdentifier' => 'sAMAccountName',
-        'groupSearchFilter' => '(objectCategory=group)',
-        'mapping' => 
-        array (
-        ),
-      ),
     )
 ];
