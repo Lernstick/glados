@@ -53,7 +53,7 @@ return [
         'description' => 'Test Active Directory connection 2',
         'domain' => 'test.local',
         'ldap_uri' => 'ldap://192.168.0.67:389',
-        'loginScheme' => '{username}@{domain}',
+        'loginScheme' => '{username}',
         'bindScheme' => '{username}@{domain}',
         'searchFilter' => '(sAMAccountName={username})',
         'groupIdentifier' => 'sAMAccountName',

@@ -58,6 +58,12 @@ class m190829_075244_ldap extends Migration
 
         $updateAllUsers = $auth->getPermission('user/update/all');
         $auth->addChild($updateAllUsers, $migrateAuth);
+
+        /* drop unqie index from user table */
+        $this->dropIndex('username', $this->userTable);
+
+        /* add unique index for username and type combined */
+        $this->createIndex('uc_username_type', $this->userTable, ['username', 'type'], true);
     }
 
     /**
@@ -95,5 +101,11 @@ class m190829_075244_ldap extends Migration
         $auth->remove($deleteAuth);
         $auth->remove($testAuth);
         $auth->remove($migrateAuth);
+
+        /* drop unqie index from user table */
+        $this->dropIndex('uc_username_type', $this->userTable);
+
+        /* add unique index for username and type combined */
+        $this->createIndex('username', $this->userTable, 'username', true);
     }
 }

@@ -919,6 +919,7 @@ class Ad extends \app\models\Auth
         // search for local usernames matching [[migrateSearchScheme]]
         $models = User::find()
             ->where(['identifier' => null])
+            ->andWhere(['type' => 'local'])
             ->andWhere(['not', ['id' => 1]])
             ->andWhere(['like', 'username', substitute($this->migrateSearchScheme, [
                 'domain' => $this->domain,

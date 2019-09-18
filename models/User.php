@@ -66,7 +66,7 @@ class User extends Base implements IdentityInterface
     public function scenarios()
     {
         return [
-            self::SCENARIO_CREATE => ['username', 'password', 'password_repeat', 'role', 'change_password'],
+            self::SCENARIO_CREATE => ['username', 'password', 'password_repeat', 'role', 'change_password', 'type'],
             self::SCENARIO_EXTERNAL => ['username', 'role', 'type', 'identifier'],
             self::SCENARIO_UPDATE => ['username', 'role', 'change_password'],
             self::SCENARIO_PASSWORD_RESET => ['password', 'password_repeat', 'change_password'],
@@ -81,10 +81,11 @@ class User extends Base implements IdentityInterface
         return [
             [['username', 'password', 'password_repeat', 'role', 'activities_last_visited', 'type'], 'safe'],
             [['username', 'password', 'password_repeat', 'role'], 'required', 'on' => self::SCENARIO_CREATE],
+            ['type', 'default', 'value' => 'local', 'on' => self::SCENARIO_CREATE],
             [['username', 'role', 'type', 'identifier'], 'required', 'on' => self::SCENARIO_EXTERNAL],
             [['username', 'role'], 'required', 'on' => self::SCENARIO_UPDATE],
             [['password', 'password_repeat'], 'required', 'on' => self::SCENARIO_PASSWORD_RESET],
-            [['username'], 'unique'], 
+            [['username'], 'unique', 'targetAttribute' => ['username', 'type'], 'message' => Yii::t('user', 'Username is already in use.')],
             [['username', 'password'], 'string', 'max' => 40],
             ['password_repeat', 'compare', 'compareAttribute' => 'password', 'message' => "Passwords don't match" ],
         ];
