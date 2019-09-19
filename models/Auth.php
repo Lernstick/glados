@@ -123,9 +123,10 @@ class Auth extends Model
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('auth', 'Order'),
+            'id' => Yii::t('auth', 'ID'),
             'class' => Yii::t('auth', 'Method'),
             'name' => Yii::t('auth', 'Name'),
+            'typeName' => Yii::t('auth', 'Type'),
             'description' => Yii::t('auth', 'Description'),
             'config' => Yii::t('auth', 'Konfiguration'),
         ];

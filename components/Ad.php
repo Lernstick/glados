@@ -85,8 +85,8 @@ class Ad extends \app\models\Auth
 
     /**
      * @var array array containing roles in the order of their priority. If a user has group
-     * membership such that he can be assiciated to multiple roles, this array determines the
-     * associated role. The user recieves the highest possible role.
+     * membership such that he can be associated to multiple roles, this array determines the
+     * role to be associated. The user recieves the highest possible role.
      */
     public $roleOrder = [
         'admin',
@@ -505,7 +505,7 @@ class Ad extends \app\models\Auth
 
     /**
      * Retrieves the group names from a list of distinguishedName's
-     * @param array dns set of distinguishedName's of groups
+     * @param array $dns set of distinguishedName's of groups
      *
      * @return array the resolved human readable group names, according to [[groupIdentifier]].
      */
@@ -531,8 +531,8 @@ class Ad extends \app\models\Auth
 
     /**
      * Determines the highest possible roles for a set of given groups
+     * 
      * @param array groups set of AD groups
-     *
      * @return mixed the highest role according to [[roleOrder]] or the first element from the roles array if nothing matches or false if roles is empty
      */
     public function determineRole($groups)
