@@ -50,6 +50,8 @@ class User extends Base implements IdentityInterface
         $this->on(self::EVENT_BEFORE_UPDATE, function($instance){
             $this->presaveAttributes = $this->getOldAttributes();
         });
+
+        parent::init();
     }
 
     /**
@@ -84,6 +86,7 @@ class User extends Base implements IdentityInterface
             ['type', 'default', 'value' => 'local', 'on' => self::SCENARIO_CREATE],
             [['username', 'role', 'type', 'identifier'], 'required', 'on' => self::SCENARIO_EXTERNAL],
             [['username', 'role'], 'required', 'on' => self::SCENARIO_UPDATE],
+            [['role'], 'prohibitLockoutByEdit', 'on' => self::SCENARIO_UPDATE],
             [['password', 'password_repeat'], 'required', 'on' => self::SCENARIO_PASSWORD_RESET],
             [['username'], 'unique', 'targetAttribute' => ['username', 'type'], 'message' => Yii::t('user', 'Username is already in use.')],
             [['username', 'password'], 'string', 'max' => 40],
@@ -106,6 +109,30 @@ class User extends Base implements IdentityInterface
             'change_password' => \Yii::t('users', 'User has to change password at next login'),
         ];
     }
+
+    /**
+     * @inheritdoc
+     * @see [[prohibitLockoutByEdit()]]
+     */
+    public function beforeDelete()
+    {
+
+        if (!parent::beforeDelete()) {
+            return false;
+        }
+
+        if ($this->id == 1) {
+            Yii::$app->session->addFlash('danger', \Yii::t('user', 'The user with id 1 cannot be deleted.'));
+            return false;
+        }
+
+        if ($this->id == Yii::$app->user->identity->id) {
+            Yii::$app->session->addFlash('danger', \Yii::t('user', 'You cannot delete yourself.', ['n' => 12]));
+            return false;
+        }
+        return true;
+    }
+
 
    /**
     * @return \yii\db\ActiveQuery
@@ -219,7 +246,7 @@ class User extends Base implements IdentityInterface
     /**
      * Validates password
      *
-     * @param  string  $password password to validate
+     * @param string $password password to validate
      * @return boolean if password provided is valid for current user
      */
     public function validatePassword($password)
@@ -247,6 +274,34 @@ class User extends Base implements IdentityInterface
         }
         return false;
     }
+
+    /**
+     * Decides whether the modification of the current user record will not
+     * lock someone out of the system.
+     * For example:
+     *  * The role of the admin user with id=1 cannot be changed
+     *  * The role of the own user cannot be changed
+     *  * The admin user with id=1 cannot be deleted
+     *  * The own user cannot be deleted
+     *
+     * @param string $attribute The attribute
+     * @param array $params
+     * @return boolean Whether modifying the record is ok or not
+     */
+    public function prohibitLockoutByEdit($attribute, $params)
+    {
+        if ($this->id == 1) {
+            $this->addError($attribute, \Yii::t('user', 'The role of user with id 1 cannot be modified.'));
+            return false;
+        }
+
+        if ($this->id == Yii::$app->user->identity->id) {
+            $this->addError($attribute, \Yii::t('user', 'You cannot modify the role of yourself.'));
+            return false;
+        }
+        return true;
+    }
+
 
     /**
      * @inheritdoc

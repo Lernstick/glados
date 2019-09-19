@@ -100,6 +100,10 @@ $this->params['breadcrumbs'][] = $this->title;
         'options' => ['id' => 'dynagrid-user-index'] // a unique identifier is important
     ]); ?>
 
+    <?= $this->render('@app/views/_notification', [
+        'session' => $session,
+    ]) ?>
+
     <?php Pjax::end(); ?>
 
 
