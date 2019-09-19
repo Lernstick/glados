@@ -111,7 +111,7 @@ $this->registerJs($active_tabs);
             <?= DetailView::widget([
                 'model' => $model,
                 'attributes' => [
-                    'id',
+                    'order',
                     'typeName',
                     //'config',
                     'name',

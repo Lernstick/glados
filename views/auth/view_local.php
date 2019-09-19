@@ -37,34 +37,6 @@ $this->registerJs($active_tabs);
             <i class="glyphicon glyphicon-home"></i>
             <?= \Yii::t('auth', 'General') ?>
         </a></li>
-        <li class="dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                <i class="glyphicon glyphicon-list-alt"></i>
-                <?= \Yii::t('auth', 'Actions') ?><span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-                <li>
-                    <?= Html::a(
-                        '<span class="glyphicon glyphicon-pencil"></span> '. \Yii::t('auth', 'Edit'),
-                        ['update', 'id' => $model->id],
-                        ['data-pjax' => 0]
-                    ) ?>
-                </li>
-                <li>
-                    <?= Html::a(
-                        '<span class="glyphicon glyphicon-trash"></span> ' . \Yii::t('auth', 'Delete'),
-                        ['delete', 'id' => $model->id],
-                        [
-                            'data' => [
-                                'confirm' => \Yii::t('auth', 'Are you sure you want to delete this item?'),
-                                'method' => 'post',
-                            ],
-                        ]
-                    ) ?>
-                </li>
-            </ul>            
-        </li>
-
     </ul>
 
     <div class="tab-content">
@@ -77,12 +49,15 @@ $this->registerJs($active_tabs);
             <?= DetailView::widget([
                 'model' => $model,
                 'attributes' => [
-                    'id',
+                    'order',
                     'typeName',
                     'name',
                     'description',
+                    'loginScheme',
                 ],
             ]) ?>
+
+            <div class="alert alert-info" role="alert"><?= $model->explanation; ?></div>
 
         <?php Pjax::end(); ?>
 

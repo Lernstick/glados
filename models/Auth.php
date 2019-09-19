@@ -20,8 +20,9 @@ class Auth extends Model
     const SCENARIO_MIGRATE = 'migrate';
 
     /* authentication type constants */
-    const LDAP = 0;
-    const ACTIVE_DIRECTORY = 1;
+    const LOCAL = 0;
+    const LDAP = 1;
+    const ACTIVE_DIRECTORY = 2;
     
     //public $configPath = __DIR__ . '/../config';
     const PATH = __DIR__ . '/../config';
@@ -67,6 +68,11 @@ class Auth extends Model
     public $description;
 
     /**
+     * @var int The order in which the authentication process should be processed.
+     */
+    public $order;
+
+    /**
      * @var array Array of authentications methods.
      */
     public $methods;
@@ -95,11 +101,31 @@ class Auth extends Model
     public function rules()
     {
         return [
-            [['name', 'description', 'class'], 'safe', 'on' => self::SCENARIO_DEFAULT],
-            [['name', 'class'], 'required', 'on' => self::SCENARIO_DEFAULT],
+            //[['name', 'description', 'class'], 'safe', 'on' => self::SCENARIO_DEFAULT],
+            [['name', 'class', 'order'], 'required', 'on' => self::SCENARIO_DEFAULT],
             [['class'], 'required', 'on' => self::SCENARIO_CREATE],
             ['class', 'in', 'range' => array_keys($this->authList), 'on' => [self::SCENARIO_CREATE, self::SCENARIO_DEFAULT]],
+            ['order', 'in',
+                'not' => true,
+                'range' => $this->orderRange(),
+                'message' => Yii::t('auth', 'This number is already assigned to another authentication method.'),
+                'on' => self::SCENARIO_DEFAULT
+            ],
+            [['order'], 'integer', 'min' => 1, 'max' => 9999, 'on' => self::SCENARIO_DEFAULT],
         ];
+    }
+
+    /**
+     * @return array array of order numbers which are already assigned to other
+     * authentication methods.
+     */
+    public function orderRange()
+    {
+        $a = array_column($this->fileConfig, 'order');
+        if (array_key_exists($this->id, $a)) {
+            unset($a[$this->id]);
+        }
+        return $a;
     }
 
     /**
@@ -108,7 +134,7 @@ class Auth extends Model
     public function scenarios()
     {
         return [
-            self::SCENARIO_DEFAULT => ['class', 'name', 'description'],
+            self::SCENARIO_DEFAULT => ['class', 'name', 'description', 'order'],
             self::SCENARIO_CREATE => ['class'],
             self::SCENARIO_MIGRATE => ['class'],
         ];
@@ -124,6 +150,7 @@ class Auth extends Model
     {
         return [
             'id' => Yii::t('auth', 'ID'),
+            'order' => Yii::t('auth', 'Order'),
             'class' => Yii::t('auth', 'Method'),
             'name' => Yii::t('auth', 'Name'),
             'typeName' => Yii::t('auth', 'Type'),
@@ -139,7 +166,8 @@ class Auth extends Model
     {
         return [
             'name' => \Yii::t('auth', 'The name of this authentication method. Could be the (short) name of the school, or just <code>LDAP</code> or <code>AD</code>'),
-            'class' => \Yii::t('auth', 'Choose one the available authentcation methods from the list below.'),
+            'class' => \Yii::t('auth', 'Choose one of the available authentication methods from the list below.'),
+            'order' => \Yii::t('auth', 'The order as a number in which the authentication process should process in case of multiple (non local) authentication methods.'),
         ];
     }
 
@@ -156,6 +184,7 @@ class Auth extends Model
                 'form' => $this->form,
                 'view' => $this->view,
                 'type' => $this->type,
+                'order' => $this->order,
             ];
         }
         return $this->_configArray;
@@ -182,11 +211,17 @@ class Auth extends Model
 
 
     /**
-     * Getter for the configuration as it is in the config file
+     * Getter for the configuration as it is in the config file with the
+     * local db config prepended
      */
     public function getFileConfig()
     {
         $config = require(self::PATH . '/auth.php');
+
+        // prepend the local auth method
+        $local = new \app\components\Local();
+        array_unshift($config['methods'], $local->configArray);
+
         return array_key_exists('methods', $config)
             ? $config['methods']
             : null;
@@ -204,6 +239,11 @@ class Auth extends Model
      */
     public function saveFileConfig($config)
     {
+        // remove the local db element from the array
+        if (array_key_exists(0, $config)) {
+            array_shift($config);
+        }
+
         $prepend = '<?php
 
 /**
@@ -243,14 +283,35 @@ return [
             $oldConfig = file_get_contents(self::PATH . '/auth.php');
             file_put_contents(self::PATH . '/auth.php.bak', $oldConfig);
 
+            $mtime = filemtime(self::PATH . '/auth.php');
+
             // write the new config file
             file_put_contents(self::PATH . '/auth.php', $newConfig);
             //file_put_contents(self::PATH . '/auth.php.bak', $newConfig);
+
+            $this->sync($mtime, self::PATH . '/auth.php');
 
             // @todo populate the new file config array
             return true;
         }
         return false;
+    }
+
+    /**
+     * The equivalent of the sync system call, wait until the file is written
+     * to disk.
+     * 
+     * @return void
+     */
+    public function sync($mtime, $file, $timeout = 4.000)
+    {
+        $start = microtime(true);
+        clearstatcache();
+        while (filemtime($file) == $mtime && $start + $timeout > microtime(true)) {
+            clearstatcache();
+            usleep(100);
+        }
+        return;
     }
 
     /**
@@ -370,6 +431,11 @@ return [
         return;
     }
 
+
+    private function sortByOrder($a, $b) {
+        return $a['order'] - $b['order'];
+    }
+
     /**
      * 
      * @return Auth[] All Authentication elements
@@ -386,6 +452,7 @@ return [
             $model->obj->id = intval($id);
             $models[] = $model->obj;
         }
+        usort($models, [$this, 'sortByOrder']);
         return $models;
     }
 
@@ -407,5 +474,4 @@ return [
             return null;
         }
     }
-
 }

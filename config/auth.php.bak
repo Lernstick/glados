@@ -8,11 +8,12 @@ return [
   'class' => 'app\models\Auth',
   'methods' => 
     array (
-      1 => 
+      0 => 
       array (
         'class' => 'app\\components\\Ad',
         'name' => 'BWZ',
         'description' => 'Active Directory Authentication Method',
+        'order' => '3',
         'domain' => 'bwzofingen.local',
         'ldap_uri' => 'ldap://bwzofingen.local:389',
         'loginScheme' => '{username}@bwz',
@@ -28,11 +29,12 @@ return [
           'Administratoren' => 'teacher',
         ),
       ),
-      2 => 
+      1 => 
       array (
         'class' => 'app\\components\\Ad',
         'name' => 'LDAP1',
         'description' => 'Test Active Directory connection 1',
+        'order' => '2',
         'domain' => 'test.local',
         'ldap_uri' => 'ldap://192.168.0.67:389',
         'loginScheme' => '{username}',
@@ -46,14 +48,15 @@ return [
           'teachers' => 'teacher',
         ),
       ),
-      3 => 
+      2 => 
       array (
         'class' => 'app\\components\\Ad',
         'name' => 'LDAP2',
         'description' => 'Test Active Directory connection 2',
+        'order' => '1',
         'domain' => 'test.local',
         'ldap_uri' => 'ldap://192.168.0.67:389',
-        'loginScheme' => '{username}@{domain}',
+        'loginScheme' => '{username}',
         'bindScheme' => '{username}@{domain}',
         'searchFilter' => '(sAMAccountName={username})',
         'groupIdentifier' => 'sAMAccountName',
@@ -63,27 +66,12 @@ return [
           'admins' => 'admin',
         ),
       ),
-      4 => 
-      array (
-        'class' => 'app\\components\\Ad',
-        'name' => 'ADtest',
-        'description' => 'Active Directory Authentication Method',
-        'domain' => 'asdasd',
-        'ldap_uri' => '',
-        'loginScheme' => '{username}',
-        'bindScheme' => '{username}@{domain}',
-        'searchFilter' => '(sAMAccountName={username})',
-        'groupIdentifier' => 'sAMAccountName',
-        'groupSearchFilter' => '(objectCategory=group)',
-        'mapping' => 
-        array (
-        ),
-      ),
-      5 => 
+      3 => 
       array (
         'class' => 'app\\components\\Ad',
         'name' => 'OpenLDAP',
         'description' => 'Local LDAP',
+        'order' => '4',
         'domain' => 'example.com',
         'ldap_uri' => 'ldap://localhost:389',
         'loginScheme' => 'cn={username},{base}',
@@ -95,6 +83,23 @@ return [
         array (
           'group2' => 'admin',
           'group' => 'teacher',
+        ),
+      ),
+      4 => 
+      array (
+        'class' => 'app\\components\\Ad',
+        'name' => 'AD',
+        'description' => 'Active Directory Authentication Method',
+        'order' => '5',
+        'domain' => 'aaaa',
+        'ldap_uri' => '',
+        'loginScheme' => '{username}',
+        'bindScheme' => '{username}@{domain}',
+        'searchFilter' => '(sAMAccountName={username})',
+        'groupIdentifier' => 'sAMAccountName',
+        'groupSearchFilter' => '(objectCategory=group)',
+        'mapping' => 
+        array (
         ),
       ),
     )

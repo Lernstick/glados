@@ -5,6 +5,7 @@ use yii\widgets\ActiveForm;
 use yii\widgets\Pjax;
 use kartik\select2\Select2;
 use yii\web\JsExpression;
+use kartik\range\RangeInput;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Auth */
@@ -110,10 +111,18 @@ $this->registerJs($js);
 
     <div class="row">
         <div class="col-md-6">
-            <?= $form->field($model, 'domain')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($model, 'domain')->textInput(['maxlength' => true]); ?>
+        </div>
+
+        <div class="col-md-6">
+            <?= $form->field($model, 'order')->textInput([
+                'type' => 'number',
+                'value' => $model->order === null
+                    ? max(array_column($model->fileConfig, 'order')) + 1
+                    : $model->order,
+            ]); ?>
         </div>
     </div>
-
     <hr>
 
     <div class="panel panel-default">

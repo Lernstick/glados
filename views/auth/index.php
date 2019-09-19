@@ -24,8 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DynaGrid::widget([
         'showPersonalize' => true,
         'columns' => [
-
-            'id',
+            'order',
             'name',
             'typeName',
             'description',
@@ -43,6 +42,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 'urlCreator' => function ($action, $model, $key, $index) {
                     return Url::to([$action, 'id' => $model->id]);
                 },
+                'visibleButtons' => [
+                    'update' => function ($model) {
+                        return $model->id != 0;
+                    },
+                    'delete' => function ($model) {
+                        return $model->id != 0;
+                    },
+                ],
             ],
         ],
         'storage' => DynaGrid::TYPE_COOKIE,
@@ -51,6 +58,9 @@ $this->params['breadcrumbs'][] = $this->title;
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
             'panel' => ['heading' => '<h3 class="panel-title">' . \Yii::t('auth', 'Authentication Methods') . '</h3>'],
+            'rowOptions' => function($model) {
+                return $model->id == 0 ? ['style' => ['background-color' => '#f5f5f5']] : null;
+            },   
             'toolbar' =>  [
                 ['content' =>
                     Html::a('<i class="glyphicon glyphicon-plus"></i>', ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => \Yii::t('auth', 'Create Authentication Method')]) . ' ' .
@@ -58,7 +68,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
                 ['content' => '{dynagridFilter}{dynagridSort}{dynagrid}'],
                 '{export}',
-        ]            
+            ]
         ],
         'options' => ['id' => 'dynagrid-auth-index'] // a unique identifier is important
     ]); ?>
