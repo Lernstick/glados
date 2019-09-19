@@ -1,6 +1,7 @@
 <?php
 
 use yii\db\Migration;
+use app\models\User;
 
 /**
  * Class m190829_075244_ldap
@@ -59,7 +60,7 @@ class m190829_075244_ldap extends Migration
         $updateAllUsers = $auth->getPermission('user/update/all');
         $auth->addChild($updateAllUsers, $migrateAuth);
 
-        /* drop unqie index from user table */
+        /* drop unique index from user table */
         $this->dropIndex('username', $this->userTable);
 
         /* add unique index for username and type combined */
@@ -71,6 +72,37 @@ class m190829_075244_ldap extends Migration
      */
     public function safeDown()
     {
+
+        // search for duplicated usernames
+        $models = (new yii\db\Query())
+            ->from($this->userTable)
+            ->select(['id', 'username', 'COUNT(*) AS c'])
+            ->groupBy(['username'])
+            ->having('c > 1')
+            ->all();
+
+        // array with duplicated usernames
+        $usernames = array_column($models, 'username');
+
+        foreach ($usernames as $key => $username) {
+            // get all ids with that duplicated username
+            $columns = (new yii\db\Query())
+                ->from($this->userTable)
+                ->select(['id'])
+                ->where(['username' => $username])
+                ->andWhere(['not', ['type' => 'local']])
+                ->all();
+
+            // array with ids of entries with duplicated usernames
+            $ids = array_column($columns, 'id');
+
+            // loop through all these ids and generate a random hashed username
+            // such that they are unique again.
+            foreach ($ids as $key => $id) {
+                $this->update($this->userTable, ['username' => 'duplicate_' . generate_uuid()], ['id' => $id]);
+            }
+        }
+
         $this->dropColumn($this->userTable, 'type');
         $this->dropColumn($this->userTable, 'identifier');
 
@@ -102,10 +134,10 @@ class m190829_075244_ldap extends Migration
         $auth->remove($testAuth);
         $auth->remove($migrateAuth);
 
-        /* drop unqie index from user table */
+        /* drop the combined unique index from user table */
         $this->dropIndex('uc_username_type', $this->userTable);
 
-        /* add unique index for username and type combined */
+        /* add unique index for username  */
         $this->createIndex('username', $this->userTable, 'username', true);
     }
 }
