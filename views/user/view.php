@@ -55,6 +55,11 @@ $this->registerJs($active_tabs);
                     <?= Html::a(
                         '<span class="glyphicon glyphicon-pencil"></span> '. \Yii::t('users', 'Edit'),
                         ['update', 'id' => $model->id],
+                        [
+                            'class' => 'btn',
+                            'style' => ['text-align' => 'left'],
+                            'disabled' => $model->type != 'local',
+                        ],
                         ['data-pjax' => 0]
                     ) ?>
                 </li>
@@ -62,6 +67,11 @@ $this->registerJs($active_tabs);
                     <?= Html::a(
                         '<span class="glyphicon glyphicon-wrench"></span> ' . \Yii::t('users', 'Reset Password'),
                         ['reset-password', 'id' => $model->id],
+                        [
+                            'class' => 'btn',
+                            'style' => ['text-align' => 'left'],
+                            'disabled' => $model->type != 'local',
+                        ],
                         ['data-pjax' => 0]
                     ) ?>
                 </li>
@@ -94,8 +104,13 @@ $this->registerJs($active_tabs);
                 'attributes' => [
                     'username',
                     'role',
+                    'type',
                     'last_visited',
                 ],
+            ]) ?>
+
+            <?= $this->render('@app/views/_notification', [
+                'session' => $session,
             ]) ?>
 
         <?php Pjax::end(); ?>

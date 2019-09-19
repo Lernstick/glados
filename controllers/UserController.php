@@ -95,6 +95,7 @@ class UserController extends Controller
         return $this->render('view', [
             'model' => $model,
             'permissionDataProvider' => $permissionDataProvider,
+            'session' => Yii::$app->session,
         ]);
     }
 
@@ -129,7 +130,12 @@ class UserController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $model->scenario = User::SCENARIO_UPDATE;
+        if ($model->type == 'local') {
+            $model->scenario = User::SCENARIO_UPDATE;
+        } else {
+            Yii::$app->session->addFlash('danger', \Yii::t('user', 'You cannot modify a non local user.'));
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
         $searchModel = new UserSearch();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -151,7 +157,13 @@ class UserController extends Controller
     public function actionResetPassword($id)
     {
         $model = $this->findModel($id);
-        $model->scenario = User::SCENARIO_PASSWORD_RESET;
+
+        if ($model->type == 'local') {
+            $model->scenario = User::SCENARIO_PASSWORD_RESET;
+        } else {
+            Yii::$app->session->addFlash('danger', \Yii::t('user', 'You cannot reset the password of a non local user.'));
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
