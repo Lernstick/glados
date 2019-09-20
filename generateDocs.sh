@@ -7,14 +7,14 @@ DATE="$(date -R)"
 PWD="$(pwd)"
 
 # remove the worktree by deleting it
-rm -R "${GLADOS_PATH}/web/docs"
+rm -R "${GLADOS_PATH}/web/docs" 2>/dev/null
 # remove the worktree from .git 
 git worktree prune
 # add the worktree again (downloads the current version of it)
 git worktree add "web/docs" gh-pages
 # remove all contents of the folder (will be generated again, see below)
 # this will remain the .git directory in web/docs
-rm -R ${GLADOS_PATH}/web/docs/*
+rm -R ${GLADOS_PATH}/web/docs/* 2>/dev/null
 
 # generate the api and guide documentation
 cd $APIDOC_PATH

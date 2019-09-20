@@ -45,7 +45,7 @@ class Ad extends \app\models\Auth
     /**
      * @inheritdoc
      */
-    public $type = \app\models\Auth::ACTIVE_DIRECTORY;
+    public $type = \app\models\Auth::AUTH_ACTIVE_DIRECTORY;
 
     /**
      * @inheritdoc
@@ -97,24 +97,29 @@ class Ad extends \app\models\Auth
     public $bind;
 
     /**
-     * @var array key value pairs for mapping of AD groups (defaultly by sAMAccountName) to roles
-     * @see [[groupIdentifier]]
+     * @var array Key-value pairs for mapping of AD groups (defaultly by sAMAccountName) to roles.
      * 
      * Example:
-     *  $mapping = [
-     *      'AD-Admin-Group'            => 'admin',
-     *      'AD-Teacher-Group'          => 'teacher',
-     *      'Another-AD-Teacher-Group'  => 'teacher',
-     *  ];
+     *
+     * ```php
+     * $mapping = [
+     *     'AD-Admin-Group'            => 'admin',
+     *     'AD-Teacher-Group'          => 'teacher',
+     *     'Another-AD-Teacher-Group'  => 'teacher',
+     * ];
+     * ```
      * 
-     * For the example above, if a user is in multiple groups appearing in the mapping, the highest
+     * In the example above, if a user is in multiple groups appearing in the mapping, the highest
      * role according to [[roleOrder]] is taken for this user. Multiple AD groups can be mapped to the
      * same role. AD groups can be given in their sAMAccountName or another arbitrary identifier.
+     * @see groupIdentifier
+     * @see roleOrder
      */
     public $mapping = [];
 
     /**
-     * @var string A unique identifier across the Active Directory (that never changes)
+     * @var string A unique identifier across the Active Directory (that never changes).
+     *
      * "The GUID is unique across the enterprise and anywhere else."
      * @see https://blogs.msdn.microsoft.com/openspecification/2009/07/10/understanding-unique-attributes-in-active-directory/
      */
@@ -124,7 +129,7 @@ class Ad extends \app\models\Auth
      * @var string A (unique) identifier across the Active Directory for the AD groups for [[mapping]]. This
      * should be unique, as that it is used to identify the group membership.
      * The sAMAccountName may not be unique "across the enterprise and anywhere else", but it is human readable.
-     * @see [[mapping]]
+     * @see mapping
      */
     public $groupIdentifier = 'sAMAccountName';
     public $userIdentifier = 'sAMAccountName';
@@ -145,51 +150,69 @@ class Ad extends \app\models\Auth
     ];
 
     /**
-     * @var string The pattern to test the given login credentials against
+     * @var string The pattern to test the given login credentials against.
+     *
      * A login over AD will only be performed if the given username matches the provided
-     * pattern. This is used to manage multiple ADs. {username} is extracted from the username given in the
-     * login form. Later in the authentication {username} is replaced by the extracted one from here.
-     * @see [[bindScheme]]
-     * @see [[searchFilter]]
+     * pattern. This is used to manage multiple ADs. `{username}` is extracted from the username given in the
+     * login form. Later in the authentication `{username}` is replaced by the extracted one from here.
      * 
      * Examples:
-     *  $loginScheme = '{username}';   // no special testing, all usernames provided are authenticated against the AD.
-     *  $loginScheme = '{username}@foo';   // only usernames ending with @foo are considered and authenticated agaist the AD.
-     *  $loginScheme = '{username}@{domain}';   // only usernames ending with @{domain} are considered and authenticated agaist the AD. {domain} is replaced with the given [[domain]] configuration variable.
-     *  $loginScheme = 'foo\{username}';   // only usernames starting with foo\ are considered and authenticated agaist the AD.
+     * 
+     * ```php
+     * $loginScheme = '{username}';   // no special testing, all usernames provided are authenticated against the AD.
+     * $loginScheme = '{username}@foo';   // only usernames ending with "@foo" are considered and authenticated against the AD.
+     * $loginScheme = '{username}@{domain}';   // only usernames ending with "@{domain}"" are considered and authenticated against the AD. {domain} is replaced with the given $domain configuration variable.
+     * $loginScheme = 'foo\{username}';   // only usernames starting with "foo\" are considered and authenticated against the AD.
+     * ```
      *
-     * The placeholders that are replaced by the values given are: {domain}, {netbiosDomain}, {base}.
+     * The placeholders that are replaced by the values given are: `{domain}` with [[domain]], `{netbiosDomain}`  with [[netbiosDomain]], `{base}` with with [[base]].
+     * 
+     * @see bindScheme
+     * @see searchFilter
      */
     public $loginScheme = '{username}';
 
     /**
      * @var string The pattern to build the login credentials for the bind to the AD.
-     * {username} is the string corresponding to {username} extracted from [[$loginScheme]].
+     * 
+     * `{username}` is the string corresponding to `{username}` extracted from [[$loginScheme]].
      * 
      * Examples:
-     *  $bindScheme = '{username}';       // no special altering, the username is taken as it is.
-     *  $bindScheme = '{username}@foo';   // the username is appended with "@foo" for authentication
-     *  $bindScheme = '{username}@{domain}';   // the username is appended with "@{domain}", where {domain} is replaced with the value given in the configuration
-     *  $bindScheme = 'cn={username},ou=People,dc=test,dc=local';   // a distinguished name is built out of the provided username. Instead of "dc=test,dc=local", one could have also used {base}.
-     *  $bindScheme = 'foo\{username}';   // the username is prepended with "foo\" for authentication
      * 
-     * The placeholders that are replaced by the values given are: {domain}, {netbiosDomain}, {base}.
+     * ```php
+     * $bindScheme = '{username}';       // no special altering, the username is taken as it is.
+     * $bindScheme = '{username}@foo';   // the username is appended with "@foo" for authentication
+     * $bindScheme = '{username}@{domain}';   // the username is appended with "@{domain}", where {domain} is replaced with the value given in the configuration
+     * $bindScheme = 'cn={username},ou=People,dc=test,dc=local';   // a distinguished name is built out of the provided username. Instead of "dc=test,dc=local", one could have also used {base}.
+     * $bindScheme = 'foo\{username}';   // the username is prepended with "foo\" for authentication
+     * ```
+     * 
+     * The placeholders that are replaced by the values given are: `{domain}` with [[domain]], `{netbiosDomain}`  with [[netbiosDomain]], `{base}` with with [[base]].
+     * 
+     * @see loginScheme
+     * @see searchFilter
      */
     public $bindScheme = '{username}@{domain}';
 
     /**
-     * @var string The search filter to query the AD for information on the current bind user. Unfortuately, we cannot use
-     * LDAPs extended operation for this (ldap_exop() with LDAP_EXOP_WHO_AM_I), since it needs PHP >=7.2.0.
-     * @see https://www.php.net/manual/en/function.ldap-exop.php 
-     * {username} is the string corresponding to {username} extracted from [[$loginScheme]].
+     * @var string The search filter to query the AD for information on the current bind user.
+     * 
+     * Unfortuately, we cannot use LDAPs extended operation for this (`ldap_exop()` with `LDAP_EXOP_WHO_AM_I`), since it needs PHP `>=7.2.0`.
+     * `{username}` is the string corresponding to `{username}` extracted from [[$loginScheme]].
      * 
      * Examples:
-     *  $searchFilter = '(sAMAccountName={username})';  // search for entries matching the sAMAccountName
-     *  $searchFilter = '(userPrincipalName={username}@foo)'; // search for entries matching the userPrincipalName to be appended by "@foo"
-     *  $searchFilter = '(userPrincipalName={username}@{domain})'; // search for entries matching the userPrincipalName to be appended by "@{domain}", where {domain} is replaced with the value given in the configuration
-     *  $searchFilter = '(dn=cn={username},ou=People,dc=test,dc=local)';    // search for entries matching the distinguished name. Instead of "dc=test,dc=local", one could have also used {base}.
+     *
+     * ```php
+     * $searchFilter = '(sAMAccountName={username})';  // search for entries matching the sAMAccountName
+     * $searchFilter = '(userPrincipalName={username}@foo)'; // search for entries matching the userPrincipalName to be appended by "@foo"
+     * $searchFilter = '(userPrincipalName={username}@{domain})'; // search for entries matching the userPrincipalName to be appended by "@{domain}", where {domain} is replaced with the value given in the configuration
+     * $searchFilter = '(dn=cn={username},ou=People,dc=test,dc=local)';    // search for entries matching the distinguished name. Instead of "dc=test,dc=local", one could have also used {base}.
+     * ```
      * 
-     * The placeholders that are replaced by the values given are: {domain}, {netbiosDomain}, {base}.
+     * The placeholders that are replaced by the values given are: `{domain}` with [[domain]], `{netbiosDomain}`  with [[netbiosDomain]], `{base}` with with [[base]].
+     *
+     * @see https://www.php.net/manual/en/function.ldap-exop.php 
+     * @see loginScheme
      */
     public $searchFilter = '(sAMAccountName={username})';
 

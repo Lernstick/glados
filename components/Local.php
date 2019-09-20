@@ -26,7 +26,7 @@ class Local extends \app\models\Auth
     /**
      * @inheritdoc
      */
-    public $type = \app\models\Auth::LOCAL;
+    public $type = \app\models\Auth::AUTH_LOCAL;
 
     /**
      * @inheritdoc

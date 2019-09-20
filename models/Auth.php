@@ -20,9 +20,9 @@ class Auth extends Model
     const SCENARIO_MIGRATE = 'migrate';
 
     /* authentication type constants */
-    const LOCAL = 0;
-    const LDAP = 1;
-    const ACTIVE_DIRECTORY = 2;
+    const AUTH_LOCAL = 0;
+    const AUTH_LDAP = 1;
+    const AUTH_ACTIVE_DIRECTORY = 2;
     
     //public $configPath = __DIR__ . '/../config';
     const PATH = __DIR__ . '/../config';
@@ -38,7 +38,7 @@ class Auth extends Model
     public $class = 'app\models\Auth';
 
     /**
-     * @var string The type of the current authentication type.
+     * @var string The type of the current authentication.
      */
     public $type;
 
@@ -212,7 +212,9 @@ class Auth extends Model
 
     /**
      * Getter for the configuration as it is in the config file with the
-     * local db config prepended
+     * local db config prepended.
+     * @return array|null the "methods" array element of the configuration array in `auth.php` or `null`
+     * if the key does not exist.
      */
     public function getFileConfig()
     {
@@ -228,10 +230,10 @@ class Auth extends Model
     }
 
     /**
-     * Saves the new config in file auth.php.
-     * A temporary file called auth.php in tmpPath (@see [[params]]) is created first and required as
-     * sanity check. If no exceptions are thrown, the original auth.php contents are moved to a backup
-     * file called auth.php.bak and the contents of auth.php are replaced with the new generated file 
+     * Saves the new config in file `auth.php`.
+     * A temporary file called `auth.php` in `tmpPath` (@see params.php) is created first and required as
+     * sanity check. If no exceptions are thrown, the original `auth.php` contents are moved to a backup
+     * file called `auth.php.bak` and the contents of `auth.php` are replaced with the new generated file 
      * contents.
      *
      * @throws UnprocessableEntityHttpException if the temporary file could not be parsed without error
