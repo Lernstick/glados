@@ -16,7 +16,7 @@ return [
         'order' => '3',
         'domain' => 'bwzofingen.local',
         'ldap_uri' => 'ldap://bwzofingen.local:389',
-        'loginScheme' => '{username}@bwz',
+        'loginScheme' => '{username}',
         'bindScheme' => '{username}@{domain}',
         'searchFilter' => '(sAMAccountName={username})',
         'groupIdentifier' => 'sAMAccountName',
@@ -83,23 +83,6 @@ return [
         array (
           'group2' => 'admin',
           'group' => 'teacher',
-        ),
-      ),
-      4 => 
-      array (
-        'class' => 'app\\components\\Ad',
-        'name' => 'AD',
-        'description' => 'Active Directory Authentication Method',
-        'order' => '5',
-        'domain' => 'aaaa',
-        'ldap_uri' => '',
-        'loginScheme' => '{username}',
-        'bindScheme' => '{username}@{domain}',
-        'searchFilter' => '(sAMAccountName={username})',
-        'groupIdentifier' => 'sAMAccountName',
-        'groupSearchFilter' => '(objectCategory=group)',
-        'mapping' => 
-        array (
         ),
       ),
     )
