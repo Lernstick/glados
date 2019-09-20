@@ -6,8 +6,8 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model app\models\Auth */
 
-$this->title = \Yii::t('auth', 'Test Authentication Method Nr. {id} of type {type}', [
-	'id' => $model->id,
+$this->title = \Yii::t('auth', 'Test Authentication Method {name} of type {type}', [
+	'name' => $model->name,
 	'type' => $model->obj->typeName,
 ]);
 

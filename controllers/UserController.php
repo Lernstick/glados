@@ -130,7 +130,7 @@ class UserController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        if ($model->type == 'local') {
+        if ($model->type == '0') {
             $model->scenario = User::SCENARIO_UPDATE;
         } else {
             Yii::$app->session->addFlash('danger', \Yii::t('user', 'You cannot modify a non local user.'));
@@ -158,7 +158,7 @@ class UserController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->type == 'local') {
+        if ($model->type == '0') {
             $model->scenario = User::SCENARIO_PASSWORD_RESET;
         } else {
             Yii::$app->session->addFlash('danger', \Yii::t('user', 'You cannot reset the password of a non local user.'));

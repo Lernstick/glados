@@ -15,7 +15,7 @@ class m190829_075244_ldap extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn($this->userTable, 'type', $this->string(255)->notNull()->defaultValue('local'));
+        $this->addColumn($this->userTable, 'type', $this->string(255)->notNull()->defaultValue('0'));
         $this->addColumn($this->userTable, 'identifier', $this->string(255)->null());
 
         $auth = Yii::$app->authManager;
@@ -90,7 +90,7 @@ class m190829_075244_ldap extends Migration
                 ->from($this->userTable)
                 ->select(['id'])
                 ->where(['username' => $username])
-                ->andWhere(['not', ['type' => 'local']])
+                ->andWhere(['not', ['type' => '0']])
                 ->all();
 
             // array with ids of entries with duplicated usernames

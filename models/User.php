@@ -6,6 +6,7 @@ use Yii;
 use app\models\Base;
 use yii\web\IdentityInterface;
 use app\models\EventItem;
+use app\models\Auth;
 
 /**
  * This is the model class for table "user".
@@ -83,7 +84,7 @@ class User extends Base implements IdentityInterface
         return [
             [['username', 'password', 'password_repeat', 'role', 'activities_last_visited', 'type'], 'safe'],
             [['username', 'password', 'password_repeat', 'role'], 'required', 'on' => self::SCENARIO_CREATE],
-            ['type', 'default', 'value' => 'local', 'on' => self::SCENARIO_CREATE],
+            ['type', 'default', 'value' => '0', 'on' => self::SCENARIO_CREATE],
             [['username', 'role', 'type', 'identifier'], 'required', 'on' => self::SCENARIO_EXTERNAL],
             [['username', 'role'], 'required', 'on' => self::SCENARIO_UPDATE],
             [['role'], 'prohibitLockoutByEdit', 'on' => self::SCENARIO_UPDATE],
@@ -216,7 +217,7 @@ class User extends Base implements IdentityInterface
      */
     public static function findByUsername($username)
     {
-        return static::findOne(['username' => $username, 'type' => 'local']);
+        return static::findOne(['username' => $username, 'type' => '0']);
     }
 
     /**
@@ -241,6 +242,14 @@ class User extends Base implements IdentityInterface
     public function validateAuthKey($authKey)
     {
         return $this->getAuthKey() === $authKey;
+    }
+
+    /**
+     * @return \yii\models\Auth The associated authentication method.
+     */
+    public function getAuthMethod()
+    {
+        return Auth::findOne($this->type);
     }
 
     /**

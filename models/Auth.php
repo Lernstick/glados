@@ -5,6 +5,7 @@ namespace app\models;
 use Yii;
 use yii\base\Model;
 use yii\base\ErrorException;
+use yii\helpers\FileHelper;
 use yii\web\UnprocessableEntityHttpException;
 
 /**
@@ -116,12 +117,14 @@ class Auth extends Model
     }
 
     /**
-     * @return array array of order numbers which are already assigned to other
+     * @return array Array of order numbers which are already assigned to other
      * authentication methods.
      */
     public function orderRange()
     {
-        $a = array_column($this->fileConfig, 'order');
+        $keys = array_keys($this->fileConfig);
+        $values = array_column($this->fileConfig, 'order');
+        $a = array_combine($keys, $values);
         if (array_key_exists($this->id, $a)) {
             unset($a[$this->id]);
         }
@@ -230,12 +233,13 @@ class Auth extends Model
     }
 
     /**
-     * Saves the new config in file `auth.php`.
+     * Saves the config to the file `auth.php`.
      * A temporary file called `auth.php` in `tmpPath` (@see params.php) is created first and required as
      * sanity check. If no exceptions are thrown, the original `auth.php` contents are moved to a backup
      * file called `auth.php.bak` and the contents of `auth.php` are replaced with the new generated file 
      * contents.
      *
+     * @param array $config the new/altered config array
      * @throws UnprocessableEntityHttpException if the temporary file could not be parsed without error
      * @return bool whether the saving succeeded.
      */
@@ -262,9 +266,13 @@ return [
 
         $newConfig = $prepend . preg_replace('/^/m', $prefix, var_export($config, true)) . $append;
 
-        if (file_put_contents(\Yii::$app->params['tmpPath'] . '/auth.php', $newConfig)) {
+        $tmpFile = FileHelper::normalizePath(\Yii::$app->params['tmpPath'] . '/auth.php');
+        $bakFile = FileHelper::normalizePath(self::PATH . '/auth.php.bak');
+        $file = FileHelper::normalizePath(self::PATH . '/auth.php');
+
+        if (@file_put_contents($tmpFile, $newConfig)) {
             try {
-                require(\Yii::$app->params['tmpPath'] . '/auth.php');
+                require($tmpFile);
             } catch (\ParseError $e) {
                 $err = \Yii::t('auth', 'Failed to write auth.php config file: ParseError: {error} in file {file} at line {line}.', [
                     'error' => $e->getMessage(),
@@ -282,38 +290,32 @@ return [
                 Yii::error($err);
                 throw new UnprocessableEntityHttpException($err);
             }
-            $oldConfig = file_get_contents(self::PATH . '/auth.php');
-            file_put_contents(self::PATH . '/auth.php.bak', $oldConfig);
+            $oldConfig = file_get_contents($file);
 
-            $mtime = filemtime(self::PATH . '/auth.php');
+            if (! @file_put_contents($bakFile, $oldConfig)) {
+                $this->addError('*', Yii::t('auth', 'Backup file {file} could not be written.', [
+                    'file' => $bakFile,
+                ]));
+                return false;
+            }
+
+            $mtime = filemtime($file);
 
             // write the new config file
-            file_put_contents(self::PATH . '/auth.php', $newConfig);
-            //file_put_contents(self::PATH . '/auth.php.bak', $newConfig);
+            if (! @file_put_contents($file, $newConfig)) {
+                $this->addError('*', Yii::t('auth', 'Configuration file {file} could not be written.', [
+                    'file' => $file,
+                ]));
+                return false;
+            }
 
-            $this->sync($mtime, self::PATH . '/auth.php');
-
-            // @todo populate the new file config array
             return true;
+        } else {
+            $this->addError('*', Yii::t('auth', 'Temporary file {file} could not be written.', [
+                'file' => $tmpFile,
+            ]));
         }
         return false;
-    }
-
-    /**
-     * The equivalent of the sync system call, wait until the file is written
-     * to disk.
-     * 
-     * @return void
-     */
-    public function sync($mtime, $file, $timeout = 4.000)
-    {
-        $start = microtime(true);
-        clearstatcache();
-        while (filemtime($file) == $mtime && $start + $timeout > microtime(true)) {
-            clearstatcache();
-            usleep(100);
-        }
-        return;
     }
 
     /**
@@ -374,7 +376,7 @@ return [
             Yii::info('Model not inserted due to validation error.', __METHOD__);
             return false;
         }
-        $this->id = max(array_keys($this->fileConfig)) + 1;
+        $this->id = $this->nextId();
         $configItem = $this->getAttributes($this->activeAttributes());
         $fileConfig = $this->fileConfig;
         $fileConfig[$this->id] = $configItem;
@@ -382,6 +384,17 @@ return [
             return true;
         };
         return false;
+    }
+
+    /**
+     * Generates the id for a new authentication method entry.
+     * 
+     * @return int the next id
+     */
+    private function nextId()
+    {
+        return generate_uuid();
+        //return max(array_keys($this->fileConfig)) + 1;
     }
 
     /**
@@ -433,7 +446,6 @@ return [
         return;
     }
 
-
     private function sortByOrder($a, $b) {
         return $a['order'] - $b['order'];
     }
@@ -451,7 +463,7 @@ return [
             $model->configArray = $configArray;
             //$model->id = $id;
             //$model->name = $configArray['name'];
-            $model->obj->id = intval($id);
+            $model->obj->id = $id;
             $models[] = $model->obj;
         }
         usort($models, [$this, 'sortByOrder']);
@@ -470,7 +482,7 @@ return [
             $model->configArray = $configArray[$id];
             //$model->name = $configArray[$id]['name'];
             //$model->id = $id;
-            $model->obj->id = intval($id);
+            $model->obj->id = $id;
             return $model->obj;
         } else {
             return null;

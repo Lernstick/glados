@@ -3,7 +3,6 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\grid\GridView;
-use yii\widgets\Pjax;
 use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
@@ -58,7 +57,7 @@ $this->registerJs($active_tabs);
                         [
                             'class' => 'btn',
                             'style' => ['text-align' => 'left'],
-                            'disabled' => $model->type != 'local',
+                            'disabled' => $model->type != '0',
                         ],
                         ['data-pjax' => 0]
                     ) ?>
@@ -70,7 +69,7 @@ $this->registerJs($active_tabs);
                         [
                             'class' => 'btn',
                             'style' => ['text-align' => 'left'],
-                            'disabled' => $model->type != 'local',
+                            'disabled' => $model->type != '0',
                         ],
                         ['data-pjax' => 0]
                     ) ?>
@@ -94,17 +93,20 @@ $this->registerJs($active_tabs);
 
     <div class="tab-content">
 
-        <?php Pjax::begin([
-            'id' => 'general',
-            'options' => ['class' => 'tab-pane fade in active'],
-        ]); ?>
+        <div id="general" class="tab-pane fade in active">
 
             <?= DetailView::widget([
                 'model' => $model,
                 'attributes' => [
                     'username',
                     'role',
-                    'type',
+                    [
+                        'attribute' => 'authMethod.name',
+                        'label' => Yii::t('auth', 'Authentication Method'),
+                        'value' => Html::a($model->authMethod->name . ' (' . $model->authMethod->typeName . ')', ['auth/view', 'id' => $model->authMethod->id
+                        ]),
+                        'format' => 'raw',
+                    ],
                     'last_visited',
                 ],
             ]) ?>
@@ -113,7 +115,7 @@ $this->registerJs($active_tabs);
                 'session' => $session,
             ]) ?>
 
-        <?php Pjax::end(); ?>
+        </div>
 
         <div id="permissions" class="tab-pane fade">
 

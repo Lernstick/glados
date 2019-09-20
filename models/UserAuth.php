@@ -21,16 +21,20 @@ class UserAuth extends User implements IdentityInterface
     public static function findByCredentials($username, $password)
     {
 
-        foreach (Yii::$app->auth->methods as $key => $config) {
+        // sorting of the methods array according to order
+        uasort(Yii::$app->auth->methods, function ($a, $b) {
+           return $a['order'] - $b['order'];
+        });
 
+        foreach (Yii::$app->auth->methods as $key => $config) {
             $method = Yii::createObject($config);
             if ($method->authenticate($username, $password)) {
 
                 // return existing user column from database
-                if (($user = static::findOne(['identifier' => $method->identifier, 'type' => $method->type])) === null) {
+                if (($user = static::findOne(['identifier' => $method->identifier, 'type' => $key])) === null) {
                     // else create new user and return the record
                     $user = new User();
-                    $user->type = $method->type;
+                    $user->type = $key;
                     $user->identifier = $method->identifier;
                 }
 

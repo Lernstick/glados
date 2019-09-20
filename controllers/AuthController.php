@@ -59,14 +59,27 @@ class AuthController extends Controller
      * Displays a single Auth model.
      *
      * @param integer $id
+     * @param bool $wait
      * @return mixed
      */
-    public function actionView($id)
+    public function actionView($id, $wait = false)
     {
-        $model = $this->findModel($id);
-        return $this->render('/auth/' . $model->view, [
-            'model' => $model,
-        ]);
+        if ($wait == true) {
+            if (($model = $this->findModel($id, false)) !== null) {
+                return $this->render('/auth/' . $model->view, [
+                    'model' => $model,
+                ]);
+            } else {
+                return $this->render('view_wait', [
+                    'id' => $id,
+                ]);
+            }
+        } else {
+            $model = $this->findModel($id);
+            return $this->render('/auth/' . $model->view, [
+                'model' => $model,
+            ]);
+        }
     }
 
     /**
@@ -88,7 +101,10 @@ class AuthController extends Controller
                 //submitted
                 $model->scenario = $model->class::SCENARIO_DEFAULT;
                 if ($model->load(Yii::$app->request->post()) && $model->save()) {
-                    return $this->redirect(['view', 'id' => $model->id]);
+                    return $this->redirect(['view',
+                        'id' => $model->id,
+                        'wait' => true,
+                    ]);
                 } else {
                     return $this->render('create', [
                         'model' => $model,
@@ -220,17 +236,23 @@ class AuthController extends Controller
 
     /**
      * Finds the Auth model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
+     * If the model is not found, a 404 HTTP exception will be thrown
+     * or null is returned.
      * @param integer $id
-     * @return Auth the loaded model
+     * @param bool $lethal throw error or just return null in case of no result
+     * @return Auth|null the loaded model or null if $lethal is not true
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected function findModel($id, $lethal = true)
     {
         if (($model = Auth::findOne($id)) !== null) {
             return $model;
         } else {
-            throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
+            if ($lethal == true) {
+                throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
+            } else {
+                return null;
+            }
         }
     }
 

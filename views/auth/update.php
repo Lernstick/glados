@@ -6,8 +6,8 @@ use yii\helpers\Html;
 /* @var $model app\models\Auth */
 /* @var $searchModel app\models\UserSearch */
 
-$this->title = \Yii::t('auth', 'Edit Authentication Method Nr. {id} of type {type}', [
-	'id' => $model->id,
+$this->title = \Yii::t('auth', 'Edit Authentication Method {name} of type {type}', [
+	'name' => $model->name,
 	'type' => $model->obj->typeName,
 ]);
 

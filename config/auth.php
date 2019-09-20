@@ -8,7 +8,7 @@ return [
   'class' => 'app\models\Auth',
   'methods' => 
     array (
-      0 => 
+      'a8cb944a-f35b-49e2-8a4f-2d81c3ab18f0' => 
       array (
         'class' => 'app\\components\\Ad',
         'name' => 'BWZ',
@@ -29,7 +29,7 @@ return [
           'Administratoren' => 'teacher',
         ),
       ),
-      1 => 
+      '608254f4-a6f9-45e9-967a-0f453835bed4' => 
       array (
         'class' => 'app\\components\\Ad',
         'name' => 'LDAP1',
@@ -48,7 +48,7 @@ return [
           'teachers' => 'teacher',
         ),
       ),
-      2 => 
+      '396bdbe5-224f-44a8-aa60-6104c4bfdbeb' => 
       array (
         'class' => 'app\\components\\Ad',
         'name' => 'LDAP2',
@@ -64,9 +64,10 @@ return [
         'mapping' => 
         array (
           'admins' => 'admin',
+          'teachers' => 'teacher',
         ),
       ),
-      3 => 
+      'b414b6db-4eb5-41a2-9fcc-97655e56329e' => 
       array (
         'class' => 'app\\components\\Ad',
         'name' => 'OpenLDAP',

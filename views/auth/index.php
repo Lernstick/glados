@@ -44,10 +44,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
                 'visibleButtons' => [
                     'update' => function ($model) {
-                        return $model->id != 0;
+                        return $model->id != "0";
                     },
                     'delete' => function ($model) {
-                        return $model->id != 0;
+                        return $model->id != "0";
                     },
                 ],
             ],
@@ -59,7 +59,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'filterModel' => $searchModel,
             'panel' => ['heading' => '<h3 class="panel-title">' . \Yii::t('auth', 'Authentication Methods') . '</h3>'],
             'rowOptions' => function($model) {
-                return $model->id == 0 ? ['style' => ['background-color' => '#f5f5f5']] : null;
+                return $model->id == "0" ? ['style' => ['background-color' => '#f5f5f5']] : null;
             },   
             'toolbar' =>  [
                 ['content' =>

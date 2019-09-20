@@ -76,6 +76,8 @@ $this->registerJs($js);
 
     <?php $form = ActiveForm::begin(['id' => 'ad_form']); ?>
 
+    <?= $form->errorSummary($model); ?>
+
     <ul class="nav nav-tabs">
         <li class="active"><a data-toggle="tab" href="#general">
             <i class="glyphicon glyphicon-home"></i>
