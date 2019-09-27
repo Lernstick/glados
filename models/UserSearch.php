@@ -20,7 +20,7 @@ class UserSearch extends User
     {
         return [
             [['id'], 'integer'],
-            [['username', 'role', 'last_visited'], 'safe'],
+            [['username', 'role', 'last_visited', 'type'], 'safe'],
         ];
     }
 
@@ -75,9 +75,8 @@ class UserSearch extends User
         }
 
         // grid filtering conditions
-        $query->andFilterWhere([
-            'last_visited' => $this->last_visited,
-        ]);
+        $query->andFilterWhere(['last_visited' => $this->last_visited])
+            ->andFilterWhere(['type' => $this->type]);
 
         $query->andFilterWhere(['like', 'username', $this->username]);
 

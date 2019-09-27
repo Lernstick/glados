@@ -11,6 +11,7 @@ use yii\web\JsExpression;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\UserSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $authSearchModel app\models\AuthSearch */
 
 $this->title = \Yii::t('users', 'Users');
 $this->params['breadcrumbs'][] = $this->title;
@@ -73,6 +74,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'type',
+                'filter' => $authSearchModel->authSelectlist,
                 'label' => Yii::t('auth', 'Authentication Method'),
                 'value' => function($model) {
                     return $model->authMethod->name . ' (' . $model->authMethod->typeName . ')';

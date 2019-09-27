@@ -104,6 +104,7 @@ class Auth extends Model
         return [
             //[['name', 'description', 'class'], 'safe', 'on' => self::SCENARIO_DEFAULT],
             [['name', 'class', 'order'], 'required', 'on' => self::SCENARIO_DEFAULT],
+            [['name'], 'string', 'max' => 10, 'on' => self::SCENARIO_DEFAULT],
             [['class'], 'required', 'on' => self::SCENARIO_CREATE],
             ['class', 'in', 'range' => array_keys($this->authList), 'on' => [self::SCENARIO_CREATE, self::SCENARIO_DEFAULT]],
             ['order', 'in',
@@ -212,7 +213,6 @@ class Auth extends Model
         ];
     }
 
-
     /**
      * Getter for the configuration as it is in the config file with the
      * local db config prepended.
@@ -293,25 +293,31 @@ return [
             $oldConfig = file_get_contents($file);
 
             if (! @file_put_contents($bakFile, $oldConfig)) {
-                $this->addError('*', Yii::t('auth', 'Backup file {file} could not be written.', [
+                $err = Yii::t('auth', 'Backup file {file} could not be written.', [
                     'file' => $bakFile,
-                ]));
+                ]);
+                $this->addError('*', $err);
+                Yii::$app->session->addFlash('danger', $err);
                 return false;
             }
 
             // write the new config file
             if (! @file_put_contents($file, $newConfig)) {
-                $this->addError('*', Yii::t('auth', 'Configuration file {file} could not be written.', [
+                $err = Yii::t('auth', 'Configuration file {file} could not be written.', [
                     'file' => $file,
-                ]));
+                ]);
+                $this->addError('*', $err);
+                Yii::$app->session->addFlash('danger', $err);
                 return false;
             }
 
             return true;
         } else {
-            $this->addError('*', Yii::t('auth', 'Temporary file {file} could not be written.', [
+            $err = Yii::t('auth', 'Temporary file {file} could not be written.', [
                 'file' => $tmpFile,
-            ]));
+            ]);
+            $this->addError('*', $err);
+            Yii::$app->session->addFlash('danger', $err);
         }
         return false;
     }

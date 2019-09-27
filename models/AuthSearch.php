@@ -53,4 +53,18 @@ class AuthSearch extends Auth
         return $dataProvider;
     }
 
+    /**
+     * Getter for the list of authentication methods and their names
+     */
+    public function getAuthSelectlist()
+    {
+        $cfg = $this->fileConfig;
+        array_walk($cfg, function(&$item) {
+            $x = new $item['class']($item   );
+            $item = $x->name . ' (' . $x->typeName . ')';
+            unset($x);
+        });
+        return $cfg;
+    }
+
 }
