@@ -97,12 +97,10 @@ class TicketController extends Controller
 
             $searchModel = new TicketSearch();
             $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-            $session = Yii::$app->session;
 
             return $this->render('index', [
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
-                'session' => $session,
             ]);
         } else if ($mode == 'list') {
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -139,16 +137,15 @@ class TicketController extends Controller
 
         $model = $this->findModel($id);
         if ($mode == 'default') {
-            $session = Yii::$app->session;
 
-            $lastState = $session['ticketLastState' . $model->id];
+            $lastState = Yii::$app->session['ticketLastState' . $model->id];
             if(isset($lastState) && $lastState != $model->state){
-                $session->addFlash('info', Yii::t('ticket', 'The Ticket state has changed from {from} to {to}', [
+                Yii::$app->session->addFlash('info', Yii::t('ticket', 'The Ticket state has changed from {from} to {to}', [
                     'from' => Yii::$app->formatter->format($lastState, 'state'),
                     'to' => Yii::$app->formatter->format($model->state, 'state')
                 ]));
             }
-            $session['ticketLastState' . $model->id] = $model->state;
+            Yii::$app->session['ticketLastState' . $model->id] = $model->state;
 
             $activitySearchModel = new ActivitySearch();
             $activityDataProvider = $activitySearchModel->search(['ActivitySearch' => ['ticket_id' => $id] ]);
@@ -213,7 +210,6 @@ class TicketController extends Controller
             return $this->render('view', [
                 'model' => $model,
                 'online' => $online,
-                'session' => $session,
                 'activitySearchModel' => $activitySearchModel,
                 'activityDataProvider' => $activityDataProvider,
                 'backupSearchModel' => $backupSearchModel,

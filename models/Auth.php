@@ -356,6 +356,11 @@ return [
      */
     public function delete()
     {
+        if ($this->id == "0") {
+            Yii::$app->session->addFlash('danger', \Yii::t('user', 'The entry with id 0 cannot be deleted.'));
+            return false;
+        }
+
         $fileConfig = $this->fileConfig;
         unset($fileConfig[$this->id]);
         if (($this->saveFileConfig($fileConfig)) === true) {

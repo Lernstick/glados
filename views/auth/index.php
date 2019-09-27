@@ -47,7 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         return $model->id != "0";
                     },
                     'delete' => function ($model) {
-                        return $model->id != "0";
+                        return true;#$model->id != "0";
                     },
                 ],
             ],
@@ -72,6 +72,8 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
         'options' => ['id' => 'dynagrid-auth-index'] // a unique identifier is important
     ]); ?>
+
+    <?= $this->render('@app/views/_notification') ?>
 
     <?php Pjax::end(); ?>
 

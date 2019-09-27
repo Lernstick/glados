@@ -111,9 +111,7 @@ $this->registerJs($active_tabs);
                 ],
             ]) ?>
 
-            <?= $this->render('@app/views/_notification', [
-                'session' => $session,
-            ]) ?>
+            <?= $this->render('@app/views/_notification') ?>
 
         </div>
 

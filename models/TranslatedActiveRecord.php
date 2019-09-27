@@ -172,16 +172,18 @@ class TranslatedActiveRecord extends Base
                 'en' => \Yii::t($category, $this->{$field . '_db'}, $params, 'en')
             ])->one();
             
-            if ($tr === null || $tr === false) {
-                // TODO: loop through all languages
-                $translation = new Translation([
-                    'en' => \Yii::t($category, $this->{$field . '_db'}, $params, 'en'),
-                    'de' => \Yii::t($category, $this->{$field . '_db'}, $params, 'de'),
-                ]);
-                $translation->save();
-                $this->{$field . '_id'} = $translation->id;
-            } else {
-                $this->{$field . '_id'} = $tr->id;
+            if ($this->{$field . '_db'} !== null) {
+                if ($tr === null || $tr === false) {
+                    // TODO: loop through all languages
+                    $translation = new Translation([
+                        'en' => \Yii::t($category, $this->{$field . '_db'}, $params, 'en'),
+                        'de' => \Yii::t($category, $this->{$field . '_db'}, $params, 'de'),
+                    ]);
+                    $translation->save();
+                    $this->{$field . '_id'} = $translation->id;
+                } else {
+                    $this->{$field . '_id'} = $tr->id;
+                }
             }
         }
     }

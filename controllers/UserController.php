@@ -60,7 +60,6 @@ class UserController extends Controller
             $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
             return $this->render('index', [
-                'session' => Yii::$app->session,
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
             ]);
@@ -95,7 +94,6 @@ class UserController extends Controller
         return $this->render('view', [
             'model' => $model,
             'permissionDataProvider' => $permissionDataProvider,
-            'session' => Yii::$app->session,
         ]);
     }
 
