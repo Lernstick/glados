@@ -47,7 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         return $model->id != "0";
                     },
                     'delete' => function ($model) {
-                        return true;#$model->id != "0";
+                        return $model->id != "0";
                     },
                 ],
             ],
