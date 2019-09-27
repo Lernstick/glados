@@ -31,7 +31,7 @@ class Local extends \app\models\Auth
     /**
      * @inheritdoc
      */
-    public $typeName = 'DB';
+    public $typeName = 'Database';
 
     /**
      * @inheritdoc

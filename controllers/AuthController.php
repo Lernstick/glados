@@ -42,10 +42,19 @@ class AuthController extends Controller
     /**
      * Lists all Auth models.
      *
+     * @param string $waitDelete the id of an entry where deletion is in process
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex($waitDelete = null)
     {
+        if ($waitDelete !== null) {
+            if (($model = $this->findModel($waitDelete, false)) !== null) {
+                return $this->render('wait_for', ['id' => $waitDelete]);
+            } else {
+                return $this->redirect(['index']);
+            }
+        }
+
         $searchModel = new AuthSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -58,28 +67,34 @@ class AuthController extends Controller
     /**
      * Displays a single Auth model.
      *
-     * @param integer $id
-     * @param bool $wait
+     * @param string $id
+     * @param bool $wait if true the view will wait for the item to appear in the actual config
+     * @param string $newCont the new content that the entry should posses, if set the view will wait until the content
+     * appears in the actual config
      * @return mixed
      */
-    public function actionView($id, $wait = false)
+    public function actionView($id, $wait = false, $newCont = null)
     {
         if ($wait == true) {
             if (($model = $this->findModel($id, false)) !== null) {
-                return $this->render('/auth/' . $model->view, [
-                    'model' => $model,
-                ]);
+                if ($newCont !== null) {
+                    if ($newCont === json_encode($model->fileConfig[$id])) {
+                        # maybe a redirect is not always the best option ???
+                        return $this->redirect(['view', 'id' => $model->id]);
+                        //return $this->render('/auth/' . $model->view, ['model' => $model]);
+                    } else {
+                        return $this->render('wait_for', ['id' => $id]);
+                    }
+                } else {
+                    return $this->redirect(['view', 'id' => $model->id]);                    
+                }
             } else {
-                return $this->render('view_wait', [
-                    'id' => $id,
-                ]);
+                return $this->render('wait_for', ['id' => $id]);
             }
-        } else {
-            $model = $this->findModel($id);
-            return $this->render('/auth/' . $model->view, [
-                'model' => $model,
-            ]);
         }
+
+        $model = $this->findModel($id);
+        return $this->render('/auth/' . $model->view, ['model' => $model]);
     }
 
     /**
@@ -137,7 +152,7 @@ class AuthController extends Controller
     /**
      * Updates an existing Auth model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
+     * @param string $id
      * @return mixed
      */
     public function actionUpdate($id)
@@ -149,7 +164,11 @@ class AuthController extends Controller
             //submitted
             $model->scenario = $model->class::SCENARIO_DEFAULT;
             if ($model->load(Yii::$app->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+                return $this->redirect(['view',
+                    'id' => $model->id,
+                    'wait' => true,
+                    'newCont' => json_encode($model->getAttributes($model->activeAttributes())),
+                ]);
             } else {
                 return $this->render('update', [
                     'model' => $model,
@@ -172,19 +191,20 @@ class AuthController extends Controller
     /**
      * Deletes an existing Auth model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
+     * @param string $id
      * @return mixed
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-
+        if ($this->findModel($id)->delete() !== false) {
+            return $this->redirect(['index', 'waitDelete' => $id]);
+        }
         return $this->redirect(['index']);
     }
 
     /**
      * Tests an existing Auth model.
-     * @param integer $id
+     * @param string $id
      * @return mixed
      */
     public function actionTest($id)
@@ -201,7 +221,7 @@ class AuthController extends Controller
     /**
      * Migrates existing app\models\User models to app\models\UserAuth models 
      * associated to an existing Auth model.
-     * @param integer $id the Auth model
+     * @param string $id the Auth model
      * @return mixed
      */
     public function actionMigrate($id)
@@ -238,7 +258,7 @@ class AuthController extends Controller
      * Finds the Auth model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown
      * or null is returned.
-     * @param integer $id
+     * @param string $id
      * @param bool $lethal throw error or just return null in case of no result
      * @return Auth|null the loaded model or null if $lethal is not true
      * @throws NotFoundHttpException if the model cannot be found

@@ -299,8 +299,6 @@ return [
                 return false;
             }
 
-            $mtime = filemtime($file);
-
             // write the new config file
             if (! @file_put_contents($file, $newConfig)) {
                 $this->addError('*', Yii::t('auth', 'Configuration file {file} could not be written.', [

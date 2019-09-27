@@ -53,7 +53,7 @@ return [
         'class' => 'app\\components\\Ad',
         'name' => 'LDAP2',
         'description' => 'Test Active Directory connection 2',
-        'order' => '99',
+        'order' => '1',
         'domain' => 'test.local',
         'ldap_uri' => 'ldap://192.168.0.67:389',
         'loginScheme' => '{username}',
@@ -84,6 +84,23 @@ return [
         array (
           'group2' => 'admin',
           'group' => 'teacher',
+        ),
+      ),
+      'c6bc5d5a-23a9-4913-a2ac-5635932d77a7' => 
+      array (
+        'class' => 'app\\components\\Ad',
+        'name' => 'AD',
+        'description' => 'Active Directory Authentication Method',
+        'order' => '5',
+        'domain' => 'asd2',
+        'ldap_uri' => 'ldap://asd:389',
+        'loginScheme' => '{username}',
+        'bindScheme' => '{username}@{domain}',
+        'searchFilter' => '(sAMAccountName={username})',
+        'groupIdentifier' => 'sAMAccountName',
+        'groupSearchFilter' => '(objectCategory=group)',
+        'mapping' => 
+        array (
         ),
       ),
     )
