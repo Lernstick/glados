@@ -56,21 +56,20 @@ $this->params['breadcrumbs'][] = $this->title;
         'theme' => 'simple-default',
         'gridOptions' => [
             'dataProvider' => $dataProvider,
-            'filterModel' => $searchModel,
             'panel' => ['heading' => '<h3 class="panel-title">' . \Yii::t('auth', 'Authentication Methods') . '</h3>'],
             'rowOptions' => function($model) {
-                return $model->id == "0" ? ['style' => ['background-color' => '#f5f5f5']] : null;
+                return $model->id == "0" ? ['class' => 'info'] : null;
             },   
             'toolbar' =>  [
                 ['content' =>
-                    Html::a('<i class="glyphicon glyphicon-plus"></i>', ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => \Yii::t('auth', 'Create Authentication Method')]) . ' ' .
+                    Html::a('<i class="glyphicon glyphicon-plus"></i>&nbsp;' . 'Add new Authentication Method', ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => \Yii::t('auth', \Yii::t('auth', 'Create Authentication Method'))]) . ' ' .
                     Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/auth/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => \Yii::t('auth', 'Reset Grid')])
                 ],
-                ['content' => '{dynagridFilter}{dynagridSort}{dynagrid}'],
+                ['content' => '{dynagrid}'],
                 '{export}',
             ]
         ],
-        'options' => ['id' => 'dynagrid-auth-index'] // a unique identifier is important
+        'options' => ['id' => 'dynagrid-auth-index'], // a unique identifier is important
     ]); ?>
 
     <?= $this->render('@app/views/_notification') ?>

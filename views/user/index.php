@@ -71,6 +71,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'role',
                 'filter' => $searchModel->roleList,
             ],
+            [
+                'attribute' => 'type',
+                'label' => Yii::t('auth', 'Authentication Method'),
+                'value' => function($model) {
+                    return $model->authMethod->name . ' (' . $model->authMethod->typeName . ')';
+                },
+                'format' => 'raw',
+            ],
             'last_visited',
 
             [

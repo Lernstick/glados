@@ -61,6 +61,7 @@ class UserSearch extends User
                     'desc' => ['auth_assignment.item_name' => SORT_DESC],
                     'label' => 'Owner'
                 ],
+                'type',
                 'last_visited',
             ]
         ]);

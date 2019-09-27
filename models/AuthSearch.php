@@ -16,6 +16,14 @@ class AuthSearch extends Auth
     /**
      * @inheritdoc
      */
+    public function rules()
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function scenarios()
     {
         // bypass scenarios() implementation in the parent class

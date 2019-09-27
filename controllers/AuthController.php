@@ -69,16 +69,16 @@ class AuthController extends Controller
      *
      * @param string $id
      * @param bool $wait if true the view will wait for the item to appear in the actual config
-     * @param string $newCont the new content that the entry should posses, if set the view will wait until the content
-     * appears in the actual config
+     * @param string $hash the md5 sum of the new content that the entry should posses, if set the view will wait until
+     * the new content appears in the actual config
      * @return mixed
      */
-    public function actionView($id, $wait = false, $newCont = null)
+    public function actionView($id, $wait = false, $hash = null)
     {
         if ($wait == true) {
             if (($model = $this->findModel($id, false)) !== null) {
-                if ($newCont !== null) {
-                    if ($newCont === json_encode($model->fileConfig[$id])) {
+                if ($hash !== null) {
+                    if ($hash === md5(json_encode($model->fileConfig[$id]))) {
                         # maybe a redirect is not always the best option ???
                         return $this->redirect(['view', 'id' => $model->id]);
                         //return $this->render('/auth/' . $model->view, ['model' => $model]);
@@ -167,7 +167,7 @@ class AuthController extends Controller
                 return $this->redirect(['view',
                     'id' => $model->id,
                     'wait' => true,
-                    'newCont' => json_encode($model->getAttributes($model->activeAttributes())),
+                    'hash' => md5(json_encode($model->getAttributes($model->activeAttributes()))),
                 ]);
             } else {
                 return $this->render('update', [

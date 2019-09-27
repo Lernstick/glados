@@ -86,14 +86,14 @@ return [
           'group' => 'teacher',
         ),
       ),
-      '35e7f28a-8fb4-4aa5-b505-8c894be87f1f' => 
+      '8c2f01e7-77e0-4688-b143-919324029385' => 
       array (
         'class' => 'app\\components\\Ad',
         'name' => 'AD',
         'description' => 'Active Directory Authentication Method',
         'order' => '5',
-        'domain' => 'sss',
-        'ldap_uri' => '',
+        'domain' => 'sss2',
+        'ldap_uri' => 'ldap://sss:389',
         'loginScheme' => '{username}',
         'bindScheme' => '{username}@{domain}',
         'searchFilter' => '(sAMAccountName={username})',

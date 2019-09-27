@@ -86,22 +86,5 @@ return [
           'group' => 'teacher',
         ),
       ),
-      '35e7f28a-8fb4-4aa5-b505-8c894be87f1f' => 
-      array (
-        'class' => 'app\\components\\Ad',
-        'name' => 'AD',
-        'description' => 'Active Directory Authentication Method',
-        'order' => '5',
-        'domain' => 'sss',
-        'ldap_uri' => '',
-        'loginScheme' => '{username}',
-        'bindScheme' => '{username}@{domain}',
-        'searchFilter' => '(sAMAccountName={username})',
-        'groupIdentifier' => 'sAMAccountName',
-        'groupSearchFilter' => '(objectCategory=group)',
-        'mapping' => 
-        array (
-        ),
-      ),
     )
 ];
