@@ -8,11 +8,11 @@ use app\models\User;
 use yii\base\InvalidConfigException;
 
 /**
- * Ad represents a connection to a Active Directory  via LDAP.
+ * AuthGenericLdap represents a connection to an generic LDAP directory.
  *
- * @property bool $isActive Whether the AD connection is established. This property is read-only.
+ * @property bool $isActive Whether the LDAP connection is established. This property is read-only.
  */
-class Ad extends \app\models\Auth
+class AuthGenericLdap extends \app\models\Auth
 {
 
     const SCENARIO_QUERY_GROUPS = 'query_groups';
@@ -24,11 +24,21 @@ class Ad extends \app\models\Auth
      */
     const LDAP_OPT_DIAGNOSTIC_MESSAGE = 0x0032;
 
+    /**
+     * @const string Bind directly to the LDAP using the username from login,
+     */
+    const BIND_BY_USERNAME = 'bind_by_username';
+
+    /**
+     * @const string Bind via a given bind user to the LDAP, then retrieve the bind attribute of the login user,
+     * then bind again using this attribute to authentication the login user,
+     */
+    const BIND_BY_BINDUSER = 'bind_by_binduser';
+
     public $ldap_uri = '';
     public $ldap_scheme = 'ldap';
     public $ldap_port = 389;
     public $domain = '';
-    public $netbiosDomain = '';
 
     public $ldap_options = [
         LDAP_OPT_PROTOCOL_VERSION => 3,
@@ -40,37 +50,42 @@ class Ad extends \app\models\Auth
     /**
      * @inheritdoc
      */
-    public $class = 'app\components\Ad';
+    public $class = 'app\components\AuthGenericLdap';
 
     /**
      * @inheritdoc
      */
-    public $type = \app\models\Auth::AUTH_ACTIVE_DIRECTORY;
+    public $type = \app\models\Auth::AUTH_LDAP;
 
     /**
      * @inheritdoc
      */
-    public $typeName = 'Active Directory';
+    public $typeName = 'Generic LDAP';
 
     /**
      * @inheritdoc
      */
-    public $view = 'view_ad';
+    public $view = 'view_ldap';
 
     /**
      * @inheritdoc
      */
-    public $form = '_form_ad';
+    public $form = '_form_ldap';
 
     /**
      * @inheritdoc
      */
-    public $name = 'AD';
+    public $migrationForm = '_form_ldap_migrate';
 
     /**
      * @inheritdoc
      */
-    public $description = 'Active Directory Authentication Method';
+    public $name = 'LDAP';
+
+    /**
+     * @inheritdoc
+     */
+    public $description = 'Generic LDAP Authentication Method';
 
 
     /**
@@ -97,54 +112,51 @@ class Ad extends \app\models\Auth
     public $bind;
 
     /**
-     * @var array Key-value pairs for mapping of AD groups (defaultly by sAMAccountName) to roles.
+     * @var array Key-value pairs for mapping of LDAP groups (defaultly by their names) to roles.
      * 
      * Example:
      *
      * ```php
      * $mapping = [
-     *     'AD-Admin-Group'            => 'admin',
-     *     'AD-Teacher-Group'          => 'teacher',
-     *     'Another-AD-Teacher-Group'  => 'teacher',
+     *     'LDAP-Admin-Group'            => 'admin',
+     *     'LDAP-Teacher-Group'          => 'teacher',
+     *     'Another-LDAP-Teacher-Group'  => 'teacher',
      * ];
      * ```
      * 
      * In the example above, if a user is in multiple groups appearing in the mapping, the highest
-     * role according to [[roleOrder]] is taken for this user. Multiple AD groups can be mapped to the
-     * same role. AD groups can be given in their sAMAccountName or another arbitrary identifier.
+     * role according to [[roleOrder]] is taken for this user. Multiple LDAP groups can be mapped to the
+     * same role. LDAP groups can be given in an arbitrary identifier.
      * @see groupIdentifier
      * @see roleOrder
      */
     public $mapping = [];
 
     /**
-     * @var string A unique identifier across the Active Directory (that never changes).
-     *
-     * "The GUID is unique across the enterprise and anywhere else."
-     * @see https://blogs.msdn.microsoft.com/openspecification/2009/07/10/understanding-unique-attributes-in-active-directory/
+     * @var string A unique identifier across the LDAP Directory (that never changes).
      */
-    public $uniqueIdentifier = 'objectGUID';
+    public $uniqueIdentifier = 'uid';
 
     /**
-     * @var string A (unique) identifier across the Active Directory for the AD groups for [[mapping]]. This
+     * @var string A (unique) identifier across the LDAP Directory for the LDAP groups for [[mapping]]. This
      * should be unique, as that it is used to identify the group membership.
-     * The sAMAccountName may not be unique "across the enterprise and anywhere else", but it is human readable.
      * @see mapping
      */
-    public $groupIdentifier = 'sAMAccountName';
-    public $userIdentifier = 'sAMAccountName';
+    public $groupIdentifier = 'cn';
+    public $userIdentifier = 'uid';
 
     /**
-     * @var array Array of AD group/user identifier attribute names for the select list of [[groupIdentifier]] and [[userIdentifier]].
+     * @var array Array of common LDAP group/user identifier attribute names for the select list of
+     * [[groupIdentifier]] and [[userIdentifier]].
      */
     public $identifierAttributes = [
-        'sAMAccountName',
+        'sAMAccountName', //AD
         'distinguishedName',
-        'userPrincipalName',
+        'userPrincipalName', //AD
         'cn',
         'name',
         'mail',
-        'objectGUID',
+        'objectGUID', //AD
         'uid', //LDAP
         'gidNumber', //LDAP
     ];
@@ -152,17 +164,17 @@ class Ad extends \app\models\Auth
     /**
      * @var string The pattern to test the given login credentials against.
      *
-     * A login over AD will only be performed if the given username matches the provided
-     * pattern. This is used to manage multiple ADs. `{username}` is extracted from the username given in the
+     * A login over LDAP will only be performed if the given username matches the provided
+     * pattern. This is used to manage multiple LDAPs. `{username}` is extracted from the username given in the
      * login form. Later in the authentication `{username}` is replaced by the extracted one from here.
      * 
      * Examples:
      * 
      * ```php
-     * $loginScheme = '{username}';   // no special testing, all usernames provided are authenticated against the AD.
-     * $loginScheme = '{username}@foo';   // only usernames ending with "@foo" are considered and authenticated against the AD.
-     * $loginScheme = '{username}@{domain}';   // only usernames ending with "@{domain}"" are considered and authenticated against the AD. {domain} is replaced with the given $domain configuration variable.
-     * $loginScheme = 'foo\{username}';   // only usernames starting with "foo\" are considered and authenticated against the AD.
+     * $loginScheme = '{username}';   // no special testing, all usernames provided are authenticated against the LDAP.
+     * $loginScheme = '{username}@foo';   // only usernames ending with "@foo" are considered and authenticated against the LDAP.
+     * $loginScheme = '{username}@{domain}';   // only usernames ending with "@{domain}"" are considered and authenticated against the LDAP. {domain} is replaced with the given $domain configuration variable.
+     * $loginScheme = 'foo\{username}';   // only usernames starting with "foo\" are considered and authenticated against the LDAP.
      * ```
      *
      * The placeholders that are replaced by the values given are: `{domain}` with [[domain]], `{netbiosDomain}`  with [[netbiosDomain]], `{base}` with with [[base]].
@@ -173,7 +185,7 @@ class Ad extends \app\models\Auth
     public $loginScheme = '{username}';
 
     /**
-     * @var string The pattern to build the login credentials for the bind to the AD.
+     * @var string The pattern to build the login credentials for the bind to the LDAP.
      * 
      * `{username}` is the string corresponding to `{username}` extracted from [[$loginScheme]].
      * 
@@ -195,7 +207,7 @@ class Ad extends \app\models\Auth
     public $bindScheme = '{username}@{domain}';
 
     /**
-     * @var string The search filter to query the AD for information on the current bind user.
+     * @var string The search filter to query the LDAP for information on the current bind user.
      * 
      * Unfortuately, we cannot use LDAPs extended operation for this (`ldap_exop()` with `LDAP_EXOP_WHO_AM_I`), since it needs PHP `>=7.2.0`.
      * `{username}` is the string corresponding to `{username}` extracted from [[$loginScheme]].
@@ -214,12 +226,12 @@ class Ad extends \app\models\Auth
      * @see https://www.php.net/manual/en/function.ldap-exop.php 
      * @see loginScheme
      */
-    public $searchFilter = '(sAMAccountName={username})';
+    public $searchFilter = '(uid={username})';
 
     /**
-     * @var string The search filter to query the AD for all group objects
+     * @var string The search filter to query the LDAP for all group objects
      */
-    public $groupSearchFilter = '(objectCategory=group)';
+    public $groupSearchFilter = '(objectClass=posixGroup)';
 
     /**
      * @var array Array of common search filters to use for group probing for the select list of [[groupSearchFilter]].
@@ -233,12 +245,12 @@ class Ad extends \app\models\Auth
     ];
 
     /**
-     * @var array Array of AD groups for the select list for the role mapping.
+     * @var array Array of LDAP groups for the select list for the role mapping.
      */
     public $groups = [];
 
     /**
-     * @var string The search filter to query the AD for user objects
+     * @var string The search filter to query the LDAP for user objects
      * The placeholders that are replaced by the values given are: {domain}, {netbiosDomain}, {base}, {userIdentifier}.
      */
     public $migrateUserSearchFilter = '(& (objectCategory=person) ({userIdentifier}={username}) )';
@@ -249,7 +261,7 @@ class Ad extends \app\models\Auth
     public $migrateSearchScheme = '{username}';
 
     /**
-     * @var array Array of AD users for the select list of the migration form.
+     * @var array Array of LDAP users for the select list of the migration form.
      */
     public $migrateUsers = [];
 
@@ -259,14 +271,42 @@ class Ad extends \app\models\Auth
     public $migrate = [];
 
     /**
+     * @var int method of authentication
+     */
+    public $method = self::BIND_BY_USERNAME;
+
+    /**
+     * @var string username for the bind
+     */
+    public $bindUsername;
+
+    /**
+     * @var string password for the bind
+     */
+    public $bindPassword;
+
+    /**
+     * @var string attribute that is used as login username
+     */
+    public $loginAttribute = 'uid';
+
+    /**
+     * @var string attribute to bind as login user
+     */
+    public $bindAttribute = 'uid';
+
+    /**
+     * @var string search filter to search for the login user entry in the LDAP
+     */
+    public $bindSearchFilter = '(& (objectCategory=person) ({loginAttribute}={username}) )';
+
+
+    /**
      * @inheritdoc
      */
     public function init()
     {
         if ($this->domain !== '') {
-            if ($this->netbiosDomain === '') {
-                $this->netbiosDomain = substr($this->domain, 0, strrpos($this->domain, '.'));
-            }
             if ($this->ldap_uri === '') {
                 $this->ldap_uri = $this->ldap_scheme . '://' . $this->domain . ':' . $this->ldap_port;
             }
@@ -301,13 +341,13 @@ class Ad extends \app\models\Auth
                 'required',
                 'when' => function($model) {return $model->scenario == self::SCENARIO_QUERY_GROUPS;},
                 'whenClient' => "function (attribute, value) {
-                    return $('#ad-scenario').val() == 'query_groups';
+                    return $('#ldap-scenario').val() == 'query_groups';
                 }",
                 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_QUERY_GROUPS]
             ],
             [
                 'query_password',
-                'getAllAdGroups',
+                'getAllLdapGroups',
                 'when' => function($model) {return !empty($model->domain);},
                 'on' => self::SCENARIO_QUERY_GROUPS
             ],
@@ -319,7 +359,7 @@ class Ad extends \app\models\Auth
             [['query_username', 'query_password'], 'required',
                 'when' => function($model) {return $model->scenario == self::SCENARIO_QUERY_USERS;},
                 'whenClient' => "function (attribute, value) {
-                    return $('#ad-scenario').val() == 'query_users';
+                    return $('#ldap-scenario').val() == 'query_users';
                 }",
                 'on' => [self::SCENARIO_MIGRATE, self::SCENARIO_QUERY_USERS]
             ],
@@ -336,7 +376,7 @@ class Ad extends \app\models\Auth
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios[self::SCENARIO_DEFAULT] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'ldap_uri', 'loginScheme', 'bindScheme', 'searchFilter', 'groupIdentifier', 'groupSearchFilter', 'mapping']);
+        $scenarios[self::SCENARIO_DEFAULT] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'ldap_uri', 'loginScheme', 'bindScheme', 'searchFilter', 'groupIdentifier', 'groupSearchFilter', 'mapping', 'uniqueIdentifier', 'bindAttribute']);
         $scenarios[self::SCENARIO_QUERY_GROUPS] = ['domain', 'ldap_uri', 'loginScheme', 'bindScheme', 'searchFilter', 'groupIdentifier', 'groupSearchFilter', 'query_username', 'query_password'];
         $scenarios[self::SCENARIO_AUTH_TEST] = ['query_username', 'query_password'];
         $scenarios[self::SCENARIO_QUERY_USERS] = ['migrateSearchScheme', 'migrateUserSearchFilter', 'userIdentifier', 'query_username', 'query_password'];
@@ -351,7 +391,6 @@ class Ad extends \app\models\Auth
     {
         return array_merge(parent::attributeLabels(), [
             'domain' => Yii::t('auth', 'Domain'),
-            'netbiosDomain' => Yii::t('auth', 'Netbios Domain'),
             'base' => Yii::t('auth', 'Base DN'),
             'ldap_uri' => Yii::t('auth', 'LDAP URI'),
             'ldap_port' => Yii::t('auth', 'LDAP Port'),
@@ -369,6 +408,8 @@ class Ad extends \app\models\Auth
                 : \Yii::t('auth', 'Query Credentials'),
             'query_username' => \Yii::t('auth', 'Username'),
             'query_password' => \Yii::t('auth', 'Password'),
+            'bindAttribute' => \Yii::t('auth', 'Bind Attribute'),
+            'loginAttribute' => \Yii::t('auth', 'Login Attribute'),
         ]);
     }
 
@@ -378,25 +419,27 @@ class Ad extends \app\models\Auth
     public function attributeHints()
     {
         return array_merge(parent::attributeHints(), [
-            'domain' => \Yii::t('auth', 'The full name of the Active Directory Domain. For Exampe <code>test.local</code>.'),
+            'domain' => \Yii::t('auth', 'The full name of the LDAP Domain. For Exampe <code>test.local</code>.'),
             'ldap_uri' => Yii::t('auth', 'A full LDAP URI of the form <code>ldap://hostname:port</code> or <code>ldaps://hostname:port</code> for SSL encryption. You can also provide multiple LDAP-URIs separated by a space as one string. Note that <code>hostname:port</code> is not a supported LDAP URI as the schema is missing. See <a target="_blank" href="https://www.php.net/manual/en/function.ldap-connect.php">ldap_connect()</a>
                 under <code>ldap_uri</code>.'),
             'ldap_options' => Yii::t('auth', 'For all possible options please visit <a target="_blank" href="https://www.php.net/manual/en/function.ldap-set-option.php">ldap_set_option()</a>'),
-            'loginScheme' => \Yii::t('auth', 'The pattern to test the given login credentials against a login over AD will only be performed if the given username matches the provided pattern. This is used to manage multiple ADs. {username} is extracted from the username given in the login form. Later in the authentication {username} is replaced by the extracted one from here (see <code>bindScheme</code> and <code>searchFilter</code>).<br>Examples:<br><ul><li><code>{username}</code>: no special testing, all usernames provided are authenticated against the AD.</li><li><code>{username}@foo</code>: only usernames ending with @foo are considered and authenticated agaist the AD.</li><li><code>{username}@{domain}</code>: only usernames ending with @{domain} are considered and authenticated agaist the AD. {domain} is replaced with the given <code>domain</code> configuration variable.</li><li><code>foo\{username}</code>: only usernames starting with foo\ are considered and authenticated agaist the AD.</li></ul>The placeholders that are replaced by the values given are: <code>{domain}</code>, <code>{netbiosDomain}</code>, <code>{base}</code>.'),
+            'loginScheme' => \Yii::t('auth', 'The pattern to test the given login credentials against a login over LDAP will only be performed if the given username matches the provided pattern. This is used to manage multiple LDAPs. {username} is extracted from the username given in the login form. Later in the authentication {username} is replaced by the extracted one from here (see <code>bindScheme</code> and <code>searchFilter</code>).<br>Examples:<br><ul><li><code>{username}</code>: no special testing, all usernames provided are authenticated against the LDAP.</li><li><code>{username}@foo</code>: only usernames ending with @foo are considered and authenticated agaist the LDAP.</li><li><code>{username}@{domain}</code>: only usernames ending with @{domain} are considered and authenticated agaist the LDAP. {domain} is replaced with the given <code>domain</code> configuration variable.</li><li><code>foo\{username}</code>: only usernames starting with foo\ are considered and authenticated agaist the LDAP.</li></ul>The placeholders that are replaced by the values given are: <code>{domain}</code>, <code>{netbiosDomain}</code>, <code>{base}</code>.'),
             'bindScheme' => \Yii::t('auth', 'TODO'),
             'searchFilter' => \Yii::t('auth', 'TODO'),
             'groupIdentifier' => \Yii::t('auth', 'TODO'),
             'groupSearchFilter' => \Yii::t('auth', 'TODO'),
-            'mapping' => \Yii::t('auth', 'The direct assignment of Active Diretory groups to user roles. You can map multiple Active Diretory groups to the same role. Goups need not to be assigned to all roles.'),
+            'mapping' => \Yii::t('auth', 'The direct assignment of LDAP groups to user roles. You can map multiple LDAP groups to the same role. Goups need not to be assigned to all roles.'),
             'query_login' => $this->scenario == self::SCENARIO_AUTH_TEST
-                ? \Yii::t('auth', 'Username and password to login to the Active Diretory servers. Login credentials are not saved anywhere.')
-                : \Yii::t('auth', 'Username and password to query the Active Diretory servers given above for group names. This information is only needed to specify the group mapping. Login credentials are not saved anywhere.'),
+                ? \Yii::t('auth', 'Username and password to login to the LDAP servers. Login credentials are not saved anywhere.')
+                : \Yii::t('auth', 'Username and password to query the LDAP servers given above for group names. This information is only needed to specify the group mapping. Login credentials are not saved anywhere.'),
+            'bindAttribute' => \Yii::t('auth', 'TODO'),
+            'loginAttribute' => \Yii::t('auth', 'TODO'),
         ]);
     }
 
     /**
-     * Returns a value indicating whether the AD connection is established.
-     * @return bool whether the AD connection is established
+     * Returns a value indicating whether the LDAP connection is established.
+     * @return bool whether the LDAP connection is established
      */
     public function getIsActive()
     {
@@ -476,18 +519,16 @@ class Ad extends \app\models\Auth
      * Decides whether the username provided by the user matches the pattern to authenticate.
      * @param string $username the username that was provided to the login form by the user attempting to login
      * @param string $scheme the login scheme
+     * @param array $substitutions array of substitutions
      *
      * @return bool whether the provided username matches the pattern or not
      */
-    private function getRealUsernameByScheme($username, $scheme) {
+    public function getRealUsernameByScheme($username, $scheme, $substitutions) {
         //$regex = '([^\"\/\\\[\]\:\;\|\=\,\+\*\?\<\>]+)';
         $regex = '(.+)';
-        $pattern = substitute($scheme, [
-            'domain' => $this->domain,
-            'netbiosDomain' => $this->netbiosDomain,
-            'base' => $this->base,
+        $pattern = substitute($scheme, array_merge($substitutions, [
             'username' => '@@@@',
-        ]);
+        ]));
         $pattern = preg_quote($pattern, '/');
         $pattern = str_replace('@@@@', $regex, $pattern);
 
@@ -500,27 +541,50 @@ class Ad extends \app\models\Auth
     }
 
     /**
-     * Decides whether the username provided by the user matches the pattern to authenticate over AD.
+     * Decides whether the username provided by the user matches the pattern to authenticate over LDAP.
      * @param string username the username that was provided to the login form by the user attempting to login
      *
      * @return bool whether the provided username matches the pattern or not
      */
     public function getRealUsername($username)
     {
-        return $this->getRealUsernameByScheme($username, $this->loginScheme);
+        return $this->getRealUsernameByScheme($username, $this->loginScheme, [
+            'domain' => $this->domain,
+            'base' => $this->base,
+        ]);
     }
 
     /**
-     * Contructs the username to bind to the AD.
+     * Contructs the username to bind to the LDAP.
      * @param string username the real username that was extracted from [[getRealUsername()]]
      *
      * @return string the bind username
      */
     public function getBindUsername($username)
     {
+        # if the method is "bind by binduser" then first bind with that user to retrieve
+        # the bind username of the login user.
+        if ($this->method == self::BIND_BY_BINDUSER) {
+            if (($username = $this->getBindAttribute($username)) !== false) {
+                return $username;
+            } else {
+                return false;
+            }
+        }
+
+        $username = $this->getSubstitutedBindUsername($username);
+        Yii::debug('Username matches LDAP::loginScheme. Proceeding with bind username: ' . $username, __METHOD__);
+        $this->debug[] = Yii::t('auth', 'Proceeding with bind username <code>{bindUser}</code> according to bindScheme <code>{bindScheme}</code>.', [
+            'bindUser' => $username,
+            'bindScheme' => $this->bindScheme,
+        ]);
+        return $username;
+    }
+
+    public function getSubstitutedBindUsername($username)
+    {
         return substitute($this->bindScheme, [
             'domain' => $this->domain,
-            'netbiosDomain' => $this->netbiosDomain,
             'base' => $this->base,
             'username' => $username,
         ]);
@@ -555,14 +619,15 @@ class Ad extends \app\models\Auth
     /**
      * Determines the highest possible roles for a set of given groups
      * 
-     * @param array groups set of AD groups
-     * @return mixed the highest role according to [[roleOrder]] or the first element from the roles array if nothing matches or false if roles is empty
+     * @param array groups set of LDAP groups
+     * @return mixed the highest role according to [[roleOrder]] or the first element from the roles
+     * array if nothing matches or false if roles is empty
      */
     public function determineRole($groups)
     {
         $roles = [];
-        foreach ($this->mapping as $adGroup => $mappedRole) {
-            if (in_array($adGroup, $groups)) {
+        foreach ($this->mapping as $ldapGroup => $mappedRole) {
+            if (in_array($ldapGroup, $groups)) {
                 array_push($roles, $mappedRole);
             }
         }
@@ -576,8 +641,64 @@ class Ad extends \app\models\Auth
     }
 
     /**
-     * Establishes a AD connection.
-     * It does nothing if a AD connection has already been established.
+     * Getter for the searchFilter with substituted values
+     * @return string substituted string
+     */
+    public function getSubstitutedSearchFilter($username)
+    {
+        return substitute($this->searchFilter, [
+            'domain' => $this->domain,
+            'base' => $this->base,
+            'username' => $username,
+            'bindAttribute' => $this->bindAttribute,
+        ]);
+    }
+
+    /**
+     * Getter for the migrateSearchFilter with substituted values
+     * @return string substituted string
+     */
+    public function getSubstitutedMigrateSearchFilter($username)
+    {
+        return substitute($this->migrateUserSearchFilter, [
+            'domain' => $this->domain,
+            'base' => $this->base,
+            'userIdentifier' => $this->userIdentifier,
+            'username' => $username,
+        ]);
+    }
+
+    /**
+     * Getter for the migrateSearchScheme with substituted values
+     * @return string substituted string
+     */
+    public function getSubstitutedMigrateSearchScheme($username)
+    {
+        return substitute($this->migrateSearchScheme, [
+            'domain' => $this->domain,
+            'base' => $this->base,
+            'username' => $username,
+        ]);
+    }
+
+    /**
+     * Getter for the bindSearchFilter with substituted values
+     * @return string substituted string
+     */
+    public function getSubstitutedBindSearchFilter($username)
+    {
+        return substitute($this->bindSearchFilter, [
+            'userIdentifier' => $this->userIdentifier,
+            'loginAttribute' => $this->loginAttribute,
+            'domain' => $this->domain,
+            'base' => $this->base,
+            'username' => $username,
+        ]);
+    }
+
+    /**
+     * Establishes an LDAP connection.
+     * It does nothing if an LDAP connection has already been established.
      * @throws Exception if connection fails
      */
     public function open()
@@ -587,20 +708,20 @@ class Ad extends \app\models\Auth
         }
 
         if (empty($this->domain)) {
-            $this->error = 'Ad::domain cannot be empty.';
-            throw new InvalidConfigException('Ad::domain cannot be empty.');
+            $this->error = 'LDAP::domain cannot be empty.';
+            throw new InvalidConfigException('LDAP::domain cannot be empty.');
         }
 
-        Yii::debug('Opening AD connection: ' . $this->ldap_uri, __METHOD__);
-        //$this->debug[] = 'Opening AD connection: ' . $this->ldap_uri;
-        $this->debug[] = Yii::t('auth', 'Opening AD connection: <code>{uri}</code>.', [
+        Yii::debug('Opening LDAP connection: ' . $this->ldap_uri, __METHOD__);
+        //$this->debug[] = 'Opening LDAP connection: ' . $this->ldap_uri;
+        $this->debug[] = Yii::t('auth', 'Opening LDAP connection: <code>{uri}</code>.', [
             'uri' => $this->ldap_uri
         ]);
         $this->connection = ldap_connect($this->ldap_uri);
 
         if ($this->connection === false) {
-            $this->error = 'Ad::ldap_uri was not parseable.';
-            throw new InvalidConfigException('Ad::ldap_uri was not parseable.');
+            $this->error = 'LDAP::ldap_uri was not parseable.';
+            throw new InvalidConfigException('LDAP::ldap_uri was not parseable.');
         }
 
         foreach ($this->ldap_options as $option => $value) {
@@ -618,26 +739,26 @@ class Ad extends \app\models\Auth
     }
 
     /**
-     * Bind to the Active Directory.
+     * Setup the bind to the LDAP.
      * 
      * @param string $username the username given from the login form
      * @param string $password the password given from the login form
-     * @return bool|string bind failure or the username
+     * @return false|string bind failure or the username
      */
-    public function bindAd($username, $password)
+    public function CheckAndBind($username, $password)
     {
         $this->init();
         if ($user = $this->getRealUsername($username)) {
-            $bindUser = $this->getBindUsername($user);
-            Yii::debug('Username matches Ad::loginScheme. Proceeding with bind username: ' . $bindUser, __METHOD__);
             $this->debug[] = Yii::t('auth', 'Username <code>{username}</code> matches loginScheme <code>{loginScheme}</code>.', [
                 'username' => $username,
                 'loginScheme' => $this->loginScheme,
             ]);
-            $this->debug[] = Yii::t('auth', 'Proceeding with bind username <code>{bindUser}</code> according to bindScheme <code>{bindScheme}</code>.', [
-                'bindUser' => $bindUser,
-                'bindScheme' => $this->bindScheme,
-            ]);
+
+            if (($bindUser = $this->getBindUsername($user)) !== false) {
+                return $this->bindLdap($bindUser, $password);
+            } else {
+                return false;
+            }
         } else {
             $this->error = Yii::t('auth', 'Username <code>{username}</code> does not match loginScheme <code>{loginScheme}</code> of authentication method <code>{name}</code>.', [
                 'username' => $username,
@@ -647,17 +768,32 @@ class Ad extends \app\models\Auth
             Yii::debug($this->error, __METHOD__);
             return false;
         }
+    }
 
+    /**
+     * Bind to the LDAP.
+     * 
+     * @param string $username the username
+     * @param string $password the password
+     * @return false|string bind failure or the username
+     */
+    public function bindLdap($username, $password)
+    {
         $this->open();
-        $this->bind = @ldap_bind($this->connection, $bindUser, $password);
+        $this->bind = @ldap_bind($this->connection, $username, $password);
 
         if ($this->bind) {
             Yii::debug('Bind successful', __METHOD__);
-            $this->debug[] = 'Bind successful';
-            return $user;
+            $this->debug[] = Yii::t('auth', 'Bind with username <code>{username}</code> successful', [
+                'username' => $username,
+            ]);
+            return $username;
         } else {
-            $this->error = 'Bind failed: ' . ldap_error($this->connection);
-            ldap_get_option($this->connection, Ad::LDAP_OPT_DIAGNOSTIC_MESSAGE, $extended_error);
+            $this->error = Yii::t('auth', 'Bind with username <code>{username}</code> failed: {error}', [
+                'username' => $username,
+                'error' => ldap_error($this->connection),
+            ]);
+            ldap_get_option($this->connection, AuthGenericLdap::LDAP_OPT_DIAGNOSTIC_MESSAGE, $extended_error);
             if (!empty($extended_error)) {
                 $this->error .= ", Detailed error message: " . $extended_error;
             }
@@ -668,7 +804,65 @@ class Ad extends \app\models\Auth
     }
 
     /**
-     * Authenticate a user over Active Directory.
+     * Finds the attribtue in the LDAP directory for the bind with the login user.
+     * 
+     * @return false|string bind failure or the username
+     */
+    public function getBindAttribute($username)
+    {
+        if (($user = $this->bindLdap($this->bindUsername, $this->bindPassword)) !== false) {
+            $searchFilter = $this->getSubstitutedBindSearchFilter($username);
+
+            $this->debug[] = Yii::t('auth', 'Querying LDAP with search filter <code>{searchFilter}</code> and base dn <code>{base}</code> for the bind attribute <code>{attribute}</code>.', [
+                'searchFilter' => $searchFilter,
+                'base' => $this->base,
+                'attribute' => $this->bindAttribute,
+            ]);
+
+            $result = @ldap_search($this->connection, $this->base, $searchFilter, array($this->bindAttribute), 0, 1);
+
+            if ($result === false) {
+                $this->error = 'Search failed: ' . ldap_error($this->connection);
+                Yii::debug($this->error, __METHOD__);
+                return false;
+            }
+
+            if ($userInfo = ldap_get_entries($this->connection, $result)) {
+                if($userInfo['count'] != 0) {
+
+                    $this->debug[] = Yii::t('auth', 'Retrieving {n} user entries.', [
+                        'n' => $userInfo['count'],
+                    ]);
+                    $username = $userInfo[0][strtolower($this->bindAttribute)][0];
+
+                    // convert binary data to hex if the identifier is objectGUID
+                    if ($this->bindAttribute == 'objectGUID') {
+                        $username = $this->convertGUIDToHex($username);
+                    }
+
+                    $this->debug[] = Yii::t('auth', 'Bind attribute <code>{attribute}</code> is <code>{username}</code>.', [
+                        'attribute' =>$this->bindAttribute,
+                        'username' => $username,
+                    ]);
+                    $this->searchFilter = '({bindAttribute}={username})';
+                    return $username;
+                } else {
+                    $this->error = 'No result found, check <code>bindSearchFilter</code>.';
+                    Yii::debug($this->error, __METHOD__);
+                    return false;
+                }
+            } else {
+                $this->error = ldap_error($this->connection);
+                Yii::debug('Recieving entries failed: ' . $this->error, __METHOD__);
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Authenticate a user over LDAP.
      * 
      * @param string $username the username given from the login form
      * @param string $password the password given from the login form
@@ -677,16 +871,11 @@ class Ad extends \app\models\Auth
     public function authenticate($username, $password)
     {
 
-        if (($user = $this->bindAd($username, $password)) !== false) {
+        if (($user = $this->CheckAndBind($username, $password)) !== false) {
 
-            $searchFilter = substitute($this->searchFilter, [
-                'domain' => $this->domain,
-                'netbiosDomain' => $this->netbiosDomain,
-                'base' => $this->base,
-                'username' => $user,
-            ]);
+            $searchFilter = $this->getSubstitutedSearchFilter($user);
 
-            $this->debug[] = Yii::t('auth', 'Querying AD with search filter <code>{searchFilter}</code> and base dn <code>{base}</code> for the attribute <code>{attribute}</code>.', [
+            $this->debug[] = Yii::t('auth', 'Querying LDAP with search filter <code>{searchFilter}</code> and base dn <code>{base}</code> for the attribute <code>{attribute}</code>.', [
                 'searchFilter' => $searchFilter,
                 'base' => $this->base,
                 'attribute' => $this->uniqueIdentifier,
@@ -769,7 +958,7 @@ class Ad extends \app\models\Auth
     public function query_groups()
     {
 
-        $this->debug[] = Yii::t('auth', 'Querying AD with search filter <code>{searchFilter}</code> and base dn <code>{base}</code> for the attribute <code>{attribute}</code>.', [
+        $this->debug[] = Yii::t('auth', 'Querying LDAP with search filter <code>{searchFilter}</code> and base dn <code>{base}</code> for the attribute <code>{attribute}</code>.', [
             'searchFilter' => $this->groupSearchFilter,
             'base' => $this->base,
             'attribute' => $this->groupIdentifier,
@@ -825,25 +1014,21 @@ class Ad extends \app\models\Auth
         $c = 0;
         $N = count($users);
         if ($N != 0) {
-            $this->debug[] = Yii::t('auth', 'Querying AD for existing local users with base dn <code>{base}</code> for the attributes <code>{attribute1}</code> and <code>{attribute2}</code>.', [
+            $this->debug[] = Yii::t('auth', 'Querying LDAP for existing local users with base dn <code>{base}</code> for the attributes <code>{attribute1}</code> and <code>{attribute2}</code>.', [
                 'base' => $this->base,
                 'attribute1' => $this->uniqueIdentifier,
                 'attribute2' => $this->userIdentifier,
             ]);
         }
         foreach ($users as $key => $usernameFromDb) {
-            $usernameReal = $this->getRealUsernameByScheme($usernameFromDb, $this->migrateSearchScheme);
-
-            $searchFilter = substitute($this->migrateUserSearchFilter, [
+            $usernameReal = $this->getRealUsernameByScheme($usernameFromDb, $this->migrateSearchScheme, [
                 'domain' => $this->domain,
-                'netbiosDomain' => $this->netbiosDomain,
                 'base' => $this->base,
-                'userIdentifier' => $this->userIdentifier,
-                'username' => $usernameReal,
             ]);
 
+            $searchFilter = $this->getSubstitutedMigrateSearchFilter($usernameReal);
 
-            $this->debug[] = Yii::t('auth', '{c}/{N}: Querying AD for <code>{user}</code> with search filter <code class="show_more">{searchFilter}</code>.', [
+            $this->debug[] = Yii::t('auth', '{c}/{N}: Querying LDAP for <code>{user}</code> with search filter <code class="show_more">{searchFilter}</code>.', [
                 'c' => $key+1,
                 'N' => $N,
                 'user' => $usernameFromDb,
@@ -907,9 +1092,9 @@ class Ad extends \app\models\Auth
      * @param \yii\validators\InlineValidator $validator related InlineValidator instance.
      * This parameter is available since version 2.0.11.
      */
-    public function getAllAdGroups ($attribute, $params, $validator)
+    public function getAllLdapGroups ($attribute, $params, $validator)
     {
-        if ($this->bindAd($this->query_username, $this->query_password)) {
+        if ($this->bindLdap($this->query_username, $this->query_password)) {
             if($this->query_groups()) {
                 return;
             }
@@ -944,12 +1129,7 @@ class Ad extends \app\models\Auth
             ->where(['identifier' => null])
             ->andWhere(['type' => '0'])
             ->andWhere(['not', ['id' => 1]])
-            ->andWhere(['like', 'username', substitute($this->migrateSearchScheme, [
-                'domain' => $this->domain,
-                'netbiosDomain' => $this->netbiosDomain,
-                'base' => $this->base,
-                'username' => '',
-            ])])
+            ->andWhere(['like', 'username', $this->getSubstitutedMigrateSearchScheme('')])
             ->all();
 
         $localUsers = array_column($models, 'username');
@@ -957,28 +1137,20 @@ class Ad extends \app\models\Auth
 
         if ($c == 0) {
             $this->error = Yii::t('auth', 'Found no local usernames matching search pattern <code>{migrateSearchScheme}</code>.', [
-                'migrateSearchScheme' => substitute($this->migrateSearchScheme, [
-                    'domain' => $this->domain,
-                    'netbiosDomain' => $this->netbiosDomain,
-                    'base' => $this->base,
-                ]),
+                'migrateSearchScheme' => $this->getSubstitutedMigrateSearchScheme('{username}'),
             ]);
             Yii::debug($this->error, __METHOD__);
             return false;
         } else {
             $this->debug[] = Yii::t('auth', 'Found {n} local usernames matching search pattern for local usernames <code>{migrateSearchScheme}</code>: <span class="show_more">{users}</span>', [
                 'n' => $c,
-                'migrateSearchScheme' => substitute($this->migrateSearchScheme, [
-                    'domain' => $this->domain,
-                    'netbiosDomain' => $this->netbiosDomain,
-                    'base' => $this->base,
-                ]),
+                'migrateSearchScheme' => $this->getSubstitutedMigrateSearchScheme('{username}'),
                 'users' => $c == 0 ? '' : '<code>' . implode('</code>, <code>', $localUsers) . '</code>',
             ]);
         }
         unset($models);
 
-        if ($this->bindAd($this->query_username, $this->query_password)) {
+        if ($this->bindLdap($this->query_username, $this->query_password)) {
             if($this->query_users($localUsers)) {
                 return;
             }
@@ -987,13 +1159,13 @@ class Ad extends \app\models\Auth
     }
 
     /**
-     * Closes the currently active AD connection.
+     * Closes the currently active LDAP connection.
      * It does nothing if the connection is already closed.
      */
     public function close()
     {
         if ($this->connection !== null) {
-            Yii::debug('Closing AD connection: ' . $this->domain, __METHOD__);
+            Yii::debug('Closing LDAP connection: ' . $this->domain, __METHOD__);
             @ldap_close($this->connection);
         }
     }

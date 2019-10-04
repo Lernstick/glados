@@ -47,6 +47,10 @@ $this->registerJs($active_tabs);
             <i class="glyphicon glyphicon-home"></i>
             <?= \Yii::t('auth', 'General') ?>
         </a></li>
+        <li><a data-toggle="tab" href="#details">
+            <i class="glyphicon glyphicon-th-list"></i>
+            <?= \Yii::t('auth', 'Details') ?>
+        </a></li>
         <li><a data-toggle="tab" href="#raw">
             <i class="glyphicon glyphicon-fire"></i>
             <?= \Yii::t('auth', 'Raw Config') ?>
@@ -109,19 +113,10 @@ $this->registerJs($active_tabs);
                 'attributes' => [
                     'order',
                     'typeName',
+                    //'config',
                     'name',
                     'description',
-                    [
-                        'attribute' => 'domain',
-                        'value' => function($model){
-                            return Yii::t('auth', '{domain} (<b>NetBIOS Domain Name:</b> {netbiosDomain})', [
-                                'domain' => $model->domain,
-                                'netbiosDomain' => $model->netbiosDomain,
-                            ]);
-                        },
-                        'format' => 'raw',
-                    ],
-                    'loginScheme',
+                    'domain',
                     [
                         'attribute' => 'mapping',
                         'format' => [
@@ -132,6 +127,41 @@ $this->registerJs($active_tabs);
                             ]
                         ],
                     ],
+                ],
+            ]) ?>
+
+        <?php Pjax::end(); ?>
+
+        <?php Pjax::begin([
+            'id' => 'details',
+            'options' => ['class' => 'tab-pane fade'],
+        ]); ?>
+
+            <?php $_GET = array_merge($_GET, ['#' => 'tab_details']); ?>
+
+            <?= DetailView::widget([
+                'model' => $model,
+                'attributes' => [
+                    'base',
+                    'ldap_uri',
+                    'ldap_port',
+                    'ldap_scheme',
+                    [
+                        'attribute' => 'ldap_options',
+                        'format' => [
+                            'mapping',
+                            [
+                                \Yii::t('auth', 'LDAP Option'),
+                                \Yii::t('auth', 'Value')
+                            ]
+                        ],
+                        'value' => $options,
+                    ],
+                    'loginScheme',
+                    'bindScheme',
+                    'searchFilter',
+                    'uniqueIdentifier',
+                    'groupIdentifier',
                 ],
             ]) ?>
 

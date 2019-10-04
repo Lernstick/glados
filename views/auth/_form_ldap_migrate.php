@@ -56,13 +56,13 @@ $this->registerJs($active_tabs);
 $js = <<< JS
 // set the scenario and reset the form errors
 $('#submit-button').on('click', function(e) {
-    $('#ad-scenario').val('migrate');
-    $("#ad_form").yiiActiveForm('resetForm');
+    $('#ldap-scenario').val('migrate');
+    $("#ldap_form").yiiActiveForm('resetForm');
 });
 
 $('#query-users-button').on('click', function(e) {
-    $('#ad-scenario').val('query_users');
-    $("#ad_form").yiiActiveForm('resetForm');
+    $('#ldap-scenario').val('query_users');
+    $("#ldap_form").yiiActiveForm('resetForm');
 });
 JS;
 
@@ -72,7 +72,7 @@ $this->registerJs($js);
 
 <div class="auth-form">
 
-    <?php $form = ActiveForm::begin(['id' => 'ad_form_migrate']); ?>
+    <?php $form = ActiveForm::begin(['id' => 'ldap_form_migrate']); ?>
 
     <ul class="nav nav-tabs">
         <li class="active"><a data-toggle="tab" href="#general">
@@ -133,7 +133,7 @@ $this->registerJs($js);
 
     <div class="row">
         <div class="col-md-12 help-block">
-            <?= \Yii::t('auth', 'The following local users where also found in the Active Directory. Selected users will be migrated from local to the authentication method {method}.', [
+            <?= \Yii::t('auth', 'The following local users where also found in the LDAP Directory. Selected users will be migrated from local to the authentication method {method}.', [
                 'method' => $model->name,
             ]); ?>
         </div>

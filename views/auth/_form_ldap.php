@@ -78,6 +78,20 @@ $this->registerJs($js);
 
     <?= $form->errorSummary($model); ?>
 
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#general">
+            <i class="glyphicon glyphicon-home"></i>
+            <?= \Yii::t('auth', 'General') ?>
+        </a></li>
+        <li>
+            <?= Html::a(
+                '<i class="glyphicon glyphicon-exclamation-sign"></i> ' . \Yii::t('exams', 'Expert Settings'),
+                '#expert',
+                ['data-toggle' => 'tab']
+            ) ?>
+        </li>
+    </ul>
+
     <div class="tab-content">
 
     <?php Pjax::begin([
@@ -109,12 +123,6 @@ $this->registerJs($js);
                     ? max(array_column($model->fileConfig, 'order')) + 1
                     : $model->order,
             ]); ?>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-6">
-            <?= $form->field($model, 'loginScheme')->textInput(['maxlength' => true]) ?>
         </div>
     </div>
     <hr>
@@ -210,6 +218,139 @@ $this->registerJs($js);
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? \Yii::t('auth', 'Create') : \Yii::t('auth', 'Apply'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary', 'id' => 'submit-button', 'name' => 'submit-button']) ?>
+    </div>
+
+    <?php Pjax::end(); ?>
+
+    <?php Pjax::begin([
+        'id' => 'expert',
+        'options' => ['class' => 'tab-pane fade'],
+    ]); ?>
+
+    <br>
+    <div class="panel panel-danger">
+        <div class="panel-heading">
+            <i class="glyphicon glyphicon-warning-sign"></i> <?= \Yii::t('auth', 'The following settings should only be used, if you know what you are doing!') ?>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <?= $form->field($model, 'ldap_uri')->textInput(['maxlength' => true]) ?>
+                </div>
+                <div class="col-md-6">
+                    <?= $form->field($model, 'loginScheme')->textInput(['maxlength' => true]) ?>
+                </div>
+                <div class="col-md-6">
+                    <?= $form->field($model, 'groupIdentifier')->widget(Select2::classname(), [
+                        'data' => array_merge([$model->groupIdentifier => $model->groupIdentifier], array_combine($model->identifierAttributes, $model->identifierAttributes)),
+                        'options' => [
+                            'placeholder' => \Yii::t('auth', 'Select an attribute ...'),
+                        ],
+                        'pluginOptions' => [
+                            'tags' => true,
+                            'allowClear' => false
+                        ],
+                    ]); ?>
+                </div>
+                <div class="col-md-6">
+                    <?= $form->field($model, 'groupSearchFilter')->widget(Select2::classname(), [
+                        'data' => array_merge([$model->groupSearchFilter => $model->groupSearchFilter], $model->groupSearchFilterList),
+                        'options' => [
+                            'placeholder' => \Yii::t('auth', 'Select a search filter ...'),
+                        ],
+                        'pluginOptions' => [
+                            'tags' => true,
+                            'allowClear' => false
+                        ],
+                    ]); ?>
+                </div>
+                <div class="col-md-6">
+                    <?= $form->field($model, 'uniqueIdentifier')->widget(Select2::classname(), [
+                        'data' => array_merge([$model->uniqueIdentifier => $model->uniqueIdentifier], array_combine($model->identifierAttributes, $model->identifierAttributes)),
+                        'options' => [
+                            'placeholder' => \Yii::t('auth', 'Select an attribute ...'),
+                        ],
+                        'pluginOptions' => [
+                            'tags' => true,
+                            'allowClear' => false
+                        ],
+                    ]); ?>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <?= $form->field($model, 'method', [
+                                'options' => ['class' => ''],
+                                'errorOptions' => ['tag' => false],
+                            ])->checkbox()->label('Bind directly by login username') ?>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-md-12">
+                                <?= $form->field($model, 'bindScheme')->textInput(['maxlength' => true]) ?>
+                            </div>
+                            <div class="col-md-12">
+                                <?= $form->field($model, 'searchFilter')->textInput(['maxlength' => true]) ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <?= $form->field($model, 'method', [
+                                'options' => ['class' => ''],
+                                'errorOptions' => ['tag' => false],
+                            ])->checkbox()->label('Bind by given username and password') ?>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-md-12">
+                                <?= $form->field($model, 'bindUsername', [
+                                    'template' => "{label}\n<div class='col-lg-8'>{input}</div>\n<div class='col-lg-4'></div>{hint}\n{error}",
+                                    'labelOptions' => ['class' => 'col-lg-4 control-label'],
+                                    'errorOptions' => ['class' => 'col-lg-8 help-block'],
+                                ]) ?>
+
+                                <?= $form->field($model, 'bindPassword', [
+                                    'template' => "{label}\n<div class='col-lg-8'>{input}</div>\n<div class='col-lg-4'></div>{hint}\n{error}",
+                                    'labelOptions' => ['class' => 'col-lg-4 control-label'],
+                                    'errorOptions' => ['class' => 'col-lg-8 help-block'],
+                                ])->passwordInput() ?>
+                            </div>
+                            <div class="col-md-12">
+                                <?= $form->field($model, 'loginAttribute')->widget(Select2::classname(), [
+                                    'data' => array_merge([$model->loginAttribute => $model->loginAttribute], array_combine($model->identifierAttributes, $model->identifierAttributes)),
+                                    'options' => [
+                                        'placeholder' => \Yii::t('auth', 'Select an attribute ...'),
+                                    ],
+                                    'pluginOptions' => [
+                                        'tags' => true,
+                                        'allowClear' => false
+                                    ],
+                                ]); ?>
+                            </div>
+                            <div class="col-md-12">
+                                <?= $form->field($model, 'bindAttribute')->widget(Select2::classname(), [
+                                    'data' => array_merge([$model->bindAttribute => $model->bindAttribute], array_combine($model->identifierAttributes, $model->identifierAttributes)),
+                                    'options' => [
+                                        'placeholder' => \Yii::t('auth', 'Select an attribute ...'),
+                                    ],
+                                    'pluginOptions' => [
+                                        'tags' => true,
+                                        'allowClear' => false
+                                    ],
+                                ]); ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
     </div>
 
     <?php Pjax::end(); ?>

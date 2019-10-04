@@ -24,6 +24,7 @@ class Auth extends Model
     const AUTH_LOCAL = 0;
     const AUTH_LDAP = 1;
     const AUTH_ACTIVE_DIRECTORY = 2;
+    const AUTH_ACTIVE_DIRECTORY_EXTENDED = 3;
     
     //public $configPath = __DIR__ . '/../config';
     const PATH = __DIR__ . '/../config';
@@ -31,7 +32,7 @@ class Auth extends Model
     public $id;
 
     public $loginScheme;
-    public $bindScheme; // @todo: evtl. remove
+    #public $bindScheme; // @todo: evtl. remove
 
     /**
      * @var string The class of the current authentication type.
@@ -208,8 +209,9 @@ class Auth extends Model
     public function getAuthList()
     {
         return [
-            'app\components\Ad' => \Yii::t('auth', 'Active Directory'),
-            'app\components\Ldap' => \Yii::t('auth', 'LDAP'),
+            'app\components\AuthGenericLdap' => \Yii::t('auth', 'Generic LDAP'),
+            'app\components\AuthAd' => \Yii::t('auth', 'Microsoft Active Directory'),
+            'app\components\AuthAdExtended' => \Yii::t('auth', 'Microsoft Active Directory (extended)'),
         ];
     }
 
@@ -324,12 +326,12 @@ return [
 
     /**
      * @todo remove
-     * Getter for the instantiated object of app\components\Auth_type
+     * Getter for the instantiated object of app\components\AuthType
      * Possible objects are:
      *  * app\models\Auth
-     *  * app\components\Ad
+     *  * app\components\Auth*
      * 
-     * @return app\models\Auth|app\components\Ad|null instantiated object
+     * @return app\models\Auth|app\components\Auth*|null instantiated object
      */
     public function getObj()
     {

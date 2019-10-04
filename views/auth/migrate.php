@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = \Yii::t('auth', 'Migrate');
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <?= $this->render($model->obj->form . '_migrate', [
+    <?= $this->render($model->obj->migrationForm, [
         'model' => $model,
     ]) ?>
 

@@ -86,13 +86,30 @@ return [
           'group' => 'teacher',
         ),
       ),
-      'aa20e5e5-5f2f-465b-9edf-37408833f32a' => 
+      'c1e3a05e-ca01-4051-96fb-ee824fc2b560' => 
+      array (
+        'class' => 'app\\components\\Ldap',
+        'name' => 'LDAP',
+        'description' => 'Generic LDAP Authentication Method',
+        'order' => '5',
+        'domain' => 'test',
+        'ldap_uri' => '',
+        'loginScheme' => '{username}',
+        'bindScheme' => '{username}@{domain}',
+        'searchFilter' => '(uid={username})',
+        'groupIdentifier' => 'cn',
+        'groupSearchFilter' => '(objectClass=posixGroup)',
+        'mapping' => 
+        array (
+        ),
+      ),
+      '525e03fe-89de-4a5d-bb6c-2f147bc3cbd0' => 
       array (
         'class' => 'app\\components\\Ad',
-        'name' => 'AD',
+        'name' => 'AD22',
         'description' => 'Active Directory Authentication Method',
-        'order' => '5',
-        'domain' => 'asd',
+        'order' => '6',
+        'domain' => 'test.local',
         'ldap_uri' => '',
         'loginScheme' => '{username}',
         'bindScheme' => '{username}@{domain}',
