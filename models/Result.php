@@ -6,6 +6,7 @@ use Yii;
 use yii\base\Model;
 use app\models\Activity;
 use app\models\Ticket;
+use app\models\Screenshot;
 use yii\helpers\FileHelper;
 
 /**
@@ -168,19 +169,20 @@ class Result extends Model
                             // exclude rdiff-backup-data directory
                             if (strpos($file, realpath($origSource . '/rdiff-backup-data')) === 0) { continue; }
 
-                            // exclude dotfiles if set
-                            if (!boolval($this->inc_dotfiles)) {
-                                if (strpos($file, '/.') !== false) { continue; }
-                            }
-
                             // exclude Screenshots if set
-                            if (strpos($file, realpath($origSource . '/Screenshots')) === 0) {
+                            $screenshotsDir = Screenshot::getScreenshotDir($ticket->token);
+                            if (strpos($file, realpath($origSource . '/' . $screenshotsDir)) === 0) {
                                 if (boolval($this->inc_screenshots)) {
                                     $this->zipInclude($file, $ticket->name . '/' . str_replace($origSource . '/', '', $file), $zip);
                                     continue;
                                 } else {
                                     continue;
                                 }
+                            }
+
+                            // exclude dotfiles if set
+                            if (!boolval($this->inc_dotfiles)) {
+                                if (strpos($file, '/.') !== false) { continue; }
                             }
 
                             if (strpos($file, realpath($source)) !== 0) { continue; }
