@@ -11,6 +11,7 @@ use app\models\AuthLdapQueryForm;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\components\AccessRule;
+use yii\helpers\StringHelper;
 
 class AuthController extends Controller
 {
@@ -114,7 +115,7 @@ class AuthController extends Controller
 
             if (Yii::$app->request->post('submit-button') !== null) {
                 //submitted
-                $model->scenario = $model->class::SCENARIO_DEFAULT;
+                $model->scenario = $this->findScenario($model);
                 if ($model->load(Yii::$app->request->post()) && $model->save()) {
                     return $this->redirect(['view',
                         'id' => $model->id,
@@ -162,7 +163,7 @@ class AuthController extends Controller
 
         if (Yii::$app->request->post('submit-button') !== null) {
             //submitted
-            $model->scenario = $model->class::SCENARIO_DEFAULT;
+            $model->scenario = $this->findScenario($model);
             if ($model->load(Yii::$app->request->post()) && $model->save()) {
                 return $this->redirect(['view',
                     'id' => $model->id,
@@ -274,6 +275,22 @@ class AuthController extends Controller
                 return null;
             }
         }
+    }
+
+    /**
+     * Finds the scenario.
+     * @param Auth $model
+     * @return string the scenario or SCENARIO_BIND_DIRECT
+     */
+    protected function findScenario($model)
+    {
+        //bind_direct or bind_byuser
+        if (isset(Yii::$app->request->post($model->formName())['method'][0])) {
+            $scenario = Yii::$app->request->post($model->formName())['method'][0];
+        } else {
+            $scenario = $model->class::SCENARIO_BIND_DIRECT;
+        }
+        return $scenario;
     }
 
 }

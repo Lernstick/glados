@@ -67,7 +67,46 @@ $('#query-groups-button').on('click', function(e) {
     $("#ldap_form").yiiActiveForm('resetForm');
 });
 JS;
+$this->registerJs($js);
 
+$js = <<< 'SCRIPT'
+directBind = $("input[name^='Auth'][name$='[method][]'][value=bind_direct]")
+userBind = $("input[name^='Auth'][name$='[method][]'][value=bind_byuser]")
+
+if (directBind.is(':checked')) {
+    $('#fields-user').hide()
+}
+
+if (userBind.is(':checked')) {
+    $('#fields-direct').hide()
+}
+
+// this is the default, invoke by a click()
+directBind.click(function(){
+    if ($(this).is(':checked')) {
+        userBind.prop("checked", false);
+        $('#fields-direct').show()
+        $('#fields-user').hide()
+    } else if ($(this).not(':checked')) {
+        userBind.prop("checked", true);
+        $('#fields-direct').hide()
+        $('#fields-user').show()
+    }
+});
+
+userBind.click(function(){
+    if ($(this).is(':checked')) {
+        directBind.prop("checked", false);
+        $('#fields-direct').hide()
+        $('#fields-user').show()
+    } else if ($(this).not(':checked')) {
+        directBind.prop("checked", true);
+        $('#fields-direct').hide()
+        $('#fields-user').show()
+    }
+});
+
+SCRIPT;
 $this->registerJs($js);
 
 ?>
@@ -125,6 +164,12 @@ $this->registerJs($js);
             ]); ?>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <?= $form->field($model, 'loginScheme')->textInput(['maxlength' => true]) ?>
+        </div>
+    </div>
     <hr>
 
     <div class="panel panel-default">
@@ -168,14 +213,13 @@ $this->registerJs($js);
                     <div class="has-success"><div class="help-block"><?= $model->success; ?></div></div>
                 </div>
             </div>
-
             <?php
             foreach (array_keys($searchModel->roleList) as $key => $role) {
 
                 ?><div class="row">
                     <div class="col-md-12 form-group">
                         <?= Select2::widget([
-                            'name' => 'Ad[mapping][' . $role . ']',
+                            'name' => $model->formName() . '[mapping][' . $role . ']',
                             'options' => [
                                 'placeholder' => \Yii::t('auth', 'Choose LDAP Groups ...'),
                                 'multiple' => true,
@@ -238,9 +282,6 @@ $this->registerJs($js);
                     <?= $form->field($model, 'ldap_uri')->textInput(['maxlength' => true]) ?>
                 </div>
                 <div class="col-md-6">
-                    <?= $form->field($model, 'loginScheme')->textInput(['maxlength' => true]) ?>
-                </div>
-                <div class="col-md-6">
                     <?= $form->field($model, 'groupIdentifier')->widget(Select2::classname(), [
                         'data' => array_merge([$model->groupIdentifier => $model->groupIdentifier], array_combine($model->identifierAttributes, $model->identifierAttributes)),
                         'options' => [
@@ -282,72 +323,82 @@ $this->registerJs($js);
                 <div class="col-md-6">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <?= $form->field($model, 'method', [
-                                'options' => ['class' => ''],
-                                'errorOptions' => ['tag' => false],
-                            ])->checkbox()->label('Bind directly by login username') ?>
+                            Method
                         </div>
                         <div class="panel-body">
-                            <div class="col-md-12">
-                                <?= $form->field($model, 'bindScheme')->textInput(['maxlength' => true]) ?>
+                            <?= $form->field($model, 'method', [
+                                'options' => [
+                                    'class' => '',
+                                ],
+                                'errorOptions' => ['tag' => false],
+                            ])->checkboxList([
+                                $model::SCENARIO_BIND_DIRECT => \Yii::t('auth', 'Bind directly by login credentials'),
+                                $model::SCENARIO_BIND_BYUSER => \Yii::t('auth', 'Bind by given username and password')
+                            ])->label(false) ?>
+
+                            <div id="fields-direct">
+                                <div class="col-md-12">
+                                    <?= $form->field($model, 'bindScheme')->textInput(['maxlength' => true]) ?>
+                                </div>
+                                <div class="col-md-12">
+                                    <?= $form->field($model, 'searchFilter')->textInput(['maxlength' => true]) ?>
+                                </div>
                             </div>
-                            <div class="col-md-12">
-                                <?= $form->field($model, 'searchFilter')->textInput(['maxlength' => true]) ?>
+
+                            <div id="fields-user">
+                                <div class="col-md-12">
+                                    <?= $form->field($model, 'bindUsername', [
+                                        'template' => "{label}\n<div class='col-lg-8'>{input}</div>\n<div class='col-lg-4'></div>{hint}\n{error}",
+                                        'labelOptions' => ['class' => 'col-lg-4 control-label'],
+                                        'errorOptions' => ['class' => 'col-lg-8 help-block'],
+                                    ]) ?>
+
+                                    <?= $form->field($model, 'bindPassword', [
+                                        'template' => "{label}\n<div class='col-lg-8'>{input}</div>\n<div class='col-lg-4'></div>{hint}\n{error}",
+                                        'labelOptions' => ['class' => 'col-lg-4 control-label'],
+                                        'errorOptions' => ['class' => 'col-lg-8 help-block'],
+                                    ])->passwordInput() ?>
+                                </div>
+                                <div class="col-md-12">
+                                    <?= $form->field($model, 'loginAttribute')->widget(Select2::classname(), [
+                                        'data' => array_merge([$model->loginAttribute => $model->loginAttribute], array_combine($model->identifierAttributes, $model->identifierAttributes)),
+                                        'options' => [
+                                            'placeholder' => \Yii::t('auth', 'Select an attribute ...'),
+                                        ],
+                                        'pluginOptions' => [
+                                            'tags' => true,
+                                            'allowClear' => false
+                                        ],
+                                    ]); ?>
+                                </div>
+                                <div class="col-md-12">
+                                    <?= $form->field($model, 'bindAttribute')->widget(Select2::classname(), [
+                                        'data' => array_merge([$model->bindAttribute => $model->bindAttribute], array_combine($model->identifierAttributes, $model->identifierAttributes)),
+                                        'options' => [
+                                            'placeholder' => \Yii::t('auth', 'Select an attribute ...'),
+                                        ],
+                                        'pluginOptions' => [
+                                            'tags' => true,
+                                            'allowClear' => false
+                                        ],
+                                    ]); ?>
+                                </div>
+                                 <div class="col-md-12">
+                                    <?= $form->field($model, 'userSearchFilter')->widget(Select2::classname(), [
+                                        'data' => array_merge([$model->userSearchFilter => $model->userSearchFilter], $model->userSearchFilterList),
+                                        'options' => [
+                                            'placeholder' => \Yii::t('auth', 'Select a search filter ...'),
+                                        ],
+                                        'pluginOptions' => [
+                                            'tags' => true,
+                                            'allowClear' => false
+                                        ],
+                                    ]); ?>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-md-6">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <?= $form->field($model, 'method', [
-                                'options' => ['class' => ''],
-                                'errorOptions' => ['tag' => false],
-                            ])->checkbox()->label('Bind by given username and password') ?>
-                        </div>
-                        <div class="panel-body">
-                            <div class="col-md-12">
-                                <?= $form->field($model, 'bindUsername', [
-                                    'template' => "{label}\n<div class='col-lg-8'>{input}</div>\n<div class='col-lg-4'></div>{hint}\n{error}",
-                                    'labelOptions' => ['class' => 'col-lg-4 control-label'],
-                                    'errorOptions' => ['class' => 'col-lg-8 help-block'],
-                                ]) ?>
-
-                                <?= $form->field($model, 'bindPassword', [
-                                    'template' => "{label}\n<div class='col-lg-8'>{input}</div>\n<div class='col-lg-4'></div>{hint}\n{error}",
-                                    'labelOptions' => ['class' => 'col-lg-4 control-label'],
-                                    'errorOptions' => ['class' => 'col-lg-8 help-block'],
-                                ])->passwordInput() ?>
-                            </div>
-                            <div class="col-md-12">
-                                <?= $form->field($model, 'loginAttribute')->widget(Select2::classname(), [
-                                    'data' => array_merge([$model->loginAttribute => $model->loginAttribute], array_combine($model->identifierAttributes, $model->identifierAttributes)),
-                                    'options' => [
-                                        'placeholder' => \Yii::t('auth', 'Select an attribute ...'),
-                                    ],
-                                    'pluginOptions' => [
-                                        'tags' => true,
-                                        'allowClear' => false
-                                    ],
-                                ]); ?>
-                            </div>
-                            <div class="col-md-12">
-                                <?= $form->field($model, 'bindAttribute')->widget(Select2::classname(), [
-                                    'data' => array_merge([$model->bindAttribute => $model->bindAttribute], array_combine($model->identifierAttributes, $model->identifierAttributes)),
-                                    'options' => [
-                                        'placeholder' => \Yii::t('auth', 'Select an attribute ...'),
-                                    ],
-                                    'pluginOptions' => [
-                                        'tags' => true,
-                                        'allowClear' => false
-                                    ],
-                                ]); ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
 
         </div>
