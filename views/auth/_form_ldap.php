@@ -278,12 +278,24 @@ $this->registerJs($js);
         </div>
         <div class="panel-body">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <?= $form->field($model, 'ldap_uri')->textInput(['maxlength' => true]) ?>
                 </div>
                 <div class="col-md-6">
-                    <?= $form->field($model, 'groupIdentifier')->widget(Select2::classname(), [
-                        'data' => array_merge([$model->groupIdentifier => $model->groupIdentifier], array_combine($model->identifierAttributes, $model->identifierAttributes)),
+                    <?= $form->field($model, 'userSearchFilter')->widget(Select2::classname(), [
+                        'data' => array_merge([$model->userSearchFilter => $model->userSearchFilter], $model->userSearchFilterList),
+                        'options' => [
+                            'placeholder' => \Yii::t('auth', 'Select a search filter ...'),
+                        ],
+                        'pluginOptions' => [
+                            'tags' => true,
+                            'allowClear' => false
+                        ],
+                    ]); ?>
+                </div>
+                <div class="col-md-6">
+                    <?= $form->field($model, 'uniqueIdentifier')->widget(Select2::classname(), [
+                        'data' => array_merge([$model->uniqueIdentifier => $model->uniqueIdentifier], array_combine($model->identifierAttributes, $model->identifierAttributes)),
                         'options' => [
                             'placeholder' => \Yii::t('auth', 'Select an attribute ...'),
                         ],
@@ -306,8 +318,56 @@ $this->registerJs($js);
                     ]); ?>
                 </div>
                 <div class="col-md-6">
-                    <?= $form->field($model, 'uniqueIdentifier')->widget(Select2::classname(), [
-                        'data' => array_merge([$model->uniqueIdentifier => $model->uniqueIdentifier], array_combine($model->identifierAttributes, $model->identifierAttributes)),
+                    <?= $form->field($model, 'groupIdentifier')->widget(Select2::classname(), [
+                        'data' => array_merge([$model->groupIdentifier => $model->groupIdentifier], array_combine($model->identifierAttributes, $model->identifierAttributes)),
+                        'options' => [
+                            'placeholder' => \Yii::t('auth', 'Select an attribute ...'),
+                        ],
+                        'pluginOptions' => [
+                            'tags' => true,
+                            'allowClear' => false
+                        ],
+                    ]); ?>
+                </div>
+                <div class="col-md-6">
+                    <?= $form->field($model, 'groupMemberAttribute')->widget(Select2::classname(), [
+                        'data' => array_merge([$model->groupMemberAttribute => $model->groupMemberAttribute], $model->groupMemberAttributeList),
+                        'options' => [
+                            'placeholder' => \Yii::t('auth', 'Select an attribute ...'),
+                        ],
+                        'pluginOptions' => [
+                            'tags' => true,
+                            'allowClear' => false
+                        ],
+                    ]); ?>
+                </div>
+                <div class="col-md-6">
+                    <?= $form->field($model, 'groupMemberUserAttribute')->widget(Select2::classname(), [
+                        'data' => array_merge([$model->groupMemberUserAttribute => $model->groupMemberUserAttribute], array_combine($model->identifierAttributes, $model->identifierAttributes)),
+                        'options' => [
+                            'placeholder' => \Yii::t('auth', 'Select an attribute ...'),
+                        ],
+                        'pluginOptions' => [
+                            'tags' => true,
+                            'allowClear' => false
+                        ],
+                    ]); ?>
+                </div>
+                <div class="col-md-6">
+                    <?= $form->field($model, 'primaryGroupUserAttribute')->widget(Select2::classname(), [
+                        'data' => array_merge([$model->primaryGroupUserAttribute => $model->primaryGroupUserAttribute], array_combine($model->identifierAttributes, $model->identifierAttributes)),
+                        'options' => [
+                            'placeholder' => \Yii::t('auth', 'Select an attribute ...'),
+                        ],
+                        'pluginOptions' => [
+                            'tags' => true,
+                            'allowClear' => false
+                        ],
+                    ]); ?>
+                </div>
+                <div class="col-md-6">
+                    <?= $form->field($model, 'primaryGroupGroupAttribute')->widget(Select2::classname(), [
+                        'data' => array_merge([$model->primaryGroupGroupAttribute => $model->primaryGroupGroupAttribute], array_combine($model->identifierAttributes, $model->identifierAttributes)),
                         'options' => [
                             'placeholder' => \Yii::t('auth', 'Select an attribute ...'),
                         ],
@@ -323,7 +383,12 @@ $this->registerJs($js);
                 <div class="col-md-6">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            Method
+                            <?php
+                            $form->field($model, 'method')->begin();
+                            echo Html::activeLabel($model,'method');
+                            echo Html::activeHint($model,'method', ['class' => 'hint-block']);
+                            $form->field($model, 'method')->end();
+                            ?>
                         </div>
                         <div class="panel-body">
                             <?= $form->field($model, 'method', [
@@ -334,7 +399,7 @@ $this->registerJs($js);
                             ])->checkboxList([
                                 $model::SCENARIO_BIND_DIRECT => \Yii::t('auth', 'Bind directly by login credentials'),
                                 $model::SCENARIO_BIND_BYUSER => \Yii::t('auth', 'Bind by given username and password')
-                            ])->label(false) ?>
+                            ])->label(false)->hint(false) ?>
 
                             <div id="fields-direct">
                                 <div class="col-md-12">
@@ -376,18 +441,6 @@ $this->registerJs($js);
                                         'data' => array_merge([$model->bindAttribute => $model->bindAttribute], array_combine($model->identifierAttributes, $model->identifierAttributes)),
                                         'options' => [
                                             'placeholder' => \Yii::t('auth', 'Select an attribute ...'),
-                                        ],
-                                        'pluginOptions' => [
-                                            'tags' => true,
-                                            'allowClear' => false
-                                        ],
-                                    ]); ?>
-                                </div>
-                                 <div class="col-md-12">
-                                    <?= $form->field($model, 'userSearchFilter')->widget(Select2::classname(), [
-                                        'data' => array_merge([$model->userSearchFilter => $model->userSearchFilter], $model->userSearchFilterList),
-                                        'options' => [
-                                            'placeholder' => \Yii::t('auth', 'Select a search filter ...'),
                                         ],
                                         'pluginOptions' => [
                                             'tags' => true,

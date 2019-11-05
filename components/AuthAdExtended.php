@@ -97,6 +97,27 @@ class AuthAdExtended extends AuthGenericLdap
     /**
      * @inheritdoc
      */
+    public $groupMemberAttribute = 'member';
+
+    /**
+     * @inheritdoc
+     */
+    public $groupMemberUserAttribute = 'distinguishedName';
+
+    /**
+     * @inheritdoc
+     */
+    public $primaryGroupUserAttribute = 'primaryGroupID';
+
+    /**
+     * @inheritdoc to.
+     */
+    public $primaryGroupGroupAttribute = 'primaryGroupToken';
+
+
+    /**
+     * @inheritdoc
+     */
     public function init()
     {
         parent::init();
@@ -196,4 +217,132 @@ class AuthAdExtended extends AuthGenericLdap
             'netbiosDomain' => $this->netbiosDomain,
         ]);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPrimaryGroup($username)
+    {
+
+        $searchFilter = $this->getSubstitutedSearchFilter($username);
+
+        $this->debug[] = Yii::t('auth', 'Querying LDAP for primary group with search filter <code>{searchFilter}</code> and base dn <code>{base}</code> for the attributes <code>{attribute1}</code> and <code>{attribute2}</code>.', [
+            'searchFilter' => $searchFilter,
+            'base' => $this->baseDn,
+            'attribute1' => 'objectSid',
+            'attribute2' => 'primaryGroupID',
+        ]);
+
+        $attributes = array('objectSid', 'primaryGroupID');
+        $ret = $this->askFor($attributes, $searchFilter, [
+            'limit' => 1,
+            'checkAttribute' => 'searchFilter',
+        ]);
+
+        if ($ret !== false) {
+
+            $userObjectSid = $ret['objectSid'];
+            $primaryGroupID = $ret['primaryGroupID'];
+            $userObjectSid = $this->decodeObjectSid($userObjectSid);
+            $groupObjectSid = $this->getSidByUserSid($userObjectSid, $primaryGroupID);
+            $primaryGroup = $this->getPrimaryGroupBySid($groupObjectSid);
+            return $primaryGroup;
+            array_unshift($groups, $primaryGroup);
+            return $groups;
+
+            return true;
+        } else {
+            return null;
+        }
+
+    }
+
+    /**
+     * Trabslates an objectSid from AD to a string
+     * @param string $sid the group pbjectSid
+     * @return string the group identifier attribute
+     */
+    public function getPrimaryGroupBySid($sid)
+    {
+
+        $searchFilter = substitute('(objectSid={sid})', [
+            'sid' => $sid,
+        ]);
+
+        $this->debug[] = Yii::t('auth', 'Querying LDAP for primary group with search filter <code>{searchFilter}</code> and base dn <code>{base}</code> for the attribute <code>{attribute}</code>.', [
+            'searchFilter' => $searchFilter,
+            'base' => $this->baseDn,
+            'attribute' => $this->groupIdentifier,
+        ]);
+
+        $result = @ldap_search($this->connection, $this->baseDn, $searchFilter, array($this->groupIdentifier), 0, 1);
+
+        if ($result === false) {
+            $this->error = 'Search failed: ' . ldap_error($this->connection);
+            Yii::debug($this->error, __METHOD__);
+            return false;
+        }
+
+        if ($info = ldap_get_entries($this->connection, $result)) {
+            if($info['count'] != 0) {
+                $this->debug[] = Yii::t('auth', 'Retrieving {n} group entries.', [
+                    'n' => $info['count'],
+                ]);
+
+                $group = $this->get_ldap_attribute($info, $this->groupIdentifier);
+                return $group;
+
+            } else {
+                $this->error = Yii::t('auth', 'Attribute <code>{attribute}</code> not existing, check <code>groupIdentifier</code>.', [
+                    'attribute' =>$this->groupIdentifier,
+                ]);
+                Yii::debug($this->error, __METHOD__);
+                return false;
+            }
+        } else {
+            $this->error = ldap_error($this->connection);
+            Yii::debug('Recieving entries failed: ' . $this->error, __METHOD__);
+            return false;
+        }
+
+    }
+
+    /**
+     * Trabslates an objectSid from AD to a string
+     * @param string $userSid the objectSid of the current user
+     * @param string $rid the revision id to change
+     * @return string
+     * @see https://ldapwiki.com/wiki/ObjectSID
+     */
+    public static function getSidByUserSid($userSid, $rid)
+    {
+        return substr($userSid, 0, -4) . strval($rid);
+    }
+
+    /**
+     * Trabslates an objectSid from AD to a string
+     * @param string $bin binary objectSid from ldap_search()
+     * @return string
+     * @see https://www.null-byte.org/development/php-active-directory-ldap-authentication/
+     */
+    public static function decodeObjectSid($bin)
+    {
+       $sid = "S-";
+       //$ADguid = $info[0]['objectguid'][0];
+       $sidinhex = str_split(bin2hex($bin), 2);
+       // Byte 0 = Revision Level
+       $sid = $sid.hexdec($sidinhex[0])."-";
+       // Byte 1-7 = 48 Bit Authority
+       $sid = $sid.hexdec($sidinhex[6].$sidinhex[5].$sidinhex[4].$sidinhex[3].$sidinhex[2].$sidinhex[1]);
+       // Byte 8 count of sub authorities - Get number of sub-authorities
+       $subauths = hexdec($sidinhex[7]);
+       //Loop through Sub Authorities
+       for($i = 0; $i < $subauths; $i++) {
+          $start = 8 + (4 * $i);
+          // X amount of 32Bit (4 Byte) Sub Authorities
+          $sid = $sid."-".hexdec($sidinhex[$start+3].$sidinhex[$start+2].$sidinhex[$start+1].$sidinhex[$start]);
+       }
+       return $sid;
+    }
+
 }
