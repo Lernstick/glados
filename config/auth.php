@@ -55,12 +55,14 @@ return [
         'uniqueIdentifier' => 'objectGUID',
         'groupMemberAttribute' => 'member',
         'groupMemberUserAttribute' => 'distinguishedName',
+        'userSearchFilter' => '(objectCategory=person)',
+        'primaryGroupUserAttribute' => 'primaryGroupID',
+        'primaryGroupGroupAttribute' => 'primaryGroupToken',
         'method' => 'bind_byuser',
         'bindUsername' => 'ad.admin@test.local',
         'bindPassword' => 'admin',
         'loginAttribute' => 'sAMAccountName',
         'bindAttribute' => 'userPrincipalName',
-        'userSearchFilter' => '(objectCategory=person)',
       ),
       'f9ca4350-0769-4929-845a-d05c926a3984' => 
       array (

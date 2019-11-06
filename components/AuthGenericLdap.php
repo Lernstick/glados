@@ -323,8 +323,7 @@ class AuthGenericLdap extends \app\models\Auth
     /**
      * @var string search filter to search for the group membership of the login user in the LDAP
      */
-    public $groupMembershipSearchFilter = '(& {groupSearchFilter} ({groupMemberAttribute}={groupMemberUserIdentifier}) )';
-
+    public $groupMembershipSearchFilter = '(& {groupSearchFilter} (| ({groupMemberAttribute}={groupMemberUserIdentifier}) ({primaryGroupUserAttribute}={primaryGroup})) )';
     /**
      * @var string attribute name within the group object that refers to the user object
      * @see [[groupMemberUserAttribute]]
@@ -336,7 +335,6 @@ class AuthGenericLdap extends \app\models\Auth
      * @see [[groupMemberAttribute]]
      */
     public $groupMemberUserAttribute = 'uid';
-    public $groupMemberUserIdentifier;
 
     /**
      * @var array Array of common names of attributes for [[groupMemberAttribute]].
@@ -357,6 +355,11 @@ class AuthGenericLdap extends \app\models\Auth
      * @see [[primaryGroupUserAttribute]]
      */
     public $primaryGroupGroupAttribute = 'gidNumber';
+
+    /**
+     * @var array array|false holding user attributes queried from the LDAP
+     */
+    public $userObject;
 
     /**
      * @inheritdoc
@@ -613,7 +616,7 @@ class AuthGenericLdap extends \app\models\Auth
      * @param string $scheme the login scheme
      * @param array $substitutions array of substitutions
      *
-     * @return bool whether the provided username matches the pattern or not
+     * @return false|string the extracted username or false
      */
     public function getRealUsernameByScheme($username, $scheme, $substitutions) {
         //$regex = '([^\"\/\\\[\]\:\;\|\=\,\+\*\?\<\>]+)';
@@ -636,7 +639,7 @@ class AuthGenericLdap extends \app\models\Auth
      * Decides whether the username provided by the user matches the pattern to authenticate over LDAP.
      * @param string username the username that was provided to the login form by the user attempting to login
      *
-     * @return bool whether the provided username matches the pattern or not
+     * @return false|string the extracted username or false
      */
     public function getRealUsername($username)
     {
@@ -649,21 +652,10 @@ class AuthGenericLdap extends \app\models\Auth
     /**
      * Contructs the username to bind to the LDAP.
      * @param string username the real username that was extracted from [[getRealUsername()]]
-     *
      * @return string the bind username
      */
     public function getBindUsername($username)
     {
-        # if the method is "bind by binduser" then first bind with that user to retrieve
-        # the bind username of the login user.
-        if ($this->method == self::SCENARIO_BIND_BYUSER) {
-            if (($username = $this->getBindAttribute($username)) !== false) {
-                return $username;
-            } else {
-                return false;
-            }
-        }
-
         $username = $this->getSubstitutedBindUsername($username);
         Yii::debug('Username matches LDAP::loginScheme. Proceeding with bind username: ' . $username, __METHOD__);
         $this->debug[] = Yii::t('auth', 'Proceeding with bind username <code>{bindUser}</code> according to bindScheme <code>{bindScheme}</code>.', [
@@ -682,12 +674,14 @@ class AuthGenericLdap extends \app\models\Auth
         ]);
     }
 
-    public function getSubstitutedGroupMembershipSearchFilter($username)
+    public function getSubstitutedGroupSearchFilter($username)
     {
         return substitute($this->groupMembershipSearchFilter, [
             'groupSearchFilter' => $this->groupSearchFilter,
             'groupMemberAttribute' => $this->groupMemberAttribute,
-            'groupMemberUserIdentifier' => $this->groupMemberUserIdentifier,
+            'groupMemberUserIdentifier' => $this->userObject[$this->groupMemberUserAttribute],
+            'primaryGroupUserAttribute' => $this->primaryGroupUserAttribute,
+            'primaryGroup' => $this->userObject[$this->primaryGroupUserAttribute],
             'username' => $username,
         ]);
     }
@@ -695,8 +689,8 @@ class AuthGenericLdap extends \app\models\Auth
     /**
      * Determines the highest possible roles for a set of given groups
      * 
-     * @param array groups set of LDAP groups
-     * @return mixed the highest role according to [[roleOrder]] or the first element from the roles
+     * @param array $groups set of LDAP groups
+     * @return string|false the highest role according to [[roleOrder]] or the first element from the roles
      * array if nothing matches or false if roles is empty
      */
     public function determineRole($groups)
@@ -820,38 +814,6 @@ class AuthGenericLdap extends \app\models\Auth
     }
 
     /**
-     * Setup the bind to the LDAP.
-     * 
-     * @param string $username the username given from the login form
-     * @param string $password the password given from the login form
-     * @return false|string bind failure or the username
-     */
-    public function CheckAndBind($username, $password)
-    {
-        $this->init();
-        if ($user = $this->getRealUsername($username)) {
-            $this->debug[] = Yii::t('auth', 'Username <code>{username}</code> matches loginScheme <code>{loginScheme}</code>.', [
-                'username' => $username,
-                'loginScheme' => $this->loginScheme,
-            ]);
-
-            if (($bindUser = $this->getBindUsername($user)) !== false) {
-                return $this->bindLdap($bindUser, $password);
-            } else {
-                return false;
-            }
-        } else {
-            $this->error = Yii::t('auth', 'Username <code>{username}</code> does not match loginScheme <code>{loginScheme}</code> of authentication method <code>{name}</code>.', [
-                'username' => $username,
-                'loginScheme' => $this->loginScheme,
-                'name' => $this->name,
-            ]);
-            Yii::debug($this->error, __METHOD__);
-            return false;
-        }
-    }
-
-    /**
      * Bind to the LDAP.
      * 
      * @param string $username the username
@@ -885,42 +847,6 @@ class AuthGenericLdap extends \app\models\Auth
     }
 
     /**
-     * Finds the attribtue in the LDAP directory for the bind with the login user.
-     * 
-     * @return false|string bind failure or the username
-     */
-    public function getBindAttribute($username)
-    {
-        if (($user = $this->bindLdap($this->bindUsername, $this->bindPassword)) !== false) {
-            $searchFilter = $this->getSubstitutedBindSearchFilter($username);
-
-            $this->debug[] = Yii::t('auth', 'Querying LDAP for the user object with search filter <code>{searchFilter}</code> and base dn <code>{base}</code> for the bind attribute <code>{attribute}</code>.', [
-                'searchFilter' => $searchFilter,
-                'base' => $this->baseDn,
-                'attribute' => $this->bindAttribute,
-            ]);
-
-            $attributes = array($this->bindAttribute);
-            $ret = $this->askFor($attributes, $searchFilter, [
-                'limit' => 1,
-                'checkAttribute' => 'bindSearchFilter',
-            ]);
-
-            if ($ret !== false) {
-                $username = $ret[$this->bindAttribute];
-
-                $this->debug[] = Yii::t('auth', 'Bind attribute <code>{attribute}</code> is <code>{username}</code>.', [
-                    'attribute' =>$this->bindAttribute,
-                    'username' => $username,
-                ]);
-                $this->searchFilter = '({bindAttribute}={username})';
-                return $username;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Authenticate a user over LDAP.
      * 
      * @param string $username the username given from the login form
@@ -929,62 +855,95 @@ class AuthGenericLdap extends \app\models\Auth
      */
     public function authenticate($username, $password)
     {
-        if (($user = $this->CheckAndBind($username, $password)) !== false) {
-            if ( $this->getUserinfo($username) !== false ){
-                if ( ($groups = $this->getGroupMembership($username)) !== false ){
-                    if ($this->role = $this->determineRole($groups)) {
-                        $this->close();
-                        $this->debug[] = Yii::t('auth', 'User role set to <code>{role}</code>.', [
-                            'role' => $this->role
-                        ]);
-
-                        $this->success = Yii::t('auth', 'Authentication was successful.');
-                        Yii::debug('role=' . $this->role . ', identifier=' . $this->identifier, __METHOD__);
-                        Yii::debug('Authentication was successful.', __METHOD__);
-                        return true;
-                    } else {
-                        $this->debug[] = Yii::t('auth', 'User group membership: <code>{membership}</code>.', [
-                            'membership' => json_encode($groups),
-                        ]);
-                        $this->debug[] = Yii::t('auth', 'Mapping: <code>{mapping}</code>.', [
-                            'mapping' => json_encode($this->mapping),
-                        ]);
-                        $this->error = 'No role found, check <code>roleOrder</code> and <code>mapping</code>.';
-                        Yii::debug($this->error, __METHOD__);
-                        $this->close();
-                        return false;
+        $this->init();
+        if (($user = $this->getRealUsername($username)) !== false) {
+            $this->debug[] = Yii::t('auth', 'Username <code>{username}</code> matches loginScheme <code>{loginScheme}</code>.', [
+                'username' => $username,
+                'loginScheme' => $this->loginScheme,
+            ]);
+            if ($this->method == self::SCENARIO_BIND_BYUSER) {
+                if ($this->bindLdap($this->bindUsername, $this->bindPassword) !== false) {
+                    if ( $this->getUserinfo($username) !== false ){
+                        $groups = $this->getGroupMembership($username);
+                        if ($this->bindLdap($this->userObject[$this->bindAttribute], $password) !== false) {
+                            return $this->concludeAuthentication($username, $groups);
+                        }
+                    }
+                }
+            } else if ($this->method == self::SCENARIO_BIND_DIRECT) {
+                if (($bindUser = $this->getBindUsername($user)) !== false) {
+                    if ($this->bindLdap($bindUser, $password) !== false) {
+                        if ( $this->getUserinfo($username) !== false ){
+                            $groups = $this->getGroupMembership($username);
+                            return $this->concludeAuthentication($username, $groups);
+                        }
                     }
                 }
             }
+        } else {
+            $this->error = Yii::t('auth', 'Username <code>{username}</code> does not match loginScheme <code>{loginScheme}</code> of authentication method <code>{name}</code>.', [
+                'username' => $username,
+                'loginScheme' => $this->loginScheme,
+                'name' => $this->name,
+            ]);
+            Yii::debug($this->error, __METHOD__);
         }
+
         return false;
     }
 
     /**
-     * Query LDAP for user information
+     * Conclude the authentication.
+     * 
+     * @param string $username the username given from the login form
+     * @param string $groups the groups array
+     * @return bool authentication success or failure
+     */
+    public function concludeAuthentication($username, $groups)
+    {
+        if ( ($this->role = $this->determineRole($groups)) !== false) {
+            $this->debug[] = Yii::t('auth', 'User role set to <code>{role}</code>.', [
+                'role' => $this->role
+            ]);
+            $this->success = Yii::t('auth', 'Authentication was successful.');
+            Yii::debug('role=' . $this->role . ', identifier=' . $this->identifier, __METHOD__);
+            Yii::debug('Authentication was successful.', __METHOD__);
+            return true;
+        } else {
+            $this->debug[] = Yii::t('auth', 'User group membership: <code>{membership}</code>.', [
+                'membership' => json_encode($groups),
+            ]);
+            $this->debug[] = Yii::t('auth', 'Mapping: <code>{mapping}</code>.', [
+                'mapping' => json_encode($this->mapping),
+            ]);
+            $this->error = 'No role found, check <code>roleOrder</code> and <code>mapping</code>.';
+            Yii::debug($this->error, __METHOD__);
+            $this->close();
+            return false;
+        }
+    }
+
+    /**
+     * Query LDAP for user information and populate [[userObject]].
      * @param string $username
-     * @return array|false array or false
+     * @return bool
      */
     public function getUserinfo($username)
     {
         $searchFilter = $this->getSubstitutedSearchFilter($username);
-
-        $this->debug[] = Yii::t('auth', 'Querying LDAP with search filter <code>{searchFilter}</code> and base dn <code>{base}</code> for the attributes <code>{attribute1}</code> and <code>{attribute2}</code>.', [
+        $this->debug[] = Yii::t('auth', 'Querying LDAP for the user object with search filter <code>{searchFilter}</code> and base dn <code>{base}</code> for the attributes <code>{attributes}</code>.', [
             'searchFilter' => $searchFilter,
             'base' => $this->baseDn,
-            'attribute1' => $this->uniqueIdentifier,
-            'attribute2' => $this->groupMemberUserAttribute,
+            'attributes' => implode("</code>, <code>", $this->userAttributes),
         ]);
 
-        $attributes = array($this->uniqueIdentifier, $this->groupMemberUserAttribute);
-        $ret = $this->askFor($attributes, $searchFilter, [
+        $this->userObject = $this->askFor($this->userAttributes, $searchFilter, [
             'limit' => 1,
-            'checkAttribute' => 'searchFilter',
+            'checkAttribute' => 'bindSearchFilter',
         ]);
+        $this->identifier = $this->userObject[$this->uniqueIdentifier];        
 
-        if ($ret !== false) {
-            $this->identifier = $ret[$this->uniqueIdentifier];
-            $this->groupMemberUserIdentifier = $ret[$this->groupMemberUserAttribute];
+        if ($this->userObject !== false) {
             return true;
         } else {
             return false;
@@ -992,113 +951,54 @@ class AuthGenericLdap extends \app\models\Auth
     }
 
     /**
+     * Return an array of user attribute to query
+     * @return array 
+     */
+    public function getUserAttributes()
+    {
+        if ($this->method == self::SCENARIO_BIND_BYUSER) {
+            return [
+                $this->bindAttribute,
+                $this->uniqueIdentifier,
+                $this->primaryGroupUserAttribute,
+                $this->groupMemberUserAttribute
+            ];
+        } else if ($this->method == self::SCENARIO_BIND_DIRECT) {
+            return [
+                $this->uniqueIdentifier,
+                $this->primaryGroupUserAttribute,
+                $this->groupMemberUserAttribute
+            ];
+        }
+    }
+
+    /**
      * Query LDAP for group membership of the user, including the primary group
+     *
      * @param string $username
      * @return array array of group identifiers / can be empty
      */
     public function getGroupMembership($username)
     {
         $groups = array();
-        $searchFilter = $this->getSubstitutedGroupMembershipSearchFilter($username);
+        $searchFilter = $this->getSubstitutedGroupSearchFilter($username);
+        $attributes = array($this->groupIdentifier);
 
-        $this->debug[] = Yii::t('auth', 'Querying LDAP for group membership with search filter <code>{searchFilter}</code> and base dn <code>{base}</code> for the attribute <code>{attribute}</code>.', [
+        $this->debug[] = Yii::t('auth', 'Querying LDAP for group membership with search filter <code>{searchFilter}</code> and base dn <code>{base}</code> for the attributes <code>{attributes}</code>.', [
             'searchFilter' => $searchFilter,
             'base' => $this->baseDn,
-            'attribute' => $this->groupIdentifier,
+            'attributes' => implode("</code>, <code>", $attributes),
         ]);
 
-        if (!ldap_get_option($this->connection, LDAP_OPT_SIZELIMIT, $limit) ) {
-            $limit = 0;
+        if ( ($ret = $this->askFor($attributes, $searchFilter, ['limit' => 0])) !== false) {
+            $groups = $ret[$this->groupIdentifier];
         }
-
-        $result = @ldap_search($this->connection, $this->baseDn, $searchFilter, array($this->groupIdentifier), 0, $limit);
-
-        if ($result === false) {
-            $this->error = 'Search failed: ' . ldap_error($this->connection);
-            Yii::debug($this->error, __METHOD__);
-        } else {
-            if ($userInfo = ldap_get_entries($this->connection, $result)) {
-                if($userInfo['count'] != 0) {
-                    $this->debug[] = Yii::t('auth', 'Retrieving {n} group entries.', [
-                        'n' => $userInfo['count'],
-                    ]);
-
-                    for ($i = 0; $i < $userInfo["count"]; $i++) {
-                        array_push($groups, $this->get_ldap_attribute($userInfo, $this->groupIdentifier, $i));
-                    }
-
-                } else {
-                    $this->error = 'No result found, check <code>groupMembershipSearchFilter</code>.';
-                    Yii::debug($this->error, __METHOD__);
-                }
-            } else {
-                $this->error = ldap_error($this->connection);
-                Yii::debug('Recieving entries failed: ' . $this->error, __METHOD__);
-            }
-        }
-
-        if (($primaryGroup = $this->getPrimaryGroup($username)) !== null) {
-            array_unshift($groups, $primaryGroup);
-        }
-
-        $this->debug[] = Yii::t('auth', 'The user is member of {n} groups.', [
-            'n' => count($groups),
-        ]);
-
         return $groups;
     }
 
     /**
-     * Query LDAP for the primary group of a user
-     * @param string $username
-     * @return string|null primary group or null
-     */
-    public function getPrimaryGroup($username)
-    {
-        $searchFilter = $this->getSubstitutedSearchFilter($username);
-
-        $this->debug[] = Yii::t('auth', 'Querying LDAP for primary group with search filter <code>{searchFilter}</code> and base dn <code>{base}</code> for the attribute <code>{attribute}</code>.', [
-            'searchFilter' => $searchFilter,
-            'base' => $this->baseDn,
-            'attribute' => $this->primaryGroupUserAttribute,
-        ]);
-
-        $attributes = array($this->primaryGroupUserAttribute);
-        $ret = $this->askFor($attributes, $searchFilter, [
-            'limit' => 1,
-            'checkAttribute' => 'searchFilter',
-        ]);
-
-        if ($ret !== false) {
-            $attributeValue = $ret[$this->primaryGroupUserAttribute];
-
-            $searchFilter = substitute('(& {searchFilter} ({attribute}={value}) )', [
-                'searchFilter' => $this->groupSearchFilter,
-                'attribute' => $this->primaryGroupGroupAttribute,
-                'value' => $attributeValue,
-            ]);
-
-            $this->debug[] = Yii::t('auth', 'Querying LDAP for primary group with search filter <code>{searchFilter}</code> and base dn <code>{base}</code> for the attribute <code>{attribute}</code>.', [
-                'searchFilter' => $searchFilter,
-                'base' => $this->baseDn,
-                'attribute' => $this->groupIdentifier,
-            ]);
-
-            $attributes = array($this->groupIdentifier);
-            $ret = $this->askFor($attributes, $searchFilter, [
-                'limit' => 1,
-                'checkAttribute' => 'searchFilter',
-            ]);
-
-            if ($ret !== false) {
-                return $ret[$this->groupIdentifier];
-            }
-        }
-        return null;
-    }
-
-    /**
      * Query LDAP for attributes with search filter
+     *
      * @param array $attributes
      * @param string $searchFilter
      * @param array $options options array
@@ -1129,7 +1029,14 @@ class AuthGenericLdap extends \app\models\Auth
 
                 $retarr['count'] = $info['count'];
                 foreach ($attributes as $key => $attr) {
-                    $retarr[$attr] = $this->get_ldap_attribute($info, $attr);
+                    if ($info['count'] > 1) {
+                        $retarr[$attr] = [];
+                        for ($i = 0; $i < $info["count"]; $i++) {
+                            array_push($retarr[$attr], $this->get_ldap_attribute($info, $attr, $i));
+                        }
+                    } else {
+                        $retarr[$attr] = $this->get_ldap_attribute($info, $attr);
+                    }
                 }
                 return $retarr;
             } else {

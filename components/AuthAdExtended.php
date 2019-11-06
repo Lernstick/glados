@@ -219,95 +219,6 @@ class AuthAdExtended extends AuthGenericLdap
     }
 
     /**
-     * @inheritdoc
-     */
-    public function getPrimaryGroup($username)
-    {
-
-        $searchFilter = $this->getSubstitutedSearchFilter($username);
-
-        $this->debug[] = Yii::t('auth', 'Querying LDAP for primary group with search filter <code>{searchFilter}</code> and base dn <code>{base}</code> for the attributes <code>{attribute1}</code> and <code>{attribute2}</code>.', [
-            'searchFilter' => $searchFilter,
-            'base' => $this->baseDn,
-            'attribute1' => 'objectSid',
-            'attribute2' => 'primaryGroupID',
-        ]);
-
-        $attributes = array('objectSid', 'primaryGroupID');
-        $ret = $this->askFor($attributes, $searchFilter, [
-            'limit' => 1,
-            'checkAttribute' => 'searchFilter',
-        ]);
-
-        if ($ret !== false) {
-
-            $userObjectSid = $ret['objectSid'];
-            $primaryGroupID = $ret['primaryGroupID'];
-            $userObjectSid = $this->decodeObjectSid($userObjectSid);
-            $groupObjectSid = $this->getSidByUserSid($userObjectSid, $primaryGroupID);
-            $primaryGroup = $this->getPrimaryGroupBySid($groupObjectSid);
-            return $primaryGroup;
-            array_unshift($groups, $primaryGroup);
-            return $groups;
-
-            return true;
-        } else {
-            return null;
-        }
-
-    }
-
-    /**
-     * Trabslates an objectSid from AD to a string
-     * @param string $sid the group pbjectSid
-     * @return string the group identifier attribute
-     */
-    public function getPrimaryGroupBySid($sid)
-    {
-
-        $searchFilter = substitute('(objectSid={sid})', [
-            'sid' => $sid,
-        ]);
-
-        $this->debug[] = Yii::t('auth', 'Querying LDAP for primary group with search filter <code>{searchFilter}</code> and base dn <code>{base}</code> for the attribute <code>{attribute}</code>.', [
-            'searchFilter' => $searchFilter,
-            'base' => $this->baseDn,
-            'attribute' => $this->groupIdentifier,
-        ]);
-
-        $result = @ldap_search($this->connection, $this->baseDn, $searchFilter, array($this->groupIdentifier), 0, 1);
-
-        if ($result === false) {
-            $this->error = 'Search failed: ' . ldap_error($this->connection);
-            Yii::debug($this->error, __METHOD__);
-            return false;
-        }
-
-        if ($info = ldap_get_entries($this->connection, $result)) {
-            if($info['count'] != 0) {
-                $this->debug[] = Yii::t('auth', 'Retrieving {n} group entries.', [
-                    'n' => $info['count'],
-                ]);
-
-                $group = $this->get_ldap_attribute($info, $this->groupIdentifier);
-                return $group;
-
-            } else {
-                $this->error = Yii::t('auth', 'Attribute <code>{attribute}</code> not existing, check <code>groupIdentifier</code>.', [
-                    'attribute' =>$this->groupIdentifier,
-                ]);
-                Yii::debug($this->error, __METHOD__);
-                return false;
-            }
-        } else {
-            $this->error = ldap_error($this->connection);
-            Yii::debug('Recieving entries failed: ' . $this->error, __METHOD__);
-            return false;
-        }
-
-    }
-
-    /**
      * Trabslates an objectSid from AD to a string
      * @param string $userSid the objectSid of the current user
      * @param string $rid the revision id to change
@@ -343,6 +254,37 @@ class AuthAdExtended extends AuthGenericLdap
           $sid = $sid."-".hexdec($sidinhex[$start+3].$sidinhex[$start+2].$sidinhex[$start+1].$sidinhex[$start]);
        }
        return $sid;
+    }
+
+    /**
+     * @inheritdoc
+     * 
+     * Add objectSid to the list of user attributes.
+     */
+    public function getUserAttributes()
+    {
+        return array_merge(parent::getUserAttributes(), ['objectSid']);
+    }
+
+    /**
+     * @inheritdoc
+     * 
+     * Inject the objectSid=... part into the searchFilter
+     */
+    public function getSubstitutedGroupSearchFilter($username)
+    {
+        $rid = $this->userObject[$this->primaryGroupUserAttribute];
+        $userSid = $this->decodeObjectSid($this->userObject['objectSid']);
+        $groupSid = $this->getSidByUserSid($userSid, $rid);
+
+        return substitute($this->groupMembershipSearchFilter, [
+            'groupSearchFilter' => $this->groupSearchFilter,
+            'groupMemberAttribute' => $this->groupMemberAttribute,
+            'groupMemberUserIdentifier' => $this->userObject[$this->groupMemberUserAttribute],
+            'primaryGroupUserAttribute' => 'objectSid',
+            'primaryGroup' => $groupSid,
+            'username' => $username,
+        ]);
     }
 
 }
