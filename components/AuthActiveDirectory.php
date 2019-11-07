@@ -8,11 +8,11 @@ use app\models\User;
 use yii\base\InvalidConfigException;
 
 /**
- * AuthAdExtended represents a connection to a Active Directory via LDAP with extended config options.
+ * AuthActiveDirectory represents a connection to a Active Directory via LDAP with extended config options.
  *
  * @inheritdoc
  */
-class AuthAdExtended extends AuthGenericLdap
+class AuthActiveDirectory extends AuthGenericLdap
 {
 
     public $netbiosDomain = '';
@@ -20,27 +20,17 @@ class AuthAdExtended extends AuthGenericLdap
     /**
      * @inheritdoc
      */
-    public $class = 'app\components\AuthAdExtended';
+    public $class = 'app\components\AuthActiveDirectory';
 
     /**
      * @inheritdoc
      */
-    public $type = \app\models\Auth::AUTH_ACTIVE_DIRECTORY_EXTENDED;
+    public $type = \app\models\Auth::AUTH_ACTIVE_DIRECTORY;
 
     /**
      * @inheritdoc
      */
-    public $typeName = 'Active Directory (extended)';
-
-    /**
-     * @inheritdoc
-     */
-    public $view = 'view_ldap';
-
-    /**
-     * @inheritdoc
-     */
-    public $form = '_form_ldap';
+    public $typeName = 'Active Directory';
 
     /**
      * @inheritdoc
@@ -72,7 +62,7 @@ class AuthAdExtended extends AuthGenericLdap
     /**
      * @inheritdoc
      */
-    public $searchFilter = '(sAMAccountName={username})';
+    public $loginSearchFilter = '(& {userSearchFilter} (sAMAccountName={username}) )';
 
     /**
      * @inheritdoc
@@ -191,9 +181,9 @@ class AuthAdExtended extends AuthGenericLdap
     /**
      * @inheritdoc
      */
-    public function getSubstitutedSearchFilter($username)
+    public function getSubstitutedLoginSearchFilter($username)
     {
-        return substitute(parent::getSubstitutedSearchFilter($username), [
+        return substitute(parent::getSubstitutedLoginSearchFilter($username), [
             'netbiosDomain' => $this->netbiosDomain,
         ]);
     }

@@ -19,12 +19,12 @@ class Auth extends Model
 
     const SCENARIO_CREATE = 'create';
     const SCENARIO_MIGRATE = 'migrate';
+    const SCENARIO_AUTH_TEST = 'auth_test';
 
     /* authentication type constants */
     const AUTH_LOCAL = 0;
     const AUTH_LDAP = 1;
     const AUTH_ACTIVE_DIRECTORY = 2;
-    const AUTH_ACTIVE_DIRECTORY_EXTENDED = 3;
     
     //public $configPath = __DIR__ . '/../config';
     const PATH = __DIR__ . '/../config';
@@ -177,6 +177,31 @@ class Auth extends Model
     }
 
     /**
+     * Decides whether the username provided by the user matches the pattern to authenticate.
+     * @param string $username the username that was provided to the login form by the user attempting to login
+     * @param string $scheme the login scheme
+     * @param array $substitutions array of substitutions
+     *
+     * @return false|string the extracted username or false
+     */
+    public function getRealUsernameByScheme($username, $scheme, $substitutions) {
+        //$regex = '([^\"\/\\\[\]\:\;\|\=\,\+\*\?\<\>]+)';
+        $regex = '(.+)';
+        $pattern = substitute($scheme, array_merge($substitutions, [
+            'username' => '@@@@',
+        ]));
+        $pattern = preg_quote($pattern, '/');
+        $pattern = str_replace('@@@@', $regex, $pattern);
+
+        preg_match('/'.$pattern.'/', $username, $matches);
+
+        if (array_key_exists(1, $matches)) {
+            return $matches[1];
+        }
+        return false;
+    }
+
+    /**
      * Getter @todo remove
      */
     public function getConfigArray()
@@ -210,8 +235,7 @@ class Auth extends Model
     {
         return [
             'app\components\AuthGenericLdap' => \Yii::t('auth', 'Generic LDAP'),
-            'app\components\AuthAd' => \Yii::t('auth', 'Microsoft Active Directory'),
-            'app\components\AuthAdExtended' => \Yii::t('auth', 'Microsoft Active Directory (extended)'),
+            'app\components\AuthActiveDirectory' => \Yii::t('auth', 'Microsoft Active Directory'),
         ];
     }
 

@@ -77,7 +77,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 'filter' => $authSearchModel->authSelectlist,
                 'label' => Yii::t('auth', 'Authentication Method'),
                 'value' => function($model) {
-                    return $model->authMethod->name . ' (' . $model->authMethod->typeName . ')';
+                    if ($model->authMethod !== null) {
+                        return $model->authMethod->name . ' (' . $model->authMethod->typeName . ')';
+                    } else {
+                        return Yii::t('auth', "No Authentication Method");
+                    }
                 },
                 'format' => 'raw',
             ],

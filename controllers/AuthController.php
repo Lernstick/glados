@@ -6,6 +6,7 @@ use Yii;
 use yii\web\Controller;
 use app\models\Auth;
 use app\models\AuthSearch;
+use app\models\AuthTestForm;
 use app\models\UserSearch;
 use app\models\AuthLdapQueryForm;
 use yii\web\NotFoundHttpException;
@@ -205,17 +206,19 @@ class AuthController extends Controller
 
     /**
      * Tests an existing Auth model.
-     * @param string $id
      * @return mixed
      */
-    public function actionTest($id)
+    public function actionTest($id = null)
     {
-        $model = $this->findModel($id);
-        $model->scenario = $model->class::SCENARIO_AUTH_TEST;
+
+        $model = new AuthTestForm();
+        $searchModel = new AuthSearch();
+
         $model->load(Yii::$app->request->post()) && $model->validate();
 
         return $this->render('test', [
             'model' => $model,
+            'searchModel' => $searchModel,
         ]);
     }
 

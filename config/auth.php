@@ -38,7 +38,7 @@ return [
       ),
       'a2b9bf48-2c60-4d71-b6a4-728857dfd02d' => 
       array (
-        'class' => 'app\\components\\AuthAdExtended',
+        'class' => 'app\\components\\AuthActiveDirectory',
         'name' => 'AD_BINDUSE',
         'description' => 'Active Directory Authentication Method',
         'order' => '2',
@@ -66,7 +66,7 @@ return [
       ),
       'f9ca4350-0769-4929-845a-d05c926a3984' => 
       array (
-        'class' => 'app\\components\\AuthAdExtended',
+        'class' => 'app\\components\\AuthActiveDirectory',
         'name' => 'AD_DIRECT',
         'description' => 'Active Directory Authentication Method',
         'order' => '3',
@@ -78,14 +78,18 @@ return [
         'mapping' => 
         array (
           'admins' => 'admin',
-          'Domänen-Benutzer' => 'teacher',
+          'test' => 'admin',
+          'testäöü' => 'teacher',
         ),
         'uniqueIdentifier' => 'objectGUID',
         'groupMemberAttribute' => 'member',
         'groupMemberUserAttribute' => 'distinguishedName',
+        'userSearchFilter' => '(objectCategory=person)',
+        'primaryGroupUserAttribute' => 'primaryGroupID',
+        'primaryGroupGroupAttribute' => 'primaryGroupToken',
         'method' => 'bind_direct',
         'bindScheme' => '{username}@{domain}',
-        'searchFilter' => '(sAMAccountName={username})',
+        'loginSearchFilter' => '(& {userSearchFilter} (sAMAccountName={username}) )',
         'bindAttribute' => 'userPrincipalName',
       ),
     )

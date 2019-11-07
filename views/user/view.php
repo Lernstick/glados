@@ -103,8 +103,13 @@ $this->registerJs($active_tabs);
                     [
                         'attribute' => 'authMethod.name',
                         'label' => Yii::t('auth', 'Authentication Method'),
-                        'value' => Html::a($model->authMethod->name . ' (' . $model->authMethod->typeName . ')', ['auth/view', 'id' => $model->authMethod->id
-                        ]),
+                        'value' => function($model) {
+                            if ($model->authMethod !== null) {
+                                return Html::a($model->authMethod->name . ' (' . $model->authMethod->typeName . ')', ['auth/view', 'id' => $model->authMethod->id]);
+                            } else {
+                                return Yii::t('auth', "No Authentication Method");
+                            }
+                        },
                         'format' => 'raw',
                     ],
                     'last_visited',

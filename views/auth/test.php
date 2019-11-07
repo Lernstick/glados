@@ -4,15 +4,11 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Auth */
+/* @var $model app\models\AuthTestForm */
 
-$this->title = \Yii::t('auth', 'Test Authentication Method {name} of type {type}', [
-	'name' => $model->name,
-	'type' => $model->obj->typeName,
-]);
+$this->title = \Yii::t('auth', 'Test Authentication Method');
 
 $this->params['breadcrumbs'][] = ['label' => \Yii::t('auth', 'Authentication Methods'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = \Yii::t('auth', 'Test');
 
 $js = <<< 'SCRIPT'
@@ -48,23 +44,30 @@ $this->registerJs($js);
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-	<?php $form = ActiveForm::begin(['id' => 'ad_form']); ?>
+	<?php $form = ActiveForm::begin(['id' => 'auth_test_form']); ?>
 
     <div class="row">
         <div class="col-lg-5">
             <div class="panel panel-info form-horizontal">
                 <div class="panel-heading">
-                    <i class="glyphicon glyphicon-user"></i> <?= Html::label($model->attributeLabels()['query_login']); ?>
-                    <div class="hint-block"><?= $model->attributeHints()['query_login']; ?></div>
+                    <i class="glyphicon glyphicon-user"></i> <?= Html::label($model->attributeLabels()['login']); ?>
+                    <div class="hint-block"><?= $model->attributeHints()['login']; ?></div>
                 </div>
                 <div class="panel-body">
-                    <?= $form->field($model, 'query_username', [
+
+                    <?php echo $form->field($model, 'method', [
+                        'template' => "{label}\n<div class='col-lg-8'>{input}</div>\n<div class='col-lg-4'></div>{hint}\n{error}",
+                        'labelOptions' => ['class' => 'col-lg-4 control-label'],
+                        'errorOptions' => ['class' => 'col-lg-8 help-block'],
+                    ])->dropDownList($searchModel->authSelectlist, [ 'prompt' => Yii::t('auth', 'Choose an authentication method ...') ]) ?>
+
+                    <?= $form->field($model, 'username', [
                         'template' => "{label}\n<div class='col-lg-8'>{input}</div>\n<div class='col-lg-4'></div>{hint}\n{error}",
                         'labelOptions' => ['class' => 'col-lg-4 control-label'],
                         'errorOptions' => ['class' => 'col-lg-8 help-block'],
                     ]) ?>
 
-                    <?= $form->field($model, 'query_password', [
+                    <?= $form->field($model, 'password', [
                         'template' => "{label}\n<div class='col-lg-8'>{input}</div>\n<div class='col-lg-4'></div>{hint}\n{error}",
                         'labelOptions' => ['class' => 'col-lg-4 control-label'],
                         'errorOptions' => ['class' => 'col-lg-8 help-block'],
@@ -79,9 +82,9 @@ $this->registerJs($js);
             </div>
         </div>
         <div class="col-lg-7">
-            <div class="help-block"><?= implode("<br>", $model->debug); ?></div>
-            <div class="has-error"><div class="help-block"><?= $model->error; ?></div></div>
-            <div class="has-success"><div class="help-block"><?= $model->success; ?></div></div>
+            <div class="help-block"><?= implode("<br>", $model->authModel->debug); ?></div>
+            <div class="has-error"><div class="help-block"><?= $model->authModel->error; ?></div></div>
+            <div class="has-success"><div class="help-block"><?= $model->authModel->success; ?></div></div>
         </div>
     </div>
 

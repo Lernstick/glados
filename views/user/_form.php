@@ -18,7 +18,7 @@ use yii\widgets\ActiveForm;
         </div>
 
         <div class="col-md-6">
-            <?php echo $form->field($model, 'role')->dropDownList($searchModel->roleList, [ 'prompt' => 'Choose a Role ...' ]) ?>
+            <?php echo $form->field($model, 'role')->dropDownList($searchModel->roleList, [ 'prompt' => \Yii::t('users', 'Choose a Role ...') ]) ?>
         </div>
     </div>
 

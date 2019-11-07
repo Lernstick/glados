@@ -142,7 +142,7 @@ $this->registerJs($active_tabs);
             <?= DetailView::widget([
                 'model' => $model,
                 'attributes' => [
-                    'base',
+                    'baseDn',
                     'ldap_uri',
                     'ldap_port',
                     'ldap_scheme',
@@ -159,7 +159,7 @@ $this->registerJs($active_tabs);
                     ],
                     'loginScheme',
                     'bindScheme',
-                    'searchFilter',
+                    'loginSearchFilter',
                     'uniqueIdentifier',
                     'groupIdentifier',
                 ],

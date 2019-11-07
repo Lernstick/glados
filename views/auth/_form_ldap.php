@@ -201,7 +201,7 @@ $this->registerJs($js);
 
                             <div class="form-group">
                                 <div class="col-lg-offset-1 col-lg-11">
-                                    <?= Html::submitButton(\Yii::t('auth', 'Retrieve LDAP Groups'), ['class' => 'btn btn-primary', 'name' => 'query-groups-button', 'id' => 'query-groups-button']) ?>
+                                    <?= Html::submitButton(\Yii::t('auth', 'Query for LDAP Groups'), ['class' => 'btn btn-primary', 'name' => 'query-groups-button', 'id' => 'query-groups-button']) ?>
                                 </div>
                             </div>
                         </div>
@@ -215,7 +215,6 @@ $this->registerJs($js);
             </div>
             <?php
             foreach (array_keys($searchModel->roleList) as $key => $role) {
-
                 ?><div class="row">
                     <div class="col-md-12 form-group">
                         <?= Select2::widget([
@@ -406,7 +405,7 @@ $this->registerJs($js);
                                     <?= $form->field($model, 'bindScheme')->textInput(['maxlength' => true]) ?>
                                 </div>
                                 <div class="col-md-12">
-                                    <?= $form->field($model, 'searchFilter')->textInput(['maxlength' => true]) ?>
+                                    <?= $form->field($model, 'loginSearchFilter')->textInput(['maxlength' => true]) ?>
                                 </div>
                             </div>
 

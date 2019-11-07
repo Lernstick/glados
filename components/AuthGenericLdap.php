@@ -17,26 +17,22 @@ class AuthGenericLdap extends \app\models\Auth
 
     const SCENARIO_QUERY_GROUPS = 'query_groups';
     const SCENARIO_QUERY_USERS = 'query_users';
-    const SCENARIO_AUTH_TEST = 'auth_test';
 
+    /**
+     * @const string Bind directly to the LDAP using the username from the login form
+     */
     const SCENARIO_BIND_DIRECT = 'bind_direct';
+
+    /**
+     * @const string Bind via a given bind user to the LDAP, then retrieve the bind attribute of the login user,
+     * then bind again using this attribute to authentication the login user,
+     */
     const SCENARIO_BIND_BYUSER = 'bind_byuser';
 
     /**
      * @const int extended error output
      */
     const LDAP_OPT_DIAGNOSTIC_MESSAGE = 0x0032;
-
-    /**
-     * @const string Bind directly to the LDAP using the username from login,
-     */
-    const BIND_BY_USERNAME = 'bind_by_username';
-
-    /**
-     * @const string Bind via a given bind user to the LDAP, then retrieve the bind attribute of the login user,
-     * then bind again using this attribute to authentication the login user,
-     */
-    const BIND_BY_BINDUSER = 'bind_by_binduser';
 
     public $ldap_uri = '';
     public $ldap_scheme = 'ldap';
@@ -186,7 +182,7 @@ class AuthGenericLdap extends \app\models\Auth
      * The placeholders that are replaced by the values given are: `{domain}` with [[domain]], `{netbiosDomain}`  with [[netbiosDomain]], `{base}` with with [[base]].
      * 
      * @see bindScheme
-     * @see searchFilter
+     * @see loginSearchFilter
      */
     public $loginScheme = '{username}';
 
@@ -208,7 +204,7 @@ class AuthGenericLdap extends \app\models\Auth
      * The placeholders that are replaced by the values given are: `{domain}` with [[domain]], `{netbiosDomain}`  with [[netbiosDomain]], `{base}` with with [[base]].
      * 
      * @see loginScheme
-     * @see searchFilter
+     * @see loginSearchFilter
      */
     public $bindScheme = '{username}@{domain}';
 
@@ -221,10 +217,10 @@ class AuthGenericLdap extends \app\models\Auth
      * Examples:
      *
      * ```php
-     * $searchFilter = '(sAMAccountName={username})';  // search for entries matching the sAMAccountName
-     * $searchFilter = '(userPrincipalName={username}@foo)'; // search for entries matching the userPrincipalName to be appended by "@foo"
-     * $searchFilter = '(userPrincipalName={username}@{domain})'; // search for entries matching the userPrincipalName to be appended by "@{domain}", where {domain} is replaced with the value given in the configuration
-     * $searchFilter = '(dn=cn={username},ou=People,dc=test,dc=local)';    // search for entries matching the distinguished name. Instead of "dc=test,dc=local", one could have also used {base}.
+     * $loginSearchFilter = '(sAMAccountName={username})';  // search for entries matching the sAMAccountName
+     * $loginSearchFilter = '(userPrincipalName={username}@foo)'; // search for entries matching the userPrincipalName to be appended by "@foo"
+     * $loginSearchFilter = '(userPrincipalName={username}@{domain})'; // search for entries matching the userPrincipalName to be appended by "@{domain}", where {domain} is replaced with the value given in the configuration
+     * $loginSearchFilter = '(dn=cn={username},ou=People,dc=test,dc=local)';    // search for entries matching the distinguished name. Instead of "dc=test,dc=local", one could have also used {base}.
      * ```
      * 
      * The placeholders that are replaced by the values given are: `{domain}` with [[domain]], `{netbiosDomain}` with [[netbiosDomain]], `{base}` with [[base]], `{username}` with the string extracted from [[$loginScheme]].
@@ -232,7 +228,7 @@ class AuthGenericLdap extends \app\models\Auth
      * @see https://www.php.net/manual/en/function.ldap-exop.php 
      * @see loginScheme
      */
-    public $searchFilter = '(uid={username})';
+    public $loginSearchFilter = '(& {userSearchFilter} (uid={username}) )';
 
     /**
      * @var string The search filter to query the LDAP for all group objects
@@ -390,11 +386,11 @@ class AuthGenericLdap extends \app\models\Auth
         return array_merge(parent::rules(), [
             [['domain'], 'required', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_BIND_DIRECT, self::SCENARIO_BIND_BYUSER, self::SCENARIO_QUERY_GROUPS]],
 
-            ['mapping', 'filter', 'filter' => [$this, 'processMapping'], 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_BIND_DIRECT, self::SCENARIO_BIND_BYUSER]],
+            ['mapping', 'filter', 'filter' => [$this, 'processMapping'], 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_BIND_DIRECT, self::SCENARIO_BIND_BYUSER, self::SCENARIO_QUERY_GROUPS]],
 
             ['method', 'filter', 'filter' => [$this, 'processMethod'], 'on' => [self::SCENARIO_BIND_DIRECT, self::SCENARIO_BIND_BYUSER, self::SCENARIO_QUERY_GROUPS]],
 
-            [['domain', 'ldap_uri', 'loginScheme', 'bindScheme', 'searchFilter', 'groupIdentifier', 'groupSearchFilter', 'query_username', 'query_password'], 'safe', 'on' => self::SCENARIO_QUERY_GROUPS],
+            [['domain', 'ldap_uri', 'loginScheme', 'bindScheme', 'loginSearchFilter', 'groupIdentifier', 'groupSearchFilter', 'query_username', 'query_password'], 'safe', 'on' => self::SCENARIO_QUERY_GROUPS],
 
             [['migrateSearchScheme', 'userIdentifier', 'migrateUserSearchFilter', 'query_username', 'query_password'], 'safe', 'on' => self::SCENARIO_QUERY_USERS],
 
@@ -413,10 +409,6 @@ class AuthGenericLdap extends \app\models\Auth
                 'when' => function($model) {return !empty($model->domain);},
                 'on' => self::SCENARIO_QUERY_GROUPS
             ],
-
-            [['query_username', 'query_password'], 'safe', 'on' => self::SCENARIO_AUTH_TEST],
-            [['query_username', 'query_password'], 'required', 'on' => self::SCENARIO_AUTH_TEST],
-            ['query_password', 'authenticateTest', 'on' => self::SCENARIO_AUTH_TEST],
 
             [['query_username', 'query_password'], 'required',
                 'when' => function($model) {return $model->scenario == self::SCENARIO_QUERY_USERS;},
@@ -438,11 +430,10 @@ class AuthGenericLdap extends \app\models\Auth
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        //$scenarios[self::SCENARIO_DEFAULT] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'ldap_uri', 'loginScheme', 'bindScheme', 'searchFilter', 'groupIdentifier', 'groupSearchFilter', 'mapping', 'uniqueIdentifier', 'bindAttribute', 'method']);
-        $scenarios[self::SCENARIO_BIND_DIRECT] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'ldap_uri', 'loginScheme', 'groupIdentifier', 'groupSearchFilter', 'mapping', 'uniqueIdentifier', 'groupMemberAttribute', 'groupMemberUserAttribute', 'userSearchFilter', 'primaryGroupUserAttribute', 'primaryGroupGroupAttribute', 'method', 'bindScheme', 'searchFilter', 'bindAttribute']);
+        //$scenarios[self::SCENARIO_DEFAULT] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'ldap_uri', 'loginScheme', 'bindScheme', 'loginSearchFilter', 'groupIdentifier', 'groupSearchFilter', 'mapping', 'uniqueIdentifier', 'bindAttribute', 'method']);
+        $scenarios[self::SCENARIO_BIND_DIRECT] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'ldap_uri', 'loginScheme', 'groupIdentifier', 'groupSearchFilter', 'mapping', 'uniqueIdentifier', 'groupMemberAttribute', 'groupMemberUserAttribute', 'userSearchFilter', 'primaryGroupUserAttribute', 'primaryGroupGroupAttribute', 'method', 'bindScheme', 'loginSearchFilter', 'bindAttribute']);
         $scenarios[self::SCENARIO_BIND_BYUSER] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'ldap_uri', 'loginScheme', 'groupIdentifier', 'groupSearchFilter', 'mapping', 'uniqueIdentifier', 'groupMemberAttribute', 'groupMemberUserAttribute', 'userSearchFilter', 'primaryGroupUserAttribute', 'primaryGroupGroupAttribute', 'method', 'bindUsername', 'bindPassword', 'loginAttribute', 'bindAttribute']);
-        $scenarios[self::SCENARIO_QUERY_GROUPS] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'ldap_uri', 'loginScheme', 'groupIdentifier', 'groupSearchFilter', 'mapping', 'uniqueIdentifier', 'groupMemberAttribute', 'groupMemberUserAttribute', 'userSearchFilter', 'method', 'primaryGroupUserAttribute', 'primaryGroupGroupAttribute', 'bindUsername', 'bindPassword', 'loginAttribute', 'bindAttribute', 'query_username', 'query_password', 'bindScheme', 'searchFilter']);
-        $scenarios[self::SCENARIO_AUTH_TEST] = ['query_username', 'query_password'];
+        $scenarios[self::SCENARIO_QUERY_GROUPS] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'ldap_uri', 'loginScheme', 'groupIdentifier', 'groupSearchFilter', 'mapping', 'uniqueIdentifier', 'groupMemberAttribute', 'groupMemberUserAttribute', 'userSearchFilter', 'method', 'primaryGroupUserAttribute', 'primaryGroupGroupAttribute', 'bindUsername', 'bindPassword', 'loginAttribute', 'bindAttribute', 'query_username', 'query_password', 'bindScheme', 'loginSearchFilter']);
         $scenarios[self::SCENARIO_QUERY_USERS] = ['migrateSearchScheme', 'migrateUserSearchFilter', 'userIdentifier', 'query_username', 'query_password'];
         $scenarios[self::SCENARIO_MIGRATE] = ['migrate'];
         return $scenarios;
@@ -462,14 +453,12 @@ class AuthGenericLdap extends \app\models\Auth
             'ldap_options' => Yii::t('auth', 'LDAP Options'),
             'loginScheme' => \Yii::t('auth', 'Login Scheme'),
             'bindScheme' => \Yii::t('auth', 'Bind Scheme'),
-            'searchFilter' => \Yii::t('auth', 'Search Filter'),
+            'loginSearchFilter' => \Yii::t('auth', 'Login Search Filter'),
             'uniqueIdentifier' => \Yii::t('auth', 'Unique User Identifier Attribute'),
             'groupIdentifier' => \Yii::t('auth', 'Group Identifier Attribute'),
             'groupSearchFilter' => \Yii::t('auth', 'Group Search Filter'),
             'mapping' => \Yii::t('auth', 'Group Mapping'),
-            'query_login' => $this->scenario == self::SCENARIO_AUTH_TEST
-                ? \Yii::t('auth', 'Test Credentials')
-                : \Yii::t('auth', 'Query Credentials'),
+            'query_login' => \Yii::t('auth', 'Query Credentials'),
             'query_username' => \Yii::t('auth', 'Username'),
             'query_password' => \Yii::t('auth', 'Password'),
             'bindAttribute' => \Yii::t('auth', 'Bind Attribute'),
@@ -488,17 +477,16 @@ class AuthGenericLdap extends \app\models\Auth
             'ldap_uri' => Yii::t('auth', 'A full LDAP URI of the form <code>ldap://hostname:port</code> or <code>ldaps://hostname:port</code> for SSL encryption. You can also provide multiple LDAP-URIs separated by a space as one string. Note that <code>hostname:port</code> is not a supported LDAP URI as the schema is missing. See <a target="_blank" href="https://www.php.net/manual/en/function.ldap-connect.php">ldap_connect()</a>
                 under <code>ldap_uri</code>.'),
             'ldap_options' => Yii::t('auth', 'For all possible options please visit <a target="_blank" href="https://www.php.net/manual/en/function.ldap-set-option.php">ldap_set_option()</a>'),
-            'loginScheme' => \Yii::t('auth', 'The pattern to test the given login credentials against a login over LDAP will only be performed if the given username matches the provided pattern. This is used to manage multiple LDAPs. {username} is extracted from the username given in the login form. Later in the authentication {username} is replaced by the extracted one from here (see <code>bindScheme</code> and <code>searchFilter</code>).<br>Examples:<br><ul><li><code>{username}</code>: no special testing, all usernames provided are authenticated against the LDAP.</li><li><code>{username}@foo</code>: only usernames ending with @foo are considered and authenticated agaist the LDAP.</li><li><code>{username}@{domain}</code>: only usernames ending with @{domain} are considered and authenticated agaist the LDAP. {domain} is replaced with the given <code>domain</code> configuration variable.</li><li><code>foo\{username}</code>: only usernames starting with foo\ are considered and authenticated agaist the LDAP.</li></ul>The placeholders that are replaced by the values given are: <code>{domain}</code>, <code>{netbiosDomain}</code>, <code>{base}</code>.'),
+            'loginScheme' => \Yii::t('auth', 'The pattern to test the given login credentials against a login over LDAP will only be performed if the given username matches the provided pattern. This is used to manage multiple LDAPs. {username} is extracted from the username given in the login form. Later in the authentication {username} is replaced by the extracted one from here (see <code>bindScheme</code> and <code>loginSearchFilter</code>).<br>Examples:<br><ul><li><code>{username}</code>: no special testing, all usernames provided are authenticated against the LDAP.</li><li><code>{username}@foo</code>: only usernames ending with @foo are considered and authenticated agaist the LDAP.</li><li><code>{username}@{domain}</code>: only usernames ending with @{domain} are considered and authenticated agaist the LDAP. {domain} is replaced with the given <code>domain</code> configuration variable.</li><li><code>foo\{username}</code>: only usernames starting with foo\ are considered and authenticated agaist the LDAP.</li></ul>The placeholders that are replaced by the values given are: <code>{domain}</code>, <code>{netbiosDomain}</code>, <code>{base}</code>.'),
             'bindScheme' => \Yii::t('auth', 'TODO'),
-            'searchFilter' => \Yii::t('auth', 'TODO'),
+            'loginSearchFilter' => \Yii::t('auth', 'TODO'),
             'groupIdentifier' => \Yii::t('auth', 'TODO'),
             'groupSearchFilter' => \Yii::t('auth', 'TODO'),
             'mapping' => \Yii::t('auth', 'The direct assignment of LDAP groups to user roles. You can map multiple LDAP groups to the same role. Goups need not to be assigned to all roles.'),
-            'query_login' => $this->scenario == self::SCENARIO_AUTH_TEST
-                ? \Yii::t('auth', 'Username and password to login to the LDAP servers. Login credentials are not saved anywhere.')
-                : \Yii::t('auth', 'Username and password to query the LDAP servers given above for group names. This information is only needed to specify the group mapping. Login credentials are not saved anywhere.'),
+            'query_login' => \Yii::t('auth', 'Username and password to query the LDAP servers given above for group names. This information is only needed to specify the group mapping. Login credentials are not saved anywhere.'),
             'bindAttribute' => \Yii::t('auth', 'TODO'),
             'loginAttribute' => \Yii::t('auth', 'TODO'),
+            'userSearchFilter' => \Yii::t('auth', 'TODO'),
             'uniqueIdentifier' => \Yii::t('auth', 'TODO'),
             'groupMemberAttribute' => \Yii::t('auth', 'TODO'),
             'groupMemberUserAttribute' => \Yii::t('auth', 'TODO'),
@@ -611,31 +599,6 @@ class AuthGenericLdap extends \app\models\Auth
     }
 
     /**
-     * Decides whether the username provided by the user matches the pattern to authenticate.
-     * @param string $username the username that was provided to the login form by the user attempting to login
-     * @param string $scheme the login scheme
-     * @param array $substitutions array of substitutions
-     *
-     * @return false|string the extracted username or false
-     */
-    public function getRealUsernameByScheme($username, $scheme, $substitutions) {
-        //$regex = '([^\"\/\\\[\]\:\;\|\=\,\+\*\?\<\>]+)';
-        $regex = '(.+)';
-        $pattern = substitute($scheme, array_merge($substitutions, [
-            'username' => '@@@@',
-        ]));
-        $pattern = preg_quote($pattern, '/');
-        $pattern = str_replace('@@@@', $regex, $pattern);
-
-        preg_match('/'.$pattern.'/', $username, $matches);
-
-        if (array_key_exists(1, $matches)) {
-            return $matches[1];
-        }
-        return false;
-    }
-
-    /**
      * Decides whether the username provided by the user matches the pattern to authenticate over LDAP.
      * @param string username the username that was provided to the login form by the user attempting to login
      *
@@ -711,15 +674,16 @@ class AuthGenericLdap extends \app\models\Auth
     }
 
     /**
-     * Getter for the searchFilter with substituted values
+     * Getter for the loginSearchFilter with substituted values
      * @return string substituted string
      */
-    public function getSubstitutedSearchFilter($username)
+    public function getSubstitutedLoginSearchFilter($username)
     {
         if ($this->method == self::SCENARIO_BIND_BYUSER) {
             return $this->getSubstitutedBindSearchFilter($username);
         } else {
-            return substitute($this->searchFilter, [
+            return substitute($this->loginSearchFilter, [
+                'userSearchFilter' => $this->userSearchFilter,
                 'domain' => $this->domain,
                 'base' => $this->baseDn,
                 'username' => $username,
@@ -901,6 +865,9 @@ class AuthGenericLdap extends \app\models\Auth
      */
     public function concludeAuthentication($username, $groups)
     {
+        $this->debug[] = Yii::t('auth', 'User group membership: <code>{groups}</code>.', [
+            'groups' => implode('</code>, <code>', $groups),
+        ]);
         if ( ($this->role = $this->determineRole($groups)) !== false) {
             $this->debug[] = Yii::t('auth', 'User role set to <code>{role}</code>.', [
                 'role' => $this->role
@@ -910,11 +877,12 @@ class AuthGenericLdap extends \app\models\Auth
             Yii::debug('Authentication was successful.', __METHOD__);
             return true;
         } else {
-            $this->debug[] = Yii::t('auth', 'User group membership: <code>{membership}</code>.', [
-                'membership' => json_encode($groups),
-            ]);
-            $this->debug[] = Yii::t('auth', 'Mapping: <code>{mapping}</code>.', [
-                'mapping' => json_encode($this->mapping),
+            $mapping = $this->mapping;
+            array_walk($mapping, function(&$value, $key) {
+                $value = "<code>{$key} -> {$value}</code>";
+            });
+            $this->debug[] = Yii::t('auth', 'Mapping: {mapping}.', [
+                'mapping' => implode(", ", $mapping),
             ]);
             $this->error = 'No role found, check <code>roleOrder</code> and <code>mapping</code>.';
             Yii::debug($this->error, __METHOD__);
@@ -930,7 +898,7 @@ class AuthGenericLdap extends \app\models\Auth
      */
     public function getUserinfo($username)
     {
-        $searchFilter = $this->getSubstitutedSearchFilter($username);
+        $searchFilter = $this->getSubstitutedLoginSearchFilter($username);
         $this->debug[] = Yii::t('auth', 'Querying LDAP for the user object with search filter <code>{searchFilter}</code> and base dn <code>{base}</code> for the attributes <code>{attributes}</code>.', [
             'searchFilter' => $searchFilter,
             'base' => $this->baseDn,
@@ -1021,7 +989,7 @@ class AuthGenericLdap extends \app\models\Auth
             return false;
         }
 
-        if ($info = ldap_get_entries($this->connection, $result)) {
+        if ( ($info = ldap_get_entries($this->connection, $result)) !== false) {
             if($info['count'] != 0) {
                 $this->debug[] = Yii::t('auth', 'Retrieving {n} entries.', [
                     'n' => $info['count'],
@@ -1060,7 +1028,7 @@ class AuthGenericLdap extends \app\models\Auth
 
     }
 
-    function convertGUIDToHex($guid)
+    public function convertGUIDToHex($guid)
     {
         $unpacked = unpack('Va/v2b/n2c/Nd', $guid);
         return strtolower(sprintf('%08X-%04X-%04X-%04X-%04X%08X', $unpacked['a'], $unpacked['b1'], $unpacked['b2'], $unpacked['c1'], $unpacked['c2'], $unpacked['d']));
@@ -1098,6 +1066,7 @@ class AuthGenericLdap extends \app\models\Auth
 
     /**
      * Query Groups for the mapping
+     * Populates the [[groups]] array.
      * 
      * @return bool 
      */
@@ -1110,41 +1079,22 @@ class AuthGenericLdap extends \app\models\Auth
             'attribute' => $this->groupIdentifier,
         ]);
 
-        $result = @ldap_search($this->connection, $this->baseDn, $this->groupSearchFilter, array($this->groupIdentifier), 0, 0);
+        if (( $ret = $this->askFor(array($this->groupIdentifier), $this->groupSearchFilter, [
+                'limit' => 0,
+                'checkAttribute' => 'groupSearchFilter',
+            ])) !== false)
+        {
+            if($ret['count'] > 0) {
+                $this->success = Yii::t('auth', 'Found {n} LDAP groups.', [
+                    'n' => $ret['count'],
+                ]);
 
-        if ($result === false) {
-            $this->error = 'Search failed:' . ldap_error($this->connection);
-            Yii::debug($this->error, __METHOD__);
-            return false;
-        }
-
-        if ($groupInfo = ldap_get_entries($this->connection, $result)) {
-            if($groupInfo['count'] != 0) {
-                $this->success = 'Retrieving ' . $groupInfo['count'] . ' group entries.';
-                //$groupName = $groupInfo[0][strtolower($this->groupIdentifier)];
-                $groups = array_column($groupInfo, strtolower($this->groupIdentifier));
-                $groups = array_column($groups, 0);
-
-                // convert binary data to hex if the identifier is objectGUID
-                if ($this->groupIdentifier == 'objectGUID') {
-                    array_walk($groups, function(&$group){
-                        $group = $this->convertGUIDToHex($group);
-                    });
-                }
-                $groups = array_combine($groups, $groups);
-                //$this->debug[] = print_r($groups, true);
-                $this->groups = $groups;
+                $groups = array_combine($ret[$this->groupIdentifier], $ret[$this->groupIdentifier]);
+                $this->groups = array_merge($this->groups, $groups);
                 return true;
-            } else {
-                $this->error = 'No result found, check <code>groupSearchFilter</code>.';
-                Yii::debug($this->error, __METHOD__);
-                return false;
             }
-        } else {
-            $this->error = 'recieving group entries failed: ' . ldap_error($this->connection);
-            Yii::debug($this->error, __METHOD__);
-            return false;
         }
+        return false;
     }
 
     /**
@@ -1229,20 +1179,6 @@ class AuthGenericLdap extends \app\models\Auth
             }
         }
         $this->addError($attribute, \Yii::t('auth', 'Incorrect username or password.'));
-    }
-
-    /**
-     * @param string $attribute the attribute currently being validated
-     * @param mixed $params the value of the "params" given in the rule
-     * @param \yii\validators\InlineValidator $validator related InlineValidator instance.
-     * This parameter is available since version 2.0.11.
-     */
-    public function authenticateTest ($attribute, $params, $validator)
-    {
-        if ($this->authenticate($this->query_username, $this->query_password)) {
-            return;
-        }
-        $this->addError($attribute, \Yii::t('auth', 'Login failed.'));
     }
 
     /**
