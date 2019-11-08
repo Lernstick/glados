@@ -47,9 +47,17 @@ $this->registerJs($active_tabs);
             <i class="glyphicon glyphicon-home"></i>
             <?= \Yii::t('auth', 'General') ?>
         </a></li>
-        <li><a data-toggle="tab" href="#details">
+        <li><a data-toggle="tab" href="#ldap_details">
+            <i class="glyphicon glyphicon-cloud"></i>
+            <?= \Yii::t('auth', 'Connection Details') ?>
+        </a></li>
+        <li><a data-toggle="tab" href="#user_details">
+            <i class="glyphicon glyphicon-user"></i>
+            <?= \Yii::t('auth', 'User/Group Details') ?>
+        </a></li>
+        <li><a data-toggle="tab" href="#auth_details">
             <i class="glyphicon glyphicon-th-list"></i>
-            <?= \Yii::t('auth', 'Details') ?>
+            <?= \Yii::t('auth', 'Authentication Details') ?>
         </a></li>
         <li><a data-toggle="tab" href="#raw">
             <i class="glyphicon glyphicon-fire"></i>
@@ -134,17 +142,20 @@ $this->registerJs($active_tabs);
         <?php Pjax::end(); ?>
 
         <?php Pjax::begin([
-            'id' => 'details',
+            'id' => 'ldap_details',
             'options' => ['class' => 'tab-pane fade'],
         ]); ?>
 
-            <?php $_GET = array_merge($_GET, ['#' => 'tab_details']); ?>
+            <?php $_GET = array_merge($_GET, ['#' => 'tab_ldap_details']); ?>
 
             <?= DetailView::widget([
                 'model' => $model,
                 'attributes' => [
-                    'baseDn',
                     'ldap_uri',
+                    'baseDn',
+                    'ldap_scheme',
+                    'ldap_port',
+                    'method',
                     [
                         'attribute' => 'ldap_options',
                         'format' => [
@@ -156,13 +167,63 @@ $this->registerJs($active_tabs);
                         ],
                         'value' => $options,
                     ],
+                ],
+            ]) ?>
+
+        <?php Pjax::end(); ?>
+
+        <?php Pjax::begin([
+            'id' => 'user_details',
+            'options' => ['class' => 'tab-pane fade'],
+        ]); ?>
+
+            <?php $_GET = array_merge($_GET, ['#' => 'tab_user_details']); ?>
+
+            <?= DetailView::widget([
+                'model' => $model,
+                'attributes' => [
                     'userSearchFilter',
                     'uniqueIdentifier',
                     'groupSearchFilter',
                     'groupIdentifier',
+                    'groupMemberAttribute',
+                    'groupMemberUserAttribute',
+                    'primaryGroupUserAttribute',
+                    'primaryGroupGroupAttribute',
+                ],
+            ]) ?>
+
+        <?php Pjax::end(); ?>
+
+        <?php Pjax::begin([
+            'id' => 'auth_details',
+            'options' => ['class' => 'tab-pane fade'],
+        ]); ?>
+
+            <?php $_GET = array_merge($_GET, ['#' => 'tab_auth_details']); ?>
+
+            <?php
+            if ($model->method == $model::SCENARIO_BIND_DIRECT) {
+                $attributes = [
+                    'method',
                     'bindScheme',
                     'loginSearchFilter',
-                ],
+                ];
+            } else if ($model->method == $model::SCENARIO_BIND_BYUSER) {
+                $attributes = [
+                    'method',
+                    'loginAttribute',
+                    'bindAttribute',
+                    'bindUsername',
+                    'bindPassword',
+                ];
+            } else {
+                $attributes = ['method'];
+            }
+            
+            echo DetailView::widget([
+                'model' => $model,
+                'attributes' => $attributes,
             ]) ?>
 
         <?php Pjax::end(); ?>

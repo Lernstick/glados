@@ -444,7 +444,7 @@ class AuthGenericLdap extends \app\models\Auth
     {
         return array_merge(parent::attributeLabels(), [
             'domain' => Yii::t('auth', 'Domain'),
-            'base' => Yii::t('auth', 'Base DN'),
+            'baseDn' => Yii::t('auth', 'Base DN'),
             'ldap_uri' => Yii::t('auth', 'LDAP URI'),
             'ldap_port' => Yii::t('auth', 'LDAP Port'),
             'ldap_scheme' => Yii::t('auth', 'LDAP Scheme'),
@@ -501,7 +501,7 @@ class AuthGenericLdap extends \app\models\Auth
             'primaryGroupGroupAttribute' => \Yii::t('auth', 'The attribute of the group object, that <code>{other_attribute}</code> is referring to.', [
                     'other_attribute' => $this->getAttributeLabel('primaryGroupUserAttribute'),
                 ]),
-            'method' => \Yii::t('auth', 'There are two differnt methods the LDAP server can be used to authenticate users.<ul><li><b>Bind directly by login credentials</b> means that the username from the login from (or parts of it) is used to bind to the LDAP server. The authenticating user needs read permission on the LDAP server for this.</li><li><b>Bind by given username and password</b> means that you have to provide credentials that are used to find the user object in the LDAP, before binding with the user itself. The provided credentials need read permission on the LDAP server, but the user itself does not.</li></ul>Please read the descriptions of the settings below to control the chosen method.'),
+            'method' => \Yii::t('auth', 'There are two differnt methods the LDAP server can be used to authenticate users.<ul><li><b>Bind directly by login credentials</b> means that the username from the login from (or parts of it) is used to bind to the LDAP server. The authenticating user needs read permission on the LDAP server for this.</li><li><b>Bind by given username and password</b> means that you have to provide credentials that are used to find the user object in the LDAP, before binding with the user itself. The provided credentials need read permission on the LDAP server, but the user itself does not.</li></ul>Please read the descriptions of the settings below for details on the specific method.'),
         ]);
     }
 
@@ -710,6 +710,10 @@ class AuthGenericLdap extends \app\models\Auth
         if (empty($this->domain)) {
             $this->error = 'LDAP::domain cannot be empty.';
             throw new InvalidConfigException('LDAP::domain cannot be empty.');
+        }
+
+        if ($this->domain !== '' && $this->ldap_uri === '') {
+            $this->ldap_uri = $this->ldap_scheme . '://' . $this->domain . ':' . $this->ldap_port;
         }
 
         Yii::debug('Opening LDAP connection: ' . $this->ldap_uri, __METHOD__);
