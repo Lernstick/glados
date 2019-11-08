@@ -178,6 +178,7 @@ class Auth extends Model
 
     /**
      * Decides whether the username provided by the user matches the pattern to authenticate.
+     *
      * @param string $username the username that was provided to the login form by the user attempting to login
      * @param string $scheme the login scheme
      * @param array $substitutions array of substitutions

@@ -208,7 +208,7 @@ class AuthController extends Controller
      * Tests an existing Auth model.
      * @return mixed
      */
-    public function actionTest($id = null)
+    public function actionTest()
     {
 
         $model = new AuthTestForm();

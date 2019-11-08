@@ -27,8 +27,8 @@ $('.hint-block').each(function () {
         html: true,
         trigger: 'focus',
         placement: 'right',
-        //title:  $hint.parent().find('label').html(),
-        title:  'Description',
+        title:  $hint.parent().find('label').html(),
+        //title:  'Description',
         toggle: 'popover',
         container: 'body',
         content: $hint.html()

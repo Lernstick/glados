@@ -116,6 +116,7 @@ $this->registerJs($active_tabs);
                     //'config',
                     'name',
                     'description',
+                    'loginScheme',
                     'domain',
                     [
                         'attribute' => 'mapping',
@@ -144,8 +145,6 @@ $this->registerJs($active_tabs);
                 'attributes' => [
                     'baseDn',
                     'ldap_uri',
-                    'ldap_port',
-                    'ldap_scheme',
                     [
                         'attribute' => 'ldap_options',
                         'format' => [
@@ -157,11 +156,12 @@ $this->registerJs($active_tabs);
                         ],
                         'value' => $options,
                     ],
-                    'loginScheme',
+                    'userSearchFilter',
+                    'uniqueIdentifier',
+                    'groupSearchFilter',
+                    'groupIdentifier',
                     'bindScheme',
                     'loginSearchFilter',
-                    'uniqueIdentifier',
-                    'groupIdentifier',
                 ],
             ]) ?>
 

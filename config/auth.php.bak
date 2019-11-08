@@ -71,7 +71,7 @@ return [
         'description' => 'Active Directory Authentication Method',
         'order' => '3',
         'domain' => 'test.local',
-        'ldap_uri' => 'ldap://192.168.0.67:389',
+        'ldap_uri' => 'ldap://192.168.0.67:3892',
         'loginScheme' => '{username}',
         'groupIdentifier' => 'sAMAccountName',
         'groupSearchFilter' => '(objectCategory=group)',
@@ -89,7 +89,7 @@ return [
         'primaryGroupGroupAttribute' => 'primaryGroupToken',
         'method' => 'bind_direct',
         'bindScheme' => '{username}@{domain}',
-        'loginSearchFilter' => '(& {userSearchFilter} (sAMAccountName={username}) )2',
+        'loginSearchFilter' => '(& {userSearchFilter} (sAMAccountName={username}) )',
         'bindAttribute' => 'userPrincipalName',
       ),
     )

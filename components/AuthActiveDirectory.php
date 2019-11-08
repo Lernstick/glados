@@ -72,7 +72,7 @@ class AuthActiveDirectory extends AuthGenericLdap
     /**
      * @inheritdoc
      */
-    public $migrateUserSearchFilter = '(& (objectCategory=person) ({userIdentifier}={username}) )';
+    public $userSearchFilter = '(objectCategory=person)';
 
     /**
      * @inheritdoc
@@ -102,7 +102,7 @@ class AuthActiveDirectory extends AuthGenericLdap
     /**
      * @inheritdoc to.
      */
-    public $primaryGroupGroupAttribute = 'primaryGroupToken';
+    public $primaryGroupGroupAttribute = 'objectSid';
 
 
     /**
@@ -158,53 +158,15 @@ class AuthActiveDirectory extends AuthGenericLdap
 
     /**
      * @inheritdoc
+     *
+     * Add objectSid and primaryGroupID to the list of substitution attributes.
      */
-    public function getRealUsername($username)
+    public function substitutionProperties()
     {
-        return $this->getRealUsernameByScheme($username, $this->loginScheme, [
-            'domain' => $this->domain,
+        return array_merge(parent::substitutionProperties(), [
             'netbiosDomain' => $this->netbiosDomain,
-            'base' => $this->base,
-        ]);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getSubstitutedBindUsername($username)
-    {
-        return substitute(parent::getSubstitutedBindUsername($username), [
-            'netbiosDomain' => $this->netbiosDomain,
-        ]);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getSubstitutedLoginSearchFilter($username)
-    {
-        return substitute(parent::getSubstitutedLoginSearchFilter($username), [
-            'netbiosDomain' => $this->netbiosDomain,
-        ]);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getSubstitutedMigrateSearchFilter($username)
-    {
-        return substitute(parent::getSubstitutedMigrateSearchFilter($username), [
-            'netbiosDomain' => $this->netbiosDomain,
-        ]);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getSubstitutedMigrateSearchScheme($username)
-    {
-        return substitute(parent::getSubstitutedMigrateSearchScheme($username), [
-            'netbiosDomain' => $this->netbiosDomain,
+            'primaryGroupUserAttribute' => 'primaryGroupID',
+            'primaryGroupGroupAttribute' => 'objectSid',
         ]);
     }
 
@@ -249,11 +211,11 @@ class AuthActiveDirectory extends AuthGenericLdap
     /**
      * @inheritdoc
      * 
-     * Add objectSid to the list of user attributes.
+     * Add objectSid and primaryGroupID to the list of user attributes.
      */
     public function getUserAttributes()
     {
-        return array_merge(parent::getUserAttributes(), ['objectSid']);
+        return array_merge(parent::getUserAttributes(), ['objectSid', 'primaryGroupID']);
     }
 
     /**
@@ -261,20 +223,18 @@ class AuthActiveDirectory extends AuthGenericLdap
      * 
      * Inject the objectSid=... part into the searchFilter
      */
-    public function getSubstitutedGroupSearchFilter($username)
+    public function substitute($string, $params)
     {
-        $rid = $this->userObject[$this->primaryGroupUserAttribute];
-        $userSid = $this->decodeObjectSid($this->userObject['objectSid']);
-        $groupSid = $this->getSidByUserSid($userSid, $rid);
+        if ($string == $this->groupMembershipSearchFilter) {
+            $rid = $this->userObject['primaryGroupID'];
+            $userSid = $this->decodeObjectSid($this->userObject['objectSid']);
+            $groupSid = $this->getSidByUserSid($userSid, $rid);
 
-        return substitute($this->groupMembershipSearchFilter, [
-            'groupSearchFilter' => $this->groupSearchFilter,
-            'groupMemberAttribute' => $this->groupMemberAttribute,
-            'groupMemberUserIdentifier' => $this->userObject[$this->groupMemberUserAttribute],
-            'primaryGroupUserAttribute' => 'objectSid',
-            'primaryGroup' => $groupSid,
-            'username' => $username,
-        ]);
+            $params = array_merge($params, [
+                'primaryGroup' => $groupSid,
+            ]);
+        }
+        return parent::substitute($string, $params);
     }
 
 }
