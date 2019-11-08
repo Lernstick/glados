@@ -996,6 +996,12 @@ class AuthGenericLdap extends \app\models\Auth
             }
         }
 
+        Yii::debug(substitute('Querying LDAP with search filter `{searchFilter}` and base dn `{base}` for the attributes `{attributes}`.', [
+            'searchFilter' => $searchFilter,
+            'base' => $this->baseDn,
+            'attributes' => implode(", ", $attributes),
+        ]), __METHOD__);
+
         $result = @ldap_search($this->connection, $this->baseDn, $searchFilter, $attributes, 0, $options["limit"]);
 
         $retarr = [];
@@ -1020,7 +1026,7 @@ class AuthGenericLdap extends \app\models\Auth
                             array_push($retarr[$attr], $this->get_ldap_attribute($info, $attr, $i));
                         }
                     } else {
-                        if (in_array("returnArray", $options)) {
+                        if (in_array("returnArray", $options, true)) {
                             $retarr[$attr] = [$this->get_ldap_attribute($info, $attr)];
                         } else {
                             $retarr[$attr] = $this->get_ldap_attribute($info, $attr);
@@ -1029,16 +1035,17 @@ class AuthGenericLdap extends \app\models\Auth
                 }
                 return $retarr;
             } else {
-                if (!in_array("noError", $options)) {
-                    if (array_key_exists("checkAttribute", $options)) {
-                        $this->error = Yii::t('auth', 'No result found, check <code>{attribute}</code>.', [
-                            'attribute' => $options["checkAttribute"],
-                        ]);
-                    } else {
-                        $this->error = Yii::t('auth', 'No result found.');
-                    }
+                if (array_key_exists("checkAttribute", $options)) {
+                    $this->error = Yii::t('auth', 'No result found, check <code>{attribute}</code>.', [
+                        'attribute' => $options["checkAttribute"],
+                    ]);
+                } else {
+                    $this->error = Yii::t('auth', 'No result found.');
                 }
                 Yii::debug($this->error, __METHOD__);
+                if (in_array("noError", $options)) {
+                    $this->error = null;
+                }
                 return false;
             }
         } else {
@@ -1147,7 +1154,7 @@ class AuthGenericLdap extends \app\models\Auth
                 $this->migrateUsers[$identifier] = $usernameFromDb;
                 $c = $c + 1;
 
-                $this->debug[] = Yii::t('auth', 'Found {n} users - taking the first one with <code>{uniqueIdentifier}={identifier}</code>.', [
+                $this->debug[] = Yii::t('auth', 'Found {n} users - taking the first one with <code>{uniqueIdentifier}</code> = <code>{identifier}</code>.', [
                     'n' => $ret['count'],
                     'uniqueIdentifier' => $this->uniqueIdentifier,
                     'identifier' => $identifier,
