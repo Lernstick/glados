@@ -203,6 +203,7 @@ $this->registerJs($active_tabs);
             <?php $_GET = array_merge($_GET, ['#' => 'tab_auth_details']); ?>
 
             <?php
+            $attributes = ['method'];
             if ($model->method == $model::SCENARIO_BIND_DIRECT) {
                 $attributes = [
                     'method',
@@ -217,8 +218,6 @@ $this->registerJs($active_tabs);
                     'bindUsername',
                     'bindPassword',
                 ];
-            } else {
-                $attributes = ['method'];
             }
             
             echo DetailView::widget([

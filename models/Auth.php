@@ -25,6 +25,7 @@ class Auth extends Model
     const AUTH_LOCAL = 0;
     const AUTH_LDAP = 1;
     const AUTH_ACTIVE_DIRECTORY = 2;
+    const AUTH_OPENLDAP = 3;
     
     //public $configPath = __DIR__ . '/../config';
     const PATH = __DIR__ . '/../config';
@@ -237,6 +238,7 @@ class Auth extends Model
         return [
             'app\components\AuthGenericLdap' => \Yii::t('auth', 'Generic LDAP'),
             'app\components\AuthActiveDirectory' => \Yii::t('auth', 'Microsoft Active Directory'),
+            'app\components\AuthOpenLdap' => \Yii::t('auth', 'OpenLDAP'),
         ];
     }
 

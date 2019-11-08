@@ -233,12 +233,12 @@ class AuthGenericLdap extends \app\models\Auth
     /**
      * @var string The search filter to query the LDAP for all group objects
      */
-    public $groupSearchFilter = '(objectClass=posixGroup)';
+    public $groupSearchFilter = '(objectClass=groupOfNames)';
 
     /**
      * @var string The search filter to query the LDAP for all user objects
      */
-    public $userSearchFilter = '(objectCategory=posixAccount)';
+    public $userSearchFilter = '(objectClass=inetOrgPerson)';
 
     /**
      * @var array Array of common search filters to use for group probing for the select list of [[groupSearchFilter]].
@@ -307,7 +307,7 @@ class AuthGenericLdap extends \app\models\Auth
     /**
      * @var string attribute to bind as login user
      */
-    public $bindAttribute = 'uid';
+    public $bindAttribute = 'dn';
 
     /**
      * @var string search filter to search for the login user entry in the LDAP
@@ -322,13 +322,13 @@ class AuthGenericLdap extends \app\models\Auth
      * @var string attribute in the group object that refers to the user object
      * @see [[groupMemberUserAttribute]]
      */
-    public $groupMemberAttribute = 'memberUid';
+    public $groupMemberAttribute = 'member';
 
     /**
      * @var string attribute name within the user object, that [[groupMemberAttribute]] is referring to.
      * @see [[groupMemberAttribute]]
      */
-    public $groupMemberUserAttribute = 'uid';
+    public $groupMemberUserAttribute = 'dn';
 
     /**
      * @var array Array of common names of attributes for [[groupMemberAttribute]].
@@ -336,6 +336,7 @@ class AuthGenericLdap extends \app\models\Auth
     public $groupMemberAttributeList = [
         'memberUid' => 'memberUid',
         'member' => 'member',
+        'UniqueMember' => 'UniqueMember',
     ];
 
     /**
@@ -530,8 +531,51 @@ class AuthGenericLdap extends \app\models\Auth
     }
 
     /**
-     * Performs the substitution of search filters and strings.
+     * Defines attribute names and convertion functions.
+     * The function should be a php callable with the following structure:
+     * 
+     *     @param string $value the value of the attribute
+     *     @return string the converted string
+     *     function ($value)
+     * 
+     * For example:
+     * [
+     *    //will call $this->convert() for each value of attribute with name "attr"
+     *    'attr' => 'convert',
+     *    //will call the given function for each value of attribute with name "attr"
+     *    'attr' => function($v){ return strtolower($v); },
+     * ]
      *
+     * @return array Array of attribute names and functions.
+     */
+    public function postProcessRules()
+    {
+        return [];
+    }
+
+    /**
+     * Applies post process rules to attribute values according to [[postProcessRules()]].
+     * @param string $attr the attribute name
+     * @param mixed $value the value of the attribute
+     * @return string the converted string
+     */
+    public function postProcess($attr, $value)
+    {
+        // convert attribute data according to postProcessRules()
+        if (array_key_exists($attr, $this->postProcessRules())) {
+            $rule = $this->postProcessRules()[$attr];
+            if (is_string($rule)) {
+                $value = $this->{$rule}($value);
+            } else if (is_callable($rule)) {
+                $value = call_user_func($rule, $value);
+            }
+        }
+
+        return $value;
+    }
+
+    /**
+     * Performs the substitution of search filters and strings.
      * @param string $string String with substitution {placeholders}
      * @param array $params Array with additional substitution keys and values. These will
      * take preference over the defined ones
@@ -1005,12 +1049,6 @@ class AuthGenericLdap extends \app\models\Auth
 
     }
 
-    public function convertGUIDToHex($guid)
-    {
-        $unpacked = unpack('Va/v2b/n2c/Nd', $guid);
-        return strtolower(sprintf('%08X-%04X-%04X-%04X-%04X%08X', $unpacked['a'], $unpacked['b1'], $unpacked['b2'], $unpacked['c1'], $unpacked['c2'], $unpacked['d']));
-    }
-
     public function get_ldap_attribute($info, $attr, $i=0)
     {
 
@@ -1029,16 +1067,6 @@ class AuthGenericLdap extends \app\models\Auth
         ]);
         Yii::debug($this->error, __METHOD__);
         return false;
-    }
-
-    public function postProcess($attr, $value)
-    {
-        // convert binary data to hex if the identifier is objectGUID
-        if ($attr == 'objectGUID') {
-            $value = $this->convertGUIDToHex($value);
-        }
-
-        return $value;
     }
 
     /**

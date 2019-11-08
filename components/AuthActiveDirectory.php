@@ -54,7 +54,7 @@ class AuthActiveDirectory extends AuthGenericLdap
      * @inheritdoc
      *
      * The sAMAccountName may not be unique "across the enterprise and anywhere else", but it is human readable.
-     * @see mapping
+     * @see [[mapping]]
      */
     public $groupIdentifier = 'sAMAccountName';
     public $userIdentifier = 'sAMAccountName';
@@ -171,19 +171,34 @@ class AuthActiveDirectory extends AuthGenericLdap
     }
 
     /**
-     * Trabslates an objectSid from AD to a string
-     * @param string $userSid the objectSid of the current user
-     * @param string $rid the revision id to change
-     * @return string
-     * @see https://ldapwiki.com/wiki/ObjectSID
+     * @inheritdoc
+     *
+     * Specific rules for Microsoft's binary attrobutes objectGUID and objectSid
      */
-    public static function getSidByUserSid($userSid, $rid)
+    public function postProcessRules()
     {
-        return substr($userSid, 0, -4) . strval($rid);
+        return array_merge(parent::postProcessRules(), [
+            'objectGUID' => 'convertGUIDToHex',
+            'objectSid' => 'decodeObjectSid',
+        ]);
+    }
+
+
+    public function convertGUIDToHex($guid)
+    {
+        $unpacked = unpack('Va/v2b/n2c/Nd', $guid);
+        return strtolower(sprintf('%08X-%04X-%04X-%04X-%04X%08X',
+            $unpacked['a'],
+            $unpacked['b1'],
+            $unpacked['b2'],
+            $unpacked['c1'],
+            $unpacked['c2'],
+            $unpacked['d']
+        ));
     }
 
     /**
-     * Trabslates an objectSid from AD to a string
+     * Translates binary objectSid from AD to a readable string
      * @param string $bin binary objectSid from ldap_search()
      * @return string
      * @see https://www.null-byte.org/development/php-active-directory-ldap-authentication/
@@ -209,6 +224,18 @@ class AuthActiveDirectory extends AuthGenericLdap
     }
 
     /**
+     * Trabslates an objectSid from AD to a string
+     * @param string $userSid the objectSid of the current user
+     * @param string $rid the revision id to change
+     * @return string
+     * @see https://ldapwiki.com/wiki/ObjectSID
+     */
+    public static function getSidByUserSid($userSid, $rid)
+    {
+        return substr($userSid, 0, -4) . strval($rid);
+    }
+
+    /**
      * @inheritdoc
      * 
      * Add objectSid and primaryGroupID to the list of user attributes.
@@ -227,9 +254,7 @@ class AuthActiveDirectory extends AuthGenericLdap
     {
         if ($string == $this->groupMembershipSearchFilter) {
             $rid = $this->userObject['primaryGroupID'];
-            $userSid = $this->decodeObjectSid($this->userObject['objectSid']);
-            $groupSid = $this->getSidByUserSid($userSid, $rid);
-
+            $groupSid = $this->getSidByUserSid($this->userObject['objectSid'], $rid);
             $params = array_merge($params, [
                 'primaryGroup' => $groupSid,
             ]);
