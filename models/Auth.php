@@ -32,8 +32,10 @@ class Auth extends Model
 
     public $id;
 
-    public $loginScheme;
-    #public $bindScheme; // @todo: evtl. remove
+    /**
+     * @var string The pattern to test the given login credentials against.
+     */
+    public $loginScheme = '{username}';
 
     /**
      * @var string The class of the current authentication type.
@@ -104,18 +106,16 @@ class Auth extends Model
     public function rules()
     {
         return [
-            //[['name', 'description', 'class'], 'safe', 'on' => self::SCENARIO_DEFAULT],
-            [['name', 'class', 'order'], 'required', 'on' => self::SCENARIO_DEFAULT],
-            [['name'], 'string', 'max' => 10, 'on' => self::SCENARIO_DEFAULT],
+            [['name', 'class', 'order', 'loginScheme'], 'required'],
+            [['name'], 'string', 'max' => 10],
             [['class'], 'required', 'on' => self::SCENARIO_CREATE],
-            ['class', 'in', 'range' => array_keys($this->authList), 'on' => [self::SCENARIO_CREATE, self::SCENARIO_DEFAULT]],
+            ['class', 'in', 'range' => array_keys($this->authList)],
             ['order', 'in',
                 'not' => true,
                 'range' => $this->orderRange(),
                 'message' => Yii::t('auth', 'This number is already assigned to another authentication method.'),
-                'on' => self::SCENARIO_DEFAULT
             ],
-            [['order'], 'integer', 'min' => 1, 'max' => 9999, 'on' => self::SCENARIO_DEFAULT],
+            [['order'], 'integer', 'min' => 1, 'max' => 9999],
         ];
     }
 

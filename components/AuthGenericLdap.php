@@ -30,6 +30,12 @@ class AuthGenericLdap extends \app\models\Auth
     const SCENARIO_BIND_BYUSER = 'bind_byuser';
 
     /**
+     * @const string Perform an anonymous bind, then retrieve the bind attribute of the login user,
+     * then bind again using this attribute to authentication the login user,
+     */
+    const SCENARIO_ANONYMOUS_BIND = 'anonymous_bind';
+
+    /**
      * @const int extended error output
      */
     const LDAP_OPT_DIAGNOSTIC_MESSAGE = 0x0032;
@@ -164,6 +170,7 @@ class AuthGenericLdap extends \app\models\Auth
     ];
 
     /**
+     * @inheritdoc
      * @var string The pattern to test the given login credentials against.
      *
      * A login over LDAP will only be performed if the given username matches the provided
@@ -383,13 +390,17 @@ class AuthGenericLdap extends \app\models\Auth
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['domain'], 'required', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_BIND_DIRECT, self::SCENARIO_BIND_BYUSER, self::SCENARIO_QUERY_GROUPS]],
+            // required stuff in all scenarios
+            [['domain', 'userSearchFilter', 'uniqueIdentifier', 'groupSearchFilter', 'groupIdentifier', 'groupMemberAttribute', 'groupMemberUserAttribute', 'primaryGroupUserAttribute','primaryGroupGroupAttribute', 'method'], 'required'],
+            [['bindScheme', 'loginSearchFilter'], 'required', 'on' => self::SCENARIO_BIND_DIRECT],
+            [['loginAttribute', 'bindAttribute'], 'required', 'on' => [self::SCENARIO_BIND_BYUSER, self::SCENARIO_ANONYMOUS_BIND]],
+            [['bindUsername', 'bindPassword'], 'required', 'on' => self::SCENARIO_BIND_BYUSER],
 
-            ['mapping', 'filter', 'filter' => [$this, 'processMapping'], 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_BIND_DIRECT, self::SCENARIO_BIND_BYUSER, self::SCENARIO_QUERY_GROUPS]],
+            [['domain'], 'required', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_BIND_DIRECT, self::SCENARIO_BIND_BYUSER, self::SCENARIO_ANONYMOUS_BIND, self::SCENARIO_QUERY_GROUPS]],
 
-            ['method', 'filter', 'filter' => [$this, 'processMethod'], 'on' => [self::SCENARIO_BIND_DIRECT, self::SCENARIO_BIND_BYUSER, self::SCENARIO_QUERY_GROUPS]],
+            ['mapping', 'filter', 'filter' => [$this, 'processMapping'], 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_BIND_DIRECT, self::SCENARIO_BIND_BYUSER, self::SCENARIO_ANONYMOUS_BIND, self::SCENARIO_QUERY_GROUPS]],
 
-            [['domain', 'ldap_uri', 'loginScheme', 'bindScheme', 'loginSearchFilter', 'groupIdentifier', 'groupSearchFilter', 'query_username', 'query_password'], 'safe', 'on' => self::SCENARIO_QUERY_GROUPS],
+            ['method', 'filter', 'filter' => [$this, 'processMethod'], 'on' => [self::SCENARIO_BIND_DIRECT, self::SCENARIO_BIND_BYUSER, self::SCENARIO_ANONYMOUS_BIND, self::SCENARIO_QUERY_GROUPS]],
 
             [['migrateSearchScheme', 'userIdentifier', 'migrateUserSearchFilter', 'query_username', 'query_password'], 'safe', 'on' => self::SCENARIO_QUERY_USERS],
 
@@ -400,10 +411,10 @@ class AuthGenericLdap extends \app\models\Auth
                 'whenClient' => "function (attribute, value) {
                     return $('#ldap-scenario').val() == 'query_groups';
                 }",
-                'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_BIND_DIRECT, self::SCENARIO_BIND_BYUSER, self::SCENARIO_QUERY_GROUPS]
+                'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_BIND_DIRECT, self::SCENARIO_BIND_BYUSER]
             ],
             [
-                'query_password',
+                'domain',
                 'getAllLdapGroups',
                 'when' => function($model) {return !empty($model->domain);},
                 'on' => self::SCENARIO_QUERY_GROUPS
@@ -429,9 +440,9 @@ class AuthGenericLdap extends \app\models\Auth
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        //$scenarios[self::SCENARIO_DEFAULT] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'ldap_uri', 'loginScheme', 'bindScheme', 'loginSearchFilter', 'groupIdentifier', 'groupSearchFilter', 'mapping', 'uniqueIdentifier', 'bindAttribute', 'method']);
         $scenarios[self::SCENARIO_BIND_DIRECT] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'ldap_uri', 'loginScheme', 'groupIdentifier', 'groupSearchFilter', 'mapping', 'uniqueIdentifier', 'groupMemberAttribute', 'groupMemberUserAttribute', 'userSearchFilter', 'primaryGroupUserAttribute', 'primaryGroupGroupAttribute', 'method', 'bindScheme', 'loginSearchFilter', 'bindAttribute']);
         $scenarios[self::SCENARIO_BIND_BYUSER] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'ldap_uri', 'loginScheme', 'groupIdentifier', 'groupSearchFilter', 'mapping', 'uniqueIdentifier', 'groupMemberAttribute', 'groupMemberUserAttribute', 'userSearchFilter', 'primaryGroupUserAttribute', 'primaryGroupGroupAttribute', 'method', 'bindUsername', 'bindPassword', 'loginAttribute', 'bindAttribute']);
+        $scenarios[self::SCENARIO_ANONYMOUS_BIND] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'ldap_uri', 'loginScheme', 'groupIdentifier', 'groupSearchFilter', 'mapping', 'uniqueIdentifier', 'groupMemberAttribute', 'groupMemberUserAttribute', 'userSearchFilter', 'primaryGroupUserAttribute', 'primaryGroupGroupAttribute', 'method', 'loginAttribute', 'bindAttribute']);
         $scenarios[self::SCENARIO_QUERY_GROUPS] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'ldap_uri', 'loginScheme', 'groupIdentifier', 'groupSearchFilter', 'mapping', 'uniqueIdentifier', 'groupMemberAttribute', 'groupMemberUserAttribute', 'userSearchFilter', 'method', 'primaryGroupUserAttribute', 'primaryGroupGroupAttribute', 'bindUsername', 'bindPassword', 'loginAttribute', 'bindAttribute', 'query_username', 'query_password', 'bindScheme', 'loginSearchFilter']);
         $scenarios[self::SCENARIO_QUERY_USERS] = ['migrateSearchScheme', 'migrateUserSearchFilter', 'userIdentifier', 'query_username', 'query_password'];
         $scenarios[self::SCENARIO_MIGRATE] = ['migrate'];
@@ -489,7 +500,7 @@ class AuthGenericLdap extends \app\models\Auth
             'groupIdentifier' => \Yii::t('auth', 'A (unique) human readable identifier across the LDAP Directory for groups. This should be unique, as that it is used to identify the group. This will be used for the group mapping.'),
             'groupSearchFilter' => \Yii::t('auth', 'The search filter for group objects.'),
             'mapping' => \Yii::t('auth', 'The direct assignment of LDAP groups to user roles. You can map multiple LDAP groups to the same role. Goups need not to be assigned to all roles.'),
-            'query_login' => \Yii::t('auth', 'Username and password to query the LDAP servers given above for group names. This information is only needed to specify the group mapping. These login credentials will not be saved anywhere.'),
+            'query_login' => \Yii::t('auth', 'Username and password to query for group names, or leave empty for an anonymous bind. This information is only needed to specify the group mapping. <i>These login credentials will not be saved anywhere</i>.'),
             'bindAttribute' => \Yii::t('auth', 'The attribute that should be used as username to authenticate via LDAP.'),
             'loginAttribute' => \Yii::t('auth', 'The attribute that is used as username in the login form.'),
             'userSearchFilter' => \Yii::t('auth', 'The search filter for user objects.'),
@@ -502,7 +513,7 @@ class AuthGenericLdap extends \app\models\Auth
             'primaryGroupGroupAttribute' => \Yii::t('auth', 'The attribute of the group object, that <code>{other_attribute}</code> is referring to.', [
                     'other_attribute' => $this->getAttributeLabel('primaryGroupUserAttribute'),
                 ]),
-            'method' => \Yii::t('auth', 'There are two differnt methods the LDAP server can be used to authenticate users.<ul><li><b>Bind directly by login credentials</b> means that the username from the login from (or parts of it) is used to bind to the LDAP server. The authenticating user needs read permission on the LDAP server for this.</li><li><b>Bind by given username and password</b> means that you have to provide credentials that are used to find the user object in the LDAP, before binding with the user itself. The provided credentials need read permission on the LDAP server, but the user itself does not.</li></ul>Please read the descriptions of the settings below for details on the specific method.'),
+            'method' => \Yii::t('auth', 'There are two differnt methods the LDAP server can be used to authenticate users.<ul><li><b>Bind directly by login credentials</b> means that the username from the login from (or parts of it) is used to bind to the LDAP server. <i>The authenticating user needs read permission on the LDAP server for this</i>.</li><li><b>Bind with given username and password</b> means that you have to provide credentials that are used to find the user object in the LDAP, before binding with the user itself. <i>The provided credentials need read permission on the LDAP server</i>, but the user itself does not.</li><li><b>Bind with anonymous user</b> means that the system performs an anonymous bind to find the user object in the LDAP, before binding with the user itself. <i>Anonymous binds must be allowed by the LDAP server for this</i>.</li></ul>Please read the descriptions of the settings below for details on the specific method.'),
         ]);
     }
 
@@ -686,7 +697,7 @@ class AuthGenericLdap extends \app\models\Auth
      * @return array the new method attribute in the format of [[method]]
      */
     public function processMethod ($arr) {
-        return $arr[0];
+        return $arr;
     }
 
     /**
@@ -795,19 +806,34 @@ class AuthGenericLdap extends \app\models\Auth
     public function bindLdap($username, $password)
     {
         $this->open();
+        $anonymous = false;
+        if (empty($username) || empty($password)) {
+            $anonymous = true;
+        }
+
         $this->bind = @ldap_bind($this->connection, $username, $password);
 
         if ($this->bind) {
             Yii::debug('Bind successful', __METHOD__);
-            $this->debug[] = Yii::t('auth', 'Bind with username <code>{username}</code> successful.', [
-                'username' => $username,
-            ]);
+            if ($anonymous) {
+                $this->debug[] = Yii::t('auth', 'Bind with anonymous user successful.');
+            } else {
+                $this->debug[] = Yii::t('auth', 'Bind with username <code>{username}</code> successful.', [
+                    'username' => $username,
+                ]);
+            }
             return $username;
         } else {
-            $this->error = Yii::t('auth', 'Bind with username <code>{username}</code> failed: {error}.', [
-                'username' => $username,
-                'error' => ldap_error($this->connection),
-            ]);
+            if ($anonymous) {
+                $this->error = Yii::t('auth', 'Bind with anonymous user failed: {error}.', [
+                    'error' => ldap_error($this->connection),
+                ]);
+            } else {
+                $this->error = Yii::t('auth', 'Bind with username <code>{username}</code> failed: {error}.', [
+                    'username' => $username,
+                    'error' => ldap_error($this->connection),
+                ]);
+            }
             ldap_get_option($this->connection, AuthGenericLdap::LDAP_OPT_DIAGNOSTIC_MESSAGE, $extended_error);
             if (!empty($extended_error)) {
                 $this->error .= ", " . Yii::t('auth', "Detailed error message:") . " " . $extended_error;
@@ -833,7 +859,7 @@ class AuthGenericLdap extends \app\models\Auth
                 'username' => $username,
                 'loginScheme' => $this->loginScheme,
             ]);
-            if ($this->method == self::SCENARIO_BIND_BYUSER) {
+            if ($this->method == self::SCENARIO_BIND_BYUSER || $this->method == self::SCENARIO_ANONYMOUS_BIND) {
                 if ($this->bindLdap($this->bindUsername, $this->bindPassword) !== false) {
                     if ( $this->getUserinfo($username) !== false ){
                         $groups = $this->getGroupMembership($username);
@@ -906,7 +932,7 @@ class AuthGenericLdap extends \app\models\Auth
      */
     public function getUserinfo($username)
     {
-        if ($this->method == self::SCENARIO_BIND_BYUSER) {
+        if ($this->method == self::SCENARIO_BIND_BYUSER || $this->method == self::SCENARIO_ANONYMOUS_BIND) {
             $searchFilter = $this->substitute($this->bindSearchFilter, ['username' => $username]);
         } else {
             $searchFilter = $this->substitute($this->loginSearchFilter, ['username' => $username]);
@@ -937,7 +963,7 @@ class AuthGenericLdap extends \app\models\Auth
      */
     public function getUserAttributes()
     {
-        if ($this->method == self::SCENARIO_BIND_BYUSER) {
+        if ($this->method == self::SCENARIO_BIND_BYUSER || $this->method == self::SCENARIO_ANONYMOUS_BIND) {
             return [
                 $this->bindAttribute,
                 $this->uniqueIdentifier,
@@ -1183,12 +1209,13 @@ class AuthGenericLdap extends \app\models\Auth
      */
     public function getAllLdapGroups ($attribute, $params, $validator)
     {
-        if ($this->bindLdap($this->query_username, $this->query_password)) {
+        if ($this->bindLdap($this->query_username, $this->query_password) !== false) {
             if($this->query_groups()) {
                 return;
             }
         }
-        $this->addError($attribute, \Yii::t('auth', 'Incorrect username or password.'));
+
+        $this->addError('query_password', \Yii::t('auth', 'Incorrect username or password.'));
     }
 
     /**
@@ -1242,6 +1269,7 @@ class AuthGenericLdap extends \app\models\Auth
         if ($this->connection !== null) {
             Yii::debug('Closing LDAP connection: ' . $this->domain, __METHOD__);
             @ldap_close($this->connection);
+            $this->connection = null;
         }
     }
 }

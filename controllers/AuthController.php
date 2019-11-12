@@ -123,6 +123,7 @@ class AuthController extends Controller
                         'wait' => true,
                     ]);
                 } else {
+                    $model->scenario = $model::SCENARIO_DEFAULT;
                     return $this->render('create', [
                         'model' => $model,
                         'searchModel' => $searchModel,
@@ -136,6 +137,7 @@ class AuthController extends Controller
                 $model->validate();
             }
 
+            $model->scenario = $model::SCENARIO_DEFAULT;
             return $this->render('create', [
                 'model' => $model,
                 'searchModel' => $searchModel,
@@ -172,6 +174,7 @@ class AuthController extends Controller
                     'hash' => md5(json_encode($model->getAttributes($model->activeAttributes()))),
                 ]);
             } else {
+                $model->scenario = $model::SCENARIO_DEFAULT;
                 return $this->render('update', [
                     'model' => $model,
                     'searchModel' => $searchModel,
@@ -184,6 +187,7 @@ class AuthController extends Controller
             $model->validate();
         }
 
+        $model->scenario = $model::SCENARIO_DEFAULT;
         return $this->render('update', [
             'model' => $model,
             'searchModel' => $searchModel,
@@ -288,8 +292,8 @@ class AuthController extends Controller
     protected function findScenario($model)
     {
         //bind_direct or bind_byuser
-        if (isset(Yii::$app->request->post($model->formName())['method'][0])) {
-            $scenario = Yii::$app->request->post($model->formName())['method'][0];
+        if (isset(Yii::$app->request->post($model->formName())['method'])) {
+            $scenario = Yii::$app->request->post($model->formName())['method'];
         } else {
             $scenario = $model->class::SCENARIO_BIND_DIRECT;
         }

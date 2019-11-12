@@ -218,6 +218,12 @@ $this->registerJs($active_tabs);
                     'bindUsername',
                     'bindPassword',
                 ];
+            } else if ($model->method == $model::SCENARIO_ANONYMOUS_BIND) {
+                $attributes = [
+                    'method',
+                    'loginAttribute',
+                    'bindAttribute',
+                ];
             }
             
             echo DetailView::widget([

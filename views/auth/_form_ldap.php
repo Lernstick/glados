@@ -66,45 +66,69 @@ $('#query-groups-button').on('click', function(e) {
     $('#ldap-scenario').val('query_groups');
     $("#ldap_form").yiiActiveForm('resetForm');
 });
+
+$('#copy-credentials-button').on('click', function(e) {
+    bindUsername = $("input[name^='Auth'][name$='[bindUsername]']");
+    bindPassword = $("input[name^='Auth'][name$='[bindPassword]']");
+    queryUsername = $("input[name^='Auth'][name$='[query_username]']");
+    queryPassword = $("input[name^='Auth'][name$='[query_password]']");
+    queryUsername.val(bindUsername.val());
+    queryPassword.val(bindPassword.val());
+});
+
+$('#copy-credentials2-button').on('click', function(e) {
+    bindUsername = $("input[name^='Auth'][name$='[bindUsername]']");
+    bindPassword = $("input[name^='Auth'][name$='[bindPassword]']");
+    queryUsername = $("input[name^='Auth'][name$='[query_username]']");
+    queryPassword = $("input[name^='Auth'][name$='[query_password]']");
+    bindUsername.val(queryUsername.val());
+    bindPassword.val(queryPassword.val());
+});
 JS;
 $this->registerJs($js);
 
-$js = <<< 'SCRIPT'
-directBind = $("input[name^='Auth'][name$='[method][]'][value=bind_direct]")
-userBind = $("input[name^='Auth'][name$='[method][]'][value=bind_byuser]")
+$js = <<< SCRIPT
 
-if (directBind.is(':checked')) {
-    $('#fields-user').hide()
-}
+method = $("select[name^='Auth'][name$='[method]']")
 
-if (userBind.is(':checked')) {
-    $('#fields-direct').hide()
-}
+bindScheme = $("input[name^='Auth'][name$='[bindScheme]']").closest("div.parent");
+loginSearchFilter = $("input[name^='Auth'][name$='[loginSearchFilter]']").closest("div.parent");
+loginAttribute = $("select[name^='Auth'][name$='[loginAttribute]']").closest("div.parent");
+bindAttribute = $("select[name^='Auth'][name$='[bindAttribute]']").closest("div.parent");
+bindUsername = $("input[name^='Auth'][name$='[bindUsername]']").closest("div.parent");
+bindPassword = $("input[name^='Auth'][name$='[bindPassword]']").closest("div.parent");
 
-// this is the default, invoke by a click()
-directBind.click(function(){
-    if ($(this).is(':checked')) {
-        userBind.prop("checked", false);
-        $('#fields-direct').show()
-        $('#fields-user').hide()
-    } else if ($(this).not(':checked')) {
-        userBind.prop("checked", true);
-        $('#fields-direct').hide()
-        $('#fields-user').show()
+method_change = function(){
+    var selected = $(this).children("option:selected").val();
+    if (selected == null) {
+        selected = "{$model->method}";
     }
-});
-
-userBind.click(function(){
-    if ($(this).is(':checked')) {
-        directBind.prop("checked", false);
-        $('#fields-direct').hide()
-        $('#fields-user').show()
-    } else if ($(this).not(':checked')) {
-        directBind.prop("checked", true);
-        $('#fields-direct').hide()
-        $('#fields-user').show()
+    if (selected == "bind_direct") {
+        bindScheme.show();
+        loginSearchFilter.show();
+        loginAttribute.hide();
+        bindAttribute.hide();
+        bindUsername.hide();
+        bindPassword.hide();
+    } else if (selected == "bind_byuser") {
+        bindScheme.hide();
+        loginSearchFilter.hide();
+        loginAttribute.show();
+        bindAttribute.show();
+        bindUsername.show();
+        bindPassword.show();
+    } else if (selected == "anonymous_bind") {
+        bindScheme.hide();
+        loginSearchFilter.hide();
+        loginAttribute.show();
+        bindAttribute.show();
+        bindUsername.hide();
+        bindPassword.hide();
     }
-});
+};
+
+method_change();
+method.change(method_change);
 
 SCRIPT;
 $this->registerJs($js);
@@ -188,9 +212,16 @@ $this->registerJs($js);
                         </div>
                         <div class="panel-body">
                             <?= $form->field($model, 'query_username', [
-                                'template' => "{label}\n<div class='col-lg-8'>{input}</div>\n<div class='col-lg-4'></div>{hint}\n{error}",
+                                'template' => "{label}\n<div class='col-lg-8'><div class='input-group'>{input}<span class='input-group-btn'>{button}</span></div></div>\n<div class='col-lg-4'></div>{hint}\n{error}",
                                 'labelOptions' => ['class' => 'col-lg-4 control-label'],
                                 'errorOptions' => ['class' => 'col-lg-8 help-block'],
+                                'parts' => [
+                                    'button' => Html::button('<span class="glyphicon glyphicon-copy" aria-hidden="true"></span>', [
+                                        'class' => 'btn btn-default',
+                                        'title' => \Yii::t('auth', 'Copy credentials from method'),
+                                        'name' => 'copy-credentials-button',
+                                        'id' => 'copy-credentials-button'])
+                                ],
                             ]) ?>
 
                             <?= $form->field($model, 'query_password', [
@@ -382,39 +413,37 @@ $this->registerJs($js);
                 <div class="col-md-6">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <?php
-                            $form->field($model, 'method')->begin();
-                            echo Html::activeLabel($model,'method');
-                            echo Html::activeHint($model,'method', ['class' => 'hint-block']);
-                            $form->field($model, 'method')->end();
-                            ?>
+                            <div class="row">
+                                <?= $form->field($model, 'method', [
+                                    'template' => "<div class='col-lg-4'>{label}</div>\n<div class='col-lg-8'>{input}</div>\n<div class='col-lg-4'></div>{hint}\n{error}",
+                                    'errorOptions' => ['class' => 'col-lg-8 help-block'],
+                                    'options' => [
+                                        'class' => '',
+                                    ],
+                                    'errorOptions' => ['tag' => false],
+                                ])->dropdownList([
+                                    $model::SCENARIO_BIND_DIRECT => \Yii::t('auth', 'Bind directly by login credentials'),
+                                    $model::SCENARIO_BIND_BYUSER => \Yii::t('auth', 'Bind with given username and password'),
+                                    $model::SCENARIO_ANONYMOUS_BIND => \Yii::t('auth', 'Bind with anonymous user'),
+                                ]) ?>
+                            </div>
                         </div>
                         <div class="panel-body">
-                            <?= $form->field($model, 'method', [
-                                'options' => [
-                                    'class' => '',
-                                ],
-                                'errorOptions' => ['tag' => false],
-                            ])->checkboxList([
-                                $model::SCENARIO_BIND_DIRECT => \Yii::t('auth', 'Bind directly by login credentials'),
-                                $model::SCENARIO_BIND_BYUSER => \Yii::t('auth', 'Bind by given username and password')
-                            ])->label(false)->hint(false) ?>
 
-                            <div id="fields-direct">
-                                <div class="col-md-12">
-                                    <?= $form->field($model, 'bindScheme')->textInput(['maxlength' => true]) ?>
-                                </div>
-                                <div class="col-md-12">
-                                    <?= $form->field($model, 'loginSearchFilter')->textInput(['maxlength' => true]) ?>
-                                </div>
-                            </div>
+                            <div id="method-fields">
 
-                            <div id="fields-user">
-                                <div class="col-md-12">
+                                <div class="col-md-12 parent">
                                     <?= $form->field($model, 'bindUsername', [
-                                        'template' => "{label}\n<div class='col-lg-8'>{input}</div>\n<div class='col-lg-4'></div>{hint}\n{error}",
+                                        'template' => "{label}\n<div class='col-lg-8'><div class='input-group'>{input}<span class='input-group-btn'>{button}</span></div></div>\n<div class='col-lg-4'></div>{hint}\n{error}",
                                         'labelOptions' => ['class' => 'col-lg-4 control-label'],
                                         'errorOptions' => ['class' => 'col-lg-8 help-block'],
+                                        'parts' => [
+                                            'button' => Html::button('<span class="glyphicon glyphicon-copy" aria-hidden="true"></span>', [
+                                                'class' => 'btn btn-default',
+                                                'title' => \Yii::t('auth', 'Copy credentials from query'),
+                                                'name' => 'copy-credentials2-button',
+                                                'id' => 'copy-credentials2-button'])
+                                        ],
                                     ]) ?>
 
                                     <?= $form->field($model, 'bindPassword', [
@@ -423,7 +452,8 @@ $this->registerJs($js);
                                         'errorOptions' => ['class' => 'col-lg-8 help-block'],
                                     ])->passwordInput() ?>
                                 </div>
-                                <div class="col-md-12">
+
+                                <div class="col-md-12 parent">
                                     <?= $form->field($model, 'loginAttribute')->widget(Select2::classname(), [
                                         'data' => array_merge([$model->loginAttribute => $model->loginAttribute], array_combine($model->identifierAttributes, $model->identifierAttributes)),
                                         'options' => [
@@ -435,7 +465,7 @@ $this->registerJs($js);
                                         ],
                                     ]); ?>
                                 </div>
-                                <div class="col-md-12">
+                                <div class="col-md-12 parent">
                                     <?= $form->field($model, 'bindAttribute')->widget(Select2::classname(), [
                                         'data' => array_merge([$model->bindAttribute => $model->bindAttribute], array_combine($model->identifierAttributes, $model->identifierAttributes)),
                                         'options' => [
@@ -446,8 +476,17 @@ $this->registerJs($js);
                                             'allowClear' => false
                                         ],
                                     ]); ?>
+                                 </div>
+
+                                <div class="col-md-12 parent">
+                                    <?= $form->field($model, 'bindScheme')->textInput(['maxlength' => true]) ?>
                                 </div>
+                                <div class="col-md-12 parent">
+                                    <?= $form->field($model, 'loginSearchFilter')->textInput(['maxlength' => true]) ?>
+                                </div>
+
                             </div>
+
                         </div>
                     </div>
                 </div>
