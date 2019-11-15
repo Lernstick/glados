@@ -91,14 +91,15 @@ $js = <<< SCRIPT
 
 method = $("select[name^='Auth'][name$='[method]']")
 
-bindScheme = $("input[name^='Auth'][name$='[bindScheme]']").closest("div.parent");
-loginSearchFilter = $("input[name^='Auth'][name$='[loginSearchFilter]']").closest("div.parent");
-loginAttribute = $("select[name^='Auth'][name$='[loginAttribute]']").closest("div.parent");
-bindAttribute = $("select[name^='Auth'][name$='[bindAttribute]']").closest("div.parent");
-bindUsername = $("input[name^='Auth'][name$='[bindUsername]']").closest("div.parent");
-bindPassword = $("input[name^='Auth'][name$='[bindPassword]']").closest("div.parent");
-
 method_change = function(){
+    var method = $("select[name^='Auth'][name$='[method]']")
+    var bindScheme = $("input[name^='Auth'][name$='[bindScheme]']").closest("div.parent");
+    var loginSearchFilter = $("input[name^='Auth'][name$='[loginSearchFilter]']").closest("div.parent");
+    var loginAttribute = $("select[name^='Auth'][name$='[loginAttribute]']").closest("div.parent");
+    var bindAttribute = $("select[name^='Auth'][name$='[bindAttribute]']").closest("div.parent");
+    var bindUsername = $("input[name^='Auth'][name$='[bindUsername]']").closest("div.parent");
+    var bindPassword = $("input[name^='Auth'][name$='[bindPassword]']").closest("div.parent");
+
     var selected = $(this).children("option:selected").val();
     if (selected == null) {
         selected = "{$model->method}";
@@ -198,8 +199,8 @@ $this->registerJs($js);
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <?= Html::label($model->attributeLabels()['mapping']); ?>
-            <div class="hint-block"><?= $model->attributeHints()['mapping']; ?></div>
+            <?= Html::label($model->getAttributeLabel('mapping')); ?>
+            <div class="hint-block"><?= $model->getAttributeHint('mapping'); ?></div>
         </div>
         <div class="panel-body">
 
@@ -207,8 +208,8 @@ $this->registerJs($js);
                 <div class="col-lg-5">
                     <div class="panel panel-info form-horizontal">
                         <div class="panel-heading">
-                            <i class="glyphicon glyphicon-user"></i> <?= Html::label($model->attributeLabels()['query_login']); ?>
-                            <div class="hint-block"><?= $model->attributeHints()['query_login']; ?></div>
+                            <i class="glyphicon glyphicon-user"></i> <?= Html::label($model->getAttributeLabel('query_login')); ?>
+                            <div class="hint-block"><?= $model->getAttributeHint('query_login'); ?></div>
                         </div>
                         <div class="panel-body">
                             <?= $form->field($model, 'query_username', [
@@ -218,7 +219,9 @@ $this->registerJs($js);
                                 'parts' => [
                                     'button' => Html::button('<span class="glyphicon glyphicon-copy" aria-hidden="true"></span>', [
                                         'class' => 'btn btn-default',
-                                        'title' => \Yii::t('auth', 'Copy credentials from method'),
+                                        'title' => \Yii::t('auth', 'Copy credentials from {field}', [
+                                            'field' => \Yii::t('auth', 'Bind credentials'),
+                                        ]),
                                         'name' => 'copy-credentials-button',
                                         'id' => 'copy-credentials-button'])
                                 ],
@@ -440,7 +443,9 @@ $this->registerJs($js);
                                         'parts' => [
                                             'button' => Html::button('<span class="glyphicon glyphicon-copy" aria-hidden="true"></span>', [
                                                 'class' => 'btn btn-default',
-                                                'title' => \Yii::t('auth', 'Copy credentials from query'),
+                                                'title' => \Yii::t('auth', 'Copy credentials from {field}', [
+                                                    'field' => $model->getAttributeLabel('query_login'),
+                                                ]),
                                                 'name' => 'copy-credentials2-button',
                                                 'id' => 'copy-credentials2-button'])
                                         ],
