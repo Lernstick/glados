@@ -64,6 +64,7 @@ $('#submit-button').on('click', function(e) {
 
 $('#query-groups-button').on('click', function(e) {
     $('#ldap-scenario').val('query_groups');
+    $(this).button('loading');
     $("#ldap_form").yiiActiveForm('resetForm');
 });
 
@@ -84,6 +85,7 @@ $('#copy-credentials2-button').on('click', function(e) {
     bindUsername.val(queryUsername.val());
     bindPassword.val(queryPassword.val());
 });
+
 JS;
 $this->registerJs($js);
 
@@ -133,6 +135,17 @@ method.change(method_change);
 
 SCRIPT;
 $this->registerJs($js);
+
+if (!empty($model->getErrors('query_password'))) {
+    $js = <<< JS
+    // open the query modal
+    $('#queryModal').modal('show');
+JS;
+    $this->registerJs($js);
+
+} else if (!empty($model->success)) {
+    Yii::$app->session->addFlash('success', $model->success . ' ' . \Yii::t('exams', 'You can now select them from the dropdown lists.'));
+}
 
 ?>
 
@@ -199,62 +212,91 @@ $this->registerJs($js);
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <?= Html::label($model->getAttributeLabel('mapping')); ?>
-            <div class="hint-block"><?= $model->getAttributeHint('mapping'); ?></div>
+            <div class="row">
+                <div class="col-lg-4">
+                    <?= Html::label($model->getAttributeLabel('mapping')); ?>
+                    <div class="hint-block"><?= $model->getAttributeHint('mapping'); ?></div>
+                </div>
+                <div class="col-lg-8 <?= empty($model->success) ? '' : 'has-success' ?>">
+                    <div class="input-group pull-right">
+                      <span></span>
+                      <button class="btn btn-default input-group-addon" style="width:100%; border-radius: 4px;" type="button" data-toggle="modal" data-target="#queryModal"><?= empty($model->success) ? '' : '<i class="glyphicon glyphicon-ok"></i>&nbsp;' ?><?= \Yii::t('auth', 'Query for LDAP groups'); ?></button>
+                      <span></span>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="panel-body">
 
             <div class="row">
-                <div class="col-lg-5">
-                    <div class="panel panel-info form-horizontal">
-                        <div class="panel-heading">
-                            <i class="glyphicon glyphicon-user"></i> <?= Html::label($model->getAttributeLabel('query_login')); ?>
-                            <div class="hint-block"><?= $model->getAttributeHint('query_login'); ?></div>
-                        </div>
-                        <div class="panel-body">
-                            <?= $form->field($model, 'query_username', [
-                                'template' => "{label}\n<div class='col-lg-8'><div class='input-group'>{input}<span class='input-group-btn'>{button}</span></div></div>\n<div class='col-lg-4'></div>{hint}\n{error}",
-                                'labelOptions' => ['class' => 'col-lg-4 control-label'],
-                                'errorOptions' => ['class' => 'col-lg-8 help-block'],
-                                'parts' => [
-                                    'button' => Html::button('<span class="glyphicon glyphicon-copy" aria-hidden="true"></span>', [
-                                        'class' => 'btn btn-default',
-                                        'title' => \Yii::t('auth', 'Copy credentials from {field}', [
-                                            'field' => \Yii::t('auth', 'Bind credentials'),
-                                        ]),
-                                        'name' => 'copy-credentials-button',
-                                        'id' => 'copy-credentials-button'])
-                                ],
-                            ]) ?>
+                <div class="col-lg-12">
+                    <div class="modal fade" id="queryModal" tabindex="-1" role="dialog" aria-labelledby="queryModalLabel">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="queryModalLabel">
+                                <i class="glyphicon glyphicon-user"></i> <?= Html::label($model->getAttributeLabel('query_login')); ?>
+                                <div class="hint-block"><?= $model->getAttributeHint('query_login'); ?></div>
+                            </h4>
+                          </div>
+                          <div class="modal-body">
 
-                            <?= $form->field($model, 'query_password', [
-                                'template' => "{label}\n<div class='col-lg-8'>{input}</div>\n<div class='col-lg-4'></div>{hint}\n{error}",
-                                'labelOptions' => ['class' => 'col-lg-4 control-label'],
-                                'errorOptions' => ['class' => 'col-lg-8 help-block'],
-                            ])->passwordInput() ?>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <?= $form->field($model, 'query_username', [
+                                        'template' => "{label}\n<div class='col-lg-8'><div class='input-group'>{input}<span class='input-group-btn'>{button}</span></div></div>\n<div class='col-lg-4'></div>{hint}\n{error}",
+                                        'labelOptions' => ['class' => 'col-lg-4 control-label'],
+                                        'errorOptions' => ['class' => 'col-lg-8 help-block'],
+                                        'parts' => [
+                                            'button' => Html::button('<span class="glyphicon glyphicon-copy" aria-hidden="true"></span>', [
+                                                'class' => 'btn btn-default',
+                                                'title' => \Yii::t('auth', 'Copy credentials from {field}', [
+                                                    'field' => \Yii::t('auth', 'Bind credentials'),
+                                                ]),
+                                                'name' => 'copy-credentials-button',
+                                                'id' => 'copy-credentials-button'])
+                                        ],
+                                    ]) ?>
 
-                            <div class="form-group">
-                                <div class="col-lg-offset-1 col-lg-11">
-                                    <?= Html::submitButton(\Yii::t('auth', 'Query for LDAP Groups'), ['class' => 'btn btn-primary', 'name' => 'query-groups-button', 'id' => 'query-groups-button']) ?>
+                                    <?= $form->field($model, 'query_password', [
+                                        'template' => "{label}\n<div class='col-lg-8'>{input}</div>\n<div class='col-lg-4'></div>{hint}\n{error}",
+                                        'labelOptions' => ['class' => 'col-lg-4 control-label'],
+                                        'errorOptions' => ['class' => 'col-lg-8 help-block'],
+                                    ])->passwordInput() ?>
                                 </div>
                             </div>
+
+                            <hr>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="col-lg-12">
+                                        <div class="help-block"><?= implode("<br>", $model->debug); ?></div>
+                                        <div class="has-error"><div class="help-block"><?= $model->error; ?></div></div>
+                                        <div class="has-success"><div class="help-block"><?= $model->success; ?></div></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal"><?= \Yii::t('auth', 'Close') ?></button>
+                            <?= Html::submitButton(\Yii::t('auth', 'Query'), ['class' => 'btn btn-primary', 'name' => 'query-groups-button', 'id' => 'query-groups-button']) ?>
+                          </div>
                         </div>
+                      </div>
                     </div>
                 </div>
-                <div class="col-lg-7">
-                    <div class="help-block"><?= implode("<br>", $model->debug); ?></div>
-                    <div class="has-error"><div class="help-block"><?= $model->error; ?></div></div>
-                    <div class="has-success"><div class="help-block"><?= $model->success; ?></div></div>
-                </div>
             </div>
+
             <?php
             foreach (array_keys($searchModel->roleList) as $key => $role) {
                 ?><div class="row">
-                    <div class="col-md-12 form-group">
+                    <div class="col-md-12 form-group <?= empty($model->groups) ? 'has-warning' : 'has-success' ?> ">
                         <?= Select2::widget([
                             'name' => $model->formName() . '[mapping][' . $role . ']',
                             'options' => [
-                                'placeholder' => \Yii::t('auth', 'Choose LDAP Groups ...'),
+                                'placeholder' => empty($model->groups) ? \Yii::t('auth', 'No groups found. Query for LDAP groups to fill this dropdown list.') : \Yii::t('auth', 'Choose LDAP Groups ...'),
                                 'multiple' => true,
                             ],
                             'value' => array_keys($model->mapping, $role),
@@ -499,6 +541,8 @@ $this->registerJs($js);
 
         </div>
     </div>
+
+    <?= $this->render('@app/views/_notification') ?>
 
     <?php Pjax::end(); ?>
 
