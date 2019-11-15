@@ -318,7 +318,7 @@ JS;
                                 'tags' => true,
                                 'allowClear' => true,
                                 'language' => [
-                                    'noResults' => new JsExpression('function (params) { return "' . \Yii::t('auth', 'No groups found, provide credentials to fill this dropdown list.') . '"; }'),
+                                    'noResults' => new JsExpression('function (params) { return "' . \Yii::t('auth', 'No groups found. Query for LDAP groups to fill this dropdown list.') . '"; }'),
                                 ],
                             ],
                         ]); ?>
