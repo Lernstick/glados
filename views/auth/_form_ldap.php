@@ -217,10 +217,11 @@ JS;
                     <?= Html::label($model->getAttributeLabel('mapping')); ?>
                     <div class="hint-block"><?= $model->getAttributeHint('mapping'); ?></div>
                 </div>
-                <div class="col-lg-8 <?= empty($model->success) ? '' : 'has-success' ?>">
+
+                <div class="col-lg-8 <?= !empty($model->getErrors('query_password')) ? 'has-error' : ( empty($model->success) ? 'has-warning' : 'has-success' ) ?> ">
                     <div class="input-group pull-right">
                       <span></span>
-                      <button class="btn btn-default input-group-addon" style="width:100%; border-radius: 4px;" type="button" data-toggle="modal" data-target="#queryModal"><?= empty($model->success) ? '' : '<i class="glyphicon glyphicon-ok"></i>&nbsp;' ?><?= \Yii::t('auth', 'Query for LDAP groups'); ?></button>
+                      <button class="btn btn-default input-group-addon" style="width:100%; border-radius: 4px;" type="button" data-toggle="modal" data-target="#queryModal"><?= !empty($model->getErrors('query_password')) ? '<i class="glyphicon glyphicon-remove"></i>&nbsp;' : ( empty($model->success) ? '' : '<i class="glyphicon glyphicon-ok"></i>&nbsp;' ) ?><?= \Yii::t('auth', 'Query for LDAP groups'); ?></button>
                       <span></span>
                     </div>
                 </div>
