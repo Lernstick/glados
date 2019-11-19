@@ -97,7 +97,7 @@ $this->registerJs($active_tabs);
                 </li>
                 <li>
                     <?= Html::a(
-                        '<span class="glyphicon glyphicon-retweet"></span> '. \Yii::t('auth', 'Migrate Local Users'),
+                        '<span class="glyphicon glyphicon-retweet"></span> '. \Yii::t('auth', 'Migrate Users'),
                         ['migrate', 'id' => $model->id],
                         ['data-pjax' => 0]
                     ) ?>

@@ -15,7 +15,14 @@ use yii\base\InvalidConfigException;
 class AuthGenericLdap extends \app\models\Auth
 {
 
+    /**
+     * @const string Scenario to query for group names
+     */
     const SCENARIO_QUERY_GROUPS = 'query_groups';
+
+    /**
+     * @const string Scenario to query for usernames
+     */
     const SCENARIO_QUERY_USERS = 'query_users';
 
     /**
@@ -285,6 +292,7 @@ class AuthGenericLdap extends \app\models\Auth
      * @var array Array of LDAP users for the select list of the migration form.
      */
     public $migrateUsers = [];
+    public $migrateFrom;
 
     public $query_username;
     public $query_password;
@@ -420,7 +428,7 @@ class AuthGenericLdap extends \app\models\Auth
                 'on' => self::SCENARIO_QUERY_GROUPS
             ],
 
-            [['query_username', 'query_password'], 'required',
+            [['query_username', 'query_password', 'migrateSearchScheme', 'migrateUserSearchFilter'], 'required',
                 'when' => function($model) {return $model->scenario == self::SCENARIO_QUERY_USERS;},
                 'whenClient' => "function (attribute, value) {
                     return $('#ldap-scenario').val() == 'query_users';
@@ -514,6 +522,8 @@ class AuthGenericLdap extends \app\models\Auth
                     'other_attribute' => $this->getAttributeLabel('primaryGroupUserAttribute'),
                 ]),
             'method' => \Yii::t('auth', 'There are two differnt methods the LDAP server can be used to authenticate users.<ul><li><b>Bind directly by login credentials</b> means that the username from the login from (or parts of it) is used to bind to the LDAP server. <i>The authenticating user needs read permission on the LDAP server for this</i>.</li><li><b>Bind with given username and password</b> means that you have to provide credentials that are used to find the user object in the LDAP, before binding with the user itself. <i>The provided credentials need read permission on the LDAP server</i>, but the user itself does not.</li><li><b>Bind with anonymous user</b> means that the system performs an anonymous bind to find the user object in the LDAP, before binding with the user itself. <i>Anonymous binds must be allowed by the LDAP server for this</i>.</li></ul>Please read the descriptions of the settings below for details on the specific method.'),
+            'migrateSearchScheme' => \Yii::t('auth', 'TODO'),
+            'migrateUserSearchFilter' => \Yii::t('auth', 'TODO'),
         ]);
     }
 
@@ -1145,7 +1155,7 @@ class AuthGenericLdap extends \app\models\Auth
         $c = 0;
         $N = count($users);
         if ($N != 0) {
-            $this->debug[] = Yii::t('auth', 'Querying LDAP for existing local users with base dn <code>{base}</code> for the attributes <code>{attribute1}</code> and <code>{attribute2}</code>.', [
+            $this->debug[] = Yii::t('auth', 'Querying LDAP for existing users with base dn <code>{base}</code> for the attributes <code>{attribute1}</code> and <code>{attribute2}</code>.', [
                 'base' => $this->baseDn,
                 'attribute1' => $this->uniqueIdentifier,
                 'attribute2' => $this->userIdentifier,
@@ -1177,7 +1187,7 @@ class AuthGenericLdap extends \app\models\Auth
                 $usernameFromLdap = $ret[$this->userIdentifier];
                 $identifier = $ret[$this->uniqueIdentifier];
 
-                $this->migrateUsers[$identifier] = $usernameFromDb;
+                $this->migrateUsers[$usernameFromDb . " -> " . $identifier] = $usernameFromDb;
                 $c = $c + 1;
 
                 $this->debug[] = Yii::t('auth', 'Found {n} users - taking the first one with <code>{uniqueIdentifier}</code> = <code>{identifier}</code>.', [
@@ -1228,8 +1238,8 @@ class AuthGenericLdap extends \app\models\Auth
     {
         // search for local usernames matching [[migrateSearchScheme]]
         $models = User::find()
-            ->where(['identifier' => null])
-            ->andWhere(['type' => '0'])
+            //->where(['identifier' => null])
+            ->andWhere(['type' => $this->migrateFrom])
             ->andWhere(['not', ['id' => 1]])
             ->andWhere(['like', 'username', $this->substitute($this->migrateSearchScheme, ['username' => ''])])
             ->all();
@@ -1238,13 +1248,13 @@ class AuthGenericLdap extends \app\models\Auth
         $c = count($localUsers);
 
         if ($c == 0) {
-            $this->error = Yii::t('auth', 'Found no local usernames matching search pattern <code>{migrateSearchScheme}</code>.', [
+            $this->error = Yii::t('auth', 'Found no usernames matching search pattern <code>{migrateSearchScheme}</code>.', [
                 'migrateSearchScheme' => $this->substitute($this->migrateSearchScheme, ['username' => '{username}']),
             ]);
             Yii::debug($this->error, __METHOD__);
             return false;
         } else {
-            $this->debug[] = Yii::t('auth', 'Found {n} local usernames matching search pattern for local usernames <code>{migrateSearchScheme}</code>: <span class="show_more">{users}</span>', [
+            $this->debug[] = Yii::t('auth', 'Found {n} usernames matching <code>{migrateSearchScheme}</code>: <span class="show_more">{users}</span>', [
                 'n' => $c,
                 'migrateSearchScheme' => $this->substitute($this->migrateSearchScheme, ['username' => '{username}']),
                 'users' => $c == 0 ? '' : '<code>' . implode('</code>, <code>', $localUsers) . '</code>',

@@ -306,7 +306,7 @@ JS;
                             'maintainOrder' => true,
                             'showToggleAll' => true,
                             'addon' => [
-                                'prepend' => ['content' => \Yii::t('auth', 'LDAP Groups')],
+                                'prepend' => ['content' => \Yii::t('auth', 'LDAP Group(s)')],
                                 'append' => ['content' => '<i class="glyphicon glyphicon-arrow-right"></i>'
                                     . \Yii::t('auth', '{groups} will be mapped to the role {role}', [
                                             'groups' => '',

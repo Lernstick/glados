@@ -7,6 +7,7 @@ use yii\web\Controller;
 use app\models\Auth;
 use app\models\AuthSearch;
 use app\models\AuthTestForm;
+use app\models\AuthMigrateForm;
 use app\models\UserSearch;
 use app\models\AuthLdapQueryForm;
 use yii\web\NotFoundHttpException;
@@ -210,15 +211,21 @@ class AuthController extends Controller
 
     /**
      * Tests an existing Auth model.
+     * @param string $id the Auth model
      * @return mixed
      */
-    public function actionTest()
+    public function actionTest($id = 0)
     {
 
         $model = new AuthTestForm();
         $searchModel = new AuthSearch();
 
         $model->load(Yii::$app->request->post()) && $model->validate();
+
+        // set the method if method is not sent by post
+        if(!Yii::$app->request->isPost) {
+            $model->method = $id;
+        }
 
         return $this->render('test', [
             'model' => $model,
@@ -227,39 +234,69 @@ class AuthController extends Controller
     }
 
     /**
-     * Migrates existing app\models\User models to app\models\UserAuth models 
-     * associated to an existing Auth model.
-     * @param string $id the Auth model
+     * Migrates existing app\models\User models associated to an inheriting Auth model.
      * @return mixed
      */
-    public function actionMigrate($id)
+    public function actionMigrate()
     {
-        $model = $this->findModel($id);
 
-        if (Yii::$app->request->post('submit-button') !== null) {
-            //submitted
-            $model->scenario = $model->class::SCENARIO_MIGRATE;
-            $model->load(Yii::$app->request->post()) && $model->validate();
+        $model = new AuthMigrateForm();
+        $searchModel = new AuthSearch();
+        $model->load(Yii::$app->request->get()) && $model->validate();
 
-            var_dump($model->errors);
-            var_dump(false);die();
-            if ($model->load(Yii::$app->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
-            } else {
-                return $this->render('migrate', [
-                    'model' => $model,
-                ]);
+        if ($model->from === null || $model->to === null) {
+            return $this->render('migrate_s1', [
+                'model' => $model,
+                'searchModel' => $searchModel,
+            ]);
+        } else {
+            if (Yii::$app->request->post('submit-button') !== null) {
+                $model->scenario = $model::SCENARIO_MIGRATE;
+
+                if ($model->load(Yii::$app->request->post()) && $model->save()) {                    
+                    
+                    $query = UserSearch::find()->where(['username' => array_keys($model->users)]);
+                    $searchModel = new UserSearch();
+                    $dataProvider = $searchModel->search([]);//Yii::$app->request->queryParams);
+                    $dataProvider->query = $query;//->where(['identifier' => $model->users]); //TODO type=$model->from
+                    return $this->render('migrate_done', [
+                        'model' => $model,
+                        'searchModel' => $searchModel,
+                        'dataProvider' => $dataProvider,
+                    ]);
+                }
             }
-        } else if (Yii::$app->request->post('query-users-button') !== null) {
-            // populate the $model->users property with all AD users found
-            $model->scenario = $model->class::SCENARIO_QUERY_USERS;
-            $model->load(Yii::$app->request->post());
-            $model->validate();
+
+            if (Yii::$app->request->post('submit-button') !== null || Yii::$app->request->post('query-users-button') !== null) {
+                // populate the $model->users property with all AD users found
+                $model->toModel->scenario = $model->toModel->class::SCENARIO_QUERY_USERS;
+                $model->toModel->migrateFrom = $model->from;
+                $model->toModel->load(Yii::$app->request->post());
+                if ($model->toModel->validate()) {
+                    $model->users = $model->toModel->migrateUsers;
+                }
+            }
+
+            $model->scenario = $model::SCENARIO_DEFAULT;
+            if ($model->to == "0") {
+                $users = $searchModel->getUsernameList(
+                    ['and', 
+                        ['=', 'type', $model->from],
+                        ['not', ['password' => null]],
+                        ['not', ['password' => '']],
+                    ]
+                );
+                $model->users = [];
+                foreach ($users as $key => $value) {
+                    $model->users[$value . " -> NULL"] = $value;
+                }
+            }
+            return $this->render('migrate_s2', [
+                'model' => $model,
+                'searchModel' => $searchModel,
+            ]);
         }
 
-        return $this->render('migrate', [
-            'model' => $model,
-        ]);
     }
 
     /**

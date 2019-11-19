@@ -60,6 +60,11 @@ class Local extends \app\models\Auth
     public $order = 0;
 
     /**
+     * @inheritdoc
+     */
+    public $migrationForm = '_form_local_migrate';
+
+    /**
      * The explanation of the local authentication method.
      * @return string the explanation
      */

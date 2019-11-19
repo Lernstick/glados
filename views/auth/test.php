@@ -5,6 +5,7 @@ use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\AuthTestForm */
+/* @var $searchmodel app\models\AuthSearch */
 
 $this->title = \Yii::t('auth', 'Test Authentication Method');
 

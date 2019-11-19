@@ -7,13 +7,28 @@ use yii\base\Model;
 use app\models\UserAuth;
 
 /**
- * LoginForm is the model behind the login form.
+ * AuthTestForm is the model behind the test login form.
  */
 class AuthTestForm extends LoginForm
 {
+    /**
+     * @var string Username to test.
+     */
     public $username;
+
+    /**
+     * @var string Password to test.
+     */
     public $password;
+
+    /**
+     * @var string Authentication method id to test.
+     */
     public $method = 0;
+
+    /**
+     * @var Auth Authentication object.
+     */
     public $authModel;
 
     /**
@@ -55,7 +70,7 @@ class AuthTestForm extends LoginForm
     public function attributeHints()
     {
         return [
-            'login' => \Yii::t('auth', 'Username and password to test. Login credentials are not saved anywhere.'),
+            'login' => \Yii::t('auth', 'Username and password to test login for. <i>Login credentials are not saved anywhere.</i>'),
         ];
     }
 
