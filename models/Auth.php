@@ -7,6 +7,7 @@ use yii\base\Model;
 use yii\base\ErrorException;
 use yii\helpers\FileHelper;
 use yii\web\UnprocessableEntityHttpException;
+use app\models\AuthInterface;
 
 /**
  * This is the model class for the Auth class.
@@ -14,7 +15,7 @@ use yii\web\UnprocessableEntityHttpException;
  * @property app\components\Ad|null $obj The instantiated configuration object of the authentication type. This property is read-only.
  * @property array $configArray @todo: remove
  */
-class Auth extends Model
+class Auth extends Model implements AuthInterface
 {
 
     const SCENARIO_CREATE = 'create';
@@ -200,6 +201,20 @@ class Auth extends Model
             'order' => \Yii::t('auth', 'The order as a number in which the authentication process should process in case of multiple (non local) authentication methods.'),
             'migrateSearchPattern' => \Yii::t('auth', 'A search pattern to only include matching usernames for migration. Leave empty to inlcude all usernames.'),
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function authenticate ($username, $password) {
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function queryUsers ($attribute, $params, $validator) {
+        return;
     }
 
     /**

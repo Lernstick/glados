@@ -43,3 +43,12 @@ See the [Manual](https://github.com/imedias/glados/tree/master/howtos/README.md)
 * [Glados config files](config-files.md)
 * [Exam client configuration](client-config.md)
 * [Network configuration](network-config.md)
+
+#### Authentication
+
+* [LDAP Authentication](ldap-authentication.md)
+* [Active Directory Authentication](ad-authentication.md)
+* [Test Login](test-login.md)
+* [User Migration](user-migration.md)
+* [Multiple LDAP Servers and/or Active Directories](multiple-ldaps.md)
+* [Placeholders](auth-placeholders.md)
