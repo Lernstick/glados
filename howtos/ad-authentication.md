@@ -24,7 +24,7 @@ Active Directory LDAP servers allow the user to bind with both the `destinguishe
 
 Assume your AD domain name is `example.com`. Below are a few examples how to set up the authentication method for different outcomes:
 
-Login Scheme			| Bind Scheme  			| Example Login			| Bind DN 			  | Authenticated? 	| Notes 		|
+Login Scheme			| Bind Scheme  			| Example Login			| Constructed Bind DN | Authenticated? 	| Notes 		|
 -------------			| ---------------		| ------------  		| -----------------   | --------------- | ------------- |
 `{username}`			| `{username}@{domain}`	| `alice`				| `alice@example.com` | yes				| default setup |
 `{username}`			| `{username}`			| `alice`				| `alice`			  | no 				| |

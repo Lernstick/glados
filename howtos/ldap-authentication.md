@@ -26,20 +26,20 @@ Examples of `Bind Schemes`:
 
 Assume your domain name is `example.com` and your LDAP allows to bind with the distinguished Name `dn` as well as with `username@example.com`. To illustrate the power of `Bind Scheme` together with `Login Scheme` to rewrite bind credentials, consider the following examples:
 
-Login Scheme			| Bind Scheme  			| Example Login			| Bind DN 			  | Authenticated? 	| Notes 		|
--------------			| ---------------		| ------------  		| -----------------   | --------------- | ------------- |
-`{username}`			| `{username}@{domain}`	| `alice`				| `alice@example.com` | yes				| default setup |
-`{username}`			| `{username}`			| `alice`				| `alice`			  | no 				| |
-`{username}`			| `{username}@{domain}`	| `alice@example.com`	| `alice@example.com@example.com` | no	| |
-`{username}@{domain}`	| `{username}@{domain}`	| `alice`				| none 				  | no				| |
-`{username}@{domain}`	| `{username}@{domain}`	| `alice@example.com`   | `alice@example.com` | yes				| |
-`{username}@{domain}`	| `{username}@{domain}`	| `alice@other_domain`  | none				  | no				| |
-`{username}@other_doman`| `{username}@{domain}`	| `alice@other_domain`  | `alice@example.com` | yes 			| rewriting of the domain |
-`{username}@other_doman`| `{username}@{domain}`	| `alice@other_domain`  | `alice@example.com` | yes 			| |
-`{username}`			| `cn={username},dc=example,dc=com`	| `alice`   | `cn=alice,dc=example,dc=com` | yes 	| |
-`{username}`			| `cn={username},{base}`| `alice`  				| `cn=alice,dc=example,dc=com` 	  | yes | |
-`{username}@{domain}`	| `cn={username},{base}`| `alice`			   	| none 				  | no  			| |
-`{username}@{domain}`	| `cn={username},{base}`| `alice@example.com`  	| `cn=alice,dc=example,dc=com` | yes    | |
+Login Scheme			| Bind Scheme  			| Example Login			| Constructed Bind DN | Notes 			|
+-------------			| ---------------		| ------------  		| -----------------   | ------------- 	|
+`{username}`			| `{username}@{domain}`	| `alice`				| `alice@example.com` | default setup 	|
+`{username}`			| `{username}`			| `alice`				| `alice`			  | |
+`{username}`			| `{username}@{domain}`	| `alice@example.com`	| `alice@example.com@example.com` |  	|
+`{username}@{domain}`	| `{username}@{domain}`	| `alice`				| none 				  |  |
+`{username}@{domain}`	| `{username}@{domain}`	| `alice@example.com`   | `alice@example.com` |  |
+`{username}@{domain}`	| `{username}@{domain}`	| `alice@other_domain`  | none				  |  |
+`{username}@other_doman`| `{username}@{domain}`	| `alice@other_domain`  | `alice@example.com` | rewriting of the domain |
+`{username}@other_doman`| `{username}@{domain}`	| `alice@other_domain`  | `alice@example.com` |  |
+`{username}`			| `cn={username},dc=example,dc=com`	| `alice`   | `cn=alice,dc=example,dc=com` | 		|
+`{username}`			| `cn={username},{base}`| `alice`  				| `cn=alice,dc=example,dc=com` 	  		|
+`{username}@{domain}`	| `cn={username},{base}`| `alice`			   	| none 				  | 				|
+`{username}@{domain}`	| `cn={username},{base}`| `alice@example.com`  	| `cn=alice,dc=example,dc=com` | 		|
 
 #### Bind anonymously
 
