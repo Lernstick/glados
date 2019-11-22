@@ -143,7 +143,7 @@ $this->registerJs($js);
             <div class="row">
 
                 <div class="col-md-6">
-                    <?= $form->field($model->toModel, 'migrateSearchScheme')->textInput(['maxlength' => true]) ?>
+                    <?= $form->field($model->toModel, 'migrateSearchPattern')->textInput(['maxlength' => true]) ?>
                 </div>
                 <div class="col-md-6">
                     <?= $form->field($model->toModel, 'migrateUserSearchFilter')->textInput(['maxlength' => true]) ?>
@@ -160,7 +160,7 @@ $this->registerJs($js);
 
 <div class="row">
     <div class="col-md-12 help-block">
-        <?= \Yii::t('auth', 'The following users where also found in the LDAP Directory. Selected users will be migrated from {from} to the authentication method {to}.', [
+        <?= \Yii::t('auth', 'The following users are currently associated to the local authentication method. The users below though where also found in the LDAP Directory, and are therefore able to be migrated. Selected users will be migrated from {from} to {to}.', [
             'from' => is_object($from) ? $from->name : $from,
             'to' => $to->name,
         ]); ?>

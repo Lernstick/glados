@@ -21,6 +21,11 @@ class Auth extends Model
     const SCENARIO_MIGRATE = 'migrate';
     const SCENARIO_AUTH_TEST = 'auth_test';
 
+    /**
+     * @const string Scenario to query for usernames
+     */
+    const SCENARIO_QUERY_USERS = 'query_users';
+
     /* authentication type constants */
     const AUTH_LOCAL = 0;
     const AUTH_LDAP = 1;
@@ -97,8 +102,28 @@ class Auth extends Model
      */
     public $success = null;
 
-    private $_obj = null; // @todo: remove
-    private $_configArray = null; // @todo: remove
+    /**
+     * @var string A search pattern for the username of local users to migrate
+     */
+    public $migrateSearchPattern = '';
+
+    /**
+     * @var array Array of LDAP users for the select list of the migration form.
+     */
+    public $migrateUsers = [];
+
+    /**
+     * @var string The migration form view for the current authentication type.
+     */
+    public $migrationForm = '_form_migrate';
+
+    /**
+     * @var string Id of the authentication method users are migrated from.
+     */
+    public $migrateFrom;
+
+    private $_obj = null; // @TODO: remove
+    private $_configArray = null; // @TODO: remove
 
     /**
      * @return array the validation rules.
@@ -116,6 +141,7 @@ class Auth extends Model
                 'message' => Yii::t('auth', 'This number is already assigned to another authentication method.'),
             ],
             [['order'], 'integer', 'min' => 1, 'max' => 9999],
+            ['migrateSearchPattern', 'queryUsers', 'skipOnEmpty' => false, 'skipOnError' => false, 'on' => self::SCENARIO_QUERY_USERS],
         ];
     }
 
@@ -143,10 +169,8 @@ class Auth extends Model
             self::SCENARIO_DEFAULT => ['class', 'name', 'description', 'order'],
             self::SCENARIO_CREATE => ['class'],
             self::SCENARIO_MIGRATE => ['class'],
+            self::SCENARIO_QUERY_USERS => ['migrateSearchPattern'],
         ];
-        /*$scenarios = parent::scenarios();
-        $scenarios[self::SCENARIO_DEFAULT] = ['class', 'name', 'description'];
-        return $scenarios;*/
     }
 
     /**
@@ -174,6 +198,7 @@ class Auth extends Model
             'name' => \Yii::t('auth', 'The name of this authentication method. Could be the (short) name of the school, or just <code>LDAP</code> or <code>AD</code>'),
             'class' => \Yii::t('auth', 'Choose one of the available authentication methods from the list below.'),
             'order' => \Yii::t('auth', 'The order as a number in which the authentication process should process in case of multiple (non local) authentication methods.'),
+            'migrateSearchPattern' => \Yii::t('auth', 'A search pattern to only include matching usernames for migration. Leave empty to inlcude all usernames.'),
         ];
     }
 
@@ -201,6 +226,65 @@ class Auth extends Model
             return $matches[1];
         }
         return false;
+    }
+
+    /**
+     * Defines which properties should be substituted into strings.
+     *
+     * @return array Array of property names and values.
+     */
+    public function substitutionProperties()
+    {
+        return [];
+    }
+
+    /**
+     * Performs the substitution of search filters and strings.
+     *
+     * @param string $string String to perform substitutions {placeholders}
+     * @param array $params Array with additional substitution keys and values. These will
+     * take preference over the defined ones
+     * @return string Substituted string
+     * @see [[substitutionProperties()]]
+     */
+    public function substitute($string, $params)
+    {
+        return substitute($string, array_merge($this->substitutionProperties(), $params));
+    }
+
+    /**
+     * Searches the database for users that are migratable in the current scenario.
+     *
+     * @return array List of usernames
+     */
+    public function findMigratableUsers($condition = [])
+    {
+        // search for local usernames matching [[migrateSearchPattern]]
+        $models = User::find()->select('username')
+            ->andWhere(['type' => $this->migrateFrom])
+            ->andWhere(['not', ['id' => 1]])
+            ->andWhere(['like', 'username', $this->substitute($this->migrateSearchPattern, [])])
+            ->andWhere($condition)
+            ->all();
+
+        $localUsers = array_column($models, 'username');
+        $c = count($localUsers);
+
+        if ($c === 0) {
+            $this->error = Yii::t('auth', 'Found no usernames matching the search pattern <code>{migrateSearchPattern}</code>.', [
+                'migrateSearchPattern' => $this->substitute($this->migrateSearchPattern, ['username' => '{username}']),
+            ]);
+            Yii::debug($this->error, __METHOD__);
+            $this->addError('migrateSearchPattern', \Yii::t('auth', 'Found no usernames matching search pattern.'));
+        } else {
+            $this->debug[] = Yii::t('auth', 'Found {n} usernames matching the search pattern <code>{migrateSearchPattern}</code>: <span class="show_more">{users}</span>', [
+                'n' => $c,
+                'migrateSearchPattern' => $this->substitute($this->migrateSearchPattern, ['username' => '{username}']),
+                'users' => $c == 0 ? '' : '<code>' . implode('</code>, <code>', $localUsers) . '</code>',
+            ]);
+        }
+
+        return $localUsers;
     }
 
     /**

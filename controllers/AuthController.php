@@ -267,18 +267,22 @@ class AuthController extends Controller
                 }
             }
 
-            if (Yii::$app->request->post('submit-button') !== null || Yii::$app->request->post('query-users-button') !== null) {
+            if (Yii::$app->request->post('submit-button') !== null
+                || Yii::$app->request->post('query-users-button') !== null
+                || $model->to == "0"
+            ) {
                 // populate the $model->users property with all AD users found
                 $model->toModel->scenario = $model->toModel->class::SCENARIO_QUERY_USERS;
                 $model->toModel->migrateFrom = $model->from;
                 $model->toModel->load(Yii::$app->request->post());
+
                 if ($model->toModel->validate()) {
                     $model->users = $model->toModel->migrateUsers;
                 }
             }
 
             $model->scenario = $model::SCENARIO_DEFAULT;
-            if ($model->to == "0") {
+            /*if ($model->to == "0") {
                 $users = $searchModel->getUsernameList(
                     ['and', 
                         ['=', 'type', $model->from],
@@ -290,7 +294,7 @@ class AuthController extends Controller
                 foreach ($users as $key => $value) {
                     $model->users[$value . " -> NULL"] = $value;
                 }
-            }
+            }*/
             return $this->render('migrate_s2', [
                 'model' => $model,
                 'searchModel' => $searchModel,

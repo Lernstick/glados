@@ -55,8 +55,11 @@ class AuthMigrateForm extends Model
                 'message' => Yii::t('auth', 'You cannot migrate users from an authentication method to itself.'),
                 'operator' => '!=',
             ],
+            ['users', 'filter',
+                'filter' => [$this, 'processUsers'],
+                'on' => self::SCENARIO_MIGRATE
+            ],
             ['users', 'required', 'on' => self::SCENARIO_MIGRATE],
-            ['users', 'filter', 'filter' => [$this, 'processUsers'], 'on' => self::SCENARIO_MIGRATE],
         ];
     }
 
@@ -83,9 +86,9 @@ class AuthMigrateForm extends Model
                 'from' => array_key_exists($this->from, AuthSearch::getAuthSelectList()) ? AuthSearch::getAuthSelectList()[$this->from] : $this->from,
                 'to' => array_key_exists($this->to, AuthSearch::getAuthSelectList()) ? AuthSearch::getAuthSelectList()[$this->to] : $this->to,
             ]),
-            'from' => \Yii::t('auth', 'TODO'),
-            'to' => \Yii::t('auth', 'TODO'),
-            'users' => \Yii::t('auth', 'Choose users to migrate. Selected users will be migrated from <code>{from}</code> to the authentication method <code>{to}</code>.', [
+            'from' => \Yii::t('auth', 'Authentication method to migrate users from. After the migration, all migrated users will <b>not anymore</b> authenticate over this method.'),
+            'to' => \Yii::t('auth', 'Authentication method to migrate users to. After the migration, all migrated users will authenticate over this method.'),
+            'users' => \Yii::t('auth', 'Choose users to migrate. Selected users will be migrated from <code>{from}</code> to <code>{to}</code>.', [
                 'from' => array_key_exists($this->from, AuthSearch::getAuthSelectList()) ? AuthSearch::getAuthSelectList()[$this->from] : $this->from,
                 'to' => array_key_exists($this->to, AuthSearch::getAuthSelectList()) ? AuthSearch::getAuthSelectList()[$this->to] : $this->to,
             ]),
@@ -106,6 +109,11 @@ class AuthMigrateForm extends Model
      */
     public function processUsers ($arr) {
         // compute the new users array here
+
+        if ($arr === '') {
+            $arr = [];
+        }
+
         $users = [];
         foreach ($arr as $key => $string) {
             list($username, $identifier) = array_values(preg_split('/\ \-\>\ /', $string, 2));

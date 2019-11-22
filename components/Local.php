@@ -6,12 +6,13 @@ use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
 use app\models\User;
+use app\models\AuthInterface;
 
 /**
  * Local represents a local authentication via db
  *
  */
-class Local extends \app\models\Auth
+class Local extends \app\models\Auth implements AuthInterface
 {
 
     /**
@@ -65,12 +66,25 @@ class Local extends \app\models\Auth
     public $migrationForm = '_form_local_migrate';
 
     /**
-     * The explanation of the local authentication method.
-     * @return string the explanation
+     * @inheritdoc
+     *
+     * @param string $attribute the attribute currently being validated
+     * @param mixed $params the value of the "params" given in the rule
+     * @param \yii\validators\InlineValidator $validator related InlineValidator instance.
      */
-    public function getExplanation ()
+    public function queryUsers ($attribute, $params, $validator)
     {
-        return Yii::t('auth', 'The local authentication method <b>cannot</b> be changed or deleted. It will always be set up as first configuration item with order 0. All login attempts will first be authenticated through this local method. This cannot be changed. If the authentication fails via local database in any way (username does not exist / password is wrong), the authentication method list will be processed further in the given order.');
+        $localUsers = $this->findMigratableUsers(['and',
+            ['not', ['password' => null]],
+            ['not', ['password' => '']],
+        ]);
+
+        if (count($localUsers) !== 0) {
+            $this->migrateUsers = [];
+            foreach ($localUsers as $key => $username) {
+                $this->migrateUsers[$username . " -> NULL"] = $username;
+            }
+        }
     }
 
     /**
@@ -105,6 +119,15 @@ class Local extends \app\models\Auth
             ]);
         }
         return false;
+    }
+
+    /**
+     * The explanation of the local authentication method.
+     * @return string the explanation
+     */
+    public function getExplanation ()
+    {
+        return Yii::t('auth', 'The local authentication method <b>cannot</b> be changed or deleted. It will always be set up as first configuration item with order 0. All login attempts will first be authenticated through this local method. This cannot be changed. If the authentication fails via local database in any way (username does not exist / password is wrong), the authentication method list will be processed further in the given order.');
     }
 
 }
