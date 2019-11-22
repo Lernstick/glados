@@ -14,6 +14,8 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\components\AccessRule;
 use yii\helpers\StringHelper;
+use yii\data\ActiveDataProvider;
+
 
 class AuthController extends Controller
 {
@@ -255,11 +257,12 @@ class AuthController extends Controller
 
                 if ($model->load(Yii::$app->request->post()) && $model->save()) {                    
                     
-                    $query = UserSearch::find()->where(['id' => array_keys($model->users)]);
-                    $searchModel = new UserSearch();
-                    $dataProvider = $searchModel->search([]);
-                    $dataProvider->query = $query;
-                    $dataProvider->sort = false;
+                    $dataProvider = new ActiveDataProvider([
+                        'query' => UserSearch::find()->where(['id' => array_keys($model->users)]),
+                        'sort' => false,
+                        'pagination' => ['pageSize' => 0],            
+                    ]);
+
                     return $this->render('migrate_done', [
                         'model' => $model,
                         'searchModel' => $searchModel,

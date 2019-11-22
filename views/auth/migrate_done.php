@@ -5,7 +5,6 @@ use yii\grid\GridView;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\AuthMigrateForm */
-/* @var $searchmodel app\models\AuthSearch */
 
 $from = $model->fromModel;
 $to = $model->toModel;
@@ -30,7 +29,7 @@ $this->params['breadcrumbs'][] = \Yii::t('auth', 'Summary');
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
-        'layout' => '{items} {summary} {pager}',
+        'layout' => '{items} {summary}',
         'emptyText' => \Yii::t('auth', 'No users found for migration.'),
         'rowOptions' => function($model) use ($to) {
             return ['class' => $model->type === $to->id ? 'success' : 'danger'];
