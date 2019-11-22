@@ -15,7 +15,7 @@ Let's look at an example. Assume you have two Active Directory domains `domain1.
 * The `Login Scheme` for `domain1.local` set to `{username}@domain1.local`.
 * The `Login Scheme` for `domain2.local` set to `{username}@domain2.local`.
 
-You users can now login via both domains by login with their traditional usernames appended with `@domain1.local` or `@domain2.local` depending on to which AD they belong to. If a user happens to exist in both domains with exactly the same username, both users can actually log in by just appending their domain to the username.
+Your users can now login via both domains by login with their traditional usernames appended with `@domain1.local` or `@domain2.local` depending on to which AD they belong to. If a user happens to exist in both domains with exactly the same username, both users can actually log in by just appending their domain to the username.
 
 You can also set up the two authentication methods as follows:
 
