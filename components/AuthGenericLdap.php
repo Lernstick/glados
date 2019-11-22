@@ -1112,7 +1112,8 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
     }
 
     /**
-     * Query Users for the user migration
+     * Query Users for the user migration.
+     * Populates the [[migrateUsers]] array
      *
      * @param array $users array of local users after which the server should be queried.
      * @return bool 
@@ -1120,6 +1121,7 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
     public function query_users($users)
     {
         $c = 0;
+        $i = 0;
         $N = count($users);
         if ($N != 0) {
             $this->debug[] = Yii::t('auth', 'Querying LDAP for existing users with base dn <code>{base}</code> for the attributes <code>{attribute1}</code> and <code>{attribute2}</code>.', [
@@ -1128,7 +1130,7 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
                 'attribute2' => $this->userIdentifier,
             ]);
         }
-        foreach ($users as $key => $usernameFromDb) {
+        foreach ($users as $idFromDb => $usernameFromDb) {
             /*$usernameReal = $this->getRealUsernameByScheme($usernameFromDb, $this->migrateSearchPattern, [
                 'domain' => $this->domain,
                 'base' => $this->baseDn,
@@ -1137,7 +1139,7 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
             $searchFilter = $this->substitute($this->migrateUserSearchFilter, ['username' => $usernameFromDb]);
 
             $this->debug[] = Yii::t('auth', '{c}/{N}: Querying LDAP for <code>{user}</code> with search filter <code class="show_more">{searchFilter}</code>.', [
-                'c' => $key+1,
+                'c' => ++$i,
                 'N' => $N,
                 'user' => $usernameFromDb,
                 'searchFilter' => $searchFilter,
@@ -1154,7 +1156,12 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
                 $usernameFromLdap = $ret[$this->userIdentifier];
                 $identifier = $ret[$this->uniqueIdentifier];
 
-                $this->migrateUsers[$usernameFromDb . " -> " . $identifier] = $usernameFromDb;
+                $this->addMigrateUser([
+                    'id' => $idFromDb,
+                    'identifier' => $identifier,
+                    'username' => $usernameFromDb,
+                ]);
+
                 $c = $c + 1;
 
                 $this->debug[] = Yii::t('auth', 'Found {n} users - taking the first one with <code>{uniqueIdentifier}</code> = <code>{identifier}</code>.', [

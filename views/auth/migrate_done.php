@@ -53,10 +53,14 @@ $this->params['breadcrumbs'][] = \Yii::t('auth', 'Summary');
                 'format' => 'raw',
             ],
             'identifier',
+            'id',
             [
                 'attribute' => 'result',
-                'value' => function ($model) use ($to) {
-                    return $model->type === $to->id ? '<i class="glyphicon glyphicon-ok-sign"></i> ' . \Yii::t('auth', 'Migration of user successful.') : '<i class="glyphicon glyphicon-alert"></i> ' . \Yii::t('auth', 'Error migrating user.');
+                'value' => function ($user) use ($to, $model) {
+                    $error = array_key_exists($user->id, $model->userErrors) ? $model->userErrors[$user->id] : '';
+                    return ( $user->type === $to->id ? '<i class="glyphicon glyphicon-ok-sign"></i> ' . \Yii::t('auth', 'Migration of user successful.') : '<i class="glyphicon glyphicon-alert"></i> ' . \Yii::t('auth', 'Error migrating user: {error}', [
+                        'error' => $error,
+                    ]) );
                 },
                 'format' => 'raw',
                 'label' => \Yii::t('auth', 'Notice')

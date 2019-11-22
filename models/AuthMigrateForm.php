@@ -28,9 +28,14 @@ class AuthMigrateForm extends Model
     public $to;
 
     /**
-     * @var array Array of usernames that are able to migrate
+     * @var array Array of user ids that are able to migrate
      */
     public $users = [];
+
+    /**
+     * @var array Array of errors of User models after save()-ing
+     */
+    public $userErrors = [];
 
     /**
      * @var Auth Authentication object of [[to]].
@@ -101,10 +106,13 @@ class AuthMigrateForm extends Model
      * @return array the new users array in the format
      * 
      * [
-     *      'identifier'                            => 'username',
-     *      '70e0bef2-b2a6-4b40-bf01-7c69f7a89eee'  => 'user_1',
-     *      '14'                                    => 'user2',
+     *      'id'  => 'identifier',
+     *      '10'  => '70e0bef2-b2a6-4b40-bf01-7c69f7a89eee',
+     *      '132' => '14',
+     *      '5'   => '1000',
      * ]
+     *
+     * 'id' is the id from the database and 'identifier' is the identifier found in the LDAP
      * 
      */
     public function processUsers ($arr) {
@@ -116,8 +124,9 @@ class AuthMigrateForm extends Model
 
         $users = [];
         foreach ($arr as $key => $string) {
-            list($username, $identifier) = array_values(preg_split('/\ \-\>\ /', $string, 2));
-            $users[$username] = $identifier;
+            // split the string "id -> identifier"
+            list($id, $identifier) = array_values(preg_split('/\ \-\>\ /', $string, 2));
+            $users[$id] = $identifier;
         }
         return $users;
     }
@@ -153,15 +162,18 @@ class AuthMigrateForm extends Model
 
             $users = User::find()->where([
                 'type' => $this->from,
-                'username' => array_keys($this->users)
+                'id' => array_keys($this->users)
             ])->all();
 
             foreach($users as $user) {
-                $identifier = $this->users[$user->username] === "NULL" ? null : $this->users[$user->username];
+                $identifier = $this->users[$user->id] === "NULL" ? null : $this->users[$user->id];
                 $user->scenario = User::SCENARIO_UPDATE;
                 $user->type = $this->to;
                 $user->identifier = $identifier;
-                $user->save();
+                if ($user->save() !== true) {
+                    $err = $user->firstErrors;
+                    $this->userErrors[$user->id] = reset($err);
+                }
             }
             return true;
         }

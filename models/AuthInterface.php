@@ -23,19 +23,12 @@ interface AuthInterface
     /**
      * A function to query for users to migrate.
      * This function returns nothing, and the [[migrateUsers]] array should be set in
-     * the following format:
+     * the format seen here [[migrateUsers]].
      * 
-     * $this->migrateUsers = [
-     *      'username1 -> identifier1' => 'username1',
-     *      'username2 -> identifier2' => 'username2',
-     *      ...
-     *      'usernameN -> identifierN' => 'usernameN',
-     * ];
-     *
-     * where 'username' is the username from the local database and 'identifier' is the user
-     * identifier in from the authentication method. Identifier may also be "NULL", which
-     * will set the identifier in the database to null (this is for a migration of a user
-     * back to the local authentication method).
+     * where 'username' and 'id' are the username and id from the local database and
+     * 'identifier' is the user identifier in from the authentication method. Identifier
+     * may also be "NULL", which will set the identifier in the database to null (this is
+     * for a migration of a user back to the local authentication method).
      *
      * @param string $attribute the attribute currently being validated
      * @param mixed $params the value of the "params" given in the rule

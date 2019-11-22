@@ -255,7 +255,7 @@ class AuthController extends Controller
 
                 if ($model->load(Yii::$app->request->post()) && $model->save()) {                    
                     
-                    $query = UserSearch::find()->where(['username' => array_keys($model->users)]);
+                    $query = UserSearch::find()->where(['id' => array_keys($model->users)]);
                     $searchModel = new UserSearch();
                     $dataProvider = $searchModel->search([]);//Yii::$app->request->queryParams);
                     $dataProvider->query = $query;//->where(['identifier' => $model->users]); //TODO type=$model->from

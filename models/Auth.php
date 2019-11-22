@@ -110,8 +110,21 @@ class Auth extends Model implements AuthInterface
 
     /**
      * @var array Array of LDAP users for the select list of the migration form.
+     *
+     * $this->migrateUsers = [
+     *      '{migrateUsersKeyScheme}' => '{migrateUsersValueScheme}',
+     *      ...
+     *      '{migrateUsersKeyScheme}' => '{migrateUsersValueScheme}',
+     * ];
+     *
      */
     public $migrateUsers = [];
+
+    /**
+     * @var string Schemes for the key and value of the [[migrateUsers]] array
+     */
+    public $migrateUsersKeyScheme = '{id} -> {identifier}';
+    public $migrateUsersValueScheme = '{username} (id={id})';
 
     /**
      * @var string The migration form view for the current authentication type.
@@ -218,6 +231,18 @@ class Auth extends Model implements AuthInterface
     }
 
     /**
+     * Creates a new entry in the [[migrateUsers]] array.
+     *
+     * @param array key value pair of substitutions
+     * @return void
+     */
+    public function addMigrateUser ($params) {
+        $key = substitute($this->migrateUsersKeyScheme, $params);
+        $value = substitute($this->migrateUsersValueScheme, $params);
+        $this->migrateUsers[$key] = $value;
+    }
+
+    /**
      * Decides whether the username provided by the user matches the pattern to authenticate.
      *
      * @param string $username the username that was provided to the login form by the user attempting to login
@@ -270,19 +295,19 @@ class Auth extends Model implements AuthInterface
     /**
      * Searches the database for users that are migratable in the current scenario.
      *
-     * @return array List of usernames
+     * @return array Array where the keys are the ids and the value are the usernames.
      */
     public function findMigratableUsers($condition = [])
     {
         // search for local usernames matching [[migrateSearchPattern]]
-        $models = User::find()->select('username')
+        $models = User::find()->select(['username', 'id'])
             ->andWhere(['type' => $this->migrateFrom])
             ->andWhere(['not', ['id' => 1]])
             ->andWhere(['like', 'username', $this->substitute($this->migrateSearchPattern, [])])
             ->andWhere($condition)
             ->all();
 
-        $localUsers = array_column($models, 'username');
+        $localUsers = array_combine(array_column($models, 'id'), array_column($models, 'username'));
         $c = count($localUsers);
 
         if ($c === 0) {

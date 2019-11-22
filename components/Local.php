@@ -81,8 +81,12 @@ class Local extends \app\models\Auth implements AuthInterface
 
         if (count($localUsers) !== 0) {
             $this->migrateUsers = [];
-            foreach ($localUsers as $key => $username) {
-                $this->migrateUsers[$username . " -> NULL"] = $username;
+            foreach ($localUsers as $id => $username) {
+                $this->addMigrateUser([
+                    'id' => $id,
+                    'identifier' => 'NULL',
+                    'username' => $username,
+                ]);
             }
         }
     }

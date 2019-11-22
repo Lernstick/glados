@@ -131,7 +131,15 @@ $this->registerJs($js);
         <hr>
 
         <div class="form-group">
-            <?= Html::submitButton(\Yii::t('auth', 'Migrate'), ['class' => 'btn btn-primary', 'id' => 'submit-button', 'name' => 'submit-button']) ?>
+            <?= Html::submitButton(\Yii::t('auth', 'Migrate'), [
+                'class' => 'btn btn-primary',
+                'id' => 'submit-button',
+                'name' => 'submit-button', 
+                'data' => [
+                    'confirm' => \Yii::t('auth', 'Are you sure you want to migrate all selected users?'),
+                    'method' => 'post',
+                ],
+            ]) ?>
         </div>
 
         <?php ActiveForm::end(); ?>
