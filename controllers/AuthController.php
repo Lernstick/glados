@@ -282,19 +282,6 @@ class AuthController extends Controller
             }
 
             $model->scenario = $model::SCENARIO_DEFAULT;
-            /*if ($model->to == "0") {
-                $users = $searchModel->getUsernameList(
-                    ['and', 
-                        ['=', 'type', $model->from],
-                        ['not', ['password' => null]],
-                        ['not', ['password' => '']],
-                    ]
-                );
-                $model->users = [];
-                foreach ($users as $key => $value) {
-                    $model->users[$value . " -> NULL"] = $value;
-                }
-            }*/
             return $this->render('migrate_s2', [
                 'model' => $model,
                 'searchModel' => $searchModel,

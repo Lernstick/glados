@@ -22,11 +22,6 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
     const SCENARIO_QUERY_GROUPS = 'query_groups';
 
     /**
-     * @const string Scenario to query for usernames
-     */
-    const SCENARIO_QUERY_USERS = 'query_users';
-
-    /**
      * @const string Bind directly to the LDAP using the username from the login form
      */
     const SCENARIO_BIND_DIRECT = 'bind_direct';
