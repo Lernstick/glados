@@ -257,8 +257,9 @@ class AuthController extends Controller
                     
                     $query = UserSearch::find()->where(['id' => array_keys($model->users)]);
                     $searchModel = new UserSearch();
-                    $dataProvider = $searchModel->search([]);//Yii::$app->request->queryParams);
-                    $dataProvider->query = $query;//->where(['identifier' => $model->users]); //TODO type=$model->from
+                    $dataProvider = $searchModel->search([]);
+                    $dataProvider->query = $query;
+                    $dataProvider->sort = false;
                     return $this->render('migrate_done', [
                         'model' => $model,
                         'searchModel' => $searchModel,

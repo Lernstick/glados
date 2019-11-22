@@ -30,15 +30,13 @@ $this->params['breadcrumbs'][] = \Yii::t('auth', 'Summary');
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'tableOptions' => ['class' => 'table table-bordered table-hover'],
         'layout' => '{items} {summary} {pager}',
         'emptyText' => \Yii::t('auth', 'No users found for migration.'),
         'rowOptions' => function($model) use ($to) {
             return ['class' => $model->type === $to->id ? 'success' : 'danger'];
         },
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+            'id',
             'username',
             [
                 'attribute' => 'type',
@@ -53,14 +51,13 @@ $this->params['breadcrumbs'][] = \Yii::t('auth', 'Summary');
                 'format' => 'raw',
             ],
             'identifier',
-            'id',
             [
                 'attribute' => 'result',
                 'value' => function ($user) use ($to, $model) {
-                    $error = array_key_exists($user->id, $model->userErrors) ? $model->userErrors[$user->id] : '';
-                    return ( $user->type === $to->id ? '<i class="glyphicon glyphicon-ok-sign"></i> ' . \Yii::t('auth', 'Migration of user successful.') : '<i class="glyphicon glyphicon-alert"></i> ' . \Yii::t('auth', 'Error migrating user: {error}', [
+                    $error = array_key_exists($user->id, $model->userErrors) ? $model->userErrors[$user->id] : \Yii::t('auth','Unknown error');
+                    return $user->type === $to->id ? '<i class="glyphicon glyphicon-ok-sign"></i> ' . \Yii::t('auth', 'Migration of user successful.') : '<i class="glyphicon glyphicon-alert"></i> ' . \Yii::t('auth', 'Error migrating user: {error}', [
                         'error' => $error,
-                    ]) );
+                    ]);
                 },
                 'format' => 'raw',
                 'label' => \Yii::t('auth', 'Notice')
