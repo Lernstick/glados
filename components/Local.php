@@ -125,6 +125,23 @@ class Local extends \app\models\Auth implements AuthInterface
         return false;
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function getMigrateFromDescription ()
+        {
+            return yiit('auth', 'The following users are currently associated to the local authentication method.');
+        }
+
+    /**
+     * @inheritdoc
+     */
+    public function getMigrateToDescription ()
+        {
+            return yiit('auth', 'In the list below, only users that have a local password are listed, because only these users are able to be migrated. This is when the user was created as a local user in the first place.');
+        }
+
     /**
      * The explanation of the local authentication method.
      * @return string the explanation

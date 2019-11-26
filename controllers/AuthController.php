@@ -239,7 +239,7 @@ class AuthController extends Controller
      * Migrates existing app\models\User models associated to an inheriting Auth model.
      * @return mixed
      */
-    public function actionMigrate()
+    public function actionMigrate($id = null)
     {
 
         $model = new AuthMigrateForm();
@@ -247,6 +247,9 @@ class AuthController extends Controller
         $model->load(Yii::$app->request->get()) && $model->validate();
 
         if ($model->from === null || $model->to === null) {
+            if ($id !== null) {
+                $model->to = $id;
+            }
             return $this->render('migrate_s1', [
                 'model' => $model,
                 'searchModel' => $searchModel,

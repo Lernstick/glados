@@ -52,14 +52,29 @@ $this->registerJs($js);
             'id' => 'migrate_form',
         ]); ?>
 
-        <div class="row">
-            <div class="col-md-6">
-                <?php echo $form->field($model, 'from')->dropDownList($searchModel->authSelectlist, [ 'prompt' => Yii::t('auth', 'Choose an authentication method ...') ]) ?>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <?= Html::label(\Yii::t('auth', 'Setup')); ?>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-6">
-                <?php echo $form->field($model, 'to')->dropDownList($searchModel->authSelectlist, [ 'prompt' => Yii::t('auth', 'Choose an authentication method ...') ]) ?>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <?php echo $form->field($model, 'from')->dropDownList($searchModel->authSelectlist, [ 'prompt' => Yii::t('auth', 'Choose an authentication method ...') ]) ?>
+                    </div>
+                    <div class="col-md-6">
+                        <?php echo $form->field($model, 'to')->dropDownList($searchModel->authSelectlist, [ 'prompt' => Yii::t('auth', 'Choose an authentication method ...') ]) ?>
 
+                    </div>
+                </div>
             </div>
+        </div>
+
+        <div class="row">
+
         </div>
         <br>
         <div class="form-group">

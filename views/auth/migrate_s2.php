@@ -58,21 +58,32 @@ $this->registerJs($js);
 
         <?php $form = ActiveForm::begin(['id' => 'migrate_form']); ?>
 
-        <div class="row">
-            <div class="col-md-6">
-                <?php echo $form->field($model, 'from')->dropDownList($searchModel->authSelectlist, [
-                    'readOnly' => true,
-                    'disabled' => true,
-                    'prompt' => Yii::t('auth', 'Choose an authentication method ...')
-                ]) ?>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <?= Html::label(\Yii::t('auth', 'Setup')); ?>
+                    </div>
+                </div>
             </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <?php echo $form->field($model, 'from')->dropDownList($searchModel->authSelectlist, [
+                            'readOnly' => true,
+                            'disabled' => true,
+                            'prompt' => Yii::t('auth', 'Choose an authentication method ...')
+                        ]) ?>
+                    </div>
 
-            <div class="col-md-6">
-                <?php echo $form->field($model, 'to')->dropDownList($searchModel->authSelectlist, [
-                    'readOnly' => true,
-                    'disabled' => true,
-                    'prompt' => Yii::t('auth', 'Choose an authentication method ...')
-                ]) ?>
+                    <div class="col-md-6">
+                        <?php echo $form->field($model, 'to')->dropDownList($searchModel->authSelectlist, [
+                            'readOnly' => true,
+                            'disabled' => true,
+                            'prompt' => Yii::t('auth', 'Choose an authentication method ...')
+                        ]) ?>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -98,6 +109,15 @@ $this->registerJs($js);
             <div class="panel-body">
                 <div class="row">
                     <div class="col-md-12 form-group <?= empty($model->users) ? 'has-warning' : 'has-success' ?> ">
+                        <div class="col-md-12 help-block">
+                            <?= \Yii::t('auth', $from->migrateFromDescription, [
+                                'from' => is_object($from) ? $from->name : $from,
+                                'to' => $to->name,
+                            ]) . ' ' . \Yii::t('auth', $to->migrateToDescription, [
+                                'from' => is_object($from) ? $from->name : $from,
+                                'to' => $to->name,
+                            ]); ?>
+                        </div>
                         <?= $form->field($model, 'users')->widget(Select2::classname(), [
                             'data' => $model->users,
                             'pluginOptions' => [

@@ -56,39 +56,23 @@ $this->registerJs($js);
 
 <div class="auth-form">
 
-    <ul class="nav nav-tabs">
-        <li class="active"><a data-toggle="tab" href="#general">
-            <i class="glyphicon glyphicon-home"></i>
-            <?= \Yii::t('auth', 'General') ?>
-        </a></li>
-        <li>
-            <?= Html::a(
-                '<i class="glyphicon glyphicon-exclamation-sign"></i> ' . \Yii::t('exams', 'Expert Settings'),
-                '#expert',
-                ['data-toggle' => 'tab']
-            ) ?>
-        </li>
-    </ul>
-
-    <div class="tab-content">
-
-    <?php Pjax::begin([
-        'id' => 'general',
-        'options' => ['class' => 'tab-pane fade in active'],
-    ]); ?>
-
-    <?= $form->field($model->toModel, 'bindUsername')->hiddenInput()->label(false)->hint(false) ?>
-    <?= $form->field($model->toModel, 'bindPassword')->hiddenInput()->label(false)->hint(false) ?>
-
-    <br>
-    <div class="row">
-        <div class="col-lg-5">
-            <div class="panel panel-info form-horizontal">
-                <div class="panel-heading">
-                    <i class="glyphicon glyphicon-user"></i> <?= Html::label($model->attributeLabels()['login']); ?>
-                    <div class="hint-block"><?= $model->attributeHints()['login']; ?></div>
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <?= Html::label(\Yii::t('auth', 'Query for users')) ?>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <?= $form->field($model->toModel, 'migrateSearchPattern')->textInput(['maxlength' => true]) ?>
                 </div>
-                <div class="panel-body">
+                <div class="col-md-6">
+                    <?= $form->field($model->toModel, 'migrateUserSearchFilter')->textInput(['maxlength' => true]) ?>
+                </div>
+            </div>
+            <div class="row">
+                <?= $form->field($model->toModel, 'bindUsername')->hiddenInput()->label(false)->hint(false) ?>
+                <?= $form->field($model->toModel, 'bindPassword')->hiddenInput()->label(false)->hint(false) ?>
+                <div class="col-lg-5">
                     <?= $form->field($model->toModel, 'query_username', [
                         'template' => "{label}\n<div class='col-lg-8'><div class='input-group'>{input}<span class='input-group-btn'>{button}</span></div></div>\n<div class='col-lg-4'></div>{hint}\n{error}",
                         'labelOptions' => ['class' => 'col-lg-4 control-label'],
@@ -116,53 +100,13 @@ $this->registerJs($js);
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="col-lg-7">
-            <div class="help-block" style="height:200px; overflow: auto;"><?= implode("<br>", $to->debug); ?></div>
-            <div class="has-error"><div class="help-block"><?= $to->error; ?></div></div>
-            <div class="has-success"><div class="help-block"><?= $to->success; ?></div></div>
-        </div>
-    </div>
-
-    <?= $form->field($model, 'scenario')->hiddenInput()->label(false)->hint(false) ?>
-
-    <?php Pjax::end(); ?>
-
-    <?php Pjax::begin([
-        'id' => 'expert',
-        'options' => ['class' => 'tab-pane fade'],
-    ]); ?>
-
-    <br>
-    <div class="panel panel-danger">
-        <div class="panel-heading">
-            <i class="glyphicon glyphicon-warning-sign"></i> <?= \Yii::t('auth', 'The following settings should only be used, if you know what you are doing!') ?>
-        </div>
-        <div class="panel-body">
-            <div class="row">
-
-                <div class="col-md-6">
-                    <?= $form->field($model->toModel, 'migrateSearchPattern')->textInput(['maxlength' => true]) ?>
-                </div>
-                <div class="col-md-6">
-                    <?= $form->field($model->toModel, 'migrateUserSearchFilter')->textInput(['maxlength' => true]) ?>
+                <div class="col-lg-7">
+                    <div class="help-block" style="height:200px; overflow: auto;"><?= implode("<br>", $to->debug); ?></div>
+                    <div class="has-error"><div class="help-block"><?= $to->error; ?></div></div>
+                    <div class="has-success"><div class="help-block"><?= $to->success; ?></div></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <?php Pjax::end(); ?>
-
-    </div>
-
-</div>
-
-<div class="row">
-    <div class="col-md-12 help-block">
-        <?= \Yii::t('auth', 'The following users are currently associated to the local authentication method. The users below though where also found in the LDAP Directory, and are therefore able to be migrated. Selected users will be migrated from {from} to {to}.', [
-            'from' => is_object($from) ? $from->name : $from,
-            'to' => $to->name,
-        ]); ?>
-    </div>
 </div>

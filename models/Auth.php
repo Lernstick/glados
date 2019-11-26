@@ -243,6 +243,22 @@ class Auth extends Model implements AuthInterface
     }
 
     /**
+     * @return string description for the users being migrated form this auth method (shown in the form)
+     */
+    public function getMigrateFromDescription ()
+    {
+        return yiit('auth', 'Selected users will be migrated from {from} to {to}.');
+    }
+
+    /**
+     * @return string description for the users being migrated to this auth method (shown in the form)
+     */
+    public function getMigrateToDescription ()
+    {
+        return '';
+    }
+
+    /**
      * Decides whether the username provided by the user matches the pattern to authenticate.
      *
      * @param string $username the username that was provided to the login form by the user attempting to login
