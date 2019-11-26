@@ -17,5 +17,4 @@ return [
     'lowerBound' =>             20,
     'abandonTicket' =>          10800, // leave the ticket after 3 hours of failed backup attempts
     'liveEvents' =>             true, // enable or disable live data
-    'auth' =>                   true, // enable or disable special authentication @todo: remove
 ];

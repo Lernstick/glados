@@ -96,7 +96,7 @@ $this->registerJs($js);
 
                     <div class="form-group">
                         <div class="col-lg-offset-1 col-lg-11">
-                            <?= Html::submitButton(\Yii::t('auth', 'Query for Users'), ['class' => 'btn btn-primary', 'name' => 'query-users-button', 'id' => 'query-users-button']) ?>
+                            <?= Html::submitButton(\Yii::t('auth', 'Query for users'), ['class' => 'btn btn-primary', 'name' => 'query-users-button', 'id' => 'query-users-button']) ?>
                         </div>
                     </div>
                 </div>

@@ -77,7 +77,7 @@ class AuthMigrateForm extends Model
             'login' =>\Yii::t('auth', 'Query Credentials'),
             'from' => \Yii::t('auth', 'From'),
             'to' => \Yii::t('auth', 'To'),
-            'users' => \Yii::t('auth', 'Users to migrate'),
+            'users' => \Yii::t('auth', 'Select users to migrate'),
         ];
     }
 
@@ -155,6 +155,10 @@ class AuthMigrateForm extends Model
 
     /**
      * @inheritdoc
+     * 
+     * Also regenerates the users auth_key such that the cookie is no longer valid. This forces
+     * the user to login again.
+     * @see https://www.yiiframework.com/doc/api/2.0/yii-web-identityinterface#getAuthKey()-detail
      */
     public function save()
     {
@@ -168,6 +172,7 @@ class AuthMigrateForm extends Model
             foreach($users as $user) {
                 $identifier = $this->users[$user->id] === "NULL" ? null : $this->users[$user->id];
                 $user->scenario = User::SCENARIO_UPDATE;
+                $user->auth_key = \Yii::$app->security->generateRandomString();
                 $user->type = $this->to;
                 $user->identifier = $identifier;
                 if ($user->save() !== true) {

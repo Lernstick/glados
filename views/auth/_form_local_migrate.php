@@ -27,7 +27,7 @@ $to = $model->toModel;
 
 		<div class="row">
 		    <div class="col-lg-5">
-		    	<?= Html::submitButton(\Yii::t('auth', 'Query for Users'), ['class' => 'btn btn-primary', 'name' => 'query-users-button', 'id' => 'query-users-button']) ?>
+		    	<?= Html::submitButton(\Yii::t('auth', 'Query for users'), ['class' => 'btn btn-primary', 'name' => 'query-users-button', 'id' => 'query-users-button']) ?>
 		    </div>
 			<div class="col-lg-7">
 		        <div class="help-block"><?= implode("<br>", $to->debug); ?></div>

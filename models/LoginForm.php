@@ -50,17 +50,15 @@ class LoginForm extends Model
 
                 // If the user can not be authenticated locally via database
                 // try to authenticate over special authentication methods
-                if (\Yii::$app->params['auth'] === true) {
-                    $this->_user = false;
-                    $user = $this->getUserAuth();
+                $this->_user = false;
+                $user = $this->getUserAuth();
 
-                    if (!$user) {
-                        $this->addError($attribute, \Yii::t('login', Yii::$app->auth->name . ': Incorrect username or password.'));
-                    } else {
-                        $this->clearErrors($attribute);
-                    }
-                    return;
+                if (!$user) {
+                    $this->addError($attribute, \Yii::t('login', Yii::$app->auth->name . ': Incorrect username or password.'));
+                } else {
+                    $this->clearErrors($attribute);
                 }
+                return;
             }
         }
     }

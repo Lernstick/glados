@@ -580,7 +580,7 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
      */
     public function getMigrateFromDescription ()
         {
-            return yiit('auth', 'The following users are currently associated to the {from} LDAP authentication method.');
+            return yiit('auth', 'The following users are currently associated to the <code>{from}</code> LDAP authentication method.');
         }
 
     /**
@@ -588,7 +588,7 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
      */
     public function getMigrateToDescription ()
         {
-            return yiit('auth', 'The users below where also found in the {to} LDAP Directory, and are therefore able to be migrated.');
+            return yiit('auth', 'The users below where also found in the <code>{to}</code> LDAP Directory, and are therefore able to be migrated.');
         }
 
     /**

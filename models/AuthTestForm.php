@@ -84,10 +84,16 @@ class AuthTestForm extends LoginForm
     public function authenticate($attribute, $params)
     {
         $this->authModel = Auth::findOne($this->method);
-        $this->authModel->scenario = $this->authModel->class::SCENARIO_AUTH_TEST;
-        if (!$this->authModel->authenticate($this->username, $this->password)) {
-            $this->addError($attribute, \Yii::t('login', 'Authentication failed.'));
+        if (is_object($this->authModel)) {
+            $this->authModel->scenario = $this->authModel->class::SCENARIO_AUTH_TEST;
+            if ($this->authModel->authenticate($this->username, $this->password)) {
+                return;
+            }
+        } else {
+            $this->authModel = new Auth();
+            $this->authModel->error = \Yii::t('aith', 'Authentication method not existing.');
         }
+        $this->addError($attribute, \Yii::t('login', 'Authentication failed.'));
     }
 
 }

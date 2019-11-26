@@ -131,7 +131,7 @@ class Local extends \app\models\Auth implements AuthInterface
      */
     public function getMigrateFromDescription ()
         {
-            return yiit('auth', 'The following users are currently associated to the local authentication method.');
+            return yiit('auth', 'The following users are currently associated to the <code>Local</code> authentication method.');
         }
 
     /**
@@ -139,7 +139,7 @@ class Local extends \app\models\Auth implements AuthInterface
      */
     public function getMigrateToDescription ()
         {
-            return yiit('auth', 'In the list below, only users that have a local password are listed, because only these users are able to be migrated. This is when the user was created as a local user in the first place.');
+            return yiit('auth', 'In the list below, only users that have a local password are listed, because only these users can login after a migration and are able to be migrated. This is when the user was created as a local user in the first place.');
         }
 
     /**
