@@ -62,7 +62,8 @@
 <a class="list-group-item" href="./test-login.html">Test Login</a>
 <a class="list-group-item" href="./user-migration.html">User Migration</a>
 <a class="list-group-item" href="./multiple-ldaps.html">Multiple LDAP Servers and/or Active Directories</a>
-<a class="list-group-item" href="./auth-placeholders.html">Placeholders</a></div></div>    </div>
+<a class="list-group-item" href="./auth-placeholders.html">Placeholders</a>
+<a class="list-group-item" href="./login-scheme.html">Login Scheme</a></div></div>    </div>
     <div class="col-md-9 guide-content" role="main">
         <h2>Network configuration <span id="network-configuration"></span><a href="#network-configuration" class="hashlink">&para;</a></h2><p>There are 2 possible ways you can configure your setup. You can either configure the network in the way that the client can autodiscover the exam server, or configure the clients to access a fixed IP-address. The client setup can be found <a href="client-config.html">here</a>.</p>
 <h3>Autodiscovery of the exam server <span id="autodiscovery-of-the-exam-server"></span><a href="#autodiscovery-of-the-exam-server" class="hashlink">&para;</a></h3><p>For this to work, you need to be able to discover the exam server via <a href="https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/NetServices/Introduction.html">Bonjour</a>. Therefore DNS Service Discovery (DNS-SD) must be allowed in the network. It is necessary to strictly allow this in your network. If you use a wireless network as exam network, notice that most accesspoints will disable this by default. If your server sits in another subnet, you have to route the needed ports, according to the Bonjour standard. Bonjour clients will talk via UDP port <code>5353</code> and multicast IP-address <code>224.0.0.251</code> (IPv4), <code>ff02::fb</code> (IPv6) respectively.</p>
@@ -91,7 +92,7 @@ If your exam server sits in another subnet than your exam clients, make sure to 
 </div>
 
 <footer class="footer">
-        <p class="pull-right"><small>Page generated on Tue, 26 Nov 2019 16:35:02 +0000</small></p>
+        <p class="pull-right"><small>Page generated on Tue, 26 Nov 2019 16:45:35 +0000</small></p>
     Powered by <a href="http://www.yiiframework.com/" rel="external">Yii Framework</a></footer>
 
 <script>jQuery(function ($) {

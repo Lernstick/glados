@@ -9,7 +9,7 @@
 <link href="./assets/1f2e89dd/style.css" rel="stylesheet">
 <script src="./assets/8261f971/jquery.js"></script>
 <script src="./assets/6c734e4f/js/bootstrap.js"></script>
-<script src="./assets/93cd64ed/jssearch.js"></script>    <title>GLaDOS Guide</title>
+<script src="./assets/93cd64ed/jssearch.js"></script>    <title>Login Scheme - Authentication - GLaDOS Guide</title>
 </head>
 <body>
 
@@ -56,13 +56,14 @@
 <a class="list-group-item" href="#navigation-149" data-toggle="collapse" data-parent="#navigation">Configuration <b class="caret"></b></a><div id="navigation-149" class="submenu panel-collapse collapse"><a class="list-group-item" href="./config-files.html">Glados config files</a>
 <a class="list-group-item" href="./client-config.html">Exam client configuration</a>
 <a class="list-group-item" href="./network-config.html">Network configuration</a></div>
-<a class="list-group-item" href="#navigation-150" data-toggle="collapse" data-parent="#navigation">Authentication <b class="caret"></b></a><div id="navigation-150" class="submenu panel-collapse collapse"><a class="list-group-item" href="./ldap-authentication.html">LDAP Authentication</a>
+<a class="list-group-item active" href="#navigation-150" data-toggle="collapse" data-parent="#navigation">Authentication <b class="caret"></b></a><div id="navigation-150" class="submenu panel-collapse collapse in"><a class="list-group-item" href="./ldap-authentication.html">LDAP Authentication</a>
 <a class="list-group-item" href="./ad-authentication-simple.html">Active Directory Authentication (Simple)</a>
 <a class="list-group-item" href="./ad-authentication-advanced.html">Active Directory Authentication (Advanced)</a>
 <a class="list-group-item" href="./test-login.html">Test Login</a>
 <a class="list-group-item" href="./user-migration.html">User Migration</a>
 <a class="list-group-item" href="./multiple-ldaps.html">Multiple LDAP Servers and/or Active Directories</a>
-<a class="list-group-item" href="./auth-placeholders.html">Placeholders</a></div></div>    </div>
+<a class="list-group-item" href="./auth-placeholders.html">Placeholders</a>
+<a class="list-group-item active" href="./login-scheme.html">Login Scheme</a></div></div>    </div>
     <div class="col-md-9 guide-content" role="main">
         <h2>Login Scheme <span id="login-scheme"></span><a href="#login-scheme" class="hashlink">&para;</a></h2><p>Every authentication method has a field called <code>Login Scheme</code>. This is a pattern to test the given login username against. A login via the associated authentication method will only be performed, if the given username matches the provided pattern. This is used to manage multiple authentication servers and methods, for example multiple LDAP or Active Directory servers with different domains, but can also be used in an environment with one single LDAP server.</p>
 <p><code>{username}</code> is extracted from the username provided in the login form according to the <code>Login Scheme</code>.</p>
@@ -102,7 +103,7 @@
 </div>
 
 <footer class="footer">
-        <p class="pull-right"><small>Page generated on Tue, 26 Nov 2019 16:35:01 +0000</small></p>
+        <p class="pull-right"><small>Page generated on Tue, 26 Nov 2019 16:45:34 +0000</small></p>
     Powered by <a href="http://www.yiiframework.com/" rel="external">Yii Framework</a></footer>
 
 <script>jQuery(function ($) {
