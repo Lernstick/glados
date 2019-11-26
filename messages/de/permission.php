@@ -60,4 +60,10 @@ return [
     'View tickets of own exams' => 'Tickets eigener Prüfungen ansehen',
     'View/Monitor all exams' => 'Alle Prüfungen ansehen/überwachen',
     'View/Monitor own exams' => 'Eigene Prüfungen ansehen/überwachen',
+    'Create a new authentication method' => 'Eine neue Authentifizierungsmethode hinzufügen',
+    'Delete all authentication methods' => 'Alle Authentifizierungsmethoden löschen',
+    'Migrate existing users to users associated to an authentication method' => 'Migrieren von existierenden Benutzern zu Benutzern, die zu einer Authentifizierungsmethode assoziiert sind',
+    'Test all authentication methods' => 'Testen aller Authentifizierungsmethoden',
+    'Update all authentication methods' => 'Bearbeiten aller Authentifizierungsmethoden',
+    'View all authentication methods' => 'Ansehen aller Authentifizierungsmethoden',
 ];

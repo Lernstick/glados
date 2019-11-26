@@ -91,7 +91,7 @@ class AuthTestForm extends LoginForm
             }
         } else {
             $this->authModel = new Auth();
-            $this->authModel->error = \Yii::t('aith', 'Authentication method not existing.');
+            $this->authModel->error = \Yii::t('auth', 'Authentication method not existing.');
         }
         $this->addError($attribute, \Yii::t('login', 'Authentication failed.'));
     }

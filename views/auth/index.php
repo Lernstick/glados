@@ -62,12 +62,12 @@ $this->params['breadcrumbs'][] = $this->title;
             },   
             'toolbar' =>  [
                 ['content' =>
-                    Html::a('<i class="glyphicon glyphicon-plus"></i>&nbsp;' . 'Add new Authentication Method', ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => \Yii::t('auth', \Yii::t('auth', 'Create Authentication Method'))]) . 
+                    Html::a('<i class="glyphicon glyphicon-plus"></i>&nbsp;' . \Yii::t('auth', 'Add new Authentication Method'), ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => \Yii::t('auth', 'Add new Authentication Method')]) . 
                     '<div class="btn-group" role="group">
                         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="glyphicon glyphicon-list-alt"></i>&nbsp;' . \Yii::t('auth', 'Actions') . '<span class="caret"></span></button>
                         <ul class="dropdown-menu">
-                          <li>' . Html::a('<i class="glyphicon glyphicon-user"></i>&nbsp;' . 'Test Login', ['test'], ['data-pjax' => 0, 'title' => \Yii::t('auth', \Yii::t('auth', 'Test Login'))]) . '</li>
-                          <li>' . Html::a('<i class="glyphicon glyphicon-retweet"></i>&nbsp;' . 'Migrate Users', ['migrate'], ['data-pjax' => 0, 'title' => \Yii::t('auth', \Yii::t('auth', 'Migrate Users'))]) . '</li>
+                          <li>' . Html::a('<i class="glyphicon glyphicon-user"></i>&nbsp;' . \Yii::t('auth', 'Test Login'), ['test'], ['data-pjax' => 0, 'title' => \Yii::t('auth', 'Test Login')]) . '</li>
+                          <li>' . Html::a('<i class="glyphicon glyphicon-retweet"></i>&nbsp;' . \Yii::t('auth', 'Migrate Users'), ['migrate'], ['data-pjax' => 0, 'title' => \Yii::t('auth', 'Migrate Users')]) . '</li>
                         </ul>
                     </div>' . 
                     Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/auth/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => \Yii::t('auth', 'Reset Grid')])

@@ -87,7 +87,7 @@ class AuthMigrateForm extends Model
     public function attributeHints()
     {
         return [
-            'login' => \Yii::t('auth', 'You can provide query credentials here, to query the servers of <code>{to}</code> for all users that are currently authenticatied via <code>{from}</code>. <i>Login credentials are not saved anywhere.</i>', [
+            'login' => \Yii::t('auth', 'You can provide query credentials here, to query the servers of <code>{to}</code> for all users that are currently authenticated via <code>{from}</code>. <i>Login credentials are not saved anywhere.</i>', [
                 'from' => array_key_exists($this->from, AuthSearch::getAuthSelectList()) ? AuthSearch::getAuthSelectList()[$this->from] : $this->from,
                 'to' => array_key_exists($this->to, AuthSearch::getAuthSelectList()) ? AuthSearch::getAuthSelectList()[$this->to] : $this->to,
             ]),

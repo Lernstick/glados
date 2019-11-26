@@ -41,4 +41,5 @@ return [
     'User has to change password at next login' => 'Der Benutzer muss sein Passwort beim nächsten Login ändern',
     'Username' => 'Benutzername',
     'Users' => 'Benutzer',
+    'Choose a Role ...' => 'Wählen Sie eine Rolle',
 ];

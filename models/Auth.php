@@ -199,7 +199,7 @@ class Auth extends Model implements AuthInterface
             'name' => Yii::t('auth', 'Name'),
             'typeName' => Yii::t('auth', 'Type'),
             'description' => Yii::t('auth', 'Description'),
-            'config' => Yii::t('auth', 'Konfiguration'),
+            'config' => Yii::t('auth', 'Configuration'),
         ];
     }
 
@@ -532,7 +532,7 @@ return [
     public function delete()
     {
         if ($this->id == "0") {
-            Yii::$app->session->addFlash('danger', \Yii::t('user', 'The entry with id 0 cannot be deleted.'));
+            Yii::$app->session->addFlash('danger', \Yii::t('auth', 'The entry with id 0 cannot be deleted.'));
             return false;
         }
 

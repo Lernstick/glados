@@ -45,7 +45,7 @@ class m190829_075244_ldap extends Migration
         $auth->add($testAuth);
 
         $migrateAuth = $auth->createPermission('auth/migrate');
-        $migrateAuth->description = yiit('permission', 'Migrate existing local users to users associated to an authentication method');
+        $migrateAuth->description = yiit('permission', 'Migrate existing users to users associated to an authentication method');
         $auth->add($migrateAuth);
 
         /* Assign permissions */

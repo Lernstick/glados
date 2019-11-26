@@ -17,7 +17,6 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    'Exam edit is disabled while there {n,plural,=1{is one ticket} other{are # tickets}} in "Running" state.' => 'Editieren dieser Prüfung ist deaktiviert, weil {n,plural,=1{ein Ticket} other{# Tickets}} im "Laufend" Zustand {n,plural,=1{ist} other{sind}}.',
     '# Tickets' => '# Tickets',
     '...all {n} minutes.' => '...alle {n} minuten.',
     '...to the directory' => '...ins Verzeichnis',
@@ -54,6 +53,7 @@ return [
     'Exam Image File (squashfs)' => 'Prüfungs-Imagedatei (squashfs)',
     'Exam Image files' => 'Prüfungs-Imagedateien',
     'Exam Zip File' => 'Prüfungs-ZIP-Datei',
+    'Exam edit is disabled while there {n,plural,=1{is one ticket} other{are # tickets}} in "Running" state.' => 'Editieren dieser Prüfung ist deaktiviert, weil {n,plural,=1{ein Ticket} other{# Tickets}} im "Laufend" Zustand {n,plural,=1{ist} other{sind}}.',
     'Exam file' => 'Prüfungsdatei',
     'Exams' => 'Prüfungen',
     'Expert Settings' => 'Experten-Einstellungen',
@@ -143,6 +143,7 @@ return [
     'User can gain root privileges by sudo' => 'Der Benutzer kann root-Rechte über sudo erhalten',
     'User has access to external filesystems such as USB Sticks' => 'Der Benutzer hat Zugriff auf externe Dateisysteme, wie USB-Sticks',
     'Visit the Manual' => 'Besuchen Sie die Benutzeranleitung',
+    'You can now select them from the dropdown lists.' => 'Sie können sie nun in the dropdown Liste auswählen.',
     'You have to provide at least one exam file.' => 'Sie müssen mindestens eine Prüfungsdatei stellen.',
     'Your Exams' => 'Ihre Prüfungen',
     'Zip File Info' => 'ZIP-Datei Info',

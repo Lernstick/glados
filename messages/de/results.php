@@ -86,5 +86,5 @@ return [
     'finished' => 'beendet',
     'result handed in' => 'Resultat eingereicht',
     'started' => 'gestartet',
-    'submitted' => 'zugewisen',
+    'submitted' => 'zugewiesen',
 ];

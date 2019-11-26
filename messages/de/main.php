@@ -37,4 +37,6 @@ return [
     'Submit results' => 'Resultate einreichen',
     'Tickets' => 'Tickets',
     'Users' => 'Benutzer',
+    'Authentication Methods' => 'Authentifizierungsmethoden',
+    'System' => 'System',
 ];
