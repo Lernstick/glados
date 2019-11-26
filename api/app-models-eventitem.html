@@ -4,12 +4,12 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="language" content="en" />
-        <link href="./assets/1cf5ba7/css/bootstrap.css" rel="stylesheet">
+        <link href="./assets/6c734e4f/css/bootstrap.css" rel="stylesheet">
 <link href="./assets/be3e053e/solarized_light.css" rel="stylesheet">
 <link href="./assets/1f2e89dd/style.css" rel="stylesheet">
 <script src="./assets/8261f971/jquery.js"></script>
-<script src="./assets/1cf5ba7/js/bootstrap.js"></script>
-<script src="./assets/ae8b5077/jssearch.js"></script>    <title>EventItem, app\models\EventItem - GLaDOS Documentation</title>
+<script src="./assets/6c734e4f/js/bootstrap.js"></script>
+<script src="./assets/93cd64ed/jssearch.js"></script>    <title>EventItem, app\models\EventItem - GLaDOS Documentation</title>
 </head>
 <body>
 
@@ -45,8 +45,13 @@
 <a class="list-group-item" href="#navigation-128" data-toggle="collapse" data-parent="#navigation">app\components <b class="caret"></b></a><div id="navigation-128" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-components-accessrule.html">AccessRule</a>
 <a class="list-group-item" href="./app-components-activeeventfield.html">ActiveEventField</a>
 <a class="list-group-item" href="./app-components-activeeventfieldasset.html">ActiveEventFieldAsset</a>
+<a class="list-group-item" href="./app-components-authactivedirectory.html">AuthActiveDirectory</a>
+<a class="list-group-item" href="./app-components-authgenericldap.html">AuthGenericLdap</a>
+<a class="list-group-item" href="./app-components-authopenldap.html">AuthOpenLdap</a>
 <a class="list-group-item" href="./app-components-editable.html">Editable</a>
 <a class="list-group-item" href="./app-components-file.html">File</a>
+<a class="list-group-item" href="./app-components-languageselector.html">LanguageSelector</a>
+<a class="list-group-item" href="./app-components-local.html">Local</a>
 <a class="list-group-item" href="./app-components-outputevent.html">OutputEvent</a>
 <a class="list-group-item" href="./app-components-shellcommand.html">ShellCommand</a>
 <a class="list-group-item" href="./app-components-squashfs.html">Squashfs</a>
@@ -67,8 +72,12 @@
 <a class="list-group-item active" href="#navigation-130" data-toggle="collapse" data-parent="#navigation">app\models <b class="caret"></b></a><div id="navigation-130" class="submenu panel-collapse collapse in"><a class="list-group-item" href="./app-models-activity.html">Activity</a>
 <a class="list-group-item" href="./app-models-activityquery.html">ActivityQuery</a>
 <a class="list-group-item" href="./app-models-activitysearch.html">ActivitySearch</a>
+<a class="list-group-item" href="./app-models-auth.html">Auth</a>
 <a class="list-group-item" href="./app-models-authassignment.html">AuthAssignment</a>
+<a class="list-group-item" href="./app-models-authinterface.html">AuthInterface</a>
 <a class="list-group-item" href="./app-models-authitem.html">AuthItem</a>
+<a class="list-group-item" href="./app-models-authmigrateform.html">AuthMigrateForm</a>
+<a class="list-group-item" href="./app-models-authsearch.html">AuthSearch</a>
 <a class="list-group-item" href="./app-models-backup.html">Backup</a>
 <a class="list-group-item" href="./app-models-backupsearch.html">BackupSearch</a>
 <a class="list-group-item" href="./app-models-base.html">Base</a>
@@ -83,6 +92,7 @@
 <a class="list-group-item" href="./app-models-examsearch.html">ExamSearch</a>
 <a class="list-group-item" href="./app-models-howto.html">Howto</a>
 <a class="list-group-item" href="./app-models-howtosearch.html">HowtoSearch</a>
+<a class="list-group-item" href="./app-models-liveactiverecord.html">LiveActiveRecord</a>
 <a class="list-group-item" href="./app-models-loginform.html">LoginForm</a>
 <a class="list-group-item" href="./app-models-rdifffilesystem.html">RdiffFileSystem</a>
 <a class="list-group-item" href="./app-models-restore.html">Restore</a>
@@ -94,7 +104,10 @@
 <a class="list-group-item" href="./app-models-ticket.html">Ticket</a>
 <a class="list-group-item" href="./app-models-ticketquery.html">TicketQuery</a>
 <a class="list-group-item" href="./app-models-ticketsearch.html">TicketSearch</a>
+<a class="list-group-item" href="./app-models-translatedactivityquery.html">TranslatedActivityQuery</a>
+<a class="list-group-item" href="./app-models-translation.html">Translation</a>
 <a class="list-group-item" href="./app-models-user.html">User</a>
+<a class="list-group-item" href="./app-models-userauth.html">UserAuth</a>
 <a class="list-group-item" href="./app-models-usersearch.html">UserSearch</a></div></div>    </div>
     <div class="col-md-9 api-content" role="main">
         <h1>Class app\models\EventItem</h1>
@@ -150,12 +163,6 @@ yii\db\ActiveRecord</td></tr>
     </tr>
             <tr id="$jsonData">
         <td><a href="app-models-eventitem.html#$jsonData-detail">$jsonData</a></td>
-        <td></td>
-        <td></td>
-        <td><a href="app-models-eventitem.html">app\models\EventItem</a></td>
-    </tr>
-            <tr id="$oldData">
-        <td><a href="app-models-eventitem.html#$oldData-detail">$oldData</a></td>
         <td></td>
         <td></td>
         <td><a href="app-models-eventitem.html">app\models\EventItem</a></td>
@@ -295,23 +302,6 @@ the 'user' array can also contain 'ALL' to address all users (multicast event), 
             </div>
 
     <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"></span> <a href="app-models-eventitem.html#$jsonData-detail">$jsonData</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">null</span></div>
-
-
-    <div class="detail-header h3" id="$oldData-detail">
-        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
-        <a class="tool-link hash" href="app-models-eventitem.html#$oldData-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
-        
-        $oldData        <span class="detail-header-tag small">
-            public                                                property
-                    </span>
-    </div>
-
-    
-    <div class="doc-description">
-        
-            </div>
-
-    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"></span> <a href="app-models-eventitem.html#$oldData-detail">$oldData</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">null</span></div>
 
 
     <div class="detail-header h3" id="$path-detail">
@@ -555,7 +545,7 @@ the 'user' array can also contain 'ALL' to address all users (multicast event), 
 </div>
 
 <footer class="footer">
-        <p class="pull-right"><small>Page generated on Fri, 21 Jun 2019 13:03:49 +0000</small></p>
+        <p class="pull-right"><small>Page generated on Tue, 26 Nov 2019 16:31:18 +0000</small></p>
     Powered by <a href="http://www.yiiframework.com/" rel="external">Yii Framework</a></footer>
 
 <script>jQuery(function ($) {

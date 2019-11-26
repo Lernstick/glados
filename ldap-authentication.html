@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="language" content="en" />
+        <link href="./assets/6c734e4f/css/bootstrap.css" rel="stylesheet">
+<link href="./assets/be3e053e/solarized_light.css" rel="stylesheet">
+<link href="./assets/1f2e89dd/style.css" rel="stylesheet">
+<script src="./assets/8261f971/jquery.js"></script>
+<script src="./assets/6c734e4f/js/bootstrap.js"></script>
+<script src="./assets/93cd64ed/jssearch.js"></script>    <title>LDAP Authentication - Authentication - GLaDOS Guide</title>
+</head>
+<body>
+
+<div class="wrap">
+    <nav id="w214" class="navbar-inverse navbar-fixed-top navbar"><div class="navbar-header"><button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#w214-collapse"><span class="sr-only">Toggle navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span></button><a class="navbar-brand" href="./index.html">GLaDOS Guide</a></div><div id="w214-collapse" class="collapse navbar-collapse"><ul id="w215" class="navbar-nav nav"><li><a href="api/index.html">Class reference</a></li>
+<li><a href="./README.html">Guide</a></li></ul><div class="navbar-form navbar-left" role="search">
+  <div class="form-group">
+    <input id="searchbox" type="text" class="form-control" placeholder="Search">
+  </div>
+</div>
+</div></nav>
+    <div id="search-resultbox" style="display: none;" class="modal-content">
+        <ul id="search-results">
+        </ul>
+    </div>
+
+    
+<div class="row">
+    <div class="col-md-2">
+                <div id="navigation" class="list-group"><a class="list-group-item" href="#navigation-207" data-toggle="collapse" data-parent="#navigation">Howtos and Manuals <b class="caret"></b></a><div id="navigation-207" class="submenu panel-collapse collapse"><a class="list-group-item" href="./create-exam.html">Create an exam</a>
+<a class="list-group-item" href="./remote-backup-path.html">Remote Backup Path</a>
+<a class="list-group-item" href="./create-zip-exam-file.html">Create a zip-file as exam file</a>
+<a class="list-group-item" href="./create-squashfs-exam-file.html">Create a squashfs-filesystem as exam file</a>
+<a class="list-group-item" href="./exam-view.html">The exam view</a>
+<a class="list-group-item" href="./create-single-ticket.html">Create a single ticket</a>
+<a class="list-group-item" href="./create-multiple-tickets.html">Create multiple tickets</a>
+<a class="list-group-item" href="./ticket-view.html">The ticket view </a>
+<a class="list-group-item" href="./ticket-states.html">Ticket states</a>
+<a class="list-group-item" href="./take-exam.html">Taking an Exam</a>
+<a class="list-group-item" href="./generate-results.html">Generate results</a>
+<a class="list-group-item" href="./correct-exams.html">Correct the exams</a>
+<a class="list-group-item" href="./submit-results.html">Submit results back to the student</a>
+<a class="list-group-item" href="./get-exam-result.html">Get the exam result as a student</a></div>
+<a class="list-group-item" href="#navigation-208" data-toggle="collapse" data-parent="#navigation">Troubleshooting <b class="caret"></b></a><div id="navigation-208" class="submenu panel-collapse collapse"><a class="list-group-item" href="./client-crash.html">Client crashes during exam</a>
+<a class="list-group-item" href="./restore-specific-file.html">Restore a specific file</a></div>
+<a class="list-group-item" href="#navigation-209" data-toggle="collapse" data-parent="#navigation">Examples <b class="caret"></b></a><div id="navigation-209" class="submenu panel-collapse collapse"><a class="list-group-item" href="./example-exam-essay.html">Example exam: Essay</a></div>
+<a class="list-group-item" href="#navigation-210" data-toggle="collapse" data-parent="#navigation">Installation <b class="caret"></b></a><div id="navigation-210" class="submenu panel-collapse collapse"><a class="list-group-item" href="./manual-install.html">Manual Installation</a>
+<a class="list-group-item" href="./deb-install.html">Automatic Installation</a></div>
+<a class="list-group-item" href="#navigation-211" data-toggle="collapse" data-parent="#navigation">Update and Upgrade <b class="caret"></b></a><div id="navigation-211" class="submenu panel-collapse collapse"><a class="list-group-item" href="./deb-update.html">Softwareupdate on Debian</a>
+<a class="list-group-item" href="./deb-8to9-upgrade.html">Upgrade from Debian 8 to 9</a></div>
+<a class="list-group-item" href="#navigation-212" data-toggle="collapse" data-parent="#navigation">Configuration <b class="caret"></b></a><div id="navigation-212" class="submenu panel-collapse collapse"><a class="list-group-item" href="./config-files.html">Glados config files</a>
+<a class="list-group-item" href="./client-config.html">Exam client configuration</a>
+<a class="list-group-item" href="./network-config.html">Network configuration</a></div>
+<a class="list-group-item active" href="#navigation-213" data-toggle="collapse" data-parent="#navigation">Authentication <b class="caret"></b></a><div id="navigation-213" class="submenu panel-collapse collapse in"><a class="list-group-item active" href="./ldap-authentication.html">LDAP Authentication</a>
+<a class="list-group-item" href="./ad-authentication-simple.html">Active Directory Authentication (Simple)</a>
+<a class="list-group-item" href="./ad-authentication-advanced.html">Active Directory Authentication (Advanced)</a>
+<a class="list-group-item" href="./test-login.html">Test Login</a>
+<a class="list-group-item" href="./user-migration.html">User Migration</a>
+<a class="list-group-item" href="./multiple-ldaps.html">Multiple LDAP Servers and/or Active Directories</a>
+<a class="list-group-item" href="./auth-placeholders.html">Placeholders</a></div></div>    </div>
+    <div class="col-md-9 guide-content" role="main">
+        <h2>LDAP Authentication <span id="ldap-authentication"></span><a href="#ldap-authentication" class="hashlink">&para;</a></h2><p>This article covers the authentication of users over LDAP. If you plan to use LDAP for authentication on GLaDOS, you have to think about how you want your users to login. LDAP servers provide multiple attributes that are suitable for a login.</p>
+<p>To add a new authentication method click <code>System-&gt;Authentication Methods</code> and <code>Add new Authentication Method</code>. In the first step you have to choose an authentication type.</p>
+<h3>Step 1: Choose an authentication type <span id="step-1-choose-an-authentication-type"></span><a href="#step-1-choose-an-authentication-type" class="hashlink">&para;</a></h3><p>There are some LDAP implementations that are directly supported, and therefore need no special setup. If yours is not listed, please choose <code>Generic LDAP</code> in the dropdown list.</p>
+<h3>Step 2: Setup <span id="step-2-setup"></span><a href="#step-2-setup" class="hashlink">&para;</a></h3><p>You can defina a <code>Name</code> and <code>Description</code> of your LDAP server, for example the school name or the domain name.</p>
+<blockquote><p>For more information about the <code>Order</code> field, please read the article <a href="multiple-ldaps.html">Multiple LDAP Servers and/or Active Directories</a> first.</p>
+</blockquote>
+<h4>Domain / LDAP URI <span id="domain-ldap-uri"></span><a href="#domain-ldap-uri" class="hashlink">&para;</a></h4><p>The configuration option <code>Domain</code> should be set to the full name of your LDAP domain, for example <code>example.com</code>. Your server(s) should be accessible by this DNS name over the network. If this is the case, you don't have set an <code>LDAP URI</code> by hand (and you should not). The <code>LDAP URI</code> is contructed from the LDAP Domain name. Only if your domain name is not resolvable over DNS, you have to provide an <code>LDAP URI</code> explicitly in the <code>Extert Settings</code>.</p>
+<h4>Login Scheme <span id="login-scheme"></span><a href="#login-scheme" class="hashlink">&para;</a></h4><blockquote><p>For more information about the <code>Login Scheme</code> field, please read the article <a href="login-scheme.html">Login Scheme</a> first.</p>
+</blockquote>
+<h4>Group Mapping <span id="group-mapping"></span><a href="#group-mapping" class="hashlink">&para;</a></h4><p>You may want to map some groups defined in your LDAP directory to user roles used in GLaDOS. Members of specific groups may become admins and others may become teachers on GLaDOS. When editing or creating an new authentication method, you can specify the group mapping. If you don't know the group names on your LDAP servers, you can read them out in the form by providing a username to query the LDAP. Click <code>Query for LDAP groups</code> in the group mapping configuration option. In the appearing window provide login credentials and proceed with <code>Query</code>. If the credentials where valid, the dropdown lists will be populated with group names recieved from the LDAP server(s). You can choose multiple groups to be mapped to the same role in GLaDOS. You may also want to map no group to some roles.</p>
+<h4>Expert Settings <span id="expert-settings"></span><a href="#expert-settings" class="hashlink">&para;</a></h4><p>Most of the settings you don't have to change. If you have chosen <code>Generic LDAP</code> in <code>Step 1</code>, then you may have to provide these settings. They should be available in the documentation of the LDAP implementation you're using.</p>
+<h5><strong>LDAP URI</strong> <span id="ldap-uri"></span><a href="#ldap-uri" class="hashlink">&para;</a></h5><p>Here you can provide a full LDAP URI of the form <code>ldap://hostname:port</code> or <code>ldaps://hostname:port</code> for SSL encryption. You can also provide multiple LDAP-URIs separated by a space as one string. Note that <code>hostname:port</code> is <strong>not</strong> a supported LDAP URI as the schema is missing. See <a target="_blank" href="https://www.php.net/manual/en/function.ldap-connect.php">ldap_connect()</a> under <code>ldap_uri</code>.</p>
+<h5><strong>Choosing a bind method</strong> <span id="choosing-a-bind-method"></span><a href="#choosing-a-bind-method" class="hashlink">&para;</a></h5><p>The way GLaDOS contacts your LDAP server(s) can be changed. There are 3 methods to choose from in the setup form:</p>
+<h6><em>Method 1: Bind directly by the login credentials</em> <span id="method-1-bind-directly-by-the-login-credentials"></span><a href="#method-1-bind-directly-by-the-login-credentials" class="hashlink">&para;</a></h6><p>If you choose this method, the username provided in the login form is taken directly as bind username to authenticate over LDAP. User details - such as group membership and various needed attributes - are then queried with the login username. Therefore you can only employ this method if the login user has the permission to browse the LDAP directory tree. This is not the default setting in all LDAP implementations, but very common.</p>
+<p>The username that should be used for the bind, can be modified in a simple way. There are 2 configuration options affecting this: <code>Bind Scheme</code> and <code>Login Scheme</code>.</p>
+<p>The <code>Bind Scheme</code> is a pattern to build the bind DN for the actual bind to the LDAP server. <code>{username}</code> is replaced with the username extracted from <code>Login Scheme</code>.</p>
+<blockquote><p>To understand how the username is extracted, please refer to <a href="login-scheme.html">Login Scheme</a>.</p>
+</blockquote>
+<p>Examples of <code>Bind Schemes</code>:</p>
+<ol>
+<li><code>{username}</code>: no special altering, the extracted username is taken as bind DN as it is.</li>
+<li><code>{username}@foo</code>: the extracted username is appended with <code>@foo</code> to contruct the bind DN.</li>
+<li><code>foo\{username}</code>: the username is prepended with <code>foo\</code> for the bind.</li>
+<li><code>{username}@{domain}</code>: the username is appended with <code>@{domain}</code>, where <code>{domain}</code> is replaced with the value given in the configuration.</li>
+<li><code>cn={username},dc=example,dc=com</code>: a distinguished name is built out of the provided username. Instead of <code>dc=example,dc=com</code>, one could have also used <code>{base}</code>.</li>
+</ol>
+<p>Assume your domain name is <code>example.com</code> and your LDAP allows to bind with the distinguished Name <code>dn</code> as well as with <code>username@example.com</code>. To illustrate the power of <code>Bind Scheme</code> together with <code>Login Scheme</code> to rewrite bind credentials, consider the following examples:</p>
+<table class="table table-bordered table-striped">
+<thead>
+<tr><th>Login Scheme			</th><th>Bind Scheme  			</th><th>Example Login			</th><th>Constructed Bind DN </th><th>Notes 			</th></tr>
+</thead>
+<tbody>
+<tr><td><code>{username}</code>			</td><td><code>{username}@{domain}</code>	</td><td><code>alice</code>				</td><td><code>alice@example.com</code> </td><td>default setup 	</td></tr>
+<tr><td><code>{username}</code>			</td><td><code>{username}</code>			</td><td><code>alice</code>				</td><td><code>alice</code>			</td></tr>
+<tr><td><code>{username}</code>			</td><td><code>{username}@{domain}</code>	</td><td><code>alice@example.com</code>	</td><td><code>alice@example.com@example.com</code> </td><td> 	</td></tr>
+<tr><td><code>{username}@{domain}</code>	</td><td><code>{username}@{domain}</code>	</td><td><code>alice</code>				</td><td>none 				</td></tr>
+<tr><td><code>{username}@{domain}</code>	</td><td><code>{username}@{domain}</code>	</td><td><code>alice@example.com</code>   </td><td><code>alice@example.com</code></td></tr>
+<tr><td><code>{username}@{domain}</code>	</td><td><code>{username}@{domain}</code>	</td><td><code>alice@other_domain</code>  </td><td>none				</td></tr>
+<tr><td><code>{username}@other_doman</code></td><td><code>{username}@{domain}</code>	</td><td><code>alice@other_domain</code>  </td><td><code>alice@example.com</code> </td><td>rewriting of the domain</td></tr>
+<tr><td><code>{username}@other_doman</code></td><td><code>{username}@{domain}</code>	</td><td><code>alice@other_domain</code>  </td><td><code>alice@example.com</code></td></tr>
+<tr><td><code>{username}</code>			</td><td><code>cn={username},dc=example,dc=com</code>	</td><td><code>alice</code>   </td><td><code>cn=alice,dc=example,dc=com</code> </td><td>		</td></tr>
+<tr><td><code>{username}</code>			</td><td><code>cn={username},{base}</code></td><td><code>alice</code>  				</td><td><code>cn=alice,dc=example,dc=com</code> 	  		</td></tr>
+<tr><td><code>{username}@{domain}</code>	</td><td><code>cn={username},{base}</code></td><td><code>alice</code>			   	</td><td>none 				  </td><td>				</td></tr>
+<tr><td><code>{username}@{domain}</code>	</td><td><code>cn={username},{base}</code></td><td><code>alice@example.com</code>  	</td><td><code>cn=alice,dc=example,dc=com</code> </td><td>		</td></tr>
+</tbody>
+</table>
+<p>where the <code>Example Login</code> column denotes a login username given in the login form and <code>Constructed Bind DN</code> shows the bind DN that is constructed using the login username and <code>Login Scheme</code> together with <code>Bind Scheme</code>. A constructed bind DN of <code>none</code> means that there is no bind DN contructed, and thus the login has failed.</p>
+<h6><em>Method 2: Bind anonymously</em> <span id="method-2-bind-anonymously"></span><a href="#method-2-bind-anonymously" class="hashlink">&para;</a></h6><p>The second method is to bind with an anonymous user. To use this method, your LDAP server must allow anonymous binds. When a user attempts to login, the LDAP directory is browsed with an anonymous bind for the <code>Bind Attribute</code> of the login user and his/her group membership. Then GLaDOS performs a second bind, but this time with the value of the users <code>Bind Attribute</code> as bind DN and the provided password. Using this method, you are able to choose the <code>Login Attribute</code>, which is the attribute that should be used for the login.</p>
+<p>See the following example configuration:</p>
+<pre><code class="hljs php language-php">loginAttribute = <span class="hljs-string">'mail'</span>;
+bindAttribute = <span class="hljs-string">'dn'</span>;
+</code></pre>
+<p>With that configuration, the user is able to login with his/her E-Mail address deposited in the LDAP directory in the <code>mail</code> attribute (this attribute should be unique across the directory). Most LDAP servers only allow to authenticate with the distinguished name <code>dn</code>.</p>
+<blockquote><p>The attribute name of the distinguished name can vary across LDAP implementations. Microsofts Active Directory uses <code>distinguishedName</code> instead of <code>dn</code>.</p>
+</blockquote>
+<h6><em>Method 3: Bind by given username and password</em> <span id="method-3-bind-by-given-username-and-password"></span><a href="#method-3-bind-by-given-username-and-password" class="hashlink">&para;</a></h6><p>If your LDAP server does not allow anonymous binds, but you anyhow want to use a special attribute as <code>Login Attribute</code>, you can choose this method. For this you have to provide credentials of an account that has the permission to browse the LDAP directory. The advantage of this method is that only that specific user account needs the permission to browse the LDAP directory - the login user itself does not need any permissions, except to bind. However most LDAP implementations do allow every user to browse the LDAP tree. The 2 configuration settings - <code>Login Attribute</code> and <code>Bind Attribute</code> - behave exactly the same as in the anonymous bind scenario above.</p>
+<h3>Step 3: Test Login <span id="step-3-test-login"></span><a href="#step-3-test-login" class="hashlink">&para;</a></h3><p>After you created an new authentication method successfully you may want to test login.</p>
+<blockquote><p>Please refer to <a href="test-login.html">Test Login</a> for more information about this.</p>
+</blockquote>
+<h3>Step 4: Migrate Users <span id="step-4-migrate-users"></span><a href="#step-4-migrate-users" class="hashlink">&para;</a></h3><p>You may have some local users, that you want to authenticate over the created authentication method now. Then you have to perform a user migration.</p>
+<blockquote><p>Please refer to <a href="user-migration.html">User Migration</a> for more information about this.</p>
+</blockquote>
+        <div class="toplink"><a href="#" class="h1" title="go to top"><span class="glyphicon glyphicon-arrow-up"></a></div>
+    </div>
+</div>
+
+
+</div>
+
+<footer class="footer">
+        <p class="pull-right"><small>Page generated on Tue, 26 Nov 2019 16:31:21 +0000</small></p>
+    Powered by <a href="http://www.yiiframework.com/" rel="external">Yii Framework</a></footer>
+
+<script>jQuery(function ($) {
+    var shiftWindow = function () { scrollBy(0, -50) };
+    if (location.hash) setTimeout(shiftWindow, 1);
+    window.addEventListener("hashchange", shiftWindow);
+var element = document.createElement("script");
+element.src = "./jssearch.index.js";
+document.body.appendChild(element);
+
+var searchBox = $('#searchbox');
+
+// search when typing in search field
+searchBox.on("keyup", function(event) {
+    var query = $(this).val();
+
+    if (query == '' || event.which == 27) {
+        $('#search-resultbox').hide();
+        return;
+    } else if (event.which == 13) {
+        var selectedLink = $('#search-resultbox a.selected');
+        if (selectedLink.length != 0) {
+            document.location = selectedLink.attr('href');
+            return;
+        }
+    } else if (event.which == 38 || event.which == 40) {
+        $('#search-resultbox').show();
+
+        var selected = $('#search-resultbox a.selected');
+        if (selected.length == 0) {
+            $('#search-results').find('a').first().addClass('selected');
+        } else {
+            var next;
+            if (event.which == 40) {
+                next = selected.parent().next().find('a').first();
+            } else {
+                next = selected.parent().prev().find('a').first();
+            }
+            if (next.length != 0) {
+                var resultbox = $('#search-results');
+                var position = next.position();
+
+//              TODO scrolling is buggy and jumps around
+//                resultbox.scrollTop(Math.floor(position.top));
+//                console.log(position.top);
+
+                selected.removeClass('selected');
+                next.addClass('selected');
+            }
+        }
+
+        return;
+    }
+    $('#search-resultbox').show();
+    $('#search-results').html('<li><span class="no-results">No results</span></li>');
+
+    var result = jssearch.search(query);
+
+    if (result.length > 0) {
+        var i = 0;
+        var resHtml = '';
+
+        for (var key in result) {
+            if (i++ > 20) {
+                break;
+            }
+            resHtml = resHtml +
+            '<li><a href="' + result[key].file.u.substr(3) +'"><span class="title">' + result[key].file.t + '</span>' +
+            '<span class="description">' + result[key].file.d + '</span></a></li>';
+        }
+        $('#search-results').html(resHtml);
+    }
+});
+
+// hide the search results on ESC
+$(document).on("keyup", function(event) { if (event.which == 27) { $('#search-resultbox').hide(); } });
+// hide search results on click to document
+$(document).bind('click', function (e) { $('#search-resultbox').hide(); });
+// except the following:
+searchBox.bind('click', function(e) { e.stopPropagation(); });
+$('#search-resultbox').bind('click', function(e) { e.stopPropagation(); });
+
+});</script></body>
+</html>

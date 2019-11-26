@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="language" content="en" />
+        <link href="./assets/6c734e4f/css/bootstrap.css" rel="stylesheet">
+<link href="./assets/be3e053e/solarized_light.css" rel="stylesheet">
+<link href="./assets/1f2e89dd/style.css" rel="stylesheet">
+<script src="./assets/8261f971/jquery.js"></script>
+<script src="./assets/6c734e4f/js/bootstrap.js"></script>
+<script src="./assets/93cd64ed/jssearch.js"></script>    <title>AuthSearch, app\models\AuthSearch - GLaDOS Documentation</title>
+</head>
+<body>
+
+<div class="wrap">
+    <nav id="w26" class="navbar-inverse navbar-fixed-top navbar"><div class="navbar-header"><button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#w26-collapse"><span class="sr-only">Toggle navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span></button><a class="navbar-brand" href="./index.html">GLaDOS Documentation</a></div><div id="w26-collapse" class="collapse navbar-collapse"><ul id="w27" class="navbar-nav nav"><li><a href="./index.html">Class reference</a></li>
+<li><a href="../README.html">Guide</a></li></ul><div class="navbar-form navbar-left" role="search">
+  <div class="form-group">
+    <input id="searchbox" type="text" class="form-control" placeholder="Search">
+  </div>
+</div>
+</div></nav>
+    <div id="search-resultbox" style="display: none;" class="modal-content">
+        <ul id="search-results">
+        </ul>
+    </div>
+
+    
+<div class="row">
+    <div class="col-md-3">
+                <div id="navigation" class="list-group"><a class="list-group-item" href="#navigation-21" data-toggle="collapse" data-parent="#navigation">app\assets <b class="caret"></b></a><div id="navigation-21" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-assets-appasset.html">AppAsset</a>
+<a class="list-group-item" href="./app-assets-eventasset.html">EventAsset</a></div>
+<a class="list-group-item" href="#navigation-22" data-toggle="collapse" data-parent="#navigation">app\commands <b class="caret"></b></a><div id="navigation-22" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-commands-analyzecontroller.html">AnalyzeController</a>
+<a class="list-group-item" href="./app-commands-backupcontroller.html">BackupController</a>
+<a class="list-group-item" href="./app-commands-daemoncontroller.html">DaemonController</a>
+<a class="list-group-item" href="./app-commands-dbcleancontroller.html">DbcleanController</a>
+<a class="list-group-item" href="./app-commands-downloadcontroller.html">DownloadController</a>
+<a class="list-group-item" href="./app-commands-rbaccontroller.html">RbacController</a>
+<a class="list-group-item" href="./app-commands-restorecontroller.html">RestoreController</a>
+<a class="list-group-item" href="./app-commands-unlockcontroller.html">UnlockController</a></div>
+<a class="list-group-item" href="#navigation-23" data-toggle="collapse" data-parent="#navigation">app\components <b class="caret"></b></a><div id="navigation-23" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-components-accessrule.html">AccessRule</a>
+<a class="list-group-item" href="./app-components-activeeventfield.html">ActiveEventField</a>
+<a class="list-group-item" href="./app-components-activeeventfieldasset.html">ActiveEventFieldAsset</a>
+<a class="list-group-item" href="./app-components-authactivedirectory.html">AuthActiveDirectory</a>
+<a class="list-group-item" href="./app-components-authgenericldap.html">AuthGenericLdap</a>
+<a class="list-group-item" href="./app-components-authopenldap.html">AuthOpenLdap</a>
+<a class="list-group-item" href="./app-components-editable.html">Editable</a>
+<a class="list-group-item" href="./app-components-file.html">File</a>
+<a class="list-group-item" href="./app-components-languageselector.html">LanguageSelector</a>
+<a class="list-group-item" href="./app-components-local.html">Local</a>
+<a class="list-group-item" href="./app-components-outputevent.html">OutputEvent</a>
+<a class="list-group-item" href="./app-components-shellcommand.html">ShellCommand</a>
+<a class="list-group-item" href="./app-components-squashfs.html">Squashfs</a>
+<a class="list-group-item" href="./app-components-zip.html">Zip</a></div>
+<a class="list-group-item" href="#navigation-24" data-toggle="collapse" data-parent="#navigation">app\controllers <b class="caret"></b></a><div id="navigation-24" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-controllers-activitycontroller.html">ActivityController</a>
+<a class="list-group-item" href="./app-controllers-backupcontroller.html">BackupController</a>
+<a class="list-group-item" href="./app-controllers-configcontroller.html">ConfigController</a>
+<a class="list-group-item" href="./app-controllers-daemoncontroller.html">DaemonController</a>
+<a class="list-group-item" href="./app-controllers-eventcontroller.html">EventController</a>
+<a class="list-group-item" href="./app-controllers-examcontroller.html">ExamController</a>
+<a class="list-group-item" href="./app-controllers-howtocontroller.html">HowtoController</a>
+<a class="list-group-item" href="./app-controllers-restorecontroller.html">RestoreController</a>
+<a class="list-group-item" href="./app-controllers-resultcontroller.html">ResultController</a>
+<a class="list-group-item" href="./app-controllers-screenshotcontroller.html">ScreenshotController</a>
+<a class="list-group-item" href="./app-controllers-sitecontroller.html">SiteController</a>
+<a class="list-group-item" href="./app-controllers-ticketcontroller.html">TicketController</a>
+<a class="list-group-item" href="./app-controllers-usercontroller.html">UserController</a></div>
+<a class="list-group-item active" href="#navigation-25" data-toggle="collapse" data-parent="#navigation">app\models <b class="caret"></b></a><div id="navigation-25" class="submenu panel-collapse collapse in"><a class="list-group-item" href="./app-models-activity.html">Activity</a>
+<a class="list-group-item" href="./app-models-activityquery.html">ActivityQuery</a>
+<a class="list-group-item" href="./app-models-activitysearch.html">ActivitySearch</a>
+<a class="list-group-item" href="./app-models-auth.html">Auth</a>
+<a class="list-group-item" href="./app-models-authassignment.html">AuthAssignment</a>
+<a class="list-group-item" href="./app-models-authinterface.html">AuthInterface</a>
+<a class="list-group-item" href="./app-models-authitem.html">AuthItem</a>
+<a class="list-group-item" href="./app-models-authmigrateform.html">AuthMigrateForm</a>
+<a class="list-group-item active" href="./app-models-authsearch.html">AuthSearch</a>
+<a class="list-group-item" href="./app-models-backup.html">Backup</a>
+<a class="list-group-item" href="./app-models-backupsearch.html">BackupSearch</a>
+<a class="list-group-item" href="./app-models-base.html">Base</a>
+<a class="list-group-item" href="./app-models-config.html">Config</a>
+<a class="list-group-item" href="./app-models-daemon.html">Daemon</a>
+<a class="list-group-item" href="./app-models-daemoninterface.html">DaemonInterface</a>
+<a class="list-group-item" href="./app-models-daemonsearch.html">DaemonSearch</a>
+<a class="list-group-item" href="./app-models-eventitem.html">EventItem</a>
+<a class="list-group-item" href="./app-models-eventstream.html">EventStream</a>
+<a class="list-group-item" href="./app-models-exam.html">Exam</a>
+<a class="list-group-item" href="./app-models-examquery.html">ExamQuery</a>
+<a class="list-group-item" href="./app-models-examsearch.html">ExamSearch</a>
+<a class="list-group-item" href="./app-models-howto.html">Howto</a>
+<a class="list-group-item" href="./app-models-howtosearch.html">HowtoSearch</a>
+<a class="list-group-item" href="./app-models-liveactiverecord.html">LiveActiveRecord</a>
+<a class="list-group-item" href="./app-models-loginform.html">LoginForm</a>
+<a class="list-group-item" href="./app-models-rdifffilesystem.html">RdiffFileSystem</a>
+<a class="list-group-item" href="./app-models-restore.html">Restore</a>
+<a class="list-group-item" href="./app-models-restoresearch.html">RestoreSearch</a>
+<a class="list-group-item" href="./app-models-result.html">Result</a>
+<a class="list-group-item" href="./app-models-screenshot.html">Screenshot</a>
+<a class="list-group-item" href="./app-models-screenshotsearch.html">ScreenshotSearch</a>
+<a class="list-group-item" href="./app-models-stats.html">Stats</a>
+<a class="list-group-item" href="./app-models-ticket.html">Ticket</a>
+<a class="list-group-item" href="./app-models-ticketquery.html">TicketQuery</a>
+<a class="list-group-item" href="./app-models-ticketsearch.html">TicketSearch</a>
+<a class="list-group-item" href="./app-models-translatedactivityquery.html">TranslatedActivityQuery</a>
+<a class="list-group-item" href="./app-models-translation.html">Translation</a>
+<a class="list-group-item" href="./app-models-user.html">User</a>
+<a class="list-group-item" href="./app-models-userauth.html">UserAuth</a>
+<a class="list-group-item" href="./app-models-usersearch.html">UserSearch</a></div></div>    </div>
+    <div class="col-md-9 api-content" role="main">
+        <h1>Class app\models\AuthSearch</h1>
+<div class="top-nav">
+    <a href="index.html">All Classes</a>
+            | <a href="#properties">Properties</a>
+                | <a href="#methods">Methods</a>
+                    | <a href="#constants">Constants</a>
+    </div>
+
+<table class="summaryTable docClass table table-bordered">
+    <colgroup>
+        <col class="col-name" />
+        <col class="col-value" />
+    </colgroup>
+            <tr><th>Inheritance</th><td><a href="app-models-authsearch.html">app\models\AuthSearch</a> &raquo;
+<a href="app-models-auth.html">app\models\Auth</a> &raquo;
+yii\base\Model</td></tr>
+                <tr><th>Implements</th><td><a href="app-models-authinterface.html">app\models\AuthInterface</a></td></tr>
+                                    </table>
+
+<div class="class-description">
+    <p><strong>AuthSearch represents the model behind the search form about <code>app\models\Auth</code>.</strong></p>
+    
+    </div>
+
+<a id="properties"></a>
+
+<div class="summary doc-property">
+<h2>Public Properties</h2>
+
+<p><a href="#" class="toggle">Hide inherited properties</a></p>
+
+<table class="summary-table table table-striped table-bordered table-hover">
+<colgroup>
+    <col class="col-property" />
+    <col class="col-type" />
+    <col class="col-description" />
+    <col class="col-defined" />
+</colgroup>
+<tr>
+  <th>Property</th><th>Type</th><th>Description</th><th>Defined By</th>
+</tr>
+        <tr class="inherited" id="$class">
+        <td><a href="app-models-auth.html#$class-detail">$class</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The class of the current authentication type.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$debug">
+        <td><a href="app-models-auth.html#$debug-detail">$debug</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>An array of debug messages to test the connection.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$description">
+        <td><a href="app-models-auth.html#$description-detail">$description</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>A description for the current authentication type.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$error">
+        <td><a href="app-models-auth.html#$error-detail">$error</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>A string holding the last error message.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$form">
+        <td><a href="app-models-auth.html#$form-detail">$form</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The edit form view for the current authentication type.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$id">
+        <td><a href="app-models-auth.html#$id-detail">$id</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$loginScheme">
+        <td><a href="app-models-auth.html#$loginScheme-detail">$loginScheme</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The pattern to test the given login credentials against.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$methods">
+        <td><a href="app-models-auth.html#$methods-detail">$methods</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>Array of authentications methods.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$migrateFrom">
+        <td><a href="app-models-auth.html#$migrateFrom-detail">$migrateFrom</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Id of the authentication method users are migrated from.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$migrateSearchPattern">
+        <td><a href="app-models-auth.html#$migrateSearchPattern-detail">$migrateSearchPattern</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>A search pattern for the username of local users to migrate</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$migrateUsers">
+        <td><a href="app-models-auth.html#$migrateUsers-detail">$migrateUsers</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>Array of LDAP users for the select list of the migration form.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$migrateUsersKeyScheme">
+        <td><a href="app-models-auth.html#$migrateUsersKeyScheme-detail">$migrateUsersKeyScheme</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Schemes for the key and value of the <a href="app-models-auth.html#$migrateUsers-detail">$migrateUsers</a> array</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$migrateUsersValueScheme">
+        <td><a href="app-models-auth.html#$migrateUsersValueScheme-detail">$migrateUsersValueScheme</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$migrationForm">
+        <td><a href="app-models-auth.html#$migrationForm-detail">$migrationForm</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The migration form view for the current authentication type.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$name">
+        <td><a href="app-models-auth.html#$name-detail">$name</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>A name for the current authentication type.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$order">
+        <td><a href="app-models-auth.html#$order-detail">$order</a></td>
+        <td><a href="http://www.php.net/language.types.integer">integer</a></td>
+        <td>The order in which the authentication process should be processed.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$success">
+        <td><a href="app-models-auth.html#$success-detail">$success</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>A string holding the last success message.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$type">
+        <td><a href="app-models-auth.html#$type-detail">$type</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The type of the current authentication.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$typeName">
+        <td><a href="app-models-auth.html#$typeName-detail">$typeName</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The authentication type in human readable form</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$view">
+        <td><a href="app-models-auth.html#$view-detail">$view</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The view for the current authentication type.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+    </table>
+</div>
+
+<a id="methods"></a>
+
+<div class="summary doc-method">
+<h2>Public Methods</h2>
+
+<p><a href="#" class="toggle">Hide inherited methods</a></p>
+
+<table class="summary-table table table-striped table-bordered table-hover">
+<colgroup>
+    <col class="col-method" />
+    <col class="col-description" />
+    <col class="col-defined" />
+</colgroup>
+<tr>
+  <th>Method</th><th>Description</th><th>Defined By</th>
+</tr>
+        <tr class="inherited" id="addMigrateUser()">
+        <td><a href="app-models-auth.html#addMigrateUser()-detail">addMigrateUser()</a></td>
+        <td>Creates a new entry in the <a href="app-models-auth.html#$migrateUsers-detail">$migrateUsers</a> array.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="attributeHints()">
+        <td><a href="app-models-auth.html#attributeHints()-detail">attributeHints()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="attributeLabels()">
+        <td><a href="app-models-auth.html#attributeLabels()-detail">attributeLabels()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="authenticate()">
+        <td><a href="app-models-auth.html#authenticate()-detail">authenticate()</a></td>
+        <td>Authenticate a user.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="delete()">
+        <td><a href="app-models-auth.html#delete()-detail">delete()</a></td>
+        <td>Deletes the config element corresponding to this model.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="find()">
+        <td><a href="app-models-auth.html#find()-detail">find()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="findAll()">
+        <td><a href="app-models-auth.html#findAll()-detail">findAll()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="findMigratableUsers()">
+        <td><a href="app-models-auth.html#findMigratableUsers()-detail">findMigratableUsers()</a></td>
+        <td>Searches the database for users that are migratable in the current scenario.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="findOne()">
+        <td><a href="app-models-auth.html#findOne()-detail">findOne()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="getAuthList()">
+        <td><a href="app-models-auth.html#getAuthList()-detail">getAuthList()</a></td>
+        <td>Getter for the list of authentication methods and their names</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="getAuthSelectlist()">
+        <td><a href="app-models-authsearch.html#getAuthSelectlist()-detail">getAuthSelectlist()</a></td>
+        <td>Getter for the list of authentication methods and their names
+For Example:</td>
+        <td><a href="app-models-authsearch.html">app\models\AuthSearch</a></td>
+    </tr>
+            <tr class="inherited" id="getConfig()">
+        <td><a href="app-models-auth.html#getConfig()-detail">getConfig()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="getConfigArray()">
+        <td><a href="app-models-auth.html#getConfigArray()-detail">getConfigArray()</a></td>
+        <td>Getter @todo remove</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="getFileConfig()">
+        <td><a href="app-models-auth.html#getFileConfig()-detail">getFileConfig()</a></td>
+        <td>Getter for the configuration as it is in the config file with the
+local db config prepended.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="getIsNewRecord()">
+        <td><a href="app-models-auth.html#getIsNewRecord()-detail">getIsNewRecord()</a></td>
+        <td>Whether the record is new and should be inserted when calling <a href="app-models-auth.html#save()-detail">save()</a>.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="getMigrateFromDescription()">
+        <td><a href="app-models-auth.html#getMigrateFromDescription()-detail">getMigrateFromDescription()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="getMigrateToDescription()">
+        <td><a href="app-models-auth.html#getMigrateToDescription()-detail">getMigrateToDescription()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="getObj()">
+        <td><a href="app-models-auth.html#getObj()-detail">getObj()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="getRealUsernameByScheme()">
+        <td><a href="app-models-auth.html#getRealUsernameByScheme()-detail">getRealUsernameByScheme()</a></td>
+        <td>Decides whether the username provided by the user matches the pattern to authenticate.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="getUsernameList()">
+        <td><a href="app-models-authsearch.html#getUsernameList()-detail">getUsernameList()</a></td>
+        <td>Gets a list of usernames by condition</td>
+        <td><a href="app-models-authsearch.html">app\models\AuthSearch</a></td>
+    </tr>
+            <tr class="inherited" id="insert()">
+        <td><a href="app-models-auth.html#insert()-detail">insert()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="orderRange()">
+        <td><a href="app-models-auth.html#orderRange()-detail">orderRange()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="queryUsers()">
+        <td><a href="app-models-auth.html#queryUsers()-detail">queryUsers()</a></td>
+        <td>A function to query for users to migrate.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="rules()">
+        <td><a href="app-models-authsearch.html#rules()-detail">rules()</a></td>
+        <td></td>
+        <td><a href="app-models-authsearch.html">app\models\AuthSearch</a></td>
+    </tr>
+            <tr class="inherited" id="save()">
+        <td><a href="app-models-auth.html#save()-detail">save()</a></td>
+        <td>Saves the current record.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="saveFileConfig()">
+        <td><a href="app-models-auth.html#saveFileConfig()-detail">saveFileConfig()</a></td>
+        <td>Saves the config to the file <code>auth.php</code>.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="scenarios()">
+        <td><a href="app-models-authsearch.html#scenarios()-detail">scenarios()</a></td>
+        <td></td>
+        <td><a href="app-models-authsearch.html">app\models\AuthSearch</a></td>
+    </tr>
+            <tr id="search()">
+        <td><a href="app-models-authsearch.html#search()-detail">search()</a></td>
+        <td>Creates data provider instance with search query applied</td>
+        <td><a href="app-models-authsearch.html">app\models\AuthSearch</a></td>
+    </tr>
+            <tr class="inherited" id="setConfigArray()">
+        <td><a href="app-models-auth.html#setConfigArray()-detail">setConfigArray()</a></td>
+        <td>Setter @todo remove</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="substitute()">
+        <td><a href="app-models-auth.html#substitute()-detail">substitute()</a></td>
+        <td>Performs the substitution of search filters and strings.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="substitutionProperties()">
+        <td><a href="app-models-auth.html#substitutionProperties()-detail">substitutionProperties()</a></td>
+        <td>Defines which properties should be substituted into strings.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="update()">
+        <td><a href="app-models-auth.html#update()-detail">update()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+    </table>
+</div>
+
+<a id="events"></a>
+
+<a id="constants"></a>
+<div class="summary doc-const">
+    <h2>Constants</h2>
+
+    <p><a href="#" class="toggle">Hide inherited constants</a></p>
+
+    <table class="summary-table table table-striped table-bordered table-hover">
+    <colgroup>
+        <col class="col-const" />
+        <col class="col-value" />
+        <col class="col-description" />
+        <col class="col-defined" />
+    </colgroup>
+    <tr>
+        <th>Constant</th><th>Value</th><th>Description</th><th>Defined By</th>
+    </tr>
+            <tr class="inherited" id="AUTH_ACTIVE_DIRECTORY">
+          <td id="AUTH_ACTIVE_DIRECTORY-detail">AUTH_ACTIVE_DIRECTORY</td>
+          <td>2</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+            <tr class="inherited" id="AUTH_LDAP">
+          <td id="AUTH_LDAP-detail">AUTH_LDAP</td>
+          <td>1</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+            <tr class="inherited" id="AUTH_LOCAL">
+          <td id="AUTH_LOCAL-detail">AUTH_LOCAL</td>
+          <td>0</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+            <tr class="inherited" id="AUTH_OPENLDAP">
+          <td id="AUTH_OPENLDAP-detail">AUTH_OPENLDAP</td>
+          <td>3</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+            <tr class="inherited" id="PATH">
+          <td id="PATH-detail">PATH</td>
+          <td>__DIR__ . '/../config'</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+            <tr class="inherited" id="SCENARIO_AUTH_TEST">
+          <td id="SCENARIO_AUTH_TEST-detail">SCENARIO_AUTH_TEST</td>
+          <td>'auth_test'</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+            <tr class="inherited" id="SCENARIO_CREATE">
+          <td id="SCENARIO_CREATE-detail">SCENARIO_CREATE</td>
+          <td>'create'</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+            <tr class="inherited" id="SCENARIO_MIGRATE">
+          <td id="SCENARIO_MIGRATE-detail">SCENARIO_MIGRATE</td>
+          <td>'migrate'</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+            <tr class="inherited" id="SCENARIO_QUERY_USERS">
+          <td id="SCENARIO_QUERY_USERS-detail">SCENARIO_QUERY_USERS</td>
+          <td>'query_users'</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+        </table>
+</div>
+
+<h2>Method Details</h2>
+
+<div class="method-doc">
+
+    <div class="detail-header h3" id="getAuthSelectlist()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-authsearch.html#getAuthSelectlist()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getAuthSelectlist()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Getter for the list of authentication methods and their names
+For Example:</strong></p>
+
+        <pre><code class="hljs php language-php">[
+     <span class="hljs-number">0</span>                                       =&gt; <span class="hljs-string">"Local (Databse)"</span>
+     <span class="hljs-string">"3df178eb-45b9-479c-b665-a97454706e6b"</span>  =&gt; <span class="hljs-string">"LDAP (Generic LDAP)"</span>
+     ...
+     <span class="hljs-string">"f9ca4350-0769-4929-845a-d05c926a3984"</span>  =&gt; <span class="hljs-string">"AD (Active Directory)"</span>
+]
+</code></pre>
+
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-authsearch.html#getAuthSelectlist()-detail">getAuthSelectlist</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getUsernameList()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-authsearch.html#getUsernameList()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getUsernameList()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Gets a list of usernames by condition</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-authsearch.html#getUsernameList()-detail">getUsernameList</a></strong> ( <span style="color: #0000BB">$condition</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$condition</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"><p>For Example:</p>
+<pre><code class="hljs php language-php">[
+     <span class="hljs-number">0</span> =&gt; <span class="hljs-string">"user_1"</span>
+     <span class="hljs-number">1</span> =&gt; <span class="hljs-string">"user_2"</span>
+     ...
+     n =&gt; <span class="hljs-string">"user_n"</span>
+]
+</code></pre>
+</td>
+                </tr>
+                                                </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="rules()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-authsearch.html#rules()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        rules()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <strong><a href="app-models-authsearch.html#rules()-detail">rules</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.array">array</a></td>
+                  <td class="param-desc-col"><p>The validation rules.</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="scenarios()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-authsearch.html#scenarios()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        scenarios()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-models-authsearch.html#scenarios()-detail">scenarios</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="search()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-models-authsearch.html#search()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        search()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Creates data provider instance with search query applied</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">\yii\data\ArrayDataProvider</span> <strong><a href="app-models-authsearch.html#search()-detail">search</a></strong> ( <span style="color: #0000BB">$params</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$params</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.array">array</a></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                                                </table>
+
+<!--	-->
+</div>
+        </div>
+</div>
+
+<script type="text/javascript">
+    /*<![CDATA[*/
+    $("a.toggle").on('click', function () {
+        var $this = $(this);
+        if ($this.hasClass('properties-hidden')) {
+            $this.text($this.text().replace(/Show/,'Hide'));
+            $this.parents(".summary").find(".inherited").show();
+            $this.removeClass('properties-hidden');
+        } else {
+            $this.text($this.text().replace(/Hide/,'Show'));
+            $this.parents(".summary").find(".inherited").hide();
+            $this.addClass('properties-hidden');
+        }
+
+        return false;
+    });
+    /*
+     $(".sourceCode a.show").toggle(function () {
+     $(this).text($(this).text().replace(/show/,'hide'));
+     $(this).parents(".sourceCode").find("div.code").show();
+     },function () {
+     $(this).text($(this).text().replace(/hide/,'show'));
+     $(this).parents(".sourceCode").find("div.code").hide();
+     });
+     $("a.sourceLink").click(function () {
+     $(this).attr('target','_blank');
+     });
+     */
+    /*]]>*/
+</script>
+
+
+</div>
+
+<footer class="footer">
+        <p class="pull-right"><small>Page generated on Tue, 26 Nov 2019 16:31:17 +0000</small></p>
+    Powered by <a href="http://www.yiiframework.com/" rel="external">Yii Framework</a></footer>
+
+<script>jQuery(function ($) {
+    var shiftWindow = function () { scrollBy(0, -50) };
+    if (location.hash) setTimeout(shiftWindow, 1);
+    window.addEventListener("hashchange", shiftWindow);
+var element = document.createElement("script");
+element.src = "./jssearch.index.js";
+document.body.appendChild(element);
+
+var searchBox = $('#searchbox');
+
+// search when typing in search field
+searchBox.on("keyup", function(event) {
+    var query = $(this).val();
+
+    if (query == '' || event.which == 27) {
+        $('#search-resultbox').hide();
+        return;
+    } else if (event.which == 13) {
+        var selectedLink = $('#search-resultbox a.selected');
+        if (selectedLink.length != 0) {
+            document.location = selectedLink.attr('href');
+            return;
+        }
+    } else if (event.which == 38 || event.which == 40) {
+        $('#search-resultbox').show();
+
+        var selected = $('#search-resultbox a.selected');
+        if (selected.length == 0) {
+            $('#search-results').find('a').first().addClass('selected');
+        } else {
+            var next;
+            if (event.which == 40) {
+                next = selected.parent().next().find('a').first();
+            } else {
+                next = selected.parent().prev().find('a').first();
+            }
+            if (next.length != 0) {
+                var resultbox = $('#search-results');
+                var position = next.position();
+
+//              TODO scrolling is buggy and jumps around
+//                resultbox.scrollTop(Math.floor(position.top));
+//                console.log(position.top);
+
+                selected.removeClass('selected');
+                next.addClass('selected');
+            }
+        }
+
+        return;
+    }
+    $('#search-resultbox').show();
+    $('#search-results').html('<li><span class="no-results">No results</span></li>');
+
+    var result = jssearch.search(query);
+
+    if (result.length > 0) {
+        var i = 0;
+        var resHtml = '';
+
+        for (var key in result) {
+            if (i++ > 20) {
+                break;
+            }
+            resHtml = resHtml +
+            '<li><a href="' + result[key].file.u.substr(3) +'"><span class="title">' + result[key].file.t + '</span>' +
+            '<span class="description">' + result[key].file.d + '</span></a></li>';
+        }
+        $('#search-results').html(resHtml);
+    }
+});
+
+// hide the search results on ESC
+$(document).on("keyup", function(event) { if (event.which == 27) { $('#search-resultbox').hide(); } });
+// hide search results on click to document
+$(document).bind('click', function (e) { $('#search-resultbox').hide(); });
+// except the following:
+searchBox.bind('click', function(e) { e.stopPropagation(); });
+$('#search-resultbox').bind('click', function(e) { e.stopPropagation(); });
+
+});</script></body>
+</html>

@@ -1,0 +1,2960 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="language" content="en" />
+        <link href="./assets/6c734e4f/css/bootstrap.css" rel="stylesheet">
+<link href="./assets/be3e053e/solarized_light.css" rel="stylesheet">
+<link href="./assets/1f2e89dd/style.css" rel="stylesheet">
+<script src="./assets/8261f971/jquery.js"></script>
+<script src="./assets/6c734e4f/js/bootstrap.js"></script>
+<script src="./assets/93cd64ed/jssearch.js"></script>    <title>AuthGenericLdap, app\components\AuthGenericLdap - GLaDOS Documentation</title>
+</head>
+<body>
+
+<div class="wrap">
+    <nav id="w439" class="navbar-inverse navbar-fixed-top navbar"><div class="navbar-header"><button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#w439-collapse"><span class="sr-only">Toggle navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span></button><a class="navbar-brand" href="./index.html">GLaDOS Documentation</a></div><div id="w439-collapse" class="collapse navbar-collapse"><ul id="w440" class="navbar-nav nav"><li><a href="./index.html">Class reference</a></li>
+<li><a href="../README.html">Guide</a></li></ul><div class="navbar-form navbar-left" role="search">
+  <div class="form-group">
+    <input id="searchbox" type="text" class="form-control" placeholder="Search">
+  </div>
+</div>
+</div></nav>
+    <div id="search-resultbox" style="display: none;" class="modal-content">
+        <ul id="search-results">
+        </ul>
+    </div>
+
+    
+<div class="row">
+    <div class="col-md-3">
+                <div id="navigation" class="list-group"><a class="list-group-item" href="#navigation-434" data-toggle="collapse" data-parent="#navigation">app\assets <b class="caret"></b></a><div id="navigation-434" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-assets-appasset.html">AppAsset</a>
+<a class="list-group-item" href="./app-assets-eventasset.html">EventAsset</a></div>
+<a class="list-group-item" href="#navigation-435" data-toggle="collapse" data-parent="#navigation">app\commands <b class="caret"></b></a><div id="navigation-435" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-commands-analyzecontroller.html">AnalyzeController</a>
+<a class="list-group-item" href="./app-commands-backupcontroller.html">BackupController</a>
+<a class="list-group-item" href="./app-commands-daemoncontroller.html">DaemonController</a>
+<a class="list-group-item" href="./app-commands-dbcleancontroller.html">DbcleanController</a>
+<a class="list-group-item" href="./app-commands-downloadcontroller.html">DownloadController</a>
+<a class="list-group-item" href="./app-commands-rbaccontroller.html">RbacController</a>
+<a class="list-group-item" href="./app-commands-restorecontroller.html">RestoreController</a>
+<a class="list-group-item" href="./app-commands-unlockcontroller.html">UnlockController</a></div>
+<a class="list-group-item active" href="#navigation-436" data-toggle="collapse" data-parent="#navigation">app\components <b class="caret"></b></a><div id="navigation-436" class="submenu panel-collapse collapse in"><a class="list-group-item" href="./app-components-accessrule.html">AccessRule</a>
+<a class="list-group-item" href="./app-components-activeeventfield.html">ActiveEventField</a>
+<a class="list-group-item" href="./app-components-activeeventfieldasset.html">ActiveEventFieldAsset</a>
+<a class="list-group-item" href="./app-components-authactivedirectory.html">AuthActiveDirectory</a>
+<a class="list-group-item active" href="./app-components-authgenericldap.html">AuthGenericLdap</a>
+<a class="list-group-item" href="./app-components-authopenldap.html">AuthOpenLdap</a>
+<a class="list-group-item" href="./app-components-editable.html">Editable</a>
+<a class="list-group-item" href="./app-components-file.html">File</a>
+<a class="list-group-item" href="./app-components-languageselector.html">LanguageSelector</a>
+<a class="list-group-item" href="./app-components-local.html">Local</a>
+<a class="list-group-item" href="./app-components-outputevent.html">OutputEvent</a>
+<a class="list-group-item" href="./app-components-shellcommand.html">ShellCommand</a>
+<a class="list-group-item" href="./app-components-squashfs.html">Squashfs</a>
+<a class="list-group-item" href="./app-components-zip.html">Zip</a></div>
+<a class="list-group-item" href="#navigation-437" data-toggle="collapse" data-parent="#navigation">app\controllers <b class="caret"></b></a><div id="navigation-437" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-controllers-activitycontroller.html">ActivityController</a>
+<a class="list-group-item" href="./app-controllers-backupcontroller.html">BackupController</a>
+<a class="list-group-item" href="./app-controllers-configcontroller.html">ConfigController</a>
+<a class="list-group-item" href="./app-controllers-daemoncontroller.html">DaemonController</a>
+<a class="list-group-item" href="./app-controllers-eventcontroller.html">EventController</a>
+<a class="list-group-item" href="./app-controllers-examcontroller.html">ExamController</a>
+<a class="list-group-item" href="./app-controllers-howtocontroller.html">HowtoController</a>
+<a class="list-group-item" href="./app-controllers-restorecontroller.html">RestoreController</a>
+<a class="list-group-item" href="./app-controllers-resultcontroller.html">ResultController</a>
+<a class="list-group-item" href="./app-controllers-screenshotcontroller.html">ScreenshotController</a>
+<a class="list-group-item" href="./app-controllers-sitecontroller.html">SiteController</a>
+<a class="list-group-item" href="./app-controllers-ticketcontroller.html">TicketController</a>
+<a class="list-group-item" href="./app-controllers-usercontroller.html">UserController</a></div>
+<a class="list-group-item" href="#navigation-438" data-toggle="collapse" data-parent="#navigation">app\models <b class="caret"></b></a><div id="navigation-438" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-models-activity.html">Activity</a>
+<a class="list-group-item" href="./app-models-activityquery.html">ActivityQuery</a>
+<a class="list-group-item" href="./app-models-activitysearch.html">ActivitySearch</a>
+<a class="list-group-item" href="./app-models-auth.html">Auth</a>
+<a class="list-group-item" href="./app-models-authassignment.html">AuthAssignment</a>
+<a class="list-group-item" href="./app-models-authinterface.html">AuthInterface</a>
+<a class="list-group-item" href="./app-models-authitem.html">AuthItem</a>
+<a class="list-group-item" href="./app-models-authmigrateform.html">AuthMigrateForm</a>
+<a class="list-group-item" href="./app-models-authsearch.html">AuthSearch</a>
+<a class="list-group-item" href="./app-models-backup.html">Backup</a>
+<a class="list-group-item" href="./app-models-backupsearch.html">BackupSearch</a>
+<a class="list-group-item" href="./app-models-base.html">Base</a>
+<a class="list-group-item" href="./app-models-config.html">Config</a>
+<a class="list-group-item" href="./app-models-daemon.html">Daemon</a>
+<a class="list-group-item" href="./app-models-daemoninterface.html">DaemonInterface</a>
+<a class="list-group-item" href="./app-models-daemonsearch.html">DaemonSearch</a>
+<a class="list-group-item" href="./app-models-eventitem.html">EventItem</a>
+<a class="list-group-item" href="./app-models-eventstream.html">EventStream</a>
+<a class="list-group-item" href="./app-models-exam.html">Exam</a>
+<a class="list-group-item" href="./app-models-examquery.html">ExamQuery</a>
+<a class="list-group-item" href="./app-models-examsearch.html">ExamSearch</a>
+<a class="list-group-item" href="./app-models-howto.html">Howto</a>
+<a class="list-group-item" href="./app-models-howtosearch.html">HowtoSearch</a>
+<a class="list-group-item" href="./app-models-liveactiverecord.html">LiveActiveRecord</a>
+<a class="list-group-item" href="./app-models-loginform.html">LoginForm</a>
+<a class="list-group-item" href="./app-models-rdifffilesystem.html">RdiffFileSystem</a>
+<a class="list-group-item" href="./app-models-restore.html">Restore</a>
+<a class="list-group-item" href="./app-models-restoresearch.html">RestoreSearch</a>
+<a class="list-group-item" href="./app-models-result.html">Result</a>
+<a class="list-group-item" href="./app-models-screenshot.html">Screenshot</a>
+<a class="list-group-item" href="./app-models-screenshotsearch.html">ScreenshotSearch</a>
+<a class="list-group-item" href="./app-models-stats.html">Stats</a>
+<a class="list-group-item" href="./app-models-ticket.html">Ticket</a>
+<a class="list-group-item" href="./app-models-ticketquery.html">TicketQuery</a>
+<a class="list-group-item" href="./app-models-ticketsearch.html">TicketSearch</a>
+<a class="list-group-item" href="./app-models-translatedactivityquery.html">TranslatedActivityQuery</a>
+<a class="list-group-item" href="./app-models-translation.html">Translation</a>
+<a class="list-group-item" href="./app-models-user.html">User</a>
+<a class="list-group-item" href="./app-models-userauth.html">UserAuth</a>
+<a class="list-group-item" href="./app-models-usersearch.html">UserSearch</a></div></div>    </div>
+    <div class="col-md-9 api-content" role="main">
+        <h1>Class app\components\AuthGenericLdap</h1>
+<div class="top-nav">
+    <a href="index.html">All Classes</a>
+            | <a href="#properties">Properties</a>
+                | <a href="#methods">Methods</a>
+                    | <a href="#constants">Constants</a>
+    </div>
+
+<table class="summaryTable docClass table table-bordered">
+    <colgroup>
+        <col class="col-name" />
+        <col class="col-value" />
+    </colgroup>
+            <tr><th>Inheritance</th><td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a> &raquo;
+<a href="app-models-auth.html">app\models\Auth</a> &raquo;
+yii\base\Model</td></tr>
+                <tr><th>Implements</th><td><a href="app-models-authinterface.html">app\models\AuthInterface</a></td></tr>
+                        <tr><th>Subclasses</th><td><a href="app-components-authactivedirectory.html">app\components\AuthActiveDirectory</a>, <a href="app-components-authopenldap.html">app\components\AuthOpenLdap</a></td></tr>
+                        </table>
+
+<div class="class-description">
+    <p><strong>AuthGenericLdap represents a connection to an generic LDAP directory.</strong></p>
+    
+    </div>
+
+<a id="properties"></a>
+
+<div class="summary doc-property">
+<h2>Public Properties</h2>
+
+<p><a href="#" class="toggle">Hide inherited properties</a></p>
+
+<table class="summary-table table table-striped table-bordered table-hover">
+<colgroup>
+    <col class="col-property" />
+    <col class="col-type" />
+    <col class="col-description" />
+    <col class="col-defined" />
+</colgroup>
+<tr>
+  <th>Property</th><th>Type</th><th>Description</th><th>Defined By</th>
+</tr>
+        <tr id="$base">
+        <td><a href="app-components-authgenericldap.html#$base-detail">$base</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$bind">
+        <td><a href="app-components-authgenericldap.html#$bind-detail">$bind</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$bindAttribute">
+        <td><a href="app-components-authgenericldap.html#$bindAttribute-detail">$bindAttribute</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Attribute to bind as login user</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$bindPassword">
+        <td><a href="app-components-authgenericldap.html#$bindPassword-detail">$bindPassword</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Password for the bind</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$bindScheme">
+        <td><a href="app-components-authgenericldap.html#$bindScheme-detail">$bindScheme</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The pattern to build the login credentials for the bind to the LDAP.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$bindSearchFilter">
+        <td><a href="app-components-authgenericldap.html#$bindSearchFilter-detail">$bindSearchFilter</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Search filter to search for the login user entry in the LDAP</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$bindUsername">
+        <td><a href="app-components-authgenericldap.html#$bindUsername-detail">$bindUsername</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Username for the bind</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$class">
+        <td><a href="app-components-authgenericldap.html#$class-detail">$class</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The class of the current authentication type.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$connection">
+        <td><a href="app-components-authgenericldap.html#$connection-detail">$connection</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$debug">
+        <td><a href="app-models-auth.html#$debug-detail">$debug</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>An array of debug messages to test the connection.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="$description">
+        <td><a href="app-components-authgenericldap.html#$description-detail">$description</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>A description for the current authentication type.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$domain">
+        <td><a href="app-components-authgenericldap.html#$domain-detail">$domain</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$error">
+        <td><a href="app-models-auth.html#$error-detail">$error</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>A string holding the last error message.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="$form">
+        <td><a href="app-components-authgenericldap.html#$form-detail">$form</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The edit form view for the current authentication type.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$groupIdentifier">
+        <td><a href="app-components-authgenericldap.html#$groupIdentifier-detail">$groupIdentifier</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>A (unique) identifier across the LDAP Directory for the LDAP groups for <a href="app-components-authgenericldap.html#$mapping-detail">$mapping</a>.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$groupMemberAttribute">
+        <td><a href="app-components-authgenericldap.html#$groupMemberAttribute-detail">$groupMemberAttribute</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Attribute in the group object that refers to the user object</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$groupMemberAttributeList">
+        <td><a href="app-components-authgenericldap.html#$groupMemberAttributeList-detail">$groupMemberAttributeList</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>Array of common names of attributes for <a href="app-components-authgenericldap.html#$groupMemberAttribute-detail">$groupMemberAttribute</a>.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$groupMemberUserAttribute">
+        <td><a href="app-components-authgenericldap.html#$groupMemberUserAttribute-detail">$groupMemberUserAttribute</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Attribute name within the user object, that <a href="app-components-authgenericldap.html#$groupMemberAttribute-detail">$groupMemberAttribute</a> is referring to.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$groupMembershipSearchFilter">
+        <td><a href="app-components-authgenericldap.html#$groupMembershipSearchFilter-detail">$groupMembershipSearchFilter</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Search filter to search for the group membership of the login user in the LDAP</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$groupSearchFilter">
+        <td><a href="app-components-authgenericldap.html#$groupSearchFilter-detail">$groupSearchFilter</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The search filter to query the LDAP for all group objects</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$groupSearchFilterList">
+        <td><a href="app-components-authgenericldap.html#$groupSearchFilterList-detail">$groupSearchFilterList</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>Array of common search filters to use for group probing for the select list of <a href="app-components-authgenericldap.html#$groupSearchFilter-detail">$groupSearchFilter</a>.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$groups">
+        <td><a href="app-components-authgenericldap.html#$groups-detail">$groups</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>Array of LDAP groups for the select list for the role mapping.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$id">
+        <td><a href="app-models-auth.html#$id-detail">$id</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="$identifier">
+        <td><a href="app-components-authgenericldap.html#$identifier-detail">$identifier</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>This is the identifier value that is written in the user entry in the database later.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$identifierAttributes">
+        <td><a href="app-components-authgenericldap.html#$identifierAttributes-detail">$identifierAttributes</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>Array of common LDAP group/user identifier attribute names for the select list of
+<a href="app-components-authgenericldap.html#$groupIdentifier-detail">$groupIdentifier</a> and <a href="app-components-authgenericldap.html#$userIdentifier-detail">$userIdentifier</a>.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$ldap_options">
+        <td><a href="app-components-authgenericldap.html#$ldap_options-detail">$ldap_options</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$ldap_port">
+        <td><a href="app-components-authgenericldap.html#$ldap_port-detail">$ldap_port</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$ldap_scheme">
+        <td><a href="app-components-authgenericldap.html#$ldap_scheme-detail">$ldap_scheme</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$ldap_uri">
+        <td><a href="app-components-authgenericldap.html#$ldap_uri-detail">$ldap_uri</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$loginAttribute">
+        <td><a href="app-components-authgenericldap.html#$loginAttribute-detail">$loginAttribute</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Attribute that is used as login username</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$loginScheme">
+        <td><a href="app-components-authgenericldap.html#$loginScheme-detail">$loginScheme</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The pattern to test the given login credentials against.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$loginSearchFilter">
+        <td><a href="app-components-authgenericldap.html#$loginSearchFilter-detail">$loginSearchFilter</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The search filter to query the LDAP for information on the current login user.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$mapping">
+        <td><a href="app-components-authgenericldap.html#$mapping-detail">$mapping</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>Key-value pairs for mapping of LDAP groups (defaultly by their names) to roles.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$method">
+        <td><a href="app-components-authgenericldap.html#$method-detail">$method</a></td>
+        <td><a href="http://www.php.net/language.types.integer">integer</a></td>
+        <td>Method of authentication</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$methods">
+        <td><a href="app-models-auth.html#$methods-detail">$methods</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>Array of authentications methods.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$migrateFrom">
+        <td><a href="app-models-auth.html#$migrateFrom-detail">$migrateFrom</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Id of the authentication method users are migrated from.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$migrateSearchPattern">
+        <td><a href="app-models-auth.html#$migrateSearchPattern-detail">$migrateSearchPattern</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>A search pattern for the username of local users to migrate</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="$migrateUserSearchFilter">
+        <td><a href="app-components-authgenericldap.html#$migrateUserSearchFilter-detail">$migrateUserSearchFilter</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The search filter to query the LDAP for user objects
+The placeholders that are replaced by the values given are: {domain}, {netbiosDomain}, {base}, {userIdentifier}.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$migrateUsers">
+        <td><a href="app-models-auth.html#$migrateUsers-detail">$migrateUsers</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>Array of LDAP users for the select list of the migration form.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$migrateUsersKeyScheme">
+        <td><a href="app-models-auth.html#$migrateUsersKeyScheme-detail">$migrateUsersKeyScheme</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Schemes for the key and value of the <a href="app-models-auth.html#$migrateUsers-detail">$migrateUsers</a> array</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$migrateUsersValueScheme">
+        <td><a href="app-models-auth.html#$migrateUsersValueScheme-detail">$migrateUsersValueScheme</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="$migrationForm">
+        <td><a href="app-components-authgenericldap.html#$migrationForm-detail">$migrationForm</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The migration form view for the current authentication type.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$name">
+        <td><a href="app-components-authgenericldap.html#$name-detail">$name</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>A name for the current authentication type.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$order">
+        <td><a href="app-models-auth.html#$order-detail">$order</a></td>
+        <td><a href="http://www.php.net/language.types.integer">integer</a></td>
+        <td>The order in which the authentication process should be processed.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="$primaryGroupGroupAttribute">
+        <td><a href="app-components-authgenericldap.html#$primaryGroupGroupAttribute-detail">$primaryGroupGroupAttribute</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Attribute name in the group object, that <a href="app-components-authgenericldap.html#$primaryGroupUserAttribute-detail">$primaryGroupUserAttribute</a> is referring to.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$primaryGroupUserAttribute">
+        <td><a href="app-components-authgenericldap.html#$primaryGroupUserAttribute-detail">$primaryGroupUserAttribute</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Attribute name in the user object referring to the primary group of the user.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$query_password">
+        <td><a href="app-components-authgenericldap.html#$query_password-detail">$query_password</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$query_username">
+        <td><a href="app-components-authgenericldap.html#$query_username-detail">$query_username</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$role">
+        <td><a href="app-components-authgenericldap.html#$role-detail">$role</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The role determined in <a href="app-components-authgenericldap.html#determineRole()-detail">determineRole()</a>.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$roleOrder">
+        <td><a href="app-components-authgenericldap.html#$roleOrder-detail">$roleOrder</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>Array containing roles in the order of their priority.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$success">
+        <td><a href="app-models-auth.html#$success-detail">$success</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>A string holding the last success message.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="$type">
+        <td><a href="app-components-authgenericldap.html#$type-detail">$type</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The type of the current authentication.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$typeName">
+        <td><a href="app-components-authgenericldap.html#$typeName-detail">$typeName</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The authentication type in human readable form</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$uniqueIdentifier">
+        <td><a href="app-components-authgenericldap.html#$uniqueIdentifier-detail">$uniqueIdentifier</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>A unique identifier across the LDAP Directory (that never changes).</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$userIdentifier">
+        <td><a href="app-components-authgenericldap.html#$userIdentifier-detail">$userIdentifier</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$userObject">
+        <td><a href="app-components-authgenericldap.html#$userObject-detail">$userObject</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>Array|false holding user attributes queried from the LDAP</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$userSearchFilter">
+        <td><a href="app-components-authgenericldap.html#$userSearchFilter-detail">$userSearchFilter</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The search filter to query the LDAP for all user objects</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$userSearchFilterList">
+        <td><a href="app-components-authgenericldap.html#$userSearchFilterList-detail">$userSearchFilterList</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>Array of common search filters to use for user probing for the select list of <a href="app-components-authgenericldap.html#$groupSearchFilter-detail">$groupSearchFilter</a>.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$view">
+        <td><a href="app-components-authgenericldap.html#$view-detail">$view</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The view for the current authentication type.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+    </table>
+</div>
+
+<a id="methods"></a>
+
+<div class="summary doc-method">
+<h2>Public Methods</h2>
+
+<p><a href="#" class="toggle">Hide inherited methods</a></p>
+
+<table class="summary-table table table-striped table-bordered table-hover">
+<colgroup>
+    <col class="col-method" />
+    <col class="col-description" />
+    <col class="col-defined" />
+</colgroup>
+<tr>
+  <th>Method</th><th>Description</th><th>Defined By</th>
+</tr>
+        <tr class="inherited" id="addMigrateUser()">
+        <td><a href="app-models-auth.html#addMigrateUser()-detail">addMigrateUser()</a></td>
+        <td>Creates a new entry in the <a href="app-models-auth.html#$migrateUsers-detail">$migrateUsers</a> array.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="askFor()">
+        <td><a href="app-components-authgenericldap.html#askFor()-detail">askFor()</a></td>
+        <td>Query LDAP for attributes with search filter</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="attributeHints()">
+        <td><a href="app-components-authgenericldap.html#attributeHints()-detail">attributeHints()</a></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="attributeLabels()">
+        <td><a href="app-components-authgenericldap.html#attributeLabels()-detail">attributeLabels()</a></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="authenticate()">
+        <td><a href="app-components-authgenericldap.html#authenticate()-detail">authenticate()</a></td>
+        <td>Authenticate a user over LDAP.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="bindLdap()">
+        <td><a href="app-components-authgenericldap.html#bindLdap()-detail">bindLdap()</a></td>
+        <td>Bind to the LDAP.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="close()">
+        <td><a href="app-components-authgenericldap.html#close()-detail">close()</a></td>
+        <td>Closes the currently active LDAP connection.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="concludeAuthentication()">
+        <td><a href="app-components-authgenericldap.html#concludeAuthentication()-detail">concludeAuthentication()</a></td>
+        <td>Conclude the authentication.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="delete()">
+        <td><a href="app-models-auth.html#delete()-detail">delete()</a></td>
+        <td>Deletes the config element corresponding to this model.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="determineRole()">
+        <td><a href="app-components-authgenericldap.html#determineRole()-detail">determineRole()</a></td>
+        <td>Determines the highest possible roles for a set of given groups</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="find()">
+        <td><a href="app-models-auth.html#find()-detail">find()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="findAll()">
+        <td><a href="app-models-auth.html#findAll()-detail">findAll()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="findMigratableUsers()">
+        <td><a href="app-models-auth.html#findMigratableUsers()-detail">findMigratableUsers()</a></td>
+        <td>Searches the database for users that are migratable in the current scenario.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="findOne()">
+        <td><a href="app-models-auth.html#findOne()-detail">findOne()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="getAllLdapGroups()">
+        <td><a href="app-components-authgenericldap.html#getAllLdapGroups()-detail">getAllLdapGroups()</a></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="getAuthList()">
+        <td><a href="app-models-auth.html#getAuthList()-detail">getAuthList()</a></td>
+        <td>Getter for the list of authentication methods and their names</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="getBaseDn()">
+        <td><a href="app-components-authgenericldap.html#getBaseDn()-detail">getBaseDn()</a></td>
+        <td>Getter for the baseDN.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="getBindUsername()">
+        <td><a href="app-components-authgenericldap.html#getBindUsername()-detail">getBindUsername()</a></td>
+        <td>Contructs the username to bind to the LDAP.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="getConfig()">
+        <td><a href="app-models-auth.html#getConfig()-detail">getConfig()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="getConfigArray()">
+        <td><a href="app-models-auth.html#getConfigArray()-detail">getConfigArray()</a></td>
+        <td>Getter @todo remove</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="getFileConfig()">
+        <td><a href="app-models-auth.html#getFileConfig()-detail">getFileConfig()</a></td>
+        <td>Getter for the configuration as it is in the config file with the
+local db config prepended.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="getGroupMembership()">
+        <td><a href="app-components-authgenericldap.html#getGroupMembership()-detail">getGroupMembership()</a></td>
+        <td>Query LDAP for group membership of the user, including the primary group</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="getIsActive()">
+        <td><a href="app-components-authgenericldap.html#getIsActive()-detail">getIsActive()</a></td>
+        <td>Returns a value indicating whether the LDAP connection is established.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="getIsNewRecord()">
+        <td><a href="app-models-auth.html#getIsNewRecord()-detail">getIsNewRecord()</a></td>
+        <td>Whether the record is new and should be inserted when calling <a href="app-models-auth.html#save()-detail">save()</a>.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="getLdap_options_name_map()">
+        <td><a href="app-components-authgenericldap.html#getLdap_options_name_map()-detail">getLdap_options_name_map()</a></td>
+        <td>Mapping of the different <a href="app-components-authgenericldap.html#$ldap_options-detail">$ldap_options</a> to their names</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="getMigrateFromDescription()">
+        <td><a href="app-components-authgenericldap.html#getMigrateFromDescription()-detail">getMigrateFromDescription()</a></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="getMigrateToDescription()">
+        <td><a href="app-components-authgenericldap.html#getMigrateToDescription()-detail">getMigrateToDescription()</a></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="getObj()">
+        <td><a href="app-models-auth.html#getObj()-detail">getObj()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="getRealUsername()">
+        <td><a href="app-components-authgenericldap.html#getRealUsername()-detail">getRealUsername()</a></td>
+        <td>Decides whether the username provided by the user matches the pattern to authenticate over LDAP.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="getRealUsernameByScheme()">
+        <td><a href="app-models-auth.html#getRealUsernameByScheme()-detail">getRealUsernameByScheme()</a></td>
+        <td>Decides whether the username provided by the user matches the pattern to authenticate.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="getUserAttributes()">
+        <td><a href="app-components-authgenericldap.html#getUserAttributes()-detail">getUserAttributes()</a></td>
+        <td>Return an array of user attribute to query</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="getUserinfo()">
+        <td><a href="app-components-authgenericldap.html#getUserinfo()-detail">getUserinfo()</a></td>
+        <td>Query LDAP for user information and populate <a href="app-components-authgenericldap.html#$userObject-detail">$userObject</a>.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="get_ldap_attribute()">
+        <td><a href="app-components-authgenericldap.html#get_ldap_attribute()-detail">get_ldap_attribute()</a></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="init()">
+        <td><a href="app-components-authgenericldap.html#init()-detail">init()</a></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="insert()">
+        <td><a href="app-models-auth.html#insert()-detail">insert()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="open()">
+        <td><a href="app-components-authgenericldap.html#open()-detail">open()</a></td>
+        <td>Establishes an LDAP connection.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="orderRange()">
+        <td><a href="app-models-auth.html#orderRange()-detail">orderRange()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="postProcess()">
+        <td><a href="app-components-authgenericldap.html#postProcess()-detail">postProcess()</a></td>
+        <td>Applies post process rules to attribute values according to <a href="app-components-authgenericldap.html#postProcessRules()-detail">postProcessRules()</a>.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="postProcessRules()">
+        <td><a href="app-components-authgenericldap.html#postProcessRules()-detail">postProcessRules()</a></td>
+        <td>Defines attribute names and convertion functions.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="processMapping()">
+        <td><a href="app-components-authgenericldap.html#processMapping()-detail">processMapping()</a></td>
+        <td>Compute the mapping array</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="processMethod()">
+        <td><a href="app-components-authgenericldap.html#processMethod()-detail">processMethod()</a></td>
+        <td>Process the method array</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="queryUsers()">
+        <td><a href="app-components-authgenericldap.html#queryUsers()-detail">queryUsers()</a></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="query_groups()">
+        <td><a href="app-components-authgenericldap.html#query_groups()-detail">query_groups()</a></td>
+        <td>Query Groups for the mapping. Populates the <a href="app-components-authgenericldap.html#$groups-detail">$groups</a> array.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="query_users()">
+        <td><a href="app-components-authgenericldap.html#query_users()-detail">query_users()</a></td>
+        <td>Query Users for the user migration.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="rules()">
+        <td><a href="app-components-authgenericldap.html#rules()-detail">rules()</a></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="save()">
+        <td><a href="app-models-auth.html#save()-detail">save()</a></td>
+        <td>Saves the current record.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="saveFileConfig()">
+        <td><a href="app-models-auth.html#saveFileConfig()-detail">saveFileConfig()</a></td>
+        <td>Saves the config to the file <code>auth.php</code>.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="scenarios()">
+        <td><a href="app-components-authgenericldap.html#scenarios()-detail">scenarios()</a></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="setConfigArray()">
+        <td><a href="app-models-auth.html#setConfigArray()-detail">setConfigArray()</a></td>
+        <td>Setter @todo remove</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="substitute()">
+        <td><a href="app-models-auth.html#substitute()-detail">substitute()</a></td>
+        <td>Performs the substitution of search filters and strings.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="substitutionProperties()">
+        <td><a href="app-components-authgenericldap.html#substitutionProperties()-detail">substitutionProperties()</a></td>
+        <td>Defines which properties should be substituted into strings.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="update()">
+        <td><a href="app-models-auth.html#update()-detail">update()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+    </table>
+</div>
+
+<a id="events"></a>
+
+<a id="constants"></a>
+<div class="summary doc-const">
+    <h2>Constants</h2>
+
+    <p><a href="#" class="toggle">Hide inherited constants</a></p>
+
+    <table class="summary-table table table-striped table-bordered table-hover">
+    <colgroup>
+        <col class="col-const" />
+        <col class="col-value" />
+        <col class="col-description" />
+        <col class="col-defined" />
+    </colgroup>
+    <tr>
+        <th>Constant</th><th>Value</th><th>Description</th><th>Defined By</th>
+    </tr>
+            <tr class="inherited" id="AUTH_ACTIVE_DIRECTORY">
+          <td id="AUTH_ACTIVE_DIRECTORY-detail">AUTH_ACTIVE_DIRECTORY</td>
+          <td>2</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+            <tr class="inherited" id="AUTH_LDAP">
+          <td id="AUTH_LDAP-detail">AUTH_LDAP</td>
+          <td>1</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+            <tr class="inherited" id="AUTH_LOCAL">
+          <td id="AUTH_LOCAL-detail">AUTH_LOCAL</td>
+          <td>0</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+            <tr class="inherited" id="AUTH_OPENLDAP">
+          <td id="AUTH_OPENLDAP-detail">AUTH_OPENLDAP</td>
+          <td>3</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+            <tr id="LDAP_OPT_DIAGNOSTIC_MESSAGE">
+          <td id="LDAP_OPT_DIAGNOSTIC_MESSAGE-detail">LDAP_OPT_DIAGNOSTIC_MESSAGE</td>
+          <td>50</td>
+          <td>
+                        </td>
+          <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+        </tr>
+            <tr class="inherited" id="PATH">
+          <td id="PATH-detail">PATH</td>
+          <td>__DIR__ . '/../config'</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+            <tr id="SCENARIO_ANONYMOUS_BIND">
+          <td id="SCENARIO_ANONYMOUS_BIND-detail">SCENARIO_ANONYMOUS_BIND</td>
+          <td>'anonymous_bind'</td>
+          <td>
+                        </td>
+          <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+        </tr>
+            <tr class="inherited" id="SCENARIO_AUTH_TEST">
+          <td id="SCENARIO_AUTH_TEST-detail">SCENARIO_AUTH_TEST</td>
+          <td>'auth_test'</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+            <tr id="SCENARIO_BIND_BYUSER">
+          <td id="SCENARIO_BIND_BYUSER-detail">SCENARIO_BIND_BYUSER</td>
+          <td>'bind_byuser'</td>
+          <td>
+                        </td>
+          <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+        </tr>
+            <tr id="SCENARIO_BIND_DIRECT">
+          <td id="SCENARIO_BIND_DIRECT-detail">SCENARIO_BIND_DIRECT</td>
+          <td>'bind_direct'</td>
+          <td>
+                        </td>
+          <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+        </tr>
+            <tr class="inherited" id="SCENARIO_CREATE">
+          <td id="SCENARIO_CREATE-detail">SCENARIO_CREATE</td>
+          <td>'create'</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+            <tr class="inherited" id="SCENARIO_MIGRATE">
+          <td id="SCENARIO_MIGRATE-detail">SCENARIO_MIGRATE</td>
+          <td>'migrate'</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+            <tr id="SCENARIO_QUERY_GROUPS">
+          <td id="SCENARIO_QUERY_GROUPS-detail">SCENARIO_QUERY_GROUPS</td>
+          <td>'query_groups'</td>
+          <td>
+                        </td>
+          <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+        </tr>
+            <tr class="inherited" id="SCENARIO_QUERY_USERS">
+          <td id="SCENARIO_QUERY_USERS-detail">SCENARIO_QUERY_USERS</td>
+          <td>'query_users'</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+        </table>
+</div>
+
+<h2>Property Details</h2>
+
+<div class="property-doc">
+
+    <div class="detail-header h3" id="$base-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$base-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $base        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"></span> <a href="app-components-authgenericldap.html#$base-detail">$base</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">''</span></div>
+
+
+    <div class="detail-header h3" id="$bind-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$bind-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $bind        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"></span> <a href="app-components-authgenericldap.html#$bind-detail">$bind</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">null</span></div>
+
+
+    <div class="detail-header h3" id="$bindAttribute-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$bindAttribute-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $bindAttribute        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Attribute to bind as login user</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$bindAttribute-detail">$bindAttribute</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'dn'</span></div>
+
+
+    <div class="detail-header h3" id="$bindPassword-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$bindPassword-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $bindPassword        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Password for the bind</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$bindPassword-detail">$bindPassword</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">null</span></div>
+
+
+    <div class="detail-header h3" id="$bindScheme-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$bindScheme-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $bindScheme        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>The pattern to build the login credentials for the bind to the LDAP.</p>
+<p><code>{username}</code> is the string corresponding to <code>{username}</code> extracted from <a href="app-components-authgenericldap.html#$loginScheme-detail">$loginScheme</a>.</p>
+<p>Examples:</p>
+<pre><code class="hljs php language-php"><span class="hljs-variable">$bindScheme</span> = <span class="hljs-string">'{username}'</span>;       <span class="hljs-comment">// no special altering, the username is taken as it is.</span>
+<span class="hljs-variable">$bindScheme</span> = <span class="hljs-string">'{username}@foo'</span>;   <span class="hljs-comment">// the username is appended with "@foo" for authentication</span>
+<span class="hljs-variable">$bindScheme</span> = <span class="hljs-string">'{username}@{domain}'</span>;   <span class="hljs-comment">// the username is appended with "@{domain}", where {domain} is replaced with the value given in the configuration</span>
+<span class="hljs-variable">$bindScheme</span> = <span class="hljs-string">'cn={username},ou=People,dc=test,dc=local'</span>;   <span class="hljs-comment">// a distinguished name is built out of the provided username. Instead of "dc=test,dc=local", one could have also used {base}.</span>
+<span class="hljs-variable">$bindScheme</span> = <span class="hljs-string">'foo\{username}'</span>;   <span class="hljs-comment">// the username is prepended with "foo\" for authentication</span>
+</code></pre>
+<p>The placeholders that are replaced by the values given are: <code>{domain}</code> with <a href="app-components-authgenericldap.html#$domain-detail">$domain</a>, <code>{netbiosDomain}</code>  with <span class="broken-link">\app\components\netbiosDomain</span>, <code>{base}</code> with with <a href="app-components-authgenericldap.html#$base-detail">$base</a>.</p>
+
+        <p>See also:</p><ul><li><a href="app-components-authgenericldap.html#$loginScheme-detail">$loginScheme</a></li><li><a href="app-components-authgenericldap.html#$loginSearchFilter-detail">$loginSearchFilter</a></li></ul>    </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$bindScheme-detail">$bindScheme</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'{username}@{domain}'</span></div>
+
+
+    <div class="detail-header h3" id="$bindSearchFilter-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$bindSearchFilter-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $bindSearchFilter        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Search filter to search for the login user entry in the LDAP</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$bindSearchFilter-detail">$bindSearchFilter</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'(&amp;&nbsp;{userSearchFilter}&nbsp;({loginAttribute}={username})&nbsp;)'</span></div>
+
+
+    <div class="detail-header h3" id="$bindUsername-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$bindUsername-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $bindUsername        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Username for the bind</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$bindUsername-detail">$bindUsername</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">null</span></div>
+
+
+    <div class="detail-header h3" id="$class-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$class-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $class        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>The class of the current authentication type.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$class-detail">$class</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'app\components\AuthGenericLdap'</span></div>
+
+
+    <div class="detail-header h3" id="$connection-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$connection-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $connection        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"></span> <a href="app-components-authgenericldap.html#$connection-detail">$connection</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">null</span></div>
+
+
+    <div class="detail-header h3" id="$description-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$description-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $description        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>A description for the current authentication type.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$description-detail">$description</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'Generic&nbsp;LDAP&nbsp;Authentication&nbsp;Method'</span></div>
+
+
+    <div class="detail-header h3" id="$domain-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$domain-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $domain        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"></span> <a href="app-components-authgenericldap.html#$domain-detail">$domain</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">''</span></div>
+
+
+    <div class="detail-header h3" id="$form-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$form-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $form        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>The edit form view for the current authentication type.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$form-detail">$form</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'_form_ldap'</span></div>
+
+
+    <div class="detail-header h3" id="$groupIdentifier-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$groupIdentifier-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $groupIdentifier        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>A (unique) identifier across the LDAP Directory for the LDAP groups for <a href="app-components-authgenericldap.html#$mapping-detail">$mapping</a>. This
+should be unique, as that it is used to identify the group membership.</p>
+
+        <p>See also <a href="app-components-authgenericldap.html#$mapping-detail">$mapping</a>.</p>    </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$groupIdentifier-detail">$groupIdentifier</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'cn'</span></div>
+
+
+    <div class="detail-header h3" id="$groupMemberAttribute-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$groupMemberAttribute-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $groupMemberAttribute        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Attribute in the group object that refers to the user object</p>
+
+        <p>See also [[<a href="app-components-authgenericldap.html#$groupMemberUserAttribute-detail">$groupMemberUserAttribute</a>]].</p>    </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$groupMemberAttribute-detail">$groupMemberAttribute</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'member'</span></div>
+
+
+    <div class="detail-header h3" id="$groupMemberAttributeList-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$groupMemberAttributeList-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $groupMemberAttributeList        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Array of common names of attributes for <a href="app-components-authgenericldap.html#$groupMemberAttribute-detail">$groupMemberAttribute</a>.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <a href="app-components-authgenericldap.html#$groupMemberAttributeList-detail">$groupMemberAttributeList</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;[</span><span style="color: #DD0000">'memberUid'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'memberUid'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'member'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'member'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'UniqueMember'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'UniqueMember'</span><span style="color: #007700">]</span></div>
+
+
+    <div class="detail-header h3" id="$groupMemberUserAttribute-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$groupMemberUserAttribute-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $groupMemberUserAttribute        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Attribute name within the user object, that <a href="app-components-authgenericldap.html#$groupMemberAttribute-detail">$groupMemberAttribute</a> is referring to.</p>
+
+        <p>See also [[<a href="app-components-authgenericldap.html#$groupMemberAttribute-detail">$groupMemberAttribute</a>]].</p>    </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$groupMemberUserAttribute-detail">$groupMemberUserAttribute</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'dn'</span></div>
+
+
+    <div class="detail-header h3" id="$groupMembershipSearchFilter-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$groupMembershipSearchFilter-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $groupMembershipSearchFilter        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Search filter to search for the group membership of the login user in the LDAP</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$groupMembershipSearchFilter-detail">$groupMembershipSearchFilter</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'(&amp;&nbsp;{groupSearchFilter}&nbsp;(|&nbsp;({groupMemberAttribute}={groupMemberUserIdentifier})&nbsp;({primaryGroupGroupAttribute}={primaryGroup}))&nbsp;)'</span></div>
+
+
+    <div class="detail-header h3" id="$groupSearchFilter-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$groupSearchFilter-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $groupSearchFilter        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>The search filter to query the LDAP for all group objects</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$groupSearchFilter-detail">$groupSearchFilter</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'(objectClass=groupOfNames)'</span></div>
+
+
+    <div class="detail-header h3" id="$groupSearchFilterList-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$groupSearchFilterList-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $groupSearchFilterList        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Array of common search filters to use for group probing for the select list of <a href="app-components-authgenericldap.html#$groupSearchFilter-detail">$groupSearchFilter</a>.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <a href="app-components-authgenericldap.html#$groupSearchFilterList-detail">$groupSearchFilterList</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;[</span><span style="color: #DD0000">'(objectCategory=group)'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'(objectCategory=group)'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'(objectClass=posixGroup)'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'(objectClass=posixGroup)'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'(objectClass=groupOfNames)'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'(objectClass=groupOfNames)'</span><span style="color: #007700">]</span></div>
+
+
+    <div class="detail-header h3" id="$groups-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$groups-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $groups        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Array of LDAP groups for the select list for the role mapping.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <a href="app-components-authgenericldap.html#$groups-detail">$groups</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;[]</span></div>
+
+
+    <div class="detail-header h3" id="$identifier-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$identifier-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $identifier        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>This is the identifier value that is written in the user entry in the database later.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$identifier-detail">$identifier</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">null</span></div>
+
+
+    <div class="detail-header h3" id="$identifierAttributes-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$identifierAttributes-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $identifierAttributes        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Array of common LDAP group/user identifier attribute names for the select list of
+<a href="app-components-authgenericldap.html#$groupIdentifier-detail">$groupIdentifier</a> and <a href="app-components-authgenericldap.html#$userIdentifier-detail">$userIdentifier</a>.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <a href="app-components-authgenericldap.html#$identifierAttributes-detail">$identifierAttributes</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;[</span><span style="color: #DD0000">'sAMAccountName'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'distinguishedName'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'userPrincipalName'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'dn'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'cn'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'name'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'mail'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'objectGUID'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'uid'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'userid'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'uidNumber'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'gidNumber'</span><span style="color: #007700">]</span></div>
+
+
+    <div class="detail-header h3" id="$ldap_options-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$ldap_options-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $ldap_options        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"></span> <a href="app-components-authgenericldap.html#$ldap_options-detail">$ldap_options</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;[</span><span style="color: #0000BB">LDAP_OPT_PROTOCOL_VERSION&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">3</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">LDAP_OPT_REFERRALS&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">0</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">LDAP_OPT_NETWORK_TIMEOUT&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">5</span><span style="color: #007700">]</span></div>
+
+
+    <div class="detail-header h3" id="$ldap_port-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$ldap_port-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $ldap_port        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"></span> <a href="app-components-authgenericldap.html#$ldap_port-detail">$ldap_port</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">389</span></div>
+
+
+    <div class="detail-header h3" id="$ldap_scheme-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$ldap_scheme-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $ldap_scheme        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"></span> <a href="app-components-authgenericldap.html#$ldap_scheme-detail">$ldap_scheme</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'ldap'</span></div>
+
+
+    <div class="detail-header h3" id="$ldap_uri-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$ldap_uri-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $ldap_uri        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"></span> <a href="app-components-authgenericldap.html#$ldap_uri-detail">$ldap_uri</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">''</span></div>
+
+
+    <div class="detail-header h3" id="$loginAttribute-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$loginAttribute-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $loginAttribute        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Attribute that is used as login username</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$loginAttribute-detail">$loginAttribute</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'uid'</span></div>
+
+
+    <div class="detail-header h3" id="$loginScheme-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$loginScheme-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $loginScheme        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>The pattern to test the given login credentials against.</p>
+<p>A login over LDAP will only be performed if the given username matches the provided
+pattern. This is used to manage multiple LDAPs. <code>{username}</code> is extracted from the username given in the
+login form. Later in the authentication <code>{username}</code> is replaced by the extracted one from here.</p>
+<p>Examples:</p>
+<pre><code class="hljs php language-php"><span class="hljs-variable">$loginScheme</span> = <span class="hljs-string">'{username}'</span>;   <span class="hljs-comment">// no special testing, all usernames provided are authenticated against the LDAP.</span>
+<span class="hljs-variable">$loginScheme</span> = <span class="hljs-string">'{username}@foo'</span>;   <span class="hljs-comment">// only usernames ending with "@foo" are considered and authenticated against the LDAP.</span>
+<span class="hljs-variable">$loginScheme</span> = <span class="hljs-string">'{username}@{domain}'</span>;   <span class="hljs-comment">// only usernames ending with "@{domain}"" are considered and authenticated against the LDAP. {domain} is replaced with the given $domain configuration variable.</span>
+<span class="hljs-variable">$loginScheme</span> = <span class="hljs-string">'foo\{username}'</span>;   <span class="hljs-comment">// only usernames starting with "foo\" are considered and authenticated against the LDAP.</span>
+</code></pre>
+<p>The placeholders that are replaced by the values given are: <code>{domain}</code> with <a href="app-components-authgenericldap.html#$domain-detail">$domain</a>, <code>{netbiosDomain}</code>  with <span class="broken-link">\app\components\netbiosDomain</span>, <code>{base}</code> with with <a href="app-components-authgenericldap.html#$base-detail">$base</a>.</p>
+<p>The pattern to test the given login credentials against.</p>
+
+        <p>See also:</p><ul><li><a href="app-components-authgenericldap.html#$bindScheme-detail">$bindScheme</a></li><li><a href="app-components-authgenericldap.html#$loginSearchFilter-detail">$loginSearchFilter</a></li></ul>    </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$loginScheme-detail">$loginScheme</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'{username}'</span></div>
+
+
+    <div class="detail-header h3" id="$loginSearchFilter-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$loginSearchFilter-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $loginSearchFilter        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>The search filter to query the LDAP for information on the current login user.</p>
+<p>Unfortuately, we cannot use LDAPs extended operation for this (<code>ldap_exop()</code> with <code>LDAP_EXOP_WHO_AM_I</code>), since it needs PHP <code>&gt;=7.2.0</code>.
+<code>{username}</code> is the string corresponding to <code>{username}</code> extracted from <a href="app-components-authgenericldap.html#$loginScheme-detail">$loginScheme</a>.</p>
+<p>Examples:</p>
+<pre><code class="hljs php language-php"><span class="hljs-variable">$loginSearchFilter</span> = <span class="hljs-string">'(sAMAccountName={username})'</span>;  <span class="hljs-comment">// search for entries matching the sAMAccountName</span>
+<span class="hljs-variable">$loginSearchFilter</span> = <span class="hljs-string">'(userPrincipalName={username}@foo)'</span>; <span class="hljs-comment">// search for entries matching the userPrincipalName to be appended by "@foo"</span>
+<span class="hljs-variable">$loginSearchFilter</span> = <span class="hljs-string">'(userPrincipalName={username}@{domain})'</span>; <span class="hljs-comment">// search for entries matching the userPrincipalName to be appended by "@{domain}", where {domain} is replaced with the value given in the configuration</span>
+<span class="hljs-variable">$loginSearchFilter</span> = <span class="hljs-string">'(dn=cn={username},ou=People,dc=test,dc=local)'</span>;    <span class="hljs-comment">// search for entries matching the distinguished name. Instead of "dc=test,dc=local", one could have also used {base}.</span>
+</code></pre>
+<p>The placeholders that are replaced by the values given are: <code>{domain}</code> with <a href="app-components-authgenericldap.html#$domain-detail">$domain</a>, <code>{netbiosDomain}</code> with <span class="broken-link">\app\components\netbiosDomain</span>, <code>{base}</code> with <a href="app-components-authgenericldap.html#$base-detail">$base</a>, <code>{username}</code> with the string extracted from <a href="app-components-authgenericldap.html#$loginScheme-detail">$loginScheme</a>.</p>
+
+        <p>See also:</p><ul><li><a href="https://www.php.net/manual/en/function.ldap-exop.php">https://www.php.net/manual/en/function.ldap-exop.php</a></li><li><a href="app-components-authgenericldap.html#$loginScheme-detail">$loginScheme</a></li></ul>    </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$loginSearchFilter-detail">$loginSearchFilter</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'(&amp;&nbsp;{userSearchFilter}&nbsp;(uid={username})&nbsp;)'</span></div>
+
+
+    <div class="detail-header h3" id="$mapping-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$mapping-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $mapping        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Key-value pairs for mapping of LDAP groups (defaultly by their names) to roles.</p>
+<p>Example:</p>
+<pre><code class="hljs php language-php"><span class="hljs-variable">$mapping</span> = [
+    <span class="hljs-string">'LDAP-Admin-Group'</span>            =&gt; <span class="hljs-string">'admin'</span>,
+    <span class="hljs-string">'LDAP-Teacher-Group'</span>          =&gt; <span class="hljs-string">'teacher'</span>,
+    <span class="hljs-string">'Another-LDAP-Teacher-Group'</span>  =&gt; <span class="hljs-string">'teacher'</span>,
+];
+</code></pre>
+<p>In the example above, if a user is in multiple groups appearing in the mapping, the highest
+role according to <a href="app-components-authgenericldap.html#$roleOrder-detail">$roleOrder</a> is taken for this user. Multiple LDAP groups can be mapped to the
+same role. LDAP groups can be given in an arbitrary identifier.</p>
+
+        <p>See also:</p><ul><li><a href="app-components-authgenericldap.html#$groupIdentifier-detail">$groupIdentifier</a></li><li><a href="app-components-authgenericldap.html#$roleOrder-detail">$roleOrder</a></li></ul>    </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <a href="app-components-authgenericldap.html#$mapping-detail">$mapping</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;[]</span></div>
+
+
+    <div class="detail-header h3" id="$method-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$method-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $method        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Method of authentication</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.integer">integer</a></span> <a href="app-components-authgenericldap.html#$method-detail">$method</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">self</span><span style="color: #007700">::</span><span style="color: #0000BB">SCENARIO_BIND_DIRECT</span></div>
+
+
+    <div class="detail-header h3" id="$migrateUserSearchFilter-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$migrateUserSearchFilter-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $migrateUserSearchFilter        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>The search filter to query the LDAP for user objects
+The placeholders that are replaced by the values given are: {domain}, {netbiosDomain}, {base}, {userIdentifier}.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$migrateUserSearchFilter-detail">$migrateUserSearchFilter</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'(&amp;&nbsp;{userSearchFilter}&nbsp;({userIdentifier}={username})&nbsp;)'</span></div>
+
+
+    <div class="detail-header h3" id="$migrationForm-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$migrationForm-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $migrationForm        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>The migration form view for the current authentication type.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$migrationForm-detail">$migrationForm</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'_form_ldap_migrate'</span></div>
+
+
+    <div class="detail-header h3" id="$name-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$name-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $name        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>A name for the current authentication type.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$name-detail">$name</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'LDAP'</span></div>
+
+
+    <div class="detail-header h3" id="$primaryGroupGroupAttribute-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$primaryGroupGroupAttribute-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $primaryGroupGroupAttribute        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Attribute name in the group object, that <a href="app-components-authgenericldap.html#$primaryGroupUserAttribute-detail">$primaryGroupUserAttribute</a> is referring to.</p>
+
+        <p>See also [[<a href="app-components-authgenericldap.html#$primaryGroupUserAttribute-detail">$primaryGroupUserAttribute</a>]].</p>    </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$primaryGroupGroupAttribute-detail">$primaryGroupGroupAttribute</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'gidNumber'</span></div>
+
+
+    <div class="detail-header h3" id="$primaryGroupUserAttribute-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$primaryGroupUserAttribute-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $primaryGroupUserAttribute        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Attribute name in the user object referring to the primary group of the user.</p>
+
+        <p>See also [[<a href="app-components-authgenericldap.html#$primaryGroupGroupAttribute-detail">$primaryGroupGroupAttribute</a>]].</p>    </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$primaryGroupUserAttribute-detail">$primaryGroupUserAttribute</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'gidNumber'</span></div>
+
+
+    <div class="detail-header h3" id="$query_password-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$query_password-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $query_password        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"></span> <a href="app-components-authgenericldap.html#$query_password-detail">$query_password</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">null</span></div>
+
+
+    <div class="detail-header h3" id="$query_username-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$query_username-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $query_username        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"></span> <a href="app-components-authgenericldap.html#$query_username-detail">$query_username</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">null</span></div>
+
+
+    <div class="detail-header h3" id="$role-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$role-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $role        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>The role determined in <a href="app-components-authgenericldap.html#determineRole()-detail">determineRole()</a>.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$role-detail">$role</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">null</span></div>
+
+
+    <div class="detail-header h3" id="$roleOrder-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$roleOrder-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $roleOrder        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Array containing roles in the order of their priority. If a user has group
+membership such that he can be associated to multiple roles, this array determines the
+role to be associated. The user recieves the highest possible role.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <a href="app-components-authgenericldap.html#$roleOrder-detail">$roleOrder</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;[</span><span style="color: #DD0000">'admin'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'teacher'</span><span style="color: #007700">]</span></div>
+
+
+    <div class="detail-header h3" id="$type-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$type-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $type        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>The type of the current authentication.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$type-detail">$type</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;\</span><span style="color: #0000BB">app</span><span style="color: #007700">\</span><span style="color: #0000BB">models</span><span style="color: #007700">\</span><span style="color: #0000BB">Auth</span><span style="color: #007700">::</span><span style="color: #0000BB">AUTH_LDAP</span></div>
+
+
+    <div class="detail-header h3" id="$typeName-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$typeName-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $typeName        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>The authentication type in human readable form</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$typeName-detail">$typeName</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'Generic&nbsp;LDAP'</span></div>
+
+
+    <div class="detail-header h3" id="$uniqueIdentifier-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$uniqueIdentifier-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $uniqueIdentifier        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>A unique identifier across the LDAP Directory (that never changes).</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$uniqueIdentifier-detail">$uniqueIdentifier</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'uid'</span></div>
+
+
+    <div class="detail-header h3" id="$userIdentifier-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$userIdentifier-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $userIdentifier        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"></span> <a href="app-components-authgenericldap.html#$userIdentifier-detail">$userIdentifier</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'uid'</span></div>
+
+
+    <div class="detail-header h3" id="$userObject-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$userObject-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $userObject        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Array|false holding user attributes queried from the LDAP</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <a href="app-components-authgenericldap.html#$userObject-detail">$userObject</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">null</span></div>
+
+
+    <div class="detail-header h3" id="$userSearchFilter-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$userSearchFilter-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $userSearchFilter        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>The search filter to query the LDAP for all user objects</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$userSearchFilter-detail">$userSearchFilter</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'(objectClass=inetOrgPerson)'</span></div>
+
+
+    <div class="detail-header h3" id="$userSearchFilterList-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$userSearchFilterList-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $userSearchFilterList        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Array of common search filters to use for user probing for the select list of <a href="app-components-authgenericldap.html#$groupSearchFilter-detail">$groupSearchFilter</a>.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <a href="app-components-authgenericldap.html#$userSearchFilterList-detail">$userSearchFilterList</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;[</span><span style="color: #DD0000">'(objectCategory=person)'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'(objectCategory=person)'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'(objectClass=posixAccount)'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'(objectClass=posixAccount)'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'(objectClass=inetOrgPerson)'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'(objectClass=inetOrgPerson)'</span><span style="color: #007700">]</span></div>
+
+
+    <div class="detail-header h3" id="$view-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#$view-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $view        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>The view for the current authentication type.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authgenericldap.html#$view-detail">$view</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'view_ldap'</span></div>
+
+</div>
+<h2>Method Details</h2>
+
+<div class="method-doc">
+
+    <div class="detail-header h3" id="askFor()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#askFor()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        askFor()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Query LDAP for attributes with search filter</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a>|<a href="http://www.php.net/language.types.boolean">false</a></span> <strong><a href="app-components-authgenericldap.html#askFor()-detail">askFor</a></strong> ( <span style="color: #0000BB">$attributes</span>, <span style="color: #0000BB">$searchFilter</span>, <span style="color: #0000BB">$options&nbsp;</span><span style="color: #007700">=&nbsp;[]</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$attributes</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.array">array</a></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$searchFilter</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$options</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.array">array</a></td>
+                  <td class="param-desc-col"><p>Options array</p>
+</td>
+                </tr>
+                                        <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.array">array</a>|<a href="http://www.php.net/language.types.boolean">false</a></td>
+                  <td class="param-desc-col"><p>Array of results in the same structure as the $attributes array</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="attributeHints()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#attributeHints()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        attributeHints()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-components-authgenericldap.html#attributeHints()-detail">attributeHints</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="attributeLabels()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#attributeLabels()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        attributeLabels()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <strong><a href="app-components-authgenericldap.html#attributeLabels()-detail">attributeLabels</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.array">array</a></td>
+                  <td class="param-desc-col"><p>Customized attribute labels</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="authenticate()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#authenticate()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        authenticate()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Authenticate a user over LDAP.</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.boolean">boolean</a></span> <strong><a href="app-components-authgenericldap.html#authenticate()-detail">authenticate</a></strong> ( <span style="color: #0000BB">$username</span>, <span style="color: #0000BB">$password</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$username</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"><p>The username given from the login form</p>
+</td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$password</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"><p>The password given from the login form</p>
+</td>
+                </tr>
+                                        <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.boolean">boolean</a></td>
+                  <td class="param-desc-col"><p>Authentication success or failure</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="bindLdap()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#bindLdap()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        bindLdap()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Bind to the LDAP.</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.boolean">false</a>|<a href="http://www.php.net/language.types.string">string</a></span> <strong><a href="app-components-authgenericldap.html#bindLdap()-detail">bindLdap</a></strong> ( <span style="color: #0000BB">$username</span>, <span style="color: #0000BB">$password</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$username</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"><p>The username</p>
+</td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$password</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"><p>The password</p>
+</td>
+                </tr>
+                                        <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.boolean">false</a>|<a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"><p>Bind failure or the username</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="close()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#close()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        close()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Closes the currently active LDAP connection.</strong></p>
+
+        <p>It does nothing if the connection is already closed.</p>
+
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-components-authgenericldap.html#close()-detail">close</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="concludeAuthentication()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#concludeAuthentication()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        concludeAuthentication()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Conclude the authentication.</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.boolean">boolean</a></span> <strong><a href="app-components-authgenericldap.html#concludeAuthentication()-detail">concludeAuthentication</a></strong> ( <span style="color: #0000BB">$username</span>, <span style="color: #0000BB">$groups</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$username</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"><p>The username given from the login form</p>
+</td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$groups</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"><p>The groups array</p>
+</td>
+                </tr>
+                                        <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.boolean">boolean</a></td>
+                  <td class="param-desc-col"><p>Authentication success or failure</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="determineRole()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#determineRole()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        determineRole()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Determines the highest possible roles for a set of given groups</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a>|<a href="http://www.php.net/language.types.boolean">false</a></span> <strong><a href="app-components-authgenericldap.html#determineRole()-detail">determineRole</a></strong> ( <span style="color: #0000BB">$groups</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$groups</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.array">array</a></td>
+                  <td class="param-desc-col"><p>Set of LDAP groups</p>
+</td>
+                </tr>
+                                        <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a>|<a href="http://www.php.net/language.types.boolean">false</a></td>
+                  <td class="param-desc-col"><p>The highest role according to <a href="app-components-authgenericldap.html#$roleOrder-detail">$roleOrder</a> or the first element from the roles
+array if nothing matches or false if roles is empty</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getAllLdapGroups()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#getAllLdapGroups()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getAllLdapGroups()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-components-authgenericldap.html#getAllLdapGroups()-detail">getAllLdapGroups</a></strong> ( <span style="color: #0000BB">$attribute</span>, <span style="color: #0000BB">$params</span>, <span style="color: #0000BB">$validator</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$attribute</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"><p>The attribute currently being validated</p>
+</td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$params</span></td>
+                  <td class="param-type-col">mixed</td>
+                  <td class="param-desc-col"><p>The value of the "params" given in the rule</p>
+</td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$validator</span></td>
+                  <td class="param-type-col">\yii\validators\InlineValidator</td>
+                  <td class="param-desc-col"><p>Related InlineValidator instance.
+This parameter is available since version 2.0.11.</p>
+</td>
+                </tr>
+                                                </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getBaseDn()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#getBaseDn()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getBaseDn()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Getter for the baseDN.</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <strong><a href="app-components-authgenericldap.html#getBaseDn()-detail">getBaseDn</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getBindUsername()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#getBindUsername()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getBindUsername()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Contructs the username to bind to the LDAP.</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <strong><a href="app-components-authgenericldap.html#getBindUsername()-detail">getBindUsername</a></strong> ( <span style="color: #0000BB">$username</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$username</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                                        <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"><p>The bind username</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getGroupMembership()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#getGroupMembership()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getGroupMembership()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Query LDAP for group membership of the user, including the primary group</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <strong><a href="app-components-authgenericldap.html#getGroupMembership()-detail">getGroupMembership</a></strong> ( <span style="color: #0000BB">$username</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$username</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                                        <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.array">array</a></td>
+                  <td class="param-desc-col"><p>Array of group identifiers / can be empty</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getIsActive()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#getIsActive()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getIsActive()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Returns a value indicating whether the LDAP connection is established.</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.boolean">boolean</a></span> <strong><a href="app-components-authgenericldap.html#getIsActive()-detail">getIsActive</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.boolean">boolean</a></td>
+                  <td class="param-desc-col"><p>Whether the LDAP connection is established</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getLdap_options_name_map()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#getLdap_options_name_map()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getLdap_options_name_map()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Mapping of the different <a href="app-components-authgenericldap.html#$ldap_options-detail">$ldap_options</a> to their names</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <strong><a href="app-components-authgenericldap.html#getLdap_options_name_map()-detail">getLdap_options_name_map</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.array">array</a></td>
+                  <td class="param-desc-col"><p>Array whose keys are the ldap_options and values are names.</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getMigrateFromDescription()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#getMigrateFromDescription()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getMigrateFromDescription()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <strong><a href="app-components-authgenericldap.html#getMigrateFromDescription()-detail">getMigrateFromDescription</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"><p>Description for the users being migrated form this auth method (shown in the form)</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getMigrateToDescription()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#getMigrateToDescription()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getMigrateToDescription()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <strong><a href="app-components-authgenericldap.html#getMigrateToDescription()-detail">getMigrateToDescription</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"><p>Description for the users being migrated to this auth method (shown in the form)</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getRealUsername()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#getRealUsername()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getRealUsername()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Decides whether the username provided by the user matches the pattern to authenticate over LDAP.</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.boolean">false</a>|<a href="http://www.php.net/language.types.string">string</a></span> <strong><a href="app-components-authgenericldap.html#getRealUsername()-detail">getRealUsername</a></strong> ( <span style="color: #0000BB">$username</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$username</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                                        <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.boolean">false</a>|<a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"><p>The extracted username or false</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getUserAttributes()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#getUserAttributes()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getUserAttributes()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Return an array of user attribute to query</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <strong><a href="app-components-authgenericldap.html#getUserAttributes()-detail">getUserAttributes</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="getUserinfo()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#getUserinfo()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        getUserinfo()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Query LDAP for user information and populate <a href="app-components-authgenericldap.html#$userObject-detail">$userObject</a>.</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.boolean">boolean</a></span> <strong><a href="app-components-authgenericldap.html#getUserinfo()-detail">getUserinfo</a></strong> ( <span style="color: #0000BB">$username</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$username</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                                                </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="get_ldap_attribute()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#get_ldap_attribute()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        get_ldap_attribute()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-components-authgenericldap.html#get_ldap_attribute()-detail">get_ldap_attribute</a></strong> ( <span style="color: #0000BB">$info</span>, <span style="color: #0000BB">$attr</span>, <span style="color: #0000BB">$i&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">0</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$info</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$attr</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$i</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                                                </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="init()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#init()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        init()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-components-authgenericldap.html#init()-detail">init</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="open()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#open()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        open()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Establishes an LDAP connection.</strong></p>
+
+        <p>It does nothing if an LDAP connection has already been established.</p>
+
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-components-authgenericldap.html#open()-detail">open</a></strong> ( )</td></tr>
+                                                            <tr>
+                  <th class="param-name-col">throws</th>
+                  <td class="param-type-col">\app\components\Exception</td>
+                  <td class="param-desc-col"><p>if connection fails</p>
+</td>
+                </tr>
+                        </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="postProcess()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#postProcess()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        postProcess()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Applies post process rules to attribute values according to <a href="app-components-authgenericldap.html#postProcessRules()-detail">postProcessRules()</a>.</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <strong><a href="app-components-authgenericldap.html#postProcess()-detail">postProcess</a></strong> ( <span style="color: #0000BB">$attr</span>, <span style="color: #0000BB">$value</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$attr</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"><p>The attribute name</p>
+</td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$value</span></td>
+                  <td class="param-type-col">mixed</td>
+                  <td class="param-desc-col"><p>The value of the attribute</p>
+</td>
+                </tr>
+                                        <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"><p>The converted string</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="postProcessRules()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#postProcessRules()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        postProcessRules()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Defines attribute names and convertion functions.</strong></p>
+
+        <p>The function should be a php callable with the following structure:</p>
+
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <strong><a href="app-components-authgenericldap.html#postProcessRules()-detail">postProcessRules</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.array">array</a></td>
+                  <td class="param-desc-col"><p>Array of attribute names and functions.</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="processMapping()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#processMapping()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        processMapping()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Compute the mapping array</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <strong><a href="app-components-authgenericldap.html#processMapping()-detail">processMapping</a></strong> ( <span style="color: #0000BB">$arr</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$arr</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                                        <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.array">array</a></td>
+                  <td class="param-desc-col"><p>The new mapping array in the format of <a href="app-components-authgenericldap.html#$mapping-detail">$mapping</a></p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="processMethod()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#processMethod()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        processMethod()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Process the method array</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <strong><a href="app-components-authgenericldap.html#processMethod()-detail">processMethod</a></strong> ( <span style="color: #0000BB">$arr</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$arr</span></td>
+                  <td class="param-type-col"></td>
+                  <td class="param-desc-col"></td>
+                </tr>
+                                        <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.array">array</a></td>
+                  <td class="param-desc-col"><p>The new method attribute in the format of <a href="app-components-authgenericldap.html#$method-detail">$method</a></p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="queryUsers()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#queryUsers()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        queryUsers()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-components-authgenericldap.html#queryUsers()-detail">queryUsers</a></strong> ( <span style="color: #0000BB">$attribute</span>, <span style="color: #0000BB">$params</span>, <span style="color: #0000BB">$validator</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$attribute</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.string">string</a></td>
+                  <td class="param-desc-col"><p>The attribute currently being validated</p>
+</td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$params</span></td>
+                  <td class="param-type-col">mixed</td>
+                  <td class="param-desc-col"><p>The value of the "params" given in the rule</p>
+</td>
+                </tr>
+                            <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$validator</span></td>
+                  <td class="param-type-col">\yii\validators\InlineValidator</td>
+                  <td class="param-desc-col"><p>Related InlineValidator instance.
+This parameter is available since version 2.0.11.</p>
+</td>
+                </tr>
+                                                </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="query_groups()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#query_groups()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        query_groups()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Query Groups for the mapping. Populates the <a href="app-components-authgenericldap.html#$groups-detail">$groups</a> array.</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.boolean">boolean</a></span> <strong><a href="app-components-authgenericldap.html#query_groups()-detail">query_groups</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="query_users()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#query_users()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        query_users()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Query Users for the user migration.</strong></p>
+
+        <p>Populates the <a href="app-models-auth.html#$migrateUsers-detail">$migrateUsers</a> array</p>
+
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.boolean">boolean</a></span> <strong><a href="app-components-authgenericldap.html#query_users()-detail">query_users</a></strong> ( <span style="color: #0000BB">$users</span> )</td></tr>
+                                    <tr>
+                  <td class="param-name-col"><span style="color: #0000BB">$users</span></td>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.array">array</a></td>
+                  <td class="param-desc-col"><p>Array of local users after which the server should be queried.</p>
+</td>
+                </tr>
+                                                </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="rules()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#rules()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        rules()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <strong><a href="app-components-authgenericldap.html#rules()-detail">rules</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.array">array</a></td>
+                  <td class="param-desc-col"><p>The validation rules.</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="scenarios()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#scenarios()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        scenarios()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong></strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type">void</span> <strong><a href="app-components-authgenericldap.html#scenarios()-detail">scenarios</a></strong> ( )</td></tr>
+            </table>
+
+<!--	-->
+
+    <div class="detail-header h3" id="substitutionProperties()-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authgenericldap.html#substitutionProperties()-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        substitutionProperties()
+        <span class="detail-header-tag small">
+            public                                    method
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p><strong>Defines which properties should be substituted into strings.</strong></p>
+
+        
+            </div>
+
+    <table class="detail-table table table-striped table-bordered table-hover">
+        <tr><td colspan="3" class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.array">array</a></span> <strong><a href="app-components-authgenericldap.html#substitutionProperties()-detail">substitutionProperties</a></strong> ( )</td></tr>
+                                                <tr>
+                  <th class="param-name-col">return</th>
+                  <td class="param-type-col"><a href="http://www.php.net/language.types.array">array</a></td>
+                  <td class="param-desc-col"><p>Array of property names and values.</p>
+</td>
+                </tr>
+                                    </table>
+
+<!--	-->
+</div>
+        </div>
+</div>
+
+<script type="text/javascript">
+    /*<![CDATA[*/
+    $("a.toggle").on('click', function () {
+        var $this = $(this);
+        if ($this.hasClass('properties-hidden')) {
+            $this.text($this.text().replace(/Show/,'Hide'));
+            $this.parents(".summary").find(".inherited").show();
+            $this.removeClass('properties-hidden');
+        } else {
+            $this.text($this.text().replace(/Hide/,'Show'));
+            $this.parents(".summary").find(".inherited").hide();
+            $this.addClass('properties-hidden');
+        }
+
+        return false;
+    });
+    /*
+     $(".sourceCode a.show").toggle(function () {
+     $(this).text($(this).text().replace(/show/,'hide'));
+     $(this).parents(".sourceCode").find("div.code").show();
+     },function () {
+     $(this).text($(this).text().replace(/hide/,'show'));
+     $(this).parents(".sourceCode").find("div.code").hide();
+     });
+     $("a.sourceLink").click(function () {
+     $(this).attr('target','_blank');
+     });
+     */
+    /*]]>*/
+</script>
+
+
+</div>
+
+<footer class="footer">
+        <p class="pull-right"><small>Page generated on Tue, 26 Nov 2019 16:31:19 +0000</small></p>
+    Powered by <a href="http://www.yiiframework.com/" rel="external">Yii Framework</a></footer>
+
+<script>jQuery(function ($) {
+    var shiftWindow = function () { scrollBy(0, -50) };
+    if (location.hash) setTimeout(shiftWindow, 1);
+    window.addEventListener("hashchange", shiftWindow);
+var element = document.createElement("script");
+element.src = "./jssearch.index.js";
+document.body.appendChild(element);
+
+var searchBox = $('#searchbox');
+
+// search when typing in search field
+searchBox.on("keyup", function(event) {
+    var query = $(this).val();
+
+    if (query == '' || event.which == 27) {
+        $('#search-resultbox').hide();
+        return;
+    } else if (event.which == 13) {
+        var selectedLink = $('#search-resultbox a.selected');
+        if (selectedLink.length != 0) {
+            document.location = selectedLink.attr('href');
+            return;
+        }
+    } else if (event.which == 38 || event.which == 40) {
+        $('#search-resultbox').show();
+
+        var selected = $('#search-resultbox a.selected');
+        if (selected.length == 0) {
+            $('#search-results').find('a').first().addClass('selected');
+        } else {
+            var next;
+            if (event.which == 40) {
+                next = selected.parent().next().find('a').first();
+            } else {
+                next = selected.parent().prev().find('a').first();
+            }
+            if (next.length != 0) {
+                var resultbox = $('#search-results');
+                var position = next.position();
+
+//              TODO scrolling is buggy and jumps around
+//                resultbox.scrollTop(Math.floor(position.top));
+//                console.log(position.top);
+
+                selected.removeClass('selected');
+                next.addClass('selected');
+            }
+        }
+
+        return;
+    }
+    $('#search-resultbox').show();
+    $('#search-results').html('<li><span class="no-results">No results</span></li>');
+
+    var result = jssearch.search(query);
+
+    if (result.length > 0) {
+        var i = 0;
+        var resHtml = '';
+
+        for (var key in result) {
+            if (i++ > 20) {
+                break;
+            }
+            resHtml = resHtml +
+            '<li><a href="' + result[key].file.u.substr(3) +'"><span class="title">' + result[key].file.t + '</span>' +
+            '<span class="description">' + result[key].file.d + '</span></a></li>';
+        }
+        $('#search-results').html(resHtml);
+    }
+});
+
+// hide the search results on ESC
+$(document).on("keyup", function(event) { if (event.which == 27) { $('#search-resultbox').hide(); } });
+// hide search results on click to document
+$(document).bind('click', function (e) { $('#search-resultbox').hide(); });
+// except the following:
+searchBox.bind('click', function(e) { e.stopPropagation(); });
+$('#search-resultbox').bind('click', function(e) { e.stopPropagation(); });
+
+});</script></body>
+</html>

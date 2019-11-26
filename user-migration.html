@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="language" content="en" />
+        <link href="./assets/6c734e4f/css/bootstrap.css" rel="stylesheet">
+<link href="./assets/be3e053e/solarized_light.css" rel="stylesheet">
+<link href="./assets/1f2e89dd/style.css" rel="stylesheet">
+<script src="./assets/8261f971/jquery.js"></script>
+<script src="./assets/6c734e4f/js/bootstrap.js"></script>
+<script src="./assets/93cd64ed/jssearch.js"></script>    <title>User Migration - Authentication - GLaDOS Guide</title>
+</head>
+<body>
+
+<div class="wrap">
+    <nav id="w223" class="navbar-inverse navbar-fixed-top navbar"><div class="navbar-header"><button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#w223-collapse"><span class="sr-only">Toggle navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span></button><a class="navbar-brand" href="./index.html">GLaDOS Guide</a></div><div id="w223-collapse" class="collapse navbar-collapse"><ul id="w224" class="navbar-nav nav"><li><a href="api/index.html">Class reference</a></li>
+<li><a href="./README.html">Guide</a></li></ul><div class="navbar-form navbar-left" role="search">
+  <div class="form-group">
+    <input id="searchbox" type="text" class="form-control" placeholder="Search">
+  </div>
+</div>
+</div></nav>
+    <div id="search-resultbox" style="display: none;" class="modal-content">
+        <ul id="search-results">
+        </ul>
+    </div>
+
+    
+<div class="row">
+    <div class="col-md-2">
+                <div id="navigation" class="list-group"><a class="list-group-item" href="#navigation-216" data-toggle="collapse" data-parent="#navigation">Howtos and Manuals <b class="caret"></b></a><div id="navigation-216" class="submenu panel-collapse collapse"><a class="list-group-item" href="./create-exam.html">Create an exam</a>
+<a class="list-group-item" href="./remote-backup-path.html">Remote Backup Path</a>
+<a class="list-group-item" href="./create-zip-exam-file.html">Create a zip-file as exam file</a>
+<a class="list-group-item" href="./create-squashfs-exam-file.html">Create a squashfs-filesystem as exam file</a>
+<a class="list-group-item" href="./exam-view.html">The exam view</a>
+<a class="list-group-item" href="./create-single-ticket.html">Create a single ticket</a>
+<a class="list-group-item" href="./create-multiple-tickets.html">Create multiple tickets</a>
+<a class="list-group-item" href="./ticket-view.html">The ticket view </a>
+<a class="list-group-item" href="./ticket-states.html">Ticket states</a>
+<a class="list-group-item" href="./take-exam.html">Taking an Exam</a>
+<a class="list-group-item" href="./generate-results.html">Generate results</a>
+<a class="list-group-item" href="./correct-exams.html">Correct the exams</a>
+<a class="list-group-item" href="./submit-results.html">Submit results back to the student</a>
+<a class="list-group-item" href="./get-exam-result.html">Get the exam result as a student</a></div>
+<a class="list-group-item" href="#navigation-217" data-toggle="collapse" data-parent="#navigation">Troubleshooting <b class="caret"></b></a><div id="navigation-217" class="submenu panel-collapse collapse"><a class="list-group-item" href="./client-crash.html">Client crashes during exam</a>
+<a class="list-group-item" href="./restore-specific-file.html">Restore a specific file</a></div>
+<a class="list-group-item" href="#navigation-218" data-toggle="collapse" data-parent="#navigation">Examples <b class="caret"></b></a><div id="navigation-218" class="submenu panel-collapse collapse"><a class="list-group-item" href="./example-exam-essay.html">Example exam: Essay</a></div>
+<a class="list-group-item" href="#navigation-219" data-toggle="collapse" data-parent="#navigation">Installation <b class="caret"></b></a><div id="navigation-219" class="submenu panel-collapse collapse"><a class="list-group-item" href="./manual-install.html">Manual Installation</a>
+<a class="list-group-item" href="./deb-install.html">Automatic Installation</a></div>
+<a class="list-group-item" href="#navigation-220" data-toggle="collapse" data-parent="#navigation">Update and Upgrade <b class="caret"></b></a><div id="navigation-220" class="submenu panel-collapse collapse"><a class="list-group-item" href="./deb-update.html">Softwareupdate on Debian</a>
+<a class="list-group-item" href="./deb-8to9-upgrade.html">Upgrade from Debian 8 to 9</a></div>
+<a class="list-group-item" href="#navigation-221" data-toggle="collapse" data-parent="#navigation">Configuration <b class="caret"></b></a><div id="navigation-221" class="submenu panel-collapse collapse"><a class="list-group-item" href="./config-files.html">Glados config files</a>
+<a class="list-group-item" href="./client-config.html">Exam client configuration</a>
+<a class="list-group-item" href="./network-config.html">Network configuration</a></div>
+<a class="list-group-item active" href="#navigation-222" data-toggle="collapse" data-parent="#navigation">Authentication <b class="caret"></b></a><div id="navigation-222" class="submenu panel-collapse collapse in"><a class="list-group-item" href="./ldap-authentication.html">LDAP Authentication</a>
+<a class="list-group-item" href="./ad-authentication-simple.html">Active Directory Authentication (Simple)</a>
+<a class="list-group-item" href="./ad-authentication-advanced.html">Active Directory Authentication (Advanced)</a>
+<a class="list-group-item" href="./test-login.html">Test Login</a>
+<a class="list-group-item active" href="./user-migration.html">User Migration</a>
+<a class="list-group-item" href="./multiple-ldaps.html">Multiple LDAP Servers and/or Active Directories</a>
+<a class="list-group-item" href="./auth-placeholders.html">Placeholders</a></div></div>    </div>
+    <div class="col-md-9 guide-content" role="main">
+        <h2>User Migration <span id="user-migration"></span><a href="#user-migration" class="hashlink">&para;</a></h2><p>This article covers the topic on user migration. User migration is needed if you have changed your authentication method A to another authentication method B and you want your existing users to authenticate over the new method. For example, you created 20 users locally on GLaDOS and now you integrated LDAP authentication and you want these 20 users to authenticate over LDAP from now on. In such a case you have to perform a user migration.</p>
+<p>Start the user migration form under <code>System-&gt;Authentication Method</code> and then click <code>Actions-&gt;Migrate User</code>.</p>
+<blockquote><p>To be able to migrate users you have to set up an authentication method first, for example <a href="ldap-authentication.html">LDAP</a> or <a href="ad-authentication-simple.html">Active Directory</a></p>
+</blockquote>
+<h3>Step 1: Setup <span id="step-1-setup"></span><a href="#step-1-setup" class="hashlink">&para;</a></h3><p>The first thing you have to choose is from which to which method you want to migrate. In the above example you should choose <code>Local (Database)</code> in the <code>From</code> dropdown list and your new authentication method in the <code>To</code> field. Depending on what you have chosen, the next step will be a bit different.</p>
+<h3>Step 2: Query for users <span id="step-2-query-for-users"></span><a href="#step-2-query-for-users" class="hashlink">&para;</a></h3><p>In this step you have to query for users that are able to migrate. You can do so by pressing the <code>Query for Users</code> button. You may have to provide credentials for this step. Depending on your migration setup, the dropdown field <code>Users to migrate</code> will be filled with users that are able to be migrated.</p>
+<blockquote><p>Which users are able to migrate depends on your setup.</p>
+</blockquote>
+<p>Essentially, all users associated to the authentication method <code>From</code> will be checked whether they could authenticate over the authentication method <code>To</code>. In the above example, the local database will be queried for users that authenticate locally. For each of found user, the LDAP server is queried whether the user exists in the LDAP diretory or not. So each user existing in both authentication methods (<code>From</code> and <code>To</code>) will be suggested for migration. The dropdown list is then filled with a list of such users. The query can be modified by the <code>Migrate Search Pattern</code> to restrict to usernames matching the pattern.</p>
+<h3>Step 3: Select users to migrate <span id="step-3-select-users-to-migrate"></span><a href="#step-3-select-users-to-migrate" class="hashlink">&para;</a></h3><p>As a last step, you have to explicitly select the users to want to migrate in the dropdown list. Click <code>Migrate</code> to migrate all selected users.</p>
+<h3>Summary <span id="summary"></span><a href="#summary" class="hashlink">&para;</a></h3><p>You will see a summary information about each user migrated of the process after you initiated the user migration. The migrated users can now login over the new authentication method.</p>
+<blockquote><p>Mirgated users can always be migrated back to their original authentication method.</p>
+</blockquote>
+        <div class="toplink"><a href="#" class="h1" title="go to top"><span class="glyphicon glyphicon-arrow-up"></a></div>
+    </div>
+</div>
+
+
+</div>
+
+<footer class="footer">
+        <p class="pull-right"><small>Page generated on Tue, 26 Nov 2019 16:31:21 +0000</small></p>
+    Powered by <a href="http://www.yiiframework.com/" rel="external">Yii Framework</a></footer>
+
+<script>jQuery(function ($) {
+    var shiftWindow = function () { scrollBy(0, -50) };
+    if (location.hash) setTimeout(shiftWindow, 1);
+    window.addEventListener("hashchange", shiftWindow);
+var element = document.createElement("script");
+element.src = "./jssearch.index.js";
+document.body.appendChild(element);
+
+var searchBox = $('#searchbox');
+
+// search when typing in search field
+searchBox.on("keyup", function(event) {
+    var query = $(this).val();
+
+    if (query == '' || event.which == 27) {
+        $('#search-resultbox').hide();
+        return;
+    } else if (event.which == 13) {
+        var selectedLink = $('#search-resultbox a.selected');
+        if (selectedLink.length != 0) {
+            document.location = selectedLink.attr('href');
+            return;
+        }
+    } else if (event.which == 38 || event.which == 40) {
+        $('#search-resultbox').show();
+
+        var selected = $('#search-resultbox a.selected');
+        if (selected.length == 0) {
+            $('#search-results').find('a').first().addClass('selected');
+        } else {
+            var next;
+            if (event.which == 40) {
+                next = selected.parent().next().find('a').first();
+            } else {
+                next = selected.parent().prev().find('a').first();
+            }
+            if (next.length != 0) {
+                var resultbox = $('#search-results');
+                var position = next.position();
+
+//              TODO scrolling is buggy and jumps around
+//                resultbox.scrollTop(Math.floor(position.top));
+//                console.log(position.top);
+
+                selected.removeClass('selected');
+                next.addClass('selected');
+            }
+        }
+
+        return;
+    }
+    $('#search-resultbox').show();
+    $('#search-results').html('<li><span class="no-results">No results</span></li>');
+
+    var result = jssearch.search(query);
+
+    if (result.length > 0) {
+        var i = 0;
+        var resHtml = '';
+
+        for (var key in result) {
+            if (i++ > 20) {
+                break;
+            }
+            resHtml = resHtml +
+            '<li><a href="' + result[key].file.u.substr(3) +'"><span class="title">' + result[key].file.t + '</span>' +
+            '<span class="description">' + result[key].file.d + '</span></a></li>';
+        }
+        $('#search-results').html(resHtml);
+    }
+});
+
+// hide the search results on ESC
+$(document).on("keyup", function(event) { if (event.which == 27) { $('#search-resultbox').hide(); } });
+// hide search results on click to document
+$(document).bind('click', function (e) { $('#search-resultbox').hide(); });
+// except the following:
+searchBox.bind('click', function(e) { e.stopPropagation(); });
+$('#search-resultbox').bind('click', function(e) { e.stopPropagation(); });
+
+});</script></body>
+</html>

@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="language" content="en" />
+        <link href="./assets/6c734e4f/css/bootstrap.css" rel="stylesheet">
+<link href="./assets/be3e053e/solarized_light.css" rel="stylesheet">
+<link href="./assets/1f2e89dd/style.css" rel="stylesheet">
+<script src="./assets/8261f971/jquery.js"></script>
+<script src="./assets/6c734e4f/js/bootstrap.js"></script>
+<script src="./assets/93cd64ed/jssearch.js"></script>    <title>AuthOpenLdap, app\components\AuthOpenLdap - GLaDOS Documentation</title>
+</head>
+<body>
+
+<div class="wrap">
+    <nav id="w390" class="navbar-inverse navbar-fixed-top navbar"><div class="navbar-header"><button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#w390-collapse"><span class="sr-only">Toggle navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span></button><a class="navbar-brand" href="./index.html">GLaDOS Documentation</a></div><div id="w390-collapse" class="collapse navbar-collapse"><ul id="w391" class="navbar-nav nav"><li><a href="./index.html">Class reference</a></li>
+<li><a href="../README.html">Guide</a></li></ul><div class="navbar-form navbar-left" role="search">
+  <div class="form-group">
+    <input id="searchbox" type="text" class="form-control" placeholder="Search">
+  </div>
+</div>
+</div></nav>
+    <div id="search-resultbox" style="display: none;" class="modal-content">
+        <ul id="search-results">
+        </ul>
+    </div>
+
+    
+<div class="row">
+    <div class="col-md-3">
+                <div id="navigation" class="list-group"><a class="list-group-item" href="#navigation-385" data-toggle="collapse" data-parent="#navigation">app\assets <b class="caret"></b></a><div id="navigation-385" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-assets-appasset.html">AppAsset</a>
+<a class="list-group-item" href="./app-assets-eventasset.html">EventAsset</a></div>
+<a class="list-group-item" href="#navigation-386" data-toggle="collapse" data-parent="#navigation">app\commands <b class="caret"></b></a><div id="navigation-386" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-commands-analyzecontroller.html">AnalyzeController</a>
+<a class="list-group-item" href="./app-commands-backupcontroller.html">BackupController</a>
+<a class="list-group-item" href="./app-commands-daemoncontroller.html">DaemonController</a>
+<a class="list-group-item" href="./app-commands-dbcleancontroller.html">DbcleanController</a>
+<a class="list-group-item" href="./app-commands-downloadcontroller.html">DownloadController</a>
+<a class="list-group-item" href="./app-commands-rbaccontroller.html">RbacController</a>
+<a class="list-group-item" href="./app-commands-restorecontroller.html">RestoreController</a>
+<a class="list-group-item" href="./app-commands-unlockcontroller.html">UnlockController</a></div>
+<a class="list-group-item active" href="#navigation-387" data-toggle="collapse" data-parent="#navigation">app\components <b class="caret"></b></a><div id="navigation-387" class="submenu panel-collapse collapse in"><a class="list-group-item" href="./app-components-accessrule.html">AccessRule</a>
+<a class="list-group-item" href="./app-components-activeeventfield.html">ActiveEventField</a>
+<a class="list-group-item" href="./app-components-activeeventfieldasset.html">ActiveEventFieldAsset</a>
+<a class="list-group-item" href="./app-components-authactivedirectory.html">AuthActiveDirectory</a>
+<a class="list-group-item" href="./app-components-authgenericldap.html">AuthGenericLdap</a>
+<a class="list-group-item active" href="./app-components-authopenldap.html">AuthOpenLdap</a>
+<a class="list-group-item" href="./app-components-editable.html">Editable</a>
+<a class="list-group-item" href="./app-components-file.html">File</a>
+<a class="list-group-item" href="./app-components-languageselector.html">LanguageSelector</a>
+<a class="list-group-item" href="./app-components-local.html">Local</a>
+<a class="list-group-item" href="./app-components-outputevent.html">OutputEvent</a>
+<a class="list-group-item" href="./app-components-shellcommand.html">ShellCommand</a>
+<a class="list-group-item" href="./app-components-squashfs.html">Squashfs</a>
+<a class="list-group-item" href="./app-components-zip.html">Zip</a></div>
+<a class="list-group-item" href="#navigation-388" data-toggle="collapse" data-parent="#navigation">app\controllers <b class="caret"></b></a><div id="navigation-388" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-controllers-activitycontroller.html">ActivityController</a>
+<a class="list-group-item" href="./app-controllers-backupcontroller.html">BackupController</a>
+<a class="list-group-item" href="./app-controllers-configcontroller.html">ConfigController</a>
+<a class="list-group-item" href="./app-controllers-daemoncontroller.html">DaemonController</a>
+<a class="list-group-item" href="./app-controllers-eventcontroller.html">EventController</a>
+<a class="list-group-item" href="./app-controllers-examcontroller.html">ExamController</a>
+<a class="list-group-item" href="./app-controllers-howtocontroller.html">HowtoController</a>
+<a class="list-group-item" href="./app-controllers-restorecontroller.html">RestoreController</a>
+<a class="list-group-item" href="./app-controllers-resultcontroller.html">ResultController</a>
+<a class="list-group-item" href="./app-controllers-screenshotcontroller.html">ScreenshotController</a>
+<a class="list-group-item" href="./app-controllers-sitecontroller.html">SiteController</a>
+<a class="list-group-item" href="./app-controllers-ticketcontroller.html">TicketController</a>
+<a class="list-group-item" href="./app-controllers-usercontroller.html">UserController</a></div>
+<a class="list-group-item" href="#navigation-389" data-toggle="collapse" data-parent="#navigation">app\models <b class="caret"></b></a><div id="navigation-389" class="submenu panel-collapse collapse"><a class="list-group-item" href="./app-models-activity.html">Activity</a>
+<a class="list-group-item" href="./app-models-activityquery.html">ActivityQuery</a>
+<a class="list-group-item" href="./app-models-activitysearch.html">ActivitySearch</a>
+<a class="list-group-item" href="./app-models-auth.html">Auth</a>
+<a class="list-group-item" href="./app-models-authassignment.html">AuthAssignment</a>
+<a class="list-group-item" href="./app-models-authinterface.html">AuthInterface</a>
+<a class="list-group-item" href="./app-models-authitem.html">AuthItem</a>
+<a class="list-group-item" href="./app-models-authmigrateform.html">AuthMigrateForm</a>
+<a class="list-group-item" href="./app-models-authsearch.html">AuthSearch</a>
+<a class="list-group-item" href="./app-models-backup.html">Backup</a>
+<a class="list-group-item" href="./app-models-backupsearch.html">BackupSearch</a>
+<a class="list-group-item" href="./app-models-base.html">Base</a>
+<a class="list-group-item" href="./app-models-config.html">Config</a>
+<a class="list-group-item" href="./app-models-daemon.html">Daemon</a>
+<a class="list-group-item" href="./app-models-daemoninterface.html">DaemonInterface</a>
+<a class="list-group-item" href="./app-models-daemonsearch.html">DaemonSearch</a>
+<a class="list-group-item" href="./app-models-eventitem.html">EventItem</a>
+<a class="list-group-item" href="./app-models-eventstream.html">EventStream</a>
+<a class="list-group-item" href="./app-models-exam.html">Exam</a>
+<a class="list-group-item" href="./app-models-examquery.html">ExamQuery</a>
+<a class="list-group-item" href="./app-models-examsearch.html">ExamSearch</a>
+<a class="list-group-item" href="./app-models-howto.html">Howto</a>
+<a class="list-group-item" href="./app-models-howtosearch.html">HowtoSearch</a>
+<a class="list-group-item" href="./app-models-liveactiverecord.html">LiveActiveRecord</a>
+<a class="list-group-item" href="./app-models-loginform.html">LoginForm</a>
+<a class="list-group-item" href="./app-models-rdifffilesystem.html">RdiffFileSystem</a>
+<a class="list-group-item" href="./app-models-restore.html">Restore</a>
+<a class="list-group-item" href="./app-models-restoresearch.html">RestoreSearch</a>
+<a class="list-group-item" href="./app-models-result.html">Result</a>
+<a class="list-group-item" href="./app-models-screenshot.html">Screenshot</a>
+<a class="list-group-item" href="./app-models-screenshotsearch.html">ScreenshotSearch</a>
+<a class="list-group-item" href="./app-models-stats.html">Stats</a>
+<a class="list-group-item" href="./app-models-ticket.html">Ticket</a>
+<a class="list-group-item" href="./app-models-ticketquery.html">TicketQuery</a>
+<a class="list-group-item" href="./app-models-ticketsearch.html">TicketSearch</a>
+<a class="list-group-item" href="./app-models-translatedactivityquery.html">TranslatedActivityQuery</a>
+<a class="list-group-item" href="./app-models-translation.html">Translation</a>
+<a class="list-group-item" href="./app-models-user.html">User</a>
+<a class="list-group-item" href="./app-models-userauth.html">UserAuth</a>
+<a class="list-group-item" href="./app-models-usersearch.html">UserSearch</a></div></div>    </div>
+    <div class="col-md-9 api-content" role="main">
+        <h1>Class app\components\AuthOpenLdap</h1>
+<div class="top-nav">
+    <a href="index.html">All Classes</a>
+            | <a href="#properties">Properties</a>
+                | <a href="#methods">Methods</a>
+                    | <a href="#constants">Constants</a>
+    </div>
+
+<table class="summaryTable docClass table table-bordered">
+    <colgroup>
+        <col class="col-name" />
+        <col class="col-value" />
+    </colgroup>
+            <tr><th>Inheritance</th><td><a href="app-components-authopenldap.html">app\components\AuthOpenLdap</a> &raquo;
+<a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a> &raquo;
+<a href="app-models-auth.html">app\models\Auth</a> &raquo;
+yii\base\Model</td></tr>
+                <tr><th>Implements</th><td><a href="app-models-authinterface.html">app\models\AuthInterface</a></td></tr>
+                                    </table>
+
+<div class="class-description">
+    <p><strong>AuthOpenLdap represents a connection to an Openldap server.</strong></p>
+    
+    </div>
+
+<a id="properties"></a>
+
+<div class="summary doc-property">
+<h2>Public Properties</h2>
+
+<p><a href="#" class="toggle">Hide inherited properties</a></p>
+
+<table class="summary-table table table-striped table-bordered table-hover">
+<colgroup>
+    <col class="col-property" />
+    <col class="col-type" />
+    <col class="col-description" />
+    <col class="col-defined" />
+</colgroup>
+<tr>
+  <th>Property</th><th>Type</th><th>Description</th><th>Defined By</th>
+</tr>
+        <tr class="inherited" id="$base">
+        <td><a href="app-components-authgenericldap.html#$base-detail">$base</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$bind">
+        <td><a href="app-components-authgenericldap.html#$bind-detail">$bind</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$bindAttribute">
+        <td><a href="app-components-authopenldap.html#$bindAttribute-detail">$bindAttribute</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Attribute to bind as login user</td>
+        <td><a href="app-components-authopenldap.html">app\components\AuthOpenLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$bindPassword">
+        <td><a href="app-components-authgenericldap.html#$bindPassword-detail">$bindPassword</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Password for the bind</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$bindScheme">
+        <td><a href="app-components-authgenericldap.html#$bindScheme-detail">$bindScheme</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The pattern to build the login credentials for the bind to the LDAP.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$bindSearchFilter">
+        <td><a href="app-components-authgenericldap.html#$bindSearchFilter-detail">$bindSearchFilter</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Search filter to search for the login user entry in the LDAP</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$bindUsername">
+        <td><a href="app-components-authgenericldap.html#$bindUsername-detail">$bindUsername</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Username for the bind</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$class">
+        <td><a href="app-components-authopenldap.html#$class-detail">$class</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The class of the current authentication type.</td>
+        <td><a href="app-components-authopenldap.html">app\components\AuthOpenLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$connection">
+        <td><a href="app-components-authgenericldap.html#$connection-detail">$connection</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$debug">
+        <td><a href="app-models-auth.html#$debug-detail">$debug</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>An array of debug messages to test the connection.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="$description">
+        <td><a href="app-components-authopenldap.html#$description-detail">$description</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>A description for the current authentication type.</td>
+        <td><a href="app-components-authopenldap.html">app\components\AuthOpenLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$domain">
+        <td><a href="app-components-authgenericldap.html#$domain-detail">$domain</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$error">
+        <td><a href="app-models-auth.html#$error-detail">$error</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>A string holding the last error message.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$form">
+        <td><a href="app-models-auth.html#$form-detail">$form</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The edit form view for the current authentication type.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="$groupIdentifier">
+        <td><a href="app-components-authopenldap.html#$groupIdentifier-detail">$groupIdentifier</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>A (unique) identifier across the LDAP Directory for the LDAP groups for <a href="app-components-authgenericldap.html#$mapping-detail">$mapping</a>.</td>
+        <td><a href="app-components-authopenldap.html">app\components\AuthOpenLdap</a></td>
+    </tr>
+            <tr id="$groupMemberAttribute">
+        <td><a href="app-components-authopenldap.html#$groupMemberAttribute-detail">$groupMemberAttribute</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Attribute in the group object that refers to the user object</td>
+        <td><a href="app-components-authopenldap.html">app\components\AuthOpenLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$groupMemberAttributeList">
+        <td><a href="app-components-authgenericldap.html#$groupMemberAttributeList-detail">$groupMemberAttributeList</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>Array of common names of attributes for <a href="app-components-authgenericldap.html#$groupMemberAttribute-detail">$groupMemberAttribute</a>.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$groupMemberUserAttribute">
+        <td><a href="app-components-authopenldap.html#$groupMemberUserAttribute-detail">$groupMemberUserAttribute</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Attribute name within the user object, that <a href="app-components-authopenldap.html#$groupMemberAttribute-detail">$groupMemberAttribute</a> is referring to.</td>
+        <td><a href="app-components-authopenldap.html">app\components\AuthOpenLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$groupMembershipSearchFilter">
+        <td><a href="app-components-authgenericldap.html#$groupMembershipSearchFilter-detail">$groupMembershipSearchFilter</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Search filter to search for the group membership of the login user in the LDAP</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$groupSearchFilter">
+        <td><a href="app-components-authopenldap.html#$groupSearchFilter-detail">$groupSearchFilter</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The search filter to query the LDAP for all group objects</td>
+        <td><a href="app-components-authopenldap.html">app\components\AuthOpenLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$groupSearchFilterList">
+        <td><a href="app-components-authgenericldap.html#$groupSearchFilterList-detail">$groupSearchFilterList</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>Array of common search filters to use for group probing for the select list of <a href="app-components-authgenericldap.html#$groupSearchFilter-detail">$groupSearchFilter</a>.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$groups">
+        <td><a href="app-components-authgenericldap.html#$groups-detail">$groups</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>Array of LDAP groups for the select list for the role mapping.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$id">
+        <td><a href="app-models-auth.html#$id-detail">$id</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$identifier">
+        <td><a href="app-components-authgenericldap.html#$identifier-detail">$identifier</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>This is the identifier value that is written in the user entry in the database later.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$identifierAttributes">
+        <td><a href="app-components-authgenericldap.html#$identifierAttributes-detail">$identifierAttributes</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>Array of common LDAP group/user identifier attribute names for the select list of
+<a href="app-components-authgenericldap.html#$groupIdentifier-detail">$groupIdentifier</a> and <a href="app-components-authgenericldap.html#$userIdentifier-detail">$userIdentifier</a>.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$ldap_options">
+        <td><a href="app-components-authgenericldap.html#$ldap_options-detail">$ldap_options</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$ldap_port">
+        <td><a href="app-components-authgenericldap.html#$ldap_port-detail">$ldap_port</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$ldap_scheme">
+        <td><a href="app-components-authgenericldap.html#$ldap_scheme-detail">$ldap_scheme</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$ldap_uri">
+        <td><a href="app-components-authgenericldap.html#$ldap_uri-detail">$ldap_uri</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$loginAttribute">
+        <td><a href="app-components-authopenldap.html#$loginAttribute-detail">$loginAttribute</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Attribute that is used as login username</td>
+        <td><a href="app-components-authopenldap.html">app\components\AuthOpenLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$loginScheme">
+        <td><a href="app-models-auth.html#$loginScheme-detail">$loginScheme</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The pattern to test the given login credentials against.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="$loginSearchFilter">
+        <td><a href="app-components-authopenldap.html#$loginSearchFilter-detail">$loginSearchFilter</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The search filter to query the LDAP for information on the current login user.</td>
+        <td><a href="app-components-authopenldap.html">app\components\AuthOpenLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$mapping">
+        <td><a href="app-components-authgenericldap.html#$mapping-detail">$mapping</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>Key-value pairs for mapping of LDAP groups (defaultly by their names) to roles.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$method">
+        <td><a href="app-components-authgenericldap.html#$method-detail">$method</a></td>
+        <td><a href="http://www.php.net/language.types.integer">integer</a></td>
+        <td>Method of authentication</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$methods">
+        <td><a href="app-models-auth.html#$methods-detail">$methods</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>Array of authentications methods.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$migrateFrom">
+        <td><a href="app-models-auth.html#$migrateFrom-detail">$migrateFrom</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Id of the authentication method users are migrated from.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$migrateSearchPattern">
+        <td><a href="app-models-auth.html#$migrateSearchPattern-detail">$migrateSearchPattern</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>A search pattern for the username of local users to migrate</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$migrateUserSearchFilter">
+        <td><a href="app-components-authgenericldap.html#$migrateUserSearchFilter-detail">$migrateUserSearchFilter</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The search filter to query the LDAP for user objects
+The placeholders that are replaced by the values given are: {domain}, {netbiosDomain}, {base}, {userIdentifier}.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$migrateUsers">
+        <td><a href="app-models-auth.html#$migrateUsers-detail">$migrateUsers</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>Array of LDAP users for the select list of the migration form.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$migrateUsersKeyScheme">
+        <td><a href="app-models-auth.html#$migrateUsersKeyScheme-detail">$migrateUsersKeyScheme</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Schemes for the key and value of the <a href="app-models-auth.html#$migrateUsers-detail">$migrateUsers</a> array</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$migrateUsersValueScheme">
+        <td><a href="app-models-auth.html#$migrateUsersValueScheme-detail">$migrateUsersValueScheme</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="$migrationForm">
+        <td><a href="app-models-auth.html#$migrationForm-detail">$migrationForm</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The migration form view for the current authentication type.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="$name">
+        <td><a href="app-components-authopenldap.html#$name-detail">$name</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>A name for the current authentication type.</td>
+        <td><a href="app-components-authopenldap.html">app\components\AuthOpenLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$order">
+        <td><a href="app-models-auth.html#$order-detail">$order</a></td>
+        <td><a href="http://www.php.net/language.types.integer">integer</a></td>
+        <td>The order in which the authentication process should be processed.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="$primaryGroupGroupAttribute">
+        <td><a href="app-components-authopenldap.html#$primaryGroupGroupAttribute-detail">$primaryGroupGroupAttribute</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Attribute name in the group object, that <a href="app-components-authopenldap.html#$primaryGroupUserAttribute-detail">$primaryGroupUserAttribute</a> is referring to.</td>
+        <td><a href="app-components-authopenldap.html">app\components\AuthOpenLdap</a></td>
+    </tr>
+            <tr id="$primaryGroupUserAttribute">
+        <td><a href="app-components-authopenldap.html#$primaryGroupUserAttribute-detail">$primaryGroupUserAttribute</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>Attribute name in the user object referring to the primary group of the user.</td>
+        <td><a href="app-components-authopenldap.html">app\components\AuthOpenLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$query_password">
+        <td><a href="app-components-authgenericldap.html#$query_password-detail">$query_password</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$query_username">
+        <td><a href="app-components-authgenericldap.html#$query_username-detail">$query_username</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$role">
+        <td><a href="app-components-authgenericldap.html#$role-detail">$role</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The role determined in <a href="app-components-authgenericldap.html#determineRole()-detail">determineRole()</a>.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$roleOrder">
+        <td><a href="app-components-authgenericldap.html#$roleOrder-detail">$roleOrder</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>Array containing roles in the order of their priority.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$success">
+        <td><a href="app-models-auth.html#$success-detail">$success</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>A string holding the last success message.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr id="$type">
+        <td><a href="app-components-authopenldap.html#$type-detail">$type</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The type of the current authentication.</td>
+        <td><a href="app-components-authopenldap.html">app\components\AuthOpenLdap</a></td>
+    </tr>
+            <tr id="$typeName">
+        <td><a href="app-components-authopenldap.html#$typeName-detail">$typeName</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The authentication type in human readable form</td>
+        <td><a href="app-components-authopenldap.html">app\components\AuthOpenLdap</a></td>
+    </tr>
+            <tr id="$uniqueIdentifier">
+        <td><a href="app-components-authopenldap.html#$uniqueIdentifier-detail">$uniqueIdentifier</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>A unique identifier across the LDAP Directory (that never changes).</td>
+        <td><a href="app-components-authopenldap.html">app\components\AuthOpenLdap</a></td>
+    </tr>
+            <tr id="$userIdentifier">
+        <td><a href="app-components-authopenldap.html#$userIdentifier-detail">$userIdentifier</a></td>
+        <td></td>
+        <td></td>
+        <td><a href="app-components-authopenldap.html">app\components\AuthOpenLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$userObject">
+        <td><a href="app-components-authgenericldap.html#$userObject-detail">$userObject</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>Array|false holding user attributes queried from the LDAP</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr id="$userSearchFilter">
+        <td><a href="app-components-authopenldap.html#$userSearchFilter-detail">$userSearchFilter</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The search filter to query the LDAP for all user objects</td>
+        <td><a href="app-components-authopenldap.html">app\components\AuthOpenLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$userSearchFilterList">
+        <td><a href="app-components-authgenericldap.html#$userSearchFilterList-detail">$userSearchFilterList</a></td>
+        <td><a href="http://www.php.net/language.types.array">array</a></td>
+        <td>Array of common search filters to use for user probing for the select list of <a href="app-components-authgenericldap.html#$groupSearchFilter-detail">$groupSearchFilter</a>.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="$view">
+        <td><a href="app-models-auth.html#$view-detail">$view</a></td>
+        <td><a href="http://www.php.net/language.types.string">string</a></td>
+        <td>The view for the current authentication type.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+    </table>
+</div>
+
+<a id="methods"></a>
+
+<div class="summary doc-method">
+<h2>Public Methods</h2>
+
+<p><a href="#" class="toggle">Hide inherited methods</a></p>
+
+<table class="summary-table table table-striped table-bordered table-hover">
+<colgroup>
+    <col class="col-method" />
+    <col class="col-description" />
+    <col class="col-defined" />
+</colgroup>
+<tr>
+  <th>Method</th><th>Description</th><th>Defined By</th>
+</tr>
+        <tr class="inherited" id="addMigrateUser()">
+        <td><a href="app-models-auth.html#addMigrateUser()-detail">addMigrateUser()</a></td>
+        <td>Creates a new entry in the <a href="app-models-auth.html#$migrateUsers-detail">$migrateUsers</a> array.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="askFor()">
+        <td><a href="app-components-authgenericldap.html#askFor()-detail">askFor()</a></td>
+        <td>Query LDAP for attributes with search filter</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="attributeHints()">
+        <td><a href="app-models-auth.html#attributeHints()-detail">attributeHints()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="attributeLabels()">
+        <td><a href="app-models-auth.html#attributeLabels()-detail">attributeLabels()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="authenticate()">
+        <td><a href="app-models-auth.html#authenticate()-detail">authenticate()</a></td>
+        <td>Authenticate a user.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="bindLdap()">
+        <td><a href="app-components-authgenericldap.html#bindLdap()-detail">bindLdap()</a></td>
+        <td>Bind to the LDAP.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="close()">
+        <td><a href="app-components-authgenericldap.html#close()-detail">close()</a></td>
+        <td>Closes the currently active LDAP connection.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="concludeAuthentication()">
+        <td><a href="app-components-authgenericldap.html#concludeAuthentication()-detail">concludeAuthentication()</a></td>
+        <td>Conclude the authentication.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="delete()">
+        <td><a href="app-models-auth.html#delete()-detail">delete()</a></td>
+        <td>Deletes the config element corresponding to this model.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="determineRole()">
+        <td><a href="app-components-authgenericldap.html#determineRole()-detail">determineRole()</a></td>
+        <td>Determines the highest possible roles for a set of given groups</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="find()">
+        <td><a href="app-models-auth.html#find()-detail">find()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="findAll()">
+        <td><a href="app-models-auth.html#findAll()-detail">findAll()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="findMigratableUsers()">
+        <td><a href="app-models-auth.html#findMigratableUsers()-detail">findMigratableUsers()</a></td>
+        <td>Searches the database for users that are migratable in the current scenario.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="findOne()">
+        <td><a href="app-models-auth.html#findOne()-detail">findOne()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="getAllLdapGroups()">
+        <td><a href="app-components-authgenericldap.html#getAllLdapGroups()-detail">getAllLdapGroups()</a></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="getAuthList()">
+        <td><a href="app-models-auth.html#getAuthList()-detail">getAuthList()</a></td>
+        <td>Getter for the list of authentication methods and their names</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="getBaseDn()">
+        <td><a href="app-components-authgenericldap.html#getBaseDn()-detail">getBaseDn()</a></td>
+        <td>Getter for the baseDN.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="getBindUsername()">
+        <td><a href="app-components-authgenericldap.html#getBindUsername()-detail">getBindUsername()</a></td>
+        <td>Contructs the username to bind to the LDAP.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="getConfig()">
+        <td><a href="app-models-auth.html#getConfig()-detail">getConfig()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="getConfigArray()">
+        <td><a href="app-models-auth.html#getConfigArray()-detail">getConfigArray()</a></td>
+        <td>Getter @todo remove</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="getFileConfig()">
+        <td><a href="app-models-auth.html#getFileConfig()-detail">getFileConfig()</a></td>
+        <td>Getter for the configuration as it is in the config file with the
+local db config prepended.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="getGroupMembership()">
+        <td><a href="app-components-authgenericldap.html#getGroupMembership()-detail">getGroupMembership()</a></td>
+        <td>Query LDAP for group membership of the user, including the primary group</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="getIsActive()">
+        <td><a href="app-components-authgenericldap.html#getIsActive()-detail">getIsActive()</a></td>
+        <td>Returns a value indicating whether the LDAP connection is established.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="getIsNewRecord()">
+        <td><a href="app-models-auth.html#getIsNewRecord()-detail">getIsNewRecord()</a></td>
+        <td>Whether the record is new and should be inserted when calling <a href="app-models-auth.html#save()-detail">save()</a>.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="getLdap_options_name_map()">
+        <td><a href="app-components-authgenericldap.html#getLdap_options_name_map()-detail">getLdap_options_name_map()</a></td>
+        <td>Mapping of the different <a href="app-components-authgenericldap.html#$ldap_options-detail">$ldap_options</a> to their names</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="getMigrateFromDescription()">
+        <td><a href="app-models-auth.html#getMigrateFromDescription()-detail">getMigrateFromDescription()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="getMigrateToDescription()">
+        <td><a href="app-models-auth.html#getMigrateToDescription()-detail">getMigrateToDescription()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="getObj()">
+        <td><a href="app-models-auth.html#getObj()-detail">getObj()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="getRealUsername()">
+        <td><a href="app-components-authgenericldap.html#getRealUsername()-detail">getRealUsername()</a></td>
+        <td>Decides whether the username provided by the user matches the pattern to authenticate over LDAP.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="getRealUsernameByScheme()">
+        <td><a href="app-models-auth.html#getRealUsernameByScheme()-detail">getRealUsernameByScheme()</a></td>
+        <td>Decides whether the username provided by the user matches the pattern to authenticate.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="getUserAttributes()">
+        <td><a href="app-components-authgenericldap.html#getUserAttributes()-detail">getUserAttributes()</a></td>
+        <td>Return an array of user attribute to query</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="getUserinfo()">
+        <td><a href="app-components-authgenericldap.html#getUserinfo()-detail">getUserinfo()</a></td>
+        <td>Query LDAP for user information and populate <a href="app-components-authgenericldap.html#$userObject-detail">$userObject</a>.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="get_ldap_attribute()">
+        <td><a href="app-components-authgenericldap.html#get_ldap_attribute()-detail">get_ldap_attribute()</a></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="init()">
+        <td><a href="app-components-authgenericldap.html#init()-detail">init()</a></td>
+        <td></td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="insert()">
+        <td><a href="app-models-auth.html#insert()-detail">insert()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="open()">
+        <td><a href="app-components-authgenericldap.html#open()-detail">open()</a></td>
+        <td>Establishes an LDAP connection.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="orderRange()">
+        <td><a href="app-models-auth.html#orderRange()-detail">orderRange()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="postProcess()">
+        <td><a href="app-components-authgenericldap.html#postProcess()-detail">postProcess()</a></td>
+        <td>Applies post process rules to attribute values according to <a href="app-components-authgenericldap.html#postProcessRules()-detail">postProcessRules()</a>.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="postProcessRules()">
+        <td><a href="app-components-authgenericldap.html#postProcessRules()-detail">postProcessRules()</a></td>
+        <td>Defines attribute names and convertion functions.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="processMapping()">
+        <td><a href="app-components-authgenericldap.html#processMapping()-detail">processMapping()</a></td>
+        <td>Compute the mapping array</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="processMethod()">
+        <td><a href="app-components-authgenericldap.html#processMethod()-detail">processMethod()</a></td>
+        <td>Process the method array</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="queryUsers()">
+        <td><a href="app-models-auth.html#queryUsers()-detail">queryUsers()</a></td>
+        <td>A function to query for users to migrate.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="query_groups()">
+        <td><a href="app-components-authgenericldap.html#query_groups()-detail">query_groups()</a></td>
+        <td>Query Groups for the mapping. Populates the <a href="app-components-authgenericldap.html#$groups-detail">$groups</a> array.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="query_users()">
+        <td><a href="app-components-authgenericldap.html#query_users()-detail">query_users()</a></td>
+        <td>Query Users for the user migration.</td>
+        <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+    </tr>
+            <tr class="inherited" id="rules()">
+        <td><a href="app-models-auth.html#rules()-detail">rules()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="save()">
+        <td><a href="app-models-auth.html#save()-detail">save()</a></td>
+        <td>Saves the current record.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="saveFileConfig()">
+        <td><a href="app-models-auth.html#saveFileConfig()-detail">saveFileConfig()</a></td>
+        <td>Saves the config to the file <code>auth.php</code>.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="scenarios()">
+        <td><a href="app-models-auth.html#scenarios()-detail">scenarios()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="setConfigArray()">
+        <td><a href="app-models-auth.html#setConfigArray()-detail">setConfigArray()</a></td>
+        <td>Setter @todo remove</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="substitute()">
+        <td><a href="app-models-auth.html#substitute()-detail">substitute()</a></td>
+        <td>Performs the substitution of search filters and strings.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="substitutionProperties()">
+        <td><a href="app-models-auth.html#substitutionProperties()-detail">substitutionProperties()</a></td>
+        <td>Defines which properties should be substituted into strings.</td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+            <tr class="inherited" id="update()">
+        <td><a href="app-models-auth.html#update()-detail">update()</a></td>
+        <td></td>
+        <td><a href="app-models-auth.html">app\models\Auth</a></td>
+    </tr>
+    </table>
+</div>
+
+<a id="events"></a>
+
+<a id="constants"></a>
+<div class="summary doc-const">
+    <h2>Constants</h2>
+
+    <p><a href="#" class="toggle">Hide inherited constants</a></p>
+
+    <table class="summary-table table table-striped table-bordered table-hover">
+    <colgroup>
+        <col class="col-const" />
+        <col class="col-value" />
+        <col class="col-description" />
+        <col class="col-defined" />
+    </colgroup>
+    <tr>
+        <th>Constant</th><th>Value</th><th>Description</th><th>Defined By</th>
+    </tr>
+            <tr class="inherited" id="AUTH_ACTIVE_DIRECTORY">
+          <td id="AUTH_ACTIVE_DIRECTORY-detail">AUTH_ACTIVE_DIRECTORY</td>
+          <td>2</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+            <tr class="inherited" id="AUTH_LDAP">
+          <td id="AUTH_LDAP-detail">AUTH_LDAP</td>
+          <td>1</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+            <tr class="inherited" id="AUTH_LOCAL">
+          <td id="AUTH_LOCAL-detail">AUTH_LOCAL</td>
+          <td>0</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+            <tr class="inherited" id="AUTH_OPENLDAP">
+          <td id="AUTH_OPENLDAP-detail">AUTH_OPENLDAP</td>
+          <td>3</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+            <tr class="inherited" id="LDAP_OPT_DIAGNOSTIC_MESSAGE">
+          <td id="LDAP_OPT_DIAGNOSTIC_MESSAGE-detail">LDAP_OPT_DIAGNOSTIC_MESSAGE</td>
+          <td>50</td>
+          <td>
+                        </td>
+          <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+        </tr>
+            <tr class="inherited" id="PATH">
+          <td id="PATH-detail">PATH</td>
+          <td>__DIR__ . '/../config'</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+            <tr class="inherited" id="SCENARIO_ANONYMOUS_BIND">
+          <td id="SCENARIO_ANONYMOUS_BIND-detail">SCENARIO_ANONYMOUS_BIND</td>
+          <td>'anonymous_bind'</td>
+          <td>
+                        </td>
+          <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+        </tr>
+            <tr class="inherited" id="SCENARIO_AUTH_TEST">
+          <td id="SCENARIO_AUTH_TEST-detail">SCENARIO_AUTH_TEST</td>
+          <td>'auth_test'</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+            <tr class="inherited" id="SCENARIO_BIND_BYUSER">
+          <td id="SCENARIO_BIND_BYUSER-detail">SCENARIO_BIND_BYUSER</td>
+          <td>'bind_byuser'</td>
+          <td>
+                        </td>
+          <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+        </tr>
+            <tr class="inherited" id="SCENARIO_BIND_DIRECT">
+          <td id="SCENARIO_BIND_DIRECT-detail">SCENARIO_BIND_DIRECT</td>
+          <td>'bind_direct'</td>
+          <td>
+                        </td>
+          <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+        </tr>
+            <tr class="inherited" id="SCENARIO_CREATE">
+          <td id="SCENARIO_CREATE-detail">SCENARIO_CREATE</td>
+          <td>'create'</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+            <tr class="inherited" id="SCENARIO_MIGRATE">
+          <td id="SCENARIO_MIGRATE-detail">SCENARIO_MIGRATE</td>
+          <td>'migrate'</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+            <tr class="inherited" id="SCENARIO_QUERY_GROUPS">
+          <td id="SCENARIO_QUERY_GROUPS-detail">SCENARIO_QUERY_GROUPS</td>
+          <td>'query_groups'</td>
+          <td>
+                        </td>
+          <td><a href="app-components-authgenericldap.html">app\components\AuthGenericLdap</a></td>
+        </tr>
+            <tr class="inherited" id="SCENARIO_QUERY_USERS">
+          <td id="SCENARIO_QUERY_USERS-detail">SCENARIO_QUERY_USERS</td>
+          <td>'query_users'</td>
+          <td>
+                        </td>
+          <td><a href="app-models-auth.html">app\models\Auth</a></td>
+        </tr>
+        </table>
+</div>
+
+<h2>Property Details</h2>
+
+<div class="property-doc">
+
+    <div class="detail-header h3" id="$bindAttribute-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authopenldap.html#$bindAttribute-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $bindAttribute        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Attribute to bind as login user</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authopenldap.html#$bindAttribute-detail">$bindAttribute</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'dn'</span></div>
+
+
+    <div class="detail-header h3" id="$class-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authopenldap.html#$class-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $class        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>The class of the current authentication type.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authopenldap.html#$class-detail">$class</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'app\components\AuthOpenLdap'</span></div>
+
+
+    <div class="detail-header h3" id="$description-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authopenldap.html#$description-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $description        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>A description for the current authentication type.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authopenldap.html#$description-detail">$description</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'OpenLDAP&nbsp;Authentication&nbsp;Method'</span></div>
+
+
+    <div class="detail-header h3" id="$groupIdentifier-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authopenldap.html#$groupIdentifier-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $groupIdentifier        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>A (unique) identifier across the LDAP Directory for the LDAP groups for <a href="app-components-authgenericldap.html#$mapping-detail">$mapping</a>. This
+should be unique, as that it is used to identify the group membership.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authopenldap.html#$groupIdentifier-detail">$groupIdentifier</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'cn'</span></div>
+
+
+    <div class="detail-header h3" id="$groupMemberAttribute-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authopenldap.html#$groupMemberAttribute-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $groupMemberAttribute        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Attribute in the group object that refers to the user object</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authopenldap.html#$groupMemberAttribute-detail">$groupMemberAttribute</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'memberUid'</span></div>
+
+
+    <div class="detail-header h3" id="$groupMemberUserAttribute-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authopenldap.html#$groupMemberUserAttribute-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $groupMemberUserAttribute        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Attribute name within the user object, that <a href="app-components-authopenldap.html#$groupMemberAttribute-detail">$groupMemberAttribute</a> is referring to.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authopenldap.html#$groupMemberUserAttribute-detail">$groupMemberUserAttribute</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'uid'</span></div>
+
+
+    <div class="detail-header h3" id="$groupSearchFilter-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authopenldap.html#$groupSearchFilter-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $groupSearchFilter        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>The search filter to query the LDAP for all group objects</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authopenldap.html#$groupSearchFilter-detail">$groupSearchFilter</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'(objectClass=posixGroup)'</span></div>
+
+
+    <div class="detail-header h3" id="$loginAttribute-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authopenldap.html#$loginAttribute-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $loginAttribute        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Attribute that is used as login username</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authopenldap.html#$loginAttribute-detail">$loginAttribute</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'uid'</span></div>
+
+
+    <div class="detail-header h3" id="$loginSearchFilter-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authopenldap.html#$loginSearchFilter-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $loginSearchFilter        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>The search filter to query the LDAP for information on the current login user.</p>
+<p>Unfortuately, we cannot use LDAPs extended operation for this (<code>ldap_exop()</code> with <code>LDAP_EXOP_WHO_AM_I</code>), since it needs PHP <code>&gt;=7.2.0</code>.
+<code>{username}</code> is the string corresponding to <code>{username}</code> extracted from <a href="app-models-auth.html#$loginScheme-detail">$loginScheme</a>.</p>
+<p>Examples:</p>
+<pre><code class="hljs php language-php"><span class="hljs-variable">$loginSearchFilter</span> = <span class="hljs-string">'(sAMAccountName={username})'</span>;  <span class="hljs-comment">// search for entries matching the sAMAccountName</span>
+<span class="hljs-variable">$loginSearchFilter</span> = <span class="hljs-string">'(userPrincipalName={username}@foo)'</span>; <span class="hljs-comment">// search for entries matching the userPrincipalName to be appended by "@foo"</span>
+<span class="hljs-variable">$loginSearchFilter</span> = <span class="hljs-string">'(userPrincipalName={username}@{domain})'</span>; <span class="hljs-comment">// search for entries matching the userPrincipalName to be appended by "@{domain}", where {domain} is replaced with the value given in the configuration</span>
+<span class="hljs-variable">$loginSearchFilter</span> = <span class="hljs-string">'(dn=cn={username},ou=People,dc=test,dc=local)'</span>;    <span class="hljs-comment">// search for entries matching the distinguished name. Instead of "dc=test,dc=local", one could have also used {base}.</span>
+</code></pre>
+<p>The placeholders that are replaced by the values given are: <code>{domain}</code> with <a href="app-components-authgenericldap.html#$domain-detail">$domain</a>, <code>{netbiosDomain}</code> with <span class="broken-link">\app\components\netbiosDomain</span>, <code>{base}</code> with <a href="app-components-authgenericldap.html#$base-detail">$base</a>, <code>{username}</code> with the string extracted from <a href="app-models-auth.html#$loginScheme-detail">$loginScheme</a>.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authopenldap.html#$loginSearchFilter-detail">$loginSearchFilter</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'(&amp;&nbsp;{userSearchFilter}&nbsp;(uid={username})&nbsp;)'</span></div>
+
+
+    <div class="detail-header h3" id="$name-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authopenldap.html#$name-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $name        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>A name for the current authentication type.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authopenldap.html#$name-detail">$name</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'LDAP'</span></div>
+
+
+    <div class="detail-header h3" id="$primaryGroupGroupAttribute-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authopenldap.html#$primaryGroupGroupAttribute-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $primaryGroupGroupAttribute        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Attribute name in the group object, that <a href="app-components-authopenldap.html#$primaryGroupUserAttribute-detail">$primaryGroupUserAttribute</a> is referring to.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authopenldap.html#$primaryGroupGroupAttribute-detail">$primaryGroupGroupAttribute</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'gidNumber'</span></div>
+
+
+    <div class="detail-header h3" id="$primaryGroupUserAttribute-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authopenldap.html#$primaryGroupUserAttribute-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $primaryGroupUserAttribute        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>Attribute name in the user object referring to the primary group of the user.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authopenldap.html#$primaryGroupUserAttribute-detail">$primaryGroupUserAttribute</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'gidNumber'</span></div>
+
+
+    <div class="detail-header h3" id="$type-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authopenldap.html#$type-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $type        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>The type of the current authentication.</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authopenldap.html#$type-detail">$type</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;\</span><span style="color: #0000BB">app</span><span style="color: #007700">\</span><span style="color: #0000BB">models</span><span style="color: #007700">\</span><span style="color: #0000BB">Auth</span><span style="color: #007700">::</span><span style="color: #0000BB">AUTH_OPENLDAP</span></div>
+
+
+    <div class="detail-header h3" id="$typeName-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authopenldap.html#$typeName-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $typeName        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>The authentication type in human readable form</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authopenldap.html#$typeName-detail">$typeName</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'OpenLDAP'</span></div>
+
+
+    <div class="detail-header h3" id="$uniqueIdentifier-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authopenldap.html#$uniqueIdentifier-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $uniqueIdentifier        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>A unique identifier across the LDAP Directory (that never changes).</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authopenldap.html#$uniqueIdentifier-detail">$uniqueIdentifier</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'uid'</span></div>
+
+
+    <div class="detail-header h3" id="$userIdentifier-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authopenldap.html#$userIdentifier-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $userIdentifier        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"></span> <a href="app-components-authopenldap.html#$userIdentifier-detail">$userIdentifier</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'uid'</span></div>
+
+
+    <div class="detail-header h3" id="$userSearchFilter-detail">
+        <a href="#" class="tool-link" title="go to top"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a class="tool-link hash" href="app-components-authopenldap.html#$userSearchFilter-detail" title="direct link to this method"><span class="glyphicon icon-hash"></span></a>
+        
+        $userSearchFilter        <span class="detail-header-tag small">
+            public                                                property
+                    </span>
+    </div>
+
+    
+    <div class="doc-description">
+        <p>The search filter to query the LDAP for all user objects</p>
+
+            </div>
+
+    <div class="signature"><span class="signature-defs">public</span> <span class="signature-type"><a href="http://www.php.net/language.types.string">string</a></span> <a href="app-components-authopenldap.html#$userSearchFilter-detail">$userSearchFilter</a> <span style="color: #0000BB"></span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'(objectClass=posixAccount)'</span></div>
+
+</div>
+        </div>
+</div>
+
+<script type="text/javascript">
+    /*<![CDATA[*/
+    $("a.toggle").on('click', function () {
+        var $this = $(this);
+        if ($this.hasClass('properties-hidden')) {
+            $this.text($this.text().replace(/Show/,'Hide'));
+            $this.parents(".summary").find(".inherited").show();
+            $this.removeClass('properties-hidden');
+        } else {
+            $this.text($this.text().replace(/Hide/,'Show'));
+            $this.parents(".summary").find(".inherited").hide();
+            $this.addClass('properties-hidden');
+        }
+
+        return false;
+    });
+    /*
+     $(".sourceCode a.show").toggle(function () {
+     $(this).text($(this).text().replace(/show/,'hide'));
+     $(this).parents(".sourceCode").find("div.code").show();
+     },function () {
+     $(this).text($(this).text().replace(/hide/,'show'));
+     $(this).parents(".sourceCode").find("div.code").hide();
+     });
+     $("a.sourceLink").click(function () {
+     $(this).attr('target','_blank');
+     });
+     */
+    /*]]>*/
+</script>
+
+
+</div>
+
+<footer class="footer">
+        <p class="pull-right"><small>Page generated on Tue, 26 Nov 2019 16:31:19 +0000</small></p>
+    Powered by <a href="http://www.yiiframework.com/" rel="external">Yii Framework</a></footer>
+
+<script>jQuery(function ($) {
+    var shiftWindow = function () { scrollBy(0, -50) };
+    if (location.hash) setTimeout(shiftWindow, 1);
+    window.addEventListener("hashchange", shiftWindow);
+var element = document.createElement("script");
+element.src = "./jssearch.index.js";
+document.body.appendChild(element);
+
+var searchBox = $('#searchbox');
+
+// search when typing in search field
+searchBox.on("keyup", function(event) {
+    var query = $(this).val();
+
+    if (query == '' || event.which == 27) {
+        $('#search-resultbox').hide();
+        return;
+    } else if (event.which == 13) {
+        var selectedLink = $('#search-resultbox a.selected');
+        if (selectedLink.length != 0) {
+            document.location = selectedLink.attr('href');
+            return;
+        }
+    } else if (event.which == 38 || event.which == 40) {
+        $('#search-resultbox').show();
+
+        var selected = $('#search-resultbox a.selected');
+        if (selected.length == 0) {
+            $('#search-results').find('a').first().addClass('selected');
+        } else {
+            var next;
+            if (event.which == 40) {
+                next = selected.parent().next().find('a').first();
+            } else {
+                next = selected.parent().prev().find('a').first();
+            }
+            if (next.length != 0) {
+                var resultbox = $('#search-results');
+                var position = next.position();
+
+//              TODO scrolling is buggy and jumps around
+//                resultbox.scrollTop(Math.floor(position.top));
+//                console.log(position.top);
+
+                selected.removeClass('selected');
+                next.addClass('selected');
+            }
+        }
+
+        return;
+    }
+    $('#search-resultbox').show();
+    $('#search-results').html('<li><span class="no-results">No results</span></li>');
+
+    var result = jssearch.search(query);
+
+    if (result.length > 0) {
+        var i = 0;
+        var resHtml = '';
+
+        for (var key in result) {
+            if (i++ > 20) {
+                break;
+            }
+            resHtml = resHtml +
+            '<li><a href="' + result[key].file.u.substr(3) +'"><span class="title">' + result[key].file.t + '</span>' +
+            '<span class="description">' + result[key].file.d + '</span></a></li>';
+        }
+        $('#search-results').html(resHtml);
+    }
+});
+
+// hide the search results on ESC
+$(document).on("keyup", function(event) { if (event.which == 27) { $('#search-resultbox').hide(); } });
+// hide search results on click to document
+$(document).bind('click', function (e) { $('#search-resultbox').hide(); });
+// except the following:
+searchBox.bind('click', function(e) { e.stopPropagation(); });
+$('#search-resultbox').bind('click', function(e) { e.stopPropagation(); });
+
+});</script></body>
+</html>

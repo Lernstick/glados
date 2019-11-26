@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="language" content="en" />
+        <link href="./assets/6c734e4f/css/bootstrap.css" rel="stylesheet">
+<link href="./assets/be3e053e/solarized_light.css" rel="stylesheet">
+<link href="./assets/1f2e89dd/style.css" rel="stylesheet">
+<script src="./assets/8261f971/jquery.js"></script>
+<script src="./assets/6c734e4f/js/bootstrap.js"></script>
+<script src="./assets/93cd64ed/jssearch.js"></script>    <title>GLaDOS Guide</title>
+</head>
+<body>
+
+<div class="wrap">
+    <nav id="w151" class="navbar-inverse navbar-fixed-top navbar"><div class="navbar-header"><button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#w151-collapse"><span class="sr-only">Toggle navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span></button><a class="navbar-brand" href="./index.html">GLaDOS Guide</a></div><div id="w151-collapse" class="collapse navbar-collapse"><ul id="w152" class="navbar-nav nav"><li><a href="api/index.html">Class reference</a></li>
+<li><a href="./README.html">Guide</a></li></ul><div class="navbar-form navbar-left" role="search">
+  <div class="form-group">
+    <input id="searchbox" type="text" class="form-control" placeholder="Search">
+  </div>
+</div>
+</div></nav>
+    <div id="search-resultbox" style="display: none;" class="modal-content">
+        <ul id="search-results">
+        </ul>
+    </div>
+
+    
+<div class="row">
+    <div class="col-md-2">
+                <div id="navigation" class="list-group"><a class="list-group-item" href="#navigation-144" data-toggle="collapse" data-parent="#navigation">Howtos and Manuals <b class="caret"></b></a><div id="navigation-144" class="submenu panel-collapse collapse"><a class="list-group-item" href="./create-exam.html">Create an exam</a>
+<a class="list-group-item" href="./remote-backup-path.html">Remote Backup Path</a>
+<a class="list-group-item" href="./create-zip-exam-file.html">Create a zip-file as exam file</a>
+<a class="list-group-item" href="./create-squashfs-exam-file.html">Create a squashfs-filesystem as exam file</a>
+<a class="list-group-item" href="./exam-view.html">The exam view</a>
+<a class="list-group-item" href="./create-single-ticket.html">Create a single ticket</a>
+<a class="list-group-item" href="./create-multiple-tickets.html">Create multiple tickets</a>
+<a class="list-group-item" href="./ticket-view.html">The ticket view </a>
+<a class="list-group-item" href="./ticket-states.html">Ticket states</a>
+<a class="list-group-item" href="./take-exam.html">Taking an Exam</a>
+<a class="list-group-item" href="./generate-results.html">Generate results</a>
+<a class="list-group-item" href="./correct-exams.html">Correct the exams</a>
+<a class="list-group-item" href="./submit-results.html">Submit results back to the student</a>
+<a class="list-group-item" href="./get-exam-result.html">Get the exam result as a student</a></div>
+<a class="list-group-item" href="#navigation-145" data-toggle="collapse" data-parent="#navigation">Troubleshooting <b class="caret"></b></a><div id="navigation-145" class="submenu panel-collapse collapse"><a class="list-group-item" href="./client-crash.html">Client crashes during exam</a>
+<a class="list-group-item" href="./restore-specific-file.html">Restore a specific file</a></div>
+<a class="list-group-item" href="#navigation-146" data-toggle="collapse" data-parent="#navigation">Examples <b class="caret"></b></a><div id="navigation-146" class="submenu panel-collapse collapse"><a class="list-group-item" href="./example-exam-essay.html">Example exam: Essay</a></div>
+<a class="list-group-item" href="#navigation-147" data-toggle="collapse" data-parent="#navigation">Installation <b class="caret"></b></a><div id="navigation-147" class="submenu panel-collapse collapse"><a class="list-group-item" href="./manual-install.html">Manual Installation</a>
+<a class="list-group-item" href="./deb-install.html">Automatic Installation</a></div>
+<a class="list-group-item" href="#navigation-148" data-toggle="collapse" data-parent="#navigation">Update and Upgrade <b class="caret"></b></a><div id="navigation-148" class="submenu panel-collapse collapse"><a class="list-group-item" href="./deb-update.html">Softwareupdate on Debian</a>
+<a class="list-group-item" href="./deb-8to9-upgrade.html">Upgrade from Debian 8 to 9</a></div>
+<a class="list-group-item" href="#navigation-149" data-toggle="collapse" data-parent="#navigation">Configuration <b class="caret"></b></a><div id="navigation-149" class="submenu panel-collapse collapse"><a class="list-group-item" href="./config-files.html">Glados config files</a>
+<a class="list-group-item" href="./client-config.html">Exam client configuration</a>
+<a class="list-group-item" href="./network-config.html">Network configuration</a></div>
+<a class="list-group-item" href="#navigation-150" data-toggle="collapse" data-parent="#navigation">Authentication <b class="caret"></b></a><div id="navigation-150" class="submenu panel-collapse collapse"><a class="list-group-item" href="./ldap-authentication.html">LDAP Authentication</a>
+<a class="list-group-item" href="./ad-authentication-simple.html">Active Directory Authentication (Simple)</a>
+<a class="list-group-item" href="./ad-authentication-advanced.html">Active Directory Authentication (Advanced)</a>
+<a class="list-group-item" href="./test-login.html">Test Login</a>
+<a class="list-group-item" href="./user-migration.html">User Migration</a>
+<a class="list-group-item" href="./multiple-ldaps.html">Multiple LDAP Servers and/or Active Directories</a>
+<a class="list-group-item" href="./auth-placeholders.html">Placeholders</a></div></div>    </div>
+    <div class="col-md-9 guide-content" role="main">
+        <h2>Login Scheme <span id="login-scheme"></span><a href="#login-scheme" class="hashlink">&para;</a></h2><p>Every authentication method has a field called <code>Login Scheme</code>. This is a pattern to test the given login username against. A login via the associated authentication method will only be performed, if the given username matches the provided pattern. This is used to manage multiple authentication servers and methods, for example multiple LDAP or Active Directory servers with different domains, but can also be used in an environment with one single LDAP server.</p>
+<p><code>{username}</code> is extracted from the username provided in the login form according to the <code>Login Scheme</code>.</p>
+<p>Examples:</p>
+<ul>
+<li><code>{username}</code>: no special testing, all usernames provided are considered for authentication.</li>
+<li><code>{username}@foo</code>: only usernames ending with <code>@foo</code> are considered.</li>
+<li><code>foo\{username}</code>: only usernames starting with <code>foo\</code> are considered.</li>
+<li><code>{username}@{domain}</code>: only usernames ending with <code>@{domain}</code> are considered.</li>
+</ul>
+<p>The follwing table gives some more detailed examples on how the <code>Login Scheme</code> affects user authentication:</p>
+<table class="table table-bordered table-striped">
+<thead>
+<tr><th>Login Scheme			</th><th>Example Login 		</th><th>Authenticated?</th><th>Extracted Username 	</th><th>Notes				</th></tr>
+</thead>
+<tbody>
+<tr><td><code>{username}</code>			</td><td><code>alice</code>				</td><td>yes			</td><td><code>alice</code>				</td><td>no excluded usernames	</td></tr>
+<tr><td><code>{username}</code>			</td><td><code>bob</code>					</td><td>yes			</td><td><code>bob</code>					</td><td>no excluded usernames</td></tr>
+<tr><td><code>{username}</code>			</td><td><code>alice@example.com</code>	</td><td>yes			</td><td><code>alice@example.com</code>	</td><td>no excluded usernames</td></tr>
+<tr><td><code>{username}@foo</code>		</td><td><code>alice</code>				</td><td>no			</td><td>none					</td><td>only usernames ending with <code>@foo</code></td></tr>
+<tr><td><code>{username}@foo</code>		</td><td><code>alice@foo</code>			</td><td>yes			</td><td><code>alice</code>				</td><td>only usernames ending with <code>@foo</code></td></tr>
+<tr><td><code>{username}@foo</code>		</td><td><code>bob@foo</code>				</td><td>yes			</td><td><code>bob</code>					</td><td>only usernames ending with <code>@foo</code></td></tr>
+<tr><td><code>foo\{username}</code>		</td><td><code>alice</code>				</td><td>no			</td><td>none					</td><td>only usernames starting with <code>foo\</code></td></tr>
+<tr><td><code>foo\{username}</code>		</td><td><code>foo\alice</code>			</td><td>yes			</td><td><code>alice</code>				</td><td>only usernames starting with <code>foo\</code></td></tr>
+<tr><td><code>{username}@{domain}</code>	</td><td><code>alice</code>				</td><td>no 			</td><td>none					</td><td>where <code>Domain</code> is <code>example.com</code></td></tr>
+<tr><td><code>{username}@{domain}</code>	</td><td><code>alice@example.com</code>   </td><td>yes 			</td><td><code>alice</code>				</td><td>where <code>Domain</code> is <code>example.com</code></td></tr>
+<tr><td><code>{username}@{domain}</code>	</td><td><code>alice@example.com</code>   </td><td>yes 			</td><td><code>alice</code>				</td><td>where <code>Domain</code> is <code>example.com</code></td></tr>
+</tbody>
+</table>
+<hr />
+<p>In the above examples, <code>{domain}</code> is a placeholder for the configuration setting <code>Domain</code>. You can also use other placeholders. For a full list, please refer to <a href="auth-placeholders.html">Placeholders</a>.</p>
+        <div class="toplink"><a href="#" class="h1" title="go to top"><span class="glyphicon glyphicon-arrow-up"></a></div>
+    </div>
+</div>
+
+
+</div>
+
+<footer class="footer">
+        <p class="pull-right"><small>Page generated on Tue, 26 Nov 2019 16:31:21 +0000</small></p>
+    Powered by <a href="http://www.yiiframework.com/" rel="external">Yii Framework</a></footer>
+
+<script>jQuery(function ($) {
+    var shiftWindow = function () { scrollBy(0, -50) };
+    if (location.hash) setTimeout(shiftWindow, 1);
+    window.addEventListener("hashchange", shiftWindow);
+var element = document.createElement("script");
+element.src = "./jssearch.index.js";
+document.body.appendChild(element);
+
+var searchBox = $('#searchbox');
+
+// search when typing in search field
+searchBox.on("keyup", function(event) {
+    var query = $(this).val();
+
+    if (query == '' || event.which == 27) {
+        $('#search-resultbox').hide();
+        return;
+    } else if (event.which == 13) {
+        var selectedLink = $('#search-resultbox a.selected');
+        if (selectedLink.length != 0) {
+            document.location = selectedLink.attr('href');
+            return;
+        }
+    } else if (event.which == 38 || event.which == 40) {
+        $('#search-resultbox').show();
+
+        var selected = $('#search-resultbox a.selected');
+        if (selected.length == 0) {
+            $('#search-results').find('a').first().addClass('selected');
+        } else {
+            var next;
+            if (event.which == 40) {
+                next = selected.parent().next().find('a').first();
+            } else {
+                next = selected.parent().prev().find('a').first();
+            }
+            if (next.length != 0) {
+                var resultbox = $('#search-results');
+                var position = next.position();
+
+//              TODO scrolling is buggy and jumps around
+//                resultbox.scrollTop(Math.floor(position.top));
+//                console.log(position.top);
+
+                selected.removeClass('selected');
+                next.addClass('selected');
+            }
+        }
+
+        return;
+    }
+    $('#search-resultbox').show();
+    $('#search-results').html('<li><span class="no-results">No results</span></li>');
+
+    var result = jssearch.search(query);
+
+    if (result.length > 0) {
+        var i = 0;
+        var resHtml = '';
+
+        for (var key in result) {
+            if (i++ > 20) {
+                break;
+            }
+            resHtml = resHtml +
+            '<li><a href="' + result[key].file.u.substr(3) +'"><span class="title">' + result[key].file.t + '</span>' +
+            '<span class="description">' + result[key].file.d + '</span></a></li>';
+        }
+        $('#search-results').html(resHtml);
+    }
+});
+
+// hide the search results on ESC
+$(document).on("keyup", function(event) { if (event.which == 27) { $('#search-resultbox').hide(); } });
+// hide search results on click to document
+$(document).bind('click', function (e) { $('#search-resultbox').hide(); });
+// except the following:
+searchBox.bind('click', function(e) { e.stopPropagation(); });
+$('#search-resultbox').bind('click', function(e) { e.stopPropagation(); });
+
+});</script></body>
+</html>

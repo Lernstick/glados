@@ -58,175 +58,175 @@ Array
 
     [8] => Array
         (
-            [line] => 482
+            [line] => 487
             [file] => /usr/share/glados/commands/BackupController.php
             [message] => Method param $ticket does not exist in parent method, @inheritdoc not possible in lockItem in app\commands\BackupController.
         )
 
     [9] => Array
         (
-            [line] => 492
+            [line] => 497
             [file] => /usr/share/glados/commands/BackupController.php
             [message] => Method param $ticket does not exist in parent method, @inheritdoc not possible in unlockItem in app\commands\BackupController.
         )
 
     [10] => Array
         (
-            [line] => 326
+            [line] => 412
             [file] => /usr/share/glados/commands/DaemonController.php
             [message] => Undefined parameter documented: $args in actionRun().
         )
 
     [11] => Array
         (
-            [line] => 349
+            [line] => 435
             [file] => /usr/share/glados/commands/DaemonController.php
             [message] => Undefined parameter documented: $args in actionRunOnce().
         )
 
     [12] => Array
         (
-            [line] => 58
+            [line] => 70
             [file] => /usr/share/glados/commands/DaemonController.php
             [message] => Method $defaultAction has no parent to inherit from in app\commands\DaemonController.
         )
 
     [13] => Array
         (
-            [line] => 91
+            [line] => 168
             [file] => /usr/share/glados/commands/DaemonController.php
             [message] => Method init has no parent to inherit from in app\commands\DaemonController.
         )
 
     [14] => Array
         (
-            [line] => 444
+            [line] => 533
             [file] => /usr/share/glados/commands/DaemonController.php
             [message] => Method doJob has no parent to inherit from in app\commands\DaemonController.
         )
 
     [15] => Array
         (
-            [line] => 58
+            [line] => 70
             [file] => /usr/share/glados/commands/DaemonController.php
             [message] => Method $defaultAction has no parent to inherit from in app\commands\DaemonController.
         )
 
     [16] => Array
         (
-            [line] => 91
+            [line] => 168
             [file] => /usr/share/glados/commands/DaemonController.php
             [message] => Method init has no parent to inherit from in app\commands\DaemonController.
         )
 
     [17] => Array
         (
-            [line] => 444
+            [line] => 533
             [file] => /usr/share/glados/commands/DaemonController.php
             [message] => Method doJob has no parent to inherit from in app\commands\DaemonController.
         )
 
     [18] => Array
         (
-            [line] => 58
+            [line] => 70
             [file] => /usr/share/glados/commands/DaemonController.php
             [message] => Method $defaultAction has no parent to inherit from in app\commands\DaemonController.
         )
 
     [19] => Array
         (
-            [line] => 91
+            [line] => 168
             [file] => /usr/share/glados/commands/DaemonController.php
             [message] => Method init has no parent to inherit from in app\commands\DaemonController.
         )
 
     [20] => Array
         (
-            [line] => 444
+            [line] => 533
             [file] => /usr/share/glados/commands/DaemonController.php
             [message] => Method doJob has no parent to inherit from in app\commands\DaemonController.
         )
 
     [21] => Array
         (
-            [line] => 58
+            [line] => 70
             [file] => /usr/share/glados/commands/DaemonController.php
             [message] => Method $defaultAction has no parent to inherit from in app\commands\DaemonController.
         )
 
     [22] => Array
         (
-            [line] => 91
+            [line] => 168
             [file] => /usr/share/glados/commands/DaemonController.php
             [message] => Method init has no parent to inherit from in app\commands\DaemonController.
         )
 
     [23] => Array
         (
-            [line] => 444
+            [line] => 533
             [file] => /usr/share/glados/commands/DaemonController.php
             [message] => Method doJob has no parent to inherit from in app\commands\DaemonController.
         )
 
     [24] => Array
         (
-            [line] => 58
+            [line] => 70
             [file] => /usr/share/glados/commands/DaemonController.php
             [message] => Method $defaultAction has no parent to inherit from in app\commands\DaemonController.
         )
 
     [25] => Array
         (
-            [line] => 91
+            [line] => 168
             [file] => /usr/share/glados/commands/DaemonController.php
             [message] => Method init has no parent to inherit from in app\commands\DaemonController.
         )
 
     [26] => Array
         (
-            [line] => 444
+            [line] => 533
             [file] => /usr/share/glados/commands/DaemonController.php
             [message] => Method doJob has no parent to inherit from in app\commands\DaemonController.
         )
 
     [27] => Array
         (
-            [line] => 58
+            [line] => 70
             [file] => /usr/share/glados/commands/DaemonController.php
             [message] => Method $defaultAction has no parent to inherit from in app\commands\DaemonController.
         )
 
     [28] => Array
         (
-            [line] => 91
+            [line] => 168
             [file] => /usr/share/glados/commands/DaemonController.php
             [message] => Method init has no parent to inherit from in app\commands\DaemonController.
         )
 
     [29] => Array
         (
-            [line] => 444
+            [line] => 533
             [file] => /usr/share/glados/commands/DaemonController.php
             [message] => Method doJob has no parent to inherit from in app\commands\DaemonController.
         )
 
     [30] => Array
         (
-            [line] => 58
+            [line] => 70
             [file] => /usr/share/glados/commands/DaemonController.php
             [message] => Method $defaultAction has no parent to inherit from in app\commands\DaemonController.
         )
 
     [31] => Array
         (
-            [line] => 91
+            [line] => 168
             [file] => /usr/share/glados/commands/DaemonController.php
             [message] => Method init has no parent to inherit from in app\commands\DaemonController.
         )
 
     [32] => Array
         (
-            [line] => 444
+            [line] => 533
             [file] => /usr/share/glados/commands/DaemonController.php
             [message] => Method doJob has no parent to inherit from in app\commands\DaemonController.
         )
@@ -288,14 +288,14 @@ Array
 
     [41] => Array
         (
-            [line] => 333
+            [line] => 350
             [file] => /usr/share/glados/commands/DownloadController.php
             [message] => Method param $ticket does not exist in parent method, @inheritdoc not possible in lockItem in app\commands\DownloadController.
         )
 
     [42] => Array
         (
-            [line] => 343
+            [line] => 360
             [file] => /usr/share/glados/commands/DownloadController.php
             [message] => Method param $ticket does not exist in parent method, @inheritdoc not possible in unlockItem in app\commands\DownloadController.
         )
@@ -351,1139 +351,1410 @@ Array
 
     [50] => Array
         (
-            [line] => 33
-            [file] => /usr/share/glados/components/Editable.php
-            [message] => Method init has no parent to inherit from in app\components\Editable.
+            [line] => 551
+            [file] => /usr/share/glados/components/AuthGenericLdap.php
+            [message] => Undefined parameter documented: $value in postProcessRules().
         )
 
     [51] => Array
         (
-            [line] => 45
-            [file] => /usr/share/glados/components/Editable.php
-            [message] => Method run has no parent to inherit from in app\components\Editable.
+            [line] => 675
+            [file] => /usr/share/glados/components/AuthGenericLdap.php
+            [message] => Undefined parameter documented:  in processMapping().
         )
 
     [52] => Array
         (
-            [line] => 16
-            [file] => /usr/share/glados/components/File.php
-            [message] => Method __construct has no parent to inherit from in app\components\File.
+            [line] => 691
+            [file] => /usr/share/glados/components/AuthGenericLdap.php
+            [message] => Undefined parameter documented:  in processMethod().
         )
 
     [53] => Array
         (
-            [line] => 16
-            [file] => /usr/share/glados/components/File.php
-            [message] => Method __construct has no parent to inherit from in app\components\File.
+            [line] => 701
+            [file] => /usr/share/glados/components/AuthGenericLdap.php
+            [message] => Undefined parameter documented:  in getRealUsername().
         )
 
     [54] => Array
+        (
+            [line] => 711
+            [file] => /usr/share/glados/components/AuthGenericLdap.php
+            [message] => Undefined parameter documented:  in getBindUsername().
+        )
+
+    [55] => Array
+        (
+            [line] => 362
+            [file] => /usr/share/glados/components/AuthGenericLdap.php
+            [message] => Method init has no parent to inherit from in app\components\AuthGenericLdap.
+        )
+
+    [56] => Array
+        (
+            [line] => 362
+            [file] => /usr/share/glados/components/AuthGenericLdap.php
+            [message] => Method init has no parent to inherit from in app\components\AuthGenericLdap.
+        )
+
+    [57] => Array
+        (
+            [line] => 362
+            [file] => /usr/share/glados/components/AuthGenericLdap.php
+            [message] => Method init has no parent to inherit from in app\components\AuthGenericLdap.
+        )
+
+    [58] => Array
+        (
+            [file] => /usr/share/glados/components/AuthGenericLdap.php
+            [message] => broken link to \app\components\netbiosDomain in app\components\AuthGenericLdap
+        )
+
+    [59] => Array
+        (
+            [file] => /usr/share/glados/components/AuthGenericLdap.php
+            [message] => broken link to \app\components\netbiosDomain in app\components\AuthGenericLdap
+        )
+
+    [60] => Array
+        (
+            [file] => /usr/share/glados/components/AuthGenericLdap.php
+            [message] => broken link to \app\components\netbiosDomain in app\components\AuthGenericLdap
+        )
+
+    [61] => Array
+        (
+            [file] => /usr/share/glados/components/AuthOpenLdap.php
+            [message] => broken link to \app\components\netbiosDomain in app\components\AuthOpenLdap
+        )
+
+    [62] => Array
+        (
+            [line] => 28
+            [file] => /usr/share/glados/components/Editable.php
+            [message] => Method init has no parent to inherit from in app\components\Editable.
+        )
+
+    [63] => Array
+        (
+            [line] => 49
+            [file] => /usr/share/glados/components/Editable.php
+            [message] => Method run has no parent to inherit from in app\components\Editable.
+        )
+
+    [64] => Array
         (
             [line] => 16
             [file] => /usr/share/glados/components/File.php
             [message] => Method __construct has no parent to inherit from in app\components\File.
         )
 
-    [55] => Array
+    [65] => Array
+        (
+            [line] => 16
+            [file] => /usr/share/glados/components/File.php
+            [message] => Method __construct has no parent to inherit from in app\components\File.
+        )
+
+    [66] => Array
+        (
+            [line] => 16
+            [file] => /usr/share/glados/components/File.php
+            [message] => Method __construct has no parent to inherit from in app\components\File.
+        )
+
+    [67] => Array
         (
             [line] => 50
             [file] => /usr/share/glados/components/ShellCommand.php
             [message] => Method __construct has no parent to inherit from in app\components\ShellCommand.
         )
 
-    [56] => Array
+    [68] => Array
         (
             [line] => 83
             [file] => /usr/share/glados/components/ShellCommand.php
             [message] => Method init has no parent to inherit from in app\components\ShellCommand.
         )
 
-    [57] => Array
+    [69] => Array
         (
             [line] => 21
             [file] => /usr/share/glados/controllers/ConfigController.php
             [message] => Method behaviors has no parent to inherit from in app\controllers\ConfigController.
         )
 
-    [58] => Array
+    [70] => Array
         (
             [line] => 21
             [file] => /usr/share/glados/controllers/DaemonController.php
             [message] => Method behaviors has no parent to inherit from in app\controllers\DaemonController.
         )
 
-    [59] => Array
+    [71] => Array
         (
             [line] => 35
             [file] => /usr/share/glados/controllers/RestoreController.php
             [message] => Undefined parameter documented: $ticket_id in actionLog().
         )
 
-    [60] => Array
+    [72] => Array
         (
             [line] => 35
             [file] => /usr/share/glados/controllers/RestoreController.php
             [message] => Undefined parameter documented: $date in actionLog().
         )
 
-    [61] => Array
+    [73] => Array
         (
             [line] => 22
             [file] => /usr/share/glados/controllers/ScreenshotController.php
             [message] => Method behaviors has no parent to inherit from in app\controllers\ScreenshotController.
         )
 
-    [62] => Array
+    [74] => Array
         (
-            [line] => 24
+            [line] => 25
             [file] => /usr/share/glados/controllers/UserController.php
             [message] => Method behaviors has no parent to inherit from in app\controllers\UserController.
         )
 
-    [63] => Array
+    [75] => Array
         (
-            [line] => 32
+            [line] => 38
             [file] => /usr/share/glados/models/Activity.php
             [message] => Method init has no parent to inherit from in app\models\Activity.
         )
 
-    [64] => Array
+    [76] => Array
         (
-            [line] => 43
+            [line] => 48
             [file] => /usr/share/glados/models/Activity.php
             [message] => Method tableName has no parent to inherit from in app\models\Activity.
         )
 
-    [65] => Array
+    [77] => Array
         (
-            [line] => 51
+            [line] => 56
+            [file] => /usr/share/glados/models/Activity.php
+            [message] => Method getTranslatedFields has no parent to inherit from in app\models\Activity.
+        )
+
+    [78] => Array
+        (
+            [line] => 66
+            [file] => /usr/share/glados/models/Activity.php
+            [message] => Method joinTables has no parent to inherit from in app\models\Activity.
+        )
+
+    [79] => Array
+        (
+            [line] => 76
             [file] => /usr/share/glados/models/Activity.php
             [message] => Method rules has no parent to inherit from in app\models\Activity.
         )
 
-    [66] => Array
+    [80] => Array
         (
-            [line] => 63
+            [line] => 88
             [file] => /usr/share/glados/models/Activity.php
             [message] => Method attributeLabels has no parent to inherit from in app\models\Activity.
         )
 
-    [67] => Array
+    [81] => Array
         (
-            [line] => 166
+            [line] => 191
             [file] => /usr/share/glados/models/Activity.php
             [message] => Method find has no parent to inherit from in app\models\Activity.
         )
 
-    [68] => Array
+    [82] => Array
         (
-            [line] => 32
+            [line] => 38
             [file] => /usr/share/glados/models/Activity.php
             [message] => Method init has no parent to inherit from in app\models\Activity.
         )
 
-    [69] => Array
+    [83] => Array
         (
-            [line] => 43
+            [line] => 48
             [file] => /usr/share/glados/models/Activity.php
             [message] => Method tableName has no parent to inherit from in app\models\Activity.
         )
 
-    [70] => Array
+    [84] => Array
         (
-            [line] => 51
+            [line] => 56
+            [file] => /usr/share/glados/models/Activity.php
+            [message] => Method getTranslatedFields has no parent to inherit from in app\models\Activity.
+        )
+
+    [85] => Array
+        (
+            [line] => 66
+            [file] => /usr/share/glados/models/Activity.php
+            [message] => Method joinTables has no parent to inherit from in app\models\Activity.
+        )
+
+    [86] => Array
+        (
+            [line] => 76
             [file] => /usr/share/glados/models/Activity.php
             [message] => Method rules has no parent to inherit from in app\models\Activity.
         )
 
-    [71] => Array
+    [87] => Array
         (
-            [line] => 63
+            [line] => 88
             [file] => /usr/share/glados/models/Activity.php
             [message] => Method attributeLabels has no parent to inherit from in app\models\Activity.
         )
 
-    [72] => Array
+    [88] => Array
         (
-            [line] => 166
+            [line] => 191
             [file] => /usr/share/glados/models/Activity.php
             [message] => Method find has no parent to inherit from in app\models\Activity.
         )
 
-    [73] => Array
+    [89] => Array
         (
             [line] => 31
             [file] => /usr/share/glados/models/ActivityQuery.php
             [message] => Method all has no parent to inherit from in app\models\ActivityQuery.
         )
 
-    [74] => Array
+    [90] => Array
         (
             [line] => 40
             [file] => /usr/share/glados/models/ActivityQuery.php
             [message] => Method one has no parent to inherit from in app\models\ActivityQuery.
         )
 
-    [75] => Array
+    [91] => Array
         (
             [line] => 32
             [file] => /usr/share/glados/models/ActivitySearch.php
             [message] => Method scenarios has no parent to inherit from in app\models\ActivitySearch.
         )
 
-    [76] => Array
+    [92] => Array
+        (
+            [line] => 239
+            [file] => /usr/share/glados/models/Auth.php
+            [message] => Undefined parameter documented:  in addMigrateUser().
+        )
+
+    [93] => Array
+        (
+            [line] => 655
+            [file] => /usr/share/glados/models/Auth.php
+            [message] => Undefined parameter documented:  in findOne().
+        )
+
+    [94] => Array
+        (
+            [line] => 180
+            [file] => /usr/share/glados/models/Auth.php
+            [message] => Method scenarios has no parent to inherit from in app\models\Auth.
+        )
+
+    [95] => Array
+        (
+            [line] => 209
+            [file] => /usr/share/glados/models/Auth.php
+            [message] => Method attributeHints has no parent to inherit from in app\models\Auth.
+        )
+
+    [96] => Array
+        (
+            [line] => 180
+            [file] => /usr/share/glados/models/Auth.php
+            [message] => Method scenarios has no parent to inherit from in app\models\Auth.
+        )
+
+    [97] => Array
+        (
+            [line] => 209
+            [file] => /usr/share/glados/models/Auth.php
+            [message] => Method attributeHints has no parent to inherit from in app\models\Auth.
+        )
+
+    [98] => Array
+        (
+            [line] => 180
+            [file] => /usr/share/glados/models/Auth.php
+            [message] => Method scenarios has no parent to inherit from in app\models\Auth.
+        )
+
+    [99] => Array
+        (
+            [line] => 209
+            [file] => /usr/share/glados/models/Auth.php
+            [message] => Method attributeHints has no parent to inherit from in app\models\Auth.
+        )
+
+    [100] => Array
+        (
+            [line] => 180
+            [file] => /usr/share/glados/models/Auth.php
+            [message] => Method scenarios has no parent to inherit from in app\models\Auth.
+        )
+
+    [101] => Array
+        (
+            [line] => 209
+            [file] => /usr/share/glados/models/Auth.php
+            [message] => Method attributeHints has no parent to inherit from in app\models\Auth.
+        )
+
+    [102] => Array
+        (
+            [line] => 180
+            [file] => /usr/share/glados/models/Auth.php
+            [message] => Method scenarios has no parent to inherit from in app\models\Auth.
+        )
+
+    [103] => Array
+        (
+            [line] => 209
+            [file] => /usr/share/glados/models/Auth.php
+            [message] => Method attributeHints has no parent to inherit from in app\models\Auth.
+        )
+
+    [104] => Array
+        (
+            [line] => 180
+            [file] => /usr/share/glados/models/Auth.php
+            [message] => Method scenarios has no parent to inherit from in app\models\Auth.
+        )
+
+    [105] => Array
+        (
+            [line] => 209
+            [file] => /usr/share/glados/models/Auth.php
+            [message] => Method attributeHints has no parent to inherit from in app\models\Auth.
+        )
+
+    [106] => Array
+        (
+            [file] => /usr/share/glados/models/Auth.php
+            [message] => broken link to \app\models\isNewRecord in app\models\Auth
+        )
+
+    [107] => Array
+        (
+            [file] => /usr/share/glados/models/Auth.php
+            [message] => broken link to \app\models\isNewRecord in app\models\Auth
+        )
+
+    [108] => Array
+        (
+            [file] => /usr/share/glados/models/Auth.php
+            [message] => broken link to \app\models\validate() in app\models\Auth
+        )
+
+    [109] => Array
         (
             [line] => 21
             [file] => /usr/share/glados/models/AuthAssignment.php
             [message] => Method tableName has no parent to inherit from in app\models\AuthAssignment.
         )
 
-    [77] => Array
+    [110] => Array
         (
             [line] => 29
             [file] => /usr/share/glados/models/AuthAssignment.php
             [message] => Method rules has no parent to inherit from in app\models\AuthAssignment.
         )
 
-    [78] => Array
+    [111] => Array
         (
             [line] => 42
             [file] => /usr/share/glados/models/AuthAssignment.php
             [message] => Method attributeLabels has no parent to inherit from in app\models\AuthAssignment.
         )
 
-    [79] => Array
+    [112] => Array
+        (
+            [file] => /usr/share/glados/models/AuthInterface.php
+            [message] => broken link to \app\models\migrateUsers in app\models\AuthInterface
+        )
+
+    [113] => Array
+        (
+            [file] => /usr/share/glados/models/AuthInterface.php
+            [message] => broken link to \app\models\migrateUsers in app\models\AuthInterface
+        )
+
+    [114] => Array
         (
             [line] => 33
             [file] => /usr/share/glados/models/AuthItem.php
             [message] => Method tableName has no parent to inherit from in app\models\AuthItem.
         )
 
-    [80] => Array
+    [115] => Array
         (
             [line] => 41
             [file] => /usr/share/glados/models/AuthItem.php
             [message] => Method rules has no parent to inherit from in app\models\AuthItem.
         )
 
-    [81] => Array
+    [116] => Array
         (
             [line] => 55
             [file] => /usr/share/glados/models/AuthItem.php
             [message] => Method attributeLabels has no parent to inherit from in app\models\AuthItem.
         )
 
-    [82] => Array
+    [117] => Array
+        (
+            [line] => 74
+            [file] => /usr/share/glados/models/AuthMigrateForm.php
+            [message] => Method attributeLabels has no parent to inherit from in app\models\AuthMigrateForm.
+        )
+
+    [118] => Array
+        (
+            [line] => 87
+            [file] => /usr/share/glados/models/AuthMigrateForm.php
+            [message] => Method attributeHints has no parent to inherit from in app\models\AuthMigrateForm.
+        )
+
+    [119] => Array
+        (
+            [line] => 163
+            [file] => /usr/share/glados/models/AuthMigrateForm.php
+            [message] => Method save has no parent to inherit from in app\models\AuthMigrateForm.
+        )
+
+    [120] => Array
         (
             [line] => 19
             [file] => /usr/share/glados/models/BackupSearch.php
             [message] => Method scenarios has no parent to inherit from in app\models\BackupSearch.
         )
 
-    [83] => Array
+    [121] => Array
         (
-            [line] => 47
+            [line] => 56
             [file] => /usr/share/glados/models/Base.php
             [message] => Undefined parameter documented:  in selectList().
         )
 
-    [84] => Array
+    [122] => Array
         (
-            [line] => 47
+            [line] => 56
             [file] => /usr/share/glados/models/Base.php
             [message] => Undefined parameter documented:  in selectList().
         )
 
-    [85] => Array
+    [123] => Array
         (
-            [line] => 47
+            [line] => 56
             [file] => /usr/share/glados/models/Base.php
             [message] => Undefined parameter documented:  in selectList().
         )
 
-    [86] => Array
+    [124] => Array
         (
-            [line] => 47
+            [line] => 56
             [file] => /usr/share/glados/models/Base.php
             [message] => Undefined parameter documented:  in selectList().
         )
 
-    [87] => Array
+    [125] => Array
         (
-            [line] => 47
+            [line] => 56
             [file] => /usr/share/glados/models/Base.php
             [message] => Undefined parameter documented:  in selectList().
         )
 
-    [88] => Array
+    [126] => Array
         (
-            [line] => 47
+            [line] => 56
             [file] => /usr/share/glados/models/Base.php
             [message] => Undefined parameter documented:  in selectList().
         )
 
-    [89] => Array
+    [127] => Array
         (
-            [line] => 47
+            [line] => 56
             [file] => /usr/share/glados/models/Base.php
             [message] => Undefined parameter documented:  in selectList().
         )
 
-    [90] => Array
+    [128] => Array
         (
             [line] => 32
             [file] => /usr/share/glados/models/Config.php
             [message] => Method init has no parent to inherit from in app\models\Config.
         )
 
-    [91] => Array
+    [129] => Array
         (
             [line] => 29
             [file] => /usr/share/glados/models/Daemon.php
             [message] => Method tableName has no parent to inherit from in app\models\Daemon.
         )
 
-    [92] => Array
+    [130] => Array
         (
             [line] => 37
             [file] => /usr/share/glados/models/Daemon.php
             [message] => Method rules has no parent to inherit from in app\models\Daemon.
         )
 
-    [93] => Array
+    [131] => Array
         (
             [line] => 52
             [file] => /usr/share/glados/models/Daemon.php
             [message] => Method attributeLabels has no parent to inherit from in app\models\Daemon.
         )
 
-    [94] => Array
+    [132] => Array
         (
             [line] => 68
             [file] => /usr/share/glados/models/Daemon.php
             [message] => Method init has no parent to inherit from in app\models\Daemon.
         )
 
-    [95] => Array
+    [133] => Array
         (
             [line] => 29
             [file] => /usr/share/glados/models/Daemon.php
             [message] => Method tableName has no parent to inherit from in app\models\Daemon.
         )
 
-    [96] => Array
+    [134] => Array
         (
             [line] => 37
             [file] => /usr/share/glados/models/Daemon.php
             [message] => Method rules has no parent to inherit from in app\models\Daemon.
         )
 
-    [97] => Array
+    [135] => Array
         (
             [line] => 52
             [file] => /usr/share/glados/models/Daemon.php
             [message] => Method attributeLabels has no parent to inherit from in app\models\Daemon.
         )
 
-    [98] => Array
+    [136] => Array
         (
             [line] => 68
             [file] => /usr/share/glados/models/Daemon.php
             [message] => Method init has no parent to inherit from in app\models\Daemon.
         )
 
-    [99] => Array
+    [137] => Array
         (
-            [line] => 44
+            [line] => 50
             [file] => /usr/share/glados/models/DaemonInterface.php
             [message] => Undefined parameter documented: $args in doJob().
         )
 
-    [100] => Array
+    [138] => Array
         (
-            [line] => 51
+            [line] => 57
             [file] => /usr/share/glados/models/DaemonInterface.php
             [message] => Undefined parameter documented: $args in doJobOnce().
         )
 
-    [101] => Array
+    [139] => Array
         (
             [line] => 30
             [file] => /usr/share/glados/models/DaemonSearch.php
             [message] => Method scenarios has no parent to inherit from in app\models\DaemonSearch.
         )
 
-    [102] => Array
+    [140] => Array
         (
-            [line] => 48
+            [line] => 47
             [file] => /usr/share/glados/models/EventItem.php
             [message] => Method tableName has no parent to inherit from in app\models\EventItem.
         )
 
-    [103] => Array
+    [141] => Array
         (
-            [line] => 57
+            [line] => 56
             [file] => /usr/share/glados/models/EventItem.php
             [message] => Method rules has no parent to inherit from in app\models\EventItem.
         )
 
-    [104] => Array
+    [142] => Array
         (
-            [line] => 48
+            [line] => 47
             [file] => /usr/share/glados/models/EventItem.php
             [message] => Method tableName has no parent to inherit from in app\models\EventItem.
         )
 
-    [105] => Array
+    [143] => Array
         (
-            [line] => 57
+            [line] => 56
             [file] => /usr/share/glados/models/EventItem.php
             [message] => Method rules has no parent to inherit from in app\models\EventItem.
         )
 
-    [106] => Array
+    [144] => Array
         (
-            [line] => 48
+            [line] => 47
             [file] => /usr/share/glados/models/EventItem.php
             [message] => Method tableName has no parent to inherit from in app\models\EventItem.
         )
 
-    [107] => Array
+    [145] => Array
         (
-            [line] => 57
+            [line] => 56
             [file] => /usr/share/glados/models/EventItem.php
             [message] => Method rules has no parent to inherit from in app\models\EventItem.
         )
 
-    [108] => Array
+    [146] => Array
         (
-            [line] => 104
+            [line] => 120
             [file] => /usr/share/glados/models/EventStream.php
             [message] => Method init has no parent to inherit from in app\models\EventStream.
         )
 
-    [109] => Array
+    [147] => Array
         (
             [file] => /usr/share/glados/models/EventStream.php
             [message] => broken link to \app\models\resumeTime in app\models\EventStream
         )
 
-    [110] => Array
+    [148] => Array
         (
             [file] => /usr/share/glados/models/EventStream.php
             [message] => broken link to \app\models\uuid in app\models\EventStream
         )
 
-    [111] => Array
+    [149] => Array
         (
             [file] => /usr/share/glados/models/EventStream.php
             [message] => broken link to \app\models\_resumeTime in app\models\EventStream
         )
 
-    [112] => Array
+    [150] => Array
         (
             [file] => /usr/share/glados/models/EventStream.php
             [message] => broken link to \app\models\_lastEvent in app\models\EventStream
         )
 
-    [113] => Array
+    [151] => Array
         (
             [file] => /usr/share/glados/models/EventStream.php
             [message] => broken link to \app\models\stream_select() in app\models\EventStream
         )
 
-    [114] => Array
+    [152] => Array
         (
             [file] => /usr/share/glados/models/EventStream.php
             [message] => broken link to \app\models\id in app\models\EventStream
         )
 
-    [115] => Array
+    [153] => Array
         (
             [file] => /usr/share/glados/models/EventStream.php
             [message] => broken link to \app\models\resumeTime in app\models\EventStream
         )
 
-    [116] => Array
+    [154] => Array
         (
             [file] => /usr/share/glados/models/EventStream.php
             [message] => broken link to \app\models\uuid in app\models\EventStream
         )
 
-    [117] => Array
+    [155] => Array
         (
             [line] => 44
             [file] => /usr/share/glados/models/Exam.php
             [message] => Method tableName has no parent to inherit from in app\models\Exam.
         )
 
-    [118] => Array
+    [156] => Array
         (
             [line] => 52
             [file] => /usr/share/glados/models/Exam.php
             [message] => Method init has no parent to inherit from in app\models\Exam.
         )
 
-    [119] => Array
+    [157] => Array
         (
             [line] => 78
             [file] => /usr/share/glados/models/Exam.php
             [message] => Method rules has no parent to inherit from in app\models\Exam.
         )
 
-    [120] => Array
+    [158] => Array
         (
             [line] => 95
             [file] => /usr/share/glados/models/Exam.php
             [message] => Method attributeLabels has no parent to inherit from in app\models\Exam.
         )
 
-    [121] => Array
+    [159] => Array
         (
             [line] => 137
             [file] => /usr/share/glados/models/Exam.php
             [message] => Method attributeHints has no parent to inherit from in app\models\Exam.
         )
 
-    [122] => Array
+    [160] => Array
         (
             [line] => 197
             [file] => /usr/share/glados/models/Exam.php
             [message] => Method delete has no parent to inherit from in app\models\Exam.
         )
 
-    [123] => Array
+    [161] => Array
         (
-            [line] => 433
+            [line] => 435
             [file] => /usr/share/glados/models/Exam.php
             [message] => Method find has no parent to inherit from in app\models\Exam.
         )
 
-    [124] => Array
+    [162] => Array
         (
             [line] => 44
             [file] => /usr/share/glados/models/Exam.php
             [message] => Method tableName has no parent to inherit from in app\models\Exam.
         )
 
-    [125] => Array
+    [163] => Array
         (
             [line] => 52
             [file] => /usr/share/glados/models/Exam.php
             [message] => Method init has no parent to inherit from in app\models\Exam.
         )
 
-    [126] => Array
+    [164] => Array
         (
             [line] => 78
             [file] => /usr/share/glados/models/Exam.php
             [message] => Method rules has no parent to inherit from in app\models\Exam.
         )
 
-    [127] => Array
+    [165] => Array
         (
             [line] => 95
             [file] => /usr/share/glados/models/Exam.php
             [message] => Method attributeLabels has no parent to inherit from in app\models\Exam.
         )
 
-    [128] => Array
+    [166] => Array
         (
             [line] => 137
             [file] => /usr/share/glados/models/Exam.php
             [message] => Method attributeHints has no parent to inherit from in app\models\Exam.
         )
 
-    [129] => Array
+    [167] => Array
         (
             [line] => 197
             [file] => /usr/share/glados/models/Exam.php
             [message] => Method delete has no parent to inherit from in app\models\Exam.
         )
 
-    [130] => Array
+    [168] => Array
         (
-            [line] => 433
+            [line] => 435
             [file] => /usr/share/glados/models/Exam.php
             [message] => Method find has no parent to inherit from in app\models\Exam.
         )
 
-    [131] => Array
+    [169] => Array
         (
             [line] => 27
             [file] => /usr/share/glados/models/ExamQuery.php
             [message] => Method all has no parent to inherit from in app\models\ExamQuery.
         )
 
-    [132] => Array
+    [170] => Array
         (
             [line] => 36
             [file] => /usr/share/glados/models/ExamQuery.php
             [message] => Method one has no parent to inherit from in app\models\ExamQuery.
         )
 
-    [133] => Array
+    [171] => Array
         (
             [line] => 32
             [file] => /usr/share/glados/models/ExamSearch.php
             [message] => Method scenarios has no parent to inherit from in app\models\ExamSearch.
         )
 
-    [134] => Array
+    [172] => Array
         (
             [line] => 19
             [file] => /usr/share/glados/models/HowtoSearch.php
             [message] => Method scenarios has no parent to inherit from in app\models\HowtoSearch.
         )
 
-    [135] => Array
+    [173] => Array
+        (
+            [line] => 21
+            [file] => /usr/share/glados/models/LiveActiveRecord.php
+            [message] => Method init has no parent to inherit from in app\models\LiveActiveRecord.
+        )
+
+    [174] => Array
+        (
+            [line] => 21
+            [file] => /usr/share/glados/models/LiveActiveRecord.php
+            [message] => Method init has no parent to inherit from in app\models\LiveActiveRecord.
+        )
+
+    [175] => Array
+        (
+            [line] => 21
+            [file] => /usr/share/glados/models/LiveActiveRecord.php
+            [message] => Method init has no parent to inherit from in app\models\LiveActiveRecord.
+        )
+
+    [176] => Array
         (
             [line] => 26
             [file] => /usr/share/glados/models/Restore.php
             [message] => Method tableName has no parent to inherit from in app\models\Restore.
         )
 
-    [136] => Array
+    [177] => Array
         (
             [line] => 34
             [file] => /usr/share/glados/models/Restore.php
             [message] => Method rules has no parent to inherit from in app\models\Restore.
         )
 
-    [137] => Array
+    [178] => Array
         (
             [line] => 48
             [file] => /usr/share/glados/models/Restore.php
             [message] => Method attributeLabels has no parent to inherit from in app\models\Restore.
         )
 
-    [138] => Array
+    [179] => Array
         (
             [line] => 26
             [file] => /usr/share/glados/models/Restore.php
             [message] => Method tableName has no parent to inherit from in app\models\Restore.
         )
 
-    [139] => Array
+    [180] => Array
         (
             [line] => 34
             [file] => /usr/share/glados/models/Restore.php
             [message] => Method rules has no parent to inherit from in app\models\Restore.
         )
 
-    [140] => Array
+    [181] => Array
         (
             [line] => 48
             [file] => /usr/share/glados/models/Restore.php
             [message] => Method attributeLabels has no parent to inherit from in app\models\Restore.
         )
 
-    [141] => Array
+    [182] => Array
         (
             [line] => 29
             [file] => /usr/share/glados/models/RestoreSearch.php
             [message] => Method scenarios has no parent to inherit from in app\models\RestoreSearch.
         )
 
-    [142] => Array
+    [183] => Array
         (
-            [line] => 87
+            [line] => 88
             [file] => /usr/share/glados/models/Result.php
             [message] => Method attributeHints has no parent to inherit from in app\models\Result.
         )
 
-    [143] => Array
+    [184] => Array
         (
             [line] => 19
             [file] => /usr/share/glados/models/ScreenshotSearch.php
             [message] => Method scenarios has no parent to inherit from in app\models\ScreenshotSearch.
         )
 
-    [144] => Array
+    [185] => Array
         (
             [line] => 69
             [file] => /usr/share/glados/models/Stats.php
             [message] => Undefined parameter documented:  in get().
         )
 
-    [145] => Array
+    [186] => Array
         (
             [line] => 69
             [file] => /usr/share/glados/models/Stats.php
             [message] => Undefined parameter documented:  in get().
         )
 
-    [146] => Array
+    [187] => Array
         (
             [line] => 96
             [file] => /usr/share/glados/models/Stats.php
             [message] => Undefined parameter documented:  in set().
         )
 
-    [147] => Array
+    [188] => Array
         (
             [line] => 96
             [file] => /usr/share/glados/models/Stats.php
             [message] => Undefined parameter documented:  in set().
         )
 
-    [148] => Array
+    [189] => Array
         (
             [line] => 96
             [file] => /usr/share/glados/models/Stats.php
             [message] => Undefined parameter documented:  in set().
         )
 
-    [149] => Array
+    [190] => Array
         (
             [line] => 117
             [file] => /usr/share/glados/models/Stats.php
             [message] => Undefined parameter documented:  in increment().
         )
 
-    [150] => Array
+    [191] => Array
         (
             [line] => 117
             [file] => /usr/share/glados/models/Stats.php
             [message] => Undefined parameter documented:  in increment().
         )
 
-    [151] => Array
+    [192] => Array
         (
             [line] => 129
             [file] => /usr/share/glados/models/Stats.php
             [message] => Undefined parameter documented:  in findByKey().
         )
 
-    [152] => Array
+    [193] => Array
         (
             [line] => 22
             [file] => /usr/share/glados/models/Stats.php
             [message] => Method tableName has no parent to inherit from in app\models\Stats.
         )
 
-    [153] => Array
+    [194] => Array
         (
             [line] => 30
             [file] => /usr/share/glados/models/Stats.php
             [message] => Method rules has no parent to inherit from in app\models\Stats.
         )
 
-    [154] => Array
+    [195] => Array
         (
             [line] => 40
             [file] => /usr/share/glados/models/Stats.php
             [message] => Method attributeLabels has no parent to inherit from in app\models\Stats.
         )
 
-    [155] => Array
+    [196] => Array
         (
             [line] => 53
             [file] => /usr/share/glados/models/Stats.php
             [message] => Method attributeHints has no parent to inherit from in app\models\Stats.
         )
 
-    [156] => Array
+    [197] => Array
         (
-            [line] => 88
-            [file] => /usr/share/glados/models/Ticket.php
-            [message] => Method init has no parent to inherit from in app\models\Ticket.
-        )
-
-    [157] => Array
-        (
-            [line] => 107
+            [line] => 115
             [file] => /usr/share/glados/models/Ticket.php
             [message] => Method tableName has no parent to inherit from in app\models\Ticket.
         )
 
-    [158] => Array
+    [198] => Array
         (
-            [line] => 115
+            [line] => 123
+            [file] => /usr/share/glados/models/Ticket.php
+            [message] => Method getTranslatedFields has no parent to inherit from in app\models\Ticket.
+        )
+
+    [199] => Array
+        (
+            [line] => 163
             [file] => /usr/share/glados/models/Ticket.php
             [message] => Method rules has no parent to inherit from in app\models\Ticket.
         )
 
-    [159] => Array
+    [200] => Array
         (
-            [line] => 139
+            [line] => 186
             [file] => /usr/share/glados/models/Ticket.php
             [message] => Method attributeLabels has no parent to inherit from in app\models\Ticket.
         )
 
-    [160] => Array
+    [201] => Array
         (
-            [line] => 171
+            [line] => 218
             [file] => /usr/share/glados/models/Ticket.php
             [message] => Method attributeHints has no parent to inherit from in app\models\Ticket.
         )
 
-    [161] => Array
+    [202] => Array
         (
-            [line] => 752
+            [line] => 682
             [file] => /usr/share/glados/models/Ticket.php
             [message] => Method find has no parent to inherit from in app\models\Ticket.
         )
 
-    [162] => Array
+    [203] => Array
         (
-            [line] => 88
-            [file] => /usr/share/glados/models/Ticket.php
-            [message] => Method init has no parent to inherit from in app\models\Ticket.
-        )
-
-    [163] => Array
-        (
-            [line] => 107
+            [line] => 115
             [file] => /usr/share/glados/models/Ticket.php
             [message] => Method tableName has no parent to inherit from in app\models\Ticket.
         )
 
-    [164] => Array
+    [204] => Array
         (
-            [line] => 115
+            [line] => 123
+            [file] => /usr/share/glados/models/Ticket.php
+            [message] => Method getTranslatedFields has no parent to inherit from in app\models\Ticket.
+        )
+
+    [205] => Array
+        (
+            [line] => 163
             [file] => /usr/share/glados/models/Ticket.php
             [message] => Method rules has no parent to inherit from in app\models\Ticket.
         )
 
-    [165] => Array
+    [206] => Array
         (
-            [line] => 139
+            [line] => 186
             [file] => /usr/share/glados/models/Ticket.php
             [message] => Method attributeLabels has no parent to inherit from in app\models\Ticket.
         )
 
-    [166] => Array
+    [207] => Array
         (
-            [line] => 171
+            [line] => 218
             [file] => /usr/share/glados/models/Ticket.php
             [message] => Method attributeHints has no parent to inherit from in app\models\Ticket.
         )
 
-    [167] => Array
+    [208] => Array
         (
-            [line] => 752
+            [line] => 682
             [file] => /usr/share/glados/models/Ticket.php
             [message] => Method find has no parent to inherit from in app\models\Ticket.
         )
 
-    [168] => Array
-        (
-            [line] => 88
-            [file] => /usr/share/glados/models/Ticket.php
-            [message] => Method init has no parent to inherit from in app\models\Ticket.
-        )
-
-    [169] => Array
-        (
-            [line] => 107
-            [file] => /usr/share/glados/models/Ticket.php
-            [message] => Method tableName has no parent to inherit from in app\models\Ticket.
-        )
-
-    [170] => Array
-        (
-            [line] => 115
-            [file] => /usr/share/glados/models/Ticket.php
-            [message] => Method rules has no parent to inherit from in app\models\Ticket.
-        )
-
-    [171] => Array
-        (
-            [line] => 139
-            [file] => /usr/share/glados/models/Ticket.php
-            [message] => Method attributeLabels has no parent to inherit from in app\models\Ticket.
-        )
-
-    [172] => Array
-        (
-            [line] => 171
-            [file] => /usr/share/glados/models/Ticket.php
-            [message] => Method attributeHints has no parent to inherit from in app\models\Ticket.
-        )
-
-    [173] => Array
-        (
-            [line] => 752
-            [file] => /usr/share/glados/models/Ticket.php
-            [message] => Method find has no parent to inherit from in app\models\Ticket.
-        )
-
-    [174] => Array
+    [209] => Array
         (
             [file] => /usr/share/glados/models/Ticket.php
             [message] => broken link to \app\models\ticket in app\models\Ticket
         )
 
-    [175] => Array
+    [210] => Array
         (
             [line] => 38
             [file] => /usr/share/glados/models/TicketQuery.php
             [message] => Method all has no parent to inherit from in app\models\TicketQuery.
         )
 
-    [176] => Array
+    [211] => Array
         (
             [line] => 47
             [file] => /usr/share/glados/models/TicketQuery.php
             [message] => Method one has no parent to inherit from in app\models\TicketQuery.
         )
 
-    [177] => Array
+    [212] => Array
         (
             [line] => 49
             [file] => /usr/share/glados/models/TicketSearch.php
             [message] => Method scenarios has no parent to inherit from in app\models\TicketSearch.
         )
 
-    [178] => Array
-        (
-            [line] => 46
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method init has no parent to inherit from in app\models\User.
-        )
-
-    [179] => Array
-        (
-            [line] => 57
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method tableName has no parent to inherit from in app\models\User.
-        )
-
-    [180] => Array
-        (
-            [line] => 65
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method scenarios has no parent to inherit from in app\models\User.
-        )
-
-    [181] => Array
-        (
-            [line] => 77
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method rules has no parent to inherit from in app\models\User.
-        )
-
-    [182] => Array
-        (
-            [line] => 93
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method attributeLabels has no parent to inherit from in app\models\User.
-        )
-
-    [183] => Array
-        (
-            [line] => 167
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method findIdentity has no parent to inherit from in app\models\User.
-        )
-
-    [184] => Array
-        (
-            [line] => 175
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method findIdentityByAccessToken has no parent to inherit from in app\models\User.
-        )
-
-    [185] => Array
-        (
-            [line] => 194
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method getId has no parent to inherit from in app\models\User.
-        )
-
-    [186] => Array
-        (
-            [line] => 202
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method getAuthKey has no parent to inherit from in app\models\User.
-        )
-
-    [187] => Array
-        (
-            [line] => 210
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method validateAuthKey has no parent to inherit from in app\models\User.
-        )
-
-    [188] => Array
-        (
-            [line] => 229
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method beforeSave has no parent to inherit from in app\models\User.
-        )
-
-    [189] => Array
-        (
-            [line] => 250
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method afterSave has no parent to inherit from in app\models\User.
-        )
-
-    [190] => Array
-        (
-            [line] => 46
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method init has no parent to inherit from in app\models\User.
-        )
-
-    [191] => Array
-        (
-            [line] => 57
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method tableName has no parent to inherit from in app\models\User.
-        )
-
-    [192] => Array
-        (
-            [line] => 65
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method scenarios has no parent to inherit from in app\models\User.
-        )
-
-    [193] => Array
-        (
-            [line] => 77
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method rules has no parent to inherit from in app\models\User.
-        )
-
-    [194] => Array
-        (
-            [line] => 93
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method attributeLabels has no parent to inherit from in app\models\User.
-        )
-
-    [195] => Array
-        (
-            [line] => 167
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method findIdentity has no parent to inherit from in app\models\User.
-        )
-
-    [196] => Array
-        (
-            [line] => 175
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method findIdentityByAccessToken has no parent to inherit from in app\models\User.
-        )
-
-    [197] => Array
-        (
-            [line] => 194
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method getId has no parent to inherit from in app\models\User.
-        )
-
-    [198] => Array
-        (
-            [line] => 202
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method getAuthKey has no parent to inherit from in app\models\User.
-        )
-
-    [199] => Array
-        (
-            [line] => 210
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method validateAuthKey has no parent to inherit from in app\models\User.
-        )
-
-    [200] => Array
-        (
-            [line] => 229
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method beforeSave has no parent to inherit from in app\models\User.
-        )
-
-    [201] => Array
-        (
-            [line] => 250
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method afterSave has no parent to inherit from in app\models\User.
-        )
-
-    [202] => Array
-        (
-            [line] => 46
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method init has no parent to inherit from in app\models\User.
-        )
-
-    [203] => Array
-        (
-            [line] => 57
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method tableName has no parent to inherit from in app\models\User.
-        )
-
-    [204] => Array
-        (
-            [line] => 65
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method scenarios has no parent to inherit from in app\models\User.
-        )
-
-    [205] => Array
-        (
-            [line] => 77
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method rules has no parent to inherit from in app\models\User.
-        )
-
-    [206] => Array
-        (
-            [line] => 93
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method attributeLabels has no parent to inherit from in app\models\User.
-        )
-
-    [207] => Array
-        (
-            [line] => 167
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method findIdentity has no parent to inherit from in app\models\User.
-        )
-
-    [208] => Array
-        (
-            [line] => 175
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method findIdentityByAccessToken has no parent to inherit from in app\models\User.
-        )
-
-    [209] => Array
-        (
-            [line] => 194
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method getId has no parent to inherit from in app\models\User.
-        )
-
-    [210] => Array
-        (
-            [line] => 202
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method getAuthKey has no parent to inherit from in app\models\User.
-        )
-
-    [211] => Array
-        (
-            [line] => 210
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method validateAuthKey has no parent to inherit from in app\models\User.
-        )
-
-    [212] => Array
-        (
-            [line] => 229
-            [file] => /usr/share/glados/models/User.php
-            [message] => Method beforeSave has no parent to inherit from in app\models\User.
-        )
-
     [213] => Array
         (
-            [line] => 250
+            [line] => 15
+            [file] => /usr/share/glados/models/TranslatedActivityQuery.php
+            [message] => Method init has no parent to inherit from in app\models\TranslatedActivityQuery.
+        )
+
+    [214] => Array
+        (
+            [line] => 21
+            [file] => /usr/share/glados/models/Translation.php
+            [message] => Method tableName has no parent to inherit from in app\models\Translation.
+        )
+
+    [215] => Array
+        (
+            [line] => 48
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method init has no parent to inherit from in app\models\User.
+        )
+
+    [216] => Array
+        (
+            [line] => 61
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method tableName has no parent to inherit from in app\models\User.
+        )
+
+    [217] => Array
+        (
+            [line] => 69
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method scenarios has no parent to inherit from in app\models\User.
+        )
+
+    [218] => Array
+        (
+            [line] => 82
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method rules has no parent to inherit from in app\models\User.
+        )
+
+    [219] => Array
+        (
+            [line] => 101
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method attributeLabels has no parent to inherit from in app\models\User.
+        )
+
+    [220] => Array
+        (
+            [line] => 118
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method beforeDelete has no parent to inherit from in app\models\User.
+        )
+
+    [221] => Array
+        (
+            [line] => 199
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method findIdentity has no parent to inherit from in app\models\User.
+        )
+
+    [222] => Array
+        (
+            [line] => 207
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method findIdentityByAccessToken has no parent to inherit from in app\models\User.
+        )
+
+    [223] => Array
+        (
+            [line] => 226
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method getId has no parent to inherit from in app\models\User.
+        )
+
+    [224] => Array
+        (
+            [line] => 234
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method getAuthKey has no parent to inherit from in app\models\User.
+        )
+
+    [225] => Array
+        (
+            [line] => 242
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method validateAuthKey has no parent to inherit from in app\models\User.
+        )
+
+    [226] => Array
+        (
+            [line] => 269
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method beforeSave has no parent to inherit from in app\models\User.
+        )
+
+    [227] => Array
+        (
+            [line] => 318
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method afterSave has no parent to inherit from in app\models\User.
+        )
+
+    [228] => Array
+        (
+            [line] => 48
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method init has no parent to inherit from in app\models\User.
+        )
+
+    [229] => Array
+        (
+            [line] => 61
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method tableName has no parent to inherit from in app\models\User.
+        )
+
+    [230] => Array
+        (
+            [line] => 69
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method scenarios has no parent to inherit from in app\models\User.
+        )
+
+    [231] => Array
+        (
+            [line] => 82
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method rules has no parent to inherit from in app\models\User.
+        )
+
+    [232] => Array
+        (
+            [line] => 101
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method attributeLabels has no parent to inherit from in app\models\User.
+        )
+
+    [233] => Array
+        (
+            [line] => 118
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method beforeDelete has no parent to inherit from in app\models\User.
+        )
+
+    [234] => Array
+        (
+            [line] => 199
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method findIdentity has no parent to inherit from in app\models\User.
+        )
+
+    [235] => Array
+        (
+            [line] => 207
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method findIdentityByAccessToken has no parent to inherit from in app\models\User.
+        )
+
+    [236] => Array
+        (
+            [line] => 226
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method getId has no parent to inherit from in app\models\User.
+        )
+
+    [237] => Array
+        (
+            [line] => 234
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method getAuthKey has no parent to inherit from in app\models\User.
+        )
+
+    [238] => Array
+        (
+            [line] => 242
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method validateAuthKey has no parent to inherit from in app\models\User.
+        )
+
+    [239] => Array
+        (
+            [line] => 269
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method beforeSave has no parent to inherit from in app\models\User.
+        )
+
+    [240] => Array
+        (
+            [line] => 318
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method afterSave has no parent to inherit from in app\models\User.
+        )
+
+    [241] => Array
+        (
+            [line] => 48
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method init has no parent to inherit from in app\models\User.
+        )
+
+    [242] => Array
+        (
+            [line] => 61
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method tableName has no parent to inherit from in app\models\User.
+        )
+
+    [243] => Array
+        (
+            [line] => 69
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method scenarios has no parent to inherit from in app\models\User.
+        )
+
+    [244] => Array
+        (
+            [line] => 82
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method rules has no parent to inherit from in app\models\User.
+        )
+
+    [245] => Array
+        (
+            [line] => 101
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method attributeLabels has no parent to inherit from in app\models\User.
+        )
+
+    [246] => Array
+        (
+            [line] => 118
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method beforeDelete has no parent to inherit from in app\models\User.
+        )
+
+    [247] => Array
+        (
+            [line] => 199
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method findIdentity has no parent to inherit from in app\models\User.
+        )
+
+    [248] => Array
+        (
+            [line] => 207
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method findIdentityByAccessToken has no parent to inherit from in app\models\User.
+        )
+
+    [249] => Array
+        (
+            [line] => 226
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method getId has no parent to inherit from in app\models\User.
+        )
+
+    [250] => Array
+        (
+            [line] => 234
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method getAuthKey has no parent to inherit from in app\models\User.
+        )
+
+    [251] => Array
+        (
+            [line] => 242
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method validateAuthKey has no parent to inherit from in app\models\User.
+        )
+
+    [252] => Array
+        (
+            [line] => 269
+            [file] => /usr/share/glados/models/User.php
+            [message] => Method beforeSave has no parent to inherit from in app\models\User.
+        )
+
+    [253] => Array
+        (
+            [line] => 318
             [file] => /usr/share/glados/models/User.php
             [message] => Method afterSave has no parent to inherit from in app\models\User.
         )
