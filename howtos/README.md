@@ -47,7 +47,8 @@ See the [Manual](https://github.com/imedias/glados/tree/master/howtos/README.md)
 #### Authentication
 
 * [LDAP Authentication](ldap-authentication.md)
-* [Active Directory Authentication](ad-authentication.md)
+* [Active Directory Authentication (Simple)](ad-authentication-simple.md)
+* [Active Directory Authentication (Advanced)](ad-authentication-advanced.md)
 * [Test Login](test-login.md)
 * [User Migration](user-migration.md)
 * [Multiple LDAP Servers and/or Active Directories](multiple-ldaps.md)

@@ -4,7 +4,7 @@ This article covers the topic on user migration. User migration is needed if you
 
 Start the user migration form under `System->Authentication Method` and then click `Actions->Migrate User`.
 
-> To be able to migrate users you have to set up an authentication method first, for example [LDAP](ldap-authentication.md) or [Active Directory](ad-authentication.md)
+> To be able to migrate users you have to set up an authentication method first, for example [LDAP](ldap-authentication.md) or [Active Directory](ad-authentication-simple.md)
 
 ### Step 1: Setup
 
