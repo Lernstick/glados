@@ -51,3 +51,4 @@
 * [User Migration](user-migration.md)
 * [Multiple LDAP Servers and/or Active Directories](multiple-ldaps.md)
 * [Placeholders](auth-placeholders.md)
+* [Login Scheme](login-scheme.md)
