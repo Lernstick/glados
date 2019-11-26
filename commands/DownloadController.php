@@ -126,7 +126,7 @@ class DownloadController extends DaemonController implements DaemonInterface
             $this->ticket->scenario = Ticket::SCENARIO_DOWNLOAD;
             $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? 1 : 0;
 
-            $this->ticket->client_state = yiit('ticket', 'download in progress';
+            $this->ticket->client_state = yiit('ticket', 'download in progress');
             $this->ticket->runCommand('echo "download in progress" > ' . $this->remotePath . '/state');
             $this->ticket->save(false);
 

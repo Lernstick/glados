@@ -192,5 +192,12 @@ $requirements = array(
         'by' => 'Generate results',
         'memo' => 'Please install the <a href="http://php.net/manual/en/book.zip.php">PHP Zip</a> extension.',
     ),
+    'LDAP' => array(
+        'name' => 'ldap',
+        'mandatory' => false,
+        'condition' => extension_loaded('ldap'),
+        'by' => 'LDAP/Active Directory Authentication',
+        'memo' => 'Please install the <a href="https://www.php.net/manual/de/book.ldap.php">PHP LDAP</a> extension.',
+    ),
 );
 $requirementsChecker->checkYii()->check($requirements)->render();

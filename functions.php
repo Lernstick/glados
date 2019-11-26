@@ -48,4 +48,18 @@ function yiit($category, $message, $params = [], $language = null) {
 	return $message;
 }
 
+/**
+ * This function act similar to Yii::t() except that it does not translate any
+ * string. It will just replace the placeholders {key} in the string with the
+ * values given in the params array.
+ * @param string string the string containing placeholders
+ * @param array params the array with key values pairs
+ * 
+ * @return string
+ */
+function substitute($string, $params) {
+	$search = preg_filter('/^.*$/', '{$0}', array_keys($params));
+	return str_replace($search, array_values($params), $string);;
+}
+
 ?>

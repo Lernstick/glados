@@ -265,9 +265,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'options' => ['id' => 'dynagrid-exam-index'] // a unique identifier is important
     ]); ?>
 
-    <?= $this->render('@app/views/_notification', [
-        'session' => $session,
-    ]) ?>
+    <?= $this->render('@app/views/_notification') ?>
 
     <?php Pjax::end(); ?>
 

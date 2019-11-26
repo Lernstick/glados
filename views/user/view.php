@@ -3,7 +3,6 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\grid\GridView;
-use yii\widgets\Pjax;
 use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
@@ -55,6 +54,11 @@ $this->registerJs($active_tabs);
                     <?= Html::a(
                         '<span class="glyphicon glyphicon-pencil"></span> '. \Yii::t('users', 'Edit'),
                         ['update', 'id' => $model->id],
+                        [
+                            'class' => 'btn',
+                            'style' => ['text-align' => 'left'],
+                            'disabled' => $model->type != '0',
+                        ],
                         ['data-pjax' => 0]
                     ) ?>
                 </li>
@@ -62,6 +66,11 @@ $this->registerJs($active_tabs);
                     <?= Html::a(
                         '<span class="glyphicon glyphicon-wrench"></span> ' . \Yii::t('users', 'Reset Password'),
                         ['reset-password', 'id' => $model->id],
+                        [
+                            'class' => 'btn',
+                            'style' => ['text-align' => 'left'],
+                            'disabled' => $model->type != '0',
+                        ],
                         ['data-pjax' => 0]
                     ) ?>
                 </li>
@@ -84,21 +93,32 @@ $this->registerJs($active_tabs);
 
     <div class="tab-content">
 
-        <?php Pjax::begin([
-            'id' => 'general',
-            'options' => ['class' => 'tab-pane fade in active'],
-        ]); ?>
+        <div id="general" class="tab-pane fade in active">
 
             <?= DetailView::widget([
                 'model' => $model,
                 'attributes' => [
                     'username',
                     'role',
+                    [
+                        'attribute' => 'authMethod.name',
+                        'label' => Yii::t('auth', 'Authentication Method'),
+                        'value' => function($model) {
+                            if ($model->authMethod !== null) {
+                                return Html::a($model->authMethod->name . ' (' . $model->authMethod->typeName . ')', ['auth/view', 'id' => $model->authMethod->id]);
+                            } else {
+                                return Yii::t('auth', "No Authentication Method");
+                            }
+                        },
+                        'format' => 'raw',
+                    ],
                     'last_visited',
                 ],
             ]) ?>
 
-        <?php Pjax::end(); ?>
+            <?= $this->render('@app/views/_notification') ?>
+
+        </div>
 
         <div id="permissions" class="tab-pane fade">
 

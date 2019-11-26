@@ -121,5 +121,44 @@ class customFormatter extends \yii\i18n\Formatter
         return $value;
     }
 
+    /**
+     * Formats the an associative array as table.
+     *
+     * @param array array the value to be formatted as assiciative array.
+     * @param array heading the table heading of the gridview (array with 2 elements)
+     * @return string the formatted result.
+     */
+    public static function asMapping($array, $header = ['from', 'to'])
+    {
+
+        $models = array_map(function($k, $v) use ($header) {
+            return array(
+                $header[0] => $k,
+                $header[1] => $v
+            );
+        }, array_keys($array), array_values($array));
+
+        $dataProvider = new \yii\data\ArrayDataProvider([
+            'allModels' => $models,
+        ]);
+        $dataProvider->pagination->pageParam = 'map-page';
+        $dataProvider->pagination->pageSize = 10;
+
+        return \yii\grid\GridView::widget([
+            'dataProvider' => $dataProvider,
+            'columns' => [
+                [
+                    'attribute' => $header[0],
+                    'label' => $header[0],
+                ],
+                [
+                    'attribute' => $header[1],
+                    'label' => $header[1],
+                ],
+            ],
+            'layout' => '{items} {pager}',
+        ]);
+    }
+
 }
 

@@ -5,7 +5,7 @@ use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\User */
-/* @var $searchModel app\models\TicketSearch */
+/* @var $searchModel app\models\UserSearch */
 
 $this->title = \Yii::t('users', 'Create User');
 $this->params['breadcrumbs'][] = ['label' => \Yii::t('users', 'Users'), 'url' => ['index']];

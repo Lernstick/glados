@@ -423,9 +423,9 @@ class Exam extends Base
 
     public function validateRunningTickets($attribute, $params)
     {
-        $this->runningTicketCount != 0 ? $this->addError($attribute, \Yii::t('exams', 'Exam edit is disabled while there {n,plural,=1{is one ticket} other{are # tickets}} in "Running" state.',
-            [ 'n' => $this->runningTicketCount ]
-        )) : null;
+        $this->runningTicketCount != 0 ? $this->addError($attribute, \Yii::t('exams', 'Exam edit is disabled while there {n,plural,=1{is one ticket} other{are # tickets}} in "Running" state.', [
+            'n' => $this->runningTicketCount
+        ])) : null;
     }
 
     /**

@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\base\Model;
+use app\models\UserAuth;
 
 /**
  * LoginForm is the model behind the login form.
@@ -27,8 +28,8 @@ class LoginForm extends Model
             [['username', 'password'], 'required'],
             // rememberMe must be a boolean value
             ['rememberMe', 'boolean'],
-            // password is validated by validatePassword()
-            ['password', 'validatePassword'],
+            // password is validated by authenticate()
+            ['password', 'authenticate'],
         ];
     }
 
@@ -39,13 +40,25 @@ class LoginForm extends Model
      * @param string $attribute the attribute currently being validated
      * @param array $params the additional name-value pairs given in the rule
      */
-    public function validatePassword($attribute, $params)
+    public function authenticate($attribute, $params)
     {
         if (!$this->hasErrors()) {
             $user = $this->getUser();
 
             if (!$user || !$user->validatePassword($this->password)) {
                 $this->addError($attribute, \Yii::t('login', 'Incorrect username or password.'));
+
+                // If the user can not be authenticated locally via database
+                // try to authenticate over special authentication methods
+                $this->_user = false;
+                $user = $this->getUserAuth();
+
+                if (!$user) {
+                    $this->addError($attribute, \Yii::t('login', Yii::$app->auth->name . ': Incorrect username or password.'));
+                } else {
+                    $this->clearErrors($attribute);
+                }
+                return;
             }
         }
     }
@@ -75,4 +88,19 @@ class LoginForm extends Model
 
         return $this->_user;
     }
+
+    /**
+     * Finds user by [[username]] and [[password]]
+     *
+     * @return User|null
+     */
+    public function getUserAuth()
+    {
+        if ($this->_user === false) {
+            $this->_user = UserAuth::findByCredentials($this->username, $this->password);
+        }
+
+        return $this->_user;
+    }
+
 }
