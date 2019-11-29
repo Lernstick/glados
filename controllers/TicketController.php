@@ -13,6 +13,8 @@ use app\models\Restore;
 use app\models\RestoreSearch;
 use app\models\Screenshot;
 use app\models\ScreenshotSearch;
+use app\models\History;
+use app\models\HistorySearch;
 use app\models\Exam;
 use app\models\EventItem;
 use app\models\Stats;
@@ -167,6 +169,14 @@ class TicketController extends Controller
             $restoreDataProvider->pagination->pageParam = 'rest-page';
             $restoreDataProvider->pagination->pageSize = 5;
 
+            $historySearchModel = new HistorySearch();
+            $historyDataProvider = $historySearchModel->search(['HistorySearch' => [
+                'table' => 'ticket',
+                'row' => $id,
+            ] ]);
+            $historyDataProvider->pagination->pageParam = 'hist-page';
+            $historyDataProvider->pagination->pageSize = 10;
+
             $options = [
                 'showDotFiles' => boolval($showDotFiles),
             ];
@@ -218,6 +228,8 @@ class TicketController extends Controller
                 'screenshotDataProvider' => $screenshotDataProvider,
                 'restoreSearchModel' => $restoreSearchModel,
                 'restoreDataProvider' => $restoreDataProvider,
+                'historySearchModel' => $historySearchModel,
+                'historyDataProvider' => $historyDataProvider,
                 'ItemsDataProvider' => $ItemsDataProvider,
                 'VersionsDataProvider' => $VersionsDataProvider,
                 'fs' => $fs,

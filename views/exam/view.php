@@ -12,6 +12,8 @@ use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Exam */
+/* @var $historySearchModel app\models\HistorySearch */
+/* @var $historyDataProvider yii\data\ActiveDataProvider */
 
 $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => \Yii::t('exams', 'Exams'), 'url' => ['index']];
@@ -279,6 +281,18 @@ $this->params['breadcrumbs'][] = $this->title;
         'id' => 'monitor',
         'options' => ['class' => 'tab-pane fade'],
     ]); ?>
+    <?php Pjax::end() ?>
+
+    <?php Pjax::begin([
+        'id' => 'history',
+        'options' => ['class' => 'tab-pane fade'],
+    ]); ?>
+        <?php $_GET = array_merge($_GET, ['#' => 'tab_history']); ?>
+        <?= $this->render('/history/index', [
+            'model' => $model,
+            'searchModel' => $historySearchModel,
+            'dataProvider' => $historyDataProvider,
+        ]); ?>
     <?php Pjax::end() ?>
 
     <div id="chart" class="tab-pane fade">

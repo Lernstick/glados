@@ -5,6 +5,7 @@ namespace app\models;
 use Yii;
 use app\models\Base;
 use yii\helpers\Html;
+use app\components\HistoryBehavior;
 
 /**
  * This is the model class for table "exam".
@@ -70,6 +71,39 @@ class Exam extends Base
         $this->libre_autosave_path = $this->isNewRecord ? '/home/user/.config/libreoffice/4/user/tmp' : $this->libre_autosave_path;
         $this->libre_createbackup_path = $this->isNewRecord ? '/home/user/.config/libreoffice/4/user/backup' : $this->libre_createbackup_path;
         $this->max_brightness = $this->isNewRecord ? 100 : $this->max_brightness;
+    }
+
+    /**
+     * @inheritdoc 
+     */
+    public function behaviors()
+    {
+        return [
+            'HistoryBehavior' => [
+                'class' => HistoryBehavior::className(),
+                'attributes' => [
+                    'name' => 'text',
+                    'subject' => 'text',
+                    'file' => 'text',
+                    'file2' => 'text',
+                    'grp_netdev' => 'boolean',
+                    'allow_sudo' => 'boolean',
+                    'allow_mount' => 'boolean',
+                    'firewall_off' => 'boolean',
+                    'screenshots' => 'boolean',
+                    'url_whitelist' => 'ntext',
+                    'backup_path' => 'text',
+                    'time_limit' => 'text',
+                    'screenshots_interval' => 'text',
+                    'libre_autosave' => 'boolean',
+                    'libre_autosave_interval' => 'text',
+                    'libre_autosave_path' => 'text',
+                    'libre_createbackup' => 'boolean',
+                    'libre_createbackup_path' => 'text',
+                    'max_brightness' => 'text',
+                ],
+            ],
+        ];
     }
 
     /**
@@ -209,7 +243,7 @@ class Exam extends Base
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
 
-    /* Getter for exam name */
+    /* Getter for user name */
     public function getUserName()
     {
         return $this->user->username;

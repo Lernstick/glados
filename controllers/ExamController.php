@@ -7,6 +7,8 @@ use app\models\Exam;
 use app\models\ExamSearch;
 use app\models\Ticket;
 use app\models\TicketSearch;
+use app\models\History;
+use app\models\HistorySearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
@@ -108,9 +110,19 @@ class ExamController extends Controller
             $urlWhitelistDataProvider->pagination->pageParam = 'url-page';
             $urlWhitelistDataProvider->pagination->pageSize = 10;            
 
+            $historySearchModel = new HistorySearch();
+            $historyDataProvider = $historySearchModel->search(['HistorySearch' => [
+                'table' => 'exam',
+                'row' => $id,
+            ] ]);
+            $historyDataProvider->pagination->pageParam = 'hist-page';
+            $historyDataProvider->pagination->pageSize = 10;
+
             return $this->render('view', [
                 'model' => $model,
                 'urlWhitelistDataProvider' => $urlWhitelistDataProvider,
+                'historySearchModel' => $historySearchModel,
+                'historyDataProvider' => $historyDataProvider,
             ]);
 
         } else if ($mode == "browse"){

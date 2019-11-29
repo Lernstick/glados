@@ -11,6 +11,7 @@ use yii\base\Event;
 use app\models\Backup;
 use app\models\Restore;
 use app\models\EventItem;
+use app\components\HistoryBehavior;
 
 /**
  * This is the model class for table "ticket".
@@ -65,8 +66,11 @@ class Ticket extends LiveActiveRecord
 
     /* db translated fields */
     public $client_state_db;
+    public $client_state_orig;
     public $backup_state_db;
+    public $backup_state_orig;
     public $restore_state_db;
+    public $restore_state_orig;
 
     /**
      * @inheritdoc
@@ -154,6 +158,38 @@ class Ticket extends LiveActiveRecord
             'restore_lock' => [ 'priority' => 0 ],
             'online',
             'last_backup',
+        ];
+    }
+
+    /**
+     * @inheritdoc 
+     */
+    public function behaviors()
+    {
+        return [
+            'HistoryBehavior' => [
+                'class' => HistoryBehavior::className(),
+                'attributes' => [
+                    'token' => 'text',
+                    'exam_id' => 'text',
+                    'start' => 'timeago',
+                    'end' => 'timeago',
+                    'ip' => 'text',
+                    'test_taker' => 'text',
+                    'backup_interval' => 'duration',
+                    'online' => 'boolean',
+                    'backup_lock' => 'boolean',
+                    'restore_lock' => 'boolean',
+                    'backup_size' => 'size',
+                    'time_limit' => 'text',
+                    'download_request' => 'boolean',
+                    'download_finished' => 'boolean',
+                    'last_backup' => 'timeago',
+                    'client_state' => 'text',
+                    'backup_state' => 'text',
+                    'restore_state' => 'text',
+                ],
+            ],
         ];
     }
 

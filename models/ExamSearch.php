@@ -113,7 +113,7 @@ class ExamSearch extends Exam
             ->andFilterWhere(['like', 'subject', $this->subject])
             ->andFilterWhere(['like', 'file', $this->file]);
 
-        // filter by exam name, subject and user_id
+        // filter by user name
         $query->joinWith(['user' => function ($q) {
             $q->andFilterWhere(['like', 'user.username', $this->userName]);
         }]);

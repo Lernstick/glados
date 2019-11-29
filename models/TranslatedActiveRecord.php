@@ -81,6 +81,7 @@ class TranslatedActiveRecord extends Base
         // set the db property if the property is set directly:
         // $this->name = $value;
         if (in_array($name, $this->getTranslatedFields())) {
+            $this->{$name . "_orig"} = $value;
             return $this->{$name . "_db"} = $value;
         }
 
@@ -159,7 +160,8 @@ class TranslatedActiveRecord extends Base
      *          @param array Array of key value pair to replace the placeholders with
      *          @return void
      *   - obj->getDescription_translation @return \yii\db\ActiveQuery The relation to the translaton table
-     *   - obj->getDescription_db @return string The string directly from the database
+     *   - obj->getDescription_db @return string The string from directly from the database
+     *   - obj->getDescription_orig @return string The string in original language directly from the database
      */
     public function getTranslatedFields()
     {
@@ -193,22 +195,27 @@ class TranslatedActiveRecord extends Base
             }, $keys);
             $params = array_combine($keys, $vals);
 
-            $tr = Translation::find()->where([
-                'en' => \Yii::t($category, $this->{$field . '_db'}, $params, 'en')
-            ])->one();
+            // only do something if the attribute is not empty or null
+            if ($this->{$field . '_orig'} != null || !empty($this->{$field . '_orig'})) {
+
+                $tr = Translation::find()->where([
+                    'en' => \Yii::t($category, $this->{$field . '_db'}, $params, 'en')
+                ])->one();
+
             
-            if ($this->{$field . '_db'} !== null) {
-                if ($tr === null || $tr === false) {
-                    // TODO: loop through all languages
-                    $translation = new Translation([
-                        'en' => \Yii::t($category, $this->{$field . '_db'}, $params, 'en'),
-                        'de' => \Yii::t($category, $this->{$field . '_db'}, $params, 'de'),
-                    ]);
-                    die();
-                    $translation->save();
-                    $this->{$field . '_id'} = $translation->id;
-                } else {
-                    $this->{$field . '_id'} = $tr->id;
+                if ($this->{$field . '_db'} !== null) {
+                    if ($tr === null || $tr === false) {
+                        // TODO: loop through all languages
+                        $translation = new Translation([
+                            'en' => \Yii::t($category, $this->{$field . '_db'}, $params, 'en'),
+                            'de' => \Yii::t($category, $this->{$field . '_db'}, $params, 'de'),
+                        ]);
+                        die();
+                        $translation->save();
+                        $this->{$field . '_id'} = $translation->id;
+                    } else {
+                        $this->{$field . '_id'} = $tr->id;
+                    }
                 }
             }
         }

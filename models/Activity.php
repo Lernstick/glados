@@ -31,6 +31,7 @@ class Activity extends TranslatedActiveRecord
 
     /* db translated fields */
     public $description_db;
+    public $description_orig;
 
     /**
      * @inheritdoc

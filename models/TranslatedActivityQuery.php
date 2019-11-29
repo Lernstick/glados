@@ -31,7 +31,8 @@ class TranslatedActivityQuery extends \yii\db\ActiveQuery
                     NULLIF(`' . $value . '`.`' . $c . '`, ""),
                     NULLIF(`' . $value . '`.`en`, ""),
                     ""
-                ) as ' . $value . '_db');
+                ) as ' . $value . '_db,
+                `' . $value . '`.`en` as ' . $value . '_orig');
         }, $class::getTranslatedFields());
         $select = array_merge(['`' . $class::tableName() . '`.*'], $select);
 
