@@ -11,7 +11,6 @@ use app\components\Editable;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Ticket */
-/* @var $session yii\web\Session */
 /* @var $activitySearchModel app\models\ActivitySearch */
 /* @var $activityDataProvider yii\data\ActiveDataProvider */
 /* @var $backupSearchModel app\models\BackupSearch */
@@ -281,9 +280,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     ]) ?>
 
-    <?= $this->render('@app/views/_notification', [
-        'session' => $session,
-    ]) ?>
+    <?= $this->render('@app/views/_notification') ?>
 
     <?php Pjax::end(); ?>
 

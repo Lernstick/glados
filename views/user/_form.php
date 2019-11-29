@@ -5,7 +5,7 @@ use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\User */
-/* @var $searchModel app\models\TicketSearch */
+/* @var $searchModel app\models\UserSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -18,7 +18,7 @@ use yii\widgets\ActiveForm;
         </div>
 
         <div class="col-md-6">
-            <?php echo $form->field($model, 'role')->dropDownList($searchModel->roleList, [ 'prompt' => 'Choose a Role ...' ]) ?>
+            <?php echo $form->field($model, 'role')->dropDownList($searchModel->roleList, [ 'prompt' => \Yii::t('users', 'Choose a Role ...') ]) ?>
         </div>
     </div>
 

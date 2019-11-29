@@ -17,11 +17,11 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    'File' => '',
-    'Finished At' => '',
-    'ID' => '',
-    'Restore Version' => '',
-    'Started At' => '',
-    'The file could not be restored.' => '',
-    'Ticket ID' => '',
+    'File' => 'Datei',
+    'Finished At' => 'Beendet am',
+    'ID' => 'ID',
+    'Restore Version' => 'Wiederherstellungsversion',
+    'Started At' => 'Begonnen am',
+    'The file could not be restored.' => 'Die Datei konnte nicht wiederhergestellt werden.',
+    'Ticket ID' => 'Ticket ID',
 ];

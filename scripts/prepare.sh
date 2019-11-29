@@ -296,6 +296,7 @@ if [ -n "${actionConfig}" ]; then
     chroot ${initrd}/newroot sed -i '/^BackupScreenshot=/{h;s/=.*/=true/};${x;/^$/{s//BackupScreenshot=true/;H};x}' /etc/lernstickWelcome
     chroot ${initrd}/newroot sed -i '/^Backup=/{h;s/=.*/=true/};${x;/^$/{s//Backup=true/;H};x}' /etc/lernstickWelcome
     chroot ${initrd}/newroot sed -i '/^BackupFrequency=/{h;s/=.*/='$bf'/};${x;/^$/{s//BackupFrequency='$bf'/;H};x}' /etc/lernstickWelcome
+    chroot ${initrd}/newroot sed -i '/^BackupSource=/{h;s/=.*/=/};${x;/^$/{s//BackupSource=\/home\/user\//;H};x}' /etc/lernstickWelcome
   fi
 
   # config->url_whitelist

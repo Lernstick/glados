@@ -67,12 +67,10 @@ class ExamController extends Controller
 
             $searchModel = new ExamSearch();
             $dataProvider = $searchModel->search($params);
-            $session = Yii::$app->session;
 
             return $this->render('index', [
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
-                'session' => $session,
             ]);
         } else if ($mode == 'list') {
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -101,7 +99,6 @@ class ExamController extends Controller
     {
 
         $model = $this->findModel($id);
-        $session = Yii::$app->session;
 
         if ($mode === 'default') {
 
@@ -126,7 +123,6 @@ class ExamController extends Controller
                 'urlWhitelistDataProvider' => $urlWhitelistDataProvider,
                 'historySearchModel' => $historySearchModel,
                 'historyDataProvider' => $historyDataProvider,
-                'session' => $session,
             ]);
 
         } else if ($mode == "browse"){
@@ -174,7 +170,6 @@ class ExamController extends Controller
                 'model' => $model,
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
-                'session' => $session,
             ]);
 
         } else if ($mode == "json"){

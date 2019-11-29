@@ -11,6 +11,7 @@ use yii\web\JsExpression;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\UserSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $authSearchModel app\models\AuthSearch */
 
 $this->title = \Yii::t('users', 'Users');
 $this->params['breadcrumbs'][] = $this->title;
@@ -71,6 +72,19 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'role',
                 'filter' => $searchModel->roleList,
             ],
+            [
+                'attribute' => 'type',
+                'filter' => $authSearchModel->authSelectlist,
+                'label' => Yii::t('auth', 'Authentication Method'),
+                'value' => function($model) {
+                    if ($model->authMethod !== null) {
+                        return $model->authMethod->name . ' (' . $model->authMethod->typeName . ')';
+                    } else {
+                        return Yii::t('auth', "No Authentication Method");
+                    }
+                },
+                'format' => 'raw',
+            ],
             'last_visited',
 
             [
@@ -99,6 +113,8 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
         'options' => ['id' => 'dynagrid-user-index'] // a unique identifier is important
     ]); ?>
+
+    <?= $this->render('@app/views/_notification') ?>
 
     <?php Pjax::end(); ?>
 

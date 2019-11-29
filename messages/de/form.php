@@ -17,7 +17,7 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    '<i>Search for... </i><b>{query}</b>' => '',
-    'Any' => '',
-    'Enter day...' => '',
+    '<i>Search for... </i><b>{query}</b>' => '<i>Suche nach... </i><b>{query}</b>',
+    'Any' => 'Alle',
+    'Enter day...' => 'Tag angeben...',
 ];

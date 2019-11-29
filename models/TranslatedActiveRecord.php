@@ -86,6 +86,31 @@ class TranslatedActiveRecord extends Base
         }
 
         if ($last == 'params' && !empty($pname) && in_array($pname, $this->translatedFields)) {
+
+            # get the size of the column from the table schema, for example int(1024) for varchar(1024)
+            $maxSize = $this->tableSchema->columns[$pname . "_data"]->size;
+            $size = strlen(Json::encode($value));
+
+            if ($size > $maxSize) {
+
+                $n = 0;
+                foreach ($value as $k => $v) {
+                    if (strlen($v) > $size/count($value)) {
+                        $n++;
+                    }
+                }
+                if ($n == 0) {
+                    $n = 1;
+                }
+
+                # cut off too long strings
+                $toCut = ceil(($size - $maxSize)/$n);
+                foreach ($value as $k => $v) {
+                    if (strlen($v) > $size/3) {
+                        $value[$k] = substr($value[$k], 0, -($toCut+3)) . '...';
+                    }
+                }
+            }
             return $this->{$pname . "_data"} = Json::encode($value);
         } else {
             return parent::__set($name, $value);
@@ -174,20 +199,23 @@ class TranslatedActiveRecord extends Base
             if ($this->{$field . '_orig'} != null || !empty($this->{$field . '_orig'})) {
 
                 $tr = Translation::find()->where([
-                    'en' => \Yii::t($category, $this->{$field . '_orig'}, $params, 'en')
+                    'en' => \Yii::t($category, $this->{$field . '_db'}, $params, 'en')
                 ])->one();
 
-                // insert a new entry if there is none
-                if ($tr === null || $tr === false) {
-                    // TODO: loop through all languages
-                    $translation = new Translation([
-                        'en' => \Yii::t($category, $this->{$field . '_orig'}, $params, 'en'),
-                        'de' => \Yii::t($category, $this->{$field . '_orig'}, $params, 'de'),
-                    ]);
-                    $translation->save();
-                    $this->{$field . '_id'} = $translation->id;
-                } else {
-                    $this->{$field . '_id'} = $tr->id;
+            
+                if ($this->{$field . '_db'} !== null) {
+                    if ($tr === null || $tr === false) {
+                        // TODO: loop through all languages
+                        $translation = new Translation([
+                            'en' => \Yii::t($category, $this->{$field . '_db'}, $params, 'en'),
+                            'de' => \Yii::t($category, $this->{$field . '_db'}, $params, 'de'),
+                        ]);
+                        die();
+                        $translation->save();
+                        $this->{$field . '_id'} = $translation->id;
+                    } else {
+                        $this->{$field . '_id'} = $tr->id;
+                    }
                 }
             }
         }

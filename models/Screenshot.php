@@ -38,6 +38,11 @@ class Screenshot extends Model
      */
     private $_thumbnail;
 
+    const SCREENSHOTDIRS = [
+        'Screenshots',
+        '.Screenshots',
+    ];
+
     /**
      * @return array the validation rules.
      */
@@ -78,6 +83,23 @@ class Screenshot extends Model
     }
 
     /**
+     * Return the first Screeshot directory that exists from the list.
+     *
+     * @param string $token the token
+     * @return string the directory
+     */
+    public function getScreenshotDir($token)
+    {
+        foreach (self::SCREENSHOTDIRS as $key => $value) {
+            $dir = \Yii::$app->params['backupPath'] . '/' . $token . '/' . $value . '/';
+            if (is_dir($dir)) {
+                return $value;
+            }
+        }
+        return self::SCREENSHOTDIRS[0];
+    }
+
+    /**
      * Return the Screeshot model related to the token and the date
      *
      * @param string $token - token
@@ -86,7 +108,7 @@ class Screenshot extends Model
      */
     public function findOne($token, $date)
     {
-        $dir = \Yii::$app->params['backupPath'] . '/' . $token . '/Screenshots/';
+        $dir = \Yii::$app->params['backupPath'] . '/' . $token . '/' . self::getScreenshotDir($token) . '/';
         if (file_exists($dir)) {
             $files = scandir($dir, SCANDIR_SORT_DESCENDING);
             foreach ($files as $screenshot) {
@@ -113,7 +135,7 @@ class Screenshot extends Model
      */
     public function findAll($token)
     {
-        $dir = \Yii::$app->params['backupPath'] . '/' . $token . '/Screenshots/';
+        $dir = \Yii::$app->params['backupPath'] . '/' . $token . '/' . $this->getScreenshotDir($token) . '/';
         $models = [];
 
         if (file_exists($dir)) {

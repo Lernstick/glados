@@ -4,7 +4,7 @@ use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\User */
-/* @var $searchModel app\models\TicketSearch */
+/* @var $searchModel app\models\UserSearch */
 
 $this->title = \Yii::t('users', 'Edit User: {id}', [ 'id' => $model->id ]);
 $this->params['breadcrumbs'][] = ['label' => \Yii::t('users', 'Users'), 'url' => ['index']];

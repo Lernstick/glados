@@ -71,9 +71,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]) ?>
 
-        <?= $this->render('@app/views/_notification', [
-            'session' => $session,
-        ]) ?>
+        <?= $this->render('@app/views/_notification') ?>
 
     <?php Pjax::end(); ?>
 

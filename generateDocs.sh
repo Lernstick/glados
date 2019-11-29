@@ -7,14 +7,18 @@ DATE="$(date -R)"
 PWD="$(pwd)"
 
 # remove the worktree by deleting it
-rm -R "${GLADOS_PATH}/web/docs"
+rm -R "${GLADOS_PATH}/web/docs" 2>/dev/null
+# checkout the gh-pages branch that its available locally
+git checkout gh-pages
+# and go back to the master branch
+git checkout master
 # remove the worktree from .git 
 git worktree prune
 # add the worktree again (downloads the current version of it)
 git worktree add "web/docs" gh-pages
 # remove all contents of the folder (will be generated again, see below)
 # this will remain the .git directory in web/docs
-rm -R ${GLADOS_PATH}/web/docs/*
+rm -R ${GLADOS_PATH}/web/docs/* 2>/dev/null
 
 # generate the api and guide documentation
 cd $APIDOC_PATH
@@ -31,7 +35,7 @@ cp -R "${GLADOS_PATH}/howtos/img" "${GLADOS_PATH}/web/docs/img"
 # adjust the permissions of the docs directory
 chown -R www-data:www-data "${GLADOS_PATH}/web/docs"
 
-# pblish the web/docs dir to gh-pages it desired
+# publish the web/docs dir to gh-pages if desired
 while true; do
     read -p "Do you wish to publish the subtree web/docs to gh-pages branch?
 * cd web/docs

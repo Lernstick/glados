@@ -17,15 +17,15 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    'Changed Files' => '',
-    'Date' => '',
-    'Deleted Files' => '',
-    'Elapsed Time' => '',
-    'Errors' => '',
-    'Increment Files' => '',
-    'Mirror Files' => '',
-    'No Backup yet.' => '',
-    'Source Files' => '',
-    'Token' => '',
-    'Total Destination Size Change' => '',
+    'Changed Files' => 'Geänderte Dateien',
+    'Date' => 'Datum',
+    'Deleted Files' => 'Gelöschte Dateien',
+    'Elapsed Time' => 'Vergangene Zeit',
+    'Errors' => 'Fehler',
+    'Increment Files' => 'Inkremente Dateien',
+    'Mirror Files' => 'Spiegel Dateien',
+    'No Backup yet.' => 'Keine Sicherungen bisher.',
+    'Source Files' => 'Quelldateien',
+    'Token' => 'Token',
+    'Total Destination Size Change' => 'Totale Änderung der Grösse',
 ];

@@ -17,9 +17,9 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    'Guide / Howto' => '',
-    'Help' => '',
-    'Howto' => '',
-    'Howtos' => '',
-    'Navigation' => '',
+    'Guide / Howto' => 'Handbuch / Howto',
+    'Help' => 'Hilfe',
+    'Howto' => 'Howto',
+    'Howtos' => 'Howtos',
+    'Navigation' => 'Navigation',
 ];
