@@ -70,12 +70,15 @@ class DownloadController extends DaemonController implements DaemonInterface
             $this->cleanup();
 
             if ($id != '') {
-                if (($this->ticket =  Ticket::findOne(['ticket.id' => $id, 'download_lock' => 0, 'bootup_lock' => 1])) == null){
+                if (($this->ticket = Ticket::findOne(['ticket.id' => $id, 'download_lock' => 0, 'bootup_lock' => 1])) == null){
                     $this->logError('Error: ticket with id ' . $id . ' not found, it is already in processing.');
                     return;
                 }
                 
-                $this->lockItem($this->ticket);
+                if (!$this->lockItem($this->ticket)) {
+                    $this->logError('Error: ticket with id ' . $id . ' not found, it is already in processing.');
+                    return;
+                }
             }
 
             if ($this->ticket == null) {
@@ -111,7 +114,7 @@ class DownloadController extends DaemonController implements DaemonInterface
         $this->ticket->save(false);
 
         if ($this->checkPort(22, 3) === false) {
-            $this->ticket->online = 0;
+            $this->ticket->online = false;
             $this->ticket->download_state = yiit('ticket', 'Download failed: network error.');
             $this->unlockItem($this->ticket);
 
@@ -124,9 +127,8 @@ class DownloadController extends DaemonController implements DaemonInterface
 
         } else {
             $this->ticket->scenario = Ticket::SCENARIO_DOWNLOAD;
-            $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? 1 : 0;
-
-            $this->ticket->client_state = yiit('ticket', 'download in progress');
+            $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? true : false;
+            $this->ticket->client_state = yiit('ticket', 'download in progress ...');
             $this->ticket->runCommand('echo "download in progress" > ' . $this->remotePath . '/state');
             $this->ticket->save(false);
 
@@ -349,9 +351,12 @@ class DownloadController extends DaemonController implements DaemonInterface
      */
     public function lockItem ($ticket)
     {
-        $ticket->download_lock = 1;
-        $ticket->running_daemon_id = $this->daemon->id;
-        return $ticket->save(false);
+        if ($this->lock($ticket->id, "download")) {
+            $ticket->download_lock = 1;
+            $ticket->running_daemon_id = $this->daemon->id;
+            return $ticket->save(false);
+        }
+        return false;
     }
 
     /**
@@ -359,6 +364,7 @@ class DownloadController extends DaemonController implements DaemonInterface
      */
     public function unlockItem ($ticket)
     {
+        $this->unlock();
         $ticket->download_lock = 0;
         return $ticket->save(false);
     }
@@ -399,8 +405,9 @@ class DownloadController extends DaemonController implements DaemonInterface
 
         // finally lock the next ticket and return it
         if (($ticket = $query->one()) !== null) {
-            $this->lockItem($ticket);
-            return $ticket;
+            if ($this->lockItem($ticket)) {
+                return $ticket;
+            }
         }
 
         return null;

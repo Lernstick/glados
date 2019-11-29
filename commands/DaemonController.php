@@ -36,6 +36,11 @@ class DaemonController extends Controller
     protected $loadarr = [];
 
     /**
+     * @var resource file pointer resource of the lock file
+     */
+    protected $lockHandle;
+
+    /**
      * @var array An array holding the timestamp of the last invocation of a job in
      * [[joblist]]. The key corresponds to the key in [[joblist]] and the value is
      * the timestamp of the last invocation.
@@ -620,6 +625,57 @@ class DaemonController extends Controller
                 die();
             }
         }
+    }
+
+    /**
+     * Locks an item via flock().
+     *
+     * @param int $id the id of the item
+     * @param string $reason the reason to lock the item
+     * @return bool success or failure
+     */
+    public function lock ($id, $reason)
+    {
+        $lockFile = \Yii::$app->params['tmpPath'] . "/" . $id . "_" . $reason . ".lock";
+        if (is_writable(\Yii::$app->params['tmpPath'])) {
+
+            if (!file_exists($lockFile)) {
+                touch($lockFile);
+            }
+
+            $this->lockHandle = fopen($lockFile, "c");
+            // acquire an exclusive lock
+            if (flock($this->lockHandle, LOCK_EX | LOCK_NB)) {
+                return true;
+            }
+            fclose($this->lockHandle);
+        }
+        return false;
+    }
+
+    /**
+     * Unlocks an item.
+     *
+     * @return bool success or failure
+     */
+    public function unlock ()
+    {
+        if ($this->locked) {
+            // release the lock
+            return flock($this->lockHandle, LOCK_UN);
+        }
+        return false;
+    }
+
+    /**
+     * Getter for locked.
+     *
+     * @return bool whether the item is locked or not
+     */
+    public function getLocked ()
+    {
+        // if the resource is still open
+        return is_resource($this->lockHandle);
     }
 
     /**

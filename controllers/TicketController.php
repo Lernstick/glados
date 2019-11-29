@@ -238,7 +238,7 @@ class TicketController extends Controller
             ]);
         } else if ($mode == 'probe') {
             //$online = $model->runCommand('source /info; ping -nq -W 10 -c 1 "${gladosIp}"', 'C', 10)[1];
-            $model->online = $model->runCommand('true', 'C', 10)[1] == 0 ? 1 : 0;
+            $model->online = $model->runCommand('true', 'C', 10)[1] == 0 ? true : false;
             $model->save(false);
             return $this->redirect(['ticket/view',
                 'id' => $model->id,

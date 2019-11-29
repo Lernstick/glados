@@ -116,8 +116,12 @@ class BackupController extends DaemonController implements DaemonInterface
                     $this->ticket = null;
                     return;
                 }
-                $this->lockItem($this->ticket);
-                $this->manualBackup = true;
+                if ($this->lockItem($this->ticket)) {
+                    $this->manualBackup = true;
+                } else {
+                    $this->logError('Error: ticket with id ' . $id . ' not found, it is already in processing, or locked while booting.');
+                    return;
+                }
             }
 
             if ($this->ticket == null) {
@@ -167,7 +171,7 @@ class BackupController extends DaemonController implements DaemonInterface
         if ($this->checkPort(22, 3) === false) {
             $this->ticket->backup_state = yiit('ticket', 'network error.');
             $this->ticket->backup_last_try = new Expression('NOW()');
-            $this->ticket->online = 0;
+            $this->ticket->online = false;
             #$this->ticket->backup_lock = 0;
             #$this->ticket->save(false);
             $this->unlockItem($this->ticket);
@@ -182,7 +186,7 @@ class BackupController extends DaemonController implements DaemonInterface
             $this->backup_failed();
 
         } else {
-            $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? 1 : 0;
+            $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? true : false;
             $this->ticket->backup_state = yiit('ticket', 'backup in progress...');
             if ($this->finishBackup == true) {
                 $this->ticket->runCommand('echo "backup in progress..." > /home/user/shutdown');
@@ -277,12 +281,12 @@ class BackupController extends DaemonController implements DaemonInterface
     /**
      * @inheritdoc
      */
-    public function stop($cause = null)
+    public function stop ($cause = null)
     {
 
         if ($this->ticket != null) {
             $this->ticket->backup_state = yiit('ticket', 'backup aborted.');
-            $this->ticket->save(false, ['backup_state']);
+            $this->ticket->save();
 
             $act = new Activity([
                     'ticket_id' => $this->ticket->id,
@@ -411,9 +415,10 @@ class BackupController extends DaemonController implements DaemonInterface
 
         // then search for finished tickets for a last backup
         if (($ticket = $this->finished()) !== null) {
-            $this->lockItem($ticket);
-            $this->finishBackup = true;
-            return $ticket;
+            if ($this->lockItem($ticket)) {
+                $this->finishBackup = true;
+                return $ticket;
+            }
         }
 
         /*
@@ -449,8 +454,9 @@ class BackupController extends DaemonController implements DaemonInterface
 
         // finally lock the next ticket and return it
         if (($ticket = $query->one()) !== null) {
-            $this->lockItem($ticket);
-            return $ticket;
+            if ($this->lockItem($ticket)) {
+                return $ticket;
+            }
         }
 
         return null;
@@ -486,9 +492,12 @@ class BackupController extends DaemonController implements DaemonInterface
      */
     public function lockItem ($ticket)
     {
-        $ticket->backup_lock = 1;
-        $ticket->running_daemon_id = $this->daemon->id;
-        return $ticket->save(false);
+        if ($this->lock($ticket->id, "backup")) {
+            $ticket->backup_lock = 1;
+            $ticket->running_daemon_id = $this->daemon->id;
+            return $ticket->save();
+        }
+        return false;
     }
 
     /**
@@ -496,6 +505,7 @@ class BackupController extends DaemonController implements DaemonInterface
      */
     public function unlockItem ($ticket)
     {
+        $this->unlock();
         $ticket->backup_lock = 0;
         return $ticket->save(false);
     }

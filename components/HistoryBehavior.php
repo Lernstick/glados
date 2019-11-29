@@ -29,10 +29,10 @@ class HistoryBehavior extends Behavior
      */
     public function events()
     {
-        return array_fill_keys(
-            [\yii\db\ActiveRecord::EVENT_AFTER_UPDATE],
-            'historyEntry'
-        );
+        return [
+            \yii\db\ActiveRecord::EVENT_AFTER_UPDATE => 'historyAdd',
+            \yii\db\ActiveRecord::EVENT_AFTER_DELETE => 'historyDelete'
+        ];
     }
 
     /**
@@ -40,7 +40,7 @@ class HistoryBehavior extends Behavior
      * array.
      * @param Event $event
      */
-    public function historyEntry($event)
+    public function historyAdd($event)
     {
 
         if ($event->name == \yii\db\ActiveRecord::EVENT_AFTER_UPDATE) {
@@ -93,6 +93,22 @@ class HistoryBehavior extends Behavior
             }
         }
     }
+
+    /**
+     * Removes all history table entries corresponding to the item.
+     * @param Event $event
+     */
+    public function historyDelete($event)
+    {
+        if ($event->name == \yii\db\ActiveRecord::EVENT_AFTER_DELETE) {
+            $table = $this->owner->tableName();
+            $row = $this->owner->id;
+            History::deleteAll([
+                'table' => $table,
+                'row' => $row,
+            ]);
+        }
+    }    
 
     /**
      * Gets the user id.

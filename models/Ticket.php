@@ -186,12 +186,13 @@ class Ticket extends LiveActiveRecord
                     'backup_size' => 'size',
                     'time_limit' => 'text',
                     'download_state' => 'text',
-                    'download_request' => 'boolean',
-                    'download_finished' => 'boolean',
-                    'last_backup' => 'timeago',
+                    'download_request' => 'timeago',
+                    'download_finished' => 'timeago',
+                    'last_backup' => 'boolean',
                     'client_state' => 'text',
                     'backup_state' => 'text',
                     'restore_state' => 'text',
+                    'running_daemon_id' => 'text',
                 ],
             ],
         ];
@@ -679,22 +680,27 @@ class Ticket extends LiveActiveRecord
     }
 
     /**
-     * Returns all backups associated to the ticket
+     * TODO
      *
      * @param string $attribute the attribute
      * @param array $params
      * @return void
      */
-    public function validateExam($attribute, $params)
+    public function validateExam ($attribute, $params)
     {
 
         $exam = Exam::findOne(['id' => $this->$attribute]);
 
-        if(Yii::$app->user->can('ticket/create/all') || $this->own == true){
-            if (!$exam->fileConsistency){
+        // don't validate in the console case, because Yii::$app->user does not exist
+        if (get_class(\Yii::$app) == "yii\console\Application") {
+            return;
+        }
+
+        if (Yii::$app->user->can('ticket/create/all') || $this->own == true) {
+            if (!$exam->fileConsistency) {
                 $this->addError($attribute, \Yii::t('ticket', 'As long as the exam file is not valid, no tickets can be created for this exam.'));
             }
-        }else{
+        } else {
             $this->addError($attribute, \Yii::t('ticket', 'You are not allowed to perform this action on this exam.'));
         }
 
