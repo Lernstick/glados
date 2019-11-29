@@ -255,7 +255,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'panel' => ['heading' => '<h3 class="panel-title">' . \Yii::t('exams', 'Your Exams') . '</h3>'],
             'toolbar' =>  [
                 ['content' =>
-                    Html::a('<i class="glyphicon glyphicon-plus"></i>', ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => \Yii::t('exams', 'Create Exam')]) . ' ' .
+                    Html::a('<i class="glyphicon glyphicon-plus"></i>&nbsp;' . \Yii::t('exams', 'Create Exam'), ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => \Yii::t('exams', 'Create Exam')]) . ' ' .
                     Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/exam/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => \Yii::t('exams', 'Reset Grid')])
                 ],
                 ['content' => '{dynagridFilter}{dynagridSort}{dynagrid}'],

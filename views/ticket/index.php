@@ -459,7 +459,7 @@ $this->params['breadcrumbs'][] = $this->title;
             },            
             'toolbar' =>  [
                 ['content' =>
-                    Html::a('<i class="glyphicon glyphicon-plus"></i>', ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => \Yii::t('ticket', 'Create Ticket')]) . ' ' .
+                    Html::a('<i class="glyphicon glyphicon-plus"></i>&nbsp;' . \Yii::t('ticket', 'Create Ticket'), ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => \Yii::t('ticket', 'Create Ticket')]) . ' ' .
                     Html::a('<i class="glyphicon glyphicon-envelope"></i>', ['update', 'mode' => 'submit'], ['data-pjax' => 0, 'class' => 'btn btn-info', 'title' => \Yii::t('ticket', 'Submit Ticket')]) . ' ' .
                     Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/ticket/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => \Yii::t('ticket', 'Reset Grid')])
                 ],

@@ -153,35 +153,35 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
                 'visible' => Yii::$app->user->can('ticket/index'),
             ],
             [
-                'label' => \Yii::t('main', 'Daemons ') . 
-                    ActiveEventField::widget([
-                        'content' => $runningDaemons,
-                        'options' => [
-                            'class' => 'badge',
-                            'change-animation' => 'bounce 1000ms linear both',
-                        ],
-                        'event' => 'runningDaemons',
-                        'jsonSelector' => 'runningDaemons',
-                    ]),
-                'encode' => false,
-                'url' => ['/daemon/index'],
-                'visible' => Yii::$app->user->can('daemon/index'),
-            ],
-            [
-                'label' => \Yii::t('main', 'Users'),
-                'url' => ['/user/index'],
-                'visible' => Yii::$app->user->can('user/index'),
-            ],
-            [
-                'label' => \Yii::t('main', 'Profile'),
-                'url' => ['/user/view', 'id' => Yii::$app->user->id],
-                'visible' => !Yii::$app->user->isGuest && Yii::$app->user->can('user/view'),
-            ],
-
-            [
                 'label' => \Yii::t('main', 'System'),
                 'visible' => !Yii::$app->user->isGuest,
                 'items' => [
+
+                    [
+                        'label' => \Yii::t('main', 'Daemons ') . 
+                            ActiveEventField::widget([
+                                'content' => $runningDaemons,
+                                'options' => [
+                                    'class' => 'badge',
+                                    'change-animation' => 'bounce 1000ms linear both',
+                                ],
+                                'event' => 'runningDaemons',
+                                'jsonSelector' => 'runningDaemons',
+                            ]),
+                        'encode' => false,
+                        'url' => ['/daemon/index'],
+                        'visible' => Yii::$app->user->can('daemon/index'),
+                    ],
+                    [
+                        'label' => \Yii::t('main', 'Users'),
+                        'url' => ['/user/index'],
+                        'visible' => Yii::$app->user->can('user/index'),
+                    ],
+                    [
+                        'label' => \Yii::t('main', 'Profile'),
+                        'url' => ['/user/view', 'id' => Yii::$app->user->id],
+                        'visible' => !Yii::$app->user->isGuest && Yii::$app->user->can('user/view'),
+                    ],
                     [
                         'label' => \Yii::t('main', 'Config'),
                         'url' => ['/config/system'],

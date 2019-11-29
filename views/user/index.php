@@ -104,7 +104,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'panel' => ['heading' => '<h3 class="panel-title">' . \Yii::t('users', 'Users') . '</h3>'],
             'toolbar' =>  [
                 ['content' =>
-                    Html::a('<i class="glyphicon glyphicon-plus"></i>', ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => \Yii::t('users', 'Create User')]) . ' ' .
+                    Html::a('<i class="glyphicon glyphicon-plus"></i>&nbsp;' . \Yii::t('users', 'Create User'), ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => \Yii::t('users', 'Create User')]) . ' ' .
                     Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/user/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => \Yii::t('users', 'Reset Grid')])
                 ],
                 ['content' => '{dynagridFilter}{dynagridSort}{dynagrid}'],
