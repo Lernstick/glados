@@ -237,10 +237,10 @@ $this->registerJs($js);
             <div class="row">
                 <div class="col-md-6">
                     <div class="row">
-                        <div class="col-md-6" style="width:auto;">
+                        <div class="col-md-12" style="width:auto;">
                             <?= $form->field($model, 'screenshots')->checkbox() ?>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <?= $form->field($model, 'screenshots_interval', [
                                 'template' => '{label}<div class="input-group"><div class="input-group-addon">' . \Yii::t('exams', 'with Interval of') . '</div>{input}<span class="input-group-addon" id="basic-addon2">' . \Yii::t('exams', 'minutes') . '</span></div>{hint}{error}'
                             ])->textInput(['type' => 'number', 'disabled' => !$model->screenshots])->label(false); ?>
@@ -418,7 +418,7 @@ $this->registerJs($js);
     <hr>
 
     <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? \Yii::t('exams', 'Next Step') : ($step == 2 ? \Yii::t('exams', 'Finish') : \Yii::t('exams', 'Apply')), ['class' => $model->isNewRecord || $step == 2 ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::submitButton($model->isNewRecord ? \Yii::t('exams', 'Next Step') : ($step == 2 ? \Yii::t('exams', 'Apply') : \Yii::t('exams', 'Apply')), ['class' => $model->isNewRecord || $step == 2 ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>
