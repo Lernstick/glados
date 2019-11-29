@@ -116,6 +116,9 @@ class m190531_162014_i18n_migrate extends Migration
         // for backward compatibility
         yiit('activity', 'Client state changed: {old} -> {new}');
         yiit('ticket', 'Client not seen yet');
+        yiit('ticket', 'shutting down.');
+        yiit('ticket', 'waiting for last backup.');
+        yiit('ticket', 'continue bootup');
         yiit('activity', 'Download failed: rsync failed (retval: {retval})');
         yiit('activity', 'Exam download aborted (server side).');
         yiit('activity', 'Exam download finished by {ip} from Ticket with token {token}.');
@@ -132,9 +135,10 @@ class m190531_162014_i18n_migrate extends Migration
         $nr = Activity::find()->count();
         $this->migrateTableFieldUp($this->activitiesTable, 'description', $models, $nr);
 
-        // ticket->client_state
         $models = Ticket::find()->all();
         $nr = Ticket::find()->count();
+
+        // ticket->client_state
         $this->migrateTableFieldUp($this->ticketTable, 'client_state', $models, $nr);
 
         // ticket->backup_state
@@ -142,6 +146,9 @@ class m190531_162014_i18n_migrate extends Migration
 
         // ticket->restore_state
         $this->migrateTableFieldUp($this->ticketTable, 'restore_state', $models, $nr);
+
+        // ticket->download_state
+        $this->migrateTableFieldUp($this->ticketTable, 'download_state', $models, $nr);
     }
 
     /**
@@ -168,6 +175,11 @@ class m190531_162014_i18n_migrate extends Migration
         $models = Ticket::find()->where(['restore_state_new' => null])->all();
         $nr = Ticket::find()->where(['restore_state_new' => null])->count();
         $this->migrateTableFieldDown($this->ticketTable, 'restore_state', $models, $nr);
+
+        // ticket->download_state
+        $models = Ticket::find()->where(['download_state_new' => null])->all();
+        $nr = Ticket::find()->where(['download_state_new' => null])->count();
+        $this->migrateTableFieldDown($this->ticketTable, 'download_state', $models, $nr);
     }
 
     private function migrateTableFieldUp($table, $field, $models, $nr)

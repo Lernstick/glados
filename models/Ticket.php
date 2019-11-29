@@ -71,6 +71,8 @@ class Ticket extends LiveActiveRecord
     public $backup_state_orig;
     public $restore_state_db;
     public $restore_state_orig;
+    public $download_state_db;
+    public $download_state_orig;
 
     /**
      * @inheritdoc
@@ -130,6 +132,7 @@ class Ticket extends LiveActiveRecord
             'client_state',
             'backup_state',
             'restore_state',
+            'download_state',
         ];
     }
 
@@ -182,6 +185,7 @@ class Ticket extends LiveActiveRecord
                     'restore_lock' => 'boolean',
                     'backup_size' => 'size',
                     'time_limit' => 'text',
+                    'download_state' => 'text',
                     'download_request' => 'boolean',
                     'download_finished' => 'boolean',
                     'last_backup' => 'timeago',

@@ -594,7 +594,7 @@ class TicketController extends Controller
                 $model->download_request = new Expression('NOW()');
                 $model->start = $model->state == 0 ? new Expression('NOW()') : $model->start;
                 $model->ip = Yii::$app->request->userIp;
-                $model->client_state = 'exam requested sccessfully';
+                $model->client_state = yiit('ticket', 'exam requested sccessfully');
                 $model->download_progress = 0;
                 $model->save();
 

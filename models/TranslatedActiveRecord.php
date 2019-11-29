@@ -160,7 +160,7 @@ class TranslatedActiveRecord extends Base
      *          @param array Array of key value pair to replace the placeholders with
      *          @return void
      *   - obj->getDescription_translation @return \yii\db\ActiveQuery The relation to the translaton table
-     *   - obj->getDescription_db @return string The string from directly from the database
+     *   - obj->getDescription_db @return string The translated string from directly from the database
      *   - obj->getDescription_orig @return string The string in original language directly from the database
      */
     public function getTranslatedFields()
@@ -199,18 +199,17 @@ class TranslatedActiveRecord extends Base
             if ($this->{$field . '_orig'} != null || !empty($this->{$field . '_orig'})) {
 
                 $tr = Translation::find()->where([
-                    'en' => \Yii::t($category, $this->{$field . '_db'}, $params, 'en')
+                    'en' => \Yii::t($category, $this->{$field . '_orig'}, $params, 'en')
                 ])->one();
-
             
                 if ($this->{$field . '_db'} !== null) {
                     if ($tr === null || $tr === false) {
                         // TODO: loop through all languages
                         $translation = new Translation([
-                            'en' => \Yii::t($category, $this->{$field . '_db'}, $params, 'en'),
-                            'de' => \Yii::t($category, $this->{$field . '_db'}, $params, 'de'),
+                            'en' => \Yii::t($category, $this->{$field . '_orig'}, $params, 'en'),
+                            'de' => \Yii::t($category, $this->{$field . '_orig'}, $params, 'de'),
                         ]);
-                        die();
+
                         $translation->save();
                         $this->{$field . '_id'} = $translation->id;
                     } else {

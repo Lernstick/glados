@@ -60,7 +60,6 @@ return [
     'File List' => 'Datei-Liste',
     'File not valid' => 'Datei ungültig',
     'File valid' => 'Datei gültig',
-    'Finish' => 'Beendet',
     'For more information, please visit ' => 'Für mehr Informationen, bitte besuchen Sie ',
     'For more information, please visit {link}.' => 'Für mehr Informationen, bitte besuchen Sie {link}.',
     'General' => 'Allgemein',
@@ -154,6 +153,7 @@ return [
     'Any' => '@@@@',
     'Check to <b>save recovery information automatically every n minutes</b>. This command saves the information necessary to restore the current document in case of a crash. Additionally, in case of a crash LibreOffice tries automatically to save AutoRecovery information for all open documents, if possible. (See <a target="_blank" href="https://help.libreoffice.org/Common/Saving_Documents_Automatically">LibreOffice Help</a>)' => '@@@@',
     'Enter day...' => '@@@@',
+    'Finish' => '@@Beendet@@',
     'If the <b>Always create backup copy</b> option is selected, the old version of the file is saved to the backup directory whenever you save the current version of the file. The backup copy has the same name as the document, but the extension is <code>.BAK</code>. If the backup folder (default: <code>/home/user/.config/libreoffice/4/backup</code>) already contains such a file, it will be overwritten without warning. (See <a target="_blank" href="https://help.libreoffice.org/Common/Saving_Documents_Automatically">LibreOffice Help</a>)' => '@@@@',
     'Libreoffice Autosave Interval' => '@@@@',
 ];

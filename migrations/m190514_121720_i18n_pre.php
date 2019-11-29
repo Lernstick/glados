@@ -56,6 +56,9 @@ class m190514_121720_i18n_pre extends Migration
         /* ticket->restore_state */
         $this->tableFieldUp($this->ticketTable, 'restore_state');
 
+        /* ticket->download_state */
+        $this->tableFieldUp($this->ticketTable, 'download_state');
+
         /* adjust event table */
         if ($this->db->schema->getTableSchema($this->eventTable, true)->getColumn('category') === null) {
             $this->addColumn($this->eventTable, 'category', $this->string(64)->defaultValue(null));
@@ -93,6 +96,10 @@ class m190514_121720_i18n_pre extends Migration
 
         /* ticket->restore_state */
         $this->tableFieldDown($this->ticketTable, 'restore_state');
+
+        /* ticket->download_state */
+        $this->tableFieldDown($this->ticketTable, 'download_state');
+
 
         $this->alterColumn($this->ticketTable, 'backup_state', 'string(10240)');
         $this->alterColumn($this->ticketTable, 'restore_state', 'string(10240)');

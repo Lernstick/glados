@@ -107,12 +107,12 @@ class DownloadController extends DaemonController implements DaemonInterface
         $this->logInfo('Processing ticket (download): ' .
             ( empty($this->ticket->test_taker) ? $this->ticket->token : $this->ticket->test_taker) .
             ' (' . $this->ticket->ip . ')', true);
-        $this->ticket->download_state = 'connecting to client';
+        $this->ticket->download_state = yiit('ticket', 'Connecting to client ...');
         $this->ticket->save(false);
 
         if ($this->checkPort(22, 3) === false) {
             $this->ticket->online = 0;
-            $this->ticket->download_state = 'download failed: network error.';
+            $this->ticket->download_state = yiit('ticket', 'Download failed: network error.');
             $this->unlockItem($this->ticket);
 
             $act = new Activity([
@@ -191,7 +191,7 @@ class DownloadController extends DaemonController implements DaemonInterface
                 ]);
                 $act->save();
 
-                $this->ticket->download_state = "download failed: rsync failed";
+                $this->ticket->download_state = yiit('ticket', "Download failed: rsync failed");
                 $this->unlockItem($this->ticket);
             } else {
 
