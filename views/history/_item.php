@@ -31,9 +31,19 @@ foreach ($model->columns as $key => $column) {
             $old = Translation::findOne($model->old_values[$key]);
             $new_params = [];
             $old_params = [];
-            if (($k = array_search($pname . '_data', $model->columns)) !== false) {
+            if ( ($k = array_search($pname . '_data', $model->columns)) !== false) {
                 $new_params = Json::decode($model->new_values[$k]);
                 $old_params = Json::decode($model->old_values[$k]);
+            } else {
+                $previous = History::find()->where([
+                    'table' => $itemModel->tableName(),
+                    'row' => $itemModel->id,
+                    'column' => $pname . '_data',
+                ])->orderBy(['changed_at' => SORT_DESC])->one();
+                if ($previous !== null) {
+                    $new_params = Json::decode($previous->new_value);
+                    $old_params = Json::decode($previous->new_value);
+                }
             }
 
             $models[] = new History([

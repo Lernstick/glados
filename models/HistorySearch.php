@@ -87,12 +87,10 @@ class HistorySearch extends History
     public function getColumnList($model)
     {
         $query = History::find();
+        $query->where(['table' => $model->tableName(), 'row' => $model->id]);
 
-        $query->where([
-            'table' => $model->tableName(),
-            'row' => $model->id,
-        ]);
-
+        // filter out all _data fields
+        $query->andWhere(['not like', 'column', ['%_data'], false]);
         $query->groupBy('column');
         $items = $query->asArray()->all();
 
