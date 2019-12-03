@@ -1,12 +1,8 @@
 <?php
 
 use yii\widgets\ListView;
-use yii\grid\GridView;
 use yii\widgets\Pjax;
 use yii\widgets\ActiveForm;
-use yii\helpers\Html;
-use kartik\select2\Select2;
-use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\HistorySearch */
