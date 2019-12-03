@@ -11,8 +11,8 @@ return [
     'dotSSH' =>                 '/var/lib/glados/.ssh/',
     'daemonLogFilePath' =>      '/var/log/glados',
     'examDownloadBandwith' =>   '10m', // 10MB per second, set 0 for no limit
-    'minDaemons' =>             1,
-    'maxDaemons' =>             1,
+    'minDaemons' =>             3,
+    'maxDaemons' =>             10,
     'upperBound' =>             80,
     'lowerBound' =>             20,
     'abandonTicket' =>          10800, // leave the ticket after 3 hours of failed backup attempts
