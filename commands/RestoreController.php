@@ -79,10 +79,11 @@ class RestoreController extends DaemonController
             return;
         }
 
-        /*if (($this->ticket = Ticket::findOne(['id' => $id, 'backup_lock' => 0, 'restore_lock' => 0])) == null) {
-            $this->log('Error: ticket with id ' . $id . ' not found or it is already in processing.');
+        if ($this->lock($id, 'restore') === false) {
+            $this->logError('Error: ticket with id ' . $id . ' is already in processing (flock).');
             return;
-        }*/
+        }
+
         $this->ticket->restore_lock = 1;
         $this->ticket->running_daemon_id = $this->daemon->id;
         $this->logInfo('Processing ticket: ' .
@@ -103,6 +104,7 @@ class RestoreController extends DaemonController
                 'severity' => Activity::SEVERITY_WARNING,
             ]);
             $act->save();
+            $this->unlock();
             return;
         } else {
             $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? true : false;
@@ -143,6 +145,7 @@ class RestoreController extends DaemonController
                 ]);
                 $act->save();
 
+                $this->unlock();
                 return;
             }
         } else {
@@ -150,6 +153,7 @@ class RestoreController extends DaemonController
             $this->logInfo($this->ticket->restore_state);
             $this->ticket->restore_lock = 0;
             $this->ticket->save(false);
+            $this->unlock();
             return;
         }
 
@@ -237,7 +241,7 @@ class RestoreController extends DaemonController
 
         $this->ticket->restore_lock = 0;
         $this->ticket->save(false);
-
+        $this->unlock();
     }
 
     /**
