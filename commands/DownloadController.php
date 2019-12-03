@@ -76,7 +76,7 @@ class DownloadController extends DaemonController implements DaemonInterface
                 }
                 
                 if (!$this->lockItem($this->ticket)) {
-                    $this->logError('Error: ticket with id ' . $id . ' not found, it is already in processing.');
+                    $this->logError('Error: ticket with id ' . $id . ' not found, it is already in processing (flock).');
                     return;
                 }
             }
@@ -128,7 +128,7 @@ class DownloadController extends DaemonController implements DaemonInterface
         } else {
             $this->ticket->scenario = Ticket::SCENARIO_DOWNLOAD;
             $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? true : false;
-            $this->ticket->client_state = yiit('ticket', 'download in progress ...');
+            $this->ticket->client_state = yiit('ticket', 'download in progress') . ' ...';
             $this->ticket->runCommand('echo "download in progress" > ' . $this->remotePath . '/state');
             $this->ticket->save(false);
 

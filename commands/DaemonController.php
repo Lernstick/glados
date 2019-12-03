@@ -36,6 +36,11 @@ class DaemonController extends Controller
     protected $loadarr = [];
 
     /**
+     * @var string file path of the lock file
+     */
+    protected $lockFile;
+
+    /**
      * @var resource file pointer resource of the lock file
      */
     protected $lockHandle;
@@ -628,7 +633,7 @@ class DaemonController extends Controller
     }
 
     /**
-     * Locks an item via flock().
+     * Locks an item using PHP's flock().
      *
      * @param int $id the id of the item
      * @param string $reason the reason to lock the item
@@ -636,16 +641,19 @@ class DaemonController extends Controller
      */
     public function lock ($id, $reason)
     {
-        $lockFile = \Yii::$app->params['tmpPath'] . "/" . $id . "_" . $reason . ".lock";
+        $this->lockFile = \Yii::$app->params['tmpPath'] . "/" . $id . "_" . $reason . ".lock";
         if (is_writable(\Yii::$app->params['tmpPath'])) {
 
-            if (!file_exists($lockFile)) {
-                touch($lockFile);
+            if (!file_exists($this->lockFile)) {
+                touch($this->lockFile);
             }
 
-            $this->lockHandle = fopen($lockFile, "c");
+            $this->lockHandle = fopen($this->lockFile, "c");
             // acquire an exclusive lock
             if (flock($this->lockHandle, LOCK_EX | LOCK_NB)) {
+                ftruncate($this->lockHandle, 0);
+                fwrite($this->lockHandle, $this->daemon->pid); // write down the process pid
+                fflush($this->lockHandle); // flush output before releasing the lock
                 return true;
             }
             fclose($this->lockHandle);
@@ -654,7 +662,7 @@ class DaemonController extends Controller
     }
 
     /**
-     * Unlocks an item.
+     * Unlocks an item using PHP's flock().
      *
      * @return bool success or failure
      */
@@ -662,7 +670,9 @@ class DaemonController extends Controller
     {
         if ($this->locked) {
             // release the lock
-            return flock($this->lockHandle, LOCK_UN);
+            flock($this->lockHandle, LOCK_UN);
+            fclose($this->lockHandle);
+            return @unlink($this->lockFile);
         }
         return false;
     }
@@ -670,7 +680,7 @@ class DaemonController extends Controller
     /**
      * Getter for locked.
      *
-     * @return bool whether the item is locked or not
+     * @return bool whether the item is still locked or not (by this process)
      */
     public function getLocked ()
     {

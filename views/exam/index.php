@@ -121,14 +121,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
                 'format'=>'raw'
             ],
-            /*[
-                'attribute' => 'userName',
-                'label' => 'Owner',
-                'value' => function($model){
-                    return ( $model->user_id == null ? '<span class="not-set">(user removed)</span>' : '<span>' . $model->user->username . '</span>' );
-                },
-                'format' => 'html',
-            ],*/
             [
                 'attribute' => 'userName',
                 'label' => \Yii::t('exams', 'Owner'),

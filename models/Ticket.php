@@ -241,15 +241,21 @@ class Ticket extends LiveActiveRecord
             'result' => \Yii::t('ticket', 'Result'),
             'time_limit' => \Yii::t('ticket', 'Time Limit'),
             'download_progress' => \Yii::t('ticket', 'Exam Download Progress'),
+            'download_state' => \Yii::t('ticket', 'Download State'),
+            'download_request' => \Yii::t('ticket', 'Download requested at'),
+            'download_finished' => \Yii::t('ticket', 'Download finshed at'),
             'client_state' => \Yii::t('ticket', 'Client State'),
+            'online' => \Yii::t('ticket', 'Online'),
             'ip' => \Yii::t('ticket', 'IP Address'),
             'test_taker' => \Yii::t('ticket', 'Test Taker'),
             'backup' => \Yii::t('ticket', 'Backup'),
+            'backup_lock' => \Yii::t('ticket', 'Backup locked'),
             'backup_last' => \Yii::t('ticket', 'Last Backup'),
             'backup_last_try' => \Yii::t('ticket', 'Last Backup Try'),
             'backup_state' => \Yii::t('ticket', 'Backup State'),
             'backup_interval' => \Yii::t('ticket', 'Backup Interval'),
             'backup_size' => \Yii::t('ticket', 'Current Backup Size'),
+            'running_daemon_id' => \Yii::t('ticket', 'ID of the running daemon'),
         ];
     }
 

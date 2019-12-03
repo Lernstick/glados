@@ -170,10 +170,15 @@ class TicketController extends Controller
             $restoreDataProvider->pagination->pageSize = 5;
 
             $historySearchModel = new HistorySearch();
-            $historyDataProvider = $historySearchModel->search(['HistorySearch' => [
+            $historyQueryParams = array_key_exists('HistorySearch', Yii::$app->request->queryParams)
+                ? Yii::$app->request->queryParams['HistorySearch']
+                : [];
+            $historyParams = array_merge($historyQueryParams, [
                 'table' => 'ticket',
                 'row' => $id,
-            ] ]);
+            ]);
+            $historyParams = ['HistorySearch' => $historyParams];
+            $historyDataProvider = $historySearchModel->search($historyParams);
             $historyDataProvider->pagination->pageParam = 'hist-page';
             $historyDataProvider->pagination->pageSize = 10;
 

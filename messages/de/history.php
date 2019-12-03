@@ -30,7 +30,8 @@ return [
     'Row' => 'Zeile',
     'System' => 'System',
     'Table' => 'Tabelle',
-    '{date} by <a>{user}</a>' => '{date} von <a>{user}</a>',
     'This is the first modification since creation' => 'Dies ist die erste Änderung seit der Erstellung',
+    '{date} by <a>{user}</a>' => '{date} von <a>{user}</a>',
     '{duration} since last modification' => '{duration} seit letzter Änderung',
+    'Choose a column to filter ...' => 'Wählen Sie eine Spalte zum Filtern ...',
 ];

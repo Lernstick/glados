@@ -111,10 +111,15 @@ class ExamController extends Controller
             $urlWhitelistDataProvider->pagination->pageSize = 10;            
 
             $historySearchModel = new HistorySearch();
-            $historyDataProvider = $historySearchModel->search(['HistorySearch' => [
+            $historyQueryParams = array_key_exists('HistorySearch', Yii::$app->request->queryParams)
+                ? Yii::$app->request->queryParams['HistorySearch']
+                : [];
+            $historyParams = array_merge($historyQueryParams, [
                 'table' => 'exam',
                 'row' => $id,
-            ] ]);
+            ]);
+            $historyParams = ['HistorySearch' => $historyParams];
+            $historyDataProvider = $historySearchModel->search($historyParams);
             $historyDataProvider->pagination->pageParam = 'hist-page';
             $historyDataProvider->pagination->pageSize = 10;
 

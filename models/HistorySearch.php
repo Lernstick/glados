@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\base\Model;
+use yii\helpers\ArrayHelper;
 use yii\data\ActiveDataProvider;
 use app\models\History;
 
@@ -75,5 +76,39 @@ class HistorySearch extends History
         ]);
 
         return $dataProvider;
+    }
+
+    /**
+     * Generates a list of columns with their translated names to filter the history view
+     * @param $model yii\base\Model the data model of the item (for example: app\models\Ticket, app\models\Exam, app\models\User, ...)
+     * @return array Array of columns, where the keys are column names from the database
+     * and the values are translated column names to display in the view.
+     */
+    public function getColumnList($model)
+    {
+        $query = History::find();
+
+        $query->where([
+            'table' => $model->tableName(),
+            'row' => $model->id,
+        ]);
+
+        $query->groupBy('column');
+        $items = $query->asArray()->all();
+
+        return ArrayHelper::map($items, 'column', function($items) use ($model) {
+                $parts = explode('_', $items['column']);
+                $last = array_pop($parts);
+                $pname = implode('_', $parts);
+                if ($last == 'id'
+                    && $model->hasMethod('getTranslatedFields')
+                    && in_array($pname, $model->translatedFields)
+                ) {
+                    return $model->getAttributeLabel($pname);
+                } else {
+                    return $model->getAttributeLabel($items['column']);
+                }
+            }
+        );
     }
 }

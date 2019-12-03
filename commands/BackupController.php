@@ -119,7 +119,7 @@ class BackupController extends DaemonController implements DaemonInterface
                 if ($this->lockItem($this->ticket)) {
                     $this->manualBackup = true;
                 } else {
-                    $this->logError('Error: ticket with id ' . $id . ' not found, it is already in processing, or locked while booting.');
+                    $this->logError('Error: ticket with id ' . $id . ' not found, it is already in processing, or locked (flock).');
                     return;
                 }
             }
@@ -154,8 +154,6 @@ class BackupController extends DaemonController implements DaemonInterface
             $this->ticket->backup_state = yiit('ticket', '{path}: No such file or directory or not writable.');
             $this->ticket->backup_state_params = [ 'path' => \Yii::$app->params['backupPath'] ];
             $this->ticket->backup_last_try = new Expression('NOW()');
-            #$this->ticket->backup_lock = 0;
-            #$this->ticket->save(false);
             $this->unlockItem($this->ticket);
             $this->logError($this->ticket->backup_state);
             $this->ticket = null;
@@ -172,8 +170,6 @@ class BackupController extends DaemonController implements DaemonInterface
             $this->ticket->backup_state = yiit('ticket', 'network error.');
             $this->ticket->backup_last_try = new Expression('NOW()');
             $this->ticket->online = false;
-            #$this->ticket->backup_lock = 0;
-            #$this->ticket->save(false);
             $this->unlockItem($this->ticket);
             
             $act = new Activity([
@@ -284,7 +280,7 @@ class BackupController extends DaemonController implements DaemonInterface
     public function stop ($cause = null)
     {
 
-        if ($this->ticket != null) {
+        if ($cause != "natural" && $this->ticket != null) {
             $this->ticket->backup_state = yiit('ticket', 'backup aborted.');
             $this->ticket->save();
 
