@@ -19,4 +19,23 @@ function add_dash_entry()
   # directory containing the rules has the same mtime as before
   touch "${initrd}/newroot/etc/dconf/db/local.d"
   chroot ${initrd}/newroot dconf update
+
+  # place ${entry} in "favorite apps" of Gnome3's dash in the user-db
+  cp -p /home/user/.config/dconf/user /home/user/.config/dconf/user.bak
+  cp -p ${initrd}/newroot/home/user/.config/dconf/user /home/user/.config/dconf/
+  sync
+
+  oldvalue="$(sudo -u user dconf read /org/gnome/shell/favorite-apps)"
+  if [ "${oldvalue}" = "" ]; then
+    newvalue="['${entry}']"
+  else
+    newvalue=$(echo "${oldvalue}" | mawk -v entry="${entry}" -F'[\,,\[,\], ]' '{ printf "["; for(i = 2; i <= NF; i++) { if($i!="") {printf "%s, ", $i;} } printf "'\''%s'\'']\n", entry; }')
+
+  fi
+  sudo -u user dconf write "/org/gnome/shell/favorite-apps" "${newvalue}"
+  sync
+
+  cp -p /home/user/.config/dconf/user ${initrd}/newroot/home/user/.config/dconf/user
+  cp -p /home/user/.config/dconf/user.bak /home/user/.config/dconf/user
+
 }
