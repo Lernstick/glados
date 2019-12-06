@@ -238,10 +238,11 @@ class DownloadController extends DaemonController implements DaemonInterface
                 $this->ticket->save();
 
                 /* run the prepare.sh script on the client */
-                $cmd = "ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa -o "
+                $cmd = "cat " . \Yii::$app->basePath . "/scripts/prepare.d/* " . \Yii::$app->basePath . "/scripts/prepare.sh "
+                     . "| ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa -o "
                      . "UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "
                      . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip) . " "
-                     . "'bash -s' < " . \Yii::$app->basePath . "/scripts/prepare.sh " . escapeshellarg($this->ticket->token);
+                     . "'bash -s' " . escapeshellarg($this->ticket->token);
 
                 $this->logInfo('Executing ssh: ' . $cmd);
 
