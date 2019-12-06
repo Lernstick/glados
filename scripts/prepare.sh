@@ -102,7 +102,12 @@ chmod 700 "${initrd}/backup/root/.ssh"
 
 # get all active network connections
 con=$(LC_ALL=C nmcli -t -f state,connection d status | awk -F: '$1=="connected"{print $2}')
-while IFS= read -r c; do echo "${c}"; echo "${c}.nmconnection"; done <<< "${con}" | LC_ALL=C xargs -I{} cp -p "/etc/NetworkManager/system-connections/{}" "${initrd}/backup/etc/NetworkManager/system-connections/"
+while IFS= read -r c; do
+  # set the autoconnect priority to 999
+  LC_ALL=C nmcli connection modify "${c}" connection.autoconnect-priority 999
+  echo "${c}"
+  echo "${c}.nmconnection"
+done <<< "${con}" | LC_ALL=C xargs -I{} cp -p "/etc/NetworkManager/system-connections/{}" "${initrd}/backup/etc/NetworkManager/system-connections/"
 
 # edit copied connections manually, because nmcli will remove the wifi-sec.psk password when edited by nmcli modify
 #sed -i '/\[connection\]/a permissions=user:root:;' ${initrd}/backup/etc/NetworkManager/system-connections/*
@@ -185,19 +190,30 @@ chmod 755 "/lib/systemd/lernstick-shutdown"
 # remove policykit action for lernstick welcome application
 rm -f ${initrd}/newroot/usr/share/polkit-1/actions/ch.lernstick.welcome.policy
 
-# place finish_exam.desktop in "favorite apps" of Gnome3's dash
+entry="finish_exam.desktop"
+# place ${entry} in "favorite apps" of Gnome3's dash in the system-db
 if [ -e "${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps" ]; then
-  newvalue=$(awk -F'[\,,\[,\], ]' '{if($0~/^favorite-apps=/){ printf "favorite-apps=["; for(i = 2; i <= NF; i++) { if($i!="") {printf "%s, ", $i;} } printf "'\''finish_exam.desktop'\'']\n"; } else { print $0; } }' ${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps)
-  echo "${newvalue}" > "${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps"
+  newvalue=$(mawk -v entry="${entry}" -F'[\,,\[,\], ]' '{if($0~/^favorite-apps=/){ printf "favorite-apps=["; for(i = 2; i <= NF; i++) { if($i!="") {printf "%s, ", $i;} } printf "'\''%s'\'']\n", entry; } else { print $0; } }' ${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps)
 else
-  echo "[org/gnome/shell]
-favorite-apps=['finish_exam.desktop']" > "${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps"
+  newvalue="[org/gnome/shell]
+favorite-apps=['${entry}']"
 fi
+echo "${newvalue}" > "${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps"
 
 # this touch is needed, because dconf update is not rebuilding the database if the
 # directory containing the rules has the same mtime as before
 touch "${initrd}/newroot/etc/dconf/db/local.d"
 chroot ${initrd}/newroot dconf update
+
+# place ${entry} in "favorite apps" of Gnome3's dash in the user-db
+oldvalue="$(sudo -u user dconf read /org/gnome/shell/favorite-apps)"
+if [ "${oldvalue}" = "" ]; then
+  newvalue="['${entry}']"
+else
+  newvalue=$(echo "oldvalue" | mawk -v entry="${entry}" -F'[\,,\[,\], ]' '{ printf "["; for(i = 2; i <= NF; i++) { if($i!="") {printf "%s, ", $i;} } printf "'\''%s'\'']\n", entry; }')
+
+fi
+chroot ${initrd}/newroot sudo -u user dconf write "/org/gnome/shell/favorite-apps" "${newvalue}"
 
 # TODO
 cat <<EOF >"${initrd}/newroot/etc/xdg/autostart/show-info.desktop"
