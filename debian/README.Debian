@@ -3,6 +3,8 @@ glados for Debian
 
 Add all new parameters in params.conf (if some)
 
+Add new config files to conf/ dir (if some)
+
 Tag a new release with the new version
 
 Get the newest source package by (should now be the newest version)
