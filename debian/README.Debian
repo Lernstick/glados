@@ -1,7 +1,7 @@
 glados for Debian
 -----------------
 
-Adjust the version number in debian/conf/params.php and add all new parameters (if some)
+Add all new parameters in params.conf (if some)
 
 Tag a new release with the new version
 
