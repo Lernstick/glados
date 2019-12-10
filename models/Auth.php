@@ -405,7 +405,7 @@ class Auth extends Model implements AuthInterface
      * Saves the config to the file `auth.php`.
      * A temporary file called `auth.php` in `tmpPath` (@see params.php) is created first and required as
      * sanity check. If no exceptions are thrown, the original `auth.php` contents are moved to a backup
-     * file called `auth.php.bak` and the contents of `auth.php` are replaced with the new generated file 
+     * file called `auth_backup.bak` and the contents of `auth.php` are replaced with the new generated file 
      * contents.
      *
      * @param array $config the new/altered config array
@@ -436,7 +436,7 @@ return [
         $newConfig = $prepend . preg_replace('/^/m', $prefix, var_export($config, true)) . $append;
 
         $tmpFile = FileHelper::normalizePath(\Yii::$app->params['tmpPath'] . '/auth.php');
-        $bakFile = FileHelper::normalizePath(self::PATH . '/auth.php.bak');
+        $bakFile = FileHelper::normalizePath(self::PATH . '/auth_backup.php');
         $file = FileHelper::normalizePath(self::PATH . '/auth.php');
 
         if (@file_put_contents($tmpFile, $newConfig)) {
