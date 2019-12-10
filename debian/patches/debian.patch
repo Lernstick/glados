@@ -1,8 +1,10 @@
 Subject: Remove dev environment
-From: Roman Gruber <roman.gruber@bwzofingen.ch>
---- a/config/web.php
-+++ b/config/web.php
-@@ -99,21 +99,4 @@
+From: Roman Gruber <roman.gruber@inf.unibe.ch>
+Index: glados/config/web.php
+===================================================================
+--- glados.orig/config/web.php
++++ glados/config/web.php
+@@ -117,21 +117,4 @@ $config = [
      'runtimePath' => '/var/lib/glados/runtime',
  ];
  
@@ -24,8 +26,10 @@ From: Roman Gruber <roman.gruber@bwzofingen.ch>
 -}
 -
  return $config;
---- a/web/index.php
-+++ b/web/index.php
+Index: glados/web/index.php
+===================================================================
+--- glados.orig/web/index.php
++++ glados/web/index.php
 @@ -4,8 +4,8 @@
  setlocale(LC_CTYPE, "C.UTF-8") || setlocale(LC_CTYPE, "en_US.UTF-8");
  

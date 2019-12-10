@@ -1,46 +1,48 @@
 glados for Debian
 -----------------
 
-First create new yii-glados package: https://github.com/chaoos/yii2-glados/
+* First create new yii-glados package: https://github.com/chaoos/yii2-glados/
 
-Tag a new release with the new version (create a pre-release and publish it)
+* Tag a new release with the new version (create a pre-release and publish it)
 
-Merge the debian branch with the master branch at the tag created
+* Merge the debian branch with the master branch at the tag created
 
-Clone the repo in the debian9 branch
+* Clone the repo in the debian9 branch
 
  git clone -b debian9 https://github.com/imedias/glados.git
 
-Add all new parameters in params.conf (if some)
+* Add all new parameters in params.conf (if some)
 
-Add new config files to debian/conf dir and to debian/links (if some)
+* Add new config files to debian/conf dir and to debian/links (if some)
 
-Before building the package, the system where to build, need some packages installed:
+* Before building the package, the system where to build, need some packages installed:
 
- apt-get install devscripts (+ more)
+ apt-get install devscripts quilt (+ more)
 
-Get the newest source package by (should now be the newest version)
+* Get the newest source package by (should now be the newest version, after tagging)
 
  debian/rules get-orig-source
 
-Write a changelog entry with the new version (can be a draft). Date format:
+* Write a changelog entry with the new version (can be a draft). Note 2(!) spaces prepend the date. Date format:
 
  LC_ALL=c date -R
 
-Maybe adjust year in debian/copyright.
+* Maybe adjust year in debian/copyright.
 
-Rename the file in debian/sql/upgrade/<version> to the new version and change the content to the latest migration.
+* Rename the file in debian/sql/upgrade/<version> to the new version and change the content to the latest migration.
 
-Update debian/control yii2-glados package to the newest version.
+* Update debian/control yii2-glados package to the newest version.
 
-Add new dependencies (if some) to debian/control
+* Add new dependencies (if some) to debian/control
 
-Have a look at debian/patches if files in the patches have changed
+* Have a look at debian/patches if files in the patches have changed
 
-Finalize the changelog entry
+* Finalize the changelog entry
 
-Build the package by
+* Build the package by
 
  dpkg-buildpackage -us -uc
+
+* Maybe commit and push changed to the debian branch
 
  -- Roman Gruber <roman.gruber@inf.unibe.ch>  Tue, 10 Dec 2019 11:42:22 +0100

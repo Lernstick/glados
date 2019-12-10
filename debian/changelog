@@ -32,7 +32,7 @@ glados (1.0.6-deb9) unstable; urgency=low
       - In the user views, the authentication belonging is now visible
       - The manual on LDAP can be found here http://docs.lernstick.ch/glados/#authentication
 
- -- Roman Gruber <roman.gruber@inf.unibe.ch> Tue, 10 Dec 2019 13:26:06 +0100
+ -- Roman Gruber <roman.gruber@inf.unibe.ch>  Tue, 10 Dec 2019 13:26:06 +0100
 
 glados (1.0.5-deb9) unstable; urgency=low
 
@@ -66,7 +66,7 @@ glados (1.0.5-deb9) unstable; urgency=low
     - Activities have severities now
     - Some fields in the ticket view are directly editable now
 
- -- Roman Gruber <roman.gruber@bwzofingen.ch> Wed, 20 Mar 2019 17:33:12 +0100
+ -- Roman Gruber <roman.gruber@bwzofingen.ch>  Wed, 20 Mar 2019 17:33:12 +0100
 
 glados (1.0.4-deb9) unstable; urgency=low
 
