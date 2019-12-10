@@ -33,7 +33,7 @@ $this->registerJs('var YII_DEBUG = ' . (YII_DEBUG ? 'true' : 'false') . ';', \yi
 <?php $this->beginBody() ?>
 
 <div class="wrap">
-    <div class="container">
+    <div class="container" style="padding-top:0px;">
         <?= $content ?>
     </div>
 </div>

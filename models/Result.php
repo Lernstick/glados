@@ -334,7 +334,7 @@ class Result extends Model
 
         }
 
-        $this->removeDirectory($tmp);
+        FileHelper::removeDirectory($tmp);
 
         return null;
     }
@@ -375,20 +375,6 @@ class Result extends Model
             }
         }
         return $this->_tickets;
-    }
-
-    /**
-     * Removes a directory recusively
-     *
-     * @param string path to directory
-     * @return bool success or failure
-     */
-    private function removeDirectory ($path) {
-        $files = glob($path . '/*');
-        foreach ($files as $file) {
-            is_dir($file) ? $this->removeDirectory($file) : unlink($file);
-        }
-        return file_exists($path) ? rmdir($path) : false;
     }
 
     /**
