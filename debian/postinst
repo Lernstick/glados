@@ -79,7 +79,7 @@ apache_install() {
 
 fix_permissions() {
     chown -R www-data:www-data "${glados_cfgdir}/auth.php"
-    chown -R www-data:www-data "${glados_cfgdir}/auth.php.bak"
+    chown -R www-data:www-data "${glados_cfgdir}/auth_backup.php"
 }
 
 generate_cookievalidationkey() {
