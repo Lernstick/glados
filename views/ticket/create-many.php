@@ -40,22 +40,22 @@ $js = new JsExpression("
         var units = input.split(/\\n\\n+/).filter(function(e){return e});
 
         //try to parse all units separately, units are separated by two newlines
-        for(var o = 0; o < units.length; o++){
+        for (var o = 0; o < units.length; o++) {
 
             var string = units[o];
             var simple_parsing = false;
             var separators = [ '\\n', '\,', '\;', '\\t' ];
 
             //loop trough all separators and check if the blocks can be parsed the simple way
-            for(var c = 0; c < separators.length; c++){
+            for (var c = 0; c < separators.length; c++) {
                 simple_parsing_item = true;
                 var e = s = 0;
                 var sepBased = string.split(separators[c]).filter(function(e){return e}).map(Function.prototype.call, String.prototype.trim);
                 var sepBased2 = sepBased;
 
-                for(var i = 0; i < sepBased2.length; i++){
-                    for(var z = 0; z < separators.length; z++){
-                        if(separators[z] != separators[c]){
+                for (var i = 0; i < sepBased2.length; i++) {
+                    for (var z = 0; z < separators.length; z++) {
+                        if (separators[z] != separators[c]) {
 							//replace all other separators with a pipe (hope there is no name with a pipe in it...)
                             sepBased2[i] = sepBased2[i].replace(new RegExp(separators[z], 'g'), '|');
                         }
@@ -63,19 +63,25 @@ $js = new JsExpression("
                     sepBasedParts = sepBased2[i].split(/ *(?:\|| )+ */).filter(function(e){return e});
                     sepBasedSimpleParts = sepBased[i].split(/ /).filter(function(e){return e});
 
-                    if(sepBasedParts.length == sepBasedSimpleParts.length && sepBasedParts.length >= 2 && !sepBased[i].match(/[\\t|\;|\,]/g)){
+                    if( sepBasedParts.length == sepBasedSimpleParts.length
+                        && sepBasedParts.length >= 2
+                        && !sepBased[i].match(/[\\t|\;|\,]/g)
+                    ) {
                         s += sepBasedParts.length
-                    }else if(sepBasedParts.length < 2 || sepBasedParts.length > 5 || sepBased[i].match(/[\\t|\;|\,]/g)){
+                    } else if (sepBasedParts.length < 2
+                        || sepBasedParts.length > 5
+                        || sepBased[i].match(/[\\t|\;|\,]/g)
+                    ) {
                         e += sepBasedParts.length;
-                    }else{
+                    } else {
                         s += sepBasedParts.length
                     }
                 }
 
 				//if there are more items which would need extended parsing, treat the whole block/unit as one
-                if(e > s){
+                if (e > s) {
                     simple_parsing_item = false;
-                }else{
+                } else {
                     simple_parsing = true;
                     var separator = separators[c];
                 }
@@ -86,15 +92,15 @@ $js = new JsExpression("
 			 * actual parsing comes here
 			 */
 
-            if(simple_parsing){
+            if (simple_parsing) {
 
 				//in case of simple parsing just split at the extracted separator and trim the items
                 var items = string.split(separator).filter(function(e){return e}).map(Function.prototype.call, String.prototype.trim);
-                for(var i = 0; i < items.length; i++){
+                for (var i = 0; i < items.length; i++) {
                     fullnames.push(items[i].replace(/ *(?:\,|\;|\\t| )+ */g, ' '));
                 }
 
-            }else{
+            } else {
 
                 var names = string.split(/ *(?:\,|\\n|\;|\\t|  )+ */).filter(function(e){return e});
 
@@ -102,14 +108,14 @@ $js = new JsExpression("
                 var most = [];
                 var max = 1;
                 var maxName = '';
-                for(var i = 0; i < names.length; i++){
-                    if (most[names[i]] == null){
+                for (var i = 0; i < names.length; i++) {
+                    if (most[names[i]] == null) {
                         most[names[i]] = 1;
-                    }else{
+                    } else {
                         most[names[i]]++;
                     }
 
-                    if (most[names[i]] > max){
+                    if (most[names[i]] > max) {
                         maxName = names[i];
                         max = most[names[i]];
                     }
@@ -117,18 +123,22 @@ $js = new JsExpression("
 
                 //rounded down
                 var peak = names.length/3 | 0;
-                if(max >= peak && max >= 3 && names.length >= 9){
-                    for(var i = 0; i < names.length; i++){
+                if (max >= peak && max >= 3 && names.length >= 9) {
+                    for (var i = 0; i < names.length; i++){
                         names[i] = names[i].replace(maxName, '');
                     }
-                    if($('#dynamicmodel-class')[0].value == ''){
+                    if ($('#dynamicmodel-class')[0].value == '') {
                         $('#dynamicmodel-class')[0].value = maxName;
                     }
                 }
                 names = names.filter(function(e){return e});
 
-                for(var i = 0; i < names.length; i=i+2) {
-                    fullnames.push(names[i] + ' ' + names[i+1]);
+                for (var i = 0; i < names.length; i=i+2) {
+                    if (names[i+1] == null) {
+                        fullnames.push(names[i]);
+                    } else {
+                        fullnames.push(names[i] + ' ' + names[i+1]);
+                    }
                 }
             }
         }
@@ -140,7 +150,7 @@ $js = new JsExpression("
         var list = document.createElement('ul');
         var value = '';
 
-        for(var i = 0; i < fullnames.length; i++) {
+        for (var i = 0; i < fullnames.length; i++) {
             var item = document.createElement('li');
             item.appendChild(document.createTextNode(fullnames[i]));
             list.appendChild(item);
@@ -216,14 +226,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 'options' => [
                     'placeholder' => \Yii::t('ticket', 'Choose an Exam ...')
                 ]
-            ])->hint(\Yii::t('ticket', 'Choose the exam those tickets has to be assigned to in the list below. Notice, only exams assigned to you will be shown underneath.')); ?>
+            ])->label(\Yii::t('ticket', 'Exam'))->hint(\Yii::t('ticket', 'Choose the exam those tickets has to be assigned to in the list below. Notice, only exams assigned to you will be shown underneath.')); ?>
 
         </div>
-        <div class="col-md-6">
+        <!--<div class="col-md-6">
             <?= $form->field($model, 'class')->textInput([
                'placeholder' => \Yii::t('ticket', 'Not yet used...'),
             ])->hint(\Yii::t('ticket', 'This has no function yet.')); ?>
-        </div>
+        </div>-->
     </div>
 
     <div class="row">

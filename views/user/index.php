@@ -85,8 +85,22 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
                 'format' => 'raw',
             ],
-            'last_visited',
-
+            [
+                'attribute' => 'last_visited',
+                'format' => 'timeago',
+                'filterType' => GridView::FILTER_DATE,
+                'filterWidgetOptions' => [
+                    'options' => ['placeholder' => \Yii::t('form', 'Enter day...')],
+                    'pluginOptions' => [
+                       'format' => 'yyyy-mm-dd',
+                       'todayHighlight' => true,
+                       'autoclose' => true,
+                    ]
+                ],
+                'contentOptions' => [
+                    'class' => 'col-md-2',
+                ],
+            ],
             [
                 'class' => 'yii\grid\ActionColumn',
                 'order' => DynaGrid::ORDER_FIX_RIGHT,

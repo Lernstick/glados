@@ -459,7 +459,12 @@ $this->params['breadcrumbs'][] = $this->title;
             },            
             'toolbar' =>  [
                 ['content' =>
-                    Html::a('<i class="glyphicon glyphicon-plus"></i>&nbsp;' . \Yii::t('ticket', 'Create Ticket'), ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => \Yii::t('ticket', 'Create Ticket')]) . ' ' .
+                    '<div class="btn-group">' . 
+                        Html::a('<i class="glyphicon glyphicon-plus"></i>&nbsp;' . \Yii::t('ticket', 'Create Ticket'), ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => \Yii::t('ticket', 'Create Ticket')]) . 
+                        '<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span><span class="sr-only">Toggle Dropdown</span></button><ul class="dropdown-menu"><li>' . 
+                        Html::a('<i class="glyphicon glyphicon-plus"></i>&nbsp;' . \Yii::t('ticket', 'Create multiple Tickets'), ['/ticket/create', 'mode' => 'many', 'type' => 'assigned'], ['data-pjax' => 0, 'title' => \Yii::t('ticket', 'Create multiple Tickets')]) . 
+                        '</li></ul>' . 
+                    '</div>' . 
                     Html::a('<i class="glyphicon glyphicon-envelope"></i>', ['update', 'mode' => 'submit'], ['data-pjax' => 0, 'class' => 'btn btn-info', 'title' => \Yii::t('ticket', 'Submit Ticket')]) . ' ' .
                     Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/ticket/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => \Yii::t('ticket', 'Reset Grid')])
                 ],

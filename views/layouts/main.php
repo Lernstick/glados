@@ -197,7 +197,7 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
 
             [
                 'label' => \Yii::t('main', 'Help'),
-                'url' => ['/howto/README.md'],
+                'url' => ['/howto/index.md'],
                 'visible' => !Yii::$app->user->isGuest,
             ],
 

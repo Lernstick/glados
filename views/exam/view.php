@@ -48,7 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 [
                     'attribute' => 'time_limit',
                     'format' => 'raw',
-                    'value' => $model->time_limit == Null ? 'No Time Limit' : yii::$app->formatter->format($model->{'time_limit'}*60, 'duration'),
+                    'value' => $model->time_limit == Null ? \Yii::t('ticket', 'No Time Limit') : yii::$app->formatter->format($model->{'time_limit'}*60, 'duration'),
                 ],
                 [
                     'attribute' => 'user.username',

@@ -132,7 +132,13 @@ $this->registerJs($active_tabs);
 
                 'columns' => [
                     ['class' => 'yii\grid\SerialColumn'],
-                    'description',
+                    [
+                        'attribute' => 'description',
+                        'label' => \Yii::t('auth', 'Description'),
+                        'value' => function ($model) {
+                            return Yii::t('permission', $model->description);
+                        },
+                    ]
                 ],
                 'layout' => '{items} {pager}',
                 'emptyText' => \Yii::t('users', 'No permissions found.'),

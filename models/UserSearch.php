@@ -75,8 +75,11 @@ class UserSearch extends User
         }
 
         // grid filtering conditions
-        $query->andFilterWhere(['last_visited' => $this->last_visited])
-            ->andFilterWhere(['type' => $this->type]);
+        $query->andFilterWhere(['type' => $this->type]);
+
+        $dateEnd = new \DateTime($this->last_visited);
+        $dateEnd->modify('+1 day');
+        $query->andFilterWhere(['between', 'last_visited', $this->last_visited, $dateEnd->format('Y-m-d')]);
 
         $query->andFilterWhere(['like', 'username', $this->username]);
 
