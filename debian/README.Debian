@@ -7,7 +7,7 @@ Add all new parameters in params.conf (if some)
 
 Add new config files to debian/conf dir (if some)
 
-Tag a new release with the new version
+Tag a new release with the new version (create a pre-release and publish it)
 
 Get the newest source package by (should now be the newest version)
 
