@@ -7,6 +7,7 @@ components  usr/share/glados
 controllers usr/share/glados
 howtos      usr/share/glados
 mail        usr/share/glados
+messages    usr/share/glados
 migrations  usr/share/glados
 models      usr/share/glados
 scripts     usr/share/glados
