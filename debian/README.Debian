@@ -3,17 +3,27 @@ glados for Debian
 
 First create new yii-glados package: https://github.com/chaoos/yii2-glados/
 
+Tag a new release with the new version (create a pre-release and publish it)
+
+Merge the debian branch with the master branch at the tag created
+
+Clone the repo in the debian9 branch
+
+ git clone -b debian9 https://github.com/imedias/glados.git
+
 Add all new parameters in params.conf (if some)
 
-Add new config files to debian/conf dir (if some)
+Add new config files to debian/conf dir and to debian/links (if some)
 
-Tag a new release with the new version (create a pre-release and publish it)
+Before building the package, the system where to build, need some packages installed:
+
+ apt-get install devscripts (+ more)
 
 Get the newest source package by (should now be the newest version)
 
  debian/rules get-orig-source
 
-Write a changelog entry. Date format:
+Write a changelog entry with the new version (can be a draft). Date format:
 
  LC_ALL=c date -R
 
@@ -25,7 +35,9 @@ Update debian/control yii2-glados package to the newest version.
 
 Add new dependencies (if some) to debian/control
 
-Have a look at debian/patches if file in the patches have changed
+Have a look at debian/patches if files in the patches have changed
+
+Finalize the changelog entry
 
 Build the package by
 

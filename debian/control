@@ -1,7 +1,7 @@
 Source: glados
 Section: web
 Priority: optional
-Maintainer: Roman Gruber <roman.gruber@bwzofingen.ch>
+Maintainer: Roman Gruber <roman.gruber@inf.unibe.ch>
 Build-Depends: debhelper (>= 9)
 Standards-Version: 3.9.5
 Homepage: https://github.com/imedias/glados
@@ -20,13 +20,15 @@ Depends: ${misc:Depends},
     php-mbstring,
     php-pear,
     php-dev,
+    php-ldap,
+    php-intl,
     squashfs-tools,
     unzip,
     rdiff-backup,
     avahi-daemon,
     openssh-client,
     dbconfig-common,
-    yii2-glados (>= 2.0.16.1-1)
+    yii2-glados (>= 2.0.30-1)
 Suggests: www-browser
 Description:  The exam server webinterface
  Glados is a fully configurable webinterface to take, manage and create exams using the Lernstick.

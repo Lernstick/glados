@@ -1,3 +1,39 @@
+glados (1.0.6-deb9) unstable; urgency=low
+
+  * Fixed several bugs:
+    - Fixed a bug, where the database was never cleaned up
+    - Fixed a bug, where the "Hand-in" icon was not appearing in the dock in the exam
+    - Fixed a bug, where in an event the header was already sent
+    - The online property in the ticket view was not always up-to-date
+    - The screenshot machanism has changed in the new Lernstick version, this is now addressed
+    - Locking of ticket works now with PHP's `flock()` method and is now atomic
+    - Fixed a bug, where the network connection from the squashfs was taken, instead of the exam network
+    - Fixed a bug, when in the squashfs gnome dash was changed, the "hand-in exam" button was not placed in the dash correctly
+  * New Features:
+    - Internationalisation: Support for more languages.
+      - New language German
+      - Table are searchable in the given language
+    - Libreoffice backup and recovery paths configurable
+    - All tickets associated to an exam can be deleted now with one button click (backups will be permanently removed too)
+    - Persistent stats in the home view, even if exams/tickets are deleted
+    - History function added. Exams and Tickets have now a detailed history of who changed what and when
+    - LDAP authentication
+      - Users such as teachers and admins are now able to login to GLaDOS via LDAP
+      - LDAP can be configured completely via the webinterface
+      - Microsoft Active Directoy is directly supported
+      - OpenLDAP is directly supported
+      - All other LDAP servers are also supported, but need more effort in the configuration
+      - A group mapping of LDAP/AD groups to GLaDOS roles can be defined via the webinterface
+      - LDAP login can be customized
+      - Multiple LDAP/AD domains are supported and an order can be defined
+      - Login via multiple LDAPs can be controlled via the Login Scheme option (see http://docs.lernstick.ch/glados/login-scheme.html)
+      - Migration of existing local users to LDAP/AD authentication methods is supported
+      - A Test login form is available to investigate failed logins
+      - In the user views, the authentication belonging is now visible
+      - The manual on LDAP can be found here http://docs.lernstick.ch/glados/#authentication
+
+ -- Roman Gruber <roman.gruber@inf.unibe.ch> Tue, 10 Dec 2019 13:26:06 +0100
+
 glados (1.0.5-deb9) unstable; urgency=low
 
   * Fixed several bugs:

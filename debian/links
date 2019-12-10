@@ -1,2 +1,4 @@
 etc/glados/db.php usr/share/glados/config/db.php
 etc/glados/params.php usr/share/glados/config/params.php
+etc/glados/auth.php usr/share/glados/config/auth.php
+etc/glados/auth.php.bak usr/share/glados/config/auth.php.bak

@@ -77,6 +77,11 @@ apache_install() {
     fi
 }
 
+fix_permissions() {
+    chown -R www-data:www-data "${glados_cfgdir}/auth.php"
+    chown -R www-data:www-data "${glados_cfgdir}/auth.php.bak"
+}
+
 generate_cookievalidationkey() {
     # generate a random md5 hash
     KEY="$(cat /dev/urandom | tr -dc 'a-f0-9' | fold -w ${1:-32} | head -n 1)"
@@ -121,6 +126,7 @@ case "$1" in
         apache_install $1
         generate_cookievalidationkey
         set_timezone
+        fix_permissions
 
         # Reload webserver in any case, configuration might have changed
         # Redirection of 3 is needed because Debconf uses it and it might
