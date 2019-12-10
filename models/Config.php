@@ -40,11 +40,14 @@ class Config extends Model
     public function attributeLabels()
     {
         return [
-            'avahiPort' => 'Avahi Port',
-            'avahiType' => 'Avahi Protocol',
-            'avahiServiceFile' => 'Avahi Service File',
-            'avahiTxtRecords' => 'Avahi TXT Records',
-            'params' => 'Options',
+            'avahiPort' => \Yii::t('config', 'Avahi Port'),
+            'avahiType' => \Yii::t('config', 'Avahi Protocol'),
+            'avahiServiceFile' => \Yii::t('config', 'Avahi Service File'),
+            'avahiTxtRecords' => \Yii::t('config', 'Avahi TXT Records'),
+            'host' => \Yii::t('config', 'Host'),
+            'ip' => \Yii::t('config', 'IP'),
+            'port' => \Yii::t('config', 'Port'),
+            'params' => \Yii::t('config', 'Options'),
         ];
     }
 

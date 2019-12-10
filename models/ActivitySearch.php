@@ -80,15 +80,13 @@ class ActivitySearch extends Activity
             'severity' => $this->severity
         ]);
 
-        $query->joinWith(['ticket' => function ($q) {
-            $q->andFilterWhere(['like', 'ticket.token', $this->token]);
-        }]);
+        $query->joinWith($this->joinTables());
+        $query->andFilterWhere(['like', 'ticket.token', $this->token]);
+        $query->andFilterHaving(['like', 'description', $this->description]);
 
         $dateEnd = new \DateTime($this->date);
         $dateEnd->modify('+1 day');
         $query->andFilterWhere(['between', 'date', $this->date, $dateEnd->format('Y-m-d')]);
-
-        $query->andFilterWhere(['like', 'description', $this->description]);
 
         Yii::$app->user->can('activity/index/all') ?: $query->own();
 

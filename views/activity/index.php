@@ -15,7 +15,7 @@ use yii\widgets\ActiveForm;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $last_visited */
 
-$this->title = 'Activities';
+$this->title = \Yii::t('activity', 'Activities');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="activity-index">
@@ -37,7 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'timeago',
                 'filterType' => GridView::FILTER_DATE,
                 'filterWidgetOptions' => [
-                    'options' => ['placeholder' => 'Enter day...'],
+                    'options' => ['placeholder' => \Yii::t('form', 'Enter day...')],
                     'pluginOptions' => [
                        'format' => 'yyyy-mm-dd',
                        'todayHighlight' => true,
@@ -92,7 +92,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                 ],
                 'filterInputOptions' => [
-                    'placeholder' => 'Any'
+                    'placeholder' => \Yii::t('form', 'Any')
                 ],
                 'format'=>'raw',
                 'contentOptions' => [
@@ -102,8 +102,8 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'description',
                 'format' => 'raw',
-                'filterType'=>GridView::FILTER_SELECT2,
-                'filterWidgetOptions'=>[
+                'filterType' => GridView::FILTER_SELECT2,
+                'filterWidgetOptions' => [
                     'pluginOptions' => [
                         'dropdownAutoWidth' => true,
                         'width' => 'auto',
@@ -136,7 +136,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                 ],
                 'filterInputOptions' => [
-                    'placeholder' => 'Any'
+                    'placeholder' => \Yii::t('form', 'Any')
                 ],
                 'contentOptions' => [
                     'class' => 'col-md-8',
@@ -148,7 +148,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'gridOptions' => [
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
-            'panel' => ['heading' => '<h3 class="panel-title">Activities</h3>'],
+            'panel' => ['heading' => '<h3 class="panel-title">' . \Yii::t('activity', 'Activities') . '</h3>'],
             'toolbar' =>  [
                 ['content' => $form->field($searchModel, 'severity', [
                         'options' => [
@@ -159,7 +159,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'hideSearch' => true,
                         'options' => [
                             'multiple' => true,
-                            'placeholder' => 'Severity',
+                            'placeholder' => \Yii::t('activity', 'Severity'),
                         ],
                         'pluginOptions' => [
                             'allowClear' => true,
@@ -171,7 +171,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ])
                 ],
                 ['content' =>
-                    Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/activity/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => 'Reset Grid'])
+                    Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/activity/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => \Yii::t('activity', 'Reset Grid')])
                 ],
                 ['content' => '{dynagridFilter}{dynagridSort}{dynagrid}'],
                 '{export}',

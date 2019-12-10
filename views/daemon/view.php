@@ -18,16 +18,16 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="dropdown">
       <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
         <i class="glyphicon glyphicon-list-alt"></i>
-        Actions&nbsp;<span class="caret"></span>
+        <?= \Yii::t('daemons', 'Actions') ?>&nbsp;<span class="caret"></span>
       </button>
       <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
         <li>
-            <?= Html::a('<span class="glyphicon glyphicon-stop"></span> Stop', ['stop', 'id' => $model->id]) ?>
+            <?= Html::a('<span class="glyphicon glyphicon-stop"></span> ' . \Yii::t('daemons', 'Stop'), ['stop', 'id' => $model->id]) ?>
         </li>
         <li>
-            <?= Html::a('<span class="glyphicon glyphicon-flash"></span> Kill', ['kill', 'id' => $model->id], [
+            <?= Html::a('<span class="glyphicon glyphicon-flash"></span> ' . \Yii::t('daemons', 'Kill'), ['kill', 'id' => $model->id], [
                 'data' => [
-                    'confirm' => 'Are you sure you want to kill this process?',
+                    'confirm' => \Yii::t('daemons', 'Are you sure you want to kill this process?'),
                 ],
             ]) ?>
         </li>        

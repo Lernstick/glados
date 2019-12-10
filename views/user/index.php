@@ -11,8 +11,9 @@ use yii\web\JsExpression;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\UserSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $authSearchModel app\models\AuthSearch */
 
-$this->title = 'Users';
+$this->title = \Yii::t('users', 'Users');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="user-index">
@@ -63,7 +64,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                 ],
                 'filterInputOptions' => [
-                    'placeholder' => 'Any'
+                    'placeholder' => \Yii::t('form', 'Any')
                 ],
                 'format'=>'raw'
             ],
@@ -71,8 +72,35 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'role',
                 'filter' => $searchModel->roleList,
             ],
-            'last_visited',
-
+            [
+                'attribute' => 'type',
+                'filter' => $authSearchModel->authSelectlist,
+                'label' => Yii::t('auth', 'Authentication Method'),
+                'value' => function($model) {
+                    if ($model->authMethod !== null) {
+                        return $model->authMethod->name . ' (' . $model->authMethod->typeName . ')';
+                    } else {
+                        return Yii::t('auth', "No Authentication Method");
+                    }
+                },
+                'format' => 'raw',
+            ],
+            [
+                'attribute' => 'last_visited',
+                'format' => 'timeago',
+                'filterType' => GridView::FILTER_DATE,
+                'filterWidgetOptions' => [
+                    'options' => ['placeholder' => \Yii::t('form', 'Enter day...')],
+                    'pluginOptions' => [
+                       'format' => 'yyyy-mm-dd',
+                       'todayHighlight' => true,
+                       'autoclose' => true,
+                    ]
+                ],
+                'contentOptions' => [
+                    'class' => 'col-md-2',
+                ],
+            ],
             [
                 'class' => 'yii\grid\ActionColumn',
                 'order' => DynaGrid::ORDER_FIX_RIGHT,
@@ -87,11 +115,11 @@ $this->params['breadcrumbs'][] = $this->title;
         'gridOptions' => [
             'dataProvider' => $dataProvider,
             'filterModel' => $searchModel,
-            'panel' => ['heading' => '<h3 class="panel-title">Users</h3>'],
+            'panel' => ['heading' => '<h3 class="panel-title">' . \Yii::t('users', 'Users') . '</h3>'],
             'toolbar' =>  [
                 ['content' =>
-                    Html::a('<i class="glyphicon glyphicon-plus"></i>', ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => 'Create User']) . ' ' .
-                    Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/user/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => 'Reset Grid'])
+                    Html::a('<i class="glyphicon glyphicon-plus"></i>&nbsp;' . \Yii::t('users', 'Create User'), ['create'], ['data-pjax' => 0, 'class' => 'btn btn-success', 'title' => \Yii::t('users', 'Create User')]) . ' ' .
+                    Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/user/index'], ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => \Yii::t('users', 'Reset Grid')])
                 ],
                 ['content' => '{dynagridFilter}{dynagridSort}{dynagrid}'],
                 '{export}',
@@ -99,6 +127,8 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
         'options' => ['id' => 'dynagrid-user-index'] // a unique identifier is important
     ]); ?>
+
+    <?= $this->render('@app/views/_notification') ?>
 
     <?php Pjax::end(); ?>
 

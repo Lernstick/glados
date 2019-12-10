@@ -16,7 +16,7 @@ use yii\widgets\ActiveForm;
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xs-8">
-                            <span>Please enter the token given on your exam sheet.</span>
+                            <span><?= \Yii::t('client', 'Please enter the token given on your exam sheet.') ?></span>
                         </div>
                         <div class="col-xs-4">
                             <div class="pull-right">
@@ -47,7 +47,7 @@ use yii\widgets\ActiveForm;
                         'name' => 'token',
                         'class' => 'form-control',
                         'style' => 'text-align:center',
-                        'placeholder' => 'Insert your token here!',
+                        'placeholder' => \Yii::t('client', 'Insert your token here!'),
                     ])->label(false)->hint(false); ?><div class="help-block"></div>
 
                     <?php ActiveForm::end(); ?>

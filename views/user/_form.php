@@ -5,7 +5,7 @@ use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\User */
-/* @var $searchModel app\models\TicketSearch */
+/* @var $searchModel app\models\UserSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -18,7 +18,7 @@ use yii\widgets\ActiveForm;
         </div>
 
         <div class="col-md-6">
-            <?php echo $form->field($model, 'role')->dropDownList($searchModel->roleList, [ 'prompt' => 'Choose a Role ...' ]) ?>
+            <?php echo $form->field($model, 'role')->dropDownList($searchModel->roleList, [ 'prompt' => \Yii::t('users', 'Choose a Role ...') ]) ?>
         </div>
     </div>
 
@@ -38,7 +38,7 @@ use yii\widgets\ActiveForm;
     </div>
 
     <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Apply', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::submitButton($model->isNewRecord ? \Yii::t('users', 'Create') : \Yii::t('users', 'Apply'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

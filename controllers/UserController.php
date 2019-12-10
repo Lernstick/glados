@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\models\User;
 use app\models\UserSearch;
+use app\models\AuthSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
@@ -58,10 +59,12 @@ class UserController extends Controller
         if ($mode === null) {
             $searchModel = new UserSearch();
             $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+            $authSearchModel = new AuthSearch();
 
             return $this->render('index', [
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
+                'authSearchModel' => $authSearchModel,
             ]);
         } else if ($mode == 'list') {
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -128,7 +131,12 @@ class UserController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $model->scenario = User::SCENARIO_UPDATE;
+        if ($model->type == '0') {
+            $model->scenario = User::SCENARIO_UPDATE;
+        } else {
+            Yii::$app->session->addFlash('danger', \Yii::t('user', 'You cannot modify a non local user.'));
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
         $searchModel = new UserSearch();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -150,7 +158,13 @@ class UserController extends Controller
     public function actionResetPassword($id)
     {
         $model = $this->findModel($id);
-        $model->scenario = User::SCENARIO_PASSWORD_RESET;
+
+        if ($model->type == '0') {
+            $model->scenario = User::SCENARIO_PASSWORD_RESET;
+        } else {
+            Yii::$app->session->addFlash('danger', \Yii::t('user', 'You cannot reset the password of a non local user.'));
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -189,7 +203,7 @@ class UserController extends Controller
                 return $model;
             }
         }
-        throw new NotFoundHttpException('The requested page does not exist.');
+        throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
 
         /*if (($model = User::findOne($id)) !== null) {
             return $model;
@@ -204,8 +218,10 @@ class UserController extends Controller
         if(Yii::$app->user->can($r . '/all') || $model->id == Yii::$app->user->id){
             return true;
         }else{
-            throw new ForbiddenHttpException('You are not allowed to ' . \Yii::$app->controller->action->id . 
-                    ' this ' . \Yii::$app->controller->id . '.');
+            throw new ForbiddenHttpException(\Yii::t('app', 'You are not allowed to {action} this {item}.', [
+                'action' => \Yii::$app->controller->action->id,
+                'item' => \Yii::$app->controller->id
+            ]));
             return false;
         }
     }

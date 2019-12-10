@@ -11,6 +11,7 @@ return [
     'id' => 'basic-console',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log', 'gii'],
+    'language' => 'en',
     'timezone' => 'Europe/Zurich',
     'vendorPath' => '/usr/share/yii2',
     'controllerNamespace' => 'app\commands',
@@ -27,6 +28,15 @@ return [
         'formatter' => [
             'class' => 'app\components\customFormatter',
             'defaultTimeZone' => 'Europe/Zurich',
+        ],
+        'i18n' => [
+            'translations' => [
+                '*' => [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@app/messages',
+                    'sourceLanguage' => 'en',
+                ],
+            ],
         ],
         'log' => [
             'targets' => [

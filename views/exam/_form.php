@@ -136,8 +136,17 @@ $js = <<< 'SCRIPT'
 $("input[name='Exam[libre_autosave]']").click(function(){
     if ($(this).is(':checked')) {
         $('#exam-libre_autosave_interval').attr("disabled", false);
+        $('#exam-libre_autosave_path').attr("disabled", false);
     } else if ($(this).not(':checked')) {
         $('#exam-libre_autosave_interval').attr("disabled", true);
+        $('#exam-libre_autosave_path').attr("disabled", true);
+    }
+});
+$("input[name='Exam[libre_createbackup]']").click(function(){
+    if ($(this).is(':checked')) {
+        $('#exam-libre_createbackup_path').attr("disabled", false);
+    } else if ($(this).not(':checked')) {
+        $('#exam-libre_createbackup_path').attr("disabled", true);
     }
 });
 $("input[name='Exam[screenshots]']").click(function(){
@@ -164,24 +173,24 @@ $this->registerJs($js);
     <ul class="nav nav-tabs">
         <li class="active"><a data-toggle="tab" href="#general">
             <i class="glyphicon glyphicon-home"></i>
-            General
+            <?= \Yii::t('exams', 'General') ?>
         </a></li>
         <li>
             <?= Html::a(
-                '<i class="glyphicon glyphicon-book"></i> Libreoffice',
+                '<i class="glyphicon glyphicon-book"></i> ' . \Yii::t('exams', 'Libreoffice'),
                 '#libreoffice',
                 ['data-toggle' => 'tab']
             ) ?>
         </li>
         <?= $step != 1 ? '<li>' . Html::a(
-                '<i class="glyphicon glyphicon-file"></i> Exam File',
+                '<i class="glyphicon glyphicon-file"></i> ' . \Yii::t('exams', 'Exam File'),
                 '#file',
                 ['data-toggle' => 'tab']
             ) . 
         '</li>' : '' ?>
         <li>
             <?= Html::a(
-                '<i class="glyphicon glyphicon-exclamation-sign"></i> Expert Settings',
+                '<i class="glyphicon glyphicon-exclamation-sign"></i> ' . \Yii::t('exams', 'Expert Settings'),
                 '#expert',
                 ['data-toggle' => 'tab']
             ) ?>
@@ -210,7 +219,7 @@ $this->registerJs($js);
     <div class="row">
         <div class="col-md-6">
             <?= $form->field($model, 'time_limit', [
-                'template' => '{label}<div class="input-group">{input}<span class="input-group-addon" id="basic-addon2">minutes</span></div>{hint}{error}'
+                'template' => '{label}<div class="input-group">{input}<span class="input-group-addon" id="basic-addon2">' . \Yii::t('exams', 'minutes') . '</span></div>{hint}{error}'
             ])->textInput(['type' => 'number']); ?>
         </div>
         <div class="col-md-6">
@@ -222,25 +231,25 @@ $this->registerJs($js);
 
     <div class="panel panel-warning">
         <div class="panel-heading">
-            <i class="glyphicon glyphicon-warning-sign"></i> Please notice, all the settings below will <b>override</b> the settings configured in the <b>exam file</b>!
+            <i class="glyphicon glyphicon-warning-sign"></i> <?= \Yii::t('exams', 'Please notice, all the settings below will <b>override</b> the settings configured in the <b>exam file</b>!') ?>
         </div>
         <div class="panel-body">
             <div class="row">
                 <div class="col-md-6">
                     <div class="row">
-                        <div class="col-md-6" style="width:auto;">
+                        <div class="col-md-12" style="width:auto;">
                             <?= $form->field($model, 'screenshots')->checkbox() ?>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <?= $form->field($model, 'screenshots_interval', [
-                                'template' => '{label}<div class="input-group"><div class="input-group-addon">with Interval of</div>{input}<span class="input-group-addon" id="basic-addon2">minutes</span></div>{hint}{error}'
+                                'template' => '{label}<div class="input-group"><div class="input-group-addon">' . \Yii::t('exams', 'with Interval of') . '</div>{input}<span class="input-group-addon" id="basic-addon2">' . \Yii::t('exams', 'minutes') . '</span></div>{hint}{error}'
                             ])->textInput(['type' => 'number', 'disabled' => !$model->screenshots])->label(false); ?>
                         </div>                
                         <div class="col-md-12">
                             <?= $form->field($model, 'max_brightness')->widget(RangeInput::classname(), [
-                                'options' => ['placeholder' => 'Select range ...'],
-                                'html5Options' => ['min'=>0, 'max'=>100, 'step'=>1],
-                                'addon' => ['append'=>['content'=>'%']]
+                                'options' => ['placeholder' => \Yii::t('exams', 'Select range ...')],
+                                'html5Options' => ['min' => 0, 'max' => 100, 'step' => 1],
+                                'addon' => ['append' => ['content' => '%']]
                             ]) ?>
                         </div>
                     </div>
@@ -264,21 +273,47 @@ $this->registerJs($js);
     <br>
     <div class="panel panel-warning">
         <div class="panel-heading">
-            <i class="glyphicon glyphicon-warning-sign"></i> Please notice, all the settings below will <b>override</b> the settings configured in the <b>exam file</b>!
+            <i class="glyphicon glyphicon-warning-sign"></i> <?= \Yii::t('exams', 'Please notice, all the settings below will <b>override</b> the settings configured in the <b>exam file</b>!') ?>
         </div>
         <div class="panel-body">
             <div class="row">
-                <div class="col-md-6" style="width:auto;">
-                    <?= $form->field($model, 'libre_autosave')->checkbox() ?>
-                </div>
-                <div class="col-md-3">
-                    <?= $form->field($model, 'libre_autosave_interval', [
-                        'template' => '{label}<div class="input-group"><div class="input-group-addon">with Interval of</div>{input}<span class="input-group-addon" id="basic-addon2">minutes</span></div>{hint}{error}'
-                    ])->textInput(['type' => 'number', 'disabled' => !$model->libre_autosave])->label(false); ?>
-                </div>
                 <div class="col-md-6">
-                    <?= $form->field($model, 'libre_createbackup')->checkbox() ?>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <?= $form->field($model, 'libre_autosave', [
+                                'options' => ['class' => ''],
+                                'errorOptions' => ['tag' => false],
+                            ])->checkbox() ?>
+                        </div>
+                        <div class="panel-body">
+                            <?= $form->field($model, 'libre_autosave_path', [
+                                'template' => '{label}<div class="input-group"><div class="input-group-addon">' . \Yii::t('exams', '...to the directory') . '</div>{input}</div>{hint}{error}'
+                            ])->textInput(['disabled' => !$model->libre_autosave])->label(false); ?>
+                            <?= $form->field($model, 'libre_autosave_interval', [
+                                'template' => '{label}<div class="input-group"><div class="input-group-addon">' . \Yii::t('exams', '...all {n} minutes.', [
+                                        'n' => '</div>{input}<span class="input-group-addon" id="basic-addon2">'
+                                    ]) . '</span></div>{hint}{error}'
+                            ])->textInput(['type' => 'number', 'disabled' => !$model->libre_autosave])->label(false); ?>
+                        </div>
+                    </div>
                 </div>
+
+                <div class="col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <?= $form->field($model, 'libre_createbackup', [
+                                'options' => ['class' => ''],
+                                'errorOptions' => ['tag' => false],
+                            ])->checkbox() ?>
+                        </div>
+                        <div class="panel-body">
+                            <?= $form->field($model, 'libre_createbackup_path', [
+                                'template' => '{label}<div class="input-group"><div class="input-group-addon">' . \Yii::t('exams', '...to the directory') . '</div>{input}</div>{hint}{error}'
+                            ])->textInput(['disabled' => !$model->libre_createbackup])->label(false); ?>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -293,7 +328,7 @@ $this->registerJs($js);
     <br>
     <div class="panel panel-danger">
         <div class="panel-heading">
-            <i class="glyphicon glyphicon-warning-sign"></i> The following settings should only be used, if you know what you are doing!
+            <i class="glyphicon glyphicon-warning-sign"></i> <?= \Yii::t('exams', 'The following settings should only be used, if you know what you are doing!') ?>
         </div>
         <div class="panel-body">
             <div class="row">
@@ -319,7 +354,7 @@ $this->registerJs($js);
     <br>
     <div class="panel panel-default">
         <div class="panel-heading">
-            <?= Html::Label('Exam Image files'); ?>
+            <?= Html::Label(\Yii::t('exams', 'Exam Image files')); ?>
             <?= Html::activeHint($model, 'file', ['class' => 'hint-block'])?>
         </div>
         <div class="panel-body">
@@ -383,7 +418,7 @@ $this->registerJs($js);
     <hr>
 
     <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? 'Next Step' : ($step == 2 ? 'Finish' : 'Apply'), ['class' => $model->isNewRecord || $step == 2 ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::submitButton($model->isNewRecord ? \Yii::t('exams', 'Next Step') : ($step == 2 ? \Yii::t('exams', 'Apply') : \Yii::t('exams', 'Apply')), ['class' => $model->isNewRecord || $step == 2 ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

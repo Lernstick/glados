@@ -69,7 +69,7 @@ class RestoreController extends DaemonController
         pcntl_signal_dispatch();
         $this->cleanup();
 
-        if (($this->ticket = Ticket::findOne(['id' => $id])) == null) {
+        if (($this->ticket = Ticket::findOne(['ticket.id' => $id])) == null) {
             $this->logError('Error: ticket with id ' . $id . ' not found.');
             return;
         }        
@@ -79,30 +79,36 @@ class RestoreController extends DaemonController
             return;
         }
 
-        /*if (($this->ticket = Ticket::findOne(['id' => $id, 'backup_lock' => 0, 'restore_lock' => 0])) == null) {
-            $this->log('Error: ticket with id ' . $id . ' not found or it is already in processing.');
+        if ($this->lock($id, 'restore') === false) {
+            $this->logError('Error: ticket with id ' . $id . ' is already in processing (flock).');
             return;
-        }*/
+        }
+
         $this->ticket->restore_lock = 1;
         $this->ticket->running_daemon_id = $this->daemon->id;
         $this->logInfo('Processing ticket: ' .
             ( empty($this->ticket->test_taker) ? $this->ticket->token : $this->ticket->test_taker) .
             ' (' . $this->ticket->ip . ')', true);
-        $this->ticket->restore_state = 'connecting to client...';
+        $this->ticket->restore_state = yiit('ticket', 'connecting to client...');
         $this->ticket->save(false);
 
         if ($this->checkPort(22, 3) === false) {
-            $this->ticket->restore_state = 'network error.';
+            $this->ticket->online = false;
+            $this->ticket->restore_state = yiit('ticket', 'network error.');
             $this->ticket->restore_lock = 0;
             $this->ticket->save(false);
 
             $act = new Activity([
-                    'ticket_id' => $this->ticket->id,
-                    'description' => 'Restore failed: ' . $this->ticket->restore_state,
-                    'severity' => Activity::SEVERITY_WARNING,
+                'ticket_id' => $this->ticket->id,
+                'description' => yiit('activity', 'Restore failed: network error.'),
+                'severity' => Activity::SEVERITY_WARNING,
             ]);
             $act->save();
+            $this->unlock();
             return;
+        } else {
+            $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? true : false;
+            $this->ticket->save();
         }
 
         $this->remotePath = FileHelper::normalizePath($this->remotePath . '/' . $this->ticket->exam->backup_path);
@@ -125,25 +131,29 @@ class RestoreController extends DaemonController
             ]);
 
             if($fs->slash($file) === null){
-                $this->ticket->restore_state = 'Restore failed: "' . $file . '": No such file or directory.';
+                $this->ticket->restore_state = yiit('ticket', 'Restore failed: "{file}": No such file or directory.');
+                $this->ticket->restore_state_params = ['file' => $file];
                 $this->logError($this->ticket->restore_state);
                 $this->ticket->restore_lock = 0;
                 $this->ticket->save(false);
 
                 $act = new Activity([
                         'ticket_id' => $this->ticket->id,
-                        'description' => 'Restore failed: ' . $this->ticket->restore_state,
+                        'description' => yiit('activity', 'Restore failed: "{file}": No such file or directory.'),
+                        'description_params' => [ 'file' => $file ],
                         'severity' => Activity::SEVERITY_WARNING,
                 ]);
                 $act->save();
 
+                $this->unlock();
                 return;
             }
         } else {
-            $this->ticket->restore_state = 'Nothing to restore.';
+            $this->ticket->restore_state = yiit('ticket', 'Nothing to restore.');
             $this->logInfo($this->ticket->restore_state);
             $this->ticket->restore_lock = 0;
             $this->ticket->save(false);
+            $this->unlock();
             return;
         }
 
@@ -159,7 +169,7 @@ class RestoreController extends DaemonController
             'restoreDate' => $date == 'now' ? date('c') : $date,
         ]);
 
-        $this->ticket->restore_state = 'restore in progress...';
+        $this->ticket->restore_state = yiit('ticket', 'restore in progress...');
         $this->ticket->save(false);
 
         $restorePath = $restorePath !== null ? $restorePath : '/overlay/' . $this->ticket->exam->backup_path;
@@ -196,35 +206,42 @@ class RestoreController extends DaemonController
 
         $this->ticket->runCommand('mount -o remount,rw /');
 
-        if($retval != 0){
-            $this->ticket->restore_state = 'rdiff-backup failed (retval: ' . $retval . '), output: '
-                 . PHP_EOL . $output;
+        if($retval != 0) {
+            $this->ticket->restore_state = yiit('ticket', 'rdiff-backup failed (retval: {retval}), output: {output}');
+            $this->ticket->restore_state_params = [
+                'retval' => $retval,
+                'output' => $output,
+            ];
+
             $this->logError($this->ticket->restore_state);
 
             $act = new Activity([
                     'ticket_id' => $this->ticket->id,
-                    'description' => 'Restore failed: rdiff-backup failed (retval: ' . $retval . ')',
+                    'description' => yiit('activity', 'Restore failed: rdiff-backup failed (retval: {retval})'),
+                    'description_params' => [ 'retval' => $retval ],
                     'severity' => Activity::SEVERITY_WARNING,
             ]);
             $act->save();
-
-        }else{
+        } else {
             $this->logInfo($output);
-            $this->ticket->restore_state = 'restore successful.';
+            $this->ticket->restore_state = yiit('ticket', 'restore successful.');
             $this->restore->finishedAt = new Expression('NOW()');
             $this->restore->save();
             $act = new Activity([
                     'ticket_id' => $this->ticket->id,
-                    'description' => 'Restore of ' . $this->restore->file . ' as it was as of ' . yii::$app->formatter->format($this->restore->restoreDate, 'datetime') . ' was successful.',
+                    'description' => yiit('activity', 'Restore of {file} as it was as of {date} was successful.'),
+                    'description_params' => [
+                        'file' => $this->restore->file,
+                        'date' => yii::$app->formatter->format($this->restore->restoreDate, 'datetime')
+                    ],
                     'severity' => Activity::SEVERITY_SUCCESS,
             ]);
             $act->save();
-
         }
 
         $this->ticket->restore_lock = 0;
         $this->ticket->save(false);
-
+        $this->unlock();
     }
 
     /**

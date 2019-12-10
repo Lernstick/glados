@@ -32,6 +32,15 @@ class Base extends \yii\db\ActiveRecord
 {
 
     /**
+     * List of tables that are able to join
+     *
+     * @return array an array with join tables in format [ "table1 alias1", "table2 alias2" ]
+     */
+    public function joinTables() {
+        return [];
+    }
+
+    /**
      * Lists an attribute
      * @param string attr attribute to list
      * @param string q query
@@ -46,13 +55,25 @@ class Base extends \yii\db\ActiveRecord
      */
     public function selectList($attr, $q, $page = 1, $per_page = 10, $id = null, $showQuery = true, $orderBy = null)
     {
+
         $id = is_null($id) ? $attr : $id;
+
         $query = $this->find();
-        $query->select([$id . ' as id', $attr . ' AS text'])
-            ->distinct();
+
+        if ($this->hasMethod('getTranslatedFields') && in_array($attr, $this->getTranslatedFields())) {
+            //nothing
+        } else {
+            $query->addSelect([$id . ' as xxxidxxx', $attr . ' AS xxxattrxxx']);
+                //->distinct();
+            $id = 'xxxidxxx';
+            $attr = 'xxxattrxxx';
+        }
+
+
+        $query->joinWith($this->joinTables());
 
         if (!is_null($q) && $q != '') {
-            $query->where(['like', $attr, $q]);
+            $query->having(['like', $attr, $q]);
         }
 
         if (is_null($orderBy)) {
@@ -61,21 +82,31 @@ class Base extends \yii\db\ActiveRecord
             $query->orderBy($orderBy);
         }
 
+        $query->groupBy($attr); // distincts even a calculated field
+
         if ($this->tableName() != "user") {
             Yii::$app->user->can($this->tableName() . '/index/all') ?: $query->own();
         }
 
         $out = ['results' => []];
-        if ($showQuery === true && $page == 1) {
+        if ($showQuery === true && $page == 1 && $q != null) {
             $out = ['results' => [
-                0 => ['id' => $q, 'text' => $q]
+                0 => ['id' => $q, 'text' => $q == null ? $q : \Yii::t('form', '<i>Search for... </i><b>{query}</b>', ['query' => $q])]
             ]];
             $per_page -= 1;
         }
 
         $command = $query->limit($per_page)->offset(($page-1)*$per_page)->createCommand();
         $data = $command->queryAll();
-        $out['results'] = array_merge($out['results'], array_values($data));
+        foreach ($data as $key => $value) {
+            $out['results'][] = [
+                'id' => $value[$id],
+                // highlight the matching part
+                'text' => $q == null ?
+                    $value[$attr] :
+                    preg_replace('/'.$q.'/i', '<b>$0</b>', $value[$attr])
+            ];
+        }
         return $out;
     }
 

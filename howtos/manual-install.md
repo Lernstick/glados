@@ -60,7 +60,7 @@ Unpack the source package:
 
     tar xfs $version.tar.gz
 
-Create a new directory `/usr/share/glados` and copy all extracted files. Then cd into the created directory:
+Create a new directory `/usr/share/glados` and copy all extracted files. Then `cd` into the created directory:
 
 ```shell
 mkdir /usr/share/glados
@@ -127,16 +127,19 @@ return [
 ```
 
 Change into the directory `/usr/share/glados`. Install all RBAC tables:
+
 ```shell
 ./yii migrate --migrationPath=@yii/rbac/migrations --interactive=0
 ```
 
 RBAC initialization:
+
 ```shell
 ./yii rbac/init --interactive=0
 ```
 
 Database tables:
+
 ```shell
 ./yii migrate --interactive=0
 ```
@@ -144,12 +147,14 @@ Database tables:
 #### PHP setup
 
 Install PECL inotify (you need [PEAR](https://pear.php.net/), PHP5 module development files and a C-compiler for this to work):
+
 ```shell
 pecl install inotify        //for PHP7
 pecl install inotify-0.1.6  //for PHP5
 ```
 
 Create a PHP ini file for inotify (example: `/etc/php/7.0/mods-available/inotify.ini` for PHP7 and `/etc/php5/mods-available/inotify.ini` for PHP5) with contents:
+
 ```ini
 ; configuration for php inotify module
 ; priority=20
@@ -161,6 +166,7 @@ extension=inotify.so
 #### Avahi setup
 
 Create an Avahi service file (`/etc/avahi/services/glados.service`) with contents:
+
 ```xml
 <?xml version="1.0" standalone='no'?>
 <!DOCTYPE service-group SYSTEM "avahi-service.dtd">
@@ -191,6 +197,7 @@ will then be
 ```shell
 http://1.2.3.4:80/glados/index.php/ticket/download/{token}
 ```
+
 If you use the Apache setup from below, you don't have to change the service file.
 
 Finally restart the avahi-daemon:
@@ -225,6 +232,7 @@ Alias /glados /usr/share/glados/web
 > Make sure `mod_rewrite` is enabled and installed.
 
 Then restart apache:
+
 ```shell
 /etc/init.d/apache2 restart
 ```

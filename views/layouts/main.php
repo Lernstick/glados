@@ -67,61 +67,64 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
         ],
     ]);
     if (YII_ENV_DEV) {
-        echo "<p class='navbar-text' style='color:red; font-size:10px; margin:10px;'>YII_ENV_DEV=true<br>YII_DEBUG=" . (YII_DEBUG ? 'true' : 'false') . "</p>";
+        echo "<p class='navbar-text' style='color:red; font-size:7px; margin:10px;'>YII_ENV_DEV=true<br>YII_DEBUG=" . (YII_DEBUG ? 'true' : 'false') . "<br>LANG=" . \Yii::$app->language . "</p>";
     }
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
-            ['label' => 'Home', 'url' => ['/site/index']],
             [
-                'label' => 'Actions',
+                'label' => \Yii::t('main', 'Home'),
+                'url' => ['/site/index']
+            ],
+            [
+                'label' => \Yii::t('main', 'Actions'),
                 'visible' => !Yii::$app->user->isGuest,
                 'items' => [
                     [
-                        'label' => 'Create User',
+                        'label' => \Yii::t('main', 'Create User'),
                         'url' => ['/user/create'],
                         'visible' => Yii::$app->user->can('user/create'),
                     ],                
                     [
-                        'label' => 'Create Exam',
+                        'label' => \Yii::t('main', 'Create Exam'),
                         'url' => ['/exam/create'],
                         'visible' => Yii::$app->user->can('exam/create'),
                     ],
                     [
-                        'label' => 'Create single Ticket',
+                        'label' => \Yii::t('main', 'Create single Ticket'),
                         'url' => ['/ticket/create', 'mode' => 'single'],
                         'visible' => Yii::$app->user->can('ticket/create'),
                     ],
                     [
-                        'label' => 'Create multiple Tickets',
+                        'label' => \Yii::t('main', 'Create multiple Tickets'),
                         'url' => ['/ticket/create', 'mode' => 'many', 'type' => 'assigned'],
                         'visible' => Yii::$app->user->can('ticket/create'),
                     ],                    
                     [
-                        'label' => 'Submit Ticket',
+                        'label' => \Yii::t('main', 'Submit Ticket'),
                         'url' => ['/ticket/update', 'mode' => 'submit'],
                         'visible' => Yii::$app->user->can('ticket/update'),                    
                     ],
                     [
-                        'label' => 'Start Daemon',
+                        'label' => \Yii::t('main', 'Start Daemon'),
                         'url' => ['/daemon/create', 'type' => 'daemon'],
                         'visible' => Yii::$app->user->can('daemon/create'),
                     ],
 
                     [
-                        'label' => 'Generate results',
+                        'label' => \Yii::t('main', 'Generate results'),
                         'url' => ['/result/generate'],
                         'visible' => Yii::$app->user->can('exam/view'),
                     ],
                     [
-                        'label' => 'Submit results',
+                        'label' => \Yii::t('main', 'Submit results'),
                         'url' => ['/result/submit'],
                         'visible' => Yii::$app->user->can('result/submit'),
                     ],
                 ],
             ],
             [
-                'label' => 'Activities ' . 
+                'label' => \Yii::t('main', 'Activities ') . 
                     ActiveEventField::widget([
                         'content' => $newActivities,
                         'options' => [
@@ -140,57 +143,68 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
                 'visible' => Yii::$app->user->can('activity/index'),
             ], 
             [
-                'label' => 'Exams',
+                'label' => \Yii::t('main', 'Exams'),
                 'url' => ['/exam/index'],
                 'visible' => Yii::$app->user->can('exam/index'),
             ],
             [
-                'label' => 'Tickets',
+                'label' => \Yii::t('main', 'Tickets'),
                 'url' => ['/ticket/index'],
                 'visible' => Yii::$app->user->can('ticket/index'),
             ],
             [
-                'label' => 'Daemons ' . 
-                    ActiveEventField::widget([
-                        'content' => $runningDaemons,
-                        'options' => [
-                            'class' => 'badge',
-                            'change-animation' => 'bounce 1000ms linear both',
-                        ],
-                        'event' => 'runningDaemons',
-                        'jsonSelector' => 'runningDaemons',
-                    ]),
-                'encode' => false,
-                'url' => ['/daemon/index'],
-                'visible' => Yii::$app->user->can('daemon/index'),
-            ],
-            [
-                'label' => 'Users',
-                'url' => ['/user/index'],
-                'visible' => Yii::$app->user->can('user/index'),
-            ],
-            [
-                'label' => 'Profile',
-                'url' => ['/user/view', 'id' => Yii::$app->user->id],
-                'visible' => !Yii::$app->user->isGuest && Yii::$app->user->can('user/view'),
+                'label' => \Yii::t('main', 'System'),
+                'visible' => !Yii::$app->user->isGuest,
+                'items' => [
+
+                    [
+                        'label' => \Yii::t('main', 'Daemons ') . 
+                            ActiveEventField::widget([
+                                'content' => $runningDaemons,
+                                'options' => [
+                                    'class' => 'badge',
+                                    'change-animation' => 'bounce 1000ms linear both',
+                                ],
+                                'event' => 'runningDaemons',
+                                'jsonSelector' => 'runningDaemons',
+                            ]),
+                        'encode' => false,
+                        'url' => ['/daemon/index'],
+                        'visible' => Yii::$app->user->can('daemon/index'),
+                    ],
+                    [
+                        'label' => \Yii::t('main', 'Users'),
+                        'url' => ['/user/index'],
+                        'visible' => Yii::$app->user->can('user/index'),
+                    ],
+                    [
+                        'label' => \Yii::t('main', 'Profile'),
+                        'url' => ['/user/view', 'id' => Yii::$app->user->id],
+                        'visible' => !Yii::$app->user->isGuest && Yii::$app->user->can('user/view'),
+                    ],
+                    [
+                        'label' => \Yii::t('main', 'Config'),
+                        'url' => ['/config/system'],
+                        'visible' => Yii::$app->user->can('config/system'),
+                    ],                
+                    [
+                        'label' => \Yii::t('main', 'Authentication Methods'),
+                        'url' => ['/auth/index'],
+                        'visible' => Yii::$app->user->can('auth/index'),
+                    ],
+                ],
             ],
 
             [
-                'label' => 'Config',
-                'url' => ['/config/system'],
-                'visible' => Yii::$app->user->can('config/system'),
-            ],
-
-            [
-                'label' => 'Help',
-                'url' => ['/howto/README.md'],
+                'label' => \Yii::t('main', 'Help'),
+                'url' => ['/howto/index.md'],
                 'visible' => !Yii::$app->user->isGuest,
             ],
 
             Yii::$app->user->isGuest ?
-                ['label' => 'Login', 'url' => ['/site/login']] :
+                ['label' => \Yii::t('main', 'Login'), 'url' => ['/site/login']] :
                 [
-                    'label' => 'Logout (' . Yii::$app->user->identity->username . ')',
+                    'label' => \Yii::t('main', 'Logout') . ' (' . Yii::$app->user->identity->username . ')',
                     'url' => ['/site/logout'],
                     'linkOptions' => ['data-method' => 'post']
                 ],
@@ -209,7 +223,7 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">&copy; GLaDOS <?= ' ' . \Yii::$app->params['version'] . ' - ' . date('Y') ?>
+        <p class="pull-left">&copy; GLaDOS <?= ' ' . \Yii::$app->version . ' - ' . date('Y') ?>
             <?= ActiveEventField::widget([
                 'options' => [
                     'tag' => 'i',

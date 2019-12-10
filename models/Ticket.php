@@ -5,11 +5,13 @@ namespace app\models;
 use Yii;
 use app\models\Base;
 use yii\helpers\ArrayHelper;
+use app\models\Translation;
 use yii\web\ConflictHttpException;
 use yii\base\Event;
 use app\models\Backup;
 use app\models\Restore;
 use app\models\EventItem;
+use app\components\HistoryBehavior;
 
 /**
  * This is the model class for table "ticket".
@@ -51,7 +53,7 @@ use app\models\EventItem;
  * @property Exam $exam
  * @property Exam $exam
  */
-class Ticket extends Base
+class Ticket extends LiveActiveRecord
 {
 
     /**
@@ -62,10 +64,20 @@ class Ticket extends Base
 
     public $tduration;
 
+    /* db translated fields */
+    public $client_state_db;
+    public $client_state_orig;
+    public $backup_state_db;
+    public $backup_state_orig;
+    public $restore_state_db;
+    public $restore_state_orig;
+    public $download_state_db;
+    public $download_state_orig;
+
     /**
-     * @var array An array holding the values of the record before changing
+     * @inheritdoc
      */
-    private $presaveAttributes;
+    const EAGERLOADING = false;
 
     /* scenario constants */
     const SCENARIO_DEFAULT = 'default';
@@ -87,19 +99,21 @@ class Ticket extends Base
      */
     public function init()
     {
-        $instance = $this;
-        $this->on(self::EVENT_BEFORE_UPDATE, function($instance){
-            $this->presaveAttributes = $this->getOldAttributes();
-        });
-        $this->on(self::EVENT_AFTER_UPDATE, [$this, 'updateEvent']);
+        $this->on(self::EVENT_AFTER_UPDATE, [$this, 'updateEvent_old']);
         $this->on(self::EVENT_AFTER_DELETE, [$this, 'deleteEvent']);
 
         /* generate the token if it's a new record */
         $this->token = $this->isNewRecord ? bin2hex(openssl_random_pseudo_bytes(\Yii::$app->params['tokenLength']/2)) : $this->token;
 
-        $this->backup_interval = $this->isNewRecord ? 300 : $this->backup_interval;
-    }
+        // set default values, but only in this context, not in TicketSearch context
+        // this would overwrite values to search
+        if ($this->isNewRecord && get_called_class() == 'app\models\Ticket') {
+            $this->backup_interval = 300;
+            $this->client_state = yiit('ticket', 'Client not seen yet');
+        }
 
+        parent::init();
+    }
 
     /**
      * @inheritdoc
@@ -112,23 +126,98 @@ class Ticket extends Base
     /**
      * @inheritdoc
      */
+    public function getTranslatedFields()
+    {
+        return [
+            'client_state',
+            'backup_state',
+            'restore_state',
+            'download_state',
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getLiveFields()
+    {
+        return [
+            'client_state' => [ 'priority' => 1 ],
+            'download_lock' => [ 'priority' => 0 ],
+            'download_progress' => [
+                'priority' => function ($field, $model) {
+                    return round($field*100) == 100 ? 0 : 2;
+                },
+                'data' => function ($field, $model) {
+                    return [
+                        'download_progress' => yii::$app->formatter->format($model->{$field}, 'percent')
+                    ];
+                }
+            ],
+            'backup_state' => [ 'priority' => 2 ],
+            'restore_state' => [ 'priority' => 2 ],
+            'download_state' => [ 'priority' => 2 ],
+            'backup_lock' => [ 'priority' => 0 ],
+            'restore_lock' => [ 'priority' => 0 ],
+            'online',
+            'last_backup',
+        ];
+    }
+
+    /**
+     * @inheritdoc 
+     */
+    public function behaviors()
+    {
+        return [
+            'HistoryBehavior' => [
+                'class' => HistoryBehavior::className(),
+                'attributes' => [
+                    'token' => 'text',
+                    'exam_id' => 'text',
+                    'start' => 'timeago',
+                    'end' => 'timeago',
+                    'ip' => 'text',
+                    'test_taker' => 'text',
+                    'backup_interval' => 'duration',
+                    'online' => 'boolean',
+                    'backup_lock' => 'boolean',
+                    'restore_lock' => 'boolean',
+                    'download_lock' => 'boolean',
+                    'backup_size' => 'shortSize',
+                    'time_limit' => 'text',
+                    'download_state' => 'text',
+                    'download_request' => 'timeago',
+                    'download_finished' => 'timeago',
+                    'last_backup' => 'boolean',
+                    'client_state' => 'text',
+                    'backup_state' => 'text',
+                    'restore_state' => 'text',
+                    'running_daemon_id' => 'text',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function rules()
     {
         return [
-            [['exam_id', 'token', 'backup_interval'], 'required'],
-            [['exam_id', 'token', 'backup_interval'], 'required', 'on' => self::SCENARIO_DEFAULT],
+            [['exam_id', 'token', 'backup_interval'], 'required', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['token', 'test_taker'], 'required', 'on' => self::SCENARIO_SUBMIT],
             [['start', 'ip'], 'required', 'on' => self::SCENARIO_DOWNLOAD],
             [['end'], 'required', 'on' => self::SCENARIO_FINISH],
-            [['client_state'], 'required', 'on' => self::SCENARIO_NOTIFY],
-            [['exam_id'], 'integer'],
-            [['backup_interval'], 'integer', 'min' => 0],
-            [['time_limit'], 'integer', 'min' => 0],
-            [['exam_id'], 'validateExam', 'skipOnEmpty' => false, 'skipOnError' => false, 'on' => self::SCENARIO_DEFAULT],
-            [['start', 'end', 'test_taker', 'ip', 'state', 'download_lock'], 'safe'],
+            [['token', 'client_state'], 'required', 'on' => self::SCENARIO_NOTIFY],
+            [['exam_id'], 'integer', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
+            [['backup_interval'], 'integer', 'min' => 0, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
+            [['time_limit'], 'integer', 'min' => 0, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
+            [['exam_id'], 'validateExam', 'skipOnEmpty' => false, 'skipOnError' => false, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
+            [['start', 'end', 'test_taker', 'ip', 'state', 'download_lock'], 'safe', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['start', 'end', 'test_taker', 'ip', 'state', 'download_lock', 'backup_lock', 'restore_lock', 'bootup_lock'], 'safe', 'on' => self::SCENARIO_DEV],
-            [['token'], 'unique'],
-            [['token'], 'string', 'max' => 32],
+            [['token'], 'unique', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
+            [['token'], 'string', 'max' => 32, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['token'], 'checkIfClosed', 'on' => self::SCENARIO_SUBMIT],
         ];
     }
@@ -139,29 +228,35 @@ class Ticket extends Base
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'state' => 'State',
-            'token' => 'Token',
-            'exam.name' => 'Exam Name',
-            'exam.subject' => 'Exam Subject',
-            'exam_id' => 'Exam',
-            'valid' => 'Valid',
-            'validTime' => 'Valid for',
-            'start' => 'Started',
-            'end' => 'Finished',
-            'duration' => 'Duration',
-            'result' => 'Result',
-            'time_limit' => 'Time Limit',
-            'download_progress' => 'Exam Download Progress',
-            'client_state' => 'Client State',
-            'ip' => 'IP Address',
-            'test_taker' => 'Test Taker',
-            'backup' => 'Backup',
-            'backup_last' => 'Last Backup',
-            'backup_last_try' => 'Last Backup Try',
-            'backup_state' => 'Backup State',
-            'backup_interval' => 'Backup Interval',
-            'backup_size' => 'Current Backup Size',
+            'id' => \Yii::t('ticket', 'ID'),
+            'state' => \Yii::t('ticket', 'State'),
+            'token' => \Yii::t('ticket', 'Token'),
+            'exam.name' => \Yii::t('ticket', 'Exam Name'),
+            'exam.subject' => \Yii::t('ticket', 'Exam Subject'),
+            'exam_id' => \Yii::t('ticket', 'Exam'),
+            'valid' => \Yii::t('ticket', 'Valid'),
+            'validTime' => \Yii::t('ticket', 'Valid for'),
+            'start' => \Yii::t('ticket', 'Started'),
+            'end' => \Yii::t('ticket', 'Finished'),
+            'duration' => \Yii::t('ticket', 'Duration'),
+            'result' => \Yii::t('ticket', 'Result'),
+            'time_limit' => \Yii::t('ticket', 'Time Limit'),
+            'download_progress' => \Yii::t('ticket', 'Exam Download Progress'),
+            'download_state' => \Yii::t('ticket', 'Download State'),
+            'download_request' => \Yii::t('ticket', 'Download requested at'),
+            'download_finished' => \Yii::t('ticket', 'Download finshed at'),
+            'client_state' => \Yii::t('ticket', 'Client State'),
+            'online' => \Yii::t('ticket', 'Online'),
+            'ip' => \Yii::t('ticket', 'IP Address'),
+            'test_taker' => \Yii::t('ticket', 'Test Taker'),
+            'backup' => \Yii::t('ticket', 'Backup'),
+            'backup_lock' => \Yii::t('ticket', 'Backup locked'),
+            'backup_last' => \Yii::t('ticket', 'Last Backup'),
+            'backup_last_try' => \Yii::t('ticket', 'Last Backup Try'),
+            'backup_state' => \Yii::t('ticket', 'Backup State'),
+            'backup_interval' => \Yii::t('ticket', 'Backup Interval'),
+            'backup_size' => \Yii::t('ticket', 'Current Backup Size'),
+            'running_daemon_id' => \Yii::t('ticket', 'ID of the running daemon'),
         ];
     }
 
@@ -171,30 +266,16 @@ class Ticket extends Base
     public function attributeHints()
     {
         return [
-            'token' => 'This is a randomly generated, unique token to <b>identify the ticket</b>. The test taker has to provide this token to gain access to his exam.',
-            'backup_interval' => 'This value (in seconds) sets the <b>interval to create automatic backups</b> of the exam system. Set to <code>0</code> to disable automatic backup.',
-            'time_limit' => 'If this value (in minutes) is set, the exam status view of the student will show the time left. This has the same effect as the value in the exam. Leave empty to inherit the value configured in the exam' . (isset($this->exam) ? ' (' . yii::$app->formatter->format($this->exam->time_limit, 'timeLimit') . ')' : '') . '. Set to <code>0</code> for no time limit. Notice, this will <b>override the setting in the exam</b>.',
-            'exam_id' => 'Choose the exam this ticket has to be assigned to in the list below. Notice, only exams assigned to you will be shown underneath.',
-            'test_taker' => 'Here you can <b>assign the ticket to a student</b>. If left empty, this can also be done later (even when the exam has finished), but it is recommended to set this value as soon as possible, to keep track of the tickets. If not set the ticket will be unassigned/anonymous.',
-            'start' => 'The start time of the exam. This should not be manually edited.',
-            'end' => 'The finish time of the exam. This should not be manually edited.',
+            'token' => \Yii::t('ticket', 'This is a randomly generated, unique token to <b>identify the ticket</b>. The test taker has to provide this token to gain access to his exam.'),
+            'backup_interval' => \Yii::t('ticket', 'This value (in seconds) sets the <b>interval to create automatic backups</b> of the exam system. Set to <code>0</code> to disable automatic backup.'),
+            'time_limit' => \Yii::t('ticket', 'If this value (in minutes) is set, the exam status view of the student will show the time left. This has the same effect as the value in the exam. Leave empty to inherit the value configured in the exam{x}. Set to <code>0</code> for no time limit. Notice, this will <b>override the setting in the exam</b>.', [
+                'x' => (isset($this->exam) ? ' (' . yii::$app->formatter->format($this->exam->time_limit, 'timeLimit') . ')' : '')
+            ]),
+            'exam_id' => \Yii::t('ticket', 'Choose the exam this ticket has to be assigned to in the list below. Notice, only exams assigned to you will be shown underneath.'),
+            'test_taker' => \Yii::t('ticket', 'Here you can <b>assign the ticket to a student</b>. If left empty, this can also be done later (even when the exam has finished), but it is recommended to set this value as soon as possible, to keep track of the tickets. If not set the ticket will be unassigned/anonymous.'),
+            'start' => \Yii::t('ticket', 'The start time of the exam. This should not be manually edited.'),
+            'end' => \Yii::t('ticket', 'The finish time of the exam. This should not be manually edited.'),
         ];
-    }
-
-    /**
-     * Checks if attributes have changed
-     * 
-     * @param array $attributes - a list of attributes to check
-     * @return bool
-     */
-    public function attributesChanged($attributes)
-    {
-        foreach($attributes as $attribute){
-            if($this->presaveAttributes[$attribute] != $this->attributes[$attribute]){
-                return true;
-            }
-        }
-        return false;
     }
 
     public function getOwn()
@@ -221,7 +302,7 @@ class Ticket extends Base
 
     public function getResultName()
     {
-        return ($this->test_taker ? $this->test_taker . ' - ' . $this->token : '_NoName - ' . $this->token) . ($this->result != null && file_exists($this->result) ? ' - Result already generated.' : ' - No result yet.');
+        return ($this->test_taker ? $this->test_taker . ' - ' . $this->token : '_NoName - ' . $this->token) . ($this->result != null && file_exists($this->result) ? ' - ' . \Yii::t('ticket', 'Result already generated.') : ' - ' . \Yii::t('ticket', 'No result yet.'));
     }
 
     /**
@@ -229,7 +310,7 @@ class Ticket extends Base
      * 
      * @return void
      */
-    public function updateEvent()
+    public function updateEvent_old()
     {
         if($this->attributesChanged([ 'start', 'end', 'test_taker', 'result' ])){
             $eventItem = new EventItem([
@@ -242,123 +323,18 @@ class Ticket extends Base
             ]);
             $eventItem->generate();
         }
-        if($this->attributesChanged([ 'download_progress' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => round($this->download_progress*100) == 100 ? 0 : 2,
-                'data' => [
-                    'download_progress' => yii::$app->formatter->format($this->download_progress, 'percent')
-                ],
-            ]);
-            $eventItem->generate();
-        }
 
-        if($this->attributesChanged([ 'download_lock' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 0,
-                'data' => [
-                    'download_lock' => $this->download_lock,
-                ],
-            ]);
-            $eventItem->generate();
-        }
-
-        if($this->attributesChanged([ 'download_state' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 2,
-                'data' => [
-                    'download_state' => yii::$app->formatter->format($this->download_state, 'ntext'),
-                ],
-            ]);
-            $eventItem->generate();
-        }
-
-        if($this->attributesChanged([ 'backup_state' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 2,
-                'data' => [
-                    'backup_state' => yii::$app->formatter->format($this->backup_state, 'ntext'),
-                ],
-            ]);
-            $eventItem->generate();
-        }
-
-        if($this->attributesChanged([ 'restore_state' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 2,
-                'data' => [
-                    'restore_state' => yii::$app->formatter->format($this->restore_state, 'ntext'),
-                ],
-            ]);
-            $eventItem->generate();
-        }
-
-        if($this->attributesChanged([ 'backup_lock' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 2,
-                'data' => [
-                    'backup_lock' => $this->backup_lock,
-                ],
-            ]);
-            $eventItem->generate();
-        }
-
-        if($this->attributesChanged([ 'restore_lock' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 2,
-                'data' => [
-                    'restore_lock' => $this->restore_lock,
-                ],
-            ]);
-            $eventItem->generate();
-        }
-
-        if($this->attributesChanged([ 'online' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 2,
-                'data' => [
-                    'online' => $this->online,
-                ],
-            ]);
-            $eventItem->generate();
-        }
-
-        if($this->attributesChanged([ 'last_backup' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 2,
-                'data' => [
-                    'last_backup' => $this->last_backup,
-                ],
-            ]);
-            $eventItem->generate();
-        }
-
-        if($this->attributesChanged([ 'client_state' ])){
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $this->id,
-                'priority' => 1,
-                'data' => [
-                    'client_state' => $this->client_state,
-                ],
-            ]);
-            $eventItem->generate();
-
+        if($this->attributesChanged([ 'client_state_id', 'client_state_data' ])){
             $act = new Activity([
                 'ticket_id' => $this->id,
-                'description' => 'Client state changed: ' .
-                $this->presaveAttributes['client_state'] . ' -> ' . $this->client_state,
+                'description' => yiit('activity', 'Client state changed: {client_state}'),
+                'description_params' => [
+                    //'old' => Translation::findOne($this->presaveAttributes['client_state_id'])->en,
+                    'client_state' => $this->client_state,
+                ],
                 'severity' => Activity::SEVERITY_INFORMATIONAL,
             ]);
             $act->save();
-
         }
         return;
     }
@@ -380,13 +356,17 @@ class Ticket extends Base
         ]);
         $eventItem->generate();
 
+        if ($this->backup == true) {
+            $this->backups[0]->delete();
+        }
+
         return;
     }
 
     /**
-     * Getter for the start time
+     * Getter for the start time.
      * 
-     * @return integer 
+     * @return integer the start time
      */
     public function getStartTime()
     {
@@ -394,9 +374,9 @@ class Ticket extends Base
     }
 
     /**
-     * Setter for the start time
+     * Setter for the start time.
      *
-     * @param integer $value - the start time
+     * @param integer $value the start time
      * @return void
      */
     public function setStartTime($value)
@@ -419,7 +399,8 @@ class Ticket extends Base
     /**
      * Mapping of the different states and the color classes
      *
-     * @return array
+     * @return array Array whose keys are the states and values are strings
+     * for the css class.
      */
     public function getClassMap()
     {
@@ -434,7 +415,7 @@ class Ticket extends Base
     /**
      * Just returns validity of the ticket.
      *
-     * @return bool
+     * @return bool validity of the ticket
      */
     public function getValid(){
         if($this->state == self::STATE_OPEN || $this->state == self::STATE_RUNNING){
@@ -444,54 +425,57 @@ class Ticket extends Base
     }
 
     /**
-     * Determine whether the ticket is abandoned or not. To be abandoned the ticket must satisfy all
-     * the following:
+     * Determine whether the ticket is abandoned or not.
+     * To be abandoned the ticket must satisfy all the following:
      * 
-     *  - be in the RUNNING/CLOSED or SUBMITTED state
+     *  - be in the [[Ticket::STATE_RUNNING]], [[Ticket::STATE_CLOSED]] or [[Ticket::STATE_SUBMITTED]] state
      *  - an IP address must be set
-     *  - a backup_interval > 0 must be set
+     *  - a `backup_interval` > 0 must be set
      *  - no last backup existing
      *  - if the computed abandon time is smaller than the no successfull backup time
      * 
      * Notes:
-     *  1. the "computed abandon time" (cat) is calculated according to the following table:
-     *      etl    ttl    at     cat
-     *      null   null   null   10800
-     *      null   null   >0     abs(at)
-     *      null   >0     null   10800
-     *      null   >0     >0     abs(at)
-     *      null   >0     null   ttl
-     *      null   >0     >0     ttl
-     *      0      null   null   10800
-     *      0      null   >0     abs(at)
-     *      0      0      null   10800
-     *      0      0      >0     abs(at)
-     *      0      >0     null   ttl
-     *      0      >0     >0     ttl
-     *      >0     null   null   etl
-     *      >0     null   >0     etl
-     *      >0     0      null   etl
-     *      >0     0      >0     etl
-     *      >0     >0     null   ttl
-     *      >0     >0     >0     ttl
-     *
-     *      where etl:   time limit from the exam
-     *            ttl:   time limit from the ticket
-     *            at:    abandon time from the configuration
-     *            abs(): the absolute value function
-     *
-     *  2. the "no (successfull) backup time" (nbt) is calculated according to the following table:
-     *      blt    bl     st     nbt
-     *      null   null   set    now-st
-     *      null   set    set    now-bl
-     *      set    null   set    blt-st
-     *      set    set    set    blt-bl
+     *  * the "computed abandon time" (cat) is calculated according to the following table:
      * 
-     *      where blt:   last backup try time
-     *            bl:    last successfull backup time
-     *            st:    ticket start time
+     *         etl    ttl    at     cat
+     *         null   null   null   10800
+     *         null   null   >0     abs(at)
+     *         null   >0     null   10800
+     *         null   >0     >0     abs(at)
+     *         null   >0     null   ttl
+     *         null   >0     >0     ttl
+     *         0      null   null   10800
+     *         0      null   >0     abs(at)
+     *         0      0      null   10800
+     *         0      0      >0     abs(at)
+     *         0      >0     null   ttl
+     *         0      >0     >0     ttl
+     *         >0     null   null   etl
+     *         >0     null   >0     etl
+     *         >0     0      null   etl
+     *         >0     0      >0     etl
+     *         >0     >0     null   ttl
+     *         >0     >0     >0     ttl
+     * 
      *
-     * @return bool
+     *  * the "no (successfull) backup time" (nbt) is calculated according to the following table:
+     *
+     *         blt    bl     st     nbt
+     *         null   null   set    now-st
+     *         null   set    set    now-bl
+     *         set    null   set    blt-st
+     *         set    set    set    blt-bl
+     * 
+     *   where:
+     *    * etl:   time limit from the exam
+     *    * ttl:   time limit from the ticket
+     *    * at:    abandon time from the configuration
+     *    * abs(): the absolute value function
+     *    * blt:   last backup try time
+     *    * bl:    last successfull backup time
+     *    * st:    ticket start time
+     *
+     * @return bool Whether the ticket is abandoned or not
      */
     public function getAbandoned() {
 
@@ -525,7 +509,7 @@ class Ticket extends Base
     /**
      * Determine whether the ticket's last backup has failed over time
      *
-     * @return bool
+     * @return bool Whether the ticket's last backup has failed over time
      */
     public function getLastBackupFailed ()
     {
@@ -542,7 +526,7 @@ class Ticket extends Base
     /**
      * Returns if there is a backup
      *
-     * @return bool
+     * @return bool Whether there is a backup
      */
     public function getBackup(){
         $backupPath = \Yii::$app->params['backupPath'] . '/' . $this->token . '/' . 'rdiff-backup-data';        
@@ -580,9 +564,7 @@ class Ticket extends Base
     /**
      * Calulates the time the ticket will be valid as DateInterval.
      *
-     * @return DateInterval|bool - Dateinterval object,
-     *                             false, if not valid,
-     *                             true, if it cannot expire
+     * @return DateInterval|bool Dateinterval object, false if not valid, true if it cannot expire
      */
     public function getValidTime(){
         if($this->state == self::STATE_OPEN || $this->state == self::STATE_RUNNING){
@@ -607,15 +589,27 @@ class Ticket extends Base
     }
 
     /**
-     * Returns the duration of the test
+     * Returns the duration of the test as a DateInterval object.
      *
      * @return DateInterval object|null
-     */    
-    public function getDuration(){
-
+     */
+    public function getDuration()
+    {
         $a = new \DateTime($this->start);
         $b = new \DateTime($this->end);
         return $a == $b ? null : $a->diff($b);
+    }
+
+    /**
+     * Returns the duration in seconds.
+     *
+     * @return int The amount of seconds
+     */
+    public function getDurationInSecs()
+    {
+        $a = new \DateTime($this->start);
+        $b = new \DateTime($this->end);
+        return $b->getTimestamp() - $a->getTimestamp();
     }
 
     /**
@@ -662,11 +656,11 @@ class Ticket extends Base
     /**
      * Runs a command in the shell of the system.
      * 
-     * @param string $cmd - the command to run
-     * @param string $lc_all - the value of the LC_ALL environment variable
-     * @param integer $timeout - the SSH connection timeout
-     * @return array - the first element contains the output (stdout and stderr),
-     *                 the second element contains the exit code of the command
+     * @param string $cmd the command to run
+     * @param string $lc_all the value of the `LC_ALL` environment variable
+     * @param integer $timeout the SSH connection timeout
+     * @return array the first element contains the output (stdout and stderr),
+     * the second element contains the exit code of the command
      */
     public function runCommand($cmd, $lc_all = "C", $timeout = 30)
     {
@@ -693,23 +687,28 @@ class Ticket extends Base
     }
 
     /**
-     * Returns all backups associated to the ticket
+     * TODO
      *
-     * @param string $attribute - the attribute
+     * @param string $attribute the attribute
      * @param array $params
      * @return void
      */
-    public function validateExam($attribute, $params)
+    public function validateExam ($attribute, $params)
     {
 
         $exam = Exam::findOne(['id' => $this->$attribute]);
 
-        if(Yii::$app->user->can('ticket/create/all') || $this->own == true){
-            if (!$exam->fileConsistency){
-                $this->addError($attribute, 'As long as the exam file is not valid, no tickets can be created for this exam.');
+        // don't validate in the console case, because Yii::$app->user does not exist
+        if (get_class(\Yii::$app) == "yii\console\Application") {
+            return;
+        }
+
+        if (Yii::$app->user->can('ticket/create/all') || $this->own == true) {
+            if (!$exam->fileConsistency) {
+                $this->addError($attribute, \Yii::t('ticket', 'As long as the exam file is not valid, no tickets can be created for this exam.'));
             }
-        }else{
-            $this->addError($attribute, 'You are not allowed to perform this action on this exam.');
+        } else {
+            $this->addError($attribute, \Yii::t('ticket', 'You are not allowed to perform this action on this exam.'));
         }
 
     }
@@ -724,7 +723,7 @@ class Ticket extends Base
     public function checkIfClosed($attribute, $params)
     {
         if ($this->state != self::STATE_CLOSED) {
-            $this->addError($attribute, 'This ticket is not in closed state.');
+            $this->addError($attribute, \Yii::t('ticket', 'This ticket is not in closed state.'));
         }
     }
 
@@ -735,7 +734,7 @@ class Ticket extends Base
      */
     public static function find()
     {
-        //$query = parent::find();
+        $c = \Yii::$app->language;
         $query = new TicketQuery(get_called_class());
 
         $query->addSelect(['`ticket`.*', new \yii\db\Expression('(case

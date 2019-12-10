@@ -9,7 +9,7 @@ use yii\widgets\Pjax;
 /* @var $model app\models\Exam */
 
 $this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Exams', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => \Yii::t('exams', 'Exams'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
@@ -35,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'dataProvider' => $dataProvider,
             'itemView' => '_item',
             'itemOptions' => ['sort-value' => 'download_progress'],
-            'emptyText' => 'No tickets found.',
+            'emptyText' => \Yii::t('exams', 'No tickets found.'),
             'layout' => '{items} <div class="col-sm-12">{summary} {pager}</div>',
         ] ); ?>
 

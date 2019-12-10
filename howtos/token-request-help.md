@@ -1,4 +1,4 @@
-## Token request
+## Help: Token request
 
 Provide the *Token* given on your *Exam Sheet* as seen below.
 

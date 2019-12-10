@@ -123,11 +123,11 @@ SCRIPT;
             'templateSelection' => new JsExpression('function (q) { return q.text; }'),
         ],
         'options' => [
-            'placeholder' => 'Choose an Exam ...'
+            'placeholder' => \Yii::t('ticket', 'Choose an Exam ...')
         ]
     ]);
     $start = $model->isNewRecord ? null : $form->field($model, 'start')->widget(DateTimePicker::classname(), [
-        'options' => ['placeholder' => 'Enter start time ...'],
+        'options' => ['placeholder' => \Yii::t('ticket', 'Enter start time ...')],
         'pluginOptions' => [
            'format' => 'yyyy-mm-dd hh:ii:ss',
            'todayHighlight' => true,
@@ -136,7 +136,7 @@ SCRIPT;
         ]
     ]);
     $end = $model->isNewRecord ? null : $form->field($model, 'end')->widget(DateTimePicker::classname(), [
-        'options' => ['placeholder' => 'Enter end time ...'],
+        'options' => ['placeholder' => \Yii::t('ticket', 'Enter end time ...')],
         'pluginOptions' => [
             'format' => 'yyyy-mm-dd hh:ii:ss',
             'todayHighlight' => true,
@@ -145,10 +145,10 @@ SCRIPT;
         ]
     ]);
     $backup_interval = $form->field($model, 'backup_interval', [
-        'template' => '{label}<div class="input-group">{input}<span class="input-group-addon" id="basic-addon2">seconds</span></div>{hint}{error}'
+        'template' => '{label}<div class="input-group">{input}<span class="input-group-addon" id="basic-addon2">' . \Yii::t('ticket', 'seconds') . '</span></div>{hint}{error}'
     ])->textInput(['type' => 'number']);
     $time_limit = $form->field($model, 'time_limit', [
-        'template' => '{label}<div class="input-group">{input}<span class="input-group-addon" id="basic-addon2">minutes</span></div>{hint}{error}'
+        'template' => '{label}<div class="input-group">{input}<span class="input-group-addon" id="basic-addon2">' . \Yii::t('ticket', 'minutes') . '</span></div>{hint}{error}'
     ])->textInput(['type' => 'number']);
     $test_taker = $form->field($model, 'test_taker')->textInput();
 
@@ -202,7 +202,7 @@ SCRIPT;
 
     <?php if ($attr == null) { ?>
     <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Apply', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::submitButton($model->isNewRecord ? \Yii::t('ticket', 'Create') : \Yii::t('ticket', 'Apply'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>
     <?php } else { ?>
         <?= Html::submitButton('<span class="glyphicon glyphicon-ok"></span>', ['class' => 'btn btn-primary btn-xs']) ?>

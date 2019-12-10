@@ -9,7 +9,7 @@ use yii\helpers\Markdown;
 
 <div class="howto-view markdown-view">
     
-    <h2><?= Html::encode('Help') ?></h2>
+    <h2><?= Html::encode($model->title) ?></h2>
 
     <?= Markdown::process($model->content, 'gfm'); ?>
 

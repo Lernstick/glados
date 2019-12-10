@@ -37,4 +37,29 @@ function nullif($expr1, $expr2){
 	return $expr1 == $expr2 ? null : $expr1;
 }
 
+/**
+ * Dummy translate function to mark text to be extracted by the "yii message" command.
+ * It does nothing but returning the message.
+ * @see https://www.yiiframework.com/doc/api/2.0/yii-baseyii#t()-detail
+ * 
+ * @return string
+ */
+function yiit($category, $message, $params = [], $language = null) {
+	return $message;
+}
+
+/**
+ * This function act similar to Yii::t() except that it does not translate any
+ * string. It will just replace the placeholders {key} in the string with the
+ * values given in the params array.
+ * @param string string the string containing placeholders
+ * @param array params the array with key values pairs
+ * 
+ * @return string
+ */
+function substitute($string, $params) {
+	$search = preg_filter('/^.*$/', '{$0}', array_keys($params));
+	return str_replace($search, array_values($params), $string);;
+}
+
 ?>

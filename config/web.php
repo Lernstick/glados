@@ -4,8 +4,16 @@ $params = require(__DIR__ . '/params.php');
 
 $config = [
     'id' => 'basic',
+    'name' => 'GLaDOS',
+    'version' => '1.0.6',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log'],
+    'bootstrap' => [
+        'log',
+        [
+            'class' => 'app\components\LanguageSelector',
+            'supportedLanguages' => ['en', 'de'],
+        ],
+    ],
     'timezone' => 'Europe/Zurich',
     'vendorPath' => '/usr/share/yii2',
     'modules' => [
@@ -58,8 +66,17 @@ $config = [
                 '<controller>/<action:(update|delete|backup|restore|stop|kill)>/<id:\d+>' => '<controller>/<action>',
                 'howto/img/<id>' => 'howto/img',
                 'howto/<id>' => 'howto/view',
-                'ticket/<action:(config|download|finish|notify|md5)>/<token:.*>' => 'ticket/<action>',
+                'ticket/<action:(config|download|finish|notify|md5|status)>/<token:.*>' => 'ticket/<action>',
             ]
+        ],
+        'i18n' => [
+            'translations' => [
+                '*' => [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@app/messages',
+                    'sourceLanguage' => 'en',
+                ],
+            ],
         ],
         'file' => [
             'class' => 'app\components\File',
@@ -94,6 +111,7 @@ $config = [
             ],
         ],
         'db' => require(__DIR__ . '/db.php'),
+        'auth' => require(__DIR__ . '/auth.php'),
     ],
     'params' => $params,
     'runtimePath' => '/var/lib/glados/runtime',

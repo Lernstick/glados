@@ -52,10 +52,10 @@ class ScreenshotController extends Controller
             } else if ($type = 'thumb') {
                 return \Yii::$app->response->sendFile($model->thumbnail, null, ['inline' => true]);
             } else {
-                throw new NotFoundHttpException('The requested page does not exist.');
+                throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
             }
         } else {
-            throw new NotFoundHttpException('The screenshot does not exist.');
+            throw new NotFoundHttpException(\Yii::t('ticket', 'The screenshot does not exist.'));
         }
     }
 
@@ -101,7 +101,7 @@ class ScreenshotController extends Controller
             "jpeg:-";
         $img = $ticket->runCommand($cmd, "C", 10);
         if ($img[1] != 0) {
-            throw new NotFoundHttpException('The screenshot could not be generated.');
+            throw new NotFoundHttpException(\Yii::t('ticket', 'The screenshot could not be generated.'));
         } else {
             return \Yii::$app->response->sendContentAsFile($img[0], $token . '.jpg', [
                 'mimeType' => 'image/jpeg',

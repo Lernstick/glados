@@ -8,7 +8,8 @@ GrowlAsset::register($this);
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Ticket */
-/* @var $session yii\web\Session */
+
+$session = Yii::$app->session;
 
 $n = [
     'success' => $session->getFlash('success'),

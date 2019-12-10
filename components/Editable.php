@@ -19,11 +19,6 @@ class Editable extends Pjax
      */
     public $editUrl;
 
-     /**
-     * @var string content in the popover to be shown, when the form is loading.
-     */
-    public $loading = "<span>Loading...</span>";
-
     private $uuid;
     
 
@@ -37,6 +32,15 @@ class Editable extends Pjax
         $this->uuid = generate_uuid();
         $this->enablePushState = false;
         $this->options['data-pjax-container'] = true;
+    }
+
+
+     /**
+     * @return string content in the popover to be shown, when the form is loading.
+     */
+    public function getLoading()
+    {
+        return '<span>' . \Yii::t('app', 'Loading...') . '</span>';
     }
 
     /**

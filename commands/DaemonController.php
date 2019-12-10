@@ -12,6 +12,13 @@ use yii\helpers\Console;
 
 /**
  * Daemon base controller
+ * 
+ * This is the base controller for other arbitrary daemons. A new daemon should be created 
+ * in the following way:
+ *
+ * ```php
+ * class NewController extends DaemonController implements DaemonInterface
+ * ```
  */
 class DaemonController extends Controller
 {
@@ -29,6 +36,16 @@ class DaemonController extends Controller
     protected $loadarr = [];
 
     /**
+     * @var string file path of the lock file
+     */
+    protected $lockFile;
+
+    /**
+     * @var resource file pointer resource of the lock file
+     */
+    protected $lockHandle;
+
+    /**
      * @var array An array holding the timestamp of the last invocation of a job in
      * [[joblist]]. The key corresponds to the key in [[joblist]] and the value is
      * the timestamp of the last invocation.
@@ -36,7 +53,7 @@ class DaemonController extends Controller
     public $jobLastRun = [];
 
     /**
-     * @var app\models\Daemon the daemon instance for db updates
+     * @var Daemon the daemon instance for db updates
      */
     public $daemon;
 
@@ -46,10 +63,15 @@ class DaemonController extends Controller
     public $_pidfile;
 
     /**
-     * @var integer the uid and gid under which the script should be executed.
+     * @var integer the uid under which the script should be executed.
      * defaults to 33, which in debian is the www-data user.
      */
     public $uid = 33;
+
+    /**
+     * @var integer the gid under which the script should be executed.
+     * defaults to 33, which in debian is the www-data user.
+     */
     public $gid = 33;
 
     /**
@@ -61,8 +83,9 @@ class DaemonController extends Controller
      * @var array list of controllers and actions to work trough in one iteration.
      * The interval (in seconds) describes that the action should be executed only
      * after that interval has passed. This is optional.
-     *
      * The list has the following pattern:
+     * 
+     * ```php
      * [
      *     0 => ['controller1', 'action1', interval1],
      *     1 => ['controller1', 'action2'],
@@ -70,46 +93,99 @@ class DaemonController extends Controller
      *     ...
      *     N => ['controllerN', 'actionN', intervalN]
      * ]
-     *
+     * ```
      */
     public $joblist = [
         0 => ['download', 'run-once'],
         1 => ['backup', 'run-once'],
         2 => ['analyze', 'run-once'],
         3 => ['dbclean', 'run-once', 300],
-        3 => ['unlock', 'run-once', 120],
+        4 => ['unlock', 'run-once', 120],
     ];
 
+    /**
+     * @var string This is set to "daemonName:pid" in the [[init()]] function.
+     * daemonName is the string in front of the name of the controller (ex: "backup" for
+     * "BackupController"). The pid is the process id of the running daemon.
+     */
     public $daemonInfo = 'daemon:0';
+
+
+    /**
+     * @var string The log file for the daemon to log its output to. It is set later to:
+     * 
+     * ```php
+     * \Yii::$app->params['daemonLogFilePath'] . '/glados.' . date('Y-m-dO') . '.log';
+     * ```
+     * 
+     * For example: `/var/log/glados/glados.2019-06-17+0200.log`
+     * 
+     * See also:
+     *  * [Glados config files](guide:config-files.md)
+     * 
+     */
     public $logFile;
+
+    /**
+     * @var string The log file for the daemon to log its error output to. It is set later to:
+     * 
+     * ```php
+     * \Yii::$app->params['daemonLogFilePath'] . '/error.' . date('Y-m-dO') . '.log';
+     * ```
+     * 
+     * For example: `/var/log/glados/error.2019-06-17+0200.log`
+     * 
+     * See also:
+     *  * [Glados config files](guide:config-files.md)
+     * 
+     */
     public $errorLogFile;
+
+    /**
+     * @var boolean Variable holding the value whether the log file is writable.
+     * The path `\Yii::$app->params['daemonLogFilePath']` should be set writable 
+     * for the user of the web server process (`www-data` in debian)
+     * 
+     * See also:
+     *  * [Glados config files](guide:config-files.md)
+     * 
+     */
     public $logFileIsWritable = true;
 
     /**
+     * The initializing function.
+     *
+     * This init() function does the following tasks:
+     * 
+     * * Register a tick handler that calls pcntl_signal_dispatch();
+     * In [[doJob()]], there must sometimes be manual calls of `pcntl_signal_dispatch()`
+     * A tick is an event that occurs for every `N` low-level tickable statements executed by
+     * the parser within the declare block. The value for `N` is specified using `ticks=N` within
+     * the declare block's directive section. Not all statements are tickable. Typically, condition 
+     * expressions and argument expressions are not tickable.
+     * * Change to web server user, gid must be set frist
+     * * Change process group id to its own one, so `SIGINT` will not be sent to all processes
+     * in the process group (this would happen, when the daemon starts new daemons, even if
+     * the new daemons have another parent pid, such as 1)
+     * * Setup signal handlers
+     * * Determine daemon info, e.g: `[daemon:1234]`, where `daemon` is the prefix of the
+     * controller and `1234` is the pid of the daemon, used to identify lines in the logfile.
+     * 
+     * @see https://www.php.net/manual/de/control-structures.declare.php#control-structures.declare.ticks
+     * 
      * @inheritdoc
      */
     public function init()
     {
 
-        /**
-         * Register a tick handler that calls pcntl_signal_dispatch();
-         * In [[doJob()]], there must sometimes be manual calls of pcntl_signal_dispatch();
-         * A tick is an event that occurs for every N low-level tickable statements executed by
-         * the parser within the declare block. The value for N is specified using ticks=N within
-         * the declare block's directive section.
-         * 
-         * Not all statements are tickable. Typically, condition expressions and argument
-         * expressions are not tickable. 
-         */
+        # Register a tick handler that calls pcntl_signal_dispatch();
         declare(ticks=1);
 
         # change to www-data user, gid must be set frist
         posix_setgid($this->gid);
         posix_setuid($this->uid);
 
-        # Change process group id to its own one, so SIGINT will not be sent to all processes
-        # in the process group (this would happen, when the daemon starts new daemons, even if
-        # the new daemons have another parent pid, such as 1)
+        # Change process group id
         posix_setpgid(getmypid(), getmypid());
 
         $this->time = round(time());
@@ -122,14 +198,17 @@ class DaemonController extends Controller
         pcntl_signal(SIGHUP,  array(&$this, "signalHandler"));
         pcntl_signal(SIGUSR1, array(&$this, "signalHandler"));
 
-        # determine daemon info, e.g: [daemon:1234], where "daemon" is the prefix of the
-        # controller and 1234 is the pid of the daemon, used to identify lines in the logfile.
+        # Determine daemon info, e.g: [daemon:1234].
         $tmp = explode('\\', str_replace('controller', '', strtolower(get_called_class())));
         $this->daemonInfo = end($tmp) . ':' . getmypid();
     }
 
     /**
      * Initiates the daemon.
+     * Opens a log file if it is writable.
+     * Generate events: 
+     * * increments runningDaemons by 1
+     * * emits the daemon/* event that a daemon has started
      *
      * @return void
      */
@@ -186,7 +265,11 @@ class DaemonController extends Controller
     }
 
     /**
-     * Stops the daemon, cleans up and finally exits the shell script
+     * Stops the daemon, cleans up and finally exits the shell script.
+     * The stopping cause will be logged.
+     * This also emits events:
+     * * decrement runningDaemons by 1
+     * * emits the daemon/* event that a daemon has stopped
      *
      * @return void
      */
@@ -233,7 +316,8 @@ class DaemonController extends Controller
 
     /**
      * Cleans daemons that are still runnning according to the database, but
-     * are not (because of a reboot maybe)
+     * are not (because of a reboot maybe).
+     * Thus it removes all database entries whose pid are not present in the system.
      *
      * @return void
      */
@@ -266,7 +350,7 @@ class DaemonController extends Controller
     }
 
     /**
-     * Logs a message to the screen and (if set) to the database
+     * Logs a message to the screen and (if set) to the database.
      *
      * @param string $message the message to log
      * @param bool $error if true the line will be printed red, and stored in the 
@@ -301,7 +385,13 @@ class DaemonController extends Controller
     }
 
     /**
-     * @see [[log]]
+     * Logs an error.
+     * Calls [[log()]] with `$error = true`.
+     * @param string $message the message to log
+     * @param bool $toDB if true, log the message to the database, defaults to false
+     * @param bool $toFile if true, log the message to the log file, defaults to true
+     * @param bool $toScreen if true, log the message to the standard output, defaults to true
+     * @return void
      */
     public function logError($message, $toDB = false, $toFile = true, $toScreen = true)
     {
@@ -309,7 +399,13 @@ class DaemonController extends Controller
     }
 
     /**
-     * @see [[log]]
+     * Logs an info message.
+     * Calls [[log()]] with `$error = false`.
+     * @param string $message the message to log
+     * @param bool $toDB if true, log the message to the database, defaults to false
+     * @param bool $toFile if true, log the message to the log file, defaults to true
+     * @param bool $toScreen if true, log the message to the standard output, defaults to true
+     * @return void
      */
     public function logInfo($message, $toDB = false, $toFile = true, $toScreen = true)
     {
@@ -320,7 +416,7 @@ class DaemonController extends Controller
      * Default action to run the daemon.
      *
      * @param mixed $args all sorts of arguments can be given to that function.
-     * All arguments will be passed to [[doJob()]] as they are. 
+     * All arguments will be passed to [[doJob()]] as they are.
      * @return void
      */
     public function actionRun()
@@ -359,8 +455,11 @@ class DaemonController extends Controller
     }
 
     /**
-     * Checks whether the other running daemons are still alive and if not, 
+     * Checks whether the other running daemons are still alive and if not
      * tries to stop and the kills them.
+     * 1. `SIGHUP` is sent to check it the daemon is still alive.
+     * 2. If there was no reaction after 5 and then again after 30 seconds, `SIGTERM` is sent.
+     * 3. If the daemon has not stopped after more 10 seconds, `SIGKILL` is sent.
      *
      * @return void
      */
@@ -477,11 +576,11 @@ class DaemonController extends Controller
     }
 
     /**
-     * Update the load calculation in the last [0,5] minutes
+     * Update the load calculation in the last [0,5] minutes.
      *
      * @param int $value can be 0 or 1:
-     *                    - 0 means to count no load since last invokation
-     *                    - 1 means to count full load since last invokation
+     * * 0 means to count no load since last invokation
+     * * 1 means to count full load since last invokation
      * @return void
      */
     protected function calcLoad ($value)
@@ -503,7 +602,13 @@ class DaemonController extends Controller
     }
 
     /**
-     * Start/stop daemons based on thresholds
+     * Start/stop daemons based on thresholds.
+     * These thresholds are set by:
+     * * `\Yii::$app->params['minDaemons'])` and 
+     * * `\Yii::$app->params['maxDaemons'])`
+     * 
+     * See also:
+     *  * [Glados config files](guide:config-files.md)
      *
      * @return void
      */
@@ -527,8 +632,73 @@ class DaemonController extends Controller
         }
     }
 
-    /*
-     * The signal handler function
+    /**
+     * Locks an item using PHP's flock().
+     *
+     * @param int $id the id of the item
+     * @param string $reason the reason to lock the item
+     * @return bool success or failure
+     */
+    public function lock ($id, $reason)
+    {
+        $this->lockFile = \Yii::$app->params['tmpPath'] . "/" . $id . "_" . $reason . ".lock";
+        if (is_writable(\Yii::$app->params['tmpPath'])) {
+
+            if (!file_exists($this->lockFile)) {
+                touch($this->lockFile);
+            }
+
+            $this->lockHandle = fopen($this->lockFile, "c");
+            // acquire an exclusive lock
+            if (flock($this->lockHandle, LOCK_EX | LOCK_NB)) {
+                ftruncate($this->lockHandle, 0);
+                fwrite($this->lockHandle, $this->daemon->pid); // write down the process pid
+                fflush($this->lockHandle); // flush output before releasing the lock
+                return true;
+            }
+            fclose($this->lockHandle);
+        }
+        return false;
+    }
+
+    /**
+     * Unlocks an item using PHP's flock().
+     *
+     * @return bool success or failure
+     */
+    public function unlock ()
+    {
+        if ($this->locked) {
+            // release the lock
+            flock($this->lockHandle, LOCK_UN);
+            fclose($this->lockHandle);
+            return @unlink($this->lockFile);
+        }
+        return false;
+    }
+
+    /**
+     * Getter for locked.
+     *
+     * @return bool whether the item is still locked or not (by this process)
+     */
+    public function getLocked ()
+    {
+        // if the resource is still open
+        return is_resource($this->lockHandle);
+    }
+
+    /**
+     * The signal handler function.
+     * It handles the follwing signals:
+     * * SIGTERM
+     * * SIGHUP
+     * * SIGINT
+     * * SIGQUIT
+     * * SIGUSR1
+     * * else the handler does nothing.
+     * 
+     * @param int $sig The signal.
      */
     public function signalHandler($sig)
     {

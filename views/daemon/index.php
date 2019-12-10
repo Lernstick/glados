@@ -10,7 +10,7 @@ use app\components\ActiveEventField;
 /* @var $searchModel app\models\DaemonSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Daemons';
+$this->title = \Yii::t('daemons', 'Daemons');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="daemon-index">
@@ -25,20 +25,20 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="dropdown">
       <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
         <i class="glyphicon glyphicon-list-alt"></i>
-        Actions&nbsp;<span class="caret"></span>
+        <?= \Yii::t('daemons', 'Actions') ?>&nbsp;<span class="caret"></span>
       </button>
       <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
         <li>
-            <?= Html::a('<span class="glyphicon glyphicon-th-list"></span> Start Daemon', ['create', 'type' => 'daemon']) ?>
+            <?= Html::a('<span class="glyphicon glyphicon-th-list"></span> ' . \Yii::t('daemons', 'Start Daemon'), ['create', 'type' => 'daemon']) ?>
         </li>      
         <li>
-            <?= Html::a('<span class="glyphicon glyphicon-hdd"></span> Start Backup Daemon', ['create', 'type' => 'backup']) ?>
+            <?= Html::a('<span class="glyphicon glyphicon-hdd"></span> ' . \Yii::t('daemons', 'Start Backup Daemon'), ['create', 'type' => 'backup']) ?>
         </li>
         <li>
-            <?= Html::a('<span class="glyphicon glyphicon-globe"></span> Start Download Daemon', ['create', 'type' => 'download']) ?>
+            <?= Html::a('<span class="glyphicon glyphicon-globe"></span> ' . \Yii::t('daemons', 'Start Download Daemon'), ['create', 'type' => 'download']) ?>
         </li>        
         <li>
-            <?= Html::a('<span class="glyphicon glyphicon-search"></span> Start Analyzer Daemon', ['create', 'type' => 'analyze']) ?>
+            <?= Html::a('<span class="glyphicon glyphicon-search"></span> ' . \Yii::t('daemons', 'Start Analyzer Daemon'), ['create', 'type' => 'analyze']) ?>
         </li>        
       </ul>
     </div>

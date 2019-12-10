@@ -42,9 +42,9 @@ SCRIPT;
 // Register tooltip/popover initialization javascript
 $this->registerJs($js);
 
-$this->title = 'Submit Ticket';
+$this->title = \Yii::t('ticket', 'Submit Ticket');
 $this->params['breadcrumbs'][] = ['label' => 'Tickets', 'url' => ['index']];
-$this->params['breadcrumbs'][] = 'Submit';
+$this->params['breadcrumbs'][] = \Yii::t('ticket', 'Submit');
 ?>
 <div class="ticket-submit">
 
@@ -76,7 +76,7 @@ $this->params['breadcrumbs'][] = 'Submit';
     <?= $model->state == $model::STATE_CLOSED ? $form->field($model, 'test_taker', ['inputOptions' => ['autofocus' => 'autofocus', 'class' => 'form-control', 'tabindex' => '1']])->textInput() : null  ?>
 
     <div class="form-group">
-        <?= Html::submitButton('Submit', ['class' => 'btn btn-primary']) ?>
+        <?= Html::submitButton(\Yii::t('ticket', 'Submit'), ['class' => 'btn btn-primary']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

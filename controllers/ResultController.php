@@ -70,7 +70,7 @@ class ResultController extends Controller
         }
         $model = Ticket::findOne(['token' => $token]);
         if (!$model) {
-            throw new NotFoundHttpException('The requested page does not exist.');
+            throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
         } else {
             return $this->render('view', [
                 'model' => $model,
@@ -118,10 +118,10 @@ class ResultController extends Controller
                 $zipFile = $model->generateZip();
 
                 if ($zipFile === null) {
-                    Yii::$app->session->addFlash('danger', 'There are no closed or submitted Tickets to generate a ZIP-File.');
+                    Yii::$app->session->addFlash('danger', \Yii::t('results', 'There are no closed or submitted Tickets to generate a ZIP-File.'));
                     return $this->redirect(['exam/view', 'id' => $exam_id]); 
                 } else if ($zipFile === false) {
-                    throw new NotFoundHttpException('The ZIP-file could not be generated.');
+                    throw new NotFoundHttpException(\Yii::t('results', 'The ZIP-file could not be generated.'));
                 } else {
                     ignore_user_abort(true);
                     \Yii::$app->response->on(\app\components\customResponse::EVENT_AFTER_SEND, function($event) use ($zipFile) {
@@ -156,7 +156,7 @@ class ResultController extends Controller
 
         $model = Ticket::findOne(['token' => $token]);
         if (!$model) {
-            throw new NotFoundHttpException('The requested page does not exist.');
+            throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
         } else {
             return \Yii::$app->response->sendFile($model->result);
         }
@@ -185,7 +185,7 @@ class ResultController extends Controller
         } else if ($mode === 'step2'){
 
             if ($hash === null){
-                throw new NotFoundHttpException('The requested page does not exist.');
+                throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
             }
 
             $searchModel = new TicketSearch();
@@ -228,31 +228,32 @@ class ResultController extends Controller
              * @see http://php.net/manual/en/features.file-upload.errors.php
              */
             $phpErrors = [
-                0 => 'There is no error, the file uploaded with success',
-                1 => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
-                2 => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form',
-                3 => 'The uploaded file was only partially uploaded',
-                4 => 'No file was uploaded',
-                6 => 'Missing a temporary folder',
-                7 => 'Failed to write file to disk.',
-                8 => 'A PHP extension stopped the file upload.',
+                0 => \Yii::t('fileUpload', 'There is no error, the file uploaded with success'),
+                1 => \Yii::t('fileUpload', 'The uploaded file exceeds the upload_max_filesize directive in php.ini'),
+                2 => \Yii::t('fileUpload', 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form'),
+                3 => \Yii::t('fileUpload', 'The uploaded file was only partially uploaded'),
+                4 => \Yii::t('fileUpload', 'No file was uploaded'),
+                6 => \Yii::t('fileUpload', 'Missing a temporary folder'),
+                7 => \Yii::t('fileUpload', 'Failed to write file to disk.'),
+                8 => \Yii::t('fileUpload', 'A PHP extension stopped the file upload.'),
             ];
 
             if ($model->file !== null) {
-                $fileError = $phpErrors[$model->file->error] ? $phpErrors[$model->file->error] : 'Unknown PHP File Upload Error: ' . $model->file->error;
+                $fileError = $phpErrors[$model->file->error] ? $phpErrors[$model->file->error] : \Yii::t('fileUpload', 'Unknown PHP File Upload Error: {error}', ['error' => $model->file->error]);
+
             } else {
-                $fileError = 'Unknown File Upload Error';
+                $fileError = \Yii::t('fileUpload', 'Unknown File Upload Error');
             }
 
             if (!is_dir(\Yii::$app->params['resultPath'])) {
-                $fileError = 'The upload directory (' . \Yii::$app->params['resultPath'] . ') does not exist.';
+                $fileError = \Yii::t('fileUpload', 'The upload directory ({dir}) does not exist.', ['dir' => \Yii::$app->params['resultPath']]);
                 @unlink($model->file);
                 return [ 'files' => [[
                     'name' => basename($model->file),
                     'error' => $fileError,
                 ]]];                
             } else if (!is_writable(\Yii::$app->params['resultPath'])) {
-                $fileError = 'The upload directory (' . \Yii::$app->params['resultPath'] . ') is not writable.';
+                $fileError = \Yii::t('fileUpload', 'The upload directory ({dir}) is not writable.', ['dir' => \Yii::$app->params['resultPath']]);
                 @unlink($model->file);
                 return [ 'files' => [[
                     'name' => basename($model->file),

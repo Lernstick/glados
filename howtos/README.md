@@ -1,10 +1,8 @@
-# Overview
+## Overview
 
 See the [Manual](https://github.com/imedias/glados/tree/master/howtos/README.md) on Github.
 
-## User Manual
-
-**Howtos and Manuals**
+### Howtos and Manuals
 
 * [Create an exam](create-exam.md)
 * [Remote Backup Path](remote-backup-path.md)
@@ -21,24 +19,38 @@ See the [Manual](https://github.com/imedias/glados/tree/master/howtos/README.md)
 * [Submit results back to the student](submit-results.md)
 * [Get the exam result as a student](get-exam-result.md)
 
-**Troubleshooting**
+### Troubleshooting
 
 * [Client crashes during exam](client-crash.md)
 * [Restore a specific file](restore-specific-file.md)
 
-**Examples**
+### Examples
 
 * [Example exam: Essay](example-exam-essay.md)
 
-## Admin Manual
+### Installation
 
-**Installation**
+* [Manual Installation](manual-install.md) (Using the source package)
+* [Automatic Installation](deb-install.md) (Using the Debian package)
 
-* [Using the Source package](manual-install.md)
-* [Using the Debian package](deb-install.md)
+### Update and Upgrade
 
-**Configuration**
+* [Softwareupdate on Debian](deb-update.md)
+* [Upgrade from Debian 8 to 9](deb-8to9-upgrade.md)
+
+### Configuration
 
 * [Glados config files](config-files.md)
 * [Exam client configuration](client-config.md)
 * [Network configuration](network-config.md)
+
+#### Authentication
+
+* [LDAP Authentication](ldap-authentication.md)
+* [Active Directory Authentication (Simple)](ad-authentication-simple.md)
+* [Active Directory Authentication (Advanced)](ad-authentication-advanced.md)
+* [Test Login](test-login.md)
+* [User Migration](user-migration.md)
+* [Multiple LDAP Servers and/or Active Directories](multiple-ldaps.md)
+* [Placeholders](auth-placeholders.md)
+* [Login Scheme](login-scheme.md)

@@ -3,14 +3,13 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\grid\GridView;
-use yii\widgets\Pjax;
 use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\User */
 
 $this->title = $model->username;
-$this->params['breadcrumbs'][] = ['label' => 'Users', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => \Yii::t('users', 'Users'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
 $active_tabs = <<<JS
@@ -36,11 +35,11 @@ $this->registerJs($active_tabs);
     <ul class="nav nav-tabs">
         <li class="active"><a data-toggle="tab" href="#general">
             <i class="glyphicon glyphicon-home"></i>
-            General
+            <?= \Yii::t('users', 'General') ?>
         </a></li>
         <li>
             <?= Html::a(
-                '<i class="glyphicon glyphicon-check"></i> Permissions',
+                '<i class="glyphicon glyphicon-check"></i> ' . \Yii::t('users', 'Permissions'),
                 '#permissions',
                 ['data-toggle' => 'tab']
             ) ?>
@@ -48,30 +47,40 @@ $this->registerJs($active_tabs);
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                 <i class="glyphicon glyphicon-list-alt"></i>
-                Actions<span class="caret"></span>
+                <?= \Yii::t('users', 'Actions') ?><span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
                 <li>
                     <?= Html::a(
-                        '<span class="glyphicon glyphicon-pencil"></span> Edit',
+                        '<span class="glyphicon glyphicon-pencil"></span> '. \Yii::t('users', 'Edit'),
                         ['update', 'id' => $model->id],
+                        [
+                            'class' => 'btn',
+                            'style' => ['text-align' => 'left'],
+                            'disabled' => $model->type != '0',
+                        ],
                         ['data-pjax' => 0]
                     ) ?>
                 </li>
                 <li>
                     <?= Html::a(
-                        '<span class="glyphicon glyphicon-wrench"></span> Reset Password',
+                        '<span class="glyphicon glyphicon-wrench"></span> ' . \Yii::t('users', 'Reset Password'),
                         ['reset-password', 'id' => $model->id],
+                        [
+                            'class' => 'btn',
+                            'style' => ['text-align' => 'left'],
+                            'disabled' => $model->type != '0',
+                        ],
                         ['data-pjax' => 0]
                     ) ?>
                 </li>
                 <li>
                     <?= Html::a(
-                        '<span class="glyphicon glyphicon-trash"></span> Delete',
+                        '<span class="glyphicon glyphicon-trash"></span> ' . \Yii::t('users', 'Delete'),
                         ['delete', 'id' => $model->id],
                         [
                             'data' => [
-                                'confirm' => 'Are you sure you want to delete this item?',
+                                'confirm' => \Yii::t('users', 'Are you sure you want to delete this item?'),
                                 'method' => 'post',
                             ],
                         ]
@@ -84,21 +93,32 @@ $this->registerJs($active_tabs);
 
     <div class="tab-content">
 
-        <?php Pjax::begin([
-            'id' => 'general',
-            'options' => ['class' => 'tab-pane fade in active'],
-        ]); ?>
+        <div id="general" class="tab-pane fade in active">
 
             <?= DetailView::widget([
                 'model' => $model,
                 'attributes' => [
                     'username',
                     'role',
+                    [
+                        'attribute' => 'authMethod.name',
+                        'label' => Yii::t('auth', 'Authentication Method'),
+                        'value' => function($model) {
+                            if ($model->authMethod !== null) {
+                                return Html::a($model->authMethod->name . ' (' . $model->authMethod->typeName . ')', ['auth/view', 'id' => $model->authMethod->id]);
+                            } else {
+                                return Yii::t('auth', "No Authentication Method");
+                            }
+                        },
+                        'format' => 'raw',
+                    ],
                     'last_visited',
                 ],
             ]) ?>
 
-        <?php Pjax::end(); ?>
+            <?= $this->render('@app/views/_notification') ?>
+
+        </div>
 
         <div id="permissions" class="tab-pane fade">
 
@@ -112,10 +132,16 @@ $this->registerJs($active_tabs);
 
                 'columns' => [
                     ['class' => 'yii\grid\SerialColumn'],
-                    'description',
+                    [
+                        'attribute' => 'description',
+                        'label' => \Yii::t('auth', 'Description'),
+                        'value' => function ($model) {
+                            return Yii::t('permission', $model->description);
+                        },
+                    ]
                 ],
                 'layout' => '{items} {pager}',
-                'emptyText' => 'No permissions found.',
+                'emptyText' => \Yii::t('users', 'No permissions found.'),
             ]); ?>
 
         </div>

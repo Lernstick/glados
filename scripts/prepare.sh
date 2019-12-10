@@ -56,7 +56,7 @@ function do_exit()
 }
 trap do_exit EXIT
 
-# get DISPLAY and XAUTHORITY env vars to display the zenity window
+# get DISPLAY and XAUTHORITY env vars to display the firefox window
 set -o allexport
 . <(strings /proc/$(pgrep firefox)/environ | awk -F= '$1=="DISPLAY"||$1=="XAUTHORITY"') 
 set +o allexport
@@ -84,6 +84,7 @@ urlConfig="${urlConfig}"
 EOF
 
 # create necessary directory structure
+mkdir -p "${initrd}/"{backup,base,newroot,squashfs,exam}
 mkdir -p "${initrd}/backup/etc/NetworkManager/"{system-connections,dispatcher.d}
 mkdir -p "${initrd}/backup/${desktop}/"
 mkdir -p "${initrd}/backup/usr/bin/"
@@ -102,7 +103,13 @@ chmod 700 "${initrd}/backup/root/.ssh"
 
 # get all active network connections
 con=$(LC_ALL=C nmcli -t -f state,connection d status | awk -F: '$1=="connected"{print $2}')
-while IFS= read -r c; do echo "${c}"; echo "${c}.nmconnection"; done <<< "${con}" | LC_ALL=C xargs -I{} cp -p "/etc/NetworkManager/system-connections/{}" "${initrd}/backup/etc/NetworkManager/system-connections/"
+while IFS= read -r c; do
+  # set the autoconnect priority to 999
+  LC_ALL=C nmcli connection modify "${c}" connection.autoconnect-priority 999
+  # use both names, the old one and the new one for backwards compatibility
+  echo "${c}"
+  echo "${c}.nmconnection"
+done <<< "${con}" | LC_ALL=C xargs -I{} cp -p "/etc/NetworkManager/system-connections/{}" "${initrd}/backup/etc/NetworkManager/system-connections/"
 
 # edit copied connections manually, because nmcli will remove the wifi-sec.psk password when edited by nmcli modify
 #sed -i '/\[connection\]/a permissions=user:root:;' ${initrd}/backup/etc/NetworkManager/system-connections/*
@@ -121,10 +128,10 @@ cp -p "/etc/lernstick-firewall/lernstick-firewall.conf" "${initrd}/backup/etc/le
 cp -p "/etc/lernstickWelcome" "${initrd}/backup/etc/lernstickWelcome"
 sed -i 's/ShowNotUsedInfo=.*/ShowNotUsedInfo=false/g' "${initrd}/backup/etc/lernstickWelcome"
 sed -i 's/AutoStartInstaller=.*/AutoStartInstaller=false/g' "${initrd}/backup/etc/lernstickWelcome"
-echo "ShowExamInfo=true" >>"${initrd}/backup/etc/lernstickWelcome" #TODO: replace with sed
+#echo "ShowExamInfo=true" >>"${initrd}/backup/etc/lernstickWelcome" #TODO: replace with sed
 cp -p "/usr/share/applications/finish_exam.desktop" "${initrd}/backup/usr/share/applications/"
 chmod 644 "${initrd}/backup/usr/share/applications/finish_exam.desktop"
-chown user:user "${initrd}/backup/${desktop}/finish_exam.desktop"
+chown user:user "${initrd}/backup/${desktop}/finish_exam.desktop" 2>/dev/null
 
 # This is to fix an issue when the DNS name of the exam server ends in .local (which is the
 # case in most Microsoft domain environments). In case of a .local name the mDNS policy in
@@ -133,50 +140,7 @@ chown user:user "${initrd}/backup/${desktop}/finish_exam.desktop"
 sed 's/#domain-name=local/domain-name=.alocal/' /etc/avahi/avahi-daemon.conf >${initrd}/backup/etc/avahi/avahi-daemon.conf
 
 # mount/prepare the root filesystem
-mount /lib/live/mount/medium/live/filesystem.squashfs ${initrd}/base
-if [ -e ${initrd}/squashfs/exam.squashfs ]; then
-  mount ${initrd}/squashfs/exam.squashfs ${initrd}/exam
-  # find out whether the squashfs is an overlayfs
-  type=$(unsquashfs -ll ${initrd}/squashfs/exam.squashfs | awk '$1~/^c/&&$3=="0,"&&$4=="0"{print "overlay"; exit}')
-  if [ "${type}" != "overlay" ]; then
-    # find out whether the squashfs is an aufs
-    type=$(unsquashfs -ll ${initrd}/squashfs/exam.squashfs | awk '$0~/\/\.wh\./{print "aufs"; exit}')
-  fi
-fi
-
-if [ -e ${initrd}/squashfs/exam.zip ]; then
-  mount -t tmpfs tmpfs ${initrd}/tmpfs
-  unzip -o ${initrd}/squashfs/exam.zip -d ${initrd}/tmpfs
-  type="zip"
-  # fix permissions of the files in the home dir
-  chown -R 1000:1000 ${initrd}/tmpfs/${home} 2>/dev/null
-  chown -R 0:0 ${initrd}/tmpfs/${home}/Screenshots 2>/dev/null
-fi
-
-# mount the whole filesystem, the result filesystem looks like this
-# +---------------+
-# | tmpfs (rw)    |
-# +---------------+
-# | zip (ro)      |
-# +---------------+
-# | squashfs (ro) |
-# +---------------+
-# | base (ro)     |
-# +---------------+
-mkdir ${initrd}/work
-if [ "${type}" = "aufs" ]; then
-  # in there are whiteouts for aufs (\.wh\.*) and no whiteouts for overlayfs (character devices with 0/0) it is an aufs filesystem
-  mount -t aufs -o br=${initrd}/backup=rw:${initrd}/tmpfs=ro:${initrd}/exam=ro:${initrd}/base=ro none "${initrd}/newroot"
-  cat <<EOF >"${mountFile}"
-mount -t aufs -o br=/backup=rw:/tmpfs=ro:/exam=ro:/base=ro none "/newroot"
-EOF
-else
-  # in all other cases the filesystem in treated as overlay
-  mount -t overlay overlay -o lowerdir=${initrd}/tmpfs:${initrd}/exam:${initrd}/base,upperdir=${initrd}/backup,workdir=${initrd}/work ${initrd}/newroot
-  cat <<EOF >"${mountFile}"
-mount -t overlay overlay -o lowerdir=/tmpfs:/exam:/base,upperdir=/backup,workdir=/work /newroot
-EOF
-fi
+mount_rootfs "newroot"
 
 # install the shutdown hook
 cp -pf "${initrd}/squashfs/mount.sh" "/lib/systemd/lernstick-shutdown"
@@ -185,15 +149,60 @@ chmod 755 "/lib/systemd/lernstick-shutdown"
 # remove policykit action for lernstick welcome application
 rm -f ${initrd}/newroot/usr/share/polkit-1/actions/ch.lernstick.welcome.policy
 
-# place finish_exam.desktop in "favorite apps" of Gnome3's dash
-if [ -e ${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps ]; then
-  newvalue=$(awk -F'[\,,\[,\], ]' '{if($0~/^favorite-apps=/){ printf "favorite-apps=["; for(i = 2; i <= NF; i++) { if($i!="") {printf "%s, ", $i;} } printf "'\''finish_exam.desktop'\'']\n"; } else { print $0; } }' ${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps)
-  echo "${newvalue}" > "${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps"
-else
-  echo "[org/gnome/shell]
-favorite-apps=['finish_exam.desktop']" > "${initrd}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps"
-fi
-chroot ${initrd}/newroot dconf update
+# add an entry to finish the exam in the dash
+add_dash_entry "finish_exam.desktop"
+
+# TODO
+mkdir -p "${initrd}/newroot/etc/xdg/autostart/"
+mkdir -p "${initrd}/newroot/usr/share/applications/"
+cat <<EOF >"${initrd}/newroot/etc/xdg/autostart/show-info.desktop"
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Icon=/usr/share/icons/gnome/256x256/status/dialog-question.png
+Version=1.0
+Name=Lernstick Exam Client Startscript
+Name[de_DE]=Lernstick Exam Client Startskript
+Exec=show_info
+X-GNOME-Autostart-enabled=true
+EOF
+
+cp "${initrd}/newroot/etc/xdg/autostart/show-info.desktop" "${initrd}/newroot/usr/share/applications/"
+
+url="${gladosProto}://${gladosIp}:${gladosPort}/glados/index.php/howto/welcome-to-exam.md?mode=inline"
+cat <<EOF >"${initrd}/newroot/show_info.html"
+<!DOCTYPE html>
+<html lang='en-US'>
+    <head>
+        <meta charset='UTF-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+        <meta http-equiv='refresh' content='0;url=${url}' />
+    </head>
+    <body>
+    Please wait, redirecting...
+    </body>
+</html>
+EOF
+
+cat <<'EOF' >"${initrd}/newroot/usr/bin/show_info"
+#!/bin/bash
+
+/usr/bin/firefox -createprofile "showInfo /tmp/showInfo" -no-remote
+/usr/bin/firefox -P "showInfo" -width 850 -height 620 -chrome "/show_info.html"
+
+# remove the profile - also remove it from the profiles.ini file
+rm -R /tmp/showInfo
+ex -e - /home/user/.mozilla/firefox/profiles.ini <<@@@
+g/Name=showInfo/.-2,+2d
+wq
+@@@
+
+EOF
+
+chmod 755 "${initrd}/newroot/usr/bin/show_info"
+
+# add an entry to show information about the exam in the dash
+add_dash_entry "show-info.desktop"
 
 ###########################################
 # apply specific exam config if available #
@@ -209,174 +218,30 @@ if [ -n "${actionConfig}" ]; then
     do_exit
   fi
 
-  # config->grp_netdev
-  if [ "$(config_value "grp_netdev")" = "False" ]; then
-    chroot ${initrd}/newroot gpasswd -d user netdev
-    sed -i 's/netdev//' ${initrd}/newroot/etc/live/config/user-setup.conf
-  else
-    chroot ${initrd}/newroot gpasswd -a user netdev
-  fi
+  # setup the expert settings
+  expert_settings
 
-  # config->allow_sudo
-  if [ "$(config_value "allow_sudo")" = "False" ]; then
-    sed '/user  ALL=(ALL) PASSWD: ALL/ s/^/#/' /etc/sudoers >${initrd}/backup/etc/sudoers
-  else
-    sed '/^#user  ALL=(ALL) PASSWD: ALL/ s/^#//' /etc/sudoers >${initrd}/backup/etc/sudoers
-  fi
+  # setup screenshots in the given interval
+  screenshots
 
-  # config->allow_sudo
-  if [ "$(config_value "allow_mount")" = "False" ]; then
-    chroot ${initrd}/newroot sed -i 's/^ResultAny=.*/ResultAny=auth_admin/;s/^ResultInactive=.*/ResultInactive=auth_admin/;s/^ResultActive=.*/ResultActive=auth_admin/' /etc/polkit-1/localauthority/50-local.d/10-udisks2.pkla
-  else
-    chroot ${initrd}/newroot sed -i 's/^ResultAny=.*/ResultAny=yes/;s/^ResultInactive=.*/ResultInactive=yes/;s/^ResultActive=.*/ResultActive=yes/' /etc/polkit-1/localauthority/50-local.d/10-udisks2.pkla
-  fi
-
-  # config->firewall_off
-  if [ "$(config_value "firewall_off")" = "False" ]; then
-    chroot ${initrd}/newroot systemctl enable lernstick-firewall.service
-  else
-    chroot ${initrd}/newroot systemctl disable lernstick-firewall.service
-  fi
-
-  # config->screenshots
-  if [ "$(config_value "screenshots")" = "False" ]; then
-    chroot ${initrd}/newroot sed -i 's/BackupScreenshot=.*/BackupScreenshot=false/' /etc/lernstickWelcome 
-  else
-    # write/append config options
-    bf=$(config_value "screenshots_interval")
-    chroot ${initrd}/newroot sed -i '/^BackupScreenshot=/{h;s/=.*/=true/};${x;/^$/{s//BackupScreenshot=true/;H};x}' /etc/lernstickWelcome
-    chroot ${initrd}/newroot sed -i '/^Backup=/{h;s/=.*/=true/};${x;/^$/{s//Backup=true/;H};x}' /etc/lernstickWelcome
-    chroot ${initrd}/newroot sed -i '/^BackupFrequency=/{h;s/=.*/='$bf'/};${x;/^$/{s//BackupFrequency='$bf'/;H};x}' /etc/lernstickWelcome
-  fi
-
-  # config->url_whitelist
-  if [ "$(config_value "url_whitelist")" != "" ]; then
-    if [ "${VERSION_ID}" = "9" ]; then
-      config_value "url_whitelist" | sed 's/\./\\\./g' | tee -a ${initrd}/newroot/etc/lernstick-firewall/url_whitelist
-    else
-      config_value "url_whitelist" | tee -a ${initrd}/newroot/etc/lernstick-firewall/url_whitelist
-    fi
-  fi
+  url_whitelist "$(config_value "url_whitelist")"
 
   # config->max_brightness
-  max_brightness=$(config_value "max_brightness")
-  if [ "${max_brightness}" != "100" ] && [ "${max_brightness}" != "" ]; then
+  max_brightness "$(config_value "max_brightness")"
 
-    # create max_brightness systemd daemon
-    cat <<EOF >"${initrd}/newroot/etc/systemd/system/max_brightness.service"
-[Unit]
-Description=max_brightness
-
-[Service]
-Environment=max=${max_brightness}
-ExecStart=/bin/bash -c "/usr/bin/max_brightness \${max}"
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-    # create max_brightness script
-    cat <<'EOF' >"${initrd}/newroot/usr/bin/max_brightness"
-#!/bin/bash
-
-ratio=${1-100}
-exist=0
-[ -n "$(ls /sys/class/backlight/ 2>/dev/null)" ] && exist=1
-
-if [ "${exist}" = "1" ] && [ "${ratio}" -ne "100" ] ; then
-
-  for backlight in /sys/class/backlight/*; do
-    if [ -e "$backlight/brightness" ] && [ -e "$backlight/actual_brightness" ] && [ -e "$backlight/max_brightness" ]; then
-      list="${list} ${backlight}/brightness"
-      init="${init}${backlight}/brightness MODIFY\n"
-    fi
-  done
-
-  ( echo -en "$init" && ( which inotifywait && notifywait -m -e MODIFY ${list} || while true; do sleep 1; echo -en "$init"; done ) ) | while read backlight action; do
-    backlight=${backlight%/brightness}
-    max=$(cat ${backlight}/max_brightness)
-    brightness=$(printf "%.0f\n" $(echo "scale=2; (${ratio}/100)*${max}" | bc))
-    mom=$(printf "%.0f\n" $(echo "scale=2; $(cat ${backlight}/actual_brightness)/(${max}/100)" | bc))
-
-    if [ "${mom}" -gt "${ratio}" ]; then
-      echo ${brightness} >${backlight}/brightness
-    fi
-  done
-
-else
-  echo "No backlight found or ratio=100. Nothing to do, sleeping."
-  while true; do sleep 10000; done
-fi
-EOF
-
-    chmod 755 "${initrd}/newroot/usr/bin/max_brightness"
-    chroot ${initrd}/newroot systemctl enable max_brightness.service
-  fi
-
-  # config->libre_autosave
-  if [ "$(config_value "libre_autosave")" = "True" ]; then
-    libre_autosave="true"
-  else
-    libre_autosave="false"
-  fi
-
-  # config->libre_createbackup
-  if [ "$(config_value "libre_createbackup")" = "True" ]; then
-    libre_createbackup="true"
-  else
-    libre_createbackup="false"
-  fi
-
-  # config->libre_autosave_interval
-  if [ "$(config_value "libre_autosave_interval")" = "" ]; then
-    libre_autosave_interval="10"
-  else
-    libre_autosave_interval="$(config_value "libre_autosave_interval")"
-  fi
-
-  registry='<item oor:path="/org.openoffice.Office.Recovery/AutoSave"><prop oor:name="TimeIntervall" oor:op="fuse"><value>'${libre_autosave_interval}'</value></prop></item>
-<item oor:path="/org.openoffice.Office.Recovery/AutoSave"><prop oor:name="Enabled" oor:op="fuse"><value>'${libre_autosave}'</value></prop></item>
-<item oor:path="/org.openoffice.Office.Common/Save/Document"><prop oor:name="CreateBackup" oor:op="fuse"><value>'${libre_createbackup}'</value></prop></item>
-</oor:items>'
-
-  # if the file exists, remove the xml entries
-  if [ -e '${initrd}/newroot/${home}/.config/libreoffice/4/user/registrymodifications.xcu' ]; then
-    sed -i -e '\#org.openoffice.Office.Recovery/AutoSave.*TimeIntervall#d' \
-      -e '\#org.openoffice.Office.Recovery/AutoSave.*Enabled#d' \
-      -e '\#org.openoffice.Office.Common/Save/Document.*CreateBackup#d' \
-      -e '\#</oor:items>#d' \
-      ${initrd}/newroot/${home}/.config/libreoffice/4/user/registrymodifications.xcu
-  else
-    # else create the needed config directory
-    mkdir -p ${initrd}/newroot/${home}/.config/libreoffice/4/user
-    registry='<?xml version="1.0" encoding="UTF-8"?>
-<oor:items xmlns:oor="http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-'${registry}
-  fi
-
-  # append the xml entries to the file
-  echo "${registry}" >> ${initrd}/newroot/${home}/.config/libreoffice/4/user/registrymodifications.xcu
+  # set all libreoffice options
+  libreoffice
 
   # fix the permissions
   chown -R user:user ${initrd}/newroot/${home}/.config
 
 else
-  # these are the default values, if the exam server does not provide a config file and the
-  # exam file has not configured them
+
   $DEBUG && >&2 echo "no config available, setting default values"
 
-  # remove user from the netdev group to prevent him from changing network connections
-  chroot ${initrd}/newroot gpasswd -d user netdev
-  sed -i 's/netdev//' ${initrd}/newroot/etc/live/config/user-setup.conf
-
-  # remove sudo privileges
-  sed '/user  ALL=(ALL) PASSWD: ALL/ s/^/#/' /etc/sudoers >${initrd}/backup/etc/sudoers
-
-  # prevent user from mounting external media
-  chroot ${initrd}/newroot sed -i 's/^ResultAny=.*/ResultAny=auth_admin/;s/^ResultInactive=.*/ResultInactive=auth_admin/;s/^ResultActive=.*/ResultActive=auth_admin/' /etc/polkit-1/localauthority/50-local.d/10-udisks2.pkla
-
-  # enable the firewall
-  chroot ${initrd}/newroot systemctl enable lernstick-firewall.service
+  # these are the default values, if the exam server does not provide a config file and the
+  # exam file has not configured them
+  expert_settings_defaults
 
 fi
 

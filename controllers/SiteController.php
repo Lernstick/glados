@@ -9,6 +9,7 @@ use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\TicketSearch;
+use app\models\Stats;
 use app\models\Activity;
 use app\models\ExamSearch;
 
@@ -58,11 +59,9 @@ class SiteController extends Controller
 
         $searchModel = new TicketSearch();
         $running_exams = $searchModel->getRunningTickets()->count();
-        $completed_exams = $searchModel->getCompletedTickets()->count();
-        $total_tickets = $searchModel->getTotalTickets()->count();
-        $total_duation = $searchModel->getTotalDuration();
-        $tot = intval($completed_exams) + intval($running_exams);
-        $average_duration = $tot == 0 ? 0 : intval($total_duation) / $tot;
+        $completed_exams = Stats::get('completed_exams');
+        $total_duration = Stats::get('total_duration');
+        $average_duration = intval($completed_exams) == 0 ? 0 : intval($total_duration) / intval($completed_exams);
 
         $searchModel = new ExamSearch();
         $total_exams = $searchModel->getTotalExams()->count();
@@ -72,8 +71,7 @@ class SiteController extends Controller
             'running_exams' => intval($running_exams),
             'total_exams' => intval($total_exams),
             'completed_exams' => intval($completed_exams),
-            'total_tickets' => intval($total_tickets),
-            'total_duation' => intval($total_duation),
+            'total_duration' => intval($total_duration),
             'average_duration' => intval($average_duration),
         ]);
     }
