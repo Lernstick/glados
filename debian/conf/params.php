@@ -1,6 +1,5 @@
 <?php
 return [
-    'version' =>                '1.0.5',
     'itemsPerPage' =>           10,
     'tokenLength' =>            10,
     'uploadPath' =>             '/var/lib/glados/uploads/',
