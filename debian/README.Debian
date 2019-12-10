@@ -25,4 +25,4 @@ Build the package by
 
  dpkg-buildpackage -us -uc
 
- -- Roman Gruber <roman.gruber@bwzofingen.ch>  Tue, 16 Jan 2018 10:45:38 +0100
+ -- Roman Gruber <roman.gruber@inf.unibe.ch>  Tue, 10 Dec 2019 11:42:22 +0100
