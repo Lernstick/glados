@@ -1,3 +1,6 @@
+# search for line endings with:
+# find . -type f | sed 's/.*\.//' | sort | uniq -c
+#
 # Set the default behavior, in case people don't have core.autocrlf set.
 * text=auto
 
@@ -18,4 +21,4 @@
 *.png binary
 *.jpg binary
 *.ico binary
-*.git binary
+*.gif binary
