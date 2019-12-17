@@ -38,6 +38,13 @@ $this->registerJs($js);
 
 ?>
 
+<div class="alert alert-success" role="alert">
+    <span class="glyphicon glyphicon-alert"></span>
+    <span><?= \Yii::t('auth', 'For more information about user authentication, please visit the {link} under "Authentication".', [
+        'link' => Html::a('Manual', ['/howto/view', 'id' => 'index.md'], ['class' => 'alert-link'])
+    ]) ?></span>
+</div>
+
 <div class="auth-form">
 
     <?php $form = ActiveForm::begin(); ?>

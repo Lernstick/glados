@@ -197,4 +197,6 @@ return [
     '{groups} will be mapped to the role {role}' => '{groups} werden zugewiesen auf die Rolle {role}',
     '{type} (No Authentication Method)' => '{type} (Keine Authentifizierungsmethode)',
     '{users} will be migrated to the authentication method {method}' => '{users} werden migriert auf die Authentifizierungsmethode {method}',
+    'For more information about user authentication, please visit the {link} under "Authentication".' => ' Für mehr Informationen über Benutzer Authentifizierung, bitte besuchen Sie das {link} unter "Authentication".',
+    'For more information, please visit the {link}.' => 'Für mehr Informationen, bitte besuchen Sie {link}.',
 ];
