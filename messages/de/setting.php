@@ -17,19 +17,23 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
+    'A hint that is show in the login form for users attempting to login.' => 'Ein Hinweis am Login Formular für Benutzer, die einloggen wollen.',
     'Apply' => 'Übernehmen',
     'Create' => 'Erstellen',
     'Default value' => 'Standardwert',
     'Edit' => 'Bearbeiten',
     'Edit Setting: {setting}' => 'Bearbeiten von {setting}',
     'ID' => 'ID',
+    'If this is set the default value is used instead. No value is saved then.' => 'Falls das gesetzt ist, wird der Standard wiederhergestellt, dann wird auch kein Wert gespeichert.',
     'Key' => 'Schlüssel',
     'Login hint' => 'Login Hinweis',
     'Reset Grid' => 'Raster zurücksetzen',
     'Settings' => 'Einstellungen',
+    'The length of the token, when generated in number of characters.' => 'Die Länge des Token in Anzahl Buchstaben, wenn er neu generiert wird.',
+    'Token length' => 'Länge des Tokens',
     'Type' => 'Typ',
     'Use default value' => 'Nehme Standardwert',
     'Value' => 'Wert',
     'You may login with **admin/admin** or **teacher/teacher**.<br>To modify the users, please login as **admin**.' => 'Sie können mit **admin/admin** oder **teacher/teacher** einloggen.<br>Um Benutzer zu verändern, loggen Sie bitte als **admin** ein.',
-    'If this is set the default value is used instead. No value is saved then.' => 'Falls das gesetzt ist, wird der Standard wiederhergestellt, dann wird auch kein Wert gespeichert.',
+    'Description' => '',
 ];

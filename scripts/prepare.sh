@@ -162,7 +162,7 @@ Encoding=UTF-8
 Icon=/usr/share/icons/gnome/256x256/status/dialog-question.png
 Version=1.0
 Name=Welcome to the exam
-Name[de_DE]=Willkommen zur Prüfung
+Name[de]=Willkommen zur Prüfung
 Exec=show_info
 X-GNOME-Autostart-enabled=true
 EOF

@@ -24,8 +24,6 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DynaGrid::widget([
         'showPersonalize' => true,
         'columns' => [
-            ['class' => 'kartik\grid\SerialColumn', 'order' => DynaGrid::ORDER_FIX_LEFT],
-
             [
                 'attribute' => 'date',
                 'format' => 'timeago',
@@ -52,11 +50,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     return \Yii::t('setting', $model->key);
                 },
             ],
+            'description',
             [
                 'attribute' => 'value',
                 'format' => 'raw',
                 'value' => function ($model) {
-                    return $model->value === null ? null : $model->renderSetting($model->value, $model->type);
+                    return $model->value === null
+                        ? $model->renderSetting($model->default_value, $model->type)
+                        : $model->renderSetting($model->value, $model->type);
                 },
             ],
             [
@@ -65,6 +66,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => function ($model) {
                     return $model->renderSetting($model->default_value, $model->type);
                 },
+                'visible' => false,
             ],
             [
                 'class' => 'yii\grid\ActionColumn',

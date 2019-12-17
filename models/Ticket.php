@@ -103,7 +103,7 @@ class Ticket extends LiveActiveRecord
         $this->on(self::EVENT_AFTER_DELETE, [$this, 'deleteEvent']);
 
         /* generate the token if it's a new record */
-        $this->token = $this->isNewRecord ? bin2hex(openssl_random_pseudo_bytes(\Yii::$app->params['tokenLength']/2)) : $this->token;
+        $this->token = $this->isNewRecord ? bin2hex(openssl_random_pseudo_bytes(Setting::get('Token length')/2)) : $this->token;
 
         // set default values, but only in this context, not in TicketSearch context
         // this would overwrite values to search
@@ -218,7 +218,7 @@ class Ticket extends LiveActiveRecord
             [['start', 'end', 'test_taker', 'ip', 'state', 'download_lock'], 'safe', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['start', 'end', 'test_taker', 'ip', 'state', 'download_lock', 'backup_lock', 'restore_lock', 'bootup_lock'], 'safe', 'on' => self::SCENARIO_DEV],
             [['token'], 'unique', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
-            [['token'], 'string', 'max' => 32, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
+            [['token'], 'string', 'max' => 16, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['token'], 'checkIfClosed', 'on' => self::SCENARIO_SUBMIT],
         ];
     }

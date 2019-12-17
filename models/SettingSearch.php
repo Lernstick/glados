@@ -19,6 +19,7 @@ class SettingSearch extends Setting
     {
         return [
             [['id'], 'integer'],
+            [['description'], 'safe'],
         ];
     }
 
@@ -68,8 +69,7 @@ class SettingSearch extends Setting
         }
 
         // grid filtering conditions
-        $query->andFilterWhere(['key' => $this->key]);
-        $query->andFilterWhere(['value' => $this->value]);
+        $query->andFilterHaving(['like', 'description', $this->description]);
 
         $dateEnd = new \DateTime($this->date);
         $dateEnd->modify('+1 day');

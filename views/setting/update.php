@@ -43,9 +43,10 @@ $this->registerJs($js);
 $js = <<< 'SCRIPT'
 $("input[name='Setting[null]']").click(function(){
     if ($(this).is(':checked')) {
-        $('#setting-value').attr("disabled", true);
+        //$('#setting-value').attr("disabled", true);
+        $('#setting-value').val($('#setting-default_value').val());
     } else if ($(this).not(':checked')) {
-        $('#setting-value').attr("disabled", false);
+        //$('#setting-value').attr("disabled", false);
     }
 });
 SCRIPT;
@@ -61,13 +62,21 @@ $this->registerJs($js);
         <?php $form = ActiveForm::begin(); ?>
         <div class="row">
             <div class="col-md-12">
-                <?= $form->field($model, 'value')->textArea(['maxlength' => true]) ?>
+                <?= $form->field($model, 'key')->hiddenInput()->label(false)->hint(false); ?>
+                <?= $form->field($model, 'default_value')->hiddenInput()->label(false)->hint(false); ?>
             </div>
         </div>
-
         <div class="row">
             <div class="col-md-6">
-               <?= $form->field($model, 'null')->checkbox() ?>
+                <?= call_user_func(array($form->field($model, 'value'), $model->typeMapping()[$model->type][0]), $model->typeMapping()[$model->type][1])->label(\Yii::t('setting', $model->key))->hint($model->description); ?>
+                <?= $form->field($model, 'null')->checkbox() ?>
+            </div>
+            <div class="col-md-6">
+                <?= Html::label($model->getAttributeLabel('default_value')); ?>
+                <div class="hint-block"><?= $model->getAttributeHint('default_value'); ?></div>
+                <div>
+                    <?= $model->renderSetting($model->default_value, $model->type); ?>
+                </div>
             </div>
         </div>
 

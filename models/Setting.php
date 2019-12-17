@@ -13,6 +13,7 @@ use app\models\LiveActiveRecord;
  * @property string $key
  * @property string $value
  * @property string $default_value
+ * @property string $description
  */
 class Setting extends TranslatedActiveRecord
 {
@@ -20,6 +21,9 @@ class Setting extends TranslatedActiveRecord
     /* db translated fields */
     public $default_value_db;
     public $default_value_orig;
+    public $description_db;
+    public $description_orig;
+
     public $null;
 
     /**
@@ -37,6 +41,7 @@ class Setting extends TranslatedActiveRecord
     {
         return [
             'default_value',
+            'description',
         ];
     }
 
@@ -45,11 +50,50 @@ class Setting extends TranslatedActiveRecord
      */
     public function rules()
     {
-        return [
+        $rules = [
             [['value', 'null'], 'safe'],
             ['null', 'filter', 'filter' => 'boolval', 'skipOnEmpty' => true],
-            ['value', 'filter', 'filter' => [$this, 'processValue']],
+        ];
 
+        // create row-wise rules according to rulesByKey()
+        foreach ($this->rulesByKey() as $i => $rule) {
+            $when = function($model) use ($rule) {
+                return $model->key == $rule[0];
+            };
+            $whenClient = "function (attribute, value) {
+                return $('#setting-key').val() == '" . $rule[0] . "';
+            }";
+            $append = [
+                'value',
+                $rule[1],
+                'when' => $when,
+                'whenClient' => $whenClient,
+            ];
+            foreach ($rule as $key => $value) {
+                if (!is_int($key)) {
+                    $append[$key] = $value;
+                }
+            }
+            $rules[] = $append;
+        }
+
+        // this must be after all previous rules
+        $rules[] = ['value', 'filter', 'filter' => [$this, 'processValue']];
+
+        return $rules;
+    }
+
+
+    /**
+     * A set of rules by key
+     * @return array rules
+     */
+    public function rulesByKey()
+    {
+        return [
+            ['Token length', 'integer', 'min' => 4, 'max' => 16],
+            ['Token length', 'required'],
+            ['Login hint', 'string', 'min' => 0, 'max' => 1024],
         ];
     }
 
@@ -65,6 +109,7 @@ class Setting extends TranslatedActiveRecord
             'null' => \Yii::t('setting', 'Use default value'),
             'type' => \Yii::t('setting', 'Type'),
             'default_value' => \Yii::t('setting', 'Default value'),
+            'description' => \Yii::t('setting', 'Description'),
         ];
     }
 
@@ -80,6 +125,17 @@ class Setting extends TranslatedActiveRecord
             'null' => \Yii::t('setting', 'If this is set the default value is used instead. No value is saved then.'),
             'type' => \Yii::t('setting', 'Type'),
             'default_value' => \Yii::t('setting', 'Default value'),
+        ];
+    }
+
+    /**
+     * Returns the method of [[ActiveField]] to show in the edit form.
+     */
+    public function typeMapping()
+    {
+        return [
+            'markdown' => ['textArea', ['maxlength' => true]],
+            'integer' => ['textInput', ['type' => 'number']],
         ];
     }
 

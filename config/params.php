@@ -2,7 +2,6 @@
 
 return [
     'itemsPerPage' =>           10,
-    'tokenLength' =>            10,
     'uploadPath' =>             '/var/lib/glados/uploads/',
     'backupPath' =>             '/var/lib/glados/backups/',
     'resultPath' =>             '/var/lib/glados/results/',
