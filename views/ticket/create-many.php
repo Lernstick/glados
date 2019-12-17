@@ -192,7 +192,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="row">
         <div class="col-md-6">
              <?= $form->field($model, 'exam_id')->widget(Select2::classname(), [
-                'data' => [],
+                'data' => [ $examModel->id => $examModel->name . " - " . $examModel->subject ],
                 'pluginOptions' => [
                     'dropdownAutoWidth' => true,
                     'width' => 'auto',
