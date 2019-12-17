@@ -18,8 +18,8 @@
  */
 return [
     'Guide / Howto' => 'Handbuch / Howto',
-    'Help' => 'Hilfe',
     'Howto' => 'Howto',
     'Howtos' => 'Howtos',
     'Navigation' => 'Navigation',
+    'Help' => '@@Hilfe@@',
 ];

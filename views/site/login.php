@@ -6,6 +6,7 @@
 
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
+use app\models\Setting;
 
 $this->title = \Yii::t('app', 'Login');
 $this->params['breadcrumbs'][] = $this->title;
@@ -41,7 +42,6 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php ActiveForm::end(); ?>
 
     <div class="col-lg-offset-1" style="color:#999;">
-        <?= \Yii::t('login', 'You may login with <strong>admin/admin</strong> or <strong>teacher/teacher</strong>.') ?><br>
-        <?= \Yii::t('login', 'To modify the users, please login as <strong>admin</strong>.') ?>
+        <?= Setting::get('Login hint'); ?>
     </div>
 </div>
