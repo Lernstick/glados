@@ -41,9 +41,17 @@ SCRIPT;
 $this->registerJs($js);
 
 ?>
+
 <div class="auth-mirgate">
 
     <h1><?= Html::encode($this->title) ?></h1>
+
+    <div class="alert alert-success" role="alert">
+        <span class="glyphicon glyphicon-alert"></span>
+        <span><?= \Yii::t('auth', 'For more information, please visit the {link}.', [
+            'link' => Html::a('Manual / User Migration', ['/howto/view', 'id' => 'user-migration.md'], ['class' => 'alert-link'])
+        ]) ?></span>
+    </div>
 
     <div class="migrate-form">
 

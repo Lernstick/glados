@@ -45,6 +45,13 @@ $this->registerJs($js);
 
     <h1><?= Html::encode($this->title) ?></h1>
 
+    <div class="alert alert-success" role="alert">
+        <span class="glyphicon glyphicon-alert"></span>
+        <span><?= \Yii::t('auth', 'For more information, please visit the {link}.', [
+            'link' => Html::a('Manual / Test Login', ['/howto/view', 'id' => 'test-login.md'], ['class' => 'alert-link'])
+        ]) ?></span>
+    </div>
+
 	<?php $form = ActiveForm::begin(['id' => 'auth_test_form']); ?>
 
     <div class="row">

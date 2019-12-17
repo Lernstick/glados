@@ -21,7 +21,10 @@ use yii\widgets\ActiveForm;
     ],
     'itemView' => '_item',
     'itemOptions' => ['tag' => 'li'],
-    'viewParams' => ['itemModel' => $model],
+    'viewParams' => [
+        'itemModel' => $model,
+        'searchModel' => $searchModel,
+    ],
     'summaryOptions' => [
         'class' => 'summary col-xs-12 col-md-12',
     ],

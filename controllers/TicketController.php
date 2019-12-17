@@ -304,7 +304,7 @@ class TicketController extends Controller
                     'attr' => null,
                 ]);
             }
-        }else if ($mode === 'many') {
+        } else if ($mode === 'many') {
             if ($type === 'anonymous') {
                 $c = 0;
                 for ($i = 1; $i <= $count; $i++) {
@@ -323,7 +323,7 @@ class TicketController extends Controller
 
                     return $this->redirect(['exam/view', 'id' => $exam_id]);
                 }
-            }else if($type == 'assigned'){
+            } else if ($type == 'assigned') {
 
                 $model = new \yii\base\DynamicModel(['names', 'exam_id', 'class']);
                 $model->addRule(['names', 'exam_id'], 'required')
@@ -337,18 +337,18 @@ class TicketController extends Controller
                     $names = array_unique(array_filter(array_map('trim', preg_split('/\n|\r/', $model->names, -1, PREG_SPLIT_NO_EMPTY))));
 
                     $c = 0;
-                    foreach($names as $key => $value){
+                    foreach ($names as $key => $value) {
                         $ticket = new Ticket();
                         $ticket->exam_id = $model->exam_id;
                         $ticket->test_taker = $value;
                         $ticket->save() ? $c++ : null;
                     }
 
-                    if(count($names) != 0) {
+                    if (count($names) != 0) {
                         if ($c == count($names)) {
                             Yii::$app->session->addFlash('success', Yii::t('ticket', 'You have successfully created {n} new Tickets.', ['n' => $c]));
                             return $this->redirect(['exam/view', 'id' => $model->exam_id]);
-                        }else{
+                        } else {
                             foreach ($ticket->getErrors() as $attribute => $value){
                                 Yii::$app->session->addFlash('danger', $value);
                             }
@@ -358,10 +358,11 @@ class TicketController extends Controller
                 }
 
                 $searchModel = new TicketSearch();
+                $examModel = Exam::findOne($exam_id);
 
                 return $this->render('create-many', [
                     'model' => $model,
-                    #'names' => $names,
+                    'examModel' => $examModel,
                     'searchModel' => $searchModel,
                 ]);
             }

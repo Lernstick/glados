@@ -10,9 +10,11 @@ use yii\helpers\Json;
 
 /* @var $model app\models\History the data model */
 /* @var $itemModel yii\base\Model the data model of the Item (for example: app\models\Ticket, app\models\Exam, app\models\User, ...) */
+/* @var $searchModel app\models\HistorySearch the search model */
 /* @var $key integer mixed, the key value associated with the data item */
 /* @var $index integer integer, the zero-based index of the data item in the items array returned by $dataProvider. */
 /* @var $widget yii\widgets\ListView this widget instance */
+
 
 $models = [];
 
@@ -80,6 +82,8 @@ $provider = new ArrayDataProvider([
     ],
 ]);
 
+$model->searchColumn = $searchModel->column;
+
 ?>
 
 <div class="block">
@@ -92,6 +96,7 @@ $provider = new ArrayDataProvider([
             ]); ?>
         </h2>
         <div class="byline">
+
             <?= $model->diffToLast == -1
                 ? \Yii::t('history', 'This is the first modification since creation')
                 : \Yii::t('history', '{duration} since last modification', [

@@ -78,7 +78,7 @@ class HowtoController extends Controller
         );
 
         if ($mode == 'inline') {
-            $this->layout = 'client';
+            $this->layout = 'client_howto';
             $view = 'client-view';
         } else {
             $view = 'view';

@@ -184,6 +184,7 @@ class Ticket extends LiveActiveRecord
                     'backup_lock' => 'boolean',
                     'restore_lock' => 'boolean',
                     'download_lock' => 'boolean',
+                    'bootup_lock' => 'boolean',
                     'backup_size' => 'shortSize',
                     'time_limit' => 'text',
                     'download_state' => 'text',

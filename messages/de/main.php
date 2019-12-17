@@ -19,6 +19,7 @@
 return [
     'Actions' => 'Aktionen',
     'Activities ' => 'Aktivitäten',
+    'Authentication Methods' => 'Authentifizierungsmethoden',
     'Config' => 'Konfiguration',
     'Create Exam' => 'Prüfung erstellen',
     'Create User' => 'Benutzer erstellen',
@@ -35,8 +36,8 @@ return [
     'Start Daemon' => 'Hintergrundprozess starten',
     'Submit Ticket' => 'Ticket zuweisen',
     'Submit results' => 'Resultate einreichen',
+    'System' => 'System',
     'Tickets' => 'Tickets',
     'Users' => 'Benutzer',
-    'Authentication Methods' => 'Authentifizierungsmethoden',
-    'System' => 'System',
+    'Settings' => 'Einstellungen',
 ];

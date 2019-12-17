@@ -17,10 +17,8 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
+    'Authentication failed.' => 'Authentifizierung fehlgeschlagen.',
     'Incorrect username or password.' => 'Falscher Benutzername oder Passwort.',
     'Login' => 'Login',
     'Please fill out the following fields to login:' => 'Bitte füllen Sie die folgenden Felder aus:',
-    'To modify the users, please login as <strong>admin</strong>.' => 'Um Benutzer zu verändern, loggen Sie bitte als <strong>admin</strong> ein.',
-    'You may login with <strong>admin/admin</strong> or <strong>teacher/teacher</strong>.' => 'Sie können mit <strong>admin/admin</strong> oder <strong>teacher/teacher</strong> einloggen.',
-    'Authentication failed.' => 'Authentifizierung fehlgeschlagen.',
 ];

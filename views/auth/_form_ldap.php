@@ -149,6 +149,13 @@ JS;
 
 ?>
 
+<div class="alert alert-success" role="alert">
+    <span class="glyphicon glyphicon-alert"></span>
+    <span><?= \Yii::t('auth', 'For more information, please visit the {link}.', [
+        'link' => Html::a('Manual / LDAP Authentication', ['/howto/view', 'id' => 'ldap-authentication.md'], ['class' => 'alert-link'])
+    ]) ?></span>
+</div>
+
 <div class="auth-form">
 
     <?php $form = ActiveForm::begin(['id' => 'ldap_form']); ?>
