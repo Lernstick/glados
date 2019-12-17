@@ -31,9 +31,14 @@ class History extends \yii\db\ActiveRecord
     public $new_values_db;
 
     /**
-     * \var string separator of the `GROUP_CONCAT()` query
+     * @const string separator of the `GROUP_CONCAT()` query
      */
     const SEPARATOR = '::';
+
+    /**
+     * @var string the filter for the column in the form 
+     */
+    public $searchColumn = null;
 
     /**
      * @inheritdoc
@@ -133,13 +138,17 @@ class History extends \yii\db\ActiveRecord
      */
     private function diff()
     {
-        return self::find()
+        $query = self::find()
             ->andWhere(['<', 'changed_at', $this->changed_at])
             ->andWhere([
                 'table' => $this->table,
-                'row' => $this->row
+                'row' => $this->row,
             ])
             ->orderBy(['changed_at' => SORT_DESC]);
+        if (!empty($this->searchColumn)) {
+            $query = $query->andWhere(['column' => $this->searchColumn]);
+        }
+        return $query;
     }
 
 

@@ -161,8 +161,8 @@ Type=Application
 Encoding=UTF-8
 Icon=/usr/share/icons/gnome/256x256/status/dialog-question.png
 Version=1.0
-Name=Lernstick Exam Client Startscript
-Name[de_DE]=Lernstick Exam Client Startskript
+Name=Welcome to the exam
+Name[de_DE]=Willkommen zur Prüfung
 Exec=show_info
 X-GNOME-Autostart-enabled=true
 EOF
