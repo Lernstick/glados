@@ -151,57 +151,31 @@ class Setting extends TranslatedActiveRecord
     /**
      * Returns the value of a key
      *
-     * @param string key the key to search for
-     * @param mixed null the value that should be returned if the entry was not found in the database
+     * @param string key the key
+     * @param mixed null the value that should be returned if the entry was not found
      * @return mixed|null the value corresponding to the key or null if no entry was found
      */
     public function get($key, $null = null)
     {
-        $model = static::findByKey($key);
-        if ( ($model = static::findByKey($key)) !== null ) {
-            if ($model->value !== null) {
-                return static::renderSetting($model->value, $model->type);
-            } else {
-                return static::renderSetting($model->default_value, $model->type);
-            }
+
+        if (array_key_exists($key, \Yii::$app->params)) {
+            return \Yii::$app->params[$key];
         } else {
             return $null;
         }
     }
 
     /**
-     * Sets the value of a key or creates the entry if it does not exists.
+     * Sets the value of a key (not permanently).
      * 
      * @param string key the key to set
      * @param mixed value the value to set
-     * @param string type the desired type in case when the entry is created.
-     *        Can be one of the PHP data types
-     *         * "boolean"
-     *         * "integer"
-     *         * "double" (aus historischen Gründen wird "double" im Fall eines float zurückgegeben, und
-     *           nicht einfach float.),
-     *         * "string"
-     *         * "array"
-     *         * "object"
-     *         * "resource"
-     *         * "resource (closed)" (von PHP 7.2.0 an)
-     *         * "NULL"
-     *         * "unknown type"
-     * @return boolean Whether the saving succeeded (i.e. no validation errors occurred).
-     * @see https://www.php.net/manual/de/function.gettype.php
+     * @param string type the desired type
+     * @return void
      */
     public function set($key, $value, $type = 'string')
     {
-        $model = static::findByKey($key);
-        if ($model === null) {
-            $model = new Stats();
-            $model->key = $key;
-            $model->value = $value;
-            $model->type = $type;
-        } else {
-            $model->value = $value;
-        }
-        return $model->save();
+        \Yii::$app->params[$key] = Setting::renderSetting($value, $type);
     }
 
     /**

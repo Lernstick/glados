@@ -59,11 +59,27 @@ class SettingController extends Controller
     {
         $model = $this->findModel($id);
 
+        if (is_array(Yii::$app->request->post('preview'))) {
+            if (array_key_exists('value', Yii::$app->request->post('preview'))) {
+                $value = Yii::$app->request->post('preview')['value'];
+                $key = Yii::$app->request->post('preview')['key'];
+                $type = Setting::findByKey($key)->type;
+                Setting::set($key, $value, $type);
+            }
+        }
+
+        $this->layout = 'preview';
+        $contents = $this->render('/site/login', [
+            'model' => new \app\models\LoginForm()
+        ]);
+        $this->layout = 'main';
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index', 'id' => $model->id]);
         } else {
             return $this->render('update', [
                 'model' => $model,
+                'contents' => $contents,
             ]);
         }
     }

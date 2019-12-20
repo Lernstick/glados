@@ -13,6 +13,10 @@ $config = [
             'class' => 'app\components\LanguageSelector',
             'supportedLanguages' => ['en', 'de'],
         ],
+        [
+            'class' => 'app\components\BootstrapSettings',
+            'params' => $params,
+        ],
     ],
     'timezone' => 'Europe/Zurich',
     'vendorPath' => '/usr/share/yii2',
@@ -113,7 +117,6 @@ $config = [
         'db' => require(__DIR__ . '/db.php'),
         'auth' => require(__DIR__ . '/auth.php'),
     ],
-    'params' => $params,
     'runtimePath' => '/var/lib/glados/runtime',
 ];
 
