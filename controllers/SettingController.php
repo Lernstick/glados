@@ -8,6 +8,7 @@ use app\models\SettingSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
+use yii\base\ViewNotFoundException;
 use app\components\AccessRule;
 
 /**
@@ -58,21 +59,24 @@ class SettingController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $contents = Yii::t('setting', 'There is no preview for this setting.');
 
-        if (is_array(Yii::$app->request->post('preview'))) {
-            if (array_key_exists('value', Yii::$app->request->post('preview'))) {
-                $value = Yii::$app->request->post('preview')['value'];
-                $key = Yii::$app->request->post('preview')['key'];
-                $type = Setting::findByKey($key)->type;
-                Setting::set($key, $value, $type);
+        if ($this->preview_exists($model)) {
+            if (is_array(Yii::$app->request->post('preview'))) {
+                if (array_key_exists('value', Yii::$app->request->post('preview'))) {
+                    $value = Yii::$app->request->post('preview')['value'];
+                    $key = Yii::$app->request->post('preview')['key'];
+                    $type = Setting::findByKey($key)->type;
+                    Setting::set($key, $value, $type);
+                }
             }
-        }
 
-        $this->layout = 'preview';
-        $contents = $this->render('/site/login', [
-            'model' => new \app\models\LoginForm()
-        ]);
-        $this->layout = 'main';
+            $this->layout = 'preview';
+            $contents = $this->render('previews/' . $model->key, [
+                'model' => $model,
+            ]);
+            $this->layout = 'main';
+        }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index', 'id' => $model->id]);
@@ -84,6 +88,16 @@ class SettingController extends Controller
         }
     }
 
+    /**
+     * If the preview view file exists
+     *
+     * @param Setting $model
+     * @return bool
+     */
+    protected function preview_exists($model)
+    {
+        return is_file(Yii::getAlias('@app/views/setting/previews/' . $model->key) . '.php');
+    }
 
     /**
      * Finds the Setting model based on its primary key value.

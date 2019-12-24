@@ -103,7 +103,7 @@ class Ticket extends LiveActiveRecord
         $this->on(self::EVENT_AFTER_DELETE, [$this, 'deleteEvent']);
 
         /* generate the token if it's a new record */
-        $this->token = $this->isNewRecord ? bin2hex(openssl_random_pseudo_bytes(Setting::get('Token length')/2)) : $this->token;
+        $this->token = $this->isNewRecord ? mb_substr(bin2hex(openssl_random_pseudo_bytes(ceil(Setting::get('tokenLength')/2))), 0, Setting::get('tokenLength')) : $this->token;
 
         // set default values, but only in this context, not in TicketSearch context
         // this would overwrite values to search

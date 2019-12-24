@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\helpers\Markdown;
+use yii\helpers\ArrayHelper;
 use app\models\LiveActiveRecord;
 
 /**
@@ -19,6 +20,8 @@ class Setting extends TranslatedActiveRecord
 {
 
     /* db translated fields */
+    public $name_db;
+    public $name_orig;
     public $default_value_db;
     public $default_value_orig;
     public $description_db;
@@ -40,6 +43,7 @@ class Setting extends TranslatedActiveRecord
     public function getTranslatedFields()
     {
         return [
+            'name',
             'default_value',
             'description',
         ];
@@ -91,9 +95,19 @@ class Setting extends TranslatedActiveRecord
     public function rulesByKey()
     {
         return [
-            ['Token length', 'integer', 'min' => 4, 'max' => 16],
-            ['Token length', 'required'],
-            ['Login hint', 'string', 'min' => 0, 'max' => 1024],
+            ['tokenLength', 'integer', 'min' => 4, 'max' => 16],
+            ['tokenLength', 'required'],
+            ['loginHint', 'string', 'min' => 0, 'max' => 1024],
+            ['upperBound', 'required'],
+            ['upperBound', 'integer', 'min' => 30, 'max' => 100],
+            ['lowerBound', 'required'],
+            ['lowerBound', 'integer', 'min' => 10, 'max' => 100],
+            ['minDaemons', 'required'],
+            ['minDaemons', 'integer', 'min' => 1, 'max' => 100],
+            ['maxDaemons', 'required'],
+            ['maxDaemons', 'integer', 'min' => 1, 'max' => 100],
+            ['abandonTicket', 'required'],
+            ['abandonTicket', 'integer', 'min' => 1800, 'max' => 36000],
         ];
     }
 
@@ -105,6 +119,7 @@ class Setting extends TranslatedActiveRecord
         return [
             'id' => \Yii::t('setting', 'ID'),
             'key' => \Yii::t('setting', 'Key'),
+            'name' => \Yii::t('setting', 'Name'),
             'value' => \Yii::t('setting', 'Value'),
             'null' => \Yii::t('setting', 'Use default value'),
             'type' => \Yii::t('setting', 'Type'),
@@ -157,7 +172,6 @@ class Setting extends TranslatedActiveRecord
      */
     public function get($key, $null = null)
     {
-
         if (array_key_exists($key, \Yii::$app->params)) {
             return \Yii::$app->params[$key];
         } else {
@@ -166,7 +180,7 @@ class Setting extends TranslatedActiveRecord
     }
 
     /**
-     * Sets the value of a key (not permanently).
+     * Sets the value of a key (not persistent).
      * 
      * @param string key the key to set
      * @param mixed value the value to set
@@ -176,6 +190,21 @@ class Setting extends TranslatedActiveRecord
     public function set($key, $value, $type = 'string')
     {
         \Yii::$app->params[$key] = Setting::renderSetting($value, $type);
+    }
+
+    /**
+     * Retrieves all settings from the database
+     * 
+     * @return void
+     */
+    public function repopulateSettings()
+    {
+        $old = \Yii::$app->params;
+        $settings = Setting::find()->all();
+        $fromDb = ArrayHelper::map($settings, 'key', function($model) {
+            return Setting::renderSetting($model->value != null ? $model->value : $model->default_value, $model->type);
+        });
+        \Yii::$app->params = ArrayHelper::merge($old, $fromDb);
     }
 
     /**

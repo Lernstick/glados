@@ -7,6 +7,7 @@ use yii\console\Controller;
 use app\models\EventItem;
 use app\models\Daemon;
 use app\models\DaemonSearch;
+use app\models\Setting;
 use yii\db\Expression;
 use yii\helpers\Console;
 
@@ -617,13 +618,18 @@ class DaemonController extends Controller
         $sum = Daemon::find()->where(['description' => 'Daemon base controller'])->sum('`load`');
         $count = Daemon::find()->where(['description' => 'Daemon base controller'])->count();
         $workload = $count != 0 ? round(100*$sum/$count) : 0;
+        Setting::repopulateSettings();
+        $minDaemons = \Yii::$app->params['minDaemons'];
+        $maxDaemons = \Yii::$app->params['maxDaemons'];
+        $upperBound = \Yii::$app->params['upperBound'];
+        $lowerBound = \Yii::$app->params['lowerBound'];
 
-        if (($workload > \Yii::$app->params['upperBound'] && $count < \Yii::$app->params['maxDaemons']) || $count < \Yii::$app->params['minDaemons']) {
+        if (($workload > $upperBound && $count < $maxDaemons) || $count < $minDaemons) {
             # start a new daemon
             $this->logInfo('Start new daemon, workload: ' . $workload . '%, count: ' . $count . '.', true);
             $daemon = new Daemon();
             $daemon->startDaemon();
-        } else if ($workload < \Yii::$app->params['lowerBound'] && $count > \Yii::$app->params['minDaemons']) {
+        } else if ($workload < $lowerBound && $count > $minDaemons) {
             # stop after 5 minutes
             if (time() - strtotime($this->daemon->started_at) > 300) {
                 $this->stop('Load threshold');

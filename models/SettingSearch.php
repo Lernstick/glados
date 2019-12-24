@@ -19,7 +19,7 @@ class SettingSearch extends Setting
     {
         return [
             [['id'], 'integer'],
-            [['description'], 'safe'],
+            [['name', 'description'], 'safe'],
         ];
     }
 
@@ -53,10 +53,10 @@ class SettingSearch extends Setting
         ]);
 
         $dataProvider->setSort([
-            'defaultOrder' => ['key' => SORT_DESC],
+            'defaultOrder' => ['name' => SORT_DESC],
             'attributes' => [
                 'date',
-                'key',
+                'name',
             ]
         ]);
 
@@ -70,6 +70,7 @@ class SettingSearch extends Setting
 
         // grid filtering conditions
         $query->andFilterHaving(['like', 'description', $this->description]);
+        $query->andFilterHaving(['like', 'name', $this->name]);
 
         $dateEnd = new \DateTime($this->date);
         $dateEnd->modify('+1 day');

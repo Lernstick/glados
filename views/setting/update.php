@@ -1,9 +1,7 @@
 <?php
 
 use yii\helpers\Html;
-use yii\helpers\Url;
 use yii\widgets\ActiveForm;
-use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Setting */
@@ -46,22 +44,45 @@ $js = <<< 'SCRIPT'
 $("input[name='Setting[null]']").click(function(){
     if ($(this).is(':checked')) {
         $('#setting-value').val($('#setting-default_value').val());
-        $('#setting-value').trigger('input');
     }
 });
 
-$("#setting-value").on('input', function() {
-    $.pjax.reload({
-        container: "#preview",
-        fragment: "body",
-        type: 'POST',
-        data: {
-            'preview[value]': $("#setting-value").val(),
-            'preview[key]': $("#setting-key").val()
-        },
-        async:false
-    });
+$("#setting-value").on('change keyup paste', function(){
+    if ($(this).val() == $("input[name='Setting[default_value]']").val()) {
+        $("input[name='Setting[null]']").prop( "checked", true );
+    } else {
+        $("input[name='Setting[null]']").prop( "checked", false );        
+    }
 });
+
+function reload() {
+    $('#setting-form').data('yiiActiveForm').submitting = false;
+    $('#setting-form').yiiActiveForm('validate');
+    if ($("#setting-form").find(".has-error").length == 0) {
+        $.pjax.reload({
+            container: "#preview",
+            fragment: "body",
+            type: 'POST',
+            data: {
+                'preview[value]': $("#setting-value").val(),
+                'preview[key]': $("#setting-key").val(),
+                '_csrf': $("input[name='_csrf']").val()
+            },
+            async:true
+        });
+    }
+}
+
+$("#preview-button").click(function() {
+    reload();
+});
+
+$("#preview").on('pjax:send', function() {
+  $('#preview-div').toggleClass('loading')
+})
+$("#preview").on('pjax:complete', function() {
+  $('#preview-div').toggleClass('loading')
+})
 
 SCRIPT;
 $this->registerJs($js);
@@ -73,24 +94,22 @@ $this->registerJs($js);
 
     <div class="setting-form">
 
-        
-        <div class="row">
-            <div class="col-md-12">
-            </div>
-        </div>
         <div class="row">
             <div class="col-md-6">
+                <?php $form = ActiveForm::begin([
+                    'id' => 'setting-form',
+                    'enableClientValidation' => true,
+                ]); ?>
                 <div class="col-md-12">
-                    <?php $form = ActiveForm::begin(); ?>
-
                     <?= $form->field($model, 'key')->hiddenInput()->label(false)->hint(false); ?>
                     <?= $form->field($model, 'default_value')->hiddenInput()->label(false)->hint(false); ?>
 
-                    <?= call_user_func(array($form->field($model, 'value'), $model->typeMapping()[$model->type][0]), $model->typeMapping()[$model->type][1])->label(\Yii::t('setting', $model->key))->hint($model->description); ?>
+                    <?= call_user_func(array($form->field($model, 'value'), $model->typeMapping()[$model->type][0]), $model->typeMapping()[$model->type][1])->label(\Yii::t('setting', $model->name))->hint($model->description); ?>
+
                     <?= $form->field($model, 'null')->checkbox() ?>
                 </div>
 
-                <div class="col-md-12">
+                <div class="form-group col-md-12">
                     <?= Html::label($model->getAttributeLabel('default_value')); ?>
                     <div class="hint-block"><?= $model->getAttributeHint('default_value'); ?></div>
                     <div>
@@ -100,21 +119,21 @@ $this->registerJs($js);
 
                 <div class="form-group col-md-12">
                     <?= Html::submitButton($model->isNewRecord ? \Yii::t('setting', 'Create') : \Yii::t('setting', 'Apply'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+                    <?= Html::Button(\Yii::t('setting', 'Reload Preview'), [
+                        'id' => 'preview-button',
+                        'class' => 'btn btn-primary'
+                    ]) ?>
                 </div>
-
                 <?php ActiveForm::end(); ?>
-
             </div>
-            <div class="col-md-6" style="overflow:hidden;border:1px solid black;height:500px;">
-                <?php Pjax::begin([
-                    'id' => 'preview'
-                ]); ?>
-                    <object type="text/html">
+            <div class="col-md-6">
+                <div class="col-md-12">
+                    <?= Html::label(Yii::t('setting', 'Preview')); ?>
+                    <div id="preview-div" class="preview form-control">
                         <?= $contents ?>
-                    </object>
-                <?php Pjax::end(); ?>
+                    </div>
+                </div>
             </div>
-
         </div>
 
 

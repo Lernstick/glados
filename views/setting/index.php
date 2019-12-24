@@ -43,13 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'raw',
                 'visible' => false,
             ],
-            [
-                'attribute' => 'key',
-                'format' => 'raw',
-                'value' => function ($model) {
-                    return \Yii::t('setting', $model->key);
-                },
-            ],
+            'name',
             'description',
             [
                 'attribute' => 'value',

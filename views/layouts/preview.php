@@ -27,7 +27,6 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
 </head>
 <body>
 <?php $this->beginBody() ?>
-
 <div class="wrap">
     <div class="container" style="padding-top:0px;">
         <?= $content ?>
