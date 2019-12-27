@@ -59,7 +59,7 @@ class SettingController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $contents = Yii::t('setting', 'There is no preview for this setting.');
+        $contents = null;
 
         if ($this->preview_exists($model)) {
             if (is_array(Yii::$app->request->post('preview'))) {

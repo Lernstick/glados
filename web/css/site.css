@@ -386,3 +386,24 @@ ul.timeline li {
   overflow:hidden;
   height:auto;
 }
+
+.highlight {
+    -moz-animation: highlight 1s ease 0s 1 alternate ;
+    -webkit-animation: highlight 1s ease 0s 1 alternate;
+    animation: highlight 1s ease 0s 1 alternate;
+}
+
+@-webkit-keyframes highlight {
+    from { background-color: #F6F6BC; }
+    to { background-color: white; }
+}
+
+@-moz-keyframes highlight {
+    from { background-color: #F6F6BC; }
+    to { background-color: white; }
+}
+
+@keyframes your-animation-name {
+    from { background-color: #F6F6BC; }
+    to { background-color: #fff; }
+}

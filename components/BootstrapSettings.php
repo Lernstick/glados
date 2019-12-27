@@ -23,7 +23,7 @@ class BootstrapSettings implements BootstrapInterface
         try {
             $settings = Setting::find()->all();
             $paramsFromDb = ArrayHelper::map($settings, 'key', function($model) {
-                return Setting::renderSetting($model->value != null ? $model->value : $model->default_value, $model->type);
+                return Setting::renderSetting($model->value !== null ? $model->value : $model->default_value, $model->type);
             });
             $app->params = ArrayHelper::merge($paramsFromFile, $paramsFromDb);
         }
