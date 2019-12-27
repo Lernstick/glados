@@ -61,24 +61,18 @@ class Setting extends TranslatedActiveRecord
 
         // create row-wise rules according to rulesByKey()
         foreach ($this->rulesByKey() as $i => $rule) {
-            $when = function($model) use ($rule) {
-                return $model->key == $rule[0];
-            };
-            $whenClient = "function (attribute, value) {
-                return $('#setting-key').val() == '" . $rule[0] . "';
-            }";
-            $append = [
-                'value',
-                $rule[1],
-                'when' => $when,
-                'whenClient' => $whenClient,
-            ];
-            foreach ($rule as $key => $value) {
-                if (!is_int($key)) {
-                    $append[$key] = $value;
+            if ($this->key == $rule[0]) {
+                $append = [
+                    'value',
+                    $rule[1],
+                ];
+                foreach ($rule as $key => $value) {
+                    if (!is_int($key)) {
+                        $append[$key] = $value;
+                    }
                 }
+                $rules[] = $append;
             }
-            $rules[] = $append;
         }
 
         // this must be after all previous rules
@@ -97,6 +91,16 @@ class Setting extends TranslatedActiveRecord
         return [
             ['tokenLength', 'integer', 'min' => 4, 'max' => 16],
             ['tokenLength', 'required'],
+            ['tokenChars', 'string', 'min' => 10, 'max' => 62],
+            ['tokenChars', 'match',
+                'pattern' => '/^(?:(.)(?!.*?\1))+$/', // only distict characters
+                'message' => \Yii::t('setting', 'Duplicate character found. All characters must be unique.')
+            ],
+            ['tokenChars', 'match',
+                'pattern' => '/^[0-9a-zA-Z]+$/', // only alphanumeric characters
+                'message' => \Yii::t('setting', 'Only alphanumeric characters (0-9, a-z, A-Z) are allowed.')
+            ],
+            ['tokenChars', 'required'],
             ['loginHint', 'string', 'min' => 0, 'max' => 1024],
             ['upperBound', 'required'],
             ['upperBound', 'integer', 'min' => 30, 'max' => 100],
@@ -149,8 +153,9 @@ class Setting extends TranslatedActiveRecord
     public function typeMapping()
     {
         return [
-            'markdown' => ['textArea', ['maxlength' => true]],
+            'markdown' => ['textArea', ['maxlength' => true, 'rows' => 5], \Yii::t('setting', 'In this field, you can write <a target="_new" href="{link}">Markdown</a>.', ['link' => 'https://guides.github.com/features/mastering-markdown/'])],
             'integer' => ['textInput', ['type' => 'number']],
+            'string' => ['textInput', ['maxlength' => true]],
         ];
     }
 

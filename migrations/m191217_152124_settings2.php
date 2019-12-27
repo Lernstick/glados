@@ -41,6 +41,16 @@ class m191217_152124_settings2 extends Migration
         ]);
         $tokenLength->save(false);
 
+        // create tokenChars
+        $tokenChars = new Setting([
+            'key' => 'tokenChars',
+            'name' => yiit('setting', 'Token characters'),
+            'type' => 'string',
+            'default_value' => '0123456789abcdef',
+            'description' => yiit('setting', 'A set of characters from which the token should be generated.'),
+        ]);
+        $tokenChars->save(false);
+
         // create minDaemons
         $minDaemons = new Setting([
             'key' => 'minDaemons',
@@ -99,6 +109,7 @@ class m191217_152124_settings2 extends Migration
     {
         Setting::deleteAll(['key' => 'Token length']);
         Setting::deleteAll(['key' => 'tokenLength']);
+        Setting::deleteAll(['key' => 'tokenChars']);
         Setting::deleteAll(['key' => 'minDaemons']);
         Setting::deleteAll(['key' => 'maxDaemons']);
         Setting::deleteAll(['key' => 'upperBound']);

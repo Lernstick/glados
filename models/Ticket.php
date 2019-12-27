@@ -103,7 +103,7 @@ class Ticket extends LiveActiveRecord
         $this->on(self::EVENT_AFTER_DELETE, [$this, 'deleteEvent']);
 
         /* generate the token if it's a new record */
-        $this->token = $this->isNewRecord ? mb_substr(bin2hex(openssl_random_pseudo_bytes(ceil(Setting::get('tokenLength')/2))), 0, Setting::get('tokenLength')) : $this->token;
+        $this->token = $this->isNewRecord ? $this->generateRandomToken() : $this->token;
 
         // set default values, but only in this context, not in TicketSearch context
         // this would overwrite values to search
@@ -294,6 +294,22 @@ class Ticket extends LiveActiveRecord
                 'ticket/view/all', //concerns all users with the ticket/view/all permission
             ],
         ];
+    }
+
+    /**
+     * Generate a random token.
+     * 
+     * @return string the randomly generated token
+     */
+    public function generateRandomToken()
+    {
+        $characters = Setting::get('tokenChars');
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < Setting::get('tokenLength'); $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randomString;
     }
 
     public function getName()

@@ -53,7 +53,7 @@ class SettingSearch extends Setting
         ]);
 
         $dataProvider->setSort([
-            'defaultOrder' => ['name' => SORT_DESC],
+            'defaultOrder' => ['name' => SORT_ASC],
             'attributes' => [
                 'date',
                 'name',

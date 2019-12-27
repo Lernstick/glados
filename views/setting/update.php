@@ -22,29 +22,36 @@ $(function () {
 $('.hint-block').each(function () {
     var $hint = $(this);
 
-    $hint.parent().find('label').after('&nbsp<a tabindex="0" role="button" class="hint glyphicon glyphicon-question-sign"></a>');
+    if (!$hint.hasClass('leave')) {
 
-    $hint.parent().find('a.hint').popover({
-        html: true,
-        trigger: 'focus',
-        placement: 'right',
-        title:  $hint.parent().find('label').html(),
-        //title:  'Description',
-        toggle: 'popover',
-        container: 'body',
-        content: $hint.html()
-    });
+        $hint.parent().find('label').after('&nbsp<a tabindex="0" role="button" class="hint glyphicon glyphicon-question-sign"></a>');
 
-    $hint.remove()
+        $hint.parent().find('a.hint').popover({
+            html: true,
+            trigger: 'focus',
+            placement: 'right',
+            title:  $hint.parent().find('label').html(),
+            //title:  'Description',
+            toggle: 'popover',
+            container: 'body',
+            content: $hint.html()
+        });
+
+        $hint.remove()
+    }
 });
 SCRIPT;
 // Register tooltip/popover initialization javascript
 $this->registerJs($js);
 
 $js = <<< 'SCRIPT'
+var pre;
 $("input[name='Setting[null]']").click(function(){
     if ($(this).is(':checked')) {
+        pre = $('#setting-value').val();
         $('#setting-value').val($('#setting-default_value').val());
+    } else {
+        $('#setting-value').val(pre);
     }
 });
 
@@ -131,19 +138,24 @@ $model->value = $model->value === null ? $model->default_value : $model->value;
                     </div>
                     <div class="panel-body">
 
-                        <div class="col-md-12">
+                        <div class="form-group col-md-12">
                             <?= $form->field($model, 'key')->hiddenInput()->label(false)->hint(false); ?>
                             <?= $form->field($model, 'default_value')->hiddenInput()->label(false)->hint(false); ?>
 
                             <?= call_user_func(array($form->field($model, 'value'), $model->typeMapping()[$model->type][0]), $model->typeMapping()[$model->type][1])->label(false)->hint(false); ?>
 
+                            <div class="hint-block leave"><?= array_key_exists(2, $model->typeMapping()[$model->type]) ? $model->typeMapping()[$model->type][2] : null; ?></div>
+
+                        </div>
+
+                        <div class="col-md-12">
                             <?= $form->field($model, 'null')->checkbox() ?>
                         </div>
 
-                        <div class="form-group col-md-12">
+                        <div class="col-md-12">
                             <?= Html::label($model->getAttributeLabel('default_value')); ?>
                             <div class="hint-block"><?= $model->getAttributeHint('default_value'); ?></div>
-                            <div>
+                            <div class="hint-block leave">
                                 <?= $model->renderSetting($model->default_value, $model->type); ?>
                             </div>
                         </div>
@@ -154,7 +166,7 @@ $model->value = $model->value === null ? $model->default_value : $model->value;
                             <?= Html::submitButton($model->isNewRecord ? \Yii::t('setting', 'Create') : \Yii::t('setting', 'Apply'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
                             <?= Html::submitButton(\Yii::t('setting', 'Reload Preview'), [
                                 'id' => 'preview-button',
-                                'class' => 'btn btn-primary',
+                                'class' => 'btn btn-primary pull-right',
                                 'disabled' => $contents === null,
                             ]) ?>
                         </li>
