@@ -72,10 +72,14 @@ class SettingController extends Controller
             }
 
             $this->layout = 'preview';
+
             $contents = $this->render('previews/' . $model->key, [
                 'model' => $model,
             ]);
             $this->layout = 'main';
+
+            // reset the breadcrumbs after preview rendering
+            $this->view->params['breadcrumbs'] = [];
         }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
