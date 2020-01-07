@@ -455,11 +455,17 @@ class TicketController extends Controller
     public function actionDelete($id = null, $mode = 'single', $exam_id = null)
     {
         if ($mode == 'single') {
-            $this->findModel($id)->delete();
-            Yii::$app->session->addFlash('danger', Yii::t('ticket', 'The Ticket has been deleted successfully.'));
+            $model = $this->findModel($id);
 
-            return $this->redirect(Yii::$app->session['ticketViewReturnURL']);
-        }else if ($mode == 'manyOpen' || $mode == 'many') {
+            if ($model->backup_lock == 0 && $model->restore_lock == 0 &&  $model->download_lock == 0) {
+                $model->delete();
+                Yii::$app->session->addFlash('danger', Yii::t('ticket', 'The Ticket has been deleted successfully.'));
+                return $this->redirect(Yii::$app->session['ticketViewReturnURL']);
+            } else {
+                Yii::$app->session->addFlash('danger', \Yii::t('ticket', 'The ticket is still locked by a daemon and can therefore not be deleted.'));
+                return $this->redirect(['ticket/view', 'id' => $id]);
+            }
+        } else if ($mode == 'manyOpen' || $mode == 'many') {
             $query = Ticket::find()->where(['exam_id' => $exam_id]);
             Yii::$app->user->can('ticket/delete/all') ?: $query->own();
             $models = $query->all();
