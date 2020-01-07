@@ -5,6 +5,7 @@ namespace app\components;
 use Yii;
 use yii\i18n\Formatter;
 use yii\base\InvalidConfigException;
+use yii\base\InvalidArgumentException;
  
 class customFormatter extends \yii\i18n\Formatter
 {
@@ -80,7 +81,13 @@ class customFormatter extends \yii\i18n\Formatter
         if (empty($value)){
             $value = '<span class="not-set">' . \Yii::t('app', '(not set)') . '</span>';
         } else {
-            $value = \yii\timeago\TimeAgo::widget(['timestamp' => $value]);
+            try {
+                $value = \yii\timeago\TimeAgo::widget(['timestamp' => $value]);
+            }
+            // just catch the error
+            catch (InvalidArgumentException $e) {
+                $value = '<span class="invalid" title="' . $value . '">' . \Yii::t('app', '(invalid date)') . '</span>';
+            }
         }
         return $value;
     }

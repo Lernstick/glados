@@ -8,6 +8,7 @@ use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Ticket */
+/* @var $examModel app\models\Exam|null */
 /* @var $form yii\widgets\ActiveForm */
 
 $js = <<< 'SCRIPT'
@@ -192,7 +193,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="row">
         <div class="col-md-6">
              <?= $form->field($model, 'exam_id')->widget(Select2::classname(), [
-                'data' => [ $examModel->id => $examModel->name . " - " . $examModel->subject ],
+                'data' => $examModel === null ? [] : [ $examModel->id => $examModel->name . " - " . $examModel->subject ],
                 'pluginOptions' => [
                     'dropdownAutoWidth' => true,
                     'width' => 'auto',
