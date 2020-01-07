@@ -338,12 +338,14 @@ class BackupController extends DaemonController implements DaemonInterface
         foreach ($tickets as $ticket) {
             if (($daemon = Daemon::findOne($ticket->running_daemon_id)) !== null) {
                 if ($daemon->running != true) {
+                    $this->logInfo("Unlocking item (token=" . $ticket->token . ")...");
                     $ticket->backup_lock = $ticket->restore_lock = 0;
                     $ticket->save(false);
                     //$daemon->delete();
                 }
             } else {
                 $ticket->backup_lock = $ticket->restore_lock = 0;
+                $this->logInfo("Unlocking item (token=" . $ticket->token . ")...");
                 $ticket->save(false);
             }
         }

@@ -593,6 +593,18 @@ class TicketController extends Controller
                 return $this->render('token-request', [
                     'model' => $model,
                 ]);                
+            } else if ($model->backup_lock != 0) {
+                $model->addError('token', \Yii::t('ticket', 'The ticket is currently in processing for backup. Please try again in a minute.'));
+                $this->startDaemon();
+                return $this->render('token-request', [
+                    'model' => $model,
+                ]);
+            } else if ($model->restore_lock != 0) {
+                $model->addError('token', \Yii::t('ticket', 'The ticket is currently in processing for restore. Please try again in a minute.'));
+                $this->startDaemon();
+                return $this->render('token-request', [
+                    'model' => $model,
+                ]);
             } else {
 
                 $model->scenario = Ticket::SCENARIO_DOWNLOAD;
@@ -627,16 +639,7 @@ class TicketController extends Controller
                 }
                 $act->save();
 
-                # saerch for running daemons
-                $daemonSearchModel = new DaemonSearch();
-                $daemonDataProvider = $daemonSearchModel->search(['DaemonSearch' => ['description' => 'Daemon base controller']]);
-                $count = $daemonDataProvider->getTotalCount();
-
-                # if no daemon is running already, start one
-                if($count == 0){
-                    $daemon = new Daemon();
-                    $daemon->startDaemon();
-                }
+                $this->startDaemon();
 
                 return $this->redirect(['download', 'token' => $model->token, 'step' => 3]);
             }
@@ -669,6 +672,7 @@ class TicketController extends Controller
      *
      * @param string $token
      * @param string $state
+     * @return array
      */
     public function actionNotify($token, $state)
     {
@@ -877,4 +881,24 @@ class TicketController extends Controller
             return false;
         }
     }
+
+    /**
+     * Starts a daemon if none is running already
+     *
+     * @return void
+     */
+    public function startDaemon()
+    {
+        # search for running daemons
+        $daemonSearchModel = new DaemonSearch();
+        $daemonDataProvider = $daemonSearchModel->search(['DaemonSearch' => ['description' => 'Daemon base controller']]);
+        $count = $daemonDataProvider->getTotalCount();
+
+        # if no daemon is running already, start one
+        if($count == 0){
+            $daemon = new Daemon();
+            $daemon->startDaemon();
+        }
+    }
+
 }
