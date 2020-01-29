@@ -5,6 +5,7 @@ namespace app\components;
 use yii\base\Behavior;
 use yii\base\Event;
 use app\models\History;
+use yii\db\Query;
 
 class HistoryBehavior extends Behavior
 {
@@ -25,18 +26,52 @@ class HistoryBehavior extends Behavior
     public $attributes = [];
 
     /**
+     * @var array array defining the relation of this entry to the entry that should
+     * be taken as reference in the history table. For Example:
+     *
+     * ```php
+     * ['exam', 'screen_capture_id']
+     * ```
+     *
+     */
+    public $relation;
+
+
+    /**
      * @inheritdoc 
      */
     public function events()
     {
         return [
+            // adds new history records upon updating the main record
             \yii\db\ActiveRecord::EVENT_AFTER_UPDATE => 'historyAdd',
+            // removes records after deleting the main record
             \yii\db\ActiveRecord::EVENT_AFTER_DELETE => 'historyDelete'
         ];
     }
 
     /**
-     * Creates a history table entry for all changed entries that are in the attributes
+     * @inheritdoc 
+     */
+    public function relation()
+    {
+        if ($this->relation !== null) {
+            list($foreign_table, $foreign_row) = $this->relation;
+            $query = new Query;
+            $query->select('id')
+                ->from($foreign_table)
+                ->where([$foreign_row => $this->owner->id])
+                ->limit(1);
+            $row = $query->one();
+            if ($row !== false) {
+                return [$foreign_table, $row['id']];
+            }
+        }
+        return [$this->owner->tableName(), $this->owner->id];
+    }
+
+    /**
+     * Creates a history entry for all changed entries that are in the attributes
      * array.
      * @param Event $event
      */
@@ -44,11 +79,9 @@ class HistoryBehavior extends Behavior
     {
 
         if ($event->name == \yii\db\ActiveRecord::EVENT_AFTER_UPDATE) {
-
             $attributes = (array) array_keys($this->attributes);
             $date = microtime(true);
-            $table = $this->owner->tableName();
-            $row = $this->owner->id;
+            list($table, $row) = $this->relation();
             $identity = $this->identity();
             $hash = bin2hex(openssl_random_pseudo_bytes(8));
 
@@ -67,8 +100,8 @@ class HistoryBehavior extends Behavior
                 }
             }
 
-            // intersection of both arrays are attributes with history entry
-            // are changed according to $event->changedAttributes
+            // intersection of both arrays are attributes with history entry.
+            // These are changed according to $event->changedAttributes
             $changedAttr = array_intersect($attributes, array_keys($event->changedAttributes));
 
             // create history entries for all attributes that have been changed
@@ -101,8 +134,7 @@ class HistoryBehavior extends Behavior
     public function historyDelete($event)
     {
         if ($event->name == \yii\db\ActiveRecord::EVENT_AFTER_DELETE) {
-            $table = $this->owner->tableName();
-            $row = $this->owner->id;
+            list($table, $row) = $this->relation();
             History::deleteAll([
                 'table' => $table,
                 'row' => $row,

@@ -9,30 +9,33 @@ use limion\jqueryfileupload\JQueryFileUpload;
 use kartik\range\RangeInput;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Exam */
+/* @var $model app\models\forms\ExamForm */
 /* @var $form yii\widgets\ActiveForm */
 
-if(($model->file && Yii::$app->file->set($model->file)->exists) || ($model->file2 && Yii::$app->file->set($model->file2)->exists)) {
+$exam = $model->exam;
+$screenCapture = $model->screenCapture;
+
+if(($exam->file && Yii::$app->file->set($exam->file)->exists) || ($exam->file2 && Yii::$app->file->set($exam->file2)->exists)) {
     $this->registerJs('var files = [];');
 }
 
-if($model->file && Yii::$app->file->set($model->file)->exists) {
+if($exam->file && Yii::$app->file->set($exam->file)->exists) {
     $this->registerJs(new JsExpression("
         files.push({
-            'name':'" . basename($model->file) . "',
-            'size':" . filesize($model->file) . ",
-            'deleteUrl':'" . Url::to(['delete', 'id' => $model->id, 'mode' => 'file', 'type' => 'squashfs']) . "',
+            'name':'" . basename($exam->file) . "',
+            'size':" . filesize($exam->file) . ",
+            'deleteUrl':'" . Url::to(['delete', 'id' => $exam->id, 'mode' => 'file', 'type' => 'squashfs']) . "',
             'deleteType':'POST'
         });
     "));
 }
 
-if($model->file2 && Yii::$app->file->set($model->file2)->exists) {
+if($exam->file2 && Yii::$app->file->set($exam->file2)->exists) {
     $this->registerJs(new JsExpression("
         files.push({
-            'name':'" . basename($model->file2) . "',
-            'size':" . filesize($model->file2) . ",
-            'deleteUrl':'" . Url::to(['delete', 'id' => $model->id, 'mode' => 'file', 'type' => 'zip']) . "',
+            'name':'" . basename($exam->file2) . "',
+            'size':" . filesize($exam->file2) . ",
+            'deleteUrl':'" . Url::to(['delete', 'id' => $exam->id, 'mode' => 'file', 'type' => 'zip']) . "',
             'deleteType':'POST'
         });
     "));
@@ -111,7 +114,7 @@ $.widget("blueimp.fileupload", $.blueimp.fileupload, {
 });
 SCRIPT;
 // file upload client side validation
-if (!$model->isNewRecord) {
+if (!$exam->isNewRecord) {
     $this->registerJs($js);
 }
 
@@ -181,6 +184,13 @@ $this->registerJs($js);
                 ['data-toggle' => 'tab']
             ) ?>
         </li>
+        <li>
+            <?= Html::a(
+                '<i class="glyphicon glyphicon-camera"></i> ' . \Yii::t('exams', 'Screen Capture'),
+                '#screen_capture',
+                ['data-toggle' => 'tab']
+            ) ?>
+        </li>
         <?= $step != 1 ? '<li>' . Html::a(
                 '<i class="glyphicon glyphicon-file"></i> ' . \Yii::t('exams', 'Exam File'),
                 '#file',
@@ -207,22 +217,22 @@ $this->registerJs($js);
 
     <div class="row">
         <div class="col-md-6">
-            <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($exam, 'name')->textInput(['maxlength' => true]) ?>
         </div>
 
         <div class="col-md-6">
-            <?= $form->field($model, 'subject')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($exam, 'subject')->textInput(['maxlength' => true]) ?>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-6">
-            <?= $form->field($model, 'time_limit', [
+            <?= $form->field($exam, 'time_limit', [
                 'template' => '{label}<div class="input-group">{input}<span class="input-group-addon" id="basic-addon2">' . \Yii::t('exams', 'minutes') . '</span></div>{hint}{error}'
             ])->textInput(['type' => 'number']); ?>
         </div>
         <div class="col-md-6">
-            <?= $form->field($model, 'backup_path')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($exam, 'backup_path')->textInput(['maxlength' => true]) ?>
         </div>        
     </div>
 
@@ -237,15 +247,15 @@ $this->registerJs($js);
                 <div class="col-md-6">
                     <div class="row">
                         <div class="col-md-12" style="width:auto;">
-                            <?= $form->field($model, 'screenshots')->checkbox() ?>
+                            <?= $form->field($exam, 'screenshots')->checkbox() ?>
                         </div>
                         <div class="col-md-12">
-                            <?= $form->field($model, 'screenshots_interval', [
+                            <?= $form->field($exam, 'screenshots_interval', [
                                 'template' => '{label}<div class="input-group"><div class="input-group-addon">' . \Yii::t('exams', 'with Interval of') . '</div>{input}<span class="input-group-addon" id="basic-addon2">' . \Yii::t('exams', 'minutes') . '</span></div>{hint}{error}'
-                            ])->textInput(['type' => 'number', 'disabled' => !$model->screenshots])->label(false); ?>
+                            ])->textInput(['type' => 'number', 'disabled' => !$exam->screenshots])->label(false); ?>
                         </div>                
                         <div class="col-md-12">
-                            <?= $form->field($model, 'max_brightness')->widget(RangeInput::classname(), [
+                            <?= $form->field($exam, 'max_brightness')->widget(RangeInput::classname(), [
                                 'options' => ['placeholder' => \Yii::t('exams', 'Select range ...')],
                                 'html5Options' => ['min' => 0, 'max' => 100, 'step' => 1],
                                 'html5Container' => ['style' => 'width:80%'],
@@ -255,7 +265,7 @@ $this->registerJs($js);
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <?= $form->field($model, 'url_whitelist')->textarea([
+                    <?= $form->field($exam, 'url_whitelist')->textarea([
                         'rows' => '6',
                     ]) ?>
                 </div>
@@ -280,20 +290,20 @@ $this->registerJs($js);
                 <div class="col-md-6">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <?= $form->field($model, 'libre_autosave', [
+                            <?= $form->field($exam, 'libre_autosave', [
                                 'options' => ['class' => ''],
                                 'errorOptions' => ['tag' => false],
                             ])->checkbox() ?>
                         </div>
                         <div class="panel-body">
-                            <?= $form->field($model, 'libre_autosave_path', [
+                            <?= $form->field($exam, 'libre_autosave_path', [
                                 'template' => '{label}<div class="input-group"><div class="input-group-addon">' . \Yii::t('exams', '...to the directory') . '</div>{input}</div>{hint}{error}'
-                            ])->textInput(['disabled' => !$model->libre_autosave])->label(false); ?>
-                            <?= $form->field($model, 'libre_autosave_interval', [
+                            ])->textInput(['disabled' => !$exam->libre_autosave])->label(false); ?>
+                            <?= $form->field($exam, 'libre_autosave_interval', [
                                 'template' => '{label}<div class="input-group"><div class="input-group-addon">' . \Yii::t('exams', '...all {n} minutes.', [
                                         'n' => '</div>{input}<span class="input-group-addon" id="basic-addon2">'
                                     ]) . '</span></div>{hint}{error}'
-                            ])->textInput(['type' => 'number', 'disabled' => !$model->libre_autosave])->label(false); ?>
+                            ])->textInput(['type' => 'number', 'disabled' => !$exam->libre_autosave])->label(false); ?>
                         </div>
                     </div>
                 </div>
@@ -301,20 +311,39 @@ $this->registerJs($js);
                 <div class="col-md-6">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <?= $form->field($model, 'libre_createbackup', [
+                            <?= $form->field($exam, 'libre_createbackup', [
                                 'options' => ['class' => ''],
                                 'errorOptions' => ['tag' => false],
                             ])->checkbox() ?>
                         </div>
                         <div class="panel-body">
-                            <?= $form->field($model, 'libre_createbackup_path', [
+                            <?= $form->field($exam, 'libre_createbackup_path', [
                                 'template' => '{label}<div class="input-group"><div class="input-group-addon">' . \Yii::t('exams', '...to the directory') . '</div>{input}</div>{hint}{error}'
-                            ])->textInput(['disabled' => !$model->libre_createbackup])->label(false); ?>
+                            ])->textInput(['disabled' => !$exam->libre_createbackup])->label(false); ?>
                         </div>
                     </div>
                 </div>
 
             </div>
+        </div>
+    </div>
+
+    <?php Pjax::end(); ?>
+
+    <?php Pjax::begin([
+        'id' => 'screen_capture',
+        'options' => ['class' => 'tab-pane fade'],
+    ]); ?>
+
+    <br>
+
+    <div class="row">
+        <div class="col-md-6">
+            <?= $form->field($screenCapture, 'enabled')->checkbox() ?>
+        </div>
+
+        <div class="col-md-6">
+            <?= $form->field($screenCapture, 'quality')->textInput(['maxlength' => true]) ?>
         </div>
     </div>
 
@@ -333,10 +362,10 @@ $this->registerJs($js);
         <div class="panel-body">
             <div class="row">
                 <div class="col-md-6">
-                    <?= $form->field($model, 'grp_netdev')->checkbox() ?>
-                    <?= $form->field($model, 'allow_sudo')->checkbox() ?>
-                    <?= $form->field($model, 'allow_mount')->checkbox() ?>
-                    <?= $form->field($model, 'firewall_off')->checkbox() ?>
+                    <?= $form->field($exam, 'grp_netdev')->checkbox() ?>
+                    <?= $form->field($exam, 'allow_sudo')->checkbox() ?>
+                    <?= $form->field($exam, 'allow_mount')->checkbox() ?>
+                    <?= $form->field($exam, 'firewall_off')->checkbox() ?>
                 </div>
                 <div class="col-md-6">
                 </div>
@@ -355,19 +384,19 @@ $this->registerJs($js);
     <div class="panel panel-default">
         <div class="panel-heading">
             <?= Html::Label(\Yii::t('exams', 'Exam Image files')); ?>
-            <?= Html::activeHint($model, 'file', ['class' => 'hint-block'])?>
+            <?= Html::activeHint($exam, 'file', ['class' => 'hint-block'])?>
         </div>
         <div class="panel-body">
             <div class="row">
                 <div class="col-md-12" id="fileupload-exam">
                     <?php
-                    if(!$model->isNewRecord) {
+                    if(!$exam->isNewRecord) {
 
-                        //echo Html::activeLabel($model, 'file');
+                        //echo Html::activeLabel($exam, 'file');
                         echo JQueryFileUpload::widget([
-                            'model' => $model,
+                            'model' => $exam,
                             'name' => 'file',
-                            'url' => ['update', 'id' => $model->id, 'mode' => 'upload'],
+                            'url' => ['update', 'id' => $exam->id, 'mode' => 'upload'],
                             'appearance' => 'ui', // available values: 'ui','plus' or 'basic'
                             'mainView'=>'@app/views/exam/_upload_main',
                             'uploadTemplateView'=>'@app/views/exam/_upload_upload',
@@ -390,7 +419,7 @@ $this->registerJs($js);
                     ?>
 
                     <?php
-                    if(($model->file && Yii::$app->file->set($model->file)->exists) || ($model->file2 && Yii::$app->file->set($model->file2)->exists)) {
+                    if(($exam->file && Yii::$app->file->set($exam->file)->exists) || ($exam->file2 && Yii::$app->file->set($exam->file2)->exists)) {
                         $js = new JsExpression('var fupload = jQuery("#w0").fileupload({
                             "maxFileSize":4000000000,
                             "dataType":"json",
@@ -398,7 +427,7 @@ $this->registerJs($js);
                             "maxNumberOfFiles":2,
                             "autoUpload":true,
                             "sequentialUploads": true,
-                            "url":' . json_encode(Url::to(['update', 'id' => $model->id, 'mode' => 'upload']), JSON_HEX_AMP) . ',
+                            "url":' . json_encode(Url::to(['update', 'id' => $exam->id, 'mode' => 'upload']), JSON_HEX_AMP) . ',
                             progressServerRate: 0.5,
                             progressServerDecayExp: 3.5
                         });
@@ -418,7 +447,7 @@ $this->registerJs($js);
     <hr>
 
     <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? \Yii::t('exams', 'Next Step') : ($step == 2 ? \Yii::t('exams', 'Apply') : \Yii::t('exams', 'Apply')), ['class' => $model->isNewRecord || $step == 2 ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::submitButton($exam->isNewRecord ? \Yii::t('exams', 'Next Step') : ($step == 2 ? \Yii::t('exams', 'Apply') : \Yii::t('exams', 'Apply')), ['class' => $exam->isNewRecord || $step == 2 ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

@@ -243,6 +243,14 @@ class Exam extends Base
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getScreenCapture()
+    {
+        return $this->hasOne(ScreenCapture::className(), ['id' => 'screen_capture_id']);
+    }
+
     /* Getter for user name */
     public function getUserName()
     {

@@ -5,6 +5,8 @@ namespace app\controllers;
 use Yii;
 use app\models\Exam;
 use app\models\ExamSearch;
+use app\models\ScreenCapture;
+use app\models\forms\ExamForm;
 use app\models\Ticket;
 use app\models\TicketSearch;
 use app\models\History;
@@ -250,10 +252,12 @@ class ExamController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Exam();
+        $model = new ExamForm();
+        $model->exam = new Exam();
+        $model->setAttributes(Yii::$app->request->post());
 
-        if ($model->load(\Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['update', 'id' => $model->id, 'step' => 2]);
+        if (Yii::$app->request->post() && $model->save()) {
+            return $this->redirect(['update', 'id' => $model->exam->id, 'step' => 2]);
         } else {
             return $this->render('create', [
                 'model' => $model,
@@ -272,19 +276,22 @@ class ExamController extends Controller
      */
     public function actionUpdate($id, $mode = 'default', $step = 0)
     {
-        $model = $this->findModel($id);
+        $model = new ExamForm();
+        $model->exam = $this->findModel($id);
+        $model->setAttributes(Yii::$app->request->post());
 
         if ($mode === 'default') {
-            if ($model->runningTicketCount != 0){
+            if ($model->exam->runningTicketCount != 0){
                 Yii::$app->session->addFlash('danger', \Yii::t('exams', 'Exam edit is disabled while there {n,plural,=1{is one ticket} other{are # tickets}} in "Running" state.',
-                    [ 'n' => $model->runningTicketCount ]
+                    [ 'n' => $model->exam->runningTicketCount ]
                 ));
-                return $this->redirect(['view', 'id' => $model->id]);
+                return $this->redirect(['view', 'id' => $model->exam->id]);
             }
 
-            if ($model->load(Yii::$app->request->post()) && $model->save()){
-                return $this->redirect(['view', 'id' => $model->id]);
-            }else{
+            if (Yii::$app->request->post() && $model->save()) {
+                return $this->redirect(['view', 'id' => $model->exam->id]);
+            } else {
+
                 if ($step == 0) {
                     return $this->render('update', [
                         'model' => $model,
@@ -296,8 +303,9 @@ class ExamController extends Controller
                         'step' => $step,
                     ]);
                 }
+
             }
-        }else if ($mode === 'upload') {
+        } else if ($mode === 'upload') {
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
             $file = UploadedFile::getInstanceByName('file');
@@ -357,7 +365,7 @@ class ExamController extends Controller
                         'error' => $model->errors['id'][0],
                     ]]];
                 }
-            }else{
+            } else {
                 @unlink($file);
                 return [ 'files' => [[
                     'name' => basename($file),
