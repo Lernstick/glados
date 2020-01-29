@@ -4,7 +4,6 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use yii\widgets\Pjax;
-//use kartik\file\FileInput;
 use yii\web\JsExpression;
 use limion\jqueryfileupload\JQueryFileUpload;
 use kartik\range\RangeInput;
@@ -249,6 +248,7 @@ $this->registerJs($js);
                             <?= $form->field($model, 'max_brightness')->widget(RangeInput::classname(), [
                                 'options' => ['placeholder' => \Yii::t('exams', 'Select range ...')],
                                 'html5Options' => ['min' => 0, 'max' => 100, 'step' => 1],
+                                'html5Container' => ['style' => 'width:80%'],
                                 'addon' => ['append' => ['content' => '%']]
                             ]) ?>
                         </div>
