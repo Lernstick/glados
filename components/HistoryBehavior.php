@@ -6,6 +6,7 @@ use yii\base\Behavior;
 use yii\base\Event;
 use app\models\History;
 use yii\db\Query;
+use yii\helpers\Inflector;
 
 class HistoryBehavior extends Behavior
 {
@@ -51,7 +52,8 @@ class HistoryBehavior extends Behavior
     }
 
     /**
-     * @inheritdoc 
+     * Find relation between a history item and the table/row it should be
+     * related to. See [[relation]]
      */
     public function relation()
     {
@@ -78,6 +80,12 @@ class HistoryBehavior extends Behavior
     public function historyAdd($event)
     {
 
+        $connection = \Yii::$app->db;
+        $transaction = $connection->transaction;
+        if ($transaction !== null && $transaction->isActive) {
+            //continue here for active transactions
+        }
+
         if ($event->name == \yii\db\ActiveRecord::EVENT_AFTER_UPDATE) {
             $attributes = (array) array_keys($this->attributes);
             $date = microtime(true);
@@ -100,7 +108,7 @@ class HistoryBehavior extends Behavior
                 }
             }
 
-            // intersection of both arrays are attributes with history entry.
+            // Intersection of both arrays are attributes with history entry.
             // These are changed according to $event->changedAttributes
             $changedAttr = array_intersect($attributes, array_keys($event->changedAttributes));
 
@@ -111,9 +119,10 @@ class HistoryBehavior extends Behavior
 
                 // only create a history entry if the old and new value differ
                 if (is_string($attribute) && $old_value != $new_value) {
+                    $column = $this->relation !== null ? $this->owner->tableName() . '.' . $attribute : $attribute;
                     $history = new History([
                         'table' => $table,
-                        'column' => $attribute,
+                        'column' => $column,
                         'row' => $row,
                         'changed_by' => $identity,
                         'changed_at' => $date,
@@ -168,21 +177,34 @@ class HistoryBehavior extends Behavior
     }
 
     /**
-     * @TODO
+     * Extract the format that is given in the [[attributes]] array.
      */
     public function formatOf($column, $default = 'text')
     {
-        return array_key_exists($column, $this->attributes)
-            ? $this->attributes[$column]
+        if (($pos = strrpos($column, '.')) !== false) {
+            $model = substr($column, 0, $pos);
+            $column = substr($column, $pos + 1);
+            $class = '\\app\\models\\' . Inflector::camelize('screen_capture');
+            $model = new $class();
+            $behavior = $model->getBehavior('HistoryBehavior');
+            $attributes = $behavior->attributes;
+            unset($model);
+        } else {
+            $attributes = $this->attributes;
+        }
+
+        //var_dump($behavior->attributes);
+        return array_key_exists($column, $attributes)
+            ? $attributes[$column]
             : $default;
     }
 
     /**
-     * @TODO
+     * Determine the icon of the history item based on the value given in
+     * the [[attributes]] array.
      */
     public function iconOf($model)
     {
-
         if ($model->new_value == '') {
             return '<i class="glyphicon glyphicon-log-out"></i>';
         } else if ($model->old_value == '') {
