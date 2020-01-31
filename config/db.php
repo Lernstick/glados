@@ -6,4 +6,7 @@ return [
     'username' => 'exam',
     'password' => 'mysqlpassword',
     'charset' => 'utf8',
+	'as history' => [
+    	'class' => 'app\components\HistoryConnectionBehavior',
+    ],
 ];

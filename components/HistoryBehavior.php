@@ -84,6 +84,7 @@ class HistoryBehavior extends Behavior
         $transaction = $connection->transaction;
         if ($transaction !== null && $transaction->isActive) {
             //continue here for active transactions
+            var_dump($transaction->commit_id);
         }
 
         if ($event->name == \yii\db\ActiveRecord::EVENT_AFTER_UPDATE) {
