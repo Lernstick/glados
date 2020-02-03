@@ -37,7 +37,9 @@ class HistoryBehavior extends Behavior
      */
     public $relation;
 
-
+    /**
+     * @var string id of the current active transaction (if there is one)
+     */
     public $commit_id;
 
     /**
