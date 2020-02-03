@@ -63,9 +63,9 @@ class ScreenCapture extends \yii\db\ActiveRecord
     {
         return [
             'id' => \Yii::t('exams', 'ID'),
-            'enabled' => \Yii::t('exams', 'Screen capturing enabled'),
-            'quality' => \Yii::t('exams', 'Screen capture quality'),
-            'command' => \Yii::t('exams', 'Screen capture command'),
+            'enabled' => \Yii::t('exams', 'Screen capture: Enabled'),
+            'quality' => \Yii::t('exams', 'Screen capture: Quality'),
+            'command' => \Yii::t('exams', 'Screen capture: Command'),
         ];
     }
 

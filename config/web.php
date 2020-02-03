@@ -17,6 +17,7 @@ $config = [
             'class' => 'app\components\BootstrapSettings',
             'params' => $params,
         ],
+        'app\components\BootstrapHistory',
     ],
     'timezone' => 'Europe/Zurich',
     'vendorPath' => '/usr/share/yii2',

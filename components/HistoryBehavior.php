@@ -38,6 +38,8 @@ class HistoryBehavior extends Behavior
     public $relation;
 
 
+    public $commit_id;
+
     /**
      * @inheritdoc 
      */
@@ -47,7 +49,9 @@ class HistoryBehavior extends Behavior
             // adds new history records upon updating the main record
             \yii\db\ActiveRecord::EVENT_AFTER_UPDATE => 'historyAdd',
             // removes records after deleting the main record
-            \yii\db\ActiveRecord::EVENT_AFTER_DELETE => 'historyDelete'
+            \yii\db\ActiveRecord::EVENT_AFTER_DELETE => 'historyDelete',
+            // establishes a connection id
+            \yii\db\Connection::EVENT_BEGIN_TRANSACTION => 'transactionBegin',
         ];
     }
 
@@ -80,19 +84,20 @@ class HistoryBehavior extends Behavior
     public function historyAdd($event)
     {
 
-        $connection = \Yii::$app->db;
-        $transaction = $connection->transaction;
-        if ($transaction !== null && $transaction->isActive) {
-            //continue here for active transactions
-            var_dump($transaction->commit_id);
-        }
-
         if ($event->name == \yii\db\ActiveRecord::EVENT_AFTER_UPDATE) {
+
+            $transaction = \Yii::$app->db->transaction;
+            // if we are in an active transaction, use the commit_id as hash
+            if ($transaction !== null && $transaction->isActive) {
+                $hash = \Yii::$app->db->getBehavior('history')->commit_id;
+            } else {
+                $hash = bin2hex(openssl_random_pseudo_bytes(8));
+            }
+
             $attributes = (array) array_keys($this->attributes);
             $date = microtime(true);
             list($table, $row) = $this->relation();
             $identity = $this->identity();
-            $hash = bin2hex(openssl_random_pseudo_bytes(8));
 
             // if it's a translated field remove the attribute, but add the 
             // two real attributes "attribute_id" and "attribute_data"
@@ -194,7 +199,6 @@ class HistoryBehavior extends Behavior
             $attributes = $this->attributes;
         }
 
-        //var_dump($behavior->attributes);
         return array_key_exists($column, $attributes)
             ? $attributes[$column]
             : $default;
@@ -217,6 +221,16 @@ class HistoryBehavior extends Behavior
         } else {
             return '<i class="glyphicon glyphicon-edit"></i>';
         }
+    }
+
+    /**
+     * Set an id for the whole transaction. This will then be used as hash for the 
+     * history item to determine which items belong together.
+     * @param Event $event
+     */
+    public function transactionBegin($event)
+    {
+        $this->commit_id = bin2hex(openssl_random_pseudo_bytes(8));
     }
 
 }
