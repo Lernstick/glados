@@ -6,6 +6,7 @@ use Yii;
 use yii\base\Model;
 use yii\widgets\ActiveForm;
 use app\models\Exam;
+use app\models\ExamSetting;
 use app\models\ScreenCapture;
 
 class ExamForm extends Model
@@ -13,12 +14,14 @@ class ExamForm extends Model
 
     private $_exam;
     private $_screenCapture;
+    private $_settings;
 
     public function rules()
     {
         return [
             [['Exam'], 'required'],
             [['ScreenCapture'], 'safe'],
+            [['ExamSettings'], 'safe'],
         ];
     }
 
@@ -36,16 +39,44 @@ class ExamForm extends Model
             return false;
         }
         $transaction = Yii::$app->db->beginTransaction();
+
         if (!$this->screenCapture->save()) {
             $transaction->rollBack();
             return false;
         }
+
         if (!$this->exam->save()) {
             $transaction->rollBack();
             return false;
         }
+
+        if (!$this->saveSettings()) {
+            $transaction->rollBack();
+            return false;
+        }
+
         $this->exam->link('screenCapture', $this->screenCapture);
         $transaction->commit();
+        return true;
+    }
+
+    public function saveSettings() 
+    {
+        $keep = [];
+        foreach ($this->examSettings as $setting) {
+            $setting->exam_id = $this->exam->id;
+            if (!$setting->save(false)) {
+                return false;
+            }
+            $keep[] = $setting->id;
+        }
+        $query = ExamSetting::find()->andWhere(['exam_id' => $this->exam->id]);
+        if ($keep) {
+            $query->andWhere(['not in', 'exam_setting.id', $keep]);
+        }
+        foreach ($query->all() as $setting) {
+            $setting->delete();
+        }        
         return true;
     }
 
@@ -84,6 +115,38 @@ class ExamForm extends Model
         }
     }
 
+    public function getExamSettings()
+    {
+        if ($this->_settings === null) {
+            $this->_settings = $this->exam->isNewRecord ? [] : $this->exam->settings;
+        }
+        return $this->_settings;
+    }
+
+    private function getExamSetting($key)
+    {
+        $setting = $key && strpos($key, 'new') === false ? ExamSetting::findOne($key) : false;
+        if (!$setting) {
+            $setting = new ExamSetting();
+            $setting->loadDefaultValues();
+        }
+        return $setting;
+    }
+
+    public function setExamSettings($settings)
+    {
+        unset($settings['__id__']); // remove the hidden "new ExamSetting" row
+        $this->_settings = [];
+        foreach ($settings as $key => $setting) {
+            if (is_array($setting)) {
+                $this->_settings[$key] = $this->getExamSetting($key);
+                $this->_settings[$key]->setAttributes($setting);
+            } elseif ($setting instanceof ExamSetting) {
+                $this->_settings[$setting->id] = $setting;
+            }
+        }
+    }
+
     public function errorSummary($form)
     {
         $errorLists = [];
@@ -103,6 +166,9 @@ class ExamForm extends Model
             'Exam' => $this->exam,
             'ScreenCapture' => $this->screenCapture,
         ];
+        foreach ($this->examSettings as $id => $setting) {
+            $models['ExamSetting.' . $id] = $this->examSettings[$id];
+        }
         return $models;
     }
 

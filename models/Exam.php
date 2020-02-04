@@ -259,6 +259,11 @@ class Exam extends Base
         return $this->hasOne(ScreenCapture::className(), ['id' => 'screen_capture_id']);
     }
 
+    public function getSettings()
+    {
+        return $this->hasMany(ExamSetting::className(), ['exam_id' => 'id']);
+    }
+
     /* Getter for user name */
     public function getUserName()
     {

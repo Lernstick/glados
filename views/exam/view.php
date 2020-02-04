@@ -214,6 +214,15 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php Pjax::end(); ?>
 
     <?php Pjax::begin([
+        'id' => 'options',
+        'options' => ['class' => 'tab-pane fade'],
+    ]); ?>
+
+    asdasd
+
+    <?php Pjax::end(); ?>
+
+    <?php Pjax::begin([
         'id' => 'settings',
         'options' => ['class' => 'tab-pane fade'],
     ]); ?>

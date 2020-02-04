@@ -47,6 +47,13 @@ $this->registerJs($active_tabs);
     </li>
     <li>
         <?= Html::a(
+            '<i class="glyphicon glyphicon-cog"></i> ' . \Yii::t('exams', 'Options'),
+            Url::to(['exam/view', 'id' => $model->id, '#' => 'options']),
+            ['data-toggle' => '']
+        ); ?>
+    </li>
+    <li>
+        <?= Html::a(
             '<i class="glyphicon glyphicon-th"></i> ' . \Yii::t('exams', 'Monitor'),
             Url::to(['exam/view', 'id' => $model->id, 'mode' => 'monitor', '#' => 'monitor']),
             ['data-toggle' => '']

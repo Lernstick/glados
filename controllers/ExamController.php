@@ -5,6 +5,8 @@ namespace app\controllers;
 use Yii;
 use app\models\Exam;
 use app\models\ExamSearch;
+use app\models\ExamSetting;
+use app\models\ExamSettingAvail;
 use app\models\ScreenCapture;
 use app\models\forms\ExamForm;
 use app\models\Ticket;
@@ -78,16 +80,22 @@ class ExamController extends Controller
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             $out = [];
             if (!is_null($attr)) {
-                $searchModel = new ExamSearch();
                 if ($attr == 'name') {
+                    $searchModel = new ExamSearch();
                     $out = $searchModel->selectList('name', $q, $page, $per_page);
                 } else if ($attr == 'subject') {
+                    $searchModel = new ExamSearch();
                     $out = $searchModel->selectList('subject', $q, $page, $per_page);
                 } else if ($attr == 'resultExam') {
+                    $searchModel = new ExamSearch();
                     $attr = 'CONCAT(name, " - ", subject)';
                     $out = $searchModel->selectList($attr, $q, $page, $per_page, 'id', false, 'name');
+                } else if ($attr == 'settings') {
+                    $searchModel = new ExamSettingAvail();
+                    $out = $searchModel->selectList('name', $q, $page, $per_page, 'key', false);
                 }
             }
+
             return $out;
         } 
     }
@@ -286,6 +294,17 @@ class ExamController extends Controller
                     [ 'n' => $model->exam->runningTicketCount ]
                 ));
                 return $this->redirect(['view', 'id' => $model->exam->id]);
+            }
+
+            if (is_array(Yii::$app->request->post('setting'))) {
+                $setting = new ExamSetting([
+                    'key' => Yii::$app->request->post('setting')['key']
+                ]);
+                return $this->renderAjax('setting/value', [
+                    'id' => Yii::$app->request->post('setting')['id'],
+                    'form' => null,
+                    'setting' => $setting,
+                ]);
             }
 
             if (Yii::$app->request->post() && $model->save()) {

@@ -3,7 +3,10 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
+use app\models\ExamSetting;
+use app\models\ExamSettingAvail;
 use yii\widgets\Pjax;
+use kartik\select2\Select2;
 use yii\web\JsExpression;
 use limion\jqueryfileupload\JQueryFileUpload;
 use kartik\range\RangeInput;
@@ -14,6 +17,9 @@ use kartik\range\RangeInput;
 
 $exam = $model->exam;
 $screenCapture = $model->screenCapture;
+
+$setting = new ExamSetting();
+$setting->loadDefaultValues();
 
 if(($exam->file && Yii::$app->file->set($exam->file)->exists) || ($exam->file2 && Yii::$app->file->set($exam->file2)->exists)) {
     $this->registerJs('var files = [];');
@@ -161,16 +167,147 @@ $("input[name='Exam[screenshots]']").click(function(){
 SCRIPT;
 $this->registerJs($js);
 
-?>
 
+$id = count($model->examSettings);
+$setting_k = isset($id) ? str_replace('new', '', $id) : 0;
+$this->registerJs('var setting_k = ' . $setting_k . ';');
+$url = \yii\helpers\Url::to(['exam/index', 'mode' => 'list', 'attr' => 'settings']);
+$placeholder = \Yii::t('exam', 'Choose a setting ...');
+$js = <<< SCRIPT
+select2_config = {
+    id: "ExamSettings_{$id}_key",
+    name: "ExamSettings[$id][key]",
+    theme: 'krajee',
+    dropdownAutoWidth: true,
+    width: 'auto',
+    allowClear: true,
+    placeholder: "{$placeholder}",
+    ajax: {
+        url: "{$url}",
+        dataType: 'json',
+        delay: 250,
+        cache: true,
+        data: function (params) {
+            return {
+                q: params.term,
+                page: params.page,
+                per_page: 10
+            };
+        },
+        processResults: function(data, page) {
+            data.results.forEach(function(el, idx){
+                var self = this;
+                $("[id^=ExamSettings_][id$=_key]").each(function (){
+                    if ($(this).attr('id') != "ExamSettings___id___key") {
+                        if ($(this).find(':selected').attr('value') == self[idx].id) {
+                            self[idx].disabled = true;
+                        }
+                    }
+                })
+            }, data.results);
+
+            return {
+                results: data.results,
+                pagination: {
+                    more: data.results.length === 10
+                }
+            };
+        },
+    },
+    escapeMarkup: function (markup) { return markup; },
+    templateResult: function(q) { return q.text; },
+    templateSelection: function (q) { return q.text; },
+};
+
+// new setting button
+$('#exam-new-setting-button').on('click', function () {
+    setting_k += 1;
+
+    $('#exam_setting').append($('#exam-new-setting-block').html().replace(/__id__/g, 'new' + setting_k));
+    $(".itemnew" + setting_k).find("select").select2(select2_config);
+    $(".itemnew" + setting_k).find("select").on('select2:select select2:unselect', selected);
+});
+
+selected = function (e) {
+    console.log("e",e);
+    var data = e.params.data;
+    var id = $(e.target).attr('data-id');
+
+    if (e.type == 'select2:select') {
+        $(e.target).parent().find('label').next('a').remove();
+        $(e.target).parent().find('label').after('&nbsp<a tabindex="0" role="button" class="hint glyphicon glyphicon-question-sign"></a>');
+
+        $(e.target).parent().find('a.hint').popover({
+            html: true,
+            trigger: 'focus',
+            placement: 'right',
+            title:  e.params.data.text,
+            toggle: 'popover',
+            container: 'body',
+            content: e.params.data.hint
+        });
+
+        $.pjax.reload({
+            container: "#item" + id,
+            fragment: "body",
+            type: 'POST',
+            data: {
+                'setting[id]': id,
+                'setting[key]': e.params.data.id,
+                '_csrf': $("input[name='_csrf']").val()
+            },
+            async:true
+        });
+    } else if (e.type == 'select2:unselect') {
+        $(e.target).parent().find('label').next('a').remove();
+
+        $.pjax.reload({
+            container: "#item" + id,
+            fragment: "body",
+            type: 'POST',
+            data: {
+                'setting[id]': '__id__',
+                'setting[key]': 'default',
+                '_csrf': $("input[name='_csrf']").val()
+            },
+            async:true
+        });
+    }
+}
+
+// remove setting button
+$(document).on('click', '.exam-remove-setting-button', function () {
+    $(this).closest('div.item').remove();
+});
+
+// activate select2 for all existing elements except of the template element
+$("[id^=ExamSettings_][id$=_key]").each(function (){
+    if ($(this).attr('id') != "ExamSettings___id___key") {
+        $(this).select2(select2_config);
+        $(this).on('select2:select select2:unselect', selected);
+    }
+})
+
+SCRIPT;
+$this->registerJs($js);
+
+?>
 <div class="exam-form">
 
     <?php $form = $step == 0 || $step == 2 ? ActiveForm::begin([
         'options' => ['enctype' => 'multipart/form-data'],
+        'enableClientValidation' => false,
     ]) : ActiveForm::begin([
         'options' => ['enctype' => 'multipart/form-data'],
-        'action' => ['create', '#' => 'file']
+        'action' => ['create', '#' => 'file'],
+        'enableClientValidation' => false,
     ]); ?>
+
+    <?= $model->errorSummary($form); ?>
+
+    <div style="display:none;">
+        <?= $form->field($exam, 'id')->widget(Select2::classname(), []); ?>
+    </div>
 
     <ul class="nav nav-tabs">
         <li class="active"><a data-toggle="tab" href="#general">
@@ -188,6 +325,13 @@ $this->registerJs($js);
             <?= Html::a(
                 '<i class="glyphicon glyphicon-camera"></i> ' . \Yii::t('exams', 'Screen Capture'),
                 '#screen_capture',
+                ['data-toggle' => 'tab']
+            ) ?>
+        </li>
+        <li>
+            <?= Html::a(
+                '<i class="glyphicon glyphicon-cog"></i> ' . \Yii::t('exams', 'Settings'),
+                '#settings',
                 ['data-toggle' => 'tab']
             ) ?>
         </li>
@@ -346,6 +490,44 @@ $this->registerJs($js);
             <?= $form->field($screenCapture, 'quality')->textInput(['maxlength' => true]) ?>
         </div>
     </div>
+
+    <?php Pjax::end(); ?>
+
+    <?php Pjax::begin([
+        'id' => 'settings',
+        'options' => ['class' => 'tab-pane fade'],
+    ]); ?>
+
+    <br>
+
+    <legend>Settings
+        <?= Html::a('New Setting', 'javascript:void(0);', [
+            'id' => 'exam-new-setting-button', 
+            'class' => 'pull-right btn btn-default btn-xs'
+        ]); ?>
+    </legend>
+
+    <div id="exam_setting">
+        <?php
+        // existing setting fields
+        foreach ($model->examSettings as $id => $_setting) {
+          echo $this->render('_form_exam_setting', [
+            'id' => $_setting->isNewRecord ? (strpos($id, 'new') !== false ? $id : 'new' . $id) : $_setting->id,
+            'form' => $form,
+            'setting' => $_setting,
+          ]);
+        }
+
+        echo '<div id="exam-new-setting-block" style="display:none;">';
+        echo $this->render('_form_exam_setting', [
+            'id' => '__id__',
+            'form' => $form,
+            'setting' => $setting,
+        ]);
+        echo '</div>'
+        ?>
+    </div>
+
 
     <?php Pjax::end(); ?>
 
