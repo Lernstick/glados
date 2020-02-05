@@ -180,6 +180,7 @@ class TranslatedActiveRecord extends Base
 
     /**
      * Automatic insertion/update of the data in the translation table
+     * when the correspongding record is updated.
      *
      * @return void
      */

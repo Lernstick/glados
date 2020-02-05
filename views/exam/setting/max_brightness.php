@@ -5,6 +5,7 @@ use kartik\range\RangeInput;
 /* @var $id integer */
 /* @var $form yii\widgets\ActiveForm */
 /* @var $setting app\models\ExamSetting */
+/* @var $members app\models\ExamSetting[] */
 
 ?>
 
@@ -17,4 +18,4 @@ use kartik\range\RangeInput;
     'html5Options' => ['min' => 0, 'max' => 100, 'step' => 1],
     'html5Container' => ['style' => 'width:80%'],
     'addon' => ['append' => ['content' => '%']]
-]) ?>
+])->label($setting->detail->name) ?>

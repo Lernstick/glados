@@ -20,8 +20,7 @@ class ExamForm extends Model
     {
         return [
             [['Exam'], 'required'],
-            [['ScreenCapture'], 'safe'],
-            [['ExamSettings'], 'safe'],
+            [['ScreenCapture', 'ExamSettings'], 'safe'],
         ];
     }
 
@@ -68,6 +67,11 @@ class ExamForm extends Model
             if (!$setting->save(false)) {
                 return false;
             }
+            if ($setting->detail->belongs_to !== null && $setting->belongs_to !== null) {
+                if (array_key_exists($setting->belongs_to, $this->examSettings)) {
+                    $setting->link('belongsTo', $this->examSettings[$setting->belongs_to]);
+                }
+            }
             $keep[] = $setting->id;
         }
         $query = ExamSetting::find()->andWhere(['exam_id' => $this->exam->id]);
@@ -100,7 +104,6 @@ class ExamForm extends Model
         }
     }
 
-
     public function getScreenCapture()
     {
         return $this->_screenCapture;
@@ -128,7 +131,7 @@ class ExamForm extends Model
         $setting = $key && strpos($key, 'new') === false ? ExamSetting::findOne($key) : false;
         if (!$setting) {
             $setting = new ExamSetting();
-            $setting->loadDefaultValues();
+            $setting->loadDefaultValue();
         }
         return $setting;
     }
@@ -149,15 +152,7 @@ class ExamForm extends Model
 
     public function errorSummary($form)
     {
-        $errorLists = [];
-        foreach ($this->getAllModels() as $id => $model) {
-            $errorList = $form->errorSummary($model, [
-              'header' => '<p>Please fix the following errors for <b>' . $id . '</b></p>',
-            ]);
-            $errorList = str_replace('<li></li>', '', $errorList); // remove the empty error
-            $errorLists[] = $errorList;
-        }
-        return implode('', $errorLists);
+        return $form->errorSummary($this->getAllModels());
     }
 
     private function getAllModels()

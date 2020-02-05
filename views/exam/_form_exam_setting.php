@@ -7,18 +7,22 @@ use yii\widgets\Pjax;
 /* @var $id integer */
 /* @var $form yii\widgets\ActiveForm */
 /* @var $setting app\models\ExamSetting */
+/* @var $members app\models\ExamSetting[] */
+
+$name = $setting->detail === null ? $setting->key : $setting->detail->name;
+$description = $setting->detail === null ? $setting->key : $setting->detail->description;
 
 ?>
 
 <div class="row item item<?= $id ?>">
     <div class="col-md-4">
         <?= $form->field($setting, 'key')->dropdownList($id == "__id__" ? [] : [
-            $setting->key => $setting->detail->name,
+            $setting->key => $name,
         ], [
             'id' => "ExamSettings_{$id}_key",
             'name' => "ExamSettings[$id][key]",
             'data-id' => $id,
-        ])->hint($id == "__id__" ? false : $setting->detail->description); ?>
+        ])->hint($id == "__id__" ? false : $description); ?>
     </div>
 
     <?php Pjax::begin([
@@ -33,6 +37,7 @@ use yii\widgets\Pjax;
         'id' => $id,
         'form' => $form,
         'setting' => $setting,
+        'members' => $members,
     ]);
 
     ?>

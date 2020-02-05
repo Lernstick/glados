@@ -172,7 +172,7 @@ $id = count($model->examSettings);
 $setting_k = isset($id) ? str_replace('new', '', $id) : 0;
 $this->registerJs('var setting_k = ' . $setting_k . ';');
 $url = \yii\helpers\Url::to(['exam/index', 'mode' => 'list', 'attr' => 'settings']);
-$placeholder = \Yii::t('exam', 'Choose a setting ...');
+$placeholder = \Yii::t('exams', 'Choose a setting ...');
 $js = <<< SCRIPT
 select2_config = {
     id: "ExamSettings_{$id}_key",
@@ -229,7 +229,6 @@ $('#exam-new-setting-button').on('click', function () {
 });
 
 selected = function (e) {
-    console.log("e",e);
     var data = e.params.data;
     var id = $(e.target).attr('data-id');
 
@@ -511,21 +510,31 @@ $this->registerJs($js);
         <?php
         // existing setting fields
         foreach ($model->examSettings as $id => $_setting) {
-          echo $this->render('_form_exam_setting', [
-            'id' => $_setting->isNewRecord ? (strpos($id, 'new') !== false ? $id : 'new' . $id) : $_setting->id,
-            'form' => $form,
-            'setting' => $_setting,
-          ]);
+            if ($_setting->detail === null || $_setting->detail->belongs_to === null) {
+                $id = $_setting->isNewRecord ? (strpos($id, 'new') !== false ? $id : 'new' . $id) : $_setting->id;
+                $members = [];
+                foreach ($model->examSettings as $s) {
+                    if($id == $s->belongs_to) {
+                        $members[] = $s;
+                    }
+                }
+                echo $this->render('_form_exam_setting', [
+                    'id' => $id,
+                    'form' => $form,
+                    'setting' => $_setting,
+                    'members' => $members,
+                ]);
+            }
         }
-
-        echo '<div id="exam-new-setting-block" style="display:none;">';
-        echo $this->render('_form_exam_setting', [
+        ?>
+        <div id="exam-new-setting-block" style="display:none;">
+        <?= $this->render('_form_exam_setting', [
             'id' => '__id__',
             'form' => $form,
             'setting' => $setting,
-        ]);
-        echo '</div>'
-        ?>
+            'members' => [],
+        ]); ?>
+        </div>
     </div>
 
 

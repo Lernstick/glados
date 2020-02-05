@@ -300,10 +300,12 @@ class ExamController extends Controller
                 $setting = new ExamSetting([
                     'key' => Yii::$app->request->post('setting')['key']
                 ]);
+                $setting->loadDefaultValue();
                 return $this->renderAjax('setting/value', [
                     'id' => Yii::$app->request->post('setting')['id'],
                     'form' => null,
                     'setting' => $setting,
+                    'members' => [],
                 ]);
             }
 
@@ -325,6 +327,7 @@ class ExamController extends Controller
 
             }
         } else if ($mode === 'upload') {
+            $model = $model->exam;
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
             $file = UploadedFile::getInstanceByName('file');

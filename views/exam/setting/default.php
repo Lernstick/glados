@@ -3,6 +3,7 @@
 /* @var $id integer */
 /* @var $form yii\widgets\ActiveForm */
 /* @var $setting app\models\ExamSetting */
+/* @var $members app\models\ExamSetting[] */
 
 ?>
 

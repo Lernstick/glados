@@ -55,7 +55,7 @@ class ExamSettingAvail extends TranslatedActiveRecord
 
         $id = is_null($id) ? $attr : $id;
 
-        $query = $this->find();
+        $query = $this->find()->where(['belongs_to' => null]);
 
         if (!is_null($q) && $q != '') {
             $query->having(['like', $attr, $q]);
@@ -88,6 +88,22 @@ class ExamSettingAvail extends TranslatedActiveRecord
             ];
         }
         return $out;
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBelongsTo()
+    {
+        return $this->hasOne(ExamSettingAvail::className(), ['id' => 'belongs_to']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMembers()
+    {
+        return $this->hasMany(ExamSettingAvail::className(), ['belongs_to' => 'id']);
     }
 
     /** 
