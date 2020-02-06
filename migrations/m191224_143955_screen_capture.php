@@ -12,6 +12,7 @@ class m191224_143955_screen_capture extends Migration
     public $scTable = 'screen_capture';
     public $settingTable = 'exam_setting';
     public $availableSettingTable = 'exam_setting_avail';
+    public $historyTable = 'history';
     public $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
 
     /**
@@ -50,7 +51,7 @@ class m191224_143955_screen_capture extends Migration
                 'key' => $this->text(),
                 'value' => $this->text(),
                 'belongs_to' => $this->integer(11),
-                'exam_id' => $this->integer(11)->notNull(),
+                'exam_id' => $this->integer(11)->null(),
             ], $this->tableOptions);
 
             $this->createIndex('idx-exam_id', $this->settingTable, 'exam_id');
@@ -106,7 +107,7 @@ class m191224_143955_screen_capture extends Migration
         $libre_autosave_path = new ExamSettingAvail([
             'key' => 'libre_autosave_path',
             'name' => yiit('exams', 'Libreoffice: Save AutoRecovery information path'),
-            'type' => 'string',
+            'type' => 'text',
             'default' => '/home/user/.config/libreoffice/4/user/tmp',
             'belongs_to' => $libre_autosave->id,
         ]);
@@ -127,7 +128,7 @@ class m191224_143955_screen_capture extends Migration
         $libre_createbackup_path = new ExamSettingAvail([
             'key' => 'libre_createbackup_path',
             'name' => yiit('exams', 'Libreoffice: Always create backup copy path'),
-            'type' => 'string',
+            'type' => 'text',
             'default' => '/home/user/.config/libreoffice/4/user/backup',
             'belongs_to' => $libre_createbackup->id,
         ]);
@@ -137,8 +138,8 @@ class m191224_143955_screen_capture extends Migration
         $max_brightness = new ExamSettingAvail([
             'key' => 'max_brightness',
             'name' => yiit('exams', 'Maximum brightness'),
-            'type' => 'range',
-            'default' => 100,
+            'type' => 'percent',
+            'default' => 1,
             'description' => yiit('exams', 'Maximum screen brightness in percent. Notice that some devices have buttons to adjust screen brightness on hardware level. This cannot be controlled by this setting.'),
         ]);
         $max_brightness->save(false);
@@ -164,6 +165,7 @@ class m191224_143955_screen_capture extends Migration
         ]);
         $screenshots_interval->save(false);
 
+        $this->addColumn($this->historyTable, 'type', $this->boolean()->notNull()->defaultValue(0));
     }
 
     /**
@@ -187,5 +189,6 @@ class m191224_143955_screen_capture extends Migration
             $this->dropTable($this->availableSettingTable);
         }
 
+        $this->dropColumn($this->historyTable, 'type');
     }
 }

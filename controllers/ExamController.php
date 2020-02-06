@@ -264,6 +264,19 @@ class ExamController extends Controller
         $model->exam = new Exam();
         $model->setAttributes(Yii::$app->request->post());
 
+        if (is_array(Yii::$app->request->post('setting'))) {
+            $setting = new ExamSetting([
+                'key' => Yii::$app->request->post('setting')['key']
+            ]);
+            $setting->loadDefaultValue();
+            return $this->renderAjax('setting/value', [
+                'id' => Yii::$app->request->post('setting')['id'],
+                'form' => null,
+                'setting' => $setting,
+                'members' => [],
+            ]);
+        }
+
         if (Yii::$app->request->post() && $model->save()) {
             return $this->redirect(['update', 'id' => $model->exam->id, 'step' => 2]);
         } else {

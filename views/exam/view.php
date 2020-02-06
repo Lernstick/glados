@@ -218,7 +218,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'options' => ['class' => 'tab-pane fade'],
     ]); ?>
 
-    asdasd
+    <?= var_dump($model->settings); ?>
 
     <?php Pjax::end(); ?>
 

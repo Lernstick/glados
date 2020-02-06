@@ -7,6 +7,7 @@ use kartik\range\RangeInput;
 /* @var $setting app\models\ExamSetting */
 /* @var $members app\models\ExamSetting[] */
 
+$setting->value *= 100;
 ?>
 
 <?= $form->field($setting, 'value')->widget(RangeInput::classname(), [

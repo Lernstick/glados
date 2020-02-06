@@ -16,9 +16,11 @@ use yii\db\ActiveRecord;
  * @property integer $changed_by
  * @property string $old_value
  * @property string $new_value
+ * @property integer $type
  * @property string $columns
  * @property string $new_values
  * @property string $old_values
+ * @property string $types
  *
  * @property User $user
  * @property string $userName
@@ -29,11 +31,17 @@ class History extends \yii\db\ActiveRecord
     public $columns_db;
     public $old_values_db;
     public $new_values_db;
+    public $types_db;
 
     /**
      * @const string separator of the `GROUP_CONCAT()` query
      */
     const SEPARATOR = '::';
+
+    /* history type constants */
+    const TYPE_UPDATE = 0;
+    const TYPE_INSERT = 1;
+    const TYPE_DELETE = 2;
 
     /**
      * @var string the filter for the column in the form 
@@ -70,7 +78,8 @@ class History extends \yii\db\ActiveRecord
             'changed_by' => \Yii::t('history', 'Changed By'),
             'old_value' => \Yii::t('history', 'Old Value'),
             'new_value' => \Yii::t('history', 'New Value'),
-            'Hash' => \Yii::t('history', 'Hash'),
+            'hash' => \Yii::t('history', 'Hash'),
+            'type' => \Yii::t('history', 'Type'),
         ];
     }
 
@@ -134,6 +143,16 @@ class History extends \yii\db\ActiveRecord
     }
 
     /**
+     * Getter the types array
+     *
+     * @return array 
+     */
+    public function getTypes()
+    {
+        return array_map('intval', explode(History::SEPARATOR, $this->types_db));
+    }
+
+    /**
      * @return \yii\db\ActiveQuery
      */
     private function diff()
@@ -179,7 +198,8 @@ class History extends \yii\db\ActiveRecord
             new \yii\db\Expression('
                 GROUP_CONCAT(`column` ORDER BY `id` DESC SEPARATOR "' . History::SEPARATOR . '") as `columns_db`,
                 GROUP_CONCAT(IFNULL(`new_value`, "") ORDER BY `id` DESC SEPARATOR "' . History::SEPARATOR . '") as `new_values_db`,
-                GROUP_CONCAT(IFNULL(`old_value`, "") ORDER BY `id` DESC SEPARATOR "' . History::SEPARATOR . '") as `old_values_db`'),
+                GROUP_CONCAT(IFNULL(`old_value`, "") ORDER BY `id` DESC SEPARATOR "' . History::SEPARATOR . '") as `old_values_db`,
+                GROUP_CONCAT(IFNULL(`type`, "") ORDER BY `id` DESC SEPARATOR "' . History::SEPARATOR . '") as `types_db`'),
         ])->groupBy('hash')
         ->orderBy(['changed_at' => SORT_DESC]);
 

@@ -35,7 +35,7 @@ class ScreenCapture extends \yii\db\ActiveRecord
         return [
             'HistoryBehavior' => [
                 'class' => HistoryBehavior::className(),
-                'relation' => ['exam', 'screen_capture_id'],
+                'relation' => 'exam',
                 'attributes' => [
                     'enabled' => 'boolean',
                     'quality' => 'text',

@@ -167,8 +167,17 @@ $("input[name='Exam[screenshots]']").click(function(){
 SCRIPT;
 $this->registerJs($js);
 
+// load default settings if there are some
+if (count($model->examSettings) == 0
+    && $exam->isNewRecord
+    && empty(Yii::$app->request->post())
+) {
+    $ExamSettings = $model->defaultExamSettings;
+} else {
+    $ExamSettings = $model->examSettings;
+}
 
-$id = count($model->examSettings);
+$id = count($ExamSettings);
 $setting_k = isset($id) ? str_replace('new', '', $id) : 0;
 $this->registerJs('var setting_k = ' . $setting_k . ';');
 $url = \yii\helpers\Url::to(['exam/index', 'mode' => 'list', 'attr' => 'settings']);
@@ -509,11 +518,17 @@ $this->registerJs($js);
     <div id="exam_setting">
         <?php
         // existing setting fields
-        foreach ($model->examSettings as $id => $_setting) {
+        foreach ($ExamSettings as $id => $_setting) {
             if ($_setting->detail === null || $_setting->detail->belongs_to === null) {
-                $id = $_setting->isNewRecord ? (strpos($id, 'new') !== false ? $id : 'new' . $id) : $_setting->id;
+                $id = $_setting->isNewRecord
+                    ? (strpos($id, 'new') !== false
+                        ? $id
+                        : 'new' . $id)
+                    : ($_setting->exam_id === null
+                        ? 'new' . $id
+                        : $_setting->id);
                 $members = [];
-                foreach ($model->examSettings as $s) {
+                foreach ($ExamSettings as $s) {
                     if($id == $s->belongs_to) {
                         $members[] = $s;
                     }

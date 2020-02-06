@@ -121,7 +121,7 @@ class ExamForm extends Model
     public function getExamSettings()
     {
         if ($this->_settings === null) {
-            $this->_settings = $this->exam->isNewRecord ? [] : $this->exam->settings;
+            $this->_settings = $this->exam->isNewRecord ? [] : $this->exam->exam_setting;
         }
         return $this->_settings;
     }
@@ -134,6 +134,11 @@ class ExamForm extends Model
             $setting->loadDefaultValue();
         }
         return $setting;
+    }
+
+    public function getDefaultExamSettings()
+    {
+        return ExamSetting::find()->where(['exam_id' => null])->all();
     }
 
     public function setExamSettings($settings)

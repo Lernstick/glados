@@ -259,9 +259,23 @@ class Exam extends Base
         return $this->hasOne(ScreenCapture::className(), ['id' => 'screen_capture_id']);
     }
 
-    public function getSettings()
+    /**
+     * @return \yii\db\ActiveQuery[]
+     */
+    public function getExam_setting()
     {
         return $this->hasMany(ExamSetting::className(), ['exam_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery[]
+     */
+    public function getSettings()
+    {
+        return array_combine(
+            array_column($this->exam_setting, 'key'),
+            array_column($this->exam_setting, 'formattedValue')
+        );
     }
 
     /* Getter for user name */
@@ -470,10 +484,7 @@ class Exam extends Base
      */
     public function getInfo()
     {
-        //var_dump(Yii::$app->squashfs->set($this->file));die();
-        $x = '';
-        //$x .= 'root passwoord ' . (Yii::$app->squashfs->set($this->file)->file_exists('/etc/passwd') ? 'not ' : '') . 'set.';
-        return $x;
+        return '';
     }
 
     public function validateRunningTickets($attribute, $params)

@@ -536,21 +536,13 @@ class TicketController extends Controller
         } else {
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             return [
-                'config' => [
+                'config' => array_merge([
                     'grp_netdev' => boolval($model->exam->{"grp_netdev"}),
                     'allow_sudo' => boolval($model->exam->{"allow_sudo"}),
                     'allow_mount' => boolval($model->exam->{"allow_mount"}),
                     'firewall_off' => boolval($model->exam->{"firewall_off"}),
-                    'screenshots' => boolval($model->exam->{"screenshots"}),
-                    'screenshots_interval' => intval($model->exam->{"screenshots_interval"}),
-                    'libre_autosave' => boolval($model->exam->{"libre_autosave"}),
-                    'libre_autosave_path' => $model->exam->{"libre_autosave_path"},
-                    'libre_autosave_interval' => intval($model->exam->{"libre_autosave_interval"}),
-                    'libre_createbackup' => boolval($model->exam->{"libre_createbackup"}),
-                    'libre_createbackup_path' => $model->exam->{"libre_createbackup_path"},
                     'url_whitelist' => implode(PHP_EOL, preg_split("/\r\n|\n|\r/", $model->exam->{"url_whitelist"}, null, PREG_SPLIT_NO_EMPTY)),
-                    'max_brightness' => intval($model->exam->{"max_brightness"}),
-                ]
+                ], $model->exam->settings)
             ];
         }
     }
