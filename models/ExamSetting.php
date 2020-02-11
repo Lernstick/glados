@@ -15,12 +15,6 @@ use app\components\HistoryBehavior;
  */
 class ExamSetting extends Base
 {
-
-
-    public function __toString() {
-        return $this->value;
-    }
-
     /**
      * @inheritdoc
      */
