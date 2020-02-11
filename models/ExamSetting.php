@@ -16,6 +16,11 @@ use app\components\HistoryBehavior;
 class ExamSetting extends Base
 {
 
+
+    public function __toString() {
+        return $this->value;
+    }
+
     /**
      * @inheritdoc
      */
@@ -66,6 +71,23 @@ class ExamSetting extends Base
             ['value', 'required', 'when' => function($m) { return $m->key == 'max_brightness'; }],
             ['value', 'integer', 'min' => 1, 'max' => 100, 'when' => function($m) { return $m->key == 'max_brightness'; }],
             ['value', 'filter', 'filter' => function ($v) { return $v/100;}, 'when' => function($m) { return $m->key == 'max_brightness'; }],
+            ['value', 'required', 'when' => function($m) { return $m->key == 'url_whitelist'; }],
+        ];
+    }
+
+    /**
+     * @TODO
+     */
+    public function jsonRules()
+    {
+        return [
+            'libre_autosave' => 'boolval',
+            'libre_autosave_interval' => 'intval',
+            'libre_createbackup' => 'boolval',
+            'screenshots' => 'boolval',
+            'screenshots_interval' => 'intval',
+            'max_brightness' => function($v){return intval($v*100);},
+            'url_whitelist' => function($v){return implode(PHP_EOL, preg_split("/\r\n|\n|\r/", $v, null, PREG_SPLIT_NO_EMPTY));},
         ];
     }
 
@@ -85,21 +107,6 @@ class ExamSetting extends Base
     {
         $models = ExamSettingAvail::find()->all();
         return array_combine(array_column($models, 'key'), array_column($models, 'description'));
-    }
-
-    /**
-     * @inheritdoc 
-     */
-    public function jsonRules()
-    {
-        return [
-            'libre_autosave' => 'boolval',
-            'libre_autosave_interval' => 'intval',
-            'libre_createbackup' => 'boolval',
-            'screenshots' => 'boolval',
-            'screenshots_interval' => 'intval',
-            'max_brightness' => function($v){return intval($v*100);},
-        ];
     }
 
     /**
@@ -137,7 +144,7 @@ class ExamSetting extends Base
     /**
      * @return mixed
      */
-    public function getFormattedValue()
+    public function getJsonValue()
     {
         $value = $this->value;
         if (array_key_exists($this->key, $this->jsonRules())) {

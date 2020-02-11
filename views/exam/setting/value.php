@@ -1,56 +1,37 @@
 <?php
 
-use yii\helpers\Html;
-use yii\web\JsExpression;
-use yii\widgets\Pjax;
-use yii\widgets\ActiveForm;
-use yii\base\ViewNotFoundException;
+/* @var $model mixed the data model */
+/* @var $key mixed the key value associated with the data item */
+/* @var $index integer the zero-based index of the data item in the items array returned by $dataProvider. */
+/* @var $widget ListView this widget instance */
 
-/* @var $id integer */
-/* @var $form yii\widgets\ActiveForm */
-/* @var $setting app\models\ExamSetting */
-/* @var $members app\models\ExamSetting[] */
+if (is_file(Yii::getAlias('@app/views/exam/setting/' . $model->key) . '.php')) {
 
-if ($form == null) {
-    $form = ActiveForm::begin([
-        'options' => ['enctype' => 'multipart/form-data'],
-        'enableClientValidation' => false,
-    ]);
-}
-
-$type = $setting->detail === null ? 'default' : $setting->detail->type;
-if (empty($members)) {
-    $members = $setting->members;
-}
-
-if (is_file(Yii::getAlias('@app/views/exam/setting/' . $setting->key) . '.php')) {
-
-    echo $this->render($setting->key, [
-        'id' => $id,
-        'form' => $form,
-        'setting' => $setting,
-        'members' => $members,
+    echo $this->render($model->key, [
+        'model' => $model,
+        'key' => $key,
+        'index' => $index,
+        'widget' => $widget,
     ]);
 
-} else if (is_file(Yii::getAlias('@app/views/exam/setting/' . $type) . '.php')) {
+} else if (is_file(Yii::getAlias('@app/views/exam/setting/' . $model->detail->type) . '.php')) {
 
     echo $this->render($type, [
-        'id' => $id,
-        'form' => $form,
-        'setting' => $setting,
-        'members' => $members,
+        'model' => $model,
+        'key' => $key,
+        'index' => $index,
+        'widget' => $widget,
     ]);
 
 } else {
 
     echo $this->render('default', [
-        'id' => $id,
-        'form' => $form,
-        'setting' => $setting,
-        'members' => $members,
+        'model' => $model,
+        'key' => $key,
+        'index' => $index,
+        'widget' => $widget,
     ]);
 
 }
-
 
 ?>

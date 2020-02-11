@@ -10,6 +10,7 @@ use kartik\select2\Select2;
 use yii\web\JsExpression;
 use limion\jqueryfileupload\JQueryFileUpload;
 use kartik\range\RangeInput;
+use kartik\switchinput\SwitchInput;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\forms\ExamForm */
@@ -139,34 +140,6 @@ $(window).bind('hashchange', function() {
 JS;
 $this->registerJs($active_tabs);
 
-
-$js = <<< 'SCRIPT'
-$("input[name='Exam[libre_autosave]']").click(function(){
-    if ($(this).is(':checked')) {
-        $('#exam-libre_autosave_interval').attr("disabled", false);
-        $('#exam-libre_autosave_path').attr("disabled", false);
-    } else if ($(this).not(':checked')) {
-        $('#exam-libre_autosave_interval').attr("disabled", true);
-        $('#exam-libre_autosave_path').attr("disabled", true);
-    }
-});
-$("input[name='Exam[libre_createbackup]']").click(function(){
-    if ($(this).is(':checked')) {
-        $('#exam-libre_createbackup_path').attr("disabled", false);
-    } else if ($(this).not(':checked')) {
-        $('#exam-libre_createbackup_path').attr("disabled", true);
-    }
-});
-$("input[name='Exam[screenshots]']").click(function(){
-    if ($(this).is(':checked')) {
-        $('#exam-screenshots_interval').attr("disabled", false);
-    } else if ($(this).not(':checked')) {
-        $('#exam-screenshots_interval').attr("disabled", true);
-    }
-});
-SCRIPT;
-$this->registerJs($js);
-
 // load default settings if there are some
 if (count($model->examSettings) == 0
     && $exam->isNewRecord
@@ -232,7 +205,7 @@ select2_config = {
 $('#exam-new-setting-button').on('click', function () {
     setting_k += 1;
 
-    $('#exam_setting').append($('#exam-new-setting-block').html().replace(/__id__/g, 'new' + setting_k));
+    $('#exam_setting').prepend($('#exam-new-setting-block').html().replace(/__id__/g, 'new' + setting_k));
     $(".itemnew" + setting_k).find("select").select2(select2_config);
     $(".itemnew" + setting_k).find("select").on('select2:select select2:unselect', selected);
 });
@@ -322,27 +295,6 @@ $this->registerJs($js);
             <i class="glyphicon glyphicon-home"></i>
             <?= \Yii::t('exams', 'General') ?>
         </a></li>
-        <li>
-            <?= Html::a(
-                '<i class="glyphicon glyphicon-book"></i> ' . \Yii::t('exams', 'Libreoffice'),
-                '#libreoffice',
-                ['data-toggle' => 'tab']
-            ) ?>
-        </li>
-        <li>
-            <?= Html::a(
-                '<i class="glyphicon glyphicon-camera"></i> ' . \Yii::t('exams', 'Screen Capture'),
-                '#screen_capture',
-                ['data-toggle' => 'tab']
-            ) ?>
-        </li>
-        <li>
-            <?= Html::a(
-                '<i class="glyphicon glyphicon-cog"></i> ' . \Yii::t('exams', 'Settings'),
-                '#settings',
-                ['data-toggle' => 'tab']
-            ) ?>
-        </li>
         <?= $step != 1 ? '<li>' . Html::a(
                 '<i class="glyphicon glyphicon-file"></i> ' . \Yii::t('exams', 'Exam File'),
                 '#file',
@@ -351,8 +303,22 @@ $this->registerJs($js);
         '</li>' : '' ?>
         <li>
             <?= Html::a(
+                '<i class="glyphicon glyphicon-cog"></i> ' . \Yii::t('exams', 'Settings'),
+                '#settings',
+                ['data-toggle' => 'tab']
+            ) ?>
+        </li>
+        <li>
+            <?= Html::a(
                 '<i class="glyphicon glyphicon-exclamation-sign"></i> ' . \Yii::t('exams', 'Expert Settings'),
                 '#expert',
+                ['data-toggle' => 'tab']
+            ) ?>
+        </li>
+        <li>
+            <?= Html::a(
+                '<i class="glyphicon glyphicon-camera"></i> ' . \Yii::t('exams', 'Screen Capture'),
+                '#screen_capture',
                 ['data-toggle' => 'tab']
             ) ?>
         </li>
@@ -387,99 +353,7 @@ $this->registerJs($js);
             <?= $form->field($exam, 'backup_path')->textInput(['maxlength' => true]) ?>
         </div>        
     </div>
-
-    <hr>
-
-    <div class="panel panel-warning">
-        <div class="panel-heading">
-            <i class="glyphicon glyphicon-warning-sign"></i> <?= \Yii::t('exams', 'Please notice, all the settings below will <b>override</b> the settings configured in the <b>exam file</b>!') ?>
-        </div>
-        <div class="panel-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="row">
-                        <div class="col-md-12" style="width:auto;">
-                            <?= $form->field($exam, 'screenshots')->checkbox() ?>
-                        </div>
-                        <div class="col-md-12">
-                            <?= $form->field($exam, 'screenshots_interval', [
-                                'template' => '{label}<div class="input-group"><div class="input-group-addon">' . \Yii::t('exams', 'with Interval of') . '</div>{input}<span class="input-group-addon" id="basic-addon2">' . \Yii::t('exams', 'minutes') . '</span></div>{hint}{error}'
-                            ])->textInput(['type' => 'number', 'disabled' => !$exam->screenshots])->label(false); ?>
-                        </div>                
-                        <div class="col-md-12">
-                            <?= $form->field($exam, 'max_brightness')->widget(RangeInput::classname(), [
-                                'options' => ['placeholder' => \Yii::t('exams', 'Select range ...')],
-                                'html5Options' => ['min' => 0, 'max' => 100, 'step' => 1],
-                                'html5Container' => ['style' => 'width:80%'],
-                                'addon' => ['append' => ['content' => '%']]
-                            ]) ?>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <?= $form->field($exam, 'url_whitelist')->textarea([
-                        'rows' => '6',
-                    ]) ?>
-                </div>
-            </div>
-        </div>
-    </div>
     
-    <?php Pjax::end(); ?>
-
-    <?php Pjax::begin([
-        'id' => 'libreoffice',
-        'options' => ['class' => 'tab-pane fade'],
-    ]); ?>
-
-    <br>
-    <div class="panel panel-warning">
-        <div class="panel-heading">
-            <i class="glyphicon glyphicon-warning-sign"></i> <?= \Yii::t('exams', 'Please notice, all the settings below will <b>override</b> the settings configured in the <b>exam file</b>!') ?>
-        </div>
-        <div class="panel-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <?= $form->field($exam, 'libre_autosave', [
-                                'options' => ['class' => ''],
-                                'errorOptions' => ['tag' => false],
-                            ])->checkbox() ?>
-                        </div>
-                        <div class="panel-body">
-                            <?= $form->field($exam, 'libre_autosave_path', [
-                                'template' => '{label}<div class="input-group"><div class="input-group-addon">' . \Yii::t('exams', '...to the directory') . '</div>{input}</div>{hint}{error}'
-                            ])->textInput(['disabled' => !$exam->libre_autosave])->label(false); ?>
-                            <?= $form->field($exam, 'libre_autosave_interval', [
-                                'template' => '{label}<div class="input-group"><div class="input-group-addon">' . \Yii::t('exams', '...all {n} minutes.', [
-                                        'n' => '</div>{input}<span class="input-group-addon" id="basic-addon2">'
-                                    ]) . '</span></div>{hint}{error}'
-                            ])->textInput(['type' => 'number', 'disabled' => !$exam->libre_autosave])->label(false); ?>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <?= $form->field($exam, 'libre_createbackup', [
-                                'options' => ['class' => ''],
-                                'errorOptions' => ['tag' => false],
-                            ])->checkbox() ?>
-                        </div>
-                        <div class="panel-body">
-                            <?= $form->field($exam, 'libre_createbackup_path', [
-                                'template' => '{label}<div class="input-group"><div class="input-group-addon">' . \Yii::t('exams', '...to the directory') . '</div>{input}</div>{hint}{error}'
-                            ])->textInput(['disabled' => !$exam->libre_createbackup])->label(false); ?>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
     <?php Pjax::end(); ?>
 
     <?php Pjax::begin([
@@ -508,47 +382,53 @@ $this->registerJs($js);
 
     <br>
 
-    <legend>Settings
-        <?= Html::a('New Setting', 'javascript:void(0);', [
-            'id' => 'exam-new-setting-button', 
-            'class' => 'pull-right btn btn-default btn-xs'
-        ]); ?>
-    </legend>
-
-    <div id="exam_setting">
-        <?php
-        // existing setting fields
-        foreach ($ExamSettings as $id => $_setting) {
-            if ($_setting->detail === null || $_setting->detail->belongs_to === null) {
-                $id = $_setting->isNewRecord
-                    ? (strpos($id, 'new') !== false
-                        ? $id
-                        : 'new' . $id)
-                    : ($_setting->exam_id === null
-                        ? 'new' . $id
-                        : $_setting->id);
-                $members = [];
-                foreach ($ExamSettings as $s) {
-                    if($id == $s->belongs_to) {
-                        $members[] = $s;
+    <div class="panel panel-warning">
+        <div class="panel-heading">
+            <i class="glyphicon glyphicon-warning-sign"></i> <?= \Yii::t('exams', 'Please notice, all the settings below will <b>override</b> the settings configured in the <b>exam file</b>!') ?>
+            <?= Html::a('New Setting', 'javascript:void(0);', [
+                'id' => 'exam-new-setting-button', 
+                'class' => 'pull-right btn btn-default btn-xs'
+            ]); ?>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div id="exam_setting" class="col-md-12">
+                    <?php
+                    // existing setting fields
+                    foreach ($ExamSettings as $id => $_setting) {
+                        if ($_setting->detail === null || $_setting->detail->belongs_to === null) {
+                            $id = $_setting->isNewRecord
+                                ? (strpos($id, 'new') !== false
+                                    ? $id
+                                    : 'new' . $id)
+                                : ($_setting->exam_id === null
+                                    ? 'new' . $id
+                                    : $_setting->id);
+                            $members = [];
+                            foreach ($ExamSettings as $s) {
+                                if($id == $s->belongs_to) {
+                                    $members[] = $s;
+                                }
+                            }
+                            echo $this->render('_form_exam_setting', [
+                                'id' => $id,
+                                'form' => $form,
+                                'setting' => $_setting,
+                                'members' => $members,
+                            ]);
+                        }
                     }
-                }
-                echo $this->render('_form_exam_setting', [
-                    'id' => $id,
-                    'form' => $form,
-                    'setting' => $_setting,
-                    'members' => $members,
-                ]);
-            }
-        }
-        ?>
-        <div id="exam-new-setting-block" style="display:none;">
-        <?= $this->render('_form_exam_setting', [
-            'id' => '__id__',
-            'form' => $form,
-            'setting' => $setting,
-            'members' => [],
-        ]); ?>
+                    ?>
+                    <div id="exam-new-setting-block" style="display:none;">
+                    <?= $this->render('_form_exam_setting', [
+                        'id' => '__id__',
+                        'form' => $form,
+                        'setting' => $setting,
+                        'members' => [],
+                    ]); ?>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -567,13 +447,55 @@ $this->registerJs($js);
         </div>
         <div class="panel-body">
             <div class="row">
-                <div class="col-md-6">
-                    <?= $form->field($exam, 'grp_netdev')->checkbox() ?>
-                    <?= $form->field($exam, 'allow_sudo')->checkbox() ?>
-                    <?= $form->field($exam, 'allow_mount')->checkbox() ?>
-                    <?= $form->field($exam, 'firewall_off')->checkbox() ?>
-                </div>
-                <div class="col-md-6">
+                <div class="col-md-12">
+                    <?= $form->field($exam, 'grp_netdev')->widget(SwitchInput::classname(), [
+                        'pluginOptions' => [
+                            'size' => 'mini',
+                            'onText' => \Yii::t('app', 'ON'),
+                            'offText' => \Yii::t('app', 'OFF'),
+                            'onColor' => 'danger',
+                            'offColor' => 'success',
+                        ],
+                        'options' => [
+                            'label' => $exam->getAttributeLabel('grp_netdev')
+                        ],
+                    ])->label(false); ?>
+                    <?= $form->field($exam, 'allow_sudo')->widget(SwitchInput::classname(), [
+                        'pluginOptions' => [
+                            'size' => 'mini',
+                            'onText' => \Yii::t('app', 'ON'),
+                            'offText' => \Yii::t('app', 'OFF'),
+                            'onColor' => 'danger',
+                            'offColor' => 'success',
+                        ],
+                        'options' => [
+                            'label' => $exam->getAttributeLabel('allow_sudo')
+                        ],
+                    ])->label(false); ?>
+                    <?= $form->field($exam, 'allow_mount')->widget(SwitchInput::classname(), [
+                        'pluginOptions' => [
+                            'size' => 'mini',
+                            'onText' => \Yii::t('app', 'ON'),
+                            'offText' => \Yii::t('app', 'OFF'),
+                            'onColor' => 'danger',
+                            'offColor' => 'success',
+                        ],
+                        'options' => [
+                            'label' => $exam->getAttributeLabel('allow_mount')
+                        ],
+                    ])->label(false); ?>
+                    <?= $form->field($exam, 'firewall_off')->widget(SwitchInput::classname(), [
+                        'pluginOptions' => [
+                            'size' => 'mini',
+                            'onText' => \Yii::t('app', 'ON'),
+                            'offText' => \Yii::t('app', 'OFF'),
+                            'onColor' => 'danger',
+                            'offColor' => 'success',
+                        ],
+                        'options' => [
+                            'label' => $exam->getAttributeLabel('firewall_off')
+                        ],
+                    ])->label(false); ?>
                 </div>
             </div>
         </div>

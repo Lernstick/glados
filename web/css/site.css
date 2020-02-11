@@ -412,3 +412,7 @@ ul.timeline li {
     from { background-color: #F6F6BC; }
     to { background-color: #fff; }
 }
+
+.item:first-child hr {
+    display: none !important;
+}

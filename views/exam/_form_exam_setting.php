@@ -15,6 +15,7 @@ $description = $setting->detail === null ? $setting->key : $setting->detail->des
 ?>
 
 <div class="row item item<?= $id ?>">
+    <hr>
     <div class="col-md-4">
         <?= $form->field($setting, 'key')->dropdownList($id == "__id__" ? [] : [
             $setting->key => $name,
@@ -30,18 +31,12 @@ $description = $setting->detail === null ? $setting->key : $setting->detail->des
         'options' => ['class' => 'col-md-7'],
     ]); ?>
 
-
-    <?php
-
-    echo $this->render('setting/value', [
-        'id' => $id,
-        'form' => $form,
-        'setting' => $setting,
-        'members' => $members,
-    ]);
-
-    ?>
-
+        <?= $this->render('setting/forms/value', [
+            'id' => $id,
+            'form' => $form,
+            'setting' => $setting,
+            'members' => $members,
+        ]); ?>
 
     <?php Pjax::end(); ?>
 

@@ -214,16 +214,32 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php Pjax::end(); ?>
 
     <?php Pjax::begin([
-        'id' => 'options',
+        'id' => 'settings',
         'options' => ['class' => 'tab-pane fade'],
     ]); ?>
 
-    <?= var_dump($model->settings); ?>
+    <?= ListView::widget([
+        'dataProvider' => $settingsDataProvider,
+        'itemOptions' => [ 'tag' => 'tr' ],
+        'itemView' => 'setting/value',
+        'itemView' => function ($model, $key, $index, $widget) {
+            if ($model->belongs_to === null) {
+                return '<td>' . $model->detail->name . '</td><td>' . $this->render('setting/value', [
+                    'model' => $model,
+                    'key' => $key,
+                    'index' => $index,
+                    'widget' => $widget,
+                ]) . '</td>';
+            }
+        },
+        'emptyText' => '<table class="table table-bordered table-hover"><tr><th>Settings</th></tr><tr><td>' . \Yii::t('exams', 'No settings found.') . '</td></tr></table>',
+        'layout' => '<table class="table table-bordered table-hover"><tr><th colspan="2">Settings</th></tr>{items}</table> {pager} {summary}',
+    ]); ?>
 
     <?php Pjax::end(); ?>
 
     <?php Pjax::begin([
-        'id' => 'settings',
+        'id' => 'expert',
         'options' => ['class' => 'tab-pane fade'],
     ]); ?>
 
@@ -237,52 +253,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'allow_sudo:boolean',
             'allow_mount:boolean',
             'firewall_off:boolean',
-            'screenshots:boolean',
-            [
-                'label' => \Yii::t('exams', 'Screenshot Interval'),
-                'value' => $model->screenshots_interval*60, # in seconds
-                'format' => 'duration'
-            ],
-            [
-                'label' => \Yii::t('exams', 'Maximum brightness'),
-                'value' => $model->max_brightness/100,
-                'format' => 'percent'
-            ],            
         ],
     ]) ?>
-
-    <?= DetailView::widget([
-        'model' => $model,
-        'template' => '<tr><th{captionOptions}>{value}</th><td{contentOptions}>{label}</td></tr>',
-        'attributes' => [
-            [
-                'label' => \Yii::t('exams', 'Libreoffice: Save AutoRecovery information (to <code>{path}</code> every <code>{interval}</code>)', [
-                    'path' => yii::$app->formatter->format($model->libre_autosave_path, 'text'),
-                    'interval' => yii::$app->formatter->format($model->libre_autosave_interval*60, 'duration'),
-                ]),
-                'value' => $model->libre_autosave,
-                'format' => 'boolean'
-            ],
-            [
-                'label' => \Yii::t('exams', 'Libreoffice: Always create backup copy (to <code>{path}</code>)', [
-                    'path' => yii::$app->formatter->format($model->libre_createbackup_path, 'text'),
-                ]),
-                'value' => $model->libre_createbackup,
-                'format' => 'boolean'
-            ],
-        ],
-    ]) ?>
-
-    <?= ListView::widget([
-        'dataProvider' => $urlWhitelistDataProvider,
-        #'options' => [ 'tag' => 'table', 'class' => 'table table-bordered table-hover'],
-        'itemOptions' => [ 'tag' => 'tr' ],
-        'itemView' => function ($model, $key, $index, $widget) {
-            return '<td>' . $model . '</td>';
-        },
-        'emptyText' => '<table class="table table-bordered table-hover"><tr><th>HTTP URL Whitelist</th></tr><tr><td>' . \Yii::t('exams', 'No URLs found.') . '</td></tr></table>',
-        'layout' => '<table class="table table-bordered table-hover"><tr><th>' . \Yii::t('exams', 'HTTP URL Whitelist') . '</th></tr>{items}</table> {pager} {summary}',
-    ]); ?>
 
     <?php Pjax::end(); ?>
 
@@ -318,7 +290,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             var s = this.series[0];
                             //vat t = this;
                             setInterval(function () {
-                                $.getJSON('index.php?r=exam/view&mode=json&id=$model->id', function (jsondata) {
+                                $.getJSON('" . Url::to(['exam/view', 'mode' => 'json', 'id' => $model->id]) . "', function (jsondata) {
                                     s.setData(jsondata);
                                     //t.setData(jsondata);
                                 });

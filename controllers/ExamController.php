@@ -111,15 +111,7 @@ class ExamController extends Controller
         $model = $this->findModel($id);
 
         if ($mode === 'default') {
-
-            $models = preg_split("/\r\n|\n|\r/", $model->{"url_whitelist"}, null, PREG_SPLIT_NO_EMPTY);
-            $models = array_merge($models, preg_split("/\r\n|\n|\r/", $model->{"sq_url_whitelist"}, null, PREG_SPLIT_NO_EMPTY));
-            $urlWhitelistDataProvider = new ArrayDataProvider([
-                'allModels' => $models,
-            ]);
-            $urlWhitelistDataProvider->pagination->pageParam = 'url-page';
-            $urlWhitelistDataProvider->pagination->pageSize = 10;            
-
+            
             $historySearchModel = new HistorySearch();
             $historyQueryParams = array_key_exists('HistorySearch', Yii::$app->request->queryParams)
                 ? Yii::$app->request->queryParams['HistorySearch']
@@ -133,11 +125,15 @@ class ExamController extends Controller
             $historyDataProvider->pagination->pageParam = 'hist-page';
             $historyDataProvider->pagination->pageSize = 10;
 
+            $settingsDataProvider = new ArrayDataProvider([
+                'allModels' => $model->exam_setting,
+            ]);
+
             return $this->render('view', [
                 'model' => $model,
-                'urlWhitelistDataProvider' => $urlWhitelistDataProvider,
                 'historySearchModel' => $historySearchModel,
                 'historyDataProvider' => $historyDataProvider,
+                'settingsDataProvider' => $settingsDataProvider,
             ]);
 
         } else if ($mode == "browse"){
@@ -269,7 +265,7 @@ class ExamController extends Controller
                 'key' => Yii::$app->request->post('setting')['key']
             ]);
             $setting->loadDefaultValue();
-            return $this->renderAjax('setting/value', [
+            return $this->renderAjax('setting/forms/value', [
                 'id' => Yii::$app->request->post('setting')['id'],
                 'form' => null,
                 'setting' => $setting,
@@ -314,7 +310,7 @@ class ExamController extends Controller
                     'key' => Yii::$app->request->post('setting')['key']
                 ]);
                 $setting->loadDefaultValue();
-                return $this->renderAjax('setting/value', [
+                return $this->renderAjax('setting/forms/value', [
                     'id' => Yii::$app->request->post('setting')['id'],
                     'form' => null,
                     'setting' => $setting,
