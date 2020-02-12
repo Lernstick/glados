@@ -122,10 +122,10 @@ class m200212_120339_screen_capture extends Migration
         // create libre_autosave
         $libre_autosave = new ExamSettingAvail([
             'key' => 'libre_autosave',
-            'name' => yiit('max_brightness', 'Libreoffice: Save AutoRecovery information'),
+            'name' => yiit('exam_setting_avail', 'Libreoffice: Save AutoRecovery information'),
             'type' => 'boolean',
             'default' => true,
-            'description' => yiit('max_brightness', 'Check to <b>save recovery information automatically every <code>n</code> minutes</b>. This command saves the information necessary to restore the current document in case of a crash (default location: <code>/home/user/.config/libreoffice/4/tmp</code>). Additionally, in case of a crash LibreOffice tries automatically to save AutoRecovery information for all open documents, if possible. (See <a target="_blank" href="https://help.libreoffice.org/Common/Saving_Documents_Automatically">LibreOffice Help</a>)'),
+            'description' => yiit('exam_setting_avail', 'Check to <b>save recovery information automatically every <code>n</code> minutes</b>. This command saves the information necessary to restore the current document in case of a crash (default location: <code>/home/user/.config/libreoffice/4/tmp</code>). Additionally, in case of a crash LibreOffice tries automatically to save AutoRecovery information for all open documents, if possible. (See <a target="_blank" href="https://help.libreoffice.org/Common/Saving_Documents_Automatically">LibreOffice Help</a>)'),
         ]);
         $libre_autosave->save(false);
         $libre_autosave->refresh();
@@ -133,7 +133,7 @@ class m200212_120339_screen_capture extends Migration
         // create libre_autosave_interval
         $libre_autosave_interval = new ExamSettingAvail([
             'key' => 'libre_autosave_interval',
-            'name' => yiit('max_brightness', 'Libreoffice: Save AutoRecovery information interval'),
+            'name' => yiit('exam_setting_avail', 'Libreoffice: Save AutoRecovery information interval'),
             'type' => 'integer',
             'default' => 10,
             'belongs_to' => $libre_autosave->id,
@@ -143,7 +143,7 @@ class m200212_120339_screen_capture extends Migration
         // create libre_autosave_path
         $libre_autosave_path = new ExamSettingAvail([
             'key' => 'libre_autosave_path',
-            'name' => yiit('max_brightness', 'Libreoffice: Save AutoRecovery information path'),
+            'name' => yiit('exam_setting_avail', 'Libreoffice: Save AutoRecovery information path'),
             'type' => 'text',
             'default' => '/home/user/.config/libreoffice/4/user/tmp',
             'belongs_to' => $libre_autosave->id,
@@ -153,10 +153,10 @@ class m200212_120339_screen_capture extends Migration
         // libre_createbackup
         $libre_createbackup = new ExamSettingAvail([
             'key' => 'libre_createbackup',
-            'name' => yiit('max_brightness', 'Libreoffice: Always create backup copy'),
+            'name' => yiit('exam_setting_avail', 'Libreoffice: Always create backup copy'),
             'type' => 'boolean',
             'default' => true,
-            'description' => yiit('max_brightness', 'If the <b>Always create backup copy</b> option is selected, the old version of the file is saved to the backup directory whenever you save the current version of the file. The backup copy has the same name as the document, but the extension is <code>.BAK</code>. If the backup folder (default location: <code>/home/user/.config/libreoffice/4/backup</code>) already contains such a file, it will be overwritten without warning. (See <a target="_blank" href="https://help.libreoffice.org/Common/Saving_Documents_Automatically">LibreOffice Help</a>)'),
+            'description' => yiit('exam_setting_avail', 'If the <b>Always create backup copy</b> option is selected, the old version of the file is saved to the backup directory whenever you save the current version of the file. The backup copy has the same name as the document, but the extension is <code>.BAK</code>. If the backup folder (default location: <code>/home/user/.config/libreoffice/4/backup</code>) already contains such a file, it will be overwritten without warning. (See <a target="_blank" href="https://help.libreoffice.org/Common/Saving_Documents_Automatically">LibreOffice Help</a>)'),
         ]);
         $libre_createbackup->save(false);
         $libre_createbackup->refresh();
@@ -164,7 +164,7 @@ class m200212_120339_screen_capture extends Migration
         // libre_createbackup_path
         $libre_createbackup_path = new ExamSettingAvail([
             'key' => 'libre_createbackup_path',
-            'name' => yiit('max_brightness', 'Libreoffice: Always create backup copy path'),
+            'name' => yiit('exam_setting_avail', 'Libreoffice: Always create backup copy path'),
             'type' => 'text',
             'default' => '/home/user/.config/libreoffice/4/user/backup',
             'belongs_to' => $libre_createbackup->id,
@@ -174,20 +174,20 @@ class m200212_120339_screen_capture extends Migration
         // create max_brightness
         $max_brightness = new ExamSettingAvail([
             'key' => 'max_brightness',
-            'name' => yiit('max_brightness', 'Maximum brightness'),
+            'name' => yiit('exam_setting_avail', 'Maximum brightness'),
             'type' => 'percent',
             'default' => 1,
-            'description' => yiit('max_brightness', 'Maximum screen brightness in percent. Notice that some devices have buttons to adjust screen brightness on hardware level. This cannot be controlled by this setting.'),
+            'description' => yiit('exam_setting_avail', 'Maximum screen brightness in percent. Notice that some devices have buttons to adjust screen brightness on hardware level. This cannot be controlled by this setting.'),
         ]);
         $max_brightness->save(false);
 
         // create screenshots
         $screenshots = new ExamSettingAvail([
             'key' => 'screenshots',
-            'name' => yiit('max_brightness', 'Take Screenshots'),
+            'name' => yiit('exam_setting_avail', 'Take Screenshots'),
             'type' => 'boolean',
             'default' => true,
-            'description' => yiit('max_brightness', 'If set, the system will <b>create screenshots every n minutes</b>. The Interval can be set in minutes. Those screenshots will appear in the Ticket view under the register "Screenshots". When generating exam results, they can also be included.'),
+            'description' => yiit('exam_setting_avail', 'If set, the system will <b>create screenshots every n minutes</b>. The Interval can be set in minutes. Those screenshots will appear in the Ticket view under the register "Screenshots". When generating exam results, they can also be included.'),
         ]);
         $screenshots->save(false);
         $screenshots->refresh();
@@ -195,7 +195,7 @@ class m200212_120339_screen_capture extends Migration
         // create screenshots_interval
         $screenshots_interval = new ExamSettingAvail([
             'key' => 'screenshots_interval',
-            'name' => yiit('max_brightness', 'Screenshot interval'),
+            'name' => yiit('exam_setting_avail', 'Screenshot interval'),
             'type' => 'integer',
             'default' => 5,
             'belongs_to' => $screenshots->id,
@@ -205,10 +205,10 @@ class m200212_120339_screen_capture extends Migration
         // create url_whitelist
         $url_whitelist = new ExamSettingAvail([
             'key' => 'url_whitelist',
-            'name' => \Yii::t('max_brightness', 'HTTP URL Whitelist'),
+            'name' => \Yii::t('exam_setting_avail', 'HTTP URL Whitelist'),
             'type' => 'ntext',
             'default' => '',
-            'description' => \Yii::t('max_brightness', 'URLs given in this list will be allowed to visit by the exam student during the exam. Notice, due to this date, only URLs starting with <code>http://</code> are supported, therefore https://</code> URLs will be ignored. The URLs should be provided newline separated. The provided URLs are allowed even if the Firewall is enabled.'),
+            'description' => \Yii::t('exam_setting_avail', 'URLs given in this list will be allowed to visit by the exam student during the exam. Notice, due to this date, only URLs starting with <code>http://</code> are supported, therefore https://</code> URLs will be ignored. The URLs should be provided newline separated. The provided URLs are allowed even if the Firewall is enabled.'),
         ]);
         $url_whitelist->save(false);
 
