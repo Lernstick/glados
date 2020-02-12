@@ -209,6 +209,7 @@ class TranslatedActiveRecord extends Base
                         $translation = new Translation([
                             'en' => \Yii::t($category, $this->{$field . '_orig'}, $params, 'en'),
                             'de' => \Yii::t($category, $this->{$field . '_orig'}, $params, 'de'),
+                            'category' => $category,
                         ]);
 
                         $translation->save();

@@ -29,6 +29,14 @@ class ExamSettingAvail extends TranslatedActiveRecord
     /**
      * @inheritdoc
      */
+    public static function tableName()
+    {
+        return 'exam_setting_avail';
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getTranslatedFields()
     {
         return [
