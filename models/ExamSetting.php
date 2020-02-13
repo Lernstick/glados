@@ -15,6 +15,10 @@ use app\components\HistoryBehavior;
  */
 class ExamSetting extends Base
 {
+
+    private $_attributeLabels;
+    private $_attributeHints;
+
     /**
      * @inheritdoc
      */
@@ -95,8 +99,11 @@ class ExamSetting extends Base
      */
     public function attributeLabels()
     {
-        $models = ExamSettingAvail::find()->all();
-        return array_combine(array_column($models, 'key'), array_column($models, 'label'));
+        if (empty($this->_attributeLabels)) {
+            $models = ExamSettingAvail::find()->all();
+            $this->_attributeLabels = array_combine(array_column($models, 'key'), array_column($models, 'name'));
+        }
+        return $this->_attributeLabels;
     }
 
     /**
@@ -104,8 +111,11 @@ class ExamSetting extends Base
      */
     public function attributeHints()
     {
-        $models = ExamSettingAvail::find()->all();
-        return array_combine(array_column($models, 'key'), array_column($models, 'description'));
+        if (empty($this->_attributeHints)) {
+            $models = ExamSettingAvail::find()->all();
+            $this->_attributeHints = array_combine(array_column($models, 'key'), array_column($models, 'description'));
+        }
+        return $this->_attributeHints;
     }
 
     /**
