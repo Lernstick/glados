@@ -754,7 +754,7 @@ class Ticket extends LiveActiveRecord
         $c = \Yii::$app->language;
         $query = new TicketQuery(get_called_class());
 
-        $query->addSelect(['`ticket`.*', new \yii\db\Expression('(case
+        $query->addSelect([new \yii\db\Expression('(case
             WHEN (start is not null and end is not null and test_taker > "") THEN
                 3 # submitted
             WHEN (start is not null and end is not null) THEN
