@@ -214,22 +214,6 @@ class Exam extends Base
     }
 
     /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getScreen_capture()
-    {
-        return $this->getScreenCapture();
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getScreenCapture()
-    {
-        return $this->hasOne(ScreenCapture::className(), ['id' => 'screen_capture_id']);
-    }
-
-    /**
      * @return \yii\db\ActiveQuery[]
      */
     public function getExam_setting()

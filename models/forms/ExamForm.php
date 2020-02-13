@@ -7,20 +7,18 @@ use yii\base\Model;
 use yii\widgets\ActiveForm;
 use app\models\Exam;
 use app\models\ExamSetting;
-use app\models\ScreenCapture;
 
 class ExamForm extends Model
 {
 
     private $_exam;
-    private $_screenCapture;
     private $_settings;
 
     public function rules()
     {
         return [
             [['Exam'], 'required'],
-            [['ScreenCapture', 'ExamSettings'], 'safe'],
+            [['ExamSettings'], 'safe'],
         ];
     }
 
@@ -39,11 +37,6 @@ class ExamForm extends Model
         }
         $transaction = Yii::$app->db->beginTransaction();
 
-        if (!$this->screenCapture->save()) {
-            $transaction->rollBack();
-            return false;
-        }
-
         if (!$this->exam->save()) {
             $transaction->rollBack();
             return false;
@@ -54,7 +47,6 @@ class ExamForm extends Model
             return false;
         }
 
-        $this->exam->link('screenCapture', $this->screenCapture);
         $transaction->commit();
         return true;
     }
@@ -95,26 +87,6 @@ class ExamForm extends Model
             $this->_exam = $exam;
         } else if (is_array($exam)) {
             $this->_exam->setAttributes($exam);
-        }
-
-        if ($this->exam->screenCapture === null) {
-            $this->_screenCapture = new ScreenCapture();
-        } else {
-            $this->_screenCapture = $this->exam->screenCapture;
-        }
-    }
-
-    public function getScreenCapture()
-    {
-        return $this->_screenCapture;
-    }
-
-    public function setScreenCapture($screenCapture)
-    {
-        if ($screenCapture instanceof ScreenCapture) {
-            $this->_screenCapture = $screenCapture;
-        } else if (is_array($screenCapture)) {
-            $this->_screenCapture->setAttributes($screenCapture);
         }
     }
 
@@ -164,7 +136,6 @@ class ExamForm extends Model
     {
         $models = [
             'Exam' => $this->exam,
-            'ScreenCapture' => $this->screenCapture,
         ];
         foreach ($this->examSettings as $id => $setting) {
             $models['ExamSetting.' . $id] = $this->examSettings[$id];

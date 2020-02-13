@@ -11,7 +11,6 @@ use app\models\ExamSettingAvail;
 class m200212_120339_screen_capture extends Migration
 {
     public $examTable = 'exam';
-    public $scTable = 'screen_capture';
     public $settingTable = 'exam_setting';
     public $availableSettingTable = 'exam_setting_avail';
     public $historyTable = 'history';
@@ -53,29 +52,6 @@ class m200212_120339_screen_capture extends Migration
     }
 
     public function preMigrationUp() {
-
-        // create the screen_capture table
-        if ($this->db->schema->getTableSchema($this->scTable, true) === null) {
-            $this->createTable($this->scTable, [
-                'id' => $this->primaryKey(),
-                'enabled' => $this->boolean()->notNull()->defaultValue(0),
-                'quality' => $this->integer(11)->notNull()->defaultValue(100),
-                'command' => $this->text(),
-            ], $this->tableOptions);
-
-            $this->addColumn($this->examTable, 'screen_capture_id', $this->integer(11));
-            $this->createIndex('idx-screen_capture_id', $this->examTable, 'screen_capture_id');
-
-            $this->addForeignKey(
-                'fk-exam-screen_capture_id',
-                $this->examTable,
-                'screen_capture_id',
-                $this->scTable,
-                'id',
-                'CASCADE',
-                'CASCADE'
-            );
-        }
 
         // create the settings table
         if ($this->db->schema->getTableSchema($this->settingTable, true) === null) {
@@ -133,7 +109,7 @@ class m200212_120339_screen_capture extends Migration
         // create libre_autosave_interval
         $libre_autosave_interval = new ExamSettingAvail([
             'key' => 'libre_autosave_interval',
-            'name' => yiit('exam_setting_avail', 'Libreoffice: Save AutoRecovery information interval'),
+            'name' => yiit('exam_setting_avail', 'Interval'),
             'type' => 'integer',
             'default' => 10,
             'belongs_to' => $libre_autosave->id,
@@ -143,7 +119,7 @@ class m200212_120339_screen_capture extends Migration
         // create libre_autosave_path
         $libre_autosave_path = new ExamSettingAvail([
             'key' => 'libre_autosave_path',
-            'name' => yiit('exam_setting_avail', 'Libreoffice: Save AutoRecovery information path'),
+            'name' => yiit('exam_setting_avail', 'Path'),
             'type' => 'text',
             'default' => '/home/user/.config/libreoffice/4/user/tmp',
             'belongs_to' => $libre_autosave->id,
@@ -164,7 +140,7 @@ class m200212_120339_screen_capture extends Migration
         // libre_createbackup_path
         $libre_createbackup_path = new ExamSettingAvail([
             'key' => 'libre_createbackup_path',
-            'name' => yiit('exam_setting_avail', 'Libreoffice: Always create backup copy path'),
+            'name' => yiit('exam_setting_avail', 'Path'),
             'type' => 'text',
             'default' => '/home/user/.config/libreoffice/4/user/backup',
             'belongs_to' => $libre_createbackup->id,
@@ -195,7 +171,7 @@ class m200212_120339_screen_capture extends Migration
         // create screenshots_interval
         $screenshots_interval = new ExamSettingAvail([
             'key' => 'screenshots_interval',
-            'name' => yiit('exam_setting_avail', 'Screenshot interval'),
+            'name' => yiit('exam_setting_avail', 'Interval'),
             'type' => 'integer',
             'default' => 5,
             'belongs_to' => $screenshots->id,
@@ -211,6 +187,60 @@ class m200212_120339_screen_capture extends Migration
             'description' => \Yii::t('exam_setting_avail', 'URLs given in this list will be allowed to visit by the exam student during the exam. Notice, due to this date, only URLs starting with <code>http://</code> are supported, therefore https://</code> URLs will be ignored. The URLs should be provided newline separated. The provided URLs are allowed even if the Firewall is enabled.'),
         ]);
         $url_whitelist->save(false);
+
+        // create screenshots
+        $screen_capture = new ExamSettingAvail([
+            'key' => 'screen_capture',
+            'name' => yiit('exam_setting_avail', 'Screen capturing'),
+            'type' => 'boolean',
+            'default' => true,
+            'description' => yiit('exam_setting_avail', 'TODO'),
+        ]);
+        $screen_capture->save(false);
+        $screen_capture->refresh();
+
+        // create screen_capture_command
+        $screen_capture_command = new ExamSettingAvail([
+            'key' => 'screen_capture_command',
+            'name' => yiit('exam_setting_avail', 'Command'),
+            'type' => 'text',
+            'default' => 'recordmydesktop --no-sound --fps 10 --on-the-fly-encoding --no-frame --v_quality 10',
+            'description' => yiit('exam_setting_avail', 'The actual command that is executed to capture the screen. This will <b>overwrite</b> all other settings.'),
+            'belongs_to' => $screen_capture->id,
+        ]);
+        $screen_capture_command->save(false);
+
+        // create screen_capture_fps
+        $screen_capture_fps = new ExamSettingAvail([
+            'key' => 'screen_capture_fps',
+            'name' => yiit('exam_setting_avail', 'FPS'),
+            'type' => 'integer',
+            'default' => 10,
+            'description' => yiit('exam_setting_avail', 'Frames per second. A positive number denoting the desired number framerate.'),
+            'belongs_to' => $screen_capture->id,
+        ]);
+        $screen_capture_fps->save(false);
+
+        // create screen_capture_fps
+        $screen_capture_quality = new ExamSettingAvail([
+            'key' => 'screen_capture_quality',
+            'name' => yiit('exam_setting_avail', 'Quality'),
+            'type' => 'percent',
+            'default' => 0.7,
+            'belongs_to' => $screen_capture->id,
+        ]);
+        $screen_capture_quality->save(false);
+
+        // create screen_capture_fps
+        $screen_capture_chunk = new ExamSettingAvail([
+            'key' => 'screen_capture_chunk',
+            'name' => yiit('exam_setting_avail', 'Chunk length'),
+            'type' => 'integer',
+            'default' => 30,
+            'description' => yiit('exam_setting_avail', 'The length of one chunk in seconds.'),
+            'belongs_to' => $screen_capture->id,
+        ]);
+        $screen_capture_chunk->save(false);
 
         $this->addColumn($this->historyTable, 'type', $this->boolean()->notNull()->defaultValue(0));
 
@@ -319,17 +349,22 @@ class m200212_120339_screen_capture extends Migration
                 array_map(function($v){return $v->value;}, $model->exam_setting)
             );
 
+            $found = false;
             foreach ($this->migrateFields as $field => $belongs_to) {
                 if (array_key_exists($field, $settings)) {
                     if (array_key_exists($field, $this->postProcessingDown())) {
                         $settings[$field] = $this->postProcessingDown()[$field]($settings[$field]);
+                        $found = true;
                     }
                 }
             }
-            Yii::$app->db->createCommand()->update($this->examTable,
-                $settings,
-                ['id' => $model->id]
-            )->execute();
+
+            if ($found) {
+                Yii::$app->db->createCommand()->update($this->examTable,
+                    $settings,
+                    ['id' => $model->id]
+                )->execute();
+            }
 
             $i = $i + 1;
         }
@@ -360,12 +395,6 @@ class m200212_120339_screen_capture extends Migration
 
     public function postMigrationDown()
     {
-        if ($this->db->schema->getTableSchema($this->scTable, true) !== null) {
-            $this->dropForeignKey('fk-exam-screen_capture_id', $this->examTable);
-            $this->dropColumn($this->examTable, 'screen_capture_id');
-            $this->dropTable($this->scTable);
-        }
-
         if ($this->db->schema->getTableSchema($this->settingTable, true) !== null) {
             $this->dropForeignKey('fk-exam_setting_exam_id', $this->settingTable);
             $this->dropTable($this->settingTable);

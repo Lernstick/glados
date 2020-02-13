@@ -66,6 +66,7 @@ class ExamSetting extends Base
             ['value', 'integer', 'min' => 1, 'max' => 100, 'when' => function($m) { return $m->key == 'max_brightness'; }],
             ['value', 'filter', 'filter' => function ($v) { return $v/100;}, 'when' => function($m) { return $m->key == 'max_brightness'; }],
             ['value', 'required', 'when' => function($m) { return $m->key == 'url_whitelist'; }],
+            ['value', 'filter', 'filter' => function ($v) { return $v/100;}, 'when' => function($m) { return $m->key == 'screen_capture_quality'; }],
         ];
     }
 
@@ -82,6 +83,10 @@ class ExamSetting extends Base
             'screenshots_interval' => 'intval',
             'max_brightness' => function($v){return intval($v*100);},
             'url_whitelist' => function($v){return implode(PHP_EOL, preg_split("/\r\n|\n|\r/", $v, null, PREG_SPLIT_NO_EMPTY));},
+            'screen_capture' => 'boolval',
+            'screen_capture_chunk' => 'intval',
+            'screen_capture_fps' => 'intval',
+            'screen_capture_quality' => function($v){return intval($v*100);},
         ];
     }
 
@@ -91,7 +96,7 @@ class ExamSetting extends Base
     public function attributeLabels()
     {
         $models = ExamSettingAvail::find()->all();
-        return array_combine(array_column($models, 'key'), array_column($models, 'name'));
+        return array_combine(array_column($models, 'key'), array_column($models, 'label'));
     }
 
     /**

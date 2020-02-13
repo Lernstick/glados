@@ -1,23 +1,15 @@
 <?php
 
-use app\models\ExamSetting;
 use kartik\switchinput\SwitchInput;
 
 /* @var $id integer */
+/* @var $label string */
+/* @var $hint string */
 /* @var $form yii\widgets\ActiveForm */
 /* @var $setting app\models\ExamSetting */
 /* @var $members app\models\ExamSetting[] */
 
-$libre_createbackup_path = new ExamSetting(['key' => 'libre_createbackup_path']);
-
-foreach($members as $s) {
-    if ($s->key == 'libre_createbackup_path') {
-        $libre_createbackup_path = $s;
-    }
-}
-
-$libre_createbackup_path->loadDefaultValue();
-
+$libre_createbackup_path = $members['libre_createbackup_path'];
 $id2 = $libre_createbackup_path->id === null ? $id . "a" : $libre_createbackup_path->id;
 
 $js = <<< SCRIPT
@@ -48,9 +40,9 @@ $this->registerJs($js);
             'options' => [
                 'id' => "ExamSettings_{$id}_value",
                 'name' => "ExamSettings[$id][value]",
-                'label' => $setting->detail->name
+                'label' => $label
             ],
-        ])->label(false); ?>
+        ])->label(false)->hint($hint); ?>
     </div>
     <div class="panel-body">
         <div style="display:none;">

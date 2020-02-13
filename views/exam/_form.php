@@ -11,13 +11,15 @@ use yii\web\JsExpression;
 use limion\jqueryfileupload\JQueryFileUpload;
 use kartik\range\RangeInput;
 use kartik\switchinput\SwitchInput;
+use app\assets\FormAsset;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\forms\ExamForm */
 /* @var $form yii\widgets\ActiveForm */
 
+FormAsset::register($this);
+
 $exam = $model->exam;
-$screenCapture = $model->screenCapture;
 
 $setting = new ExamSetting();
 $setting->loadDefaultValues();
@@ -48,33 +50,7 @@ if($exam->file2 && Yii::$app->file->set($exam->file2)->exists) {
     "));
 }
 
-$js = <<< 'SCRIPT'
-/* To initialize BS3 popovers set this below */
-$(function () { 
-    $("[data-toggle='popover']").popover(); 
-});
 
-$('.hint-block').each(function () {
-    var $hint = $(this);
-
-    $hint.parent().find('label').after('&nbsp<a tabindex="0" role="button" class="hint glyphicon glyphicon-question-sign"></a>');
-
-    $hint.parent().find('a.hint').popover({
-        html: true,
-        trigger: 'focus',
-        placement: 'right',
-        //title:  $hint.parent().find('label').html(),
-        title:  'Description',
-        toggle: 'popover',
-        container: 'body',
-        content: $hint.html()
-    });
-
-    $hint.remove()
-});
-SCRIPT;
-// Register tooltip/popover initialization javascript
-$this->registerJs($js);
 
 $js = <<< 'SCRIPT'
 // add custom validation to the process queue of fileupload
@@ -315,13 +291,6 @@ $this->registerJs($js);
                 ['data-toggle' => 'tab']
             ) ?>
         </li>
-        <li>
-            <?= Html::a(
-                '<i class="glyphicon glyphicon-camera"></i> ' . \Yii::t('exams', 'Screen Capture'),
-                '#screen_capture',
-                ['data-toggle' => 'tab']
-            ) ?>
-        </li>
     </ul>
 
     <div class="tab-content">
@@ -357,25 +326,6 @@ $this->registerJs($js);
     <?php Pjax::end(); ?>
 
     <?php Pjax::begin([
-        'id' => 'screen_capture',
-        'options' => ['class' => 'tab-pane fade'],
-    ]); ?>
-
-    <br>
-
-    <div class="row">
-        <div class="col-md-6">
-            <?= $form->field($screenCapture, 'enabled')->checkbox() ?>
-        </div>
-
-        <div class="col-md-6">
-            <?= $form->field($screenCapture, 'quality')->textInput(['maxlength' => true]) ?>
-        </div>
-    </div>
-
-    <?php Pjax::end(); ?>
-
-    <?php Pjax::begin([
         'id' => 'settings',
         'options' => ['class' => 'tab-pane fade'],
     ]); ?>
@@ -404,17 +354,10 @@ $this->registerJs($js);
                                 : ($_setting->exam_id === null
                                     ? 'new' . $id
                                     : $_setting->id);
-                            $members = [];
-                            foreach ($ExamSettings as $s) {
-                                if($id == $s->belongs_to) {
-                                    $members[] = $s;
-                                }
-                            }
                             echo $this->render('_form_exam_setting', [
                                 'id' => $id,
                                 'form' => $form,
                                 'setting' => $_setting,
-                                'members' => $members,
                             ]);
                         }
                     }
@@ -424,7 +367,6 @@ $this->registerJs($js);
                         'id' => '__id__',
                         'form' => $form,
                         'setting' => $setting,
-                        'members' => [],
                     ]); ?>
                     </div>
                 </div>

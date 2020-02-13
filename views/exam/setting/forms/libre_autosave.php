@@ -1,26 +1,16 @@
 <?php
 
-use app\models\ExamSetting;
 use kartik\switchinput\SwitchInput;
 
 /* @var $id integer */
+/* @var $label string */
+/* @var $hint string */
 /* @var $form yii\widgets\ActiveForm */
 /* @var $setting app\models\ExamSetting */
 /* @var $members app\models\ExamSetting[] */
 
-$libre_autosave_interval = new ExamSetting(['key' => 'libre_autosave_interval']);
-$libre_autosave_path = new ExamSetting(['key' => 'libre_autosave_path']);
-
-foreach($members as $s) {
-    if ($s->key == 'libre_autosave_interval') {
-        $libre_autosave_interval = $s;
-    } else if ($s->key == 'libre_autosave_path') {
-        $libre_autosave_path = $s;
-    }
-}
-
-$libre_autosave_interval->loadDefaultValue();
-$libre_autosave_path->loadDefaultValue();
+$libre_autosave_interval = $members['libre_autosave_interval'];
+$libre_autosave_path = $members['libre_autosave_path'];
 
 $id2 = $libre_autosave_path->id === null ? $id . "b" : $libre_autosave_path->id;
 $id3 = $libre_autosave_interval->id === null ? $id . "a" : $libre_autosave_interval->id;
@@ -47,7 +37,6 @@ $this->registerJs($js);
                 'class' => ''
             ],
         ])->widget(SwitchInput::classname(), [
-            'id' => 'a1732345678754',
             'pluginOptions' => [
                 'size' => 'mini',
                 'onText' => \Yii::t('app', 'ON'),
@@ -56,9 +45,9 @@ $this->registerJs($js);
             'options' => [
                 'id' => "ExamSettings_{$id}_value",
                 'name' => "ExamSettings[$id][value]",
-                'label' => $setting->detail->name
+                'label' => $label
             ],
-        ])->label(false); ?>
+        ])->label(false)->hint($hint); ?>
     </div>
     <div class="panel-body">
         <div style="display:none;">

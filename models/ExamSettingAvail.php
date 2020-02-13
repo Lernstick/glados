@@ -114,6 +114,18 @@ class ExamSettingAvail extends TranslatedActiveRecord
         return $this->hasMany(ExamSettingAvail::className(), ['belongs_to' => 'id']);
     }
 
+    /**
+     * @return Getter for the label
+     */
+    public function getLabel()
+    {
+        if ($this->belongsTo !== null) {
+            return $this->belongsTo->name . ': ' . $this->name;
+        } else {
+            return $this->name;
+        }
+    }
+
     /** 
      * @inheritdoc 
      * @return ActivityQuery the active query used by this AR class. 
