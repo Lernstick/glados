@@ -6,7 +6,6 @@ use yii\base\Behavior;
 use yii\base\Event;
 use app\models\History;
 use yii\db\Query;
-use yii\helpers\Inflector;
 
 class HistoryBehavior extends Behavior
 {
@@ -320,7 +319,6 @@ class HistoryBehavior extends Behavior
         if (($pos = strrpos($column, '.')) !== false) {
             $model = substr($column, 0, $pos);
             $column = substr($column, $pos + 1);
-
             $model = $this->owner->getRelation($model);
             $class = $model->modelClass;
             $model = new $class();

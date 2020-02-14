@@ -32,8 +32,6 @@ class ExamSetting extends Base
      */
     public function behaviors()
     {
-        $models = ExamSettingAvail::find()->all();
-        $attr = array_combine(array_column($models, 'key'), array_column($models, 'type'));
         return [
             'HistoryBehavior' => [
                 'class' => HistoryBehavior::className(),
@@ -41,9 +39,23 @@ class ExamSetting extends Base
                 'track_insertion' => true,
                 'relation' => 'exam',
                 'columnAttribute' => 'key',
-                'attributes' => array_merge([
-                    'value' => 'text',
-                ], $attr),
+                'attributes' => [
+                    'value'                     => 'text',
+                    "libre_autosave"            => "boolean",
+                    "libre_autosave_interval"   => "integer",
+                    "libre_autosave_path"       => "text",
+                    "libre_createbackup"        => "boolean",
+                    "libre_createbackup_path"   => "text",
+                    "max_brightness"            => "percent",
+                    "screenshots"               => "boolean",
+                    "screenshots_interval"      => "integer",
+                    "url_whitelist"             => "ntext",
+                    "screen_capture"            => "boolean",
+                    "screen_capture_command"    => "text",
+                    "screen_capture_fps"        => "integer",
+                    "screen_capture_quality"    => "percent",
+                    "screen_capture_chunk"      => "integer",
+                ],
             ],
         ];
     }

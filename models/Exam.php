@@ -218,7 +218,8 @@ class Exam extends Base
      */
     public function getExam_setting()
     {
-        return $this->hasMany(ExamSetting::className(), ['exam_id' => 'id']);
+        return $this->hasMany(ExamSetting::className(), ['exam_id' => 'id'])
+            ->orderBy(['exam_setting.id' => SORT_DESC]);
     }
 
     /**
