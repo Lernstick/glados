@@ -48,6 +48,8 @@ class History extends \yii\db\ActiveRecord
      */
     public $searchColumn = null;
 
+    private $_diffToLast;
+
     /**
      * @inheritdoc
      */
@@ -176,12 +178,15 @@ class History extends \yii\db\ActiveRecord
      */
     public function getDiffToLast()
     {
-        $pre = $this->diff()->one();
-        if ($pre !== null) {
-            return floatval($this->changed_at) - floatval($pre->changed_at);
-        } else {
-            return -1;
+        if ($this->_diffToLast === null) {
+            $pre = $this->diff()->one();
+            if ($pre !== null) {
+                $this->_diffToLast = floatval($this->changed_at) - floatval($pre->changed_at);
+            } else {
+                $this->_diffToLast = -1;
+            }
         }
+        return $this->_diffToLast;
     }
 
     /**

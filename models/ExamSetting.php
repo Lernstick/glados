@@ -163,7 +163,7 @@ class ExamSetting extends Base
     }
 
     /**
-     * @return mixed
+     * @return mixed Getter for the value in json
      */
     public function getJsonValue()
     {

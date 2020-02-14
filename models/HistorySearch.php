@@ -46,7 +46,7 @@ class HistorySearch extends History
      */
     public function search($params)
     {
-        $query = History::find();
+        $query = History::find()->with('user');
 
         // add conditions that should always apply here
 
