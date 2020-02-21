@@ -232,6 +232,9 @@ if [ -n "${actionConfig}" ]; then
   # set all libreoffice options
   libreoffice
 
+  # set all libreoffice options
+  screen_capture
+
   # fix the permissions
   chown -R user:user ${initrd}/newroot/${home}/.config
 

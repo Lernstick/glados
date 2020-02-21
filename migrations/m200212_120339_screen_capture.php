@@ -204,7 +204,8 @@ class m200212_120339_screen_capture extends Migration
             'key' => 'screen_capture_command',
             'name' => yiit('exam_setting_avail', 'Command'),
             'type' => 'text',
-            'default' => 'recordmydesktop --no-sound --fps 10 --on-the-fly-encoding --no-frame --v_quality 10',
+            //'default' => 'recordmydesktop --no-sound --fps 10 --on-the-fly-encoding --no-frame --v_quality 10',
+            'default' => 'ffmpeg -f x11grab -r 10 -s 1920x1080 -i :0 -c:v libx264 -b:v 300k -an'
             'description' => yiit('exam_setting_avail', 'The actual command that is executed to capture the screen. This will <b>overwrite</b> all other settings.'),
             'belongs_to' => $screen_capture->id,
         ]);
