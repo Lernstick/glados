@@ -143,12 +143,13 @@ $this->registerJs($js);
 
         <div class="parent">
             <?= $form->field($screen_capture_command, 'value', [
-            ])->textInput([
+            ])->textarea([
                 'id' => "ExamSettings_{$id2}_value",
                 'name' => "ExamSettings[$id2][value]",
-                'type' => 'text',
+                'rows' => '5',
                 'disabled' => !$setting->value,
-            ])->label($screen_capture_command->detail->name)->hint($screen_capture_command->detail->description); ?>
+            ])->label($screen_capture_command->detail->name)->hint($screen_capture_command->detail->description); 
+            ?>
         </div>
 
         <div class="parent">

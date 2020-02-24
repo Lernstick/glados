@@ -8,6 +8,7 @@ use yii\helpers\Url;
 use yii\bootstrap\Modal;
 use app\components\ActiveEventField;
 use app\components\Editable;
+use \wbraganca\videojs\VideoJsWidget;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Ticket */
@@ -355,6 +356,38 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php Pjax::end() ?>
     <?php } ?>
+
+    <?php Pjax::begin([
+        'id' => 'screencapture',
+        'options' => ['class' => 'tab-pane fade'],
+    ]); ?>
+
+        <?= VideoJsWidget::widget([
+            'options' => [
+                'class' => 'video-js vjs-default-skin vjs-big-play-centered',
+                'poster' => "http://www.videojs.com/img/poster.jpg",
+                'controls' => true,
+                'preload' => 'auto',
+                'width' => '970',
+                'height' => '400',
+            ],
+            'tags' => [
+                'source' => [
+                    ['src' => 'http://vjs.zencdn.net/v/oceans.mp4', 'type' => 'video/mp4'],
+                    ['src' => 'http://vjs.zencdn.net/v/oceans.webm', 'type' => 'video/webm']
+                ],
+                'track' => [
+                    [
+                        'kind' => 'captions',
+                        'src' => 'http://vjs.zencdn.net/vtt/captions.vtt',
+                        'srclang' => 'en',
+                        'label' => 'English'
+                    ]
+                ]
+            ]
+        ]); ?>
+
+    <?php Pjax::end() ?>
 
     <?php Pjax::begin([
         'id' => 'browse',

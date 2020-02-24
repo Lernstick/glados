@@ -66,6 +66,15 @@ $this->registerJs($active_tabs);
             <?= \Yii::t('ticket', 'Screenshots') ?>
         </a></li>
     <?php } ?>
+
+    <li>
+        <?= Html::a(
+            '<i class="glyphicon glyphicon-camera"></i> ' . \Yii::t('ticket', 'Screen Capture'),
+            Url::to(['ticket/view', 'id' => $model->id, '#' => 'screencapture']),
+            ['data-toggle' => 'tab']
+        ); ?>
+    </li>
+
     <li>
         <?= Html::a(
             '<i class="glyphicon glyphicon-sunglasses"></i> ' . \Yii::t('ticket', 'Result'),

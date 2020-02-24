@@ -29,7 +29,8 @@
         "fxp/composer-asset-plugin": "^1.4.1",
         "yiidoc/yii2-timeago": "dev-master",
         "yiisoft/yii2-imagine": "~2.0.0",
-        "russ666/yii2-countdown": "*"
+        "russ666/yii2-countdown": "*",
+        "wbraganca/yii2-videojs-widget": "~1.0"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",
