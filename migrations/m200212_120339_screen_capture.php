@@ -17,6 +17,11 @@ class m200212_120339_screen_capture extends Migration
     public $translationTable = 'translation';
     public $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
 
+    /**
+     * @array key value pair of fields to migrate, where key defines the olf field 
+     * name in the "exam" table, and the value relation to which settings the setting
+     * belongs to.
+     */
     public $migrateFields = [
         'screenshots' => null,
         'screenshots_interval' => 'screenshots',
@@ -205,7 +210,7 @@ class m200212_120339_screen_capture extends Migration
             'name' => yiit('exam_setting_avail', 'Command'),
             'type' => 'ntext',
             //'default' => 'recordmydesktop --no-sound --fps 10 --on-the-fly-encoding --no-frame --v_quality 10',
-            'default' => 'ffmpeg -f x11grab -r 10 -s 1920x1080 -i :0 -c:v libx264 -b:v 300k -an'
+            'default' => 'ffmpeg -f x11grab -r 10 -s 1920x1080 -i :0 -c:v libx264 -b:v 300k -an',
             'description' => yiit('exam_setting_avail', 'The actual command that is executed to capture the screen. This will <b>overwrite</b> all other settings.'),
             'belongs_to' => $screen_capture->id,
         ]);
@@ -350,6 +355,7 @@ class m200212_120339_screen_capture extends Migration
                 array_map(function($v){return $v->value;}, $model->exam_setting)
             );
 
+            // post processing down
             $found = false;
             foreach ($this->migrateFields as $field => $belongs_to) {
                 if (array_key_exists($field, $settings)) {
@@ -360,9 +366,17 @@ class m200212_120339_screen_capture extends Migration
                 }
             }
 
-            if ($found) {
+            // only set these field that have columns in the table exam
+            $updateSettings = [];
+            foreach ($this->migrateFields as $key => $belongs_to) {
+                if (array_key_exists($key, $settings)) {
+                    $updateSettings[$key] = $settings[$key];
+                }
+            }
+
+            if ($found && !empty($updateSettings)) {
                 Yii::$app->db->createCommand()->update($this->examTable,
-                    $settings,
+                    $updateSettings,
                     ['id' => $model->id]
                 )->execute();
             }

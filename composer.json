@@ -30,7 +30,7 @@
         "yiidoc/yii2-timeago": "dev-master",
         "yiisoft/yii2-imagine": "~2.0.0",
         "russ666/yii2-countdown": "*",
-        "wbraganca/yii2-videojs-widget": "~1.0"
+        "videojs/video.js": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",
@@ -39,6 +39,23 @@
         "yiisoft/yii2-faker": "*",
         "yiisoft/yii2-apidoc": "~2.1.0"
     },
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "videojs/video.js",
+                "version": "master",
+                "dist": {
+                    "type": "zip",
+                    "url": "https://github.com/videojs/video.js/releases/download/v7.6.6/video-js-7.6.6.zip",
+                    "reference": "master"
+                },
+                "autoload": {
+                    "classmap": ["."]
+                }
+            }
+        }
+    ],
     "config": {
         "process-timeout": 1800,
         "vendor-dir": "/usr/share/yii2",

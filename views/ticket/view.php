@@ -8,7 +8,7 @@ use yii\helpers\Url;
 use yii\bootstrap\Modal;
 use app\components\ActiveEventField;
 use app\components\Editable;
-use \wbraganca\videojs\VideoJsWidget;
+use app\components\VideoJsWidget;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Ticket */
@@ -362,6 +362,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'options' => ['class' => 'tab-pane fade'],
     ]); ?>
 
+        <button onClick="var player = videojs('videojs-w4'); player.play();">init</button>
         <?= VideoJsWidget::widget([
             'options' => [
                 'class' => 'video-js vjs-default-skin vjs-big-play-centered',
@@ -373,17 +374,11 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             'tags' => [
                 'source' => [
-                    ['src' => 'http://vjs.zencdn.net/v/oceans.mp4', 'type' => 'video/mp4'],
-                    ['src' => 'http://vjs.zencdn.net/v/oceans.webm', 'type' => 'video/webm']
-                ],
-                'track' => [
                     [
-                        'kind' => 'captions',
-                        'src' => 'http://vjs.zencdn.net/vtt/captions.vtt',
-                        'srclang' => 'en',
-                        'label' => 'English'
-                    ]
-                ]
+                        'src' => 'https://d2zihajmogu5jn.cloudfront.net/bipbop-advanced/bipbop_16x9_variant.m3u8',
+                        'type' => 'application/x-mpegURL',
+                    ],
+                ],
             ]
         ]); ?>
 
