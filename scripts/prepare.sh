@@ -152,9 +152,70 @@ sed 's/#domain-name=local/domain-name=.alocal/' /etc/avahi/avahi-daemon.conf >${
 # mount/prepare the root filesystem
 mount_rootfs "newroot"
 
-# install the shutdown hook
+DESTDIR="${initrd}"
+verbose="y"
+
+# create directories
+for d in etc bin sbin proc ; do
+  mkdir "$initrd/$d" || true 2>/dev/null
+done
+
+# copy busybox and dependencies to /run/initramfs
+# Bug is filed: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=953563
+# see /usr/share/initramfs-tools/hooks/zz-busybox
+BB_BIN=/bin/busybox
+
+if [ -r /usr/share/initramfs-tools/hook-functions ]; then
+  . /usr/share/initramfs-tools/hook-functions
+
+  if [ -f $DESTDIR/bin/sh ] && cmp -s $DESTDIR/bin/sh $BB_BIN ; then
+    # initramfs copies busybox into /bin/sh, undo this
+    rm -f $DESTDIR/bin/sh
+  fi
+  rm -f $DESTDIR/bin/busybox      # for compatibility with old initramfs
+  copy_exec $BB_BIN /bin/busybox
+
+  # this line fixes the canonicalization problem: copy_file copies the binary
+  # to /usr/bin instead of /bin, causing the rest of the script to fail, specially
+  # the line that link the alias to busybox below
+  ln "$DESTDIR/usr/bin/busybox" "$DESTDIR/bin/busybox"
+
+  for alias in $($BB_BIN --list-long); do
+    alias="${alias#/}"
+    case "$alias" in
+      # strip leading /usr, we don't use it
+      usr/*) alias="${alias#usr/}" ;;
+      */*) ;;
+      *) alias="bin/$alias" ;;  # make it into /bin
+    esac
+
+    [ -e "$DESTDIR/$alias" ] || \
+      ln "$DESTDIR/bin/busybox" "$DESTDIR/$alias"
+  done
+
+  # copy plymouth
+  . /usr/share/initramfs-tools/hooks/plymouth
+
+  # copy systemctl needed for final shutdown
+  copy_exec /bin/systemctl
+
+  # disable set -e again (set in /usr/share/initramfs-tools/hooks/plymouth)
+  set +e
+
+fi
+
+# mount proc
+mount -o bind /proc $initrd/proc
+
+# copy shutdown script, this script will be executed later by systemd-shutdown
 cp -pf "${initrd}/squashfs/mount.sh" "/lib/systemd/lernstick-shutdown"
 chmod 755 "/lib/systemd/lernstick-shutdown"
+
+# We do this here, anyway the script /lib/systemd/system-shutdown/lernstick might
+# also copy it. That's why in the above line the mount.sh script is also copied to
+# /lib/systemd/lernstick-shutdown. The above 2 lines are for backward compatibility.
+cp -pf "${initrd}/squashfs/mount.sh" "${initrd}/shutdown"
+chmod 755 "${initrd}/shutdown"
 
 # remove policykit action for lernstick welcome application
 rm -f ${initrd}/newroot/usr/share/polkit-1/actions/ch.lernstick.welcome.policy
@@ -162,7 +223,7 @@ rm -f ${initrd}/newroot/usr/share/polkit-1/actions/ch.lernstick.welcome.policy
 # add an entry to finish the exam in the dash
 add_dash_entry "finish_exam.desktop"
 
-# TODO
+# Welcome to exam .desktop entry to be executed at autostart
 mkdir -p "${initrd}/newroot/etc/xdg/autostart/"
 mkdir -p "${initrd}/newroot/usr/share/applications/"
 cat <<EOF >"${initrd}/newroot/etc/xdg/autostart/show-info.desktop"
