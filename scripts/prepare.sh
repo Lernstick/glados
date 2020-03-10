@@ -326,7 +326,7 @@ screen -d -m bash -c '
   set +o allexport
 
   if $DEBUG; then
-    if ${zenity} --question --title="Continue" --text="The system setup is done. Continue?"; then
+    if ${zenity} --width=300 --question --title="Continue" --text="The system setup is done. Continue?"; then
       clientState "continue bootup"
       echo "${eths}" | LC_ALL=C xargs -t -I{} nmcli connection down uuid "{}"
       halt
@@ -337,7 +337,7 @@ screen -d -m bash -c '
       echo "${i}0"
       #echo "#The system will continue in $((10 - $i)) seconds"
       sleep 1
-    done | ${zenity} --progress --no-cancel --title="Continue" --text="The system will continue in 10 seconds" --percentage=0 --auto-close
+    done | ${zenity} --width=300 --progress --no-cancel --title="Continue" --text="The system will continue in 10 seconds" --percentage=0 --auto-close
     clientState "continue bootup"
     echo "${eths}" | LC_ALL=C xargs -t -I{} nmcli connection down uuid "{}"
     halt
