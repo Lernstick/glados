@@ -16,6 +16,16 @@ home="$(sudo -u ${examUser} xdg-user-dir)"
 # source os-release
 . /etc/os-release
 
+# determines whether we have debian 9 or newer
+function isdeb9ornewer()
+{
+  if [ "$(echo "${VERSION_ID}"| egrep -q "^[0-9]+$")" != "" ] && [ ${VERSION_ID} -le 8 ]; then
+    false
+  else
+    true
+  fi
+}
+
 # transmit state to server
 function clientState()
 {
@@ -187,11 +197,32 @@ EOF
 cat <<'EOF' >"${initrd}/newroot/usr/bin/show_info"
 #!/bin/bash
 
+[ -e /tmp/showInfo ] && rm -r /tmp/showInfo
 /usr/bin/firefox -createprofile "showInfo /tmp/showInfo" -no-remote
-/usr/bin/firefox -P "showInfo" -width 850 -height 620 -chrome "/show_info.html"
+mkdir -p /tmp/showInfo/chrome/
+(
+  cat - <<EOFINNER
+/*
+ * set default namespace to XUL
+ */
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+ 
+/*
+ * Hide tab bar, navigation bar and scrollbars
+ * !important may be added to force override, but not necessary
+ * #content is not necessary to hide scroll bars
+ */
+#toolbar-context-menu {display: none !important;}
+#TabsToolbar {visibility: collapse;}
+#navigator-toolbox {visibility: collapse;}
+browser {margin-right: -14px; margin-bottom: -14px;}
+EOFINNER
+) | sudo -u user tee /tmp/showInfo/chrome/userChrome.css >/dev/null
+
+/usr/bin/firefox -no-remote -profile "/tmp/showInfo" -width 850 -height 620 "/show_info.html"
 
 # remove the profile - also remove it from the profiles.ini file
-rm -R /tmp/showInfo
+[ -e /tmp/showInfo ] && rm -r /tmp/showInfo
 ex -e - /home/user/.mozilla/firefox/profiles.ini <<@@@
 g/Name=showInfo/.-2,+2d
 wq
@@ -252,7 +283,7 @@ echo "${sshKey}" >>"${initrd}/backup/root/.ssh/authorized_keys"
 echo "tcp ${gladosIp} 22" >>${initrd}/backup/etc/lernstick-firewall/net_whitelist_input
 
 # hand over the url whitelist
-if [ "${VERSION_ID}" = "9" ]; then
+if isdeb9ornewer; then
   echo "${gladosProto}://${gladosIp}" | sed 's/\./\\\./g' >>${initrd}/backup/etc/lernstick-firewall/url_whitelist
 else
   echo "${gladosProto}://${gladosIp}:${gladosPort}" >>${initrd}/backup/etc/lernstick-firewall/url_whitelist
