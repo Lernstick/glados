@@ -259,8 +259,11 @@ cat <<'EOF' >"${initrd}/newroot/usr/bin/show_info"
 #!/bin/bash
 
 [ -e /tmp/showInfo ] && rm -r /tmp/showInfo
-/usr/bin/firefox -createprofile "showInfo /tmp/showInfo" -no-remote
+#/usr/bin/firefox -createprofile "showInfo /tmp/showInfo" -no-remote
 mkdir -p /tmp/showInfo/chrome/
+
+# Dirty hacky way to create a new firefox profile
+/usr/bin/firefox -profile /tmp/showInfo/ -no-remote --headless --screenshot i-dont-exist
 (
   cat - <<EOFINNER
 /*
@@ -278,7 +281,10 @@ mkdir -p /tmp/showInfo/chrome/
 #navigator-toolbox {visibility: collapse;}
 browser {margin-right: -14px; margin-bottom: -14px;}
 EOFINNER
-) | sudo -u user tee /tmp/showInfo/chrome/userChrome.css >/dev/null
+) | tee /tmp/showInfo/chrome/userChrome.css >/dev/null
+
+# another hacky way to remove some firefox default settings at the first start
+echo 'user_pref("browser.tabs.warnOnClose", false);' >> /tmp/showInfo/prefs.js
 
 /usr/bin/firefox -no-remote -profile "/tmp/showInfo" -width 850 -height 620 "/show_info.html"
 
