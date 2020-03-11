@@ -382,6 +382,10 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
             }*/
         }
 
+        if ($this->isNewRecord) {
+            $this->connection_method = self::CONNECT_VIA_DOMAIN;
+        }
+
         if ($this->groups === []) {
             $this->groups = array_combine(array_keys($this->mapping), array_keys($this->mapping));
         }
@@ -800,19 +804,32 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
         }
 
         if ($this->connection_method == self::CONNECT_VIA_DOMAIN) {
+            // reverse lookup
             $ip = gethostbyname($this->domain);
-            Yii::debug('Looking up IP from hostname. Name: ' . $this->domain . ', IP: ' . $ip . '.', __METHOD__);
-            $this->debug[] = Yii::t('auth', 'Looking up IP via DNS: <code>{name}</code> -> <code>{ip}</code>.', [
-                'name' => $this->domain,
-                'ip' => $ip,
-            ]);
+            if ($ip == $this->domain) {
 
-            $host = gethostbyaddr($ip);
-            Yii::debug('Looking up hostname from IP. Name: ' . $host . ', IP: ' . $ip . '.', __METHOD__);
-            $this->debug[] = Yii::t('auth', 'Looking up hostname from IP: <code>{ip}</code> -> <code>{name}</code>.', [
-                'name' => $host,
-                'ip' => $ip,
-            ]);
+                Yii::debug('Reverse DNS lookup for the IP address failed. Name: ' . $this->domain . ', IP: ' . $ip . '.', __METHOD__);
+                $this->debug[] = Yii::t('auth', 'Reverse DNS lookup for the IP address failed: <code>{name}</code> -> <code>{ip}</code>.', [
+                    'name' => $this->domain,
+                    'ip' => 'no result',
+                ]);
+
+                $host = $this->domain;
+            } else {
+
+                Yii::debug('Reverse DNS lookup for the IP address. Name: ' . $this->domain . ', IP: ' . $ip . '.', __METHOD__);
+                $this->debug[] = Yii::t('auth', 'Reverse DNS lookup for the IP address: <code>{name}</code> -> <code>{ip}</code>.', [
+                    'name' => $this->domain,
+                    'ip' => $ip,
+                ]);
+
+                $host = gethostbyaddr($ip);
+                Yii::debug('DNS lookup for hostname from IP. Name: ' . $host . ', IP: ' . $ip . '.', __METHOD__);
+                $this->debug[] = Yii::t('auth', 'Looking up hostname from IP: <code>{ip}</code> -> <code>{name}</code>.', [
+                    'name' => $host,
+                    'ip' => $ip,
+                ]);
+            }
 
             $this->ldap_uri = $this->ldap_scheme . '://' . $host . ':' . $this->ldap_port;
         }
