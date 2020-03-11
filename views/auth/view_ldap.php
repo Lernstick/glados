@@ -151,10 +151,20 @@ $this->registerJs($active_tabs);
             <?= DetailView::widget([
                 'model' => $model,
                 'attributes' => [
-                    'ldap_uri',
+                    'connection_method',
+                    [
+                        'attribute' => 'ldap_uri',
+                        'visible' => $model->connection_method == $model::CONNECT_VIA_URI,
+                    ],
+                    [
+                        'attribute' => 'ldap_port',
+                        'visible' => $model->connection_method == $model::CONNECT_VIA_DOMAIN,
+                    ],
+                    [
+                        'attribute' => 'ldap_scheme',
+                        'visible' => $model->connection_method == $model::CONNECT_VIA_DOMAIN,
+                    ],
                     'baseDn',
-                    'ldap_scheme',
-                    'ldap_port',
                     'method',
                     [
                         'attribute' => 'ldap_options',
