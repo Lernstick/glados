@@ -12,7 +12,7 @@ Package: glados
 Architecture: all
 Depends: ${misc:Depends},
     apache2,
-    mysql-server,
+    default-mysql-server,
     php,
     php-zip,
     php-mysql,
