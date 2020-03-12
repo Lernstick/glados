@@ -91,10 +91,10 @@ $this->registerJs($js);
 
 $js = <<< SCRIPT
 
-method = $("select[name^='Auth'][name$='[method]']")
+method = $("select[name^='Auth'][name$='[method]']");
 
 method_change = function(){
-    var method = $("select[name^='Auth'][name$='[method]']")
+    var method = $("select[name^='Auth'][name$='[method]']");
     var bindScheme = $("input[name^='Auth'][name$='[bindScheme]']").closest("div.parent");
     var loginSearchFilter = $("input[name^='Auth'][name$='[loginSearchFilter]']").closest("div.parent");
     var loginAttribute = $("select[name^='Auth'][name$='[loginAttribute]']").closest("div.parent");
@@ -132,6 +132,35 @@ method_change = function(){
 
 method_change();
 method.change(method_change);
+
+connection_method = $("select[name^='Auth'][name$='[connection_method]']");
+
+connection_method_change = function(){
+    var connection_method = $("select[name^='Auth'][name$='[connection_method]']");
+    var ldap_uri = $("input[name^='Auth'][name$='[ldap_uri]']").closest("div.parent");
+    var ldap_port = $("input[name^='Auth'][name$='[ldap_port]']").closest("div.parent");
+    var ldap_scheme = $("select[name^='Auth'][name$='[ldap_scheme]']").closest("div.parent");
+
+    var selected = $(this).children("option:selected").val();
+    if (selected == null) {
+        selected = "{$model->connection_method}";
+    }
+    console.log(ldap_uri);
+    console.log(ldap_scheme);
+    console.log(ldap_port);
+    if (selected == "connect_via_uri") {
+        ldap_uri.show();
+        ldap_port.hide();
+        ldap_scheme.hide();
+    } else if (selected == "connect_via_domain") {
+        ldap_uri.hide();
+        ldap_port.show();
+        ldap_scheme.show();
+    }
+};
+
+connection_method_change();
+connection_method.change(connection_method_change);
 
 SCRIPT;
 $this->registerJs($js);
@@ -362,7 +391,44 @@ JS;
         <div class="panel-body">
             <div class="row">
                 <div class="col-md-12">
-                    <?= $form->field($model, 'ldap_uri')->textInput(['maxlength' => true]) ?>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <?= $form->field($model, 'connection_method', [
+                                    'template' => "<div class='col-lg-4'>{label}</div>\n<div class='col-lg-8'>{input}</div>\n<div class='col-lg-4'></div>{hint}\n{error}",
+                                    'errorOptions' => ['class' => 'col-lg-8 help-block'],
+                                    'options' => [
+                                        'class' => '',
+                                    ],
+                                    'errorOptions' => ['tag' => false],
+                                ])->dropdownList([
+                                    $model::CONNECT_VIA_DOMAIN => \Yii::t('auth', 'Build the LDAP URI'),
+                                    $model::CONNECT_VIA_URI => \Yii::t('auth', 'Connect via given LDAP URI'),
+                                ]) ?>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+
+                            <div id="connection_method-fields">
+
+                                <div class="col-md-6 parent">
+                                    <?= $form->field($model, 'ldap_scheme')->dropdownList([
+                                    'ldap' => 'ldap',
+                                    'ldaps' => 'ldaps',
+                                ]) ?>
+                                </div>
+
+                                <div class="col-md-6 parent">
+                                    <?= $form->field($model, 'ldap_port')->textInput(['maxlength' => true]) ?>
+                                </div>
+
+                                <div class="col-md-12 parent">
+                                    <?= $form->field($model, 'ldap_uri')->textInput(['maxlength' => true]) ?>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
                 <div class="col-md-6">
                     <?= $form->field($model, 'userSearchFilter')->widget(Select2::classname(), [

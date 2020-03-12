@@ -248,6 +248,7 @@ $this->registerJs($js);
                         <div class="col-md-12">
                             <?= $form->field($model, 'max_brightness')->widget(RangeInput::classname(), [
                                 'options' => ['placeholder' => \Yii::t('exams', 'Select range ...')],
+                                'html5Container' => ['style' => 'width:80%'],
                                 'html5Options' => ['min' => 0, 'max' => 100, 'step' => 1],
                                 'addon' => ['append' => ['content' => '%']]
                             ]) ?>

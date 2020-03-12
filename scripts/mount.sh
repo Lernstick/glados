@@ -46,9 +46,15 @@ if [ -f "/restore" ]; then
   sleep 1
   kill -9 "$(pidof plymouthd)"
 
+  # this could spawn a shell to investigate
+  #exec /bin/sh
+
   # get data from info file
   eval $(cat /info)
   mkdir -p /usb
+  if [ -z "${partitionSystem}" ]; then
+    partitionSystem="/dev/sr0"
+  fi
   oldMnt="$(awk -v m="$partitionSystem" '$1==m{print $2}' /proc/mounts)"
   if [ -z "${oldMnt}" ]; then
     mount ${partitionSystem} /usb
