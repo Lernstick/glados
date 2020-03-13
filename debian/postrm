@@ -3,6 +3,8 @@
 
 set -e
 
+php_version=$(php -r 'list($m, $n)=explode(".", phpversion()); echo "$m.$n";') # gives MAJOR.MINOR
+
 apache_remove() {
     COMMON_STATE=$(dpkg-query -f '${Status}' -W 'apache2.2-common' 2>/dev/null | awk '{print $3}' || true)
 
@@ -69,11 +71,11 @@ if [ "$1" = "remove" ] || [ "$1" = "purge" ]; then
             rm -f /etc/avahi/services/glados.service
         fi
 
-        if [ -h /etc/php/7.0/mods-available/glados.ini ] ; then
-            rm -f /etc/php/7.0/mods-available/glados.ini
+        if [ -h /etc/php/${php_version}/mods-available/glados.ini ] ; then
+            rm -f /etc/php/${php_version}/mods-available/glados.ini
         fi
 
-        rm -f /etc/php/7.0/mods-available/inotify.ini
+        rm -f /etc/php/${php_version}/mods-available/inotify.ini
         rm -rf /etc/glados /var/lib/glados
     fi
 fi
