@@ -128,7 +128,7 @@ class m190514_121720_i18n_pre extends Migration
 
         // create table->field_id
         if ($this->db->schema->getTableSchema($table, true)->getColumn($idField) === null) {
-            $this->addColumn($table, $idField, $this->integer(11)->notNull()->defaultValue(0));
+            $this->addColumn($table, $idField, $this->integer(11)->notNull());
         }
 
         // rename table->field to table->field_old
