@@ -7,11 +7,11 @@ glados for Debian
 
 * Merge the debian branch with the master branch at the tag created
 
-* Clone the repo in the debian9 branch
+* Clone the repo in the debian branch
 
- git clone -b debian9 https://github.com/imedias/glados.git
+ git clone -b debian https://github.com/imedias/glados.git
 
-* Add all new parameters in params.conf (if some)
+* Add all new parameters in conf/params.conf (if some)
 
 * Add new config files to debian/conf dir and to debian/links (if some)
 
@@ -43,6 +43,6 @@ glados for Debian
 
  dpkg-buildpackage -us -uc
 
-* Maybe commit and push changed to the debian branch
+* Maybe commit and push changes to the debian branch
 
  -- Roman Gruber <roman.gruber@inf.unibe.ch>  Tue, 10 Dec 2019 11:42:22 +0100

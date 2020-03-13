@@ -1,3 +1,16 @@
+glados (1.0.7-deb10) unstable; urgency=low
+
+  * Fixed several bugs:
+    - Fixed a bug, where the form to create multiple tickets broke
+    - Fixed the range input field in the exam form
+    - Fixed a bug, where no default values were defined, but the field was
+      defined as NOT NULL.
+  * New Features
+    - LDAP: possibility to chosse between two different connection methods
+    - Debian 10 Client support for Lernstick >2020-03-08
+
+ -- Roman Gruber <roman.gruber@inf.unibe.ch>  Fri, 13 Mar 2020 13:46:02 +0100
+
 glados (1.0.6-deb9) unstable; urgency=low
 
   * Fixed several bugs:
