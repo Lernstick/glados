@@ -40,6 +40,10 @@ unmount_loop $BASEPATH
 # exist, do a normal shutdown.
 if [ -f "/restore" ]; then
 
+  echo "##############################################################" >/dev/kmsg 2>&1
+  echo "##################  SWITCHING TO EXAM MODE  ##################" >/dev/kmsg 2>&1
+  echo "##############################################################" >/dev/kmsg 2>&1
+
   # workaround, plymouth removes /dev/null, which then is recreated as regular
   # file with mode 644. This causes lots of processes to fail.
   kill "$(pidof plymouthd)"
@@ -47,7 +51,7 @@ if [ -f "/restore" ]; then
   kill -9 "$(pidof plymouthd)"
 
   # this could spawn a shell to investigate
-  #exec /bin/sh
+  #/bin/sh >/dev/console
 
   # get data from info file
   eval $(cat /info)

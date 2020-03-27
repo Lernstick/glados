@@ -204,9 +204,6 @@ if [ -r /usr/share/initramfs-tools/hook-functions ]; then
 
 fi
 
-# mount proc
-mount -o bind /proc $initrd/proc
-
 # copy shutdown script, this script will be executed later by systemd-shutdown
 cp -pf "${initrd}/squashfs/mount.sh" "/lib/systemd/lernstick-shutdown"
 chmod 755 "/lib/systemd/lernstick-shutdown"
@@ -258,14 +255,15 @@ EOF
 cat <<'EOF' >"${initrd}/newroot/usr/bin/show_info"
 #!/bin/bash
 
-[ -e /tmp/showInfo ] && rm -r /tmp/showInfo
 #/usr/bin/firefox -createprofile "showInfo /tmp/showInfo" -no-remote
 mkdir -p /tmp/showInfo/chrome/
 
-# Dirty hacky way to create a new firefox profile
-/usr/bin/firefox -profile /tmp/showInfo/ -no-remote --headless --screenshot i-dont-exist
-(
-  cat - <<EOFINNER
+# Dirty hacky way to create a new firefox profile (only in firstrun)
+if ! [ -e /tmp/showInfo/prefs.js ]; then
+  timeout -s INT -k 8 4 \
+    /usr/bin/firefox -profile "/tmp/showInfo/" -no-remote --screenshot i-dont-exist
+  (
+    cat - <<EOFINNER
 /*
  * set default namespace to XUL
  */
@@ -281,15 +279,20 @@ mkdir -p /tmp/showInfo/chrome/
 #navigator-toolbox {visibility: collapse;}
 browser {margin-right: -14px; margin-bottom: -14px;}
 EOFINNER
-) | tee /tmp/showInfo/chrome/userChrome.css >/dev/null
+  ) | tee /tmp/showInfo/chrome/userChrome.css >/dev/null
 
-# another hacky way to remove some firefox default settings at the first start
-echo 'user_pref("browser.tabs.warnOnClose", false);' >> /tmp/showInfo/prefs.js
+  # another hacky way to remove some firefox default settings at the first start
+  echo 'user_pref("browser.tabs.warnOnClose", false);' >> /tmp/showInfo/prefs.js
 
-/usr/bin/firefox -no-remote -profile "/tmp/showInfo" -width 850 -height 620 "/show_info.html"
+fi
+
+profile="$(mktemp -d)"
+cp -a /tmp/showInfo/. "$profile"
+
+/usr/bin/firefox -no-remote -profile "$profile" -width 850 -height 620 "/show_info.html"
 
 # remove the profile - also remove it from the profiles.ini file
-[ -e /tmp/showInfo ] && rm -r /tmp/showInfo
+rm -r "$profile"
 ex -e - /home/user/.mozilla/firefox/profiles.ini <<@@@
 g/Name=showInfo/.-2,+2d
 wq
