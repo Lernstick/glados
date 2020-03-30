@@ -54,7 +54,19 @@ class BackupController extends Controller
 
         $contents = $fs->slash($path)->versionAt($date)->restore(true);
 
+        $ext = pathinfo($path, PATHINFO_EXTENSION);
+        $arr = [
+            'm3u8' => 'application/x-mpegURL',
+            'ts' => 'video/MP2T',
+        ];
+        $mimeType = array_key_exists($ext, $arr) ? $arr[$ext] : 'application/octet-stream';
+        if ($ext == 'm3u8') {
+            $contents = str_replace("#EXT-X-PLAYLIST-TYPE:EVENT", "#EXT-X-PLAYLIST-TYPE:VOD", $contents) . "#EXT-X-ENDLIST" . PHP_EOL;
+            #$contents .= "#EXT-X-ENDLIST" . PHP_EOL;
+        }
+
         return Yii::$app->response->sendContentAsFile($contents, $fs->slash($path)->basename, [
+            'mimeType' => $mimeType,
             'inline' => false,
         ]);
     }
