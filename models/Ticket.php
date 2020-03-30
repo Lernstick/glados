@@ -146,7 +146,7 @@ class Ticket extends LiveActiveRecord
             'download_lock' => [ 'priority' => 0 ],
             'download_progress' => [
                 'priority' => function ($field, $model) {
-                    return round($field*100) == 100 ? 0 : 2;
+                    return round($model->{$field}*100) == 100 ? 0 : 2;
                 },
                 'data' => function ($field, $model) {
                     return [

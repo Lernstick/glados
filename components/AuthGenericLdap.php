@@ -41,6 +41,17 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
     const SCENARIO_ANONYMOUS_BIND = 'anonymous_bind';
 
     /**
+     * @const string Connect directly via explicitly given LDAP URI
+     */
+    const CONNECT_VIA_URI = 'connect_via_uri';
+
+    /**
+     * @const string Build the LDAP URI using [[ldap_scheme]], [[ldap_port]], and [[domain]]
+     * {ldap_scheme}://{domain}:{ldap_port}
+     */
+    const CONNECT_VIA_DOMAIN = 'connect_via_domain';
+
+    /**
      * @const int extended error output
      */
     const LDAP_OPT_DIAGNOSTIC_MESSAGE = 0x0032;
@@ -49,6 +60,7 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
     public $ldap_scheme = 'ldap';
     public $ldap_port = 389;
     public $domain = '';
+    public $connection_method = self::CONNECT_VIA_URI;
 
     public $ldap_options = [
         LDAP_OPT_PROTOCOL_VERSION => 3,
@@ -362,12 +374,16 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
     public function init()
     {
         if ($this->domain !== '') {
-            if ($this->ldap_uri === '') {
+            /*if ($this->ldap_uri === '') {
                 $this->ldap_uri = $this->ldap_scheme . '://' . $this->domain . ':' . $this->ldap_port;
-            }
+            }*/
             /*if ($this->base === '') {
                 $this->base = "dc=" . implode(",dc=", explode(".", $this->domain));
             }*/
+        }
+
+        if ($this->isNewRecord) {
+            $this->connection_method = self::CONNECT_VIA_DOMAIN;
         }
 
         if ($this->groups === []) {
@@ -384,7 +400,7 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
     {
         return array_merge(parent::rules(), [
             // required stuff in all scenarios
-            [['domain', 'userSearchFilter', 'uniqueIdentifier', 'groupSearchFilter', 'groupIdentifier', 'groupMemberAttribute', 'groupMemberUserAttribute', 'primaryGroupUserAttribute','primaryGroupGroupAttribute', 'method'], 'required'],
+            [['domain', 'userSearchFilter', 'uniqueIdentifier', 'groupSearchFilter', 'groupIdentifier', 'groupMemberAttribute', 'groupMemberUserAttribute', 'primaryGroupUserAttribute','primaryGroupGroupAttribute', 'method', 'connection_method'], 'required'],
             [['bindScheme', 'loginSearchFilter'], 'required', 'on' => self::SCENARIO_BIND_DIRECT],
             [['loginAttribute', 'bindAttribute'], 'required', 'on' => [self::SCENARIO_BIND_BYUSER, self::SCENARIO_ANONYMOUS_BIND]],
             [['bindUsername', 'bindPassword'], 'required', 'on' => self::SCENARIO_BIND_BYUSER],
@@ -420,6 +436,27 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
                 }",
                 'on' => [self::SCENARIO_MIGRATE, self::SCENARIO_QUERY_USERS]
             ],
+
+            [
+                ['ldap_uri'],
+                'required',
+                'when' => function($model) {return $model->connection_method == self::CONNECT_VIA_URI;},
+                'whenClient' => "function (attribute, value) {
+                    return $(\"select[name^='Auth'][name$='[connection_method]']\").children('option:selected').val() == 'connect_via_uri';
+                }",
+                'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_BIND_DIRECT, self::SCENARIO_BIND_BYUSER]
+            ],
+
+            [
+                ['ldap_port', 'ldap_scheme'],
+                'required',
+                'when' => function($model) {return $model->connection_method == self::CONNECT_VIA_DOMAIN;},
+                'whenClient' => "function (attribute, value) {
+                    return $(\"select[name^='Auth'][name$='[connection_method]']\").children('option:selected').val() == 'connect_via_domain';
+                }",
+                'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_BIND_DIRECT, self::SCENARIO_BIND_BYUSER]
+            ],
+
         ]);
     }
 
@@ -429,10 +466,10 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios[self::SCENARIO_BIND_DIRECT] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'ldap_uri', 'loginScheme', 'groupIdentifier', 'groupSearchFilter', 'mapping', 'uniqueIdentifier', 'groupMemberAttribute', 'groupMemberUserAttribute', 'userSearchFilter', 'primaryGroupUserAttribute', 'primaryGroupGroupAttribute', 'method', 'bindScheme', 'loginSearchFilter', 'bindAttribute']);
-        $scenarios[self::SCENARIO_BIND_BYUSER] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'ldap_uri', 'loginScheme', 'groupIdentifier', 'groupSearchFilter', 'mapping', 'uniqueIdentifier', 'groupMemberAttribute', 'groupMemberUserAttribute', 'userSearchFilter', 'primaryGroupUserAttribute', 'primaryGroupGroupAttribute', 'method', 'bindUsername', 'bindPassword', 'loginAttribute', 'bindAttribute']);
-        $scenarios[self::SCENARIO_ANONYMOUS_BIND] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'ldap_uri', 'loginScheme', 'groupIdentifier', 'groupSearchFilter', 'mapping', 'uniqueIdentifier', 'groupMemberAttribute', 'groupMemberUserAttribute', 'userSearchFilter', 'primaryGroupUserAttribute', 'primaryGroupGroupAttribute', 'method', 'loginAttribute', 'bindAttribute']);
-        $scenarios[self::SCENARIO_QUERY_GROUPS] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'ldap_uri', 'loginScheme', 'groupIdentifier', 'groupSearchFilter', 'mapping', 'uniqueIdentifier', 'groupMemberAttribute', 'groupMemberUserAttribute', 'userSearchFilter', 'method', 'primaryGroupUserAttribute', 'primaryGroupGroupAttribute', 'bindUsername', 'bindPassword', 'loginAttribute', 'bindAttribute', 'query_username', 'query_password', 'bindScheme', 'loginSearchFilter']);
+        $scenarios[self::SCENARIO_BIND_DIRECT] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'connection_method', 'ldap_uri', 'ldap_scheme', 'ldap_port', 'loginScheme', 'groupIdentifier', 'groupSearchFilter', 'mapping', 'uniqueIdentifier', 'groupMemberAttribute', 'groupMemberUserAttribute', 'userSearchFilter', 'primaryGroupUserAttribute', 'primaryGroupGroupAttribute', 'method', 'bindScheme', 'loginSearchFilter', 'bindAttribute']);
+        $scenarios[self::SCENARIO_BIND_BYUSER] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'connection_method', 'ldap_uri', 'ldap_scheme', 'ldap_port', 'loginScheme', 'groupIdentifier', 'groupSearchFilter', 'mapping', 'uniqueIdentifier', 'groupMemberAttribute', 'groupMemberUserAttribute', 'userSearchFilter', 'primaryGroupUserAttribute', 'primaryGroupGroupAttribute', 'method', 'bindUsername', 'bindPassword', 'loginAttribute', 'bindAttribute']);
+        $scenarios[self::SCENARIO_ANONYMOUS_BIND] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'connection_method', 'ldap_uri', 'ldap_scheme', 'ldap_port', 'loginScheme', 'groupIdentifier', 'groupSearchFilter', 'mapping', 'uniqueIdentifier', 'groupMemberAttribute', 'groupMemberUserAttribute', 'userSearchFilter', 'primaryGroupUserAttribute', 'primaryGroupGroupAttribute', 'method', 'loginAttribute', 'bindAttribute']);
+        $scenarios[self::SCENARIO_QUERY_GROUPS] = array_merge($scenarios[self::SCENARIO_DEFAULT], ['domain', 'connection_method', 'ldap_uri', 'ldap_scheme', 'ldap_port', 'loginScheme', 'groupIdentifier', 'groupSearchFilter', 'mapping', 'uniqueIdentifier', 'groupMemberAttribute', 'groupMemberUserAttribute', 'userSearchFilter', 'method', 'primaryGroupUserAttribute', 'primaryGroupGroupAttribute', 'bindUsername', 'bindPassword', 'loginAttribute', 'bindAttribute', 'query_username', 'query_password', 'bindScheme', 'loginSearchFilter']);
         $scenarios[self::SCENARIO_QUERY_USERS] = ['migrateSearchPattern', 'migrateUserSearchFilter', 'userIdentifier', 'query_username', 'query_password'];
         return $scenarios;
     }
@@ -505,6 +542,9 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
             'migrateUserSearchFilter' => \Yii::t('auth', 'A search filter to query the LDAP for each username matching the condition to migrate. Placeholders can be used. For a full list of placeholders, please refer to {link}.', [
                 'link' => Html::a('Placeholders', Url::to(['howto/view', 'id' => 'auth-placeholders.md'])),
             ]),
+            'connection_method' => \Yii::t('auth', 'There are 2 differnt methods to connect to the LDAP server.<ul><li><b>Connect via given LDAP URI</b> means that the  server will connect exactly to the LDAP URI provided in the field below.</li><li><b>Build the LDAP URI</b> means that the system will build the LDAP URI using the given attributes. The LDAP URI is built as follows<br><code>{scheme}://{name}:{port}</code>.<br>In this scenario, the <code>{name}</code> used in the LDAP URI is determined using a DNS lookup of the <code>{domain}</code> name and then a reverse DNS lookup of the obtained IP address. Using this method, the correct hostname of the LDAP server can be determined even if you use DNS rotation on the domain name. This is ideal for Active Directory servers.</li></ul>'),
+            'ldap_port' => \Yii::t('auth', 'The TCP port to connect to, when establishing an LDAP connection. Usually <code>389</code> for ldap and <code>636</code> for ldaps.'),
+            'ldap_scheme' => \Yii::t('auth', 'The ldap scheme. Use either <code>ldap</code> or <code>ldaps</code>.'),
         ]);
     }
 
@@ -761,6 +801,37 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
 
         if ($this->domain !== '' && $this->ldap_uri === '') {
             $this->ldap_uri = $this->ldap_scheme . '://' . $this->domain . ':' . $this->ldap_port;
+        }
+
+        if ($this->connection_method == self::CONNECT_VIA_DOMAIN) {
+            // reverse lookup
+            $ip = gethostbyname($this->domain);
+            if ($ip == $this->domain) {
+
+                Yii::debug('Reverse DNS lookup for the IP address failed. Name: ' . $this->domain . ', IP: ' . $ip . '.', __METHOD__);
+                $this->debug[] = Yii::t('auth', 'Reverse DNS lookup for the IP address failed: <code>{name}</code> -> <code>{ip}</code>.', [
+                    'name' => $this->domain,
+                    'ip' => 'no result',
+                ]);
+
+                $host = $this->domain;
+            } else {
+
+                Yii::debug('Reverse DNS lookup for the IP address. Name: ' . $this->domain . ', IP: ' . $ip . '.', __METHOD__);
+                $this->debug[] = Yii::t('auth', 'Reverse DNS lookup for the IP address: <code>{name}</code> -> <code>{ip}</code>.', [
+                    'name' => $this->domain,
+                    'ip' => $ip,
+                ]);
+
+                $host = gethostbyaddr($ip);
+                Yii::debug('DNS lookup for hostname from IP. Name: ' . $host . ', IP: ' . $ip . '.', __METHOD__);
+                $this->debug[] = Yii::t('auth', 'Looking up hostname from IP: <code>{ip}</code> -> <code>{name}</code>.', [
+                    'name' => $host,
+                    'ip' => $ip,
+                ]);
+            }
+
+            $this->ldap_uri = $this->ldap_scheme . '://' . $host . ':' . $this->ldap_port;
         }
 
         Yii::debug('Opening LDAP connection: ' . $this->ldap_uri, __METHOD__);

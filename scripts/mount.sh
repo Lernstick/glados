@@ -40,15 +40,25 @@ unmount_loop $BASEPATH
 # exist, do a normal shutdown.
 if [ -f "/restore" ]; then
 
+  echo "##############################################################" >/dev/kmsg 2>&1
+  echo "##################  SWITCHING TO EXAM MODE  ##################" >/dev/kmsg 2>&1
+  echo "##############################################################" >/dev/kmsg 2>&1
+
   # workaround, plymouth removes /dev/null, which then is recreated as regular
   # file with mode 644. This causes lots of processes to fail.
   kill "$(pidof plymouthd)"
   sleep 1
   kill -9 "$(pidof plymouthd)"
 
+  # this could spawn a shell to investigate
+  #/bin/sh >/dev/console
+
   # get data from info file
   eval $(cat /info)
   mkdir -p /usb
+  if [ -z "${partitionSystem}" ]; then
+    partitionSystem="/dev/sr0"
+  fi
   oldMnt="$(awk -v m="$partitionSystem" '$1==m{print $2}' /proc/mounts)"
   if [ -z "${oldMnt}" ]; then
     mount ${partitionSystem} /usb
