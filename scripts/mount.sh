@@ -53,12 +53,22 @@ if [ -f "/restore" ]; then
   # this could spawn a shell to investigate
   #/bin/sh >/dev/console
 
-  # get data from info file
-  eval $(cat /info)
-  mkdir -p /usb
+  # determine partitionSystem once and for all
+  # this one is for debian 10
+  partitionSystem="$(awk '$2~/run\/live\/medium/{print $1}' /proc/mounts)"
+  if [ -z "${partitionSystem}" ]; then
+    # this one is for debian 9
+    partitionSystem="$(awk '$2~/live\/mount\/medium/{print $1}' /proc/mounts)"
+  fi
   if [ -z "${partitionSystem}" ]; then
     partitionSystem="/dev/sr0"
   fi
+  sed -i "s#partitionSystem=.*#partitionSystem=${partitionSystem}#" /info
+
+  # get data from info file
+  eval $(cat /info)
+  mkdir -p /usb
+
   oldMnt="$(awk -v m="$partitionSystem" '$1==m{print $2}' /proc/mounts)"
   if [ -z "${oldMnt}" ]; then
     mount ${partitionSystem} /usb
