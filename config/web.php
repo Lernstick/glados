@@ -73,6 +73,7 @@ $config = [
                 'howto/img/<id>' => 'howto/img',
                 'howto/<id>' => 'howto/view',
                 'ticket/<action:(config|download|finish|notify|md5|status)>/<token:.*>' => 'ticket/<action>',
+                'backup/<action:file>/<ticket_id:\d+>' => 'backup/<action>',
             ]
         ],
         'i18n' => [

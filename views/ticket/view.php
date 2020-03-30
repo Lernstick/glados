@@ -362,11 +362,21 @@ $this->params['breadcrumbs'][] = $this->title;
         'options' => ['class' => 'tab-pane fade'],
     ]); ?>
 
-        <button onClick="var player = videojs('videojs-w4'); player.play();">init</button>
+        <button onClick="
+videojs.Hls.xhr.beforeRequest = function(options) {
+  options.uri = options.uri.replace(/backup\/file\/video(\d+)/, 'backup/file/2899?path=%2FSchreibtisch%2Fout%2Fvideo$1');
+  console.log('options2', options);
+  return options;
+};
+
+var player = videojs('video-container');
+player.play();
+">init</button>
         <?= VideoJsWidget::widget([
             'options' => [
+                'id' => 'video-container',
                 'class' => 'video-js vjs-default-skin vjs-big-play-centered',
-                'poster' => "http://www.videojs.com/img/poster.jpg",
+                //'poster' => "http://www.videojs.com/img/poster.jpg",
                 'controls' => true,
                 'preload' => 'auto',
                 'width' => '970',
@@ -375,7 +385,11 @@ $this->params['breadcrumbs'][] = $this->title;
             'tags' => [
                 'source' => [
                     [
-                        'src' => 'https://d2zihajmogu5jn.cloudfront.net/bipbop-advanced/bipbop_16x9_variant.m3u8',
+                        //'src' => 'https://d2zihajmogu5jn.cloudfront.net/bipbop-advanced/bipbop_16x9_variant.m3u8',
+                        'src' => Url::to(['backup/file', 'ticket_id' => $model->id,
+                            'path' => '/Schreibtisch/out/video.m3u8',
+                            'date' => '2020-03-30T11:02:21+02:00',
+                        ]),
                         'type' => 'application/x-mpegURL',
                     ],
                 ],

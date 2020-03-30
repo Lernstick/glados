@@ -24,7 +24,7 @@ function screen_capture()
     fi
 
     sc_path="/home/user/Schreibtisch/out"
-    output="/home/user/Schreibtisch/out/video.m3u8"
+    output="${sc_path}/video.m3u8"
 
     if [ "${sc_command}" != "" ]; then
 
