@@ -4,9 +4,9 @@ use yii\db\Migration;
 use app\models\Setting;
 
 /**
- * Class m191224_143955_settings2
+ * Class m200330_081029_settings2
  */
-class m191224_143955_settings2 extends Migration
+class m200330_081029_settings2 extends Migration
 {
     public $settingsTable = 'setting';
 

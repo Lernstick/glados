@@ -6,9 +6,9 @@ use app\models\ExamSetting;
 use app\models\ExamSettingAvail;
 
 /**
- * Class m200212_120339_screen_capture
+ * Class m200330_081053_screen_capture
  */
-class m200212_120339_screen_capture extends Migration
+class m200330_081053_screen_capture extends Migration
 {
     public $examTable = 'exam';
     public $settingTable = 'exam_setting';

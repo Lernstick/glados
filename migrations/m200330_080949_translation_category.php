@@ -4,9 +4,9 @@ use yii\db\Migration;
 use app\models\Translation;
 
 /**
- * Class m191217_152124_translation_category
+ * Class m200330_080949_translation_category
  */
-class m191217_152124_translation_category extends Migration
+class m200330_080949_translation_category extends Migration
 {
 
     public $translationTable = 'translation';

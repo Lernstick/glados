@@ -30,6 +30,11 @@ class BootstrapSettings implements BootstrapInterface
         catch (\yii\db\Exception $e) {
             return;
         }
+        # to also catch the error even if the table "setting" does not exist yet
+        # for backwards compatibility
+        catch (\yii\base\InvalidConfigException $e) {
+            return;
+        }
 
     }
 }
