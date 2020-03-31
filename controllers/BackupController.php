@@ -60,9 +60,8 @@ class BackupController extends Controller
             'ts' => 'video/MP2T',
         ];
         $mimeType = array_key_exists($ext, $arr) ? $arr[$ext] : 'application/octet-stream';
-        if ($ext == 'm3u8') {
+        if ($ext == 'm3u8' && ($ticket->state == Ticket::STATE_CLOSED || $ticket->state == Ticket::STATE_SUBMITTED)) {
             $contents = str_replace("#EXT-X-PLAYLIST-TYPE:EVENT", "#EXT-X-PLAYLIST-TYPE:VOD", $contents) . "#EXT-X-ENDLIST" . PHP_EOL;
-            #$contents .= "#EXT-X-ENDLIST" . PHP_EOL;
         }
 
         return Yii::$app->response->sendContentAsFile($contents, $fs->slash($path)->basename, [

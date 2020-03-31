@@ -196,6 +196,9 @@ class History extends \yii\db\ActiveRecord
      */
     public static function find()
     {
+        # set the new length of group concat to be 3 times the length of text datatype 
+        Yii::$app->db->createCommand('SET SESSION group_concat_max_len = 3*65536')->execute();
+
         $query = new \yii\db\ActiveQuery(get_called_class());
 
         $query->select([

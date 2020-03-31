@@ -351,78 +351,45 @@ $this->params['breadcrumbs'][] = $this->title;
         'options' => ['class' => 'tab-pane fade'],
     ]); ?>
 
-    <?php ActiveEventField::begin([
-        'event' => 'ticket/' . $model->id,
-        'jsonSelector' => 'backup_lock',
-        'jsHandler' => 'function(d, s){if(d == "0"){
-            console.log("----------------backup triggered reload of player---------------");
-            var player = videojs("video-container");
-            var modal = player.getChild("Modal");
-            modal.open();
-            player.pause();
-            $("#playerCurrentTime").val(player.currentTime());
-            player.src({ type: "application/x-mpegURL", src: "' . Url::to(['backup/file', 'ticket_id' => $model->id, 'path' => '/Schreibtisch/out4/video.m3u8']) . '" });
-        }}'
-    ]) ?>
-    <?php ActiveEventField::end(); ?>
-
         <button onClick="
 //videojs.log.level('all');
 videojs.Hls.xhr.beforeRequest = function(options) {
-  options.uri = options.uri.replace(/backup\/file\/video(\d+)/, 'backup/file/<?= $model->id?>?path=%2FSchreibtisch%2Fout4%2Fvideo$1');
+  options.uri = options.uri.replace(/backup\/file\/video(\d+)/, 'backup/file/<?= $model->id?>?path=%2FSchreibtisch%2Fout%2Fvideo$1');
   return options;
 };
 
-var ModalDialog  = videojs.getComponent('ModalDialog');
-var player = videojs('video-container');
-var modal = new ModalDialog(player, {
+var player = videojs('video-container', {
+    liveui: true
+});
+//var ModalDialog  = videojs.getComponent('ModalDialog');
+/*var modal = new ModalDialog(player, {
     content: 'Please wait while the video refreshes.',
     temporary: false
 });
 modal.name_ = 'Modal';
-player.addChild(modal);
-player.play();
-player.on('loadedmetadata', function(){
-    var player = this;
-    var ct = $('#playerCurrentTime').val();
-    console.log('----------------metadata loaded---------------');
-    player.currentTime(ct);
-    player.play();
-});
+player.addChild(modal);*/
 
 player.on('play', function(){
     var player = this;
-    console.log('----------------playing triggered---------------');
-    var modal = player.getChild('Modal');
-    modal.close();
+    console.log('----------------play triggered---------------', player);
 });
 ">init</button>
-        <button onClick='
-var player = videojs("video-container");
-console.log("----------------button triggered reload of player---------------", player);
-var modal = player.getChild("Modal");
-modal.open();
-player.pause();
-$("#playerCurrentTime").val(player.currentTime());
-player.src({ type: "application/x-mpegURL", src: "<?= Url::to(["backup/file", "ticket_id" => $model->id, "path" => "/Schreibtisch/out4/video.m3u8"])?>" });
-'>reload src</button>
-        <input type="text" value="0" id="playerCurrentTime"></input>
         <?= VideoJsWidget::widget([
             'options' => [
                 'id' => 'video-container',
-                'class' => 'video-js vjs-default-skin vjs-big-play-centered',
+                'class' => 'video-js vjs-fluid vjs-default-skin vjs-big-play-centered',
                 //'poster' => "http://www.videojs.com/img/poster.jpg",
                 'controls' => true,
                 'preload' => 'auto',
-                'width' => '970',
-                'height' => '400',
+                'fluid' => true,
+                'responsive' => true,
             ],
             'tags' => [
                 'source' => [
                     [
                         //'src' => 'https://d2zihajmogu5jn.cloudfront.net/bipbop-advanced/bipbop_16x9_variant.m3u8',
                         'src' => Url::to(['backup/file', 'ticket_id' => $model->id,
-                            'path' => '/Schreibtisch/out4/video.m3u8',
+                            'path' => '/Schreibtisch/out/video.m3u8',
                         ]),
                         'type' => 'application/x-mpegURL',
                     ],
