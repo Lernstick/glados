@@ -8,7 +8,6 @@ use yii\helpers\Url;
 use yii\bootstrap\Modal;
 use app\components\ActiveEventField;
 use app\components\Editable;
-use app\components\VideoJsWidget;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Ticket */
@@ -351,50 +350,10 @@ $this->params['breadcrumbs'][] = $this->title;
         'options' => ['class' => 'tab-pane fade'],
     ]); ?>
 
-        <button onClick="
-//videojs.log.level('all');
-videojs.Hls.xhr.beforeRequest = function(options) {
-  options.uri = options.uri.replace(/backup\/file\/video(\d+)/, 'backup/file/<?= $model->id?>?path=%2FSchreibtisch%2Fout%2Fvideo$1');
-  return options;
-};
 
-var player = videojs('video-container', {
-    liveui: true
-});
-//var ModalDialog  = videojs.getComponent('ModalDialog');
-/*var modal = new ModalDialog(player, {
-    content: 'Please wait while the video refreshes.',
-    temporary: false
-});
-modal.name_ = 'Modal';
-player.addChild(modal);*/
-
-player.on('play', function(){
-    var player = this;
-    console.log('----------------play triggered---------------', player);
-});
-">init</button>
-        <?= VideoJsWidget::widget([
-            'options' => [
-                'id' => 'video-container',
-                'class' => 'video-js vjs-fluid vjs-default-skin vjs-big-play-centered',
-                //'poster' => "http://www.videojs.com/img/poster.jpg",
-                'controls' => true,
-                'preload' => 'auto',
-                'fluid' => true,
-                'responsive' => true,
-            ],
-            'tags' => [
-                'source' => [
-                    [
-                        //'src' => 'https://d2zihajmogu5jn.cloudfront.net/bipbop-advanced/bipbop_16x9_variant.m3u8',
-                        'src' => Url::to(['backup/file', 'ticket_id' => $model->id,
-                            'path' => '/Schreibtisch/out/video.m3u8',
-                        ]),
-                        'type' => 'application/x-mpegURL',
-                    ],
-                ],
-            ]
+        <?php $_GET = array_merge($_GET, ['#' => 'tab_browse']); ?>
+        <?= $this->render('/ticket/screen_capture', [
+            'model' => $model,
         ]); ?>
 
     <?php Pjax::end() ?>

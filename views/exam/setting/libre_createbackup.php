@@ -11,9 +11,15 @@ foreach($model->members as $s) {
     }
 }
 
-echo \Yii::t('exams', '<b>{yesno}</b> (to <code>{path}</code>)', [
-	'yesno' => yii::$app->formatter->format($model->value, 'boolean'),
-    'path' => yii::$app->formatter->format($libre_createbackup_path->value, 'text'),
-]);
+if ($model->value) {
+	echo \Yii::t('exams', '<b>{yesno}</b> (to <code>{path}</code>)', [
+		'yesno' => yii::$app->formatter->format($model->value, 'boolean'),
+	    'path' => yii::$app->formatter->format($libre_createbackup_path->value, 'text'),
+	]);
+} else {
+	echo \Yii::t('exams', '<b>{yesno}</b>', [
+		'yesno' => yii::$app->formatter->format($model->value, 'boolean'),
+	]);
+}
 
 ?>

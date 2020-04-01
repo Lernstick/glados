@@ -416,3 +416,14 @@ ul.timeline li {
 .item:first-child hr {
     display: none !important;
 }
+
+ul.nav-special > li:not(.active) > a > div > span {
+    display:none;
+}
+
+ul.nav-special > li.active > a > div {
+    width: 100px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}

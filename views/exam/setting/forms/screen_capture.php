@@ -15,11 +15,13 @@ $screen_capture_command = $members['screen_capture_command'];
 $screen_capture_fps = $members['screen_capture_fps'];
 $screen_capture_quality = $members['screen_capture_quality'];
 $screen_capture_chunk = $members['screen_capture_chunk'];
+$screen_capture_bitrate = $members['screen_capture_bitrate'];
 
 $id2 = $screen_capture_command->id === null ? $id . "a" : $screen_capture_command->id;
 $id3 = $screen_capture_fps->id === null ? $id . "b" : $screen_capture_fps->id;
 $id4 = $screen_capture_quality->id === null ? $id . "c" : $screen_capture_quality->id;
 $id5 = $screen_capture_chunk->id === null ? $id . "d" : $screen_capture_chunk->id;
+$id6 = $screen_capture_bitrate->id === null ? $id . "e" : $screen_capture_bitrate->id;
 
 $screen_capture_quality->value *= 100;
 
@@ -30,11 +32,13 @@ $("#ExamSettings_{$id}_value").on("switchChange.bootstrapSwitch change", functio
         $('#ExamSettings_{$id3}_value').attr("disabled", false);
         $('#ExamSettings_{$id4}_value').attr("disabled", false);
         $('#ExamSettings_{$id5}_value').attr("disabled", false);
+        $('#ExamSettings_{$id6}_value').attr("disabled", false);
     } else if ($(this).not(':checked')) {
         $('#ExamSettings_{$id2}_value').attr("disabled", true);
         $('#ExamSettings_{$id3}_value').attr("disabled", true);
         $('#ExamSettings_{$id4}_value').attr("disabled", true);
         $('#ExamSettings_{$id5}_value').attr("disabled", true);
+        $('#ExamSettings_{$id6}_value').attr("disabled", true);
     }
 });
 
@@ -45,6 +49,8 @@ mode_change = function(){
     var command = $('#ExamSettings_{$id2}_value').closest("div.parent");
     var fps = $('#ExamSettings_{$id3}_value').closest("div.parent");
     var quality = $('#ExamSettings_{$id4}_value').closest("div.parent");
+    var chunk = $('#ExamSettings_{$id5}_value').closest("div.parent");
+    var bitrate = $('#ExamSettings_{$id6}_value').closest("div.parent");
 
     if (selected == null) {
         selected = "options";
@@ -54,10 +60,14 @@ mode_change = function(){
         command.hide();
         fps.show();
         quality.show();
+        chunk.show();
+        bitrate.show();
     } else if (selected == "command") {
         command.show();
         fps.hide();
         quality.hide();
+        chunk.hide();
+        bitrate.hide();
     }
 };
 
@@ -130,6 +140,16 @@ $this->registerJs($js);
                 'name' => "ExamSettings[$id5][belongs_to]",
                 'value' => $id,
             ])->label(false)->hint(false); ?>
+            <?= $form->field($screen_capture_bitrate, 'key')->hiddenInput([
+                'id' => "ExamSettings_{$id6}_key",
+                'name' => "ExamSettings[$id6][key]",
+                'data-id' => $id6,
+            ])->label(false)->hint(false); ?>
+            <?= $form->field($screen_capture_bitrate, 'belongs_to')->hiddenInput([
+                'id' => "ExamSettings_{$id6}_belongs_to",
+                'name' => "ExamSettings[$id6][belongs_to]",
+                'value' => $id,
+            ])->label(false)->hint(false); ?>
         </div>
 
         <?= Html::label(\Yii::t('exam_setting', 'Mode')); ?>
@@ -196,6 +216,22 @@ $this->registerJs($js);
                 'type' => 'number',
                 'disabled' => !$setting->value,
             ])->label($screen_capture_chunk->detail->name)->hint($screen_capture_chunk->detail->description); ?>
+        </div>
+
+        <div class="parent">
+            <?= $form->field($screen_capture_bitrate, 'value', [
+                'template' => '{label}<div class="input-group">' . \Yii::t('exams', '{n} bits per second.', [
+                        'n' => '{input}<span class="input-group-addon" id="basic-addon2">'
+                    ]) . '</span></div>{hint}{error}'
+            ])->widget(\yii\widgets\MaskedInput::className(), [
+                'type' => 'text',
+                'mask' => ['9{1,4}(\k|\K|\m|\M){1}'],
+                'options' => [
+                    'id' => "ExamSettings_{$id6}_value",
+                    'name' => "ExamSettings[$id6][value]",
+                    'disabled' => !$setting->value,
+                ],
+            ])->label($screen_capture_bitrate->detail->name)->hint($screen_capture_bitrate->detail->description); ?>
         </div>
     </div>
 </div>

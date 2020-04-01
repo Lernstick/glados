@@ -11,9 +11,15 @@ foreach($model->members as $s) {
     }
 }
 
-echo \Yii::t('exams', '<b>{yesno}</b> (every <i>{interval}</i>)', [
-	'yesno' => yii::$app->formatter->format($model->value, 'boolean'),
-    'interval' => yii::$app->formatter->format($screenshots_interval->value*60, 'duration'),
-]);
+if ($model->value) {
+    echo \Yii::t('exams', '<b>{yesno}</b> (every <i>{interval}</i>)', [
+        'yesno' => yii::$app->formatter->format($model->value, 'boolean'),
+        'interval' => yii::$app->formatter->format($screenshots_interval->value*60, 'duration'),
+    ]);
+} else {
+    echo \Yii::t('exams', '<b>{yesno}</b>', [
+        'yesno' => yii::$app->formatter->format($model->value, 'boolean'),
+    ]);
+}
 
 ?>

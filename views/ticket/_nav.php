@@ -28,70 +28,70 @@ $this->registerJs($active_tabs);
 
 ?>
 
-<ul class="nav nav-tabs">
-    <li class="active"><a data-toggle="tab" href="#general">
-        <i class="glyphicon glyphicon-home"></i>
-        <?= \Yii::t('ticket', 'General') ?>
+<ul class="nav nav-tabs nav-special">
+    <li class="active"  title="<?= \Yii::t('ticket', 'General') ?>"><a data-toggle="tab" href="#general">
+        <div><i class="glyphicon glyphicon-home"></i>
+        <span><?= \Yii::t('ticket', 'General') ?></span></div>
     </a></li>
-    <li>
+    <li title="<?= \Yii::t('ticket', 'Activity Log') ?>">
         <?= Html::a(
-            '<i class="glyphicon glyphicon-comment"></i> ' . \Yii::t('ticket', 'Activity Log'),
+            '<div><i class="glyphicon glyphicon-comment"></i> <span>' . \Yii::t('ticket', 'Activity Log') . '</span></div>',
             '#activities',
             ['data-toggle' => 'tab']
         ) ?>
     </li>
-    <li>
+    <li title="<?= \Yii::t('ticket', 'Backups') ?>">
         <?= Html::a(
-            '<i class="glyphicon glyphicon-hdd"></i> ' . \Yii::t('ticket', 'Backups'),
+            '<div><i class="glyphicon glyphicon-hdd"></i> <span>' . \Yii::t('ticket', 'Backups') . '</span></div>',
             Url::to(['backup/index', 'ticket_id' => $model->id, '#' => 'backups']),
             ['data-toggle' => 'tab']
         ); ?>
     </li>
-    <li>
+    <li title="<?= \Yii::t('ticket', 'Browse Backup') ?>">
         <?= Html::a(
-            '<i class="glyphicon glyphicon-folder-open"></i> ' . \Yii::t('ticket', 'Browse Backup'),
+            '<div><i class="glyphicon glyphicon-folder-open"></i> <span>' . \Yii::t('ticket', 'Browse Backup') . '</span></div>',
             Url::to(['backup/browse', 'ticket_id' => $model->id, '#' => 'browse']),
             ['data-toggle' => 'tab', 'id' => 'browseButton']
         ); ?>
     </li>
 
     <?php if (Yii::$app->user->can('screenshot/view')) { ?>
-        <li><a data-toggle="tab" href="#screenshots">
-            <i class="glyphicon glyphicon-picture"></i>
-            <?= \Yii::t('ticket', 'Screenshots') ?>
+        <li title="<?= \Yii::t('ticket', 'Screenshots') ?>"><a data-toggle="tab" href="#screenshots">
+            <div><i class="glyphicon glyphicon-picture"></i>
+            <span><?= \Yii::t('ticket', 'Screenshots') ?></span></div>
         </a></li>
     <?php } else { ?>
-        <li class="disabled"><a class="disabled" data-toggle="" href="#">
-            <i class="glyphicon glyphicon-picture"></i>
-            <?= \Yii::t('ticket', 'Screenshots') ?>
+        <li class="disabled" title="<?= \Yii::t('ticket', 'Screenshots') ?>"><a class="disabled" data-toggle="" href="#">
+            <div><i class="glyphicon glyphicon-picture"></i>
+            <span><?= \Yii::t('ticket', 'Screenshots') ?></span></div>
         </a></li>
     <?php } ?>
 
-    <li>
+    <li title="<?= \Yii::t('ticket', 'Screen Capture') ?>">
         <?= Html::a(
-            '<i class="glyphicon glyphicon-camera"></i> ' . \Yii::t('ticket', 'Screen Capture'),
+            '<div><i class="glyphicon glyphicon-camera"></i> <span>' . \Yii::t('ticket', 'Screen Capture') . '</span></div>',
             Url::to(['ticket/view', 'id' => $model->id, '#' => 'screencapture']),
             ['data-toggle' => 'tab']
         ); ?>
     </li>
 
-    <li>
+    <li title="<?= \Yii::t('ticket', 'Result') ?>">
         <?= Html::a(
-            '<i class="glyphicon glyphicon-sunglasses"></i> ' . \Yii::t('ticket', 'Result'),
+            '<div><i class="glyphicon glyphicon-sunglasses"></i> <span>' . \Yii::t('ticket', 'Result') . '</span></div>',
             Url::to(['result/view', 'token' => $model->token, '#' => 'result']),
             ['data-toggle' => 'tab']
         ); ?>
     </li>        
-    <li>
+    <li title="<?= \Yii::t('ticket', 'Restores') ?>">
         <?= Html::a(
-            '<i class="glyphicon glyphicon-tasks"></i> ' . \Yii::t('ticket', 'Restores'),
+            '<div><i class="glyphicon glyphicon-tasks"></i> <span>' . \Yii::t('ticket', 'Restores') . '</span></div>',
             Url::to(['restore/index', 'ticket_id' => $model->id, '#' => 'restores']),
             ['data-toggle' => 'tab']
         ); ?>
     </li>
-    <li>
+    <li title="<?= \Yii::t('ticket', 'History') ?>">
         <?= Html::a(
-            '<i class="glyphicon glyphicon-book"></i> ' . \Yii::t('ticket', 'History'),
+            '<div><i class="glyphicon glyphicon-book"></i> <span>' . \Yii::t('ticket', 'History') . '</span></div>',
             Url::to(['ticket/view', 'id' => $model->id, '#' => 'history']),
             ['data-toggle' => 'tab']
         ); ?>

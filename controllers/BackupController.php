@@ -52,8 +52,14 @@ class BackupController extends Controller
             'restoreHost' => $ticket->ip,
         ]);
 
-        $contents = $fs->slash($path)->versionAt($date)->restore(true);
+        $file = $fs->slash($path);
 
+        if ($file !== null) {
+            $contents = $file->versionAt($date)->restore(true);
+        } else {
+            throw new NotFoundHttpException($path . ': No such file or directory.');
+        }
+        
         $ext = pathinfo($path, PATHINFO_EXTENSION);
         $arr = [
             'm3u8' => 'application/x-mpegURL',

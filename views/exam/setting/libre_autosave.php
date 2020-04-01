@@ -13,10 +13,16 @@ foreach($model->members as $s) {
     }
 }
 
-echo \Yii::t('exams', '<b>{yesno}</b> (to <code>{path}</code> every <i>{interval}</i>)', [
-	'yesno' => yii::$app->formatter->format($model->value, 'boolean'),
-    'path' => yii::$app->formatter->format($libre_autosave_path->value, 'text'),
-    'interval' => yii::$app->formatter->format($libre_autosave_interval->value*60, 'duration'),
-]);
+if ($model->value) {
+	echo \Yii::t('exams', '<b>{yesno}</b> (to <code>{path}</code> every <i>{interval}</i>)', [
+		'yesno' => yii::$app->formatter->format($model->value, 'boolean'),
+	    'path' => yii::$app->formatter->format($libre_autosave_path->value, 'text'),
+	    'interval' => yii::$app->formatter->format($libre_autosave_interval->value*60, 'duration'),
+	]);
+} else {
+	echo \Yii::t('exams', '<b>{yesno}</b>', [
+		'yesno' => yii::$app->formatter->format($model->value, 'boolean'),
+	]);
+}
 
 ?>

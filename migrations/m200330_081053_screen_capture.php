@@ -227,7 +227,7 @@ class m200330_081053_screen_capture extends Migration
         ]);
         $screen_capture_fps->save(false);
 
-        // create screen_capture_fps
+        // create screen_capture_quality
         $screen_capture_quality = new ExamSettingAvail([
             'key' => 'screen_capture_quality',
             'name' => yiit('exam_setting_avail', 'Quality'),
@@ -237,16 +237,27 @@ class m200330_081053_screen_capture extends Migration
         ]);
         $screen_capture_quality->save(false);
 
-        // create screen_capture_fps
+        // create screen_capture_chunk
         $screen_capture_chunk = new ExamSettingAvail([
             'key' => 'screen_capture_chunk',
             'name' => yiit('exam_setting_avail', 'Chunk length'),
             'type' => 'integer',
-            'default' => 30,
+            'default' => 10,
             'description' => yiit('exam_setting_avail', 'The length of one chunk in seconds.'),
             'belongs_to' => $screen_capture->id,
         ]);
         $screen_capture_chunk->save(false);
+
+        // create screen_capture_bitrate
+        $screen_capture_bitrate = new ExamSettingAvail([
+            'key' => 'screen_capture_bitrate',
+            'name' => yiit('exam_setting_avail', 'Bitrate'),
+            'type' => 'text',
+            'default' => '300k',
+            'description' => yiit('exam_setting_avail', 'The bitrate (<code>bitrate = filesize / duration</code>) is the amount of bits that should be produced per second. Use abbreviations like <code>k</code> for kBit/s and <code>m</code> for MBit/s. Notice that the default value <code>300k</code>, will for a 3h exam end up in approximately <code>400MB</code> video stream data per exam.'),
+            'belongs_to' => $screen_capture->id,
+        ]);
+        $screen_capture_bitrate->save(false);
 
         $this->addColumn($this->historyTable, 'type', $this->boolean()->notNull()->defaultValue(0));
 

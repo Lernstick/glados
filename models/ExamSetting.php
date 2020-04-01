@@ -55,6 +55,7 @@ class ExamSetting extends Base
                     "screen_capture_fps"        => "integer",
                     "screen_capture_quality"    => "percent",
                     "screen_capture_chunk"      => "integer",
+                    "screen_capture_bitrate"    => "text",
                 ],
             ],
         ];
