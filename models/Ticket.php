@@ -195,6 +195,7 @@ class Ticket extends LiveActiveRecord
                     'backup_state' => 'text',
                     'restore_state' => 'text',
                     'running_daemon_id' => 'text',
+                    'sc_size' => 'shortSize',
                 ],
             ],
         ];
@@ -258,6 +259,7 @@ class Ticket extends LiveActiveRecord
             'backup_interval' => \Yii::t('ticket', 'Backup Interval'),
             'backup_size' => \Yii::t('ticket', 'Current Backup Size'),
             'running_daemon_id' => \Yii::t('ticket', 'ID of the running daemon'),
+            'sc_size' => \Yii::t('ticket', 'Current Screen Capture Size'),
         ];
     }
 
@@ -668,6 +670,16 @@ class Ticket extends LiveActiveRecord
     public function getUserId()
     {
         return $this->exam->user_id;
+    }
+
+    /**
+     * Returns the Screencapture model
+     *
+     * @return \app\models\Screencapture|null
+     */
+    public function getScreencapture()
+    {
+        return Screencapture::findOne($this->id);
     }
 
     /**

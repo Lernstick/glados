@@ -8,27 +8,24 @@ function screen_capture()
   # config->screen_capture
   if [ "$(config_value "screen_capture")" = "True" ]; then
 
-    # config->screen_capture_chunk
-    if [ "$(config_value "screen_capture_chunk")" = "" ]; then
-      sc_chunk="30"
-    else
-      sc_chunk="$(config_value "screen_capture_chunk")"
-    fi
+    c="$(config_value "screen_capture_chunk")"
+    chunk="${c:-"10"}"
 
-    # config->screen_capture_command
-    if [ "$(config_value "screen_capture_command")" = "" ]; then
-      sc_command=""
-    else
-      v="$(config_value "screen_capture_command")"
-      sc_command="${v}"
-    fi
+    c="$(config_value "screen_capture_bitrate")"
+    bitrate="${c:-"300k"}"
 
-    sc_path="/home/user/Schreibtisch/out"
-    output="${sc_path}/video.m3u8"
+    c="$(config_value "screen_capture_fps")"
+    fps="${c:-"10"}"
 
-    if [ "${sc_command}" != "" ]; then
+    c="$(config_value "screen_capture_path")"
+    path="${c:-"/home/user/Schreibtisch/out"}"
 
-      #RuntimeMaxSec=${sc_chunk}
+    command="$(config_value "screen_capture_command")"
+    output="${path}/video.m3u8"
+
+    if [ "${command}" != "" ]; then
+
+      #RuntimeMaxSec=${chunk}
 
     # create screen_capture script
     cat <<EOF >"${initrd}/newroot/usr/bin/screen_capture"
@@ -39,10 +36,15 @@ set -o allexport
 . <(strings /proc/*/environ | awk -F= '\$1=="DISPLAY"||\$1=="XAUTHORITY"' | head -2) 
 set +o allexport
 resolution="\$(xdpyinfo | awk '\$1=="dimensions:"{print \$2}')"
-mkdir -p "${sc_path}"
-output="${output}"
+path="${path}"
+chunk="${chunk}"
+bitrate="${bitrate}"
+fps="${fps}"
+gop="\$((chunk*fps))"
 
-${sc_command}
+mkdir -p "${path}"
+${command}
+
 EOF
 
       # create screen_capture systemd daemon

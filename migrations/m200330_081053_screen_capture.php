@@ -11,6 +11,7 @@ use app\models\ExamSettingAvail;
 class m200330_081053_screen_capture extends Migration
 {
     public $examTable = 'exam';
+    public $ticketTable = 'ticket';
     public $settingTable = 'exam_setting';
     public $availableSettingTable = 'exam_setting_avail';
     public $historyTable = 'history';
@@ -209,8 +210,11 @@ class m200330_081053_screen_capture extends Migration
             'key' => 'screen_capture_command',
             'name' => yiit('exam_setting_avail', 'Command'),
             'type' => 'ntext',
-            //'default' => 'recordmydesktop --no-sound --fps 10 --on-the-fly-encoding --no-frame --v_quality 10',
-            'default' => 'ffmpeg -f x11grab -r 10 -s 1920x1080 -i :0 -c:v libx264 -b:v 300k -an',
+            'default' => 'ffmpeg -f x11grab -r "${fps}" -s "${resolution}" -i :0 -vf "scale=\'max(1280,iw/2)\':-2" \
+  -c:v h264 -b:v "${bitrate}" -profile:v baseline -pix_fmt:v yuv420p -an \
+  -flags +cgop -g "${gop}" -hls_playlist_type event -hls_time "${chunk}" \
+  -strftime 1 -hls_flags append_list -master_pl_name "master.m3u8" \
+  -hls_segment_filename "${path}/video%s.ts" "${path}/video.m3u8"',
             'description' => yiit('exam_setting_avail', 'The actual command that is executed to capture the screen. This will <b>overwrite</b> all other settings.'),
             'belongs_to' => $screen_capture->id,
         ]);
@@ -259,7 +263,19 @@ class m200330_081053_screen_capture extends Migration
         ]);
         $screen_capture_bitrate->save(false);
 
+        // create screen_capture_path
+        $screen_capture_path = new ExamSettingAvail([
+            'key' => 'screen_capture_path',
+            'name' => yiit('exam_setting_avail', 'Path'),
+            'type' => 'text',
+            'default' => "/home/user/Schreibtisch/out",
+            'description' => yiit('exam_setting_avail', 'The path to save output files.'),
+            'belongs_to' => $screen_capture->id,
+        ]);
+        $screen_capture_path->save(false);
+
         $this->addColumn($this->historyTable, 'type', $this->boolean()->notNull()->defaultValue(0));
+        $this->addColumn($this->ticketTable, 'sc_size', $this->integer(11)->notNull()->defaultValue(0));
 
         // Default setting
         $this->insert($this->settingTable, [
@@ -434,6 +450,7 @@ class m200330_081053_screen_capture extends Migration
         $this->alterColumn($this->translationTable, 'de', $this->string(255));
 
         $this->dropColumn($this->historyTable, 'type');
+        $this->dropColumn($this->ticketTable, 'sc_size');
     }
 
 }

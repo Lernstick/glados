@@ -2,27 +2,18 @@
 
 use yii\helpers\Url;
 use yii\helpers\Html;
+use yii\widgets\DetailView;
 use app\components\VideoJsWidget;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Ticket */
 
 # the m3u8 video file
-$file = \Yii::$app->params['backupPath'] . '/' . $model->token . '/Schreibtisch/out/video.m3u8';
-
-if (file_exists($file)) {
-
-    $url = Url::to(['backup/file', 'ticket_id' => $model->id, 'path' => '/Schreibtisch/out/video.m3u8']);
+if ($model->screencapture !== null) {
     $js = <<< SCRIPT
-videojs.Hls.xhr.beforeRequest = function(options) {
-  options.uri = options.uri.replace(/backup\/file\/video(\d+)/, 'backup/file/<?= $model->id?>?path=%2FSchreibtisch%2Fout%2Fvideo$1');
-  return options;
-};
-
 var player = videojs('video-container', {
     liveui: true
 });
-
 SCRIPT;
 
     // Initialze the videojs player
@@ -30,12 +21,15 @@ SCRIPT;
 
 ?>
 
+<?= DetailView::widget([
+    'model' => $model,
+    'attributes' => [
+        'sc_size:shortSize',
+    ],
+]) ?>
+
     <button onClick="
     //videojs.log.level('all');
-    videojs.Hls.xhr.beforeRequest = function(options) {
-      options.uri = options.uri.replace(/backup\/file\/video(\d+)/, 'backup/file/<?= $model->id?>?path=%2FSchreibtisch%2Fout%2Fvideo$1');
-      return options;
-    };
 
     var player = videojs('video-container', {
         liveui: true
@@ -66,7 +60,7 @@ SCRIPT;
         'tags' => [
             'source' => [
                 [
-                    'src' => Url::to(['backup/file', 'ticket_id' => $model->id, 'path' => '/Schreibtisch/out/video.m3u8']),
+                    'src' => Url::to(['screencapture/view', 'id' => $model->id, 'file' => 'master.m3u8']),
                     'type' => 'application/x-mpegURL',
                 ],
             ],

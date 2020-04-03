@@ -16,12 +16,14 @@ $screen_capture_fps = $members['screen_capture_fps'];
 $screen_capture_quality = $members['screen_capture_quality'];
 $screen_capture_chunk = $members['screen_capture_chunk'];
 $screen_capture_bitrate = $members['screen_capture_bitrate'];
+$screen_capture_path = $members['screen_capture_path'];
 
 $id2 = $screen_capture_command->id === null ? $id . "a" : $screen_capture_command->id;
 $id3 = $screen_capture_fps->id === null ? $id . "b" : $screen_capture_fps->id;
 $id4 = $screen_capture_quality->id === null ? $id . "c" : $screen_capture_quality->id;
 $id5 = $screen_capture_chunk->id === null ? $id . "d" : $screen_capture_chunk->id;
 $id6 = $screen_capture_bitrate->id === null ? $id . "e" : $screen_capture_bitrate->id;
+$id7 = $screen_capture_path->id === null ? $id . "f" : $screen_capture_path->id;
 
 $screen_capture_quality->value *= 100;
 
@@ -33,12 +35,14 @@ $("#ExamSettings_{$id}_value").on("switchChange.bootstrapSwitch change", functio
         $('#ExamSettings_{$id4}_value').attr("disabled", false);
         $('#ExamSettings_{$id5}_value').attr("disabled", false);
         $('#ExamSettings_{$id6}_value').attr("disabled", false);
+        $('#ExamSettings_{$id7}_value').attr("disabled", false);
     } else if ($(this).not(':checked')) {
         $('#ExamSettings_{$id2}_value').attr("disabled", true);
         $('#ExamSettings_{$id3}_value').attr("disabled", true);
         $('#ExamSettings_{$id4}_value').attr("disabled", true);
         $('#ExamSettings_{$id5}_value').attr("disabled", true);
         $('#ExamSettings_{$id6}_value').attr("disabled", true);
+        $('#ExamSettings_{$id7}_value').attr("disabled", false);
     }
 });
 
@@ -51,6 +55,7 @@ mode_change = function(){
     var quality = $('#ExamSettings_{$id4}_value').closest("div.parent");
     var chunk = $('#ExamSettings_{$id5}_value').closest("div.parent");
     var bitrate = $('#ExamSettings_{$id6}_value').closest("div.parent");
+    var path = $('#ExamSettings_{$id7}_value').closest("div.parent");
 
     if (selected == null) {
         selected = "options";
@@ -58,12 +63,14 @@ mode_change = function(){
 
     if (selected == "options") {
         command.hide();
+        path.hide();
         fps.show();
         quality.show();
         chunk.show();
         bitrate.show();
     } else if (selected == "command") {
         command.show();
+        path.show();
         fps.hide();
         quality.hide();
         chunk.hide();
@@ -150,16 +157,27 @@ $this->registerJs($js);
                 'name' => "ExamSettings[$id6][belongs_to]",
                 'value' => $id,
             ])->label(false)->hint(false); ?>
+            <?= $form->field($screen_capture_path, 'key')->hiddenInput([
+                'id' => "ExamSettings_{$id7}_key",
+                'name' => "ExamSettings[$id7][key]",
+                'data-id' => $id6,
+            ])->label(false)->hint(false); ?>
+            <?= $form->field($screen_capture_path, 'belongs_to')->hiddenInput([
+                'id' => "ExamSettings_{$id7}_belongs_to",
+                'name' => "ExamSettings[$id7][belongs_to]",
+                'value' => $id,
+            ])->label(false)->hint(false); ?>
         </div>
 
-        <?= Html::label(\Yii::t('exam_setting', 'Mode')); ?>
-        <?= Html::dropdownList('mode', 'options', [
-            'options' => 'Use options',
-            'command' => 'Provide a command',
-        ], [
-            'id' => 'mode'
-        ]) ?>
-
+        <div class="cols-sm-12">
+            <?= Html::label(\Yii::t('exam_setting', 'Mode')); ?>
+            <?= Html::dropdownList('mode', 'options', [
+                'options' => 'Use options',
+                'command' => 'Provide a command',
+            ], [
+                'id' => 'mode'
+            ]) ?>
+        </div>
 
         <div class="parent">
             <?= $form->field($screen_capture_command, 'value', [
@@ -172,66 +190,81 @@ $this->registerJs($js);
             ?>
         </div>
 
-        <div class="parent">
-            <?= $form->field($screen_capture_quality, 'value', [
-                'inputOptions' => [
-                    'style' => ['min-width' => '50px'],
-                ],
-            ])->widget(RangeInput::classname(), [
-                'options' => [
-                    'id' => "ExamSettings_{$id4}_value",
-                    'name' => "ExamSettings[$id4][value]",
+        <div class="row">
+            <div class="parent col-sm-6">
+                <?= $form->field($screen_capture_quality, 'value', [
+                    'inputOptions' => [
+                        'style' => ['min-width' => '50px'],
+                    ],
+                ])->widget(RangeInput::classname(), [
+                    'options' => [
+                        'id' => "ExamSettings_{$id4}_value",
+                        'name' => "ExamSettings[$id4][value]",
+                        'disabled' => !$setting->value,
+                        'placeholder' => \Yii::t('exams', 'Select range ...'),
+                    ],
+                    'html5Options' => ['min' => 0, 'max' => 100, 'step' => 1],
+                    'html5Container' => ['style' => 'width:70%'],
+                    'addon' => [
+                        'append' => ['content' => '%'],
+                    ],
+                ])->label($screen_capture_quality->detail->name)->hint($setting->detail->description); ?>
+            </div>
+
+            <div class="parent col-sm-6">
+                <?= $form->field($screen_capture_fps, 'value', [
+                    'template' => '{label}<div class="input-group">' . \Yii::t('exams', '{n} frames per seond.', [
+                            'n' => '{input}<span class="input-group-addon" id="basic-addon2">'
+                        ]) . '</span></div>{hint}{error}'
+                ])->textInput([
+                    'id' => "ExamSettings_{$id3}_value",
+                    'name' => "ExamSettings[$id3][value]",
+                    'type' => 'number',
                     'disabled' => !$setting->value,
-                    'placeholder' => \Yii::t('exams', 'Select range ...'),
-                ],
-                'html5Options' => ['min' => 0, 'max' => 100, 'step' => 1],
-                'html5Container' => ['style' => 'width:70%'],
-                'addon' => [
-                    'append' => ['content' => '%'],
-                ],
-            ])->label($screen_capture_quality->detail->name)->hint($setting->detail->description); ?>
+                ])->label($screen_capture_fps->detail->name)->hint($screen_capture_fps->detail->description); ?>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="parent col-sm-6">
+                <?= $form->field($screen_capture_chunk, 'value', [
+                    'template' => '{label}<div class="input-group">' . \Yii::t('exams', '{n} seconds.', [
+                            'n' => '{input}<span class="input-group-addon" id="basic-addon2">'
+                        ]) . '</span></div>{hint}{error}'
+                ])->textInput([
+                    'id' => "ExamSettings_{$id5}_value",
+                    'name' => "ExamSettings[$id5][value]",
+                    'type' => 'number',
+                    'disabled' => !$setting->value,
+                ])->label($screen_capture_chunk->detail->name)->hint($screen_capture_chunk->detail->description); ?>
+            </div>
+
+            <div class="parent col-sm-6">
+                <?= $form->field($screen_capture_bitrate, 'value', [
+                    'template' => '{label}<div class="input-group">' . \Yii::t('exams', '{n} bits per second.', [
+                            'n' => '{input}<span class="input-group-addon" id="basic-addon2">'
+                        ]) . '</span></div>{hint}{error}'
+                ])->widget(\yii\widgets\MaskedInput::className(), [
+                    'type' => 'text',
+                    'mask' => ['9{1,4}(\k|\K|\m|\M){1}'],
+                    'options' => [
+                        'id' => "ExamSettings_{$id6}_value",
+                        'name' => "ExamSettings[$id6][value]",
+                        'disabled' => !$setting->value,
+                    ],
+                ])->label($screen_capture_bitrate->detail->name)->hint($screen_capture_bitrate->detail->description); ?>
+            </div>
         </div>
 
         <div class="parent">
-            <?= $form->field($screen_capture_fps, 'value', [
-                'template' => '{label}<div class="input-group">' . \Yii::t('exams', '{n} frames per seond.', [
-                        'n' => '{input}<span class="input-group-addon" id="basic-addon2">'
-                    ]) . '</span></div>{hint}{error}'
+            <?= $form->field($screen_capture_path, 'value', [
+                'template' => '{label}<div class="input-group"><div class="input-group-addon">' . \Yii::t('exams', '...to the directory') . '</div>{input}</div>{hint}{error}'
             ])->textInput([
-                'id' => "ExamSettings_{$id3}_value",
-                'name' => "ExamSettings[$id3][value]",
-                'type' => 'number',
-                'disabled' => !$setting->value,
-            ])->label($screen_capture_fps->detail->name)->hint($screen_capture_fps->detail->description); ?>
-        </div>
-
-        <div class="parent">
-            <?= $form->field($screen_capture_chunk, 'value', [
-                'template' => '{label}<div class="input-group">' . \Yii::t('exams', '{n} seconds.', [
-                        'n' => '{input}<span class="input-group-addon" id="basic-addon2">'
-                    ]) . '</span></div>{hint}{error}'
-            ])->textInput([
-                'id' => "ExamSettings_{$id5}_value",
-                'name' => "ExamSettings[$id5][value]",
-                'type' => 'number',
-                'disabled' => !$setting->value,
-            ])->label($screen_capture_chunk->detail->name)->hint($screen_capture_chunk->detail->description); ?>
-        </div>
-
-        <div class="parent">
-            <?= $form->field($screen_capture_bitrate, 'value', [
-                'template' => '{label}<div class="input-group">' . \Yii::t('exams', '{n} bits per second.', [
-                        'n' => '{input}<span class="input-group-addon" id="basic-addon2">'
-                    ]) . '</span></div>{hint}{error}'
-            ])->widget(\yii\widgets\MaskedInput::className(), [
+                'id' => "ExamSettings_{$id7}_value",
+                'name' => "ExamSettings[$id7][value]",
                 'type' => 'text',
-                'mask' => ['9{1,4}(\k|\K|\m|\M){1}'],
-                'options' => [
-                    'id' => "ExamSettings_{$id6}_value",
-                    'name' => "ExamSettings[$id6][value]",
-                    'disabled' => !$setting->value,
-                ],
-            ])->label($screen_capture_bitrate->detail->name)->hint($screen_capture_bitrate->detail->description); ?>
+                'disabled' => !$setting->value,
+            ])->label($screen_capture_path->detail->name)->hint($screen_capture_path->detail->description); ?>
         </div>
     </div>
 </div>

@@ -23,7 +23,11 @@ class AccessRule extends \yii\filters\AccessRule
                     return true;
                 }
             } elseif ($role === 'rbac') {
-                $r = \Yii::$app->controller->id . '/' . \Yii::$app->controller->action->id;
+                if (\Yii::$app->controller->canGetProperty('rbac_id')) {
+                    $r = \Yii::$app->controller->rbac_id . '/' . \Yii::$app->controller->action->id;
+                } else {
+                    $r = \Yii::$app->controller->id . '/' . \Yii::$app->controller->action->id;
+                }
                 return $user->can($r);
             } elseif ($user->can($role)) {
                 return true;

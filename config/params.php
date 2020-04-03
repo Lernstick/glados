@@ -6,6 +6,7 @@ return [
     'backupPath' =>             '/var/lib/glados/backups/',
     'resultPath' =>             '/var/lib/glados/results/',
     'tmpPath' =>                '/var/lib/glados/tmp/',
+    'scPath' =>                 '/var/lib/glados/sc/',
     'sciptsPath' =>             '/usr/share/glados/scripts/',
     'dotSSH' =>                 '/var/lib/glados/.ssh/',
     'daemonLogFilePath' =>      '/var/log/glados',

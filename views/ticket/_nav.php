@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\helpers\Url;
+use app\components\ActiveEventField;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Exam */
@@ -42,7 +43,28 @@ $this->registerJs($active_tabs);
     </li>
     <li title="<?= \Yii::t('ticket', 'Backups') ?>">
         <?= Html::a(
-            '<div><i class="glyphicon glyphicon-hdd"></i> <span>' . \Yii::t('ticket', 'Backups') . '</span></div>',
+            '<div>'
+            . ActiveEventField::widget([
+                'options' => [
+                    'tag' => 'i',
+                    'class' => 'glyphicon ' . ($model->backup_lock == 1 ? 'glyphicon-cog gly-spin text-danger' : 'glyphicon-hdd'),
+                ],
+                'event' => 'ticket/' . $model->id,
+                'jsonSelector' => 'backup_lock',
+                'jsHandler' => 'function(d, s){
+                    if(d == "1"){
+                        s.classList.remove("glyphicon-hdd");
+                        s.classList.add("gly-spin");
+                        s.classList.add("glyphicon-cog");
+                        s.classList.add("text-danger");
+                    }else if(d == "0"){
+                        s.classList.remove("gly-spin");
+                        s.classList.remove("text-danger");
+                        s.classList.remove("glyphicon-cog");
+                        s.classList.add("glyphicon-hdd");
+                    }
+                }',
+            ]) . ' <span>' . \Yii::t('ticket', 'Backups') . '</span></div>',
             Url::to(['backup/index', 'ticket_id' => $model->id, '#' => 'backups']),
             ['data-toggle' => 'tab']
         ); ?>
@@ -84,7 +106,26 @@ $this->registerJs($active_tabs);
     </li>        
     <li title="<?= \Yii::t('ticket', 'Restores') ?>">
         <?= Html::a(
-            '<div><i class="glyphicon glyphicon-tasks"></i> <span>' . \Yii::t('ticket', 'Restores') . '</span></div>',
+            '<div>'
+            . ActiveEventField::widget([
+                'options' => [
+                    'tag' => 'i',
+                    'class' => 'glyphicon ' . ($model->restore_lock == 1 ? 'glyphicon-cog gly-spin' : 'glyphicon-tasks'),
+                ],
+                'event' => 'ticket/' . $model->id,
+                'jsonSelector' => 'restore_lock',
+                'jsHandler' => 'function(d, s){
+                    if(d == "1"){
+                        s.classList.add("gly-spin");
+                        s.classList.add("glyphicon-cog");
+                        s.classList.remove("glyphicon-tasks");
+                    }else if(d == "0"){
+                        s.classList.remove("gly-spin");
+                        s.classList.add("glyphicon-tasks");
+                        s.classList.remove("glyphicon-cog");
+                    }
+                }',
+            ]) . ' <span>' . \Yii::t('ticket', 'Restores') . '</span></div>',
             Url::to(['restore/index', 'ticket_id' => $model->id, '#' => 'restores']),
             ['data-toggle' => 'tab']
         ); ?>
@@ -132,7 +173,7 @@ $this->registerJs($active_tabs);
             <li>
                 <?= Html::a(
                     '<span class="glyphicon glyphicon-hdd"></span> ' . \Yii::t('ticket', 'Backup Now'),
-                    ['backup', 'id' => $model->id, '#' => 'backups'],
+                    ['backup', 'id' => $model->id, '#' => 'tab_backups'],
                     ['id' => 'backup-now']
                 ) ?>
             </li>

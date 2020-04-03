@@ -275,8 +275,6 @@ class TicketController extends Controller
 
             // return the pdf output as per the destination setting
             return $pdf->render(); 
-        /*} else if ($mode == 'screen_capture') {
-            return \Yii::$app->response->sendFile($model->path, null, ['inline' => true]);*/
         }
     }
 

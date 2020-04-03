@@ -105,7 +105,7 @@ class BackupController extends DaemonController implements DaemonInterface
             $this->remotePath = '/overlay';
 
             if ($id != '') {
-                if (($this->ticket =  Ticket::findOne(['ticket.id' => $id, 'backup_lock' => 0, 'restore_lock' => 0])) == null){
+                if (($this->ticket = Ticket::findOne(['ticket.id' => $id, 'backup_lock' => 0, 'restore_lock' => 0])) == null){
                     $this->logError('Error: ticket with id ' . $id . ' not found, it is already in processing, or locked while booting.');
                     return;
                 }
@@ -218,7 +218,7 @@ class BackupController extends DaemonController implements DaemonInterface
 
             $retval = $cmd->run();
 
-            if($retval != 0){
+            if ($retval != 0) {
                 $this->ticket->backup_state = yiit('ticket', 'rdiff-backup failed (retval: {retval}), output: {output}');
                 $this->ticket->backup_state_params = [
                     'retval' => $retval,
@@ -239,7 +239,13 @@ class BackupController extends DaemonController implements DaemonInterface
                 if ($this->finishBackup == true) {
                     $this->ticket->runCommand('echo "backup failed, waiting for next try..." > /home/user/shutdown');
                 }
-            }else{
+            } else {
+
+                /* run the fetch daemon in the foreground */
+                $this->logInfo("Fetching data...");
+                $fetchDaemon = new Daemon();
+                $pid = $fetchDaemon->startFetch($this->ticket->id, false);
+
                 $this->ticket->backup_last = new Expression('NOW()');
                 $this->ticket->backup_state = yiit('ticket', 'backup successful.');
 
@@ -264,11 +270,11 @@ class BackupController extends DaemonController implements DaemonInterface
                 # Calculate the size
                 $this->logInfo("Calculate backup size...");
                 $this->ticket->backup_size = $this->directorySize(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token) - $this->directorySize(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token . '/rdiff-backup-data');
+                $this->ticket->sc_size = $this->directorySize(\Yii::$app->params['scPath'] . "/" . $this->ticket->token);
             }
 
             $this->ticket->backup_last_try = new Expression('NOW()');
             $this->unlockItem($this->ticket);
-
         }
 
         $this->ticket = null;

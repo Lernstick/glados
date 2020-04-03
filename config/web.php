@@ -68,6 +68,7 @@ $config = [
             'rules' => [
                 'activities' => 'activity/index',
                 '<controller>s' => '<controller>/index',
+                'screencapture/<id:\d+>/<file:[\w\.]+>' => 'screencapture/view',
                 '<controller>/<id:\d+>' => '<controller>/view',
                 '<controller>/<action:(update|delete|backup|restore|stop|kill)>/<id:\d+>' => '<controller>/<action>',
                 'howto/img/<id>' => 'howto/img',

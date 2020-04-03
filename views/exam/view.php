@@ -249,6 +249,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'template' => '<tr><th{captionOptions}>{value}</th><td{contentOptions}>{label}</td></tr>',
         'attributes' => [
+            'backup_path',
             'grp_netdev:boolean',
             'allow_sudo:boolean',
             'allow_mount:boolean',

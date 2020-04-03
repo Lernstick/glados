@@ -315,13 +315,11 @@ class RdiffFileSystem extends Model
      */
     public function versionAt($date)
     {
-
         if ($date == 'now' || $date == 'all' || preg_match($this->dateRegex, $date, $matches) === 1) {
             $this->_date = $date;
             return $this;
-        }else{
+        } else {
             return null;
-            //throw new NotFoundHttpException($this->remotePath . ' (' . $date . ')' . ': No such file or directory.'); 
         }
     }
 
@@ -708,7 +706,7 @@ class RdiffFileSystem extends Model
             $contents = file_get_contents($tmpFile);
             @unlink($tmpFile);
             return $contents;
-        }else{
+        } else {
             // failed to restore
             foreach ($output as $line) {
                 $out .= $line . PHP_EOL;
