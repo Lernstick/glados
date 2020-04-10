@@ -21,6 +21,14 @@ class ScreencaptureController extends Controller
     public $rbac_id = 'ticket';
 
     /**
+     * @var string Fake the action id for the RBAC system
+     */
+    public function getAction_id ()
+    {
+        return 'view';
+    }
+
+    /**
      * @inheritdoc
      */
     public function behaviors()
@@ -88,4 +96,18 @@ class ScreencaptureController extends Controller
             throw new NotFoundHttpException(\Yii::t('ticket', 'The screen capture does not exist.'));
         }
     }
+
+    /**
+     * Displays the ffmpeg log by Screencapture model.
+     * @param integer $ticket_id id of the Ticket model.
+     * @return The response object
+     */
+    public function actionLog($ticket_id)
+    {
+        $screencapture = Screencapture::findOne($ticket_id);
+        return $this->renderAjax('/screen_capture/log', [
+            'log' => $screencapture->screencaptureLog,
+        ]);
+    }
+
 }

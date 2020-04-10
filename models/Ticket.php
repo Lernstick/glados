@@ -100,7 +100,7 @@ class Ticket extends LiveActiveRecord
     public function init()
     {
         $this->on(self::EVENT_AFTER_UPDATE, [$this, 'updateEvent_old']);
-        $this->on(self::EVENT_AFTER_DELETE, [$this, 'deleteEvent']);
+        $this->on(self::EVENT_BEFORE_DELETE, [$this, 'deleteEvent']);
 
         /* generate the token if it's a new record */
         $this->token = $this->isNewRecord ? $this->generateRandomToken() : $this->token;
@@ -377,6 +377,10 @@ class Ticket extends LiveActiveRecord
 
         if ($this->backup == true) {
             $this->backups[0]->delete();
+        }
+
+        if ($this->screencapture !== null) {
+            $this->screencapture->delete();
         }
 
         return;
@@ -743,7 +747,7 @@ class Ticket extends LiveActiveRecord
     }
 
     /**
-     * Generates an error message when the ticket is in closed state
+     * Generates an error message when the ticket is not in closed state
      *
      * @param string $attribute - the attribute
      * @param array $params

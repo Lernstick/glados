@@ -94,7 +94,7 @@ urlConfig="${urlConfig}"
 EOF
 
 # create necessary directory structure
-mkdir -p "${initrd}/"{backup,base,newroot,squashfs,exam}
+mkdir -p "${initrd}/"{backup,base,newroot,squashfs,exam,tmpfs}
 mkdir -p "${initrd}/backup/etc/NetworkManager/"{system-connections,dispatcher.d}
 mkdir -p "${initrd}/backup/${desktop}/"
 mkdir -p "${initrd}/backup/usr/bin/"

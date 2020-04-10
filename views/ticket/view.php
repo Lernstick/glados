@@ -352,7 +352,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
         <?php $_GET = array_merge($_GET, ['#' => 'tab_browse']); ?>
-        <?= $this->render('/ticket/screen_capture', [
+        <?= $this->render('/screen_capture/view', [
             'model' => $model,
         ]); ?>
 

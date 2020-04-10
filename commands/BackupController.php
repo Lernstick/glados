@@ -189,6 +189,20 @@ class BackupController extends DaemonController implements DaemonInterface
             }
             $this->ticket->save(false);
 
+            # disable screen capture service on the client
+            if ($this->finishBackup == true) {
+                $this->ticket->runCommand('service screen_capture stop', 'C', 10);
+            }
+
+
+            /* Exclude screen_capture_path from backup */
+            if (array_key_exists('screen_capture', $this->ticket->exam->settings)
+                && $this->ticket->exam->settings['screen_capture']
+            ) {
+                $this->excludeList[] = FileHelper::normalizePath(
+                    $this->remotePath . '/' . $this->ticket->exam->settings['screen_capture_path']);
+            }
+
             $this->remotePath = FileHelper::normalizePath($this->remotePath . '/' . $this->ticket->exam->backup_path);
 
             /* Generate exclude list based on remotePath */

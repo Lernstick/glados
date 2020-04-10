@@ -18,6 +18,7 @@ use app\models\DaemonInterface;
 /**
  * Fetching Daemon (pull)
  * This is the daemon which calls rsync to pull the data from the clients one by one.
+ * It also removes fetched files from the client (see rsync's option --remove-source-files)
  */
 class FetchController extends DaemonController
 {
@@ -96,20 +97,26 @@ class FetchController extends DaemonController
             return;
         }
 
-        $this->logInfo('Processing ticket (fetch): ' .
-            ( empty($this->ticket->test_taker) ? $this->ticket->token : $this->ticket->test_taker) .
-            ' (' . $this->ticket->ip . ')', true);
-        $this->ticket->backup_state = yiit('ticket', 'fetch in progress...');
-        $this->ticket->save(false);
-
-        $remotePath = FileHelper::normalizePath($this->remotePath . '/' . $this->ticket->exam->settings['screen_capture_path']);
+        /**
+         * set remotePath to nothing, because rsync together with --remove-source-files, will then remove
+         * source files inside /overlay - which is the upper dir of overlayfs. This breaks the file, resulting
+         * in a "Stale file handle". The filename in unusable then.
+         */
+        $this->remotePath = '';
 
         /* Generate fetch list based on the properties of the exam */
         if (array_key_exists('screen_capture', $this->ticket->exam->settings) && $this->ticket->exam->settings['screen_capture']) {
-            $this->fetchList[] = FileHelper::normalizePath($this->remotePath . '/' . $this->ticket->exam->settings['screen_capture_path']) . '/*';
+            $this->fetchList[] = FileHelper::normalizePath($this->remotePath . '/' . $this->ticket->exam->settings['screen_capture_path']) . '/launch/*';
         }
 
         if (!empty($this->fetchList)) {
+
+            $this->logInfo('Processing ticket (fetch): ' .
+                ( empty($this->ticket->test_taker) ? $this->ticket->token : $this->ticket->test_taker) .
+                ' (' . $this->ticket->ip . ')', true);
+            $this->ticket->backup_state = yiit('ticket', 'fetch in progress...');
+            $this->ticket->save(false);
+
             $fetch = '';
             foreach ($this->fetchList as $n => $toFetch) {
                 $fetch .= ' ' . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . ":" . $toFetch);
@@ -119,6 +126,7 @@ class FetchController extends DaemonController
                 . "--bwlimit=" . escapeshellarg($this->bwlimit) . " "
                  . "--rsh='ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
                  . " -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' "
+                 . "--remove-source-files "
                  . $fetch . " "
                  . escapeshellarg(\Yii::$app->params['scPath'] . "/" . $this->ticket->token . "/") . " "
                  . "| stdbuf -oL tr '\\r' '\\n' ";

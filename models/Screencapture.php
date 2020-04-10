@@ -25,6 +25,11 @@ class Screencapture extends Model
     public $master;
     public $ticket;
 
+    public function getScreencaptureDir()
+    {
+        return \Yii::$app->params['scPath'] . '/' . $this->ticket->token;
+    }
+
     /**
      * Return the Screencapture model related to the ticket id
      *
@@ -55,6 +60,34 @@ class Screencapture extends Model
     {
         $file = FileHelper::normalizePath($file);
         return FileHelper::normalizePath(StringHelper::dirname($this->master) . '/' . $file);
+    }
+
+    /**
+     * Removes all screen captures
+     *
+     * @return void
+     * @throws yii\base\ErrorException
+     * @see https://www.yiiframework.com/doc/api/2.0/yii-helpers-basefilehelper#removeDirectory()-detail
+     */
+    public function delete()
+    {
+        return FileHelper::removeDirectory($this->screencaptureDir);
+    }
+
+    /**
+     * Getter for the backup log
+     *
+     * @return array
+     */
+    public function getScreencaptureLog()
+    {
+        $glob = $this->screencaptureDir . '/ffreport-*.log';
+        $log = [];
+        foreach (glob($glob) as $filename) {
+            $lines = file($filename);
+            $log = array_merge($log, $lines);
+        }
+        return $log;
     }
 
 }
