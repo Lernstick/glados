@@ -117,17 +117,18 @@ class FetchController extends DaemonController
             $this->ticket->backup_state = yiit('ticket', 'fetch in progress...');
             $this->ticket->save(false);
 
-            $fetch = '';
-            foreach ($this->fetchList as $n => $toFetch) {
-                $fetch .= ' ' . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . ":" . $toFetch);
-            }
+            $fetchList = $this->fetchList;
+            /* Escape the whole excludeList */
+            array_walk($fetchList, function(&$e, $key){
+                $e = escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . ":" . $e);
+            });
 
-            $this->_cmd = "rsync -L --checksum --partial --progress "
+            $this->_cmd = "rsync -L --checksum --partial --progress --protect-args "
                 . "--bwlimit=" . escapeshellarg($this->bwlimit) . " "
                  . "--rsh='ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
                  . " -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' "
                  . "--remove-source-files "
-                 . $fetch . " "
+                 . implode($fetchList, ' ') . ' '
                  . escapeshellarg(\Yii::$app->params['scPath'] . "/" . $this->ticket->token . "/") . " "
                  . "| stdbuf -oL tr '\\r' '\\n' ";
 

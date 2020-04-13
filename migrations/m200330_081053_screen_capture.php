@@ -214,7 +214,7 @@ class m200330_081053_screen_capture extends Migration
   -c:v h264 -b:v "${bitrate}" -profile:v baseline -pix_fmt:v yuv420p -an \
   -flags +cgop -g "${gop}" -hls_playlist_type event -hls_time "${chunk}" \
   -strftime 1 -hls_flags append_list -master_pl_name "master.m3u8" \
-  -hls_segment_filename "${path}/video%s.ts" "${path}/video.m3u8"',
+  -hls_segment_filename "video%s.ts" -loglevel level+info -nostats "video.m3u8"',
             'description' => yiit('exam_setting_avail', 'The actual command that is executed to capture the screen. This will <b>overwrite</b> all other settings.'),
             'belongs_to' => $screen_capture->id,
         ]);
@@ -268,11 +268,22 @@ class m200330_081053_screen_capture extends Migration
             'key' => 'screen_capture_path',
             'name' => yiit('exam_setting_avail', 'Path'),
             'type' => 'text',
-            'default' => "/home/user/Schreibtisch/out",
+            'default' => "/home/user/ScreenCapture",
             'description' => yiit('exam_setting_avail', 'The path to save output files.'),
             'belongs_to' => $screen_capture->id,
         ]);
         $screen_capture_path->save(false);
+
+        // create screen_capture_overflow_threshold
+        $screen_capture_overflow_threshold = new ExamSettingAvail([
+            'key' => 'screen_capture_overflow_threshold',
+            'name' => yiit('exam_setting_avail', 'Overflow threshold'),
+            'type' => 'text',
+            'default' => "500m",
+            'description' => yiit('exam_setting_avail', 'Since on the client system there is a lot of data produced in memory due to screen capturing leading to the system to being out of memory, you can define a threshold, such that when reached, the client system starts to delete screen capture files that are not yet fetched by the server in order to free memory.<br>Examples: <ul><li><code>25%</code>: the threshold is reached when 25% of physical system memory is filled with screen capture files.</li><li><code>500m</code>: a fixed threshold, that is reached when more than 500 Megabytes of screen capture files are produced and not yet fetched by the server.</li><li><code>0m</code>/<code>0%</code>: disables the threshold, never delete anything.</li></ul>'),
+            'belongs_to' => $screen_capture->id,
+        ]);
+        $screen_capture_overflow_threshold->save(false);
 
         $this->addColumn($this->historyTable, 'type', $this->boolean()->notNull()->defaultValue(0));
         $this->addColumn($this->ticketTable, 'sc_size', $this->integer(11)->notNull()->defaultValue(0));

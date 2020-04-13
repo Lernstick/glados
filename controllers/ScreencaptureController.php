@@ -104,10 +104,13 @@ class ScreencaptureController extends Controller
      */
     public function actionLog($ticket_id)
     {
-        $screencapture = Screencapture::findOne($ticket_id);
-        return $this->renderAjax('/screen_capture/log', [
-            'log' => $screencapture->screencaptureLog,
-        ]);
+        if (($screencapture = Screencapture::findOne($ticket_id)) !== null) {
+            return $this->renderAjax('/screen_capture/log', [
+                'log' => $screencapture->screencaptureLog,
+            ]);
+        } else {
+            throw new NotFoundHttpException(\Yii::t('ticket', 'The screen capture log file does not exist.'));
+        }
     }
 
 }

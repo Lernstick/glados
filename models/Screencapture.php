@@ -81,10 +81,9 @@ class Screencapture extends Model
      */
     public function getScreencaptureLog()
     {
-        $glob = $this->screencaptureDir . '/ffreport-*.log';
         $log = [];
-        foreach (glob($glob) as $filename) {
-            $lines = file($filename);
+        if (file_exists($this->screencaptureDir . '/screen_capture.log')) {
+            $lines = file($this->screencaptureDir . '/screen_capture.log');
             $log = array_merge($log, $lines);
         }
         return $log;

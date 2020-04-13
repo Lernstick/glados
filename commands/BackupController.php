@@ -210,6 +210,11 @@ class BackupController extends DaemonController implements DaemonInterface
                 return (strpos($v, $this->remotePath) === 0);
             });
 
+            /* Escape the whole excludeList */
+            array_walk($exclude, function(&$e, $key){
+                $e = escapeshellarg($e);
+            });
+
             $this->_cmd = "rdiff-backup --remote-schema 'ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
                  . "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -C %s rdiff-backup --server' "
                  . "-v5 --print-statistics "
@@ -284,7 +289,9 @@ class BackupController extends DaemonController implements DaemonInterface
                 # Calculate the size
                 $this->logInfo("Calculate backup size...");
                 $this->ticket->backup_size = $this->directorySize(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token) - $this->directorySize(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token . '/rdiff-backup-data');
-                $this->ticket->sc_size = $this->directorySize(\Yii::$app->params['scPath'] . "/" . $this->ticket->token);
+                if (is_dir(\Yii::$app->params['scPath'] . "/" . $this->ticket->token)) {
+                    $this->ticket->sc_size = $this->directorySize(\Yii::$app->params['scPath'] . "/" . $this->ticket->token);
+                }
             }
 
             $this->ticket->backup_last_try = new Expression('NOW()');

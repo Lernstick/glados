@@ -21,6 +21,8 @@ SCRIPT;
     // Initialze the videojs player
     $this->registerJs($js, \yii\web\View::POS_READY);
 
+}
+
 ?>
 
 <?= DetailView::widget([
@@ -58,46 +60,42 @@ SCRIPT;
         </div>
         <div class="panel-body">
 
-            <?= VideoJsWidget::widget([
-                'options' => [
-                    'id' => 'video-container',
-                    'class' => 'video-js vjs-fluid vjs-default-skin vjs-big-play-centered',
-                    //'poster' => "http://www.videojs.com/img/poster.jpg",
-                    'controls' => true,
-                    'preload' => 'auto',
-                    'fluid' => true,
-                    'responsive' => true,
-                ],
-                'tags' => [
-                    'source' => [
-                        [
-                            'src' => Url::to(['screencapture/view', 'id' => $model->id, 'file' => 'master.m3u8']),
-                            'type' => 'application/x-mpegURL',
-                        ],
+            <?php if ($model->screencapture !== null) { ?>
+
+                <?= VideoJsWidget::widget([
+                    'options' => [
+                        'id' => 'video-container',
+                        'class' => 'video-js vjs-fluid vjs-default-skin vjs-big-play-centered',
+                        //'poster' => "http://www.videojs.com/img/poster.jpg",
+                        'controls' => true,
+                        'preload' => 'auto',
+                        'fluid' => true,
+                        'responsive' => true,
                     ],
-                ]
-            ]); ?>
+                    'tags' => [
+                        'source' => [
+                            [
+                                'src' => Url::to(['screencapture/view', 'id' => $model->id, 'file' => 'master.m3u8']),
+                                'type' => 'application/x-mpegURL',
+                            ],
+                        ],
+                    ]
+                ]); ?>
+
+            <?php } else { ?>
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <i class="glyphicon glyphicon-warning-sign"></i>&nbsp;<span><?= Yii::t('ticket', 'No video file(s) found.') ?></span>
+                        <br><br>
+                        <a class="btn btn-default" onClick='$.pjax.reload({container:"#screencapture"});'><i class="glyphicon glyphicon-refresh"></i>&nbsp;<?= Yii::t('app', 'Reload') ?></a>
+                    </div>
+                </div>
+            <?php } ?>
 
         </div>
     </div>
 
 <?php
-
-} else {
-
-?>
-
-    <div class="row">
-        <div class="col-sm-12 text-center">
-            <i class="glyphicon glyphicon-warning-sign"></i>&nbsp;<span><?= Yii::t('ticket', 'No video file(s) found.') ?></span>
-            <br><br>
-            <a class="btn btn-default" onClick='$.pjax.reload({container:"#screencapture"});'><i class="glyphicon glyphicon-refresh"></i>&nbsp;<?= Yii::t('app', 'Reload') ?></a>
-        </div>
-    </div>
-
-<?php
-
-}
 
 $screencaptureLogButton = "
     $('#screencapture-log-show').click(function(event) {

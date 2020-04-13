@@ -17,6 +17,7 @@ $screen_capture_quality = $members['screen_capture_quality'];
 $screen_capture_chunk = $members['screen_capture_chunk'];
 $screen_capture_bitrate = $members['screen_capture_bitrate'];
 $screen_capture_path = $members['screen_capture_path'];
+$screen_capture_overflow_threshold = $members['screen_capture_overflow_threshold'];
 
 $id2 = $screen_capture_command->id === null ? $id . "a" : $screen_capture_command->id;
 $id3 = $screen_capture_fps->id === null ? $id . "b" : $screen_capture_fps->id;
@@ -24,6 +25,7 @@ $id4 = $screen_capture_quality->id === null ? $id . "c" : $screen_capture_qualit
 $id5 = $screen_capture_chunk->id === null ? $id . "d" : $screen_capture_chunk->id;
 $id6 = $screen_capture_bitrate->id === null ? $id . "e" : $screen_capture_bitrate->id;
 $id7 = $screen_capture_path->id === null ? $id . "f" : $screen_capture_path->id;
+$id8 = $screen_capture_overflow_threshold->id === null ? $id . "g" : $screen_capture_overflow_threshold->id;
 
 $screen_capture_quality->value *= 100;
 
@@ -36,13 +38,15 @@ $("#ExamSettings_{$id}_value").on("switchChange.bootstrapSwitch change", functio
         $('#ExamSettings_{$id5}_value').attr("disabled", false);
         $('#ExamSettings_{$id6}_value').attr("disabled", false);
         $('#ExamSettings_{$id7}_value').attr("disabled", false);
+        $('#ExamSettings_{$id8}_value').attr("disabled", false);
     } else if ($(this).not(':checked')) {
         $('#ExamSettings_{$id2}_value').attr("disabled", true);
         $('#ExamSettings_{$id3}_value').attr("disabled", true);
         $('#ExamSettings_{$id4}_value').attr("disabled", true);
         $('#ExamSettings_{$id5}_value').attr("disabled", true);
         $('#ExamSettings_{$id6}_value').attr("disabled", true);
-        $('#ExamSettings_{$id7}_value').attr("disabled", false);
+        $('#ExamSettings_{$id7}_value').attr("disabled", true);
+        $('#ExamSettings_{$id8}_value').attr("disabled", true);
     }
 });
 
@@ -160,11 +164,21 @@ $this->registerJs($js);
             <?= $form->field($screen_capture_path, 'key')->hiddenInput([
                 'id' => "ExamSettings_{$id7}_key",
                 'name' => "ExamSettings[$id7][key]",
-                'data-id' => $id6,
+                'data-id' => $id7,
             ])->label(false)->hint(false); ?>
             <?= $form->field($screen_capture_path, 'belongs_to')->hiddenInput([
                 'id' => "ExamSettings_{$id7}_belongs_to",
                 'name' => "ExamSettings[$id7][belongs_to]",
+                'value' => $id,
+            ])->label(false)->hint(false); ?>
+            <?= $form->field($screen_capture_overflow_threshold, 'key')->hiddenInput([
+                'id' => "ExamSettings_{$id8}_key",
+                'name' => "ExamSettings[$id8][key]",
+                'data-id' => $id8,
+            ])->label(false)->hint(false); ?>
+            <?= $form->field($screen_capture_overflow_threshold, 'belongs_to')->hiddenInput([
+                'id' => "ExamSettings_{$id8}_belongs_to",
+                'name' => "ExamSettings[$id8][belongs_to]",
                 'value' => $id,
             ])->label(false)->hint(false); ?>
         </div>
@@ -266,5 +280,23 @@ $this->registerJs($js);
                 'disabled' => !$setting->value,
             ])->label($screen_capture_path->detail->name)->hint($screen_capture_path->detail->description); ?>
         </div>
+
+        <div class="parent">
+            <?= $form->field($screen_capture_overflow_threshold, 'value', [
+                'template' => '{label}<div class="input-group"><span class="input-group-addon">' . \Yii::t('exams', 'Remove capture files when {threshold} exceeds.', [
+                            'threshold' => '</span>{input}<span class="input-group-addon">'
+                        ]) . '</span></div>{hint}{error}'
+            ])->widget(\yii\widgets\MaskedInput::className(), [
+                'type' => 'text',
+                //'mask' => ['9{1,4}MB', '9{1,2}\%'],
+                'mask' => ['9{1,4}m', '9{1,2}\%'],
+                'options' => [
+                    'id' => "ExamSettings_{$id8}_value",
+                    'name' => "ExamSettings[$id8][value]",
+                    'disabled' => !$setting->value,
+                ],
+            ])->label($screen_capture_overflow_threshold->detail->name)->hint($screen_capture_overflow_threshold->detail->description); ?>
+        </div>
+
     </div>
 </div>
