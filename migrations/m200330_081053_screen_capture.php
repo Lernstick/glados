@@ -269,7 +269,7 @@ class m200330_081053_screen_capture extends Migration
             'name' => yiit('exam_setting_avail', 'Path'),
             'type' => 'text',
             'default' => "/home/user/ScreenCapture",
-            'description' => yiit('exam_setting_avail', 'The path to save output files.'),
+            'description' => yiit('exam_setting_avail', 'The path to save output files. This is also the working directory of the command above.'),
             'belongs_to' => $screen_capture->id,
         ]);
         $screen_capture_path->save(false);
