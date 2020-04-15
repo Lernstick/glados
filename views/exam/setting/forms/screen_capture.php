@@ -283,7 +283,7 @@ $this->registerJs($js);
 
         <div class="parent">
             <?= $form->field($screen_capture_overflow_threshold, 'value', [
-                'template' => '{label}<div class="input-group"><span class="input-group-addon">' . \Yii::t('exams', 'Remove capture files when {threshold} exceeds.', [
+                'template' => '{label}<div class="input-group"><span class="input-group-addon">' . \Yii::t('exams', 'Remove capture files when they exceed {threshold} of total disk space.', [
                             'threshold' => '</span>{input}<span class="input-group-addon">'
                         ]) . '</span></div>{hint}{error}'
             ])->widget(\yii\widgets\MaskedInput::className(), [

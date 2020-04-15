@@ -58,7 +58,7 @@ SCRIPT;
                 </div>
             </div>
         </div>
-        <div class="panel-body">
+        <div>
 
             <?php if ($model->screencapture !== null) { ?>
 
@@ -83,6 +83,7 @@ SCRIPT;
                 ]); ?>
 
             <?php } else { ?>
+                <br>
                 <div class="row">
                     <div class="col-sm-12 text-center">
                         <i class="glyphicon glyphicon-warning-sign"></i>&nbsp;<span><?= Yii::t('ticket', 'No video file(s) found.') ?></span>
@@ -90,6 +91,7 @@ SCRIPT;
                         <a class="btn btn-default" onClick='$.pjax.reload({container:"#screencapture"});'><i class="glyphicon glyphicon-refresh"></i>&nbsp;<?= Yii::t('app', 'Reload') ?></a>
                     </div>
                 </div>
+                <br>
             <?php } ?>
 
         </div>

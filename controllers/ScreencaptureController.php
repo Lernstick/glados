@@ -74,12 +74,12 @@ class ScreencaptureController extends Controller
 
             if ($ext == 'm3u8') {
                 $contents = file_get_contents($path);
-                if ($ticket->state == Ticket::STATE_CLOSED || $ticket->state == Ticket::STATE_SUBMITTED) {
-                    // simulate a vod stream
-                    $contents = str_replace("#EXT-X-PLAYLIST-TYPE:EVENT", "#EXT-X-PLAYLIST-TYPE:VOD", $contents) . "#EXT-X-ENDLIST" . PHP_EOL;
-                } else {
+                if ($ticket->state == Ticket::STATE_RUNNING) {
                     // simulate a live stream
                     $contents = str_replace("#EXT-X-ENDLIST", "", $contents);
+                } else {
+                    // simulate a vod stream
+                    $contents = str_replace("#EXT-X-PLAYLIST-TYPE:EVENT", "#EXT-X-PLAYLIST-TYPE:VOD", $contents) . "#EXT-X-ENDLIST" . PHP_EOL;
                 }
                 return Yii::$app->response->sendContentAsFile($contents, basename($path), [
                     'mimeType' => $mimeType,

@@ -44,8 +44,9 @@ chunk="${chunk}"
 bitrate="${bitrate}"
 fps="${fps}"
 gop="\$((chunk*fps))"
-
 mkdir -p "${path}"
+
+echo "[screen_capture] [info] Starting screen capturing..."
 ${command}
 EOF1
 
@@ -60,10 +61,12 @@ Description=screen_capture
 Type=simple
 WorkingDirectory=${path}
 ExecStart=/usr/bin/screen_capture
+ExecStopPost=/bin/bash -c 'cp -vl *.{m3u8,log} launch/; mv -v *.ts launch/'
 Restart=always
 RestartSec=10
-StandardOutput=append:${path}/screen_capture.log
-StandardError=append:${path}/screen_capture.log
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=screen_capture
 
 [Install]
 WantedBy=graphical.target
@@ -71,6 +74,16 @@ EOF2
 
     chroot ${initrd}/newroot mkdir "${path}"
     chroot ${initrd}/newroot systemctl enable screen_capture.service
+
+    # set up rsyslog 
+    cat <<EOF_RSYSLOG >"${initrd}/newroot/etc/rsyslog.d/screen_capture.conf"
+:programname, isequal, "screen_capture" /var/log/screen_capture.log
+EOF_RSYSLOG
+
+    chroot ${initrd}/newroot ln -s /var/log/screen_capture.log "${path}"/screen_capture.log
+
+    # root:adm
+    chown 0:4 "${initrd}/newroot/etc/rsyslog.d/screen_capture.conf"
 
     # create screen_capture_launch script
     cat <<EOF3 >"${initrd}/newroot/usr/bin/screen_capture_launch"
@@ -90,14 +103,17 @@ LANG=C stat -c '%Y %N' "\${path}"/*.ts | \\
     xargs -I {} sh -c "mv -v '{}' '\${launch}/';"
 
 # get total physical RAM in bytes
-ram="\$(awk '\$1~/MemTotal/{printf "%.0f",\$2*1024}' /proc/meminfo)"
+#ram="\$(awk '\$1~/MemTotal/{printf "%.0f",\$2*1024}' /proc/meminfo)"
+# get total drive space in bytes
+space="\$(df --block-size=1 --output=size "\${path}" | tail -1)"
 if [ "\${threshold}" != "0%" ] || [ "\${threshold}" != "0m" ]; then
     cur="\$(du -cb "\${launch}/"*.ts | tail -1 | cut -f1)"
+    # calculate the threshold in bytes
     [[ "\${threshold}" == *m ]] && threshold=\$((\${threshold%?}*1042*1024))
-    [[ "\${threshold}" == *% ]] && threshold=\$((\${threshold%?}*\${ram}/100))
+    [[ "\${threshold}" == *% ]] && threshold=\$((\${threshold%?}*\${space}/100))
 
     if [ "\${cur}" -gt "\${threshold}" ]; then
-        echo "[screen_capture_launch] [fatal] overflow threshold exceeded: removing files" | tee -a "\${path}/screen_capture.log"
+        echo "[screen_capture_launch] [fatal] overflow threshold of \${threshold} bytes exceeded: removing files" | tee -a "\${path}/screen_capture.log"
         oldest="\$(ls -t1 "\${launch}"/*.ts | tail -1)"
         i=0
         while [ "\${cur}" -gt "\${threshold}" ] && [ -n "\${oldest}" ] && [ "\$i" -lt 10 ]; do
@@ -121,6 +137,9 @@ Description=screen_capture_launch
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/screen_capture_launch
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=screen_capture
 EOF4
 
     # create screen_capture_launch systemd timer file
