@@ -351,6 +351,7 @@ class Auth extends Model implements AuthInterface
         if(!isset($this->_configArray)){
             $this->_configArray = [
                 'class' => $this->class,
+                'id' => $this->id,
                 'name' => $this->name,
                 'description' => $this->description,
                 'form' => $this->form,
@@ -368,6 +369,7 @@ class Auth extends Model implements AuthInterface
     public function setConfigArray($array)
     {
         $this->_configArray = $array;
+        $this->_configArray['id'] = $this->id;
     }
 
     /**
@@ -636,12 +638,11 @@ return [
     {
         $models = [];
         foreach ($this->fileConfig as $id => $configArray) {
-            //var_dump($configArray);die();
-            $model = new Auth();
+            $model = new Auth([
+                # see comment below in findOne()
+                'id' => $id,
+            ]);
             $model->configArray = $configArray;
-            //$model->id = $id;
-            //$model->name = $configArray['name'];
-            $model->obj->id = $id;
             $models[] = $model->obj;
         }
         usort($models, [$this, 'sortByOrder']);
@@ -656,11 +657,12 @@ return [
     {
         $configArray = self::getFileConfig();
         if (array_key_exists($id, $configArray)) {
-            $model = new Auth();
+            $model = new Auth([
+                # The id needs to be massive assigned before init() is called. This is needed
+                # by isNewRecord to correctly determine its value
+                'id' => $id,
+            ]);
             $model->configArray = $configArray[$id];
-            //$model->name = $configArray[$id]['name'];
-            //$model->id = $id;
-            $model->obj->id = $id;
             return $model->obj;
         } else {
             return null;
