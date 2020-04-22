@@ -119,7 +119,7 @@ $config = [
 
 if (YII_ENV_DEV) {
     // configuration adjustments for 'dev' environment
-    if($_SERVER['PATH_INFO'] != '/event/stream') {
+    if(array_key_exists('PATH_INFO', $_SERVER) && $_SERVER['PATH_INFO'] != '/event/stream') {
         $config['bootstrap'][] = 'debug';
         $config['modules']['debug'] = [
             'class' => 'yii\debug\Module',
