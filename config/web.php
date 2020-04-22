@@ -73,7 +73,7 @@ $config = [
                 '<controller>/<action:(update|delete|backup|restore|stop|kill)>/<id:\d+>' => '<controller>/<action>',
                 'howto/img/<id>' => 'howto/img',
                 'howto/<id>' => 'howto/view',
-                'ticket/<action:(config|download|finish|notify|md5|status)>/<token:.*>' => 'ticket/<action>',
+                'ticket/<action:(config|download|finish|notify|md5|status|live)>/<token:.*>' => 'ticket/<action>',
                 'backup/<action:file>/<ticket_id:\d+>' => 'backup/<action>',
             ]
         ],

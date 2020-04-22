@@ -42,7 +42,7 @@ class LiveActiveRecord extends TranslatedActiveRecord
 
     /**
      * The default configuration for a live field if no other is given.
-     * These field are merged with the provided array in a way that the
+     * These fields are merged with the provided array in a way that the
      * values of the given array overwrite the ones below.
      * 
      * @return array The default configuration

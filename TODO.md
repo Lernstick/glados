@@ -26,3 +26,7 @@ TODO:
   * order of mount?
   * in the download process, all these files are rsync to the client
   * in the mount process, these files are mounted/unzipped in the given order before that "main" squashfs/zip files are mounted over them
+
+
+* Live overview
+  * "longtext" in event table for data field - should be able to contain images in base64

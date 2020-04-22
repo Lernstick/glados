@@ -34,7 +34,6 @@ use app\components\AccessRule;
 use yii\data\ArrayDataProvider;
 use yii\widgets\ActiveForm;
 
-
 /**
  * TicketController implements the CRUD actions for Ticket model.
  */
@@ -51,6 +50,7 @@ class TicketController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['post'],
+                    'live' => ['get', 'post'],
                 ],
             ],
             'access' => [
@@ -70,6 +70,7 @@ class TicketController extends Controller
                             'notify',    // notify a new client status
                             'finish',    // finish exam
                             'status',    // show the status of the exam
+                            'live',      // post the live stream
                         ],
                         'roles' => ['?', '@'],
                     ],
@@ -838,6 +839,64 @@ class TicketController extends Controller
         } else {
             throw new ServerErrorHttpException(\Yii::t('ticket', 'The public key could not be generated.'));
         }
+    }
+
+
+    /**
+     * Receive the uploaded POST raw data from ffmpeg and save it to
+     * [[uploadPath]]/live/$token.jpg or send the stored image in case
+     * of a GET request.
+     *
+     * @param string $token
+     * @return The response object or an array with the error description
+     */
+    public function actionLive($token)
+    {
+
+        $model = Ticket::findOne(['token' => $token]);
+        $request = Yii::$app->request;
+        $path = \Yii::$app->params['uploadPath'] . '/live';
+        $file = $path . '/' . $token . '.jpg';
+
+        if (!$model) {
+            throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+        } else if ($request->isGet) {
+            if (file_exists($file)) {
+                return \Yii::$app->response->sendFile($file, 'live.jpg', [
+                    'mimeType' => 'image/jpeg',
+                    'inline' => true
+                ]);
+            } else {
+                throw new NotFoundHttpException(Yii::t('app', 'File not found.'));
+            }
+        } else if ($request->isPost) {
+            if (!is_dir($path)) {
+                mkdir($path);
+            }
+            file_put_contents($file, $request->getRawBody());
+            $eventItem = new EventItem([
+                'event' => 'ticket/' . $model->id,
+                'priority' => 0,
+                'data' => [
+                    'live' => [
+                        'base64' => base64_encode($request->getRawBody()),
+                    ],
+                ],
+            ]);
+            $eventItem->generate();
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function beforeAction($action) 
+    { 
+        // Remove CSRF validation on actionLive calls
+        if ($action->id == 'live') {
+            $this->enableCsrfValidation = false; 
+        }
+        return parent::beforeAction($action); 
     }
 
     /**
