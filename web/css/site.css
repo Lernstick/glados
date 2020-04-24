@@ -419,3 +419,36 @@ ul.nav-special > li.active > a > div {
     white-space: nowrap;
     text-overflow: ellipsis;
 }
+
+/*.bigdrop > li.select2-results {
+    max-height: : 20px !important;
+}*/
+
+.bigdrop > .select2-results > ul.select2-results__options {
+  max-height: 300px !important;
+}
+
+/* side by side effect*/
+/*.bigdrop > .select2-results > ul.select2-results__options > li.select2-results__option {
+  width: 33.333% !important;
+  float: left;
+}*/
+
+.bigdrop > .select2-results > ul.select2-results__options > li.select2-results__option > div {
+  max-height: 60px !important;
+  overflow: hidden;
+  position: relative;
+}
+
+.bigdrop > .select2-results > ul.select2-results__options > li.select2-results__option > div > div {
+  position: absolute; 
+  bottom: 0px;
+  right: 12px;
+  background-color: white;
+}
+
+.select2-container--krajee .select2-results__option--highlighted[aria-selected] > div > div {
+    background-color: #337ab7 !important;
+    color: #fff !important;
+
+}

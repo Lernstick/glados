@@ -93,6 +93,7 @@ class FetchController extends DaemonController
             $this->ticket->backup_state = yiit('ticket', '{path}: No such file or directory or not writable.');
             $this->ticket->backup_state_params = [ 'path' => \Yii::$app->params['scPath'] ];
             $this->logError($this->ticket->backup_state);
+            $this->ticket->save(false);
             $this->ticket = null;
             return;
         }

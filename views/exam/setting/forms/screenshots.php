@@ -15,9 +15,9 @@ $id2 = $screenshots_interval->id === null ? $id . "a" : $screenshots_interval->i
 $js = <<< SCRIPT
 $("#ExamSettings_{$id}_value").on("switchChange.bootstrapSwitch change", function(){
     if ($(this).is(':checked')) {
-        $('#ExamSettings_{$id2}_value').attr("disabled", false);
+        $('#ExamSettings_{$id2}_value').attr("readonly", false);
     } else if ($(this).not(':checked')) {
-        $('#ExamSettings_{$id2}_value').attr("disabled", true);
+        $('#ExamSettings_{$id2}_value').attr("readonly", true);
     }
 });
 SCRIPT;
@@ -63,7 +63,7 @@ $this->registerJs($js);
             'type' => 'number',
             'id' => "ExamSettings_{$id2}_value",
             'name' => "ExamSettings[$id2][value]",
-            'disabled' => !$setting->value
+            'readonly' => !$setting->value
         ])->label(false); ?>
     </div>
 </div>

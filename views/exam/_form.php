@@ -132,11 +132,16 @@ $this->registerJs('var setting_k = ' . $setting_k . ';');
 $url = \yii\helpers\Url::to(['exam/index', 'mode' => 'list', 'attr' => 'settings']);
 $placeholder = \Yii::t('exams', 'Choose a setting ...');
 $js = <<< SCRIPT
+
+function format_rt(state) {
+    return $('<div><div>...</div><span><b>' + state.text + '</b><br>' + state.hint + '</span></div>');
+}
+
 select2_config = {
     id: "ExamSettings_{$id}_key",
     name: "ExamSettings[$id][key]",
     theme: 'krajee',
-    dropdownAutoWidth: true,
+    dropdownCssClass: "bigdrop",
     width: 'auto',
     allowClear: true,
     placeholder: "{$placeholder}",
@@ -173,7 +178,7 @@ select2_config = {
         },
     },
     escapeMarkup: function (markup) { return markup; },
-    templateResult: function(q) { return q.text; },
+    templateResult: format_rt,
     templateSelection: function (q) { return q.text; },
 };
 
@@ -191,6 +196,10 @@ selected = function (e) {
     var id = $(e.target).attr('data-id');
 
     if (e.type == 'select2:select') {
+
+        // hide the element with the key input field in it
+        $(e.target).closest('.key').addClass('hidden');
+
         $(e.target).parent().find('label').next('a').remove();
         $(e.target).parent().find('label').after('&nbsp<a tabindex="0" role="button" class="hint glyphicon glyphicon-question-sign"></a>');
 
@@ -335,9 +344,9 @@ $this->registerJs($js);
     <div class="panel panel-warning">
         <div class="panel-heading">
             <i class="glyphicon glyphicon-warning-sign"></i> <?= \Yii::t('exams', 'Please notice, all the settings below will <b>override</b> the settings configured in the <b>exam file</b>!') ?>
-            <?= Html::a('New Setting', 'javascript:void(0);', [
+            <?= Html::a('<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>&nbsp;' . \Yii::t('exams', 'New Setting'), 'javascript:void(0);', [
                 'id' => 'exam-new-setting-button', 
-                'class' => 'pull-right btn btn-default btn-xs'
+                'class' => 'pull-right btn btn-success btn-xs'
             ]); ?>
         </div>
         <div class="panel-body">

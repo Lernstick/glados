@@ -32,21 +32,21 @@ $screen_capture_quality->value *= 100;
 $js = <<< SCRIPT
 $("#ExamSettings_{$id}_value").on("switchChange.bootstrapSwitch change", function(){
     if ($(this).is(':checked')) {
-        $('#ExamSettings_{$id2}_value').attr("disabled", false);
-        $('#ExamSettings_{$id3}_value').attr("disabled", false);
-        $('#ExamSettings_{$id4}_value').attr("disabled", false);
-        $('#ExamSettings_{$id5}_value').attr("disabled", false);
-        $('#ExamSettings_{$id6}_value').attr("disabled", false);
-        $('#ExamSettings_{$id7}_value').attr("disabled", false);
-        $('#ExamSettings_{$id8}_value').attr("disabled", false);
+        $('#ExamSettings_{$id2}_value').attr("readonly", false);
+        $('#ExamSettings_{$id3}_value').attr("readonly", false);
+        $('#ExamSettings_{$id4}_value').attr("readonly", false);
+        $('#ExamSettings_{$id5}_value').attr("readonly", false);
+        $('#ExamSettings_{$id6}_value').attr("readonly", false);
+        $('#ExamSettings_{$id7}_value').attr("readonly", false);
+        $('#ExamSettings_{$id8}_value').attr("readonly", false);
     } else if ($(this).not(':checked')) {
-        $('#ExamSettings_{$id2}_value').attr("disabled", true);
-        $('#ExamSettings_{$id3}_value').attr("disabled", true);
-        $('#ExamSettings_{$id4}_value').attr("disabled", true);
-        $('#ExamSettings_{$id5}_value').attr("disabled", true);
-        $('#ExamSettings_{$id6}_value').attr("disabled", true);
-        $('#ExamSettings_{$id7}_value').attr("disabled", true);
-        $('#ExamSettings_{$id8}_value').attr("disabled", true);
+        $('#ExamSettings_{$id2}_value').attr("readonly", true);
+        $('#ExamSettings_{$id3}_value').attr("readonly", true);
+        $('#ExamSettings_{$id4}_value').attr("readonly", true);
+        $('#ExamSettings_{$id5}_value').attr("readonly", true);
+        $('#ExamSettings_{$id6}_value').attr("readonly", true);
+        $('#ExamSettings_{$id7}_value').attr("readonly", true);
+        $('#ExamSettings_{$id8}_value').attr("readonly", true);
     }
 });
 
@@ -199,7 +199,7 @@ $this->registerJs($js);
                 'id' => "ExamSettings_{$id2}_value",
                 'name' => "ExamSettings[$id2][value]",
                 'rows' => '5',
-                'disabled' => !$setting->value,
+                'readonly' => !$setting->value,
             ])->label($screen_capture_command->detail->name)->hint($screen_capture_command->detail->description); 
             ?>
         </div>
@@ -214,7 +214,7 @@ $this->registerJs($js);
                     'options' => [
                         'id' => "ExamSettings_{$id4}_value",
                         'name' => "ExamSettings[$id4][value]",
-                        'disabled' => !$setting->value,
+                        'readonly' => !$setting->value,
                         'placeholder' => \Yii::t('exams', 'Select range ...'),
                     ],
                     'html5Options' => ['min' => 0, 'max' => 100, 'step' => 1],
@@ -234,7 +234,7 @@ $this->registerJs($js);
                     'id' => "ExamSettings_{$id3}_value",
                     'name' => "ExamSettings[$id3][value]",
                     'type' => 'number',
-                    'disabled' => !$setting->value,
+                    'readonly' => !$setting->value,
                 ])->label($screen_capture_fps->detail->name)->hint($screen_capture_fps->detail->description); ?>
             </div>
         </div>
@@ -249,7 +249,7 @@ $this->registerJs($js);
                     'id' => "ExamSettings_{$id5}_value",
                     'name' => "ExamSettings[$id5][value]",
                     'type' => 'number',
-                    'disabled' => !$setting->value,
+                    'readonly' => !$setting->value,
                 ])->label($screen_capture_chunk->detail->name)->hint($screen_capture_chunk->detail->description); ?>
             </div>
 
@@ -264,7 +264,7 @@ $this->registerJs($js);
                     'options' => [
                         'id' => "ExamSettings_{$id6}_value",
                         'name' => "ExamSettings[$id6][value]",
-                        'disabled' => !$setting->value,
+                        'readonly' => !$setting->value,
                     ],
                 ])->label($screen_capture_bitrate->detail->name)->hint($screen_capture_bitrate->detail->description); ?>
             </div>
@@ -277,7 +277,7 @@ $this->registerJs($js);
                 'id' => "ExamSettings_{$id7}_value",
                 'name' => "ExamSettings[$id7][value]",
                 'type' => 'text',
-                'disabled' => !$setting->value,
+                'readonly' => !$setting->value,
             ])->label($screen_capture_path->detail->name)->hint($screen_capture_path->detail->description); ?>
         </div>
 
@@ -293,7 +293,7 @@ $this->registerJs($js);
                 'options' => [
                     'id' => "ExamSettings_{$id8}_value",
                     'name' => "ExamSettings[$id8][value]",
-                    'disabled' => !$setting->value,
+                    'readonly' => !$setting->value,
                 ],
             ])->label($screen_capture_overflow_threshold->detail->name)->hint($screen_capture_overflow_threshold->detail->description); ?>
         </div>

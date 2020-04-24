@@ -18,11 +18,11 @@ $id3 = $libre_autosave_interval->id === null ? $id . "a" : $libre_autosave_inter
 $js = <<< SCRIPT
 $("#ExamSettings_{$id}_value").on("switchChange.bootstrapSwitch change", function(){
     if ($(this).is(':checked')) {
-        $('#ExamSettings_{$id2}_value').attr("disabled", false);
-        $('#ExamSettings_{$id3}_value').attr("disabled", false);
+        $('#ExamSettings_{$id2}_value').attr("readonly", false);
+        $('#ExamSettings_{$id3}_value').attr("readonly", false);
     } else if ($(this).not(':checked')) {
-        $('#ExamSettings_{$id2}_value').attr("disabled", true);
-        $('#ExamSettings_{$id3}_value').attr("disabled", true);
+        $('#ExamSettings_{$id2}_value').attr("readonly", true);
+        $('#ExamSettings_{$id3}_value').attr("readonly", true);
     }
 });
 SCRIPT;
@@ -77,7 +77,7 @@ $this->registerJs($js);
         ])->textInput([
             'id' => "ExamSettings_{$id2}_value",
             'name' => "ExamSettings[$id2][value]",
-            'disabled' => !$setting->value,
+            'readonly' => !$setting->value,
         ])->label(false); ?>
         <?= $form->field($libre_autosave_interval, 'value', [
             'template' => '{label}<div class="input-group"><div class="input-group-addon">' . \Yii::t('exams', '...all {n} minutes.', [
@@ -87,7 +87,7 @@ $this->registerJs($js);
             'id' => "ExamSettings_{$id3}_value",
             'name' => "ExamSettings[$id3][value]",
             'type' => 'number',
-            'disabled' => !$setting->value,
+            'readonly' => !$setting->value,
         ])->label(false); ?>
     </div>
 </div>

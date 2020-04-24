@@ -15,9 +15,9 @@ $id2 = $libre_createbackup_path->id === null ? $id . "a" : $libre_createbackup_p
 $js = <<< SCRIPT
 $("#ExamSettings_{$id}_value").on("switchChange.bootstrapSwitch change", function(){
     if ($(this).is(':checked')) {
-        $('#ExamSettings_{$id2}_value').attr("disabled", false);
+        $('#ExamSettings_{$id2}_value').attr("readonly", false);
     } else if ($(this).not(':checked')) {
-        $('#ExamSettings_{$id2}_value').attr("disabled", true);
+        $('#ExamSettings_{$id2}_value').attr("readonly", true);
     }
 });
 SCRIPT;
@@ -62,7 +62,7 @@ $this->registerJs($js);
         ])->textInput([
             'id' => "ExamSettings_{$id2}_value",
             'name' => "ExamSettings[$id2][value]",
-            'disabled' => !$setting->value,
+            'readonly' => !$setting->value,
         ])->label(false); ?>
     </div>
 </div>
