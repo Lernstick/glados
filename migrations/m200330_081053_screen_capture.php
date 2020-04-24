@@ -35,8 +35,12 @@ class m200330_081053_screen_capture extends Migration
         'url_whitelist' => null,
     ];
 
+    /**
+     * @return false|mixed if returned false, the settings entry is not written
+     */
     public function postProcessingUp()
     {   return [
+            'url_whitelist' => function($v){return $v == '' ? false : $v;},
             'max_brightness' => function($v){return $v/100;},
         ];
     }
@@ -311,14 +315,18 @@ class m200330_081053_screen_capture extends Migration
                 } else {
                     $value = $model->{$field};
                 }
-                Yii::$app->db->createCommand()->insert($this->settingTable, [
-                    'key' => $field,
-                    'value' => $value,
-                    'exam_id' => $model->id,
-                    'belongs_to' => $belongs_to !== null ? $lastId : null,
-                ])->execute();
-                if ($belongs_to === null) {
-                    $lastId = Yii::$app->db->getLastInsertID();
+
+                // skip the entry if the value evalutes to false (see [[postProcessingUp]])
+                if ($value !== false) {
+                    Yii::$app->db->createCommand()->insert($this->settingTable, [
+                        'key' => $field,
+                        'value' => $value,
+                        'exam_id' => $model->id,
+                        'belongs_to' => $belongs_to !== null ? $lastId : null,
+                    ])->execute();
+                    if ($belongs_to === null) {
+                        $lastId = Yii::$app->db->getLastInsertID();
+                    }
                 }
             }
             $i = $i + 1;
