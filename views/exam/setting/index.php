@@ -64,16 +64,7 @@ $this->registerJs($js);
         'gridOptions' => [
             'dataProvider' => $dataProvider,
             //'filterModel' => $searchModel,
-            'layout' => '{items}\n{pager}',
-            'panel' => [
-                'heading' => false,
-                'footer' => false,
-                'before' => false,
-                'after' => false,
-            ],
-            'toolbar' =>  [
-                //['content' => '{DynaGrid}'],
-            ],
+            'layout' => '{items}<br>{pager}',
             'rowOptions' => function ($model, $key, $index, $grid) {
                 return [
                     'class' => 'settingClick',

@@ -554,6 +554,7 @@ $this->registerJs($js);
 
         Pjax::begin([
             'id' => 'keyModalContent',
+            'enablePushState' => false,
         ]);
         Pjax::end();
 

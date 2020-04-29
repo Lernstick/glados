@@ -130,9 +130,6 @@ class ExamSettingAvail extends TranslatedActiveRecord
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination'=>array(
-                'pageSize'=>\Yii::$app->params['itemsPerPage'],
-            ),
         ]);
 
         $dataProvider->setSort([
