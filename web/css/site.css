@@ -181,10 +181,10 @@ a.desc:after {
   display: initial;
 }
 
-#backupLogModal .modal-dialog, #restoreLogModal .modal-dialog, #screencaptureLogModal .modal-dialog {
+#backupLogModal .modal-dialog, #restoreLogModal .modal-dialog, #screencaptureLogModal .modal-dialog, #keyModal .modal-dialog {
     overflow-y: initial !important
 }
-#backupLogModal .modal-body, #restoreLogModal .modal-body, #screencaptureLogModal .modal-body {
+#backupLogModal .modal-body, #restoreLogModal .modal-body, #screencaptureLogModal .modal-body, #keyModal .modal-body {
     max-height: calc(100vh - 200px);
     overflow-y: auto;
 }
@@ -451,4 +451,21 @@ ul.nav-special > li.active > a > div {
     background-color: #337ab7 !important;
     color: #fff !important;
 
+}
+
+.exam-settings-index tr:not(.disabled):hover td {
+    background-color: #337ab7 !important;
+    color: #fff;
+    cursor: pointer;
+}
+
+.exam-settings-index tr.disabled td {
+    color: #333;
+    background: #fff;
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+
+.exam-settings-index tr td:first-child {
+    font-weight: bold;
 }

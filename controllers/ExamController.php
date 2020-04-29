@@ -77,7 +77,6 @@ class ExamController extends Controller
                 'dataProvider' => $dataProvider,
             ]);
         } else if ($mode == 'list') {
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             $out = [];
             if (!is_null($attr)) {
                 if ($attr == 'name') {
@@ -93,9 +92,18 @@ class ExamController extends Controller
                 } else if ($attr == 'settings') {
                     $searchModel = new ExamSettingAvail();
                     $out = $searchModel->selectList('name', $q, $page, $per_page, 'key', false);
+                } else if ($attr == 'settings2') {
+                    $params = Yii::$app->request->queryParams;
+                    $searchModel = new ExamSettingAvail();
+                    $dataProvider = $searchModel->search($params);
+                    //$out = $searchModel->selectList('name', $q, $page, $per_page, 'key', false);
+                    return $this->renderAjax('setting/index', [
+                        'searchModel' => $searchModel,
+                        'dataProvider' => $dataProvider,
+                    ]);
                 }
             }
-
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             return $out;
         } 
     }

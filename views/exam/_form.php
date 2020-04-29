@@ -12,6 +12,7 @@ use limion\jqueryfileupload\JQueryFileUpload;
 use kartik\range\RangeInput;
 use kartik\switchinput\SwitchInput;
 use app\assets\FormAsset;
+use yii\bootstrap\Modal;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\forms\ExamForm */
@@ -128,7 +129,7 @@ if (count($model->examSettings) == 0
 
 $id = count($ExamSettings);
 $setting_k = isset($id) ? str_replace('new', '', $id) : 0;
-$this->registerJs('var setting_k = ' . $setting_k . ';');
+$this->registerJs('var setting_k = ' . $setting_k . ';', $this::POS_HEAD);
 $url = \yii\helpers\Url::to(['exam/index', 'mode' => 'list', 'attr' => 'settings']);
 $placeholder = \Yii::t('exams', 'Choose a setting ...');
 $js = <<< SCRIPT
@@ -183,12 +184,16 @@ select2_config = {
 };
 
 // new setting button
-$('#exam-new-setting-button').on('click', function () {
+$('#exam-new-setting-button').on('click', function (event) {
+    event.preventDefault();
     setting_k += 1;
 
     $('#exam_setting').prepend($('#exam-new-setting-block').html().replace(/__id__/g, 'new' + setting_k));
     $(".itemnew" + setting_k).find("select").select2(select2_config);
     $(".itemnew" + setting_k).find("select").on('select2:select select2:unselect', selected);
+
+    $('#keyModal').modal('show');
+    $.pjax({url: this.href, container: '#keyModalContent', push: false, async:false})
 });
 
 selected = function (e) {
@@ -344,10 +349,17 @@ $this->registerJs($js);
     <div class="panel panel-warning">
         <div class="panel-heading">
             <i class="glyphicon glyphicon-warning-sign"></i> <?= \Yii::t('exams', 'Please notice, all the settings below will <b>override</b> the settings configured in the <b>exam file</b>!') ?>
-            <?= Html::a('<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>&nbsp;' . \Yii::t('exams', 'New Setting'), 'javascript:void(0);', [
-                'id' => 'exam-new-setting-button', 
-                'class' => 'pull-right btn btn-success btn-xs'
-            ]); ?>
+            <?= Html::a('<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>&nbsp;' . \Yii::t('exams', 'New Setting'),
+                Url::to([
+                    'exam/index',
+                    'mode' => 'list',
+                    'attr' => 'settings2'
+                ]),
+                [
+                    'id' => 'exam-new-setting-button', 
+                    'class' => 'pull-right btn btn-success btn-xs'
+                ]
+            ); ?>
         </div>
         <div class="panel-body">
             <div class="row">
@@ -530,5 +542,23 @@ $this->registerJs($js);
     </div>
 
     <?php ActiveForm::end(); ?>
+
+    <?php
+
+    Modal::begin([
+        'id' => 'keyModal',
+        'header' => '<h4>Title</h4>',
+        //'footer' => Html::Button(\Yii::t('exam', 'Close'), ['data-dismiss' => 'modal', 'class' => 'btn btn-default']),
+        'size' => \yii\bootstrap\Modal::SIZE_LARGE,
+    ]);
+
+        Pjax::begin([
+            'id' => 'keyModalContent',
+        ]);
+        Pjax::end();
+
+    Modal::end();
+
+    ?>
 
 </div>

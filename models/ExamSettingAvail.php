@@ -6,6 +6,7 @@ use Yii;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 use app\models\ExamSetting;
+use yii\data\ActiveDataProvider;
 
 /**
  * This is the base model class for exam_setting_avail tables.
@@ -112,6 +113,54 @@ class ExamSettingAvail extends TranslatedActiveRecord
     public function getMembers()
     {
         return $this->hasMany(ExamSettingAvail::className(), ['belongs_to' => 'id']);
+    }
+
+    /**
+     * Creates data provider instance with search query applied
+     *
+     * @param array $params
+     *
+     * @return ActiveDataProvider
+     */
+    public function search($params)
+    {
+        $query = ExamSettingAvail::find();
+
+        $query->where(['belongs_to' => null]);
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'pagination'=>array(
+                'pageSize'=>\Yii::$app->params['itemsPerPage'],
+            ),
+        ]);
+
+        $dataProvider->setSort([
+            'defaultOrder' => [
+                'id' => SORT_DESC
+            ],
+            'attributes' => [
+                'id',
+                'name',
+                'description',
+                'key',
+                'type',
+                'default',
+            ]
+        ]);
+
+        $this->load($params);
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to return any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+        $query->andFilterWhere(['like', 'name', $this->name])
+            ->andFilterWhere(['like', 'description', $this->description]);
+
+        return $dataProvider;
     }
 
     /** 

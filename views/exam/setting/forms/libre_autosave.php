@@ -72,22 +72,28 @@ $this->registerJs($js);
                 'value' => $id,
             ])->label(false)->hint(false); ?>
         </div>
-        <?= $form->field($libre_autosave_path, 'value', [
-            'template' => '{label}<div class="input-group"><div class="input-group-addon">' . \Yii::t('exams', '...to the directory') . '</div>{input}</div>{hint}{error}'
-        ])->textInput([
-            'id' => "ExamSettings_{$id2}_value",
-            'name' => "ExamSettings[$id2][value]",
-            'readonly' => !$setting->value,
-        ])->label(false); ?>
-        <?= $form->field($libre_autosave_interval, 'value', [
-            'template' => '{label}<div class="input-group"><div class="input-group-addon">' . \Yii::t('exams', '...all {n} minutes.', [
-                    'n' => '</div>{input}<span class="input-group-addon" id="basic-addon2">'
-                ]) . '</span></div>{hint}{error}'
-        ])->textInput([
-            'id' => "ExamSettings_{$id3}_value",
-            'name' => "ExamSettings[$id3][value]",
-            'type' => 'number',
-            'readonly' => !$setting->value,
-        ])->label(false); ?>
+        <div class="row">
+            <div class="col-md-6">
+                <?= $form->field($libre_autosave_path, 'value', [
+                    'template' => '{label}<div class="input-group"><div class="input-group-addon">' . \Yii::t('exams', '...to the directory') . '</div>{input}</div>{hint}{error}'
+                ])->textInput([
+                    'id' => "ExamSettings_{$id2}_value",
+                    'name' => "ExamSettings[$id2][value]",
+                    'readonly' => !$setting->value,
+                ])->label(false); ?>
+            </div>
+            <div class="col-md-6">
+                <?= $form->field($libre_autosave_interval, 'value', [
+                    'template' => '{label}<div class="input-group"><div class="input-group-addon">' . \Yii::t('exams', '...all {n} minutes.', [
+                            'n' => '</div>{input}<span class="input-group-addon" id="basic-addon2">'
+                        ]) . '</span></div>{hint}{error}'
+                ])->textInput([
+                    'id' => "ExamSettings_{$id3}_value",
+                    'name' => "ExamSettings[$id3][value]",
+                    'type' => 'number',
+                    'readonly' => !$setting->value,
+                ])->label(false); ?>
+            </div>
+        </div>
     </div>
 </div>
