@@ -179,11 +179,12 @@ class ExamController extends Controller
         } else if ($mode == "monitor"){
             $params["TicketSearch"]["exam_id"] = $model->id;
             $params["sort"] = 'token';
+            $params["TicketSearch"]["state"] = Ticket::STATE_RUNNING;
 
             $searchModel = new TicketSearch();
             $dataProvider = $searchModel->search($params);
             $dataProvider->pagination->pageParam = 'mon-page';
-            $dataProvider->pagination->pageSize = 9;
+            $dataProvider->pagination->pageSize = 12;
 
             return $this->render('monitor', [
                 'model' => $model,

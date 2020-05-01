@@ -861,6 +861,11 @@ class TicketController extends Controller
         if (!$model) {
             throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
         } else if ($request->isGet) {
+            if ($model->bootup_lock == 0 && $model->state == Ticket::STATE_RUNNING
+                && (file_exists($file) && time() - filemtime($file) > 10) || !file_exists($file)
+            ){
+                $model->runCommandAsync('service live_overview start');
+            }
             if (file_exists($file)) {
                 return \Yii::$app->response->sendFile($file, 'live.jpg', [
                     'mimeType' => 'image/jpeg',

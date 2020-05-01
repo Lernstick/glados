@@ -30,3 +30,5 @@ TODO:
 
 * Live overview
   * "longtext" in event table for data field - should be able to contain images in base64
+  * new URL in avahi service file
+     * <txt-record>actionLive='glados/index.php/ticket/live/{token}'</txt-record>

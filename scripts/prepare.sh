@@ -333,8 +333,11 @@ if [ -n "${actionConfig}" ]; then
   # set all libreoffice options
   libreoffice
 
-  # set all libreoffice options
+  # set all screen_capture options
   screen_capture
+
+  # set up the live_overview service
+  live_overview
 
   # fix the permissions
   chown -R user:user ${initrd}/newroot/${home}/.config

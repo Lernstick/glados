@@ -11,6 +11,7 @@ use yii\base\Event;
 use app\models\Backup;
 use app\models\Restore;
 use app\models\EventItem;
+use app\models\RemoteExecution;
 use app\components\HistoryBehavior;
 
 /**
@@ -717,6 +718,23 @@ class Ticket extends LiveActiveRecord
         }
 
         return [ $output, $retval ];
+    }
+
+    /**
+     * Runs a command in the shell of the system asynchonously and thus not blocking the web request.
+     *
+     * @param string $cmd the command to run
+     * @param string $lc_all the value of the `LC_ALL` environment variable
+     * @return boolean Whether the saving succeeded (i.e. no validation errors occurred).
+     */
+    public function runCommandAsync($cmd, $lc_all = "C")
+    {
+        $r = new RemoteExecution([
+            'cmd' => $cmd,
+            'env' => "LC_ALL=" . $lc_all,
+            'host' => $this->ip,
+        ]);
+        return $r->request();
     }
 
     /**

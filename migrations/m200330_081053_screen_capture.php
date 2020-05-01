@@ -17,6 +17,7 @@ class m200330_081053_screen_capture extends Migration
     public $historyTable = 'history';
     public $translationTable = 'translation';
     public $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
+    public $execTable = 'remote_execution';
 
     /**
      * @array key value pair of fields to migrate, where key defines the olf field 
@@ -298,6 +299,20 @@ class m200330_081053_screen_capture extends Migration
             'value' => true,
         ]);
 
+        // create the command table
+        if ($this->db->schema->getTableSchema($this->execTable, true) === null) {
+            $this->createTable($this->execTable, [
+                'id' => $this->primaryKey(),
+                'cmd' => $this->string(255)->notNull(),
+                'env' => $this->string(255)->notNull(),
+                'host' => $this->string(255)->notNull(),
+                'requested_at' => $this->double('14,4')->notNull(),
+            ], $this->tableOptions);
+
+            /* add unique index for cmd, env and host combined */
+            $this->createIndex('uc-cmd-env-host', $this->execTable, ['cmd', 'env', 'host'], true);
+        }
+
     }
 
     public function migrateDataUp()
@@ -470,6 +485,13 @@ class m200330_081053_screen_capture extends Migration
 
         $this->dropColumn($this->historyTable, 'type');
         $this->dropColumn($this->ticketTable, 'sc_size');
+
+        if ($this->db->schema->getTableSchema($this->execTable, true) !== null) {
+            /* drop the combined unique index from exec table */
+            //$this->dropIndex('uc-cmd-env-host', $this->execTable);
+
+            $this->dropTable($this->execTable);
+        }
     }
 
 }

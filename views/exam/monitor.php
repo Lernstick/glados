@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ListView;
-use app\components\ActiveEventField;
+use yii\bootstrap\Modal;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Exam */
@@ -25,9 +25,15 @@ setInterval(function(){
     if (now - time > 10) {
         img.attr('src', src + '?_ts=' + now);
         img.attr("data-time", now);
+        img.next().find(">:first-child").removeClass("live");
     }
 });
 },1000);
+
+$('#galleryModal').on('show.bs.modal', function(e) {
+    $('#galleryModal img').attr("src", "");
+    $('#galleryModal img').attr("src", $(e.relatedTarget).data('src') + "&" + new Date().getTime());
+});
 SCRIPT;
 $this->registerJs($js, \yii\web\View::POS_READY);
 
@@ -38,46 +44,46 @@ $this->registerJs($js, \yii\web\View::POS_READY);
 
     <?= $this->render('_nav', [
         'model' => $model,
+        'tab' => 'monitor',
     ]) ?>
 
     <p></p>
 
+    <div class="tab-content">
 
-        <?php $_GET = array_merge($_GET, ['#' => 'tab_monitor']); ?>
+        <div id="monitor" class="tab-pane fade">
 
-        <?= ListView::widget([
-            'dataProvider' => $dataProvider,
-            'options' => ['class' => 'row'],
-            'itemOptions' => ['class' => 'col-xs-6 col-md-3'],
-            'itemView' => function ($model, $key, $index, $widget) {
+            <?php $_GET = array_merge($_GET, ['#' => 'tab_monitor']); ?>
 
-                return '<div class="thumbnail">' . ActiveEventField::widget([
-                        'options' => [
-                            'tag' => 'img',
-                            'alt' => 'No img', #TODO
-                            'src' => Url::to(['ticket/live', 'token' => $model->token, '_ts']),
-                            'data-time' => intval(microtime(true)),
-                            'data-url' => Url::to(['ticket/live', 'token' => $model->token]),
-                            'class' => 'live-thumbnail',
-                        ],
-                        'event' => 'ticket/' . $model->id,
-                        'jsonSelector' => 'live',
-                        'jsHandler' => 'function(d, s) {
-                            // reload image when a new has arrived
-                            s.src = "data:image/jpg;base64," + d.base64;
-                            $(s).attr("data-time", parseInt(new Date().getTime()/1000));
-                        }',
-                    ])
-                     . '<div class="caption">'
-                     . $model->token #TODO
-                     . '</div></div>';
-            },
-            'summaryOptions' => [
-                'class' => 'summary col-xs-12 col-md-12',
-            ],
-            'emptyText' => \Yii::t('ticket', 'No tickets found.'),
-            'layout' => '{items} <br>{summary} {pager}',
-        ]); ?>
+            <?= ListView::widget([
+                'dataProvider' => $dataProvider,
+                'options' => ['class' => 'row'],
+                'itemOptions' => ['class' => 'col-xs-6 col-md-3 live-overview-item-container'],
+                'itemView' => '_live_overview_item',
+                'summaryOptions' => [
+                    'class' => 'summary col-xs-12 col-md-12',
+                ],
+                'emptyText' => \Yii::t('ticket', 'No tickets found.'),
+                'layout' => '{items} <br>{summary} {pager}',
+            ]); ?>
 
+        </div>
+
+    </div>
+
+<?php Modal::begin([
+    'id' => 'galleryModal',
+    'header' => false,
+    'footer' => Html::Button(\Yii::t('app', 'Close'), ['data-dismiss' => 'modal', 'class' => 'btn btn-default']),
+    'size' => \yii\bootstrap\Modal::SIZE_LARGE
+]); ?>
+
+
+    <div class="live-overview-detail">
+        <span class="live-overview-detail-title"><i class="gly-spin glyphicon glyphicon-cog"></i> Please wait...</span>
+        <img src="#" alt="Image not found.">
+    </div>
+
+<?php Modal::end(); ?>
 
 </div>
