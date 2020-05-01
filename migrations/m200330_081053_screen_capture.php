@@ -488,7 +488,7 @@ class m200330_081053_screen_capture extends Migration
 
         if ($this->db->schema->getTableSchema($this->execTable, true) !== null) {
             /* drop the combined unique index from exec table */
-            //$this->dropIndex('uc-cmd-env-host', $this->execTable);
+            $this->dropIndex('uc-cmd-env-host', $this->execTable);
 
             $this->dropTable($this->execTable);
         }
