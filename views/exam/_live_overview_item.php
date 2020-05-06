@@ -1,5 +1,6 @@
 <?php
 
+use yii\helpers\Html;
 use yii\helpers\Url;
 use app\components\ActiveEventField;
 
@@ -10,7 +11,7 @@ use app\components\ActiveEventField;
 
 ?>
 
-<div class="live-overview-item" data-alt="<?= Url::to(['ticket/live', 'token' => $model->token]) ?>" data-src="<?= Url::to(['screenshot/snap', 'token' => $model->token]) ?>" data-toggle="modal" data-target="#galleryModal",>
+<div class="live-overview-item">
         <?= ActiveEventField::widget([
             'options' => [
                 'tag' => 'img',
@@ -18,6 +19,10 @@ use app\components\ActiveEventField;
                 'src' => Url::to(['ticket/live', 'token' => $model->token, '_ts']),
                 'data-time' => intval(microtime(true)),
                 'data-url' => Url::to(['ticket/live', 'token' => $model->token]),
+                'data-toggle' => 'modal',
+                'data-target' => '#galleryModal',
+                'data-src' => Url::to(['screenshot/snap', 'token' => $model->token]),
+                'data-alt' => Url::to(['ticket/live', 'token' => $model->token]),
                 'class' => 'live-thumbnail',
             ],
             'event' => 'ticket/' . $model->id,
@@ -27,10 +32,13 @@ use app\components\ActiveEventField;
                 s.src = "data:image/jpg;base64," + d.base64;
                 $(s).attr("data-time", parseInt(new Date().getTime()/1000));
                 $(s).next().find(">:first-child").addClass("live");
+                $(s).next().find(">:first-child").attr("title", "' . \Yii::t('ticket', 'Currently playing live') . '");
             }',
         ]); ?>
 
-        <span class="live-overview-item-title"><span>(live) </span><?= empty($model->test_taker) ? $model->token : $model->test_taker ?></span>
+        <?= Html::a("<span class='glyphicon glyphicon-circle' title='" . \Yii::t('ticket', 'Currently behind live') . "'></span>" . (empty($model->test_taker) ? $model->token : $model->test_taker), Url::to(['ticket/view', 'id' => $model->id]), [
+            'class' => 'live-overview-item-title'
+        ]); ?>
 </div>
 
 

@@ -12,7 +12,7 @@ $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => \Yii::t('exams', 'Exams'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
-$src = Url::to(['ticket/live', 'token' => '{token}']);
+$title = \Yii::t('ticket', 'Currently behind live');
 
 $js = <<< SCRIPT
 // reload images if no new image for 10 seconds
@@ -26,6 +26,7 @@ setInterval(function(){
         img.attr('src', src + '?_ts=' + now);
         img.attr("data-time", now);
         img.next().find(">:first-child").removeClass("live");
+        img.next().find(">:first-child").attr("title", "$title");
     }
 });
 },1000);

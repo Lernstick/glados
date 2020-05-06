@@ -467,6 +467,15 @@ class EventStream extends EventItem
                     'type' => $lost ? 'lost event' : json_encode($inotifyEvent),
                     'delta' => microtime(true) - $event->generated_at
                 ]) : null;
+
+                // read the file contents if the payload was too large
+                if (strpos($event->data, "file://") === 0) {
+                    $file = substr($event->data, strlen("file://"));
+                    if (is_readable($file)) {
+                        $event->data = file_get_contents($file);
+                        @unlink($file);
+                    }
+                }
                 $this->sentEvents++;
             }
             $this->_lastEvent = end($this->events);

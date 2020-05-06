@@ -479,12 +479,7 @@ ul.nav-special > li.active > a > div {
 
 .live-overview-item:hover img {
     opacity: 1;
-  -webkit-animation: flash 1.5s;
-  animation: flash 1.5s;
 }
-
-@-webkit-keyframes flash { 0% { opacity: .4; } 100% { opacity: 1; } }
-@keyframes flash { 0% { opacity: .4; } 100% { opacity: 1; } }
 
 .live-overview-item-title {
     position: absolute;
@@ -501,7 +496,13 @@ ul.nav-special > li.active > a > div {
 }
 
 .live-overview-item:hover .live-overview-item-title {
-    display:none;
+    opacity:0.5;
+}
+
+.live-overview-item:hover .live-overview-item-title:hover {
+    opacity:1;
+    color: #fff !important;
+    text-decoration: none;
 }
 
 .live-overview-item {
@@ -532,16 +533,13 @@ ul.nav-special > li.active > a > div {
 }
 
 .live-overview-item-title span:not(.live) {
-    display:none;
+    margin-right: .5em;
+    color: #888;
 }
 
-.live-overview-item-title span.live) {
+.live-overview-item-title span.live {
     margin-right: .5em;
     color: red;
-}
-
-.live-overview-item-title span.live:before) {
-    content: "\f111";
 }
 
 .live-overview-detail {
@@ -555,4 +553,9 @@ ul.nav-special > li.active > a > div {
 .live-overview-item-container {
     padding-top: 15px;
     padding-bottom: 15px;
+}
+
+.glyphicon.glyphicon-circle:before {
+    content: "\25cf";
+    font-size: 1em;
 }

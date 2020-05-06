@@ -7,6 +7,7 @@ use yii\base\Model;
 use yii\db\ActiveRecord;
 use app\models\User;
 use app\models\AuthItem;
+use yii\helpers\FileHelper;
 
 /**
  * This is the model class for event streams.
@@ -88,6 +89,22 @@ class EventItem extends \yii\db\ActiveRecord
         $this->generated_at = microtime(true);
         $this->broadcast = (array_key_exists('users', $this->concerns) && in_array('ALL', $this->concerns['users']))
             ? 1 : 0;
+
+        /* Store the data in a file if the data payload too large for the database.
+         * Can happen sometimes in case of images.
+         */
+        foreach ($this->tableSchema->columns as $key => $column) {
+            if($column->name == "data") {
+                if (strlen($this->data) > $column->size) {
+                    if (is_writable(\Yii::$app->params['tmpPath'])) {
+                        $filename = FileHelper::normalizePath(\Yii::$app->params['tmpPath'] . "/event-" . md5($this->data));
+                        file_put_contents($filename, $this->data);
+                        $this->data = "file://" . $filename;
+                    }
+                }
+            }
+        }
+
         $this->save();
 
         //this part can be removed later

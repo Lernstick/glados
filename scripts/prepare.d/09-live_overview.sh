@@ -9,7 +9,7 @@ function live_overview()
     cat <<EOF1 >"${initrd}/newroot/usr/bin/live_overview"
 #!/bin/bash
 
-# source the infor file
+# source the info file
 . /info
 
 # get DISPLAY and XAUTHORITY env vars
