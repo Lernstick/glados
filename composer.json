@@ -30,7 +30,8 @@
         "yiidoc/yii2-timeago": "dev-master",
         "yiisoft/yii2-imagine": "~2.0.0",
         "russ666/yii2-countdown": "*",
-        "videojs/video.js": "dev-master"
+        "videojs/video.js": "dev-master",
+        "npm-asset/event-source-polyfill": "*",
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",
