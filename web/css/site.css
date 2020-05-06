@@ -499,7 +499,19 @@ ul.nav-special > li.active > a > div {
     opacity:0.5;
 }
 
-.live-overview-item:hover .live-overview-item-title:hover {
+.live-overview-item:hover span.live-overview-fullscreen {
+    position: absolute;
+    display: block;
+    top: 10px;
+    right: 10px;
+    color: gray;
+}
+
+.live-overview-item span.live-overview-fullscreen {
+    display: none;
+}
+
+.live-overview-item:hover .live-overview-item-title:hover, .live-overview-item .live-overview-item-title:focus {
     opacity:1;
     color: #fff !important;
     text-decoration: none;
@@ -507,12 +519,11 @@ ul.nav-special > li.active > a > div {
 
 .live-overview-item {
     cursor: pointer;
-}
-.live-overview-item {
     position: relative;
     display: inline-block;
+    /* 16:10 ratio */
     width: 260px;
-    height: 160px;
+    height: 162.5px;
 }
 
 .live-overview-detail img {

@@ -15,7 +15,7 @@ use app\components\ActiveEventField;
         <?= ActiveEventField::widget([
             'options' => [
                 'tag' => 'img',
-                'alt' => 'No img', #TODO
+                'alt' => \Yii::t('ticket', 'Please wait, while the live image is being produced...'),
                 'src' => Url::to(['ticket/live', 'token' => $model->token, '_ts']),
                 'data-time' => intval(microtime(true)),
                 'data-url' => Url::to(['ticket/live', 'token' => $model->token]),
@@ -23,7 +23,6 @@ use app\components\ActiveEventField;
                 'data-target' => '#galleryModal',
                 'data-src' => Url::to(['screenshot/snap', 'token' => $model->token]),
                 'data-alt' => Url::to(['ticket/live', 'token' => $model->token]),
-                'class' => 'live-thumbnail',
             ],
             'event' => 'ticket/' . $model->id,
             'jsonSelector' => 'live',
@@ -39,6 +38,7 @@ use app\components\ActiveEventField;
         <?= Html::a("<span class='glyphicon glyphicon-circle' title='" . \Yii::t('ticket', 'Currently behind live') . "'></span>" . (empty($model->test_taker) ? $model->token : $model->test_taker), Url::to(['ticket/view', 'id' => $model->id]), [
             'class' => 'live-overview-item-title'
         ]); ?>
+        <span class='live-overview-fullscreen glyphicon glyphicon-fullscreen'></span>
 </div>
 
 
