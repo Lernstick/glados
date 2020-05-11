@@ -182,7 +182,7 @@ class DownloadController extends DaemonController implements DaemonInterface
             @unlink($tempDir . "/mount.sh");
             @rmdir($tempDir);
 
-            if($retval != 0) {
+            if ($retval != 0) {
                 $this->logError('rsync failed (retval: ' . $retval . '), output: ' . PHP_EOL . $output);
 
                 $act = new Activity([
@@ -231,7 +231,8 @@ class DownloadController extends DaemonController implements DaemonInterface
                 if ($backupDataProvider->totalCount > 0) {
                     $restoreDaemon = new Daemon();
                     /* run the restore daemon in the foreground */
-                    $pid = $restoreDaemon->startRestore($this->ticket->id, '/', 'now', false, '/run/initramfs/backup/' . $this->ticket->exam->backup_path);
+                    /* restore all that was backed up AND the screen_capture files as well */
+                    $pid = $restoreDaemon->startRestore($this->ticket->id, '::All::', 'now', false, '/run/initramfs/backup/' . $this->ticket->exam->backup_path);
                 }
 
                 $this->ticket->client_state = yiit('ticket', 'preparing system');

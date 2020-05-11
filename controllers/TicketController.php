@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use Yii;
+use yii\web\Controller;
 use app\models\Ticket;
 use app\models\TicketSearch;
 use app\models\Activity;
@@ -21,9 +22,9 @@ use app\models\Stats;
 use app\models\Daemon;
 use app\models\DaemonSearch;
 use app\models\RdiffFileSystem;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
+use yii\web\BadRequestHttpException;
 use yii\web\ServerErrorHttpException;
 use yii\filters\VerbFilter;
 use yii\db\Expression;
@@ -62,7 +63,6 @@ class TicketController extends Controller
                     [
                         'allow' => true,
                         'actions' => [
-                            'download2', // download/start exam (old)
                             'download',  // request download of exam
                             'md5',       // verify exam file (old)
                             'config',    // retrieve exam config
@@ -423,7 +423,7 @@ class TicketController extends Controller
                 return $this->render('submit', [
                     'model' => $model,
                 ]);
-            }else if ($test_taker === null) {
+            } else if ($test_taker === null) {
                 $model->scenario = Ticket::SCENARIO_SUBMIT;
                 $model->load(Yii::$app->request->post());
                 $model->validate(['token'], true);
@@ -432,7 +432,7 @@ class TicketController extends Controller
                 return $this->render('submit', [
                     'model' => $model,
                 ]);
-            }else{
+            } else {
                 $model->scenario = Ticket::SCENARIO_SUBMIT;
                 $this->checkRbac($model);
                 if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -548,10 +548,10 @@ class TicketController extends Controller
     }
 
     /**
-     * TODO.
+     * Renders the exam download prompt.
      *
      * @param string $token
-     * @return mixed TODO
+     * @return mixed
      */
     public function actionDownload($token = null, $step = 1)
     {
@@ -592,13 +592,15 @@ class TicketController extends Controller
                     'model' => $model,
                 ]);                
             } else if ($model->backup_lock != 0) {
-                $model->addError('token', \Yii::t('ticket', 'The ticket is currently in processing for backup. Please try again in a minute.'));
+                $model->addError('token', \Yii::t('ticket', 'The ticket is currently in processing for backup. '
+                                        . 'Please try again in a minute.'));
                 $this->startDaemon();
                 return $this->render('token-request', [
                     'model' => $model,
                 ]);
             } else if ($model->restore_lock != 0) {
-                $model->addError('token', \Yii::t('ticket', 'The ticket is currently in processing for restore. Please try again in a minute.'));
+                $model->addError('token', \Yii::t('ticket', 'The ticket is currently in processing for restore. '
+                                        . 'Please try again in a minute.'));
                 $this->startDaemon();
                 return $this->render('token-request', [
                     'model' => $model,
@@ -649,7 +651,7 @@ class TicketController extends Controller
     }
 
     /**
-     * TODO.
+     * Returns the exam status view for the student.
      *
      * @param string $token
      * @return mixed 
@@ -670,7 +672,7 @@ class TicketController extends Controller
      *
      * @param string $token
      * @param string $state
-     * @return array
+     * @return array JSON response
      */
     public function actionNotify($token, $state)
     {
@@ -845,7 +847,9 @@ class TicketController extends Controller
     /**
      * Receive the uploaded POST raw data from ffmpeg and save it to
      * [[uploadPath]]/live/$token.jpg or send the stored image in case
-     * of a GET request.
+     * of a GET request. If the stored file exceeds the age of 10 seconds
+     * the command "service live_overview start" is requested to be
+     * executed on the client.
      *
      * @param string $token
      * @return The response object or an array with the error description
@@ -875,20 +879,24 @@ class TicketController extends Controller
                 throw new NotFoundHttpException(Yii::t('app', 'File not found.'));
             }
         } else if ($request->isPost) {
-            if (!is_dir($path)) {
-                mkdir($path);
-            }
-            file_put_contents($file, $request->getRawBody());
-            $eventItem = new EventItem([
-                'event' => 'ticket/' . $model->id,
-                'priority' => 0,
-                'data' => [
-                    'live' => [
-                        'base64' => base64_encode($request->getRawBody()),
+            if ($model->state == Ticket::STATE_RUNNING){
+                if (!is_dir($path)) {
+                    mkdir($path);
+                }
+                file_put_contents($file, $request->getRawBody());
+                $eventItem = new EventItem([
+                    'event' => 'ticket/' . $model->id,
+                    'priority' => 0,
+                    'data' => [
+                        'live' => [
+                            'base64' => base64_encode($request->getRawBody()),
+                        ],
                     ],
-                ],
-            ]);
-            $eventItem->generate();
+                ]);
+                $eventItem->generate();
+            } else {
+                throw new BadRequestHttpException(Yii::t('app', 'Ticket is not in running state.'));
+            }
         }
     }
 

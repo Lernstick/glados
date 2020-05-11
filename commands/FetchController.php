@@ -126,12 +126,11 @@ class FetchController extends DaemonController
 
             $this->_cmd = "rsync -L --checksum --partial --progress --protect-args "
                 . "--bwlimit=" . escapeshellarg($this->bwlimit) . " "
-                 . "--rsh='ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
-                 . " -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' "
-                 . "--remove-source-files "
-                 . implode($fetchList, ' ') . ' '
-                 . escapeshellarg(\Yii::$app->params['scPath'] . "/" . $this->ticket->token . "/") . " "
-                 . "| stdbuf -oL tr '\\r' '\\n' ";
+                . "--rsh='ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
+                . " -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' "
+                . "--remove-source-files "
+                . implode($fetchList, ' ') . ' '
+                . escapeshellarg(\Yii::$app->params['scPath'] . "/" . $this->ticket->token . "/") . " ";
 
             $this->logInfo('Executing rsync: ' . $this->_cmd);
 
