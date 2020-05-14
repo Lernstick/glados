@@ -14,8 +14,92 @@ use yii\widgets\Pjax;
 if ($model->screencapture !== null) {
     $js = <<< SCRIPT
 var player = videojs('video-container', {
-    liveui: true
+    liveui: true,
+    html5: {
+        nativeTextTracks: false
+    }
 });
+
+/*
+player.on('loadeddata', function() {
+    textTracks = player.textTracks();
+    if (1 in textTracks) {
+        var track = textTracks[1];
+        track.on('cuechange', function (e) {
+            var ac = track.activeCues;
+            if (0 in ac) {
+                var cue = ac[0];
+                if (typeof cue !== 'undefined') {
+                    var times = cue.text.match(/([0-9]+\:[0-9]+\:[0-9]+\.[0-9]+)/g);
+                    var texts = cue.text.split(/\<[0-9]+\:[0-9]+\:[0-9]+\.[0-9]+\>/);
+                    var cueStartTimes = [ cue.startTime ];
+                    var cueTexts = [ "<c.now>" + texts[0] + "</c><c.future>" + texts.slice(1).join("") + "</c>" ];
+                    var cueEndTimes = [];
+                    if (times !== null) {
+                        for (i = 0; i < times.length; i++) {
+                            a = times[i].match(/([0-9]+)\:([0-9]+)\:([0-9]+)\.([0-9]+)/);
+                            tot_ms = parseInt(a[4])/1000 + parseInt(a[3]) + parseInt(a[2])*60 + parseInt(a[1])*60*60;
+                            cueStartTimes.push(tot_ms);
+                            //cueTexts.push("<c.past>" + cueTexts[cueTexts.length - 1] + "</c><c.now>" + texts[i+1]) + "</c>";
+                            var past = texts.slice(0, i+1).join("");
+                            var now = texts[i+1];
+                            var future = texts.slice(i+2).join("");
+                            cueTexts.push("<c.past>" + past + "</c><c.now>" + now + "</c><c.future>" + future + "</c>");
+                        }
+
+                        for (i = 0; i < cueStartTimes.length; i++) {
+                            if (i+1 in cueStartTimes) {
+                                cueEndTimes.push(cueStartTimes[i+1]);
+                                var end = cueStartTimes[i+1];
+                            } else {
+                                cueEndTimes.push(cue.endTime);
+                                var end = cue.endTime;
+                            }
+                        }
+                        track.removeCue(cue);
+                        for (i = 0; i < cueStartTimes.length; i++) {
+                            track.addCue(new window.VTTCue(cueStartTimes[i], cueEndTimes[i], cueTexts[i]));
+                        }
+                    } else {
+                        console.log(cue.startTime, cue.endTime, cue.text);
+                    }
+                }
+            }
+        });
+        track.mode = 'hidden';
+    }
+});
+*/
+
+// simulate karaoke style subtitles (mozilla's vtt.js semms not to support them)
+player.on('loadeddata', function() {
+    textTracks = player.textTracks();
+    if (1 in textTracks) {
+        var track = textTracks[1];
+        track.on('cuechange', function (e) {
+            var ac = track.activeCues;
+            if (0 in ac) {
+                var cue = ac[0];
+                if (typeof cue !== 'undefined') {
+                    var time = cue.text.match(/\<[0-9]+\:[0-9]+\:[0-9]+\.[0-9]+\>/);
+                    var texts = cue.text.split(time);
+                    console.log(time, texts)
+                    if (time !== null) {
+                        [tot, h, m, s, ms] = time[0].match(/\<([0-9]+)\:([0-9]+)\:([0-9]+)\.([0-9]+)\>/);
+                        int = parseInt(ms)/1000 + parseInt(s) + parseInt(m)*60 + parseInt(h)*60*60;
+                        var start = cue.startTime;
+                        var end = cue.endTime;
+                        track.removeCue(cue);
+                        track.addCue(new window.VTTCue(start, int, texts[0]));
+                        track.addCue(new window.VTTCue(int, end, texts[0] + texts[1]));
+                    }
+                }
+            }
+        });
+        track.mode = 'hidden';
+    }
+});
+
 SCRIPT;
 
     // Initialze the videojs player
@@ -66,7 +150,6 @@ SCRIPT;
                     'options' => [
                         'id' => 'video-container',
                         'class' => 'video-js vjs-fluid vjs-default-skin vjs-big-play-centered',
-                        //'poster' => "http://www.videojs.com/img/poster.jpg",
                         'controls' => true,
                         'preload' => 'auto',
                         'fluid' => true,
@@ -77,6 +160,14 @@ SCRIPT;
                             [
                                 'src' => Url::to(['screencapture/view', 'id' => $model->id, 'file' => 'master.m3u8']),
                                 'type' => 'application/x-mpegURL',
+                            ],
+                        ],
+                        'track' => [
+                            [
+                                'src' => Url::to(['screencapture/view', 'id' => $model->id, 'file' => 'subtitles.vtt']),
+                                'kind' => 'captions',
+                                'label' => 'english',
+                                'srclang' => 'en',
                             ],
                         ],
                     ]

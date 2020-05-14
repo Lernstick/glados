@@ -59,6 +59,31 @@ class ScreencaptureController extends Controller
         $ticket = Ticket::findOne($id);
         if (($model = $ticket->screencapture) !== null) {
 
+            if ($file == "subtitles.vtt") {
+                return Yii::$app->response->sendContentAsFile("WEBVTT
+
+1
+00:00:01.500 --> 00:00:03.500
+When the moon <00:00:02.500>hits your eye
+
+2
+00:00:03.500 --> 00:00:05.500
+Like a <00:00:04.000>big-a <00:00:04.500>pizza <00:00:05.000>pie
+
+3
+00:00:05.500 --> 00:00:06.500
+That's <00:00:06.000>amore
+
+4
+00:00:07.000 --> 00:00:55.500
+Long living <c.class><v delay-500>text</v></c>
+
+", "subtitles.vtt", [
+                    'mimeType' => "text/vtt",
+                    'inline' => false,
+                ]);
+            }
+
             $path = $file == 'master.m3u8' ? $model->master : $model->segment($file);
 
             if (!file_exists($path)) {

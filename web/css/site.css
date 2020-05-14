@@ -570,3 +570,16 @@ ul.nav-special > li.active > a > div {
     content: "\25cf";
     font-size: 1em;
 }
+
+span.future {
+    visibility: hidden;
+}
+
+span.now {
+    color:white;
+}
+
+
+span.past {
+    color:gray;
+}
