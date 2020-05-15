@@ -59,7 +59,8 @@ class ScreencaptureController extends Controller
         $ticket = Ticket::findOne($id);
         if (($model = $ticket->screencapture) !== null) {
 
-            if ($file == "subtitles.vtt") {
+
+            if ($file == "subtitles.webvtt") {
                 return Yii::$app->response->sendContentAsFile("WEBVTT
 
 1
@@ -84,37 +85,13 @@ Long living <c.class><v delay-500>text</v></c>
                 ]);
             }
 
-            $path = $file == 'master.m3u8' ? $model->master : $model->segment($file);
-
-            if (!file_exists($path)) {
-                throw new NotFoundHttpException($file . ': No such file or directory.');
-            }
-
-            $ext = pathinfo($path, PATHINFO_EXTENSION);
-            $arr = [
-                'm3u8' => 'application/x-mpegURL',
-                'ts' => 'video/MP2T',
-            ];
-            $mimeType = array_key_exists($ext, $arr) ? $arr[$ext] : 'application/octet-stream';
-
-            if ($ext == 'm3u8') {
-                $contents = file_get_contents($path);
-                if ($ticket->state == Ticket::STATE_RUNNING) {
-                    // simulate a live stream
-                    $contents = str_replace("#EXT-X-ENDLIST", "", $contents);
-                } else {
-                    // simulate a vod stream
-                    $contents = str_replace("#EXT-X-PLAYLIST-TYPE:EVENT", "#EXT-X-PLAYLIST-TYPE:VOD", $contents) . "#EXT-X-ENDLIST" . PHP_EOL;
-                }
-                return Yii::$app->response->sendContentAsFile($contents, basename($path), [
-                    'mimeType' => $mimeType,
+            if ( ($contents = $model->getFile($file)) !== null ) {
+                return Yii::$app->response->sendContentAsFile($model->getFile($file), basename($file), [
+                    'mimeType' => $model->getMimeType($file),
                     'inline' => false,
                 ]);
             } else {
-                return Yii::$app->response->sendFile($path, basename($path), [
-                    'mimeType' => $mimeType,
-                    'inline' => false,
-                ]);
+                throw new NotFoundHttpException($file . ': No such file or directory.');
             }
 
         } else {

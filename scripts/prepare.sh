@@ -333,11 +333,18 @@ if [ -n "${actionConfig}" ]; then
   # set all libreoffice options
   libreoffice
 
+  # set up the launch timer service if keylogger or screen_capture is active
+  rm "${initrd}/newroot/etc/launch.conf"
+  launch
+
   # set all screen_capture options
   screen_capture
 
   # set up the live_overview service
   live_overview
+
+  # set up the live_overview service
+  keylogger
 
   # fix the permissions
   chown -R user:user ${initrd}/newroot/${home}/.config

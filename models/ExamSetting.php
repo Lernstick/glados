@@ -57,6 +57,9 @@ class ExamSetting extends Base
                     "screen_capture_chunk"      => "integer",
                     "screen_capture_bitrate"    => "text",
                     "screen_capture_path"       => "text",
+                    "keylogger"                 => "boolean",
+                    "keylogger_keymap"          => "text",
+                    "keylogger_path"            => "text",
                 ],
             ],
         ];
@@ -106,6 +109,7 @@ class ExamSetting extends Base
             'screen_capture_chunk' => 'intval',
             'screen_capture_fps' => 'intval',
             'screen_capture_quality' => function($v){return intval($v*100);},
+            'keylogger' => 'boolval',
         ];
     }
 

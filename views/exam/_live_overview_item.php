@@ -15,6 +15,7 @@ use app\components\ActiveEventField;
         <?= ActiveEventField::widget([
             'options' => [
                 'tag' => 'img',
+                'class' => 'live-thumbnail',
                 'alt' => \Yii::t('ticket', 'Please wait, while the live image is being produced...'),
                 'src' => Url::to(['ticket/live', 'token' => $model->token, '_ts']),
                 'data-time' => intval(microtime(true)),

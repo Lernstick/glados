@@ -290,6 +290,41 @@ class m200330_081053_screen_capture extends Migration
         ]);
         $screen_capture_overflow_threshold->save(false);
 
+        // create keylogger
+        $keylogger = new ExamSettingAvail([
+            'key' => 'keylogger',
+            'name' => yiit('exam_setting_avail', 'Activate keylogger'),
+            'type' => 'boolean',
+            'default' => true,
+            'description' => yiit('exam_setting_avail', 'Activates a keylogger software (logkeys) that captures all input via the keyboard of the student and log them.'),
+        ]);
+        $keylogger->save(false);
+        $keylogger->refresh();
+
+        // create keylogger_keymap
+        $keylogger_keymap = new ExamSettingAvail([
+            'key' => 'keylogger_keymap',
+            'name' => yiit('exam_setting_avail', 'Keymap'),
+            'type' => 'text',
+            'default' => 'auto',
+            'description' => yiit('exam_setting_avail', 'The input keymap for processing pressed keys. Use <code>auto</code> such that the system determines the keymap itself - if it cannot be determined, the system falls back to the <code>en_US</code> keymap.'),
+            'belongs_to' => $keylogger->id,
+        ]);
+        $keylogger_keymap->save(false);
+        $keylogger_keymap->refresh();
+
+        // create keylogger_path
+        $keylogger_path = new ExamSettingAvail([
+            'key' => 'keylogger_path',
+            'name' => yiit('exam_setting_avail', 'Path'),
+            'type' => 'text',
+            'default' => '/home/user/ScreenCapture',
+            'description' => yiit('exam_setting_avail', 'The path to save output files.'),
+            'belongs_to' => $keylogger->id,
+        ]);
+        $keylogger_path->save(false);
+        $keylogger_path->refresh();
+
         $this->addColumn($this->historyTable, 'type', $this->boolean()->notNull()->defaultValue(0));
         $this->addColumn($this->ticketTable, 'sc_size', $this->integer(11)->notNull()->defaultValue(0));
 

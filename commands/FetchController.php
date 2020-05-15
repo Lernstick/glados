@@ -110,6 +110,12 @@ class FetchController extends DaemonController
             $this->fetchList[] = FileHelper::normalizePath($this->remotePath . '/' . $this->ticket->exam->settings['screen_capture_path']) . '/launch/*';
         }
 
+        if (array_key_exists('keylogger', $this->ticket->exam->settings) && $this->ticket->exam->settings['keylogger']) {
+            $this->fetchList[] = FileHelper::normalizePath($this->remotePath . '/' . $this->ticket->exam->settings['keylogger_path']) . '/launch/*';
+        }
+
+        $this->fetchList = array_unique($this->fetchList);
+
         if (!empty($this->fetchList)) {
 
             $this->logInfo('Processing ticket (fetch): ' .
