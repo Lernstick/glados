@@ -20,21 +20,25 @@ var player = videojs('video-container', {
     }
 });
 
-/*
+
 player.on('loadeddata', function() {
     textTracks = player.textTracks();
     if (1 in textTracks) {
         var track = textTracks[1];
         track.on('cuechange', function (e) {
+            console.log("cuechange called");
             var ac = track.activeCues;
             if (0 in ac) {
+                console.log("inner1 block");
                 var cue = ac[0];
                 if (typeof cue !== 'undefined') {
+                    console.log("inner2 block", cue.startTime, cue.endTime, cue.text);
                     var times = cue.text.match(/([0-9]+\:[0-9]+\:[0-9]+\.[0-9]+)/g);
                     var texts = cue.text.split(/\<[0-9]+\:[0-9]+\:[0-9]+\.[0-9]+\>/);
                     var cueStartTimes = [ cue.startTime ];
                     var cueTexts = [ "<c.now>" + texts[0] + "</c><c.future>" + texts.slice(1).join("") + "</c>" ];
                     var cueEndTimes = [];
+                    console.log(times, texts, cue)
                     if (times !== null) {
                         for (i = 0; i < times.length; i++) {
                             a = times[i].match(/([0-9]+)\:([0-9]+)\:([0-9]+)\.([0-9]+)/);
@@ -58,7 +62,8 @@ player.on('loadeddata', function() {
                         }
                         track.removeCue(cue);
                         for (i = 0; i < cueStartTimes.length; i++) {
-                            track.addCue(new window.VTTCue(cueStartTimes[i], cueEndTimes[i], cueTexts[i]));
+                            track.addCue(new window.VTTCue(cueStartTimes[i]+8.6, cueEndTimes[i]+8.6, cueTexts[i]));
+                            console.log("adding cue", cueStartTimes[i]+8.6, cueEndTimes[i]+8.6, cueTexts[i]);
                         }
                     } else {
                         console.log(cue.startTime, cue.endTime, cue.text);
@@ -69,7 +74,7 @@ player.on('loadeddata', function() {
         track.mode = 'hidden';
     }
 });
-*/
+
 
 /*
 // simulate karaoke style subtitles (mozilla's vtt.js seems not to support them)

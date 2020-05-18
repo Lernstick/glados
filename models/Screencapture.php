@@ -65,7 +65,7 @@ class Screencapture extends Model
     public function streamFile($file)
     {
         $file = StringHelper::basename($file);
-        return FileHelper::normalizePath(\Yii::$app->params['scPath'] . '/' . $this->ticket->token . '/' . $file);
+        return FileHelper::normalizePath($this->screencaptureDir . '/' . $file);
     }
 
     /**
@@ -176,29 +176,141 @@ class Screencapture extends Model
     {
 
         preg_match('/subtitles([0-9]+)\.webvtt/', $file, $matches);
-        $timestamp = $matches[1];
-        $start = 1589555303;
-        $secs = intval($timestamp) - $start;
+        $stream_start = $this->starttime;
+        $chunk_start = intval($matches[1]);
+        $chunk_end = $this->getNexttime($chunk_start);
+        $chunk_size = $chunk_end - $chunk_start;
 
-        $hours = floor($secs/3600);
-        $secs -= $hours*3600;
-        $mins = floor($secs/60);
-        $secs -= $mins*60;
-        $next = $secs + 8;
+        $ms_start = ($chunk_start - $stream_start)*1000;
+        $ms_end = ($chunk_end - $stream_start)*1000;
+        //var_dump($stream_start, $chunk_start, $chunk_end, $chunk_size);die();
 
-        $hours = sprintf('%02d', $hours);
-        $mins = sprintf('%02d', $mins);
-        $secs = sprintf('%02d', $secs);
-        $next = sprintf('%02d', $next);
+        // write the header of the webvtt file
+        $vtt = 'WEBVTT'. PHP_EOL . 'X-TIMESTAMP-MAP=MPEGTS:900000,LOCAL:00:00:00.000' . PHP_EOL . PHP_EOL;
+
+        $keyloggerFiles = glob($this->screencaptureDir . '/keylogger*.key');
+        $i=1;
+        $vtt .= $i . PHP_EOL . $this->format_time($ms_start) . ' --> ' . $this->format_time($ms_end) . PHP_EOL;
+        foreach($keyloggerFiles as $file) {
+            preg_match('/keylogger([0-9]+)\.key/', $file, $matches);
+            if (array_key_exists(1, $matches)) {
+                $timestamp = intval($matches[1]);
+                $next_chunk_end = $this->getNexttime($chunk_end);
+                if ($timestamp >= $chunk_start && $timestamp + 10 <= $next_chunk_end) {
+                    $lines = file($file, FILE_IGNORE_NEW_LINES);
+                    foreach ($lines as $nl => $line) {
+                        list($time, $msg) = explode(' ', $line, 2);
+                        if (array_key_exists($nl+1, $lines)) {
+                            list($ntime, $nmsg) = explode(' ', $lines[$nl+1], 2);
+                        } else {
+                            $ntime = $time + 1000;
+                        }
+                        //$vtt .= $i . PHP_EOL . $this->format_time($time - $stream_start*1000) . ' --> ' . $this->format_time($ntime - $stream_start*1000) . PHP_EOL . $msg . PHP_EOL;
+                        $vtt .= '<' . $this->format_time($time - $stream_start*1000) . '>' . $this->format_subtitle($msg);
+                        $i++;
+                    }
+                }
+            }
+        }
+        $vtt .= PHP_EOL . PHP_EOL;
+        return $vtt;
+
+        $s = $this->format_time($ms_start+123);
+        $e = $this->format_time(($ms_start + $chunk_size*1000) - 434);
 
         return "WEBVTT
 X-TIMESTAMP-MAP=MPEGTS:900000,LOCAL:00:00:00.000
 
-$hours:$mins:$secs.000 --> $hours:$mins:$next.000
-English subtitle 1 -Unforced- ($hours:$mins:$secs.000)
+$s --> $e
+English subtitle 1 -Unforced- ($s to $e)
 
 
 ";
+    }
+
+
+    /**
+     * Getter for the timestamp of the first video chunk file
+     *
+     * @return integer
+     */
+    public function getStarttime()
+    {
+        $dir = new \DirectoryIterator($this->screencaptureDir);
+        $reftime = 9999999999;
+        foreach ($dir as $fileinfo) {
+            if (!$fileinfo->isDot()) {
+                preg_match('/video([0-9]+)\.ts/', $fileinfo->getFilename(), $matches);
+                if (array_key_exists(1, $matches)) {
+                    $reftime = $reftime > intval($matches[1]) ? intval($matches[1]) : $reftime;
+                }
+            }
+        }
+        return $reftime == 9999999999 ? 0 : $reftime;
+    }
+
+    /**
+     * Gets the timestamp of the next video chunk given a timestamp
+     *
+     * @return integer
+     */
+    public function getNexttime($start)
+    {
+        $dir = new \DirectoryIterator($this->screencaptureDir);
+        $reftime = 9999999999;
+        foreach ($dir as $fileinfo) {
+            if (!$fileinfo->isDot()) {
+                preg_match('/video([0-9]+)\.ts/', $fileinfo->getFilename(), $matches);
+                if (array_key_exists(1, $matches)) {
+                    $timestamp = intval($matches[1]);
+                    if ($timestamp > $start) {
+                        $reftime = $reftime > $timestamp ? $timestamp : $reftime;
+                    }
+                }
+            }
+        }
+        return $reftime == 9999999999 ? 0 : $reftime;
+    }
+
+
+    /**
+     * Converts milliseconds into time indicators in a webvtt file
+     * Example: 1715123 will be converted into "00:28:35.123".
+     *
+     * @param int $ms milliseconds to convert
+     * @return string
+     */
+    public function format_time($ms)
+    {
+
+        //$seconds = floor($ms/1000);
+        $hours = floor($ms/3600000);
+        $ms -= $hours*3600000;
+        $mins = floor($ms/60000);
+        $ms -= $mins*60000;
+        $seconds = floor($ms/1000);
+        $ms -= $seconds*1000;
+        return sprintf('%02d:%02d:%02d.%03d', $hours, $mins, $seconds, $ms);
+    }
+
+    /**
+     * Format a subtitle with correct escape sequences
+     * Example: <ctrl> will be formatted into "&lt;ctrl&gt;".
+     *
+     * @param string $subtitle string to format
+     * @return string
+     */
+    public function format_subtitle($subtitle)
+    {
+        $chars = [
+            '&' => '&amp;',
+            '<' => '&lt;',
+            '>' => '&gt;',
+        ];
+        if ($subtitle == '') {
+            $subtitle = '␣';
+        }
+        return str_replace(array_keys($chars), array_values($chars), $subtitle);
     }
 
     /**

@@ -573,6 +573,7 @@ ul.nav-special > li.active > a > div {
 
 span.future {
     visibility: hidden;
+    display:none;
 }
 
 span.now {
