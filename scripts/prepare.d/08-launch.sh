@@ -27,12 +27,12 @@ for key in "${!path[@]}"; do
 
     # hard link the hardlink glob files into the launch directory
     if [ -n "$h" ]; then 
-        cp -vl $(eval echo "${path}/"$h) "${launch}/"
+        cp -vl $(eval echo "${p}/"$h) "${launch}/"
     fi
 
     # move all but the two newest files matching the move glob to the launch directory
     if [ -n "$m" ]; then 
-        LANG=C stat -c '%Y %N' $(eval echo "${path}"/$m) | \
+        LANG=C stat -c '%Y %N' $(eval echo "${p}"/$m) | \
             sort -nk1 | head -n -2 | cut -d ' ' -f2- | \
             xargs -I {} sh -c "mv -v '{}' '${launch}/';"
     fi

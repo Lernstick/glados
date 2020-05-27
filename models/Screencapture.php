@@ -108,8 +108,9 @@ class Screencapture extends Model
      */
     public function adjustPlaylist($contents)
     {
-        if (false && $this->ticket->state == Ticket::STATE_RUNNING) {
+        if ($this->ticket->state == Ticket::STATE_RUNNING) {
             // simulate a live stream
+            $contents = str_replace("#EXT-X-PLAYLIST-TYPE:VOD", "#EXT-X-PLAYLIST-TYPE:EVENT", $contents);
             return str_replace("#EXT-X-ENDLIST", "", $contents);
         } else {
             // simulate a vod stream
@@ -205,8 +206,8 @@ class Screencapture extends Model
                         } else {
                             $ntime = $time + 1000;
                         }
-                        //$vtt .= $i . PHP_EOL . $this->format_time($time - $stream_start*1000) . ' --> ' . $this->format_time($ntime - $stream_start*1000) . PHP_EOL . $msg . PHP_EOL;
                         $vtt .= '<' . $this->format_time($time - $stream_start*1000) . '>' . $this->format_subtitle($msg);
+                        #$vtt .= $this->format_subtitle($msg);
                         $i++;
                     }
                 }

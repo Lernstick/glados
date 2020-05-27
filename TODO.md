@@ -16,6 +16,7 @@ TODO:
   * run fetching not every backup interval, only when traffic allows
   * for last backup: fetch must run
   * restore \*.m3u8 and \*.log files
+    * No: the stream should not resume, instead start from new with video2.m3u8, ...
 
 * multiple filessystems for exams
   * option to upload squashfs/zip files detached from exam context
@@ -31,3 +32,6 @@ TODO:
 * Live overview
   * new URL in avahi service file
      * <txt-record>actionLive='glados/index.php/ticket/live/{token}'</txt-record>
+
+* misc
+  * disable firewall not working anymore

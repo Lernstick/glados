@@ -62,8 +62,8 @@ player.on('loadeddata', function() {
                         }
                         track.removeCue(cue);
                         for (i = 0; i < cueStartTimes.length; i++) {
-                            track.addCue(new window.VTTCue(cueStartTimes[i]+8.6, cueEndTimes[i]+8.6, cueTexts[i]));
-                            console.log("adding cue", cueStartTimes[i]+8.6, cueEndTimes[i]+8.6, cueTexts[i]);
+                            track.addCue(new window.VTTCue(cueStartTimes[i], cueEndTimes[i], cueTexts[i]));
+                            console.log("adding cue", cueStartTimes[i], cueEndTimes[i], cueTexts[i]);
                         }
                     } else {
                         console.log(cue.startTime, cue.endTime, cue.text);
