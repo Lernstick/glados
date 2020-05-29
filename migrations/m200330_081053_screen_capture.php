@@ -218,8 +218,8 @@ class m200330_081053_screen_capture extends Migration
             'default' => 'ffmpeg -f x11grab -r "${fps}" -s "${resolution}" -i :0 -vf "scale=\'max(1280,iw/2)\':-2" \
   -c:v h264 -b:v "${bitrate}" -profile:v baseline -pix_fmt:v yuv420p -an \
   -flags +cgop -g "${gop}" -hls_playlist_type event -hls_time "${chunk}" \
-  -strftime 1 -hls_flags append_list -master_pl_name "master.m3u8" \
-  -hls_segment_filename "video%s.ts" -loglevel level+info -nostats "video.m3u8"',
+  -strftime 1 -hls_flags append_list+program_date_time -master_pl_name "${master}" \
+  -hls_segment_filename "video%s.ts" -loglevel level+info -nostats "${playlist}"',
             'description' => yiit('exam_setting_avail', 'The actual command that is executed to capture the screen. This will <b>overwrite</b> all other settings.'),
             'belongs_to' => $screen_capture->id,
         ]);
@@ -273,7 +273,7 @@ class m200330_081053_screen_capture extends Migration
             'key' => 'screen_capture_path',
             'name' => yiit('exam_setting_avail', 'Path'),
             'type' => 'text',
-            'default' => "/home/user/ScreenCapture",
+            'default' => "/home/user/.ScreenCapture",
             'description' => yiit('exam_setting_avail', 'The path to save output files. This is also the working directory of the command above.'),
             'belongs_to' => $screen_capture->id,
         ]);
@@ -318,7 +318,7 @@ class m200330_081053_screen_capture extends Migration
             'key' => 'keylogger_path',
             'name' => yiit('exam_setting_avail', 'Path'),
             'type' => 'text',
-            'default' => '/home/user/ScreenCapture',
+            'default' => '/home/user/.Keylogger',
             'description' => yiit('exam_setting_avail', 'The path to save output files.'),
             'belongs_to' => $keylogger->id,
         ]);

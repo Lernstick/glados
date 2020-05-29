@@ -251,28 +251,7 @@ class RestoreController extends DaemonController
         $glob = glob($rsyncFile, GLOB_BRACE);
         if ($rsync && array_key_exists('screen_capture', $this->ticket->exam->settings) && $this->ticket->exam->settings['screen_capture'] && !empty($glob)) {
 
-            $rsyncRestorePath = '/run/initramfs/backup/' . $this->ticket->exam->settings['screen_capture_path'];
-
-            /* 2nd command: rsync */
-            $this->_cmd = "rsync --rsync-path=\"mkdir -p /run/initramfs/backup/" . $this->ticket->exam->settings['screen_capture_path'] . " && rsync\" "
-                . "-L --checksum --partial --progress --protect-args "
-                . "--rsh='ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
-                . " -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' "
-                . implode($glob, ' ') . " "
-                . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . ":" . FileHelper::normalizePath($rsyncRestorePath)) . " ";
-
-            $this->logInfo('Executing rsync: ' . $this->_cmd);
-
-            $cmd = new ShellCommand($this->_cmd);
-            $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use (&$output, $logFile) {
-                echo $this->ansiFormat($event->line, $event->channel == ShellCommand::STDOUT ? Console::NORMAL : Console::FG_RED);
-                $output .= $event->line;
-                file_put_contents($logFile, $event->line, FILE_APPEND);
-            });
-
-            $retval = $cmd->run();
-
-            /* 3rd command: rsync */
+            /* 2nd command: rsync restore screen_capture.log */
             $this->_cmd = "rsync --rsync-path=\"mkdir -p /run/initramfs/backup/var/log/ && rsync\" "
                 . "-L --checksum --partial --progress --protect-args "
                 . "--rsh='ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "

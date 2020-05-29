@@ -66,6 +66,7 @@ player.on('loadeddata', function() {
                             console.log("adding cue", cueStartTimes[i], cueEndTimes[i], cueTexts[i]);
                         }
                     } else {
+                        //$(".js-keylogger__log").append(texts[0] + "<br>");
                         console.log(cue.startTime, cue.endTime, cue.text);
                     }
                 }
@@ -76,9 +77,9 @@ player.on('loadeddata', function() {
 });
 
 
-/*
+
 // simulate karaoke style subtitles (mozilla's vtt.js seems not to support them)
-player.on('loadeddata', function() {
+/*player.on('loadeddata', function() {
     textTracks = player.textTracks();
     if (1 in textTracks) {
         var track = textTracks[1];
@@ -107,8 +108,12 @@ player.on('loadeddata', function() {
         });
         track.mode = 'hidden';
     }
+});*/
+
+
+$(".js-playlist__item-button").on('click', function () {
+    player.src({type: 'application/x-mpegURL', src: $(this).data("src") });
 });
-*/
 
 SCRIPT;
 
@@ -156,7 +161,7 @@ SCRIPT;
 
             <?php if ($model->screencapture !== null) { ?>
 
-                <div class="col-md-12">
+                <div class="col-md-9">
                 <?= VideoJsWidget::widget([
                     'options' => [
                         'id' => 'video-container',
@@ -169,20 +174,22 @@ SCRIPT;
                     'tags' => [
                         'source' => [
                             [
-                                'src' => Url::to(['screencapture/view', 'id' => $model->id, 'file' => 'master.m3u8']),
+                                'src' => Url::to(['screencapture/view', 'id' => $model->id, 'file' => $model->screencapture->masters[0]]),
                                 'type' => 'application/x-mpegURL',
                             ],
                         ],
-                        /*'track' => [
-                            [
-                                'src' => Url::to(['screencapture/view', 'id' => $model->id, 'file' => 'subtitles.m3u8']),
-                                'kind' => 'captions',
-                                'label' => 'english',
-                                'srclang' => 'en',
-                            ],
-                        ],*/
                     ]
                 ]); ?>
+                </div>
+                <div class="col-md-3">
+                    <h4><?= Yii::t('ticket', 'Available screen captures:') ?></h4>
+                    <ul>
+                        <?php foreach ($model->screencapture->masters as $key => $master) { ?>
+                            <li><a class='js-playlist__item-button' data-src='<?= Url::to(['screencapture/view', 'id' => $model->id, 'file' => $master]) ?>'><?= $master ?></a></li>
+                        <?php } ?>
+                    </ul>
+                </div>
+                <div class="col-md-3 js-keylogger__log">
                 </div>
 
             <?php } else { ?>

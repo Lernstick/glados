@@ -43,8 +43,12 @@ bitrate="${bitrate}"
 fps="${fps}"
 gop="\$((chunk*fps))"
 mkdir -p "${path}"
+date="\$(date +%s)"
+master="master\${date}.m3u8"
+playlist="video\${date}.m3u8"
 
 echo "[screen_capture] [info] Starting screen capturing..."
+echo "[screen_capture] [info] calling ${command}"
 ${command}
 EOF1
 

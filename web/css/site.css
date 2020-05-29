@@ -584,3 +584,7 @@ span.now {
 span.past {
     color:gray;
 }
+
+.js-playlist__item-button {
+  cursor: pointer;
+}

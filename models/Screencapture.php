@@ -17,12 +17,16 @@ use yii\helpers\Url;
 class Screencapture extends Model
 {
 
-    const MASTER = 'master.m3u8';
+    const GLOB_MASTER = 'master*.m3u8';
+    const GLOB_PLAYLIST = 'video*.m3u8';
+    const GLOB_SEGMENT = 'video*.ts';
+    const GLOB_KEYLOGGER = 'keylogger*.key';
 
     /**
-     * @var string The filesystem path to the master m3u8 file (the full absolute path)
+     * @var array The filesystem path to all the master m3u8 files (only basenames)
      */
-    public $master;
+    public $masters;
+
     public $ticket;
 
     public $mimeTypes = [
@@ -45,10 +49,15 @@ class Screencapture extends Model
     public function findOne($id)
     {
         if ( ($ticket = Ticket::findOne($id)) !== null) {
-            $master = \Yii::$app->params['scPath'] . '/' . $ticket->token . '/' . self::MASTER;
-            if (file_exists($master)) {
+            $masters = glob(\Yii::$app->params['scPath'] . '/' . $ticket->token . '/' . self::GLOB_MASTER);
+            rsort($masters);
+            array_walk($masters, function(&$item){
+                $item = basename($item);
+            });
+
+            if (!empty($masters)) {
                 return new Screencapture([
-                    'master' => $master,
+                    'masters' => $masters,
                     'ticket' => $ticket,
                 ]);
             }
@@ -75,12 +84,12 @@ class Screencapture extends Model
      */
     public function getFile($file)
     {
-        if ($file == "subtitles.m3u8") {
-            return $this->subtitles;
+        if (preg_match('/^subtitles([0-9]+)\.m3u8$/', $file, $matches) !== 0) {
+            return $this->subtitles($matches[1]);
         }
 
-        if ($file == "master.m3u8") {
-            return $this->alteredMaster;
+        if (preg_match('/^master([0-9]+)\.m3u8$/', $file, $matches) !== 0) {
+            return $this->master($matches[1]);
         }
 
         /* if $file ends with .webvtt */
@@ -88,25 +97,58 @@ class Screencapture extends Model
             return $this->getSubtitleFile($file);
         }
 
+        if (preg_match('/^video([0-9]+)\.m3u8$/', $file, $matches) !== 0) {
+            return $this->playlist($matches[1]);
+        }
+
         $path = $this->streamFile($file);
         if (file_exists($path)) {
-            $ext = pathinfo($path, PATHINFO_EXTENSION);
-            $contents = file_get_contents($path);
-            if ($ext == 'm3u8') {
-                $contents = $this->adjustPlaylist($contents);
-            }
-            return $contents;
+            return file_get_contents($path);
         }
         return null;
     }
 
+
     /**
-     * Adjust the contents of the playlist to simulate a live of vod stream, depending
-     * on the ticket state.
+     * Adjust the contents of the playlist to simulate a live or vod stream, depending
+     * on the ticket state and the stream.
      *
+     * @param string $timestamp the master file timestamp
+     * @return string|null
+     */
+    public function playlist($timestamp)
+    {
+        $file = "video" . $timestamp . ".m3u8";
+        $path = $this->streamFile($file);
+        if (file_exists($path)) {
+            $contents = file_get_contents($path);
+
+            if ( array_search("master" . $timestamp . ".m3u8", $this->masters) === 0) {
+                if ($this->ticket->state == Ticket::STATE_RUNNING) {
+                    // simulate a live stream
+                    $contents = str_replace("#EXT-X-PLAYLIST-TYPE:VOD", "#EXT-X-PLAYLIST-TYPE:EVENT", $contents);
+                    return str_replace("#EXT-X-ENDLIST", "", $contents);
+                }
+            }
+            // simulate a vod stream
+            $contents = str_replace("#EXT-X-DISCONTINUITY", "", $contents);
+            $contents = str_replace("#EXT-X-ENDLIST", "", $contents);
+            return str_replace("#EXT-X-PLAYLIST-TYPE:EVENT", "#EXT-X-PLAYLIST-TYPE:VOD", $contents) . "#EXT-X-ENDLIST" . PHP_EOL;
+
+        }
+        return null;
+
+    }
+
+    /**
+     * Adjust the contents of the playlist to simulate a live or vod stream, depending
+     * on the ticket state and the stream.
+     *
+     * @param string $contents the contents of the file
+     * @param string $file the requested file name
      * @return string
      */
-    public function adjustPlaylist($contents)
+    public function adjustPlaylist($contents, $file)
     {
         if ($this->ticket->state == Ticket::STATE_RUNNING) {
             // simulate a live stream
@@ -122,11 +164,13 @@ class Screencapture extends Model
     /**
      * Returns the contents of the altered "master.m3u8" file with a subtitle track included
      *
+     * @param string $timestamp the master file timestamp
      * @return string|null
      */
-    public function getAlteredMaster()
+    public function master($timestamp)
     {
-        $path = $this->streamFile('master.m3u8');
+        $file = "master" . $timestamp . ".m3u8";
+        $path = $this->streamFile($file);
         if (file_exists($path)) {
             $lines = file($path, FILE_IGNORE_NEW_LINES);
             
@@ -138,32 +182,30 @@ class Screencapture extends Model
 
             foreach ($lines as $nl => $line) {
                 if ($line == "#EXT-X-VERSION:3") {
-                    array_splice($lines, $nl+1, 0, '#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="English",DEFAULT=YES,AUTOSELECT=YES,FORCED=NO,LANGUAGE="en",URI="subtitles.m3u8"');
+                    array_splice($lines, $nl+1, 0, '#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="English",DEFAULT=YES,AUTOSELECT=YES,FORCED=NO,LANGUAGE="en",URI="subtitles' . $timestamp . '.m3u8"');
                 }
             }
-            $contents = implode(PHP_EOL, $lines);
-            $contents = $this->adjustPlaylist($contents);
-            return $contents;
+            return implode(PHP_EOL, $lines);
         }
         return null;
     }
 
     /**
-     * Returns the contents of the generated "subtitles.m3u8" file for the live stream, or null if
-     * it cannot be generated. This file is generated from the "video.m3u8" by just replacing the
+     * Returns the contents of the generated "subtitles[timestamp].m3u8" file for the live stream, or null if
+     * it cannot be generated. This file is generated from the "video[timestamp].m3u8" by just replacing the
      * video[timestamp].ts file entries with subtitle[timestamp].webvtt
      *
+     * @param string $timestamp the subtitles file timestamp
      * @return string|null
      */
-    public function getSubtitles()
+    public function subtitles($timestamp)
     {
-        if ( ($contents = $this->getFile('video.m3u8')) !== null ) {
+        if ( ($contents = $this->getFile('video' . $timestamp . '.m3u8')) !== null ) {
             $contents = preg_replace('/video([0-9]+)\.ts/', 'subtitles\1.webvtt', $contents);
             return $contents;
         } else {
             return null;
         }
-        
     }
 
     /**
@@ -177,102 +219,106 @@ class Screencapture extends Model
     {
 
         preg_match('/subtitles([0-9]+)\.webvtt/', $file, $matches);
-        $stream_start = $this->starttime;
+        $stream_start = $this->starttime($matches[1]);
         $chunk_start = intval($matches[1]);
         $chunk_end = $this->getNexttime($chunk_start);
         $chunk_size = $chunk_end - $chunk_start;
 
         $ms_start = ($chunk_start - $stream_start)*1000;
         $ms_end = ($chunk_end - $stream_start)*1000;
-        //var_dump($stream_start, $chunk_start, $chunk_end, $chunk_size);die();
 
         // write the header of the webvtt file
-        $vtt = 'WEBVTT'. PHP_EOL . 'X-TIMESTAMP-MAP=MPEGTS:900000,LOCAL:00:00:00.000' . PHP_EOL . PHP_EOL;
+        $vtt = 'WEBVTT'. PHP_EOL . 'X-TIMESTAMP-MAP=MPEGTS:0,LOCAL:00:00:00.000' . PHP_EOL . PHP_EOL;
 
-        $keyloggerFiles = glob($this->screencaptureDir . '/keylogger*.key');
+        $keyloggerFiles = glob($this->screencaptureDir . '/' . self::GLOB_KEYLOGGER);
         $i=1;
         $vtt .= $i . PHP_EOL . $this->format_time($ms_start) . ' --> ' . $this->format_time($ms_end) . PHP_EOL;
         foreach($keyloggerFiles as $file) {
-            preg_match('/keylogger([0-9]+)\.key/', $file, $matches);
-            if (array_key_exists(1, $matches)) {
-                $timestamp = intval($matches[1]);
+            if ( preg_match('/keylogger([0-9]+)\.key/', $file, $matches) === 1) {
+                $key_starttime = intval($matches[1]);
                 $next_chunk_end = $this->getNexttime($chunk_end);
-                if ($timestamp >= $chunk_start && $timestamp + 10 <= $next_chunk_end) {
+                if ($key_starttime + 10 >= $chunk_start && $key_starttime - 10 <= $chunk_end) {
                     $lines = file($file, FILE_IGNORE_NEW_LINES);
                     foreach ($lines as $nl => $line) {
                         list($time, $msg) = explode(' ', $line, 2);
-                        if (array_key_exists($nl+1, $lines)) {
-                            list($ntime, $nmsg) = explode(' ', $lines[$nl+1], 2);
-                        } else {
-                            $ntime = $time + 1000;
+                        $time = intval($time);
+                        if ( $time >= $chunk_start*1000 && $time <= $chunk_end*1000 ) {
+                            $vtt .= '<' . $this->format_time($time - $stream_start*1000) . '>' . $this->format_subtitle($msg);
                         }
-                        $vtt .= '<' . $this->format_time($time - $stream_start*1000) . '>' . $this->format_subtitle($msg);
-                        #$vtt .= $this->format_subtitle($msg);
                         $i++;
                     }
                 }
             }
         }
-        $vtt .= PHP_EOL . PHP_EOL;
-        return $vtt;
-
-        $s = $this->format_time($ms_start+123);
-        $e = $this->format_time(($ms_start + $chunk_size*1000) - 434);
-
-        return "WEBVTT
-X-TIMESTAMP-MAP=MPEGTS:900000,LOCAL:00:00:00.000
-
-$s --> $e
-English subtitle 1 -Unforced- ($s to $e)
-
-
-";
+        return $vtt . PHP_EOL . PHP_EOL;
     }
 
 
     /**
      * Getter for the timestamp of the first video chunk file
      *
-     * @return integer
+     * @param integer $timestamp of the current subtitle file
+     * @return integer timestamp
      */
-    public function getStarttime()
+    public function starttime($timestamp)
     {
-        $dir = new \DirectoryIterator($this->screencaptureDir);
-        $reftime = 9999999999;
-        foreach ($dir as $fileinfo) {
-            if (!$fileinfo->isDot()) {
-                preg_match('/video([0-9]+)\.ts/', $fileinfo->getFilename(), $matches);
-                if (array_key_exists(1, $matches)) {
-                    $reftime = $reftime > intval($matches[1]) ? intval($matches[1]) : $reftime;
-                }
-            }
-        }
-        return $reftime == 9999999999 ? 0 : $reftime;
-    }
-
-    /**
-     * Gets the timestamp of the next video chunk given a timestamp
-     *
-     * @return integer
-     */
-    public function getNexttime($start)
-    {
-        $dir = new \DirectoryIterator($this->screencaptureDir);
-        $reftime = 9999999999;
-        foreach ($dir as $fileinfo) {
-            if (!$fileinfo->isDot()) {
-                preg_match('/video([0-9]+)\.ts/', $fileinfo->getFilename(), $matches);
-                if (array_key_exists(1, $matches)) {
-                    $timestamp = intval($matches[1]);
-                    if ($timestamp > $start) {
-                        $reftime = $reftime > $timestamp ? $timestamp : $reftime;
+        $playlists = glob($this->screencaptureDir . '/' . self::GLOB_PLAYLIST);
+        foreach ($playlists as $key => $playlist) {
+            $lines = file($playlist);
+            foreach ($lines as $key => $line) {
+                if (trim($line) == 'video' . $timestamp . '.ts') {
+                    foreach ($lines as $key => $line) {
+                        if (preg_match('/video([0-9]+)\.ts/', $line, $matches) === 1) {
+                            return intval($matches[1]);
+                        }
                     }
                 }
             }
         }
-        return $reftime == 9999999999 ? 0 : $reftime;
+        return 0;
     }
 
+    /**
+     * Gets the timestamp of the next video chunk given the current chunk start timestamp
+     *
+     * @param integer $start current timestamp
+     * @return integer timestamp
+     */
+    public function getNexttime($start)
+    {
+        return $this->getTime($start, +1);
+    }
+
+    /**
+     * Gets the timestamp of the previous video chunk given the current chunk start timestamp
+     *
+     * @param integer $start current timestamp
+     * @return integer timestamp
+     */
+    public function getPrevtime($start)
+    {
+        return $this->getTime($start, -1);
+    }
+
+    /**
+     * Gets the timestamp of the video chunk [[delta]] steps away given the current chunk start timestamp
+     *
+     * @param integer $start current timestamp
+     * @param integer $delta number of steps to go
+     * @return integer timestamp
+     */
+    public function getTime($start, $delta)
+    {
+        $segments = glob($this->screencaptureDir . '/' . self::GLOB_SEGMENT);
+        foreach ($segments as $key => $segment) {
+            if (basename($segment) == 'video' . $start . '.ts' && array_key_exists($key+$delta, $segments)) {
+                if ( preg_match('/video([0-9]+)\.ts/', $segments[$key+$delta], $matches) === 1){
+                    return intval($matches[1]);
+                }
+            }
+        }
+        return $delta > 0 ? 99999999999999 : 0;
+    }
 
     /**
      * Converts milliseconds into time indicators in a webvtt file
@@ -307,6 +353,7 @@ English subtitle 1 -Unforced- ($s to $e)
             '&' => '&amp;',
             '<' => '&lt;',
             '>' => '&gt;',
+            '␣' => '&nbsp;',
         ];
         if ($subtitle == '') {
             $subtitle = '␣';
