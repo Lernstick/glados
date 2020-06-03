@@ -92,10 +92,11 @@ EOF_RSYSLOG
 # screen_capture
 threshold+=("${threshold}")
 path+=("${path}")
-hardlink+=("*.{m3u8,log}")
+hardlink+=("@(*.m3u8|*.log)")
 move+=("*.ts")
 remove+=("*.ts")
 log+=("screen_capture.log")
+chunk+=("${chunk}")
 
 EOF3
 

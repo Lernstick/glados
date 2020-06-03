@@ -21,27 +21,29 @@ for key in "${!path[@]}"; do
     m="${move[$key]}";
     r="${remove[$key]}";
     l="${log[$key]}";
+    c="${chunk[$key]}";
 
     launch="${p}/launch"
     mkdir -p "${launch}"
 
+    # enable extended globs for example "@(*.m3u8|*.log)"
+    shopt -s extglob
+
     # hard link the hardlink glob files into the launch directory
     if [ -n "$h" ]; then 
-        cp -vl $(eval echo "${p}/"$h) "${launch}/"
+        compgen -G "${p}/"$h >/dev/null && cp -vl "${p}/"$h "${launch}/"
     fi
 
-    # move all but the two newest files matching the move glob to the launch directory
+    # move all files older than the chunk size to the launch directory
     if [ -n "$m" ]; then 
-        LANG=C stat -c '%Y %N' $(eval echo "${p}"/$m) | \
-            sort -nk1 | head -n -2 | cut -d ' ' -f2- | \
-            xargs -I {} sh -c "mv -v '{}' '${launch}/';"
+        LANG=C compgen -G "${p}"/$m >/dev/null && \
+            find "${p}"/$m -maxdepth 1 -not -newermt "-${c} seconds" -exec sh -c 'mv -v "$1" "$2"' sh {} "${launch}/" ";"
     fi
-
 
     # get total drive space in bytes
     space="$(df --block-size=1 --output=size "${p}" | tail -1)"
     if [ "${t}" != "0%" ] && [ "${t}" != "0m" ] && [ -n "$r" ]; then
-        cur="$(du -cb $(eval echo "${launch}/"$r) | tail -1 | cut -f1)"
+        cur="$(du -cb "${launch}/"$r 2>/dev/null | tail -1 | cut -f1)"
         # calculate the threshold in bytes
         [[ "${t}" == *m ]] && t=$((${t%?}*1042*1024))
         [[ "${t}" == *% ]] && t=$((${t%?}*${space}/100))
@@ -52,7 +54,7 @@ for key in "${!path[@]}"; do
             if [ -n "$l" ]; then 
                 echo "[launch] [fatal] overflow threshold of ${t} bytes exceeded: removing files" >> "$p/$l"
             fi
-            oldest="$(ls -t1 $(eval echo "${launch}"/$r) | tail -1)"
+            oldest="$(ls -t1 "${launch}"/$r | tail -1)"
             i=0
             while [ "${cur}" -gt "${t}" ] && [ -n "${oldest}" ] && [ "$i" -lt 10 ]; do
                 if [ -n "$l" ]; then
@@ -60,8 +62,8 @@ for key in "${!path[@]}"; do
                 else
                     rm -vf "${oldest}" 2>&1
                 fi
-                oldest="$(ls -t1 $(eval echo "${launch}"/$r) | tail -1)"
-                cur="$(du -cb $(eval echo "${launch}/"$r) | tail -1 | cut -f1)"
+                oldest="$(ls -t1 "${launch}"/$r | tail -1)"
+                cur="$(du -cb "${launch}/"$r 2>/dev/null | tail -1 | cut -f1)"
                 i=$(($i + 1))
             done
         fi

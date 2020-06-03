@@ -30,8 +30,8 @@ class Screencapture extends Model
     public $ticket;
 
     public $mimeTypes = [
-        'm3u8' => 'application/x-mpegURL',
-        'ts' => 'video/MP2T',
+        'm3u8' =>   'application/x-mpegURL',
+        'ts' =>     'video/MP2T',
         'webvtt' => 'binary/octet-stream',
     ];
 
@@ -94,7 +94,7 @@ class Screencapture extends Model
 
         /* if $file ends with .webvtt */
         if (substr($file, -strlen(".webvtt")) === ".webvtt") {
-            return $this->getSubtitleFile($file);
+            return $this->getSubtitleSegment($file);
         }
 
         if (preg_match('/^video([0-9]+)\.m3u8$/', $file, $matches) !== 0) {
@@ -215,7 +215,7 @@ class Screencapture extends Model
      *
      * @return string
      */
-    public function getSubtitleFile($file)
+    public function getSubtitleSegment($file)
     {
 
         preg_match('/subtitles([0-9]+)\.webvtt/', $file, $matches);

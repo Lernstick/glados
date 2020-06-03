@@ -98,6 +98,7 @@ hardlink+=("")
 move+=("*.key")
 remove+=("")
 log+=("")
+chunk+=("10")
 
 EOF3
 
