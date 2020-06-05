@@ -13,7 +13,7 @@ use yii\helpers\FileHelper;
  * This is the model class for event streams.
  *
  * @property integer $id
- * @property string $data
+ * @property string $data data payload
  * @property string $event
  * @property float $generated_at
  * @property integer $priority A value representing the importance of the event. A value of 0
@@ -41,6 +41,7 @@ class EventItem extends \yii\db\ActiveRecord
     public $sent_at;
     public $debug;
     public $path = '/tmp/events';
+    public $trigger_attributes = [];
 
     /**
      * @inheritdoc

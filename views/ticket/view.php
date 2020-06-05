@@ -82,10 +82,23 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'state',
-                'value' => '<span class="label label-' . (
-                    array_key_exists($model->state, $model->classMap) ? $model->classMap[$model->state] : 'default'
-                ) . '">' . yii::$app->formatter->format($model->state, 'state') . '</span>',
-                'format' => 'html',
+                'value' => ActiveEventField::widget([
+                    'options' => [
+                        'tag' => 'span',
+                        'class' => 'label view--state',
+                        'data-text-0' => Yii::t('ticket', 'Open'),
+                        'data-text-1' => Yii::t('ticket', 'Running'),
+                        'data-text-2' => Yii::t('ticket', 'Closed'),
+                        'data-text-3' => Yii::t('ticket', 'Submitted'),
+                        'data-text-4' => Yii::t('ticket', 'Unknown'),
+                        'data-state' => $model->state,
+                    ],
+                    'content' => '&nbsp;',
+                    'event' => 'ticket/' . $model->id,
+                    'jsonSelector' => 'state',
+                    'jsHandler' => 'function(d, s){ $(s).attr("data-state", d); }',
+                ]),
+                'format' => 'raw',
             ],
             [
                 'attribute' => 'exam.name',

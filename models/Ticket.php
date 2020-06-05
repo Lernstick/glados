@@ -61,7 +61,7 @@ class Ticket extends LiveActiveRecord
      * @var integer A value from 0 to 4 representing the state of the ticket.
      * @see ticket state constants below.
      */
-    public $state;
+    private $_state;
 
     public $tduration;
 
@@ -162,6 +162,7 @@ class Ticket extends LiveActiveRecord
             'restore_lock' => [ 'priority' => 0 ],
             'online',
             'last_backup',
+            'state' => [ 'trigger_attributes' => [ 'start', 'end', 'test_taker' ], ],
         ];
     }
 
@@ -280,6 +281,27 @@ class Ticket extends LiveActiveRecord
             'start' => \Yii::t('ticket', 'The start time of the exam. This should not be manually edited.'),
             'end' => \Yii::t('ticket', 'The finish time of the exam. This should not be manually edited.'),
         ];
+    }
+
+    public function setState($state)
+    {
+        $this->_state = (int) $state;
+    }
+
+    public function getState()
+    {
+        $s = 4;
+        if (!empty($this->start)) {
+            if (!empty($this->end)) {
+                $s = !empty($this->test_taker) ? 3 : 2;
+            } else {
+                $s = 1;
+            }
+        } else if (empty($this->end)) {
+            $s = 0;
+        }
+        $this->setState($s);
+        return $this->_state;
     }
 
     public function getOwn()

@@ -588,3 +588,15 @@ span.past {
 .js-playlist__item-button {
   cursor: pointer;
 }
+
+span.view--state[data-state="0"] { background-color: #5cb85c; } /* label-success */
+span.view--state[data-state="1"] { background-color: #5bc0de; } /* label-info    */
+span.view--state[data-state="2"] { background-color: #d9534f; } /* label-danger  */
+span.view--state[data-state="3"] { background-color: #f0ad4e; } /* label-warning */
+span.view--state[data-state="4"] { background-color: #777777; } /* label-default */
+span.view--state[data-state] { display: inline-block; }
+span.view--state[data-state="0"]::after { content: attr(data-text-0); }
+span.view--state[data-state="1"]::after { content: attr(data-text-1); }
+span.view--state[data-state="2"]::after { content: attr(data-text-2); }
+span.view--state[data-state="3"]::after { content: attr(data-text-3); }
+span.view--state[data-state="4"]::after { content: attr(data-text-4); }
