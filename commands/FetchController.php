@@ -107,11 +107,11 @@ class FetchController extends DaemonController
 
         /* Generate fetch list based on the properties of the exam */
         if (array_key_exists('screen_capture', $this->ticket->exam->settings) && $this->ticket->exam->settings['screen_capture']) {
-            $this->fetchList[] = FileHelper::normalizePath($this->remotePath . '/' . $this->ticket->exam->settings['screen_capture_path']) . '/launch/*';
+            $this->fetchList[] = FileHelper::normalizePath($this->remotePath . '/' . $this->ticket->exam->settings['screen_capture_path']) . '/launch/';
         }
 
         if (array_key_exists('keylogger', $this->ticket->exam->settings) && $this->ticket->exam->settings['keylogger']) {
-            $this->fetchList[] = FileHelper::normalizePath($this->remotePath . '/' . $this->ticket->exam->settings['keylogger_path']) . '/launch/*';
+            $this->fetchList[] = FileHelper::normalizePath($this->remotePath . '/' . $this->ticket->exam->settings['keylogger_path']) . '/launch/';
         }
 
         $this->fetchList = array_unique($this->fetchList);
@@ -130,7 +130,7 @@ class FetchController extends DaemonController
                 $e = escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . ":" . $e);
             });
 
-            $this->_cmd = "rsync -L --checksum --partial --progress --protect-args "
+            $this->_cmd = "rsync -r -L --checksum --partial --progress --protect-args "
                 . "--bwlimit=" . escapeshellarg($this->bwlimit) . " "
                 . "--rsh='ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
                 . " -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' "

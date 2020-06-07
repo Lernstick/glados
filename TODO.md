@@ -12,13 +12,13 @@ TODO:
   * show in the ticket view
 
 * screen capturing
-  * remove video files when storage space exceeds (overflow)
+  * remove video files when storage space exceeds (overflow): done
   * run fetching not every backup interval, only when traffic allows
   * for last backup: fetch must run
   * restore \*.m3u8 and \*.log files
-    * No: the stream should not resume, instead start from new with video2.m3u8, ...
-    * keylogger: old keylogger.key files should be transmitted after a while, even if no more files appear
-    * launch script should launch files when too old
+    * No: the stream should not resume, instead start from new with video2.m3u8, ... done
+    * keylogger: old keylogger.key files should be transmitted after a while, even if no more files appear: done
+    * launch script should launch files when too old: done
 
 * multiple filessystems for exams
   * option to upload squashfs/zip files detached from exam context

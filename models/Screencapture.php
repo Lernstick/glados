@@ -17,6 +17,7 @@ use yii\helpers\Url;
 class Screencapture extends Model
 {
 
+    /* Globs for the hls live stream and keylogger files */
     const GLOB_MASTER = 'master*.m3u8';
     const GLOB_PLAYLIST = 'video*.m3u8';
     const GLOB_SEGMENT = 'video*.ts';
@@ -26,6 +27,14 @@ class Screencapture extends Model
      * @var array The filesystem path to all the master m3u8 files (only basenames)
      */
     public $masters;
+
+    /* hls headers and tags */
+    const HLS_HEADER_SUBTITLES = '#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="{name}",DEFAULT=YES,AUTOSELECT=YES,FORCED=NO,LANGUAGE="en",URI="subtitles{timestamp}.m3u8"';
+    const HLS_TAG_VOD = '#EXT-X-PLAYLIST-TYPE:VOD';
+    const HLS_TAG_LIVE = '#EXT-X-PLAYLIST-TYPE:EVENT';
+    const HLS_TAG_ENDLIST = '#EXT-X-ENDLIST';
+    const HLS_TAG_DISCONTINUITY = '#EXT-X-DISCONTINUITY';
+    const HLS_TAG_VERSION = '#EXT-X-VERSION:3';
 
     public $ticket;
 
@@ -126,14 +135,14 @@ class Screencapture extends Model
             if ( array_search("master" . $timestamp . ".m3u8", $this->masters) === 0) {
                 if ($this->ticket->state == Ticket::STATE_RUNNING) {
                     // simulate a live stream
-                    $contents = str_replace("#EXT-X-PLAYLIST-TYPE:VOD", "#EXT-X-PLAYLIST-TYPE:EVENT", $contents);
-                    return str_replace("#EXT-X-ENDLIST", "", $contents);
+                    $contents = str_replace(self::HLS_TAG_VOD, self::HLS_TAG_LIVE, $contents);
+                    return str_replace(self::HLS_TAG_ENDLIST, "", $contents);
                 }
             }
             // simulate a vod stream
-            $contents = str_replace("#EXT-X-DISCONTINUITY", "", $contents);
-            $contents = str_replace("#EXT-X-ENDLIST", "", $contents);
-            return str_replace("#EXT-X-PLAYLIST-TYPE:EVENT", "#EXT-X-PLAYLIST-TYPE:VOD", $contents) . "#EXT-X-ENDLIST" . PHP_EOL;
+            $contents = str_replace(self::HLS_TAG_DISCONTINUITY, "", $contents);
+            $contents = str_replace(self::HLS_TAG_ENDLIST, "", $contents);
+            return str_replace(self::HLS_TAG_LIVE, self::HLS_TAG_VOD, $contents) . self::HLS_TAG_ENDLIST . PHP_EOL;
 
         }
         return null;
@@ -152,12 +161,12 @@ class Screencapture extends Model
     {
         if ($this->ticket->state == Ticket::STATE_RUNNING) {
             // simulate a live stream
-            $contents = str_replace("#EXT-X-PLAYLIST-TYPE:VOD", "#EXT-X-PLAYLIST-TYPE:EVENT", $contents);
-            return str_replace("#EXT-X-ENDLIST", "", $contents);
+            $contents = str_replace(self::HLS_TAG_VOD, self::HLS_TAG_LIVE, $contents);
+            return str_replace(self::HLS_TAG_ENDLIST, "", $contents);
         } else {
             // simulate a vod stream
-            $contents = str_replace("#EXT-X-DISCONTINUITY", "", $contents);
-            return str_replace("#EXT-X-PLAYLIST-TYPE:EVENT", "#EXT-X-PLAYLIST-TYPE:VOD", $contents) . "#EXT-X-ENDLIST" . PHP_EOL;
+            $contents = str_replace(self::HLS_TAG_DISCONTINUITY, "", $contents);
+            return str_replace(self::HLS_TAG_LIVE, self::HLS_TAG_VOD, $contents) . self::HLS_TAG_ENDLIST . PHP_EOL;
         }
     }
 
@@ -181,8 +190,11 @@ class Screencapture extends Model
             }
 
             foreach ($lines as $nl => $line) {
-                if ($line == "#EXT-X-VERSION:3") {
-                    array_splice($lines, $nl+1, 0, '#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="English",DEFAULT=YES,AUTOSELECT=YES,FORCED=NO,LANGUAGE="en",URI="subtitles' . $timestamp . '.m3u8"');
+                if ($line == self::HLS_TAG_VERSION) {
+                    array_splice($lines, $nl+1, 0, substitute(self::HLS_HEADER_SUBTITLES, [
+                        'name' => \Yii::t('app', 'keystrokes from Keylogger'),
+                        'timestamp' => $timestamp,
+                    ]));
                 }
             }
             return implode(PHP_EOL, $lines);

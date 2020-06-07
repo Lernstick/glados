@@ -56,6 +56,8 @@ class EventController extends Controller
             ]), $uuid);
         });
 
+        ob_end_flush();
+        ob_start();
         $stream->start();
 
         while ($stream->onEvent() === true) {
@@ -92,8 +94,7 @@ class EventController extends Controller
         }
 
         $stream->stop();
-        exit();
-
+        exit(); # or return ob_get_clean();
     }
 
 
@@ -103,7 +104,7 @@ class EventController extends Controller
         ob_flush();
         flush();
         if (YII_ENV_DEV) {
-            file_put_contents('/var/log/glados/debug-stream-uuid=' . $uuid, $message, FILE_APPEND);
+            file_put_contents(\Yii::$app->params['daemonLogFilePath'] . '/debug-stream-uuid=' . $uuid, $message, FILE_APPEND);
         }
     }
 
