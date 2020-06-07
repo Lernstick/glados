@@ -110,7 +110,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     ['data-pjax' => 0]
                 )
             ],
-
             'start:timeago',
             'end:timeago',
             'duration:duration',
