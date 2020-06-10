@@ -9,14 +9,8 @@ use yii\web\AssetBundle;
  */
 class VideoJsAsset extends AssetBundle
 {
-    public $sourcePath = '@vendor/videojs/video.js';
-    public $css = [
-    	'video-js.min.css',
-    ];
-    public $js = [
-        'video.min.js',
-    ];
     public $depends = [
-        'yii\web\JqueryAsset'
+        'app\assets\VideoJsCoreAsset',
+        'app\assets\VideoJsKaraokeAsset',
     ];
 }

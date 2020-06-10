@@ -600,3 +600,12 @@ span.view--state[data-state="1"]::after { content: attr(data-text-1); }
 span.view--state[data-state="2"]::after { content: attr(data-text-2); }
 span.view--state[data-state="3"]::after { content: attr(data-text-3); }
 span.view--state[data-state="4"]::after { content: attr(data-text-4); }
+
+.vjs-overlay {
+  position:absolute;
+  right:20px;
+  top:20px;
+  cursor:grab;
+  resize:both;
+  overflow: auto;
+}

@@ -19,6 +19,16 @@ TODO:
     * No: the stream should not resume, instead start from new with video2.m3u8, ... done
     * keylogger: old keylogger.key files should be transmitted after a while, even if no more files appear: done
     * launch script should launch files when too old: done
+  * VideoJs Plugin: overlay of a 2nd video possibility / for example webcam overlay
+    * sync the 2 videos
+    * simultan play, pause, seek, ...
+    * subtitles always in the main window
+    * move the PIP
+    * resize PIP
+    * Button: enable/disable PIP (just as the subtitles)
+      * test in fullscreen
+    * Button: switch the two videos
+      * test in fullscreen
 
 * multiple filessystems for exams
   * option to upload squashfs/zip files detached from exam context
