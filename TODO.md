@@ -47,3 +47,6 @@ TODO:
 
 * misc
   * disable firewall not working anymore
+  
+* daemons
+  * have a look at https://github.com/yiisoft/yii2-queue
