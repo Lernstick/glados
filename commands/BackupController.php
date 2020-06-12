@@ -191,9 +191,8 @@ class BackupController extends DaemonController implements DaemonInterface
 
             # disable screen capture service on the client
             if ($this->finishBackup == true) {
-                $this->ticket->runCommand('service screen_capture stop; service keylogger stop', 'C', 10);
+                $this->ticket->runCommand('service screen_capture stop; service keylogger stop', 'C', 20);
             }
-
 
             /* Exclude screen_capture_path from backup */
             if (array_key_exists('screen_capture', $this->ticket->exam->settings)

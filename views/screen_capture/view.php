@@ -23,7 +23,7 @@ if ($model->screencapture !== null) {
     }
 });*/
 
-
+var player = videojs('video-container');
 $(".js-playlist__item-button").on('click', function () {
     player.src({type: 'application/x-mpegURL', src: $(this).data("src") });
 });

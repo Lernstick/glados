@@ -63,7 +63,8 @@ Description=screen_capture
 Type=simple
 WorkingDirectory=${path}
 ExecStart=/usr/bin/screen_capture
-ExecStopPost=/bin/bash -c 'cp -vl *.{m3u8,log} launch/; mv -v *.ts launch/'
+ExecStop=/bin/bash -c 'kill \$1; tail --pid=\$1 -f /dev/null' sh \$MAINPID
+ExecStopPost=/usr/bin/launch screen_capture
 Restart=always
 RestartSec=10
 StandardOutput=syslog
@@ -90,6 +91,7 @@ EOF_RSYSLOG
     # setup the launch timer
     cat <<EOF3 >>"${initrd}/newroot/etc/launch.conf"
 # screen_capture
+name+=("screen_capture")
 threshold+=("${threshold}")
 path+=("${path}")
 hardlink+=("@(*.m3u8|*.log)")

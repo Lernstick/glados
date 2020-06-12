@@ -15,12 +15,13 @@ TODO:
   * remove video files when storage space exceeds (overflow): done
   * run fetching not every backup interval, only when traffic allows
   * for last backup: fetch must run
+  * when service ends -> launch all files: done
   * restore \*.m3u8 and \*.log files
     * No: the stream should not resume, instead start from new with video2.m3u8, ... done
     * keylogger: old keylogger.key files should be transmitted after a while, even if no more files appear: done
     * launch script should launch files when too old: done
   * VideoJs Plugin: overlay of a 2nd video possibility / for example webcam overlay
-    * see commit https://github.com/imedias/glados/commit/c650c33cedde9b410ab965a883b8086c88fd2280
+    * see commits https://github.com/imedias/glados/commit/c650c33cedde9b410ab965a883b8086c88fd2280 and https://github.com/imedias/glados/commit/da2553bd15ec4beb45638cc63ea536300667d5ae
     * sync the 2 videos
     * simultan play, pause, seek, ...
     * subtitles always in the main window
@@ -47,7 +48,7 @@ TODO:
      * <txt-record>actionLive='glados/index.php/ticket/live/{token}'</txt-record>
 
 * misc
-  * disable firewall not working anymore
+  * disable firewall not working anymore: done
   
 * daemons
   * have a look at https://github.com/yiisoft/yii2-queue

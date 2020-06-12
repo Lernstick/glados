@@ -22,6 +22,7 @@ for key in "${!path[@]}"; do
     r="${remove[$key]}";
     l="${log[$key]}";
     c="${chunk[$key]}";
+    n="${name[$key]}";
 
     launch="${p}/launch"
     mkdir -p "${launch}"
@@ -35,7 +36,10 @@ for key in "${!path[@]}"; do
     fi
 
     # move all files older than the chunk size to the launch directory
-    if [ -n "$m" ]; then 
+    if [ -n "$m" ]; then
+        if [ "$1" = "$n" ]; then
+            c=0;
+        fi
         LANG=C compgen -G "${p}"/$m >/dev/null && \
             find "${p}"/$m -maxdepth 1 -not -newermt "-${c} seconds" -exec sh -c 'mv -v "$1" "$2"' sh {} "${launch}/" ";"
     fi

