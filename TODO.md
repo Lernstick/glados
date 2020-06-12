@@ -20,6 +20,7 @@ TODO:
     * keylogger: old keylogger.key files should be transmitted after a while, even if no more files appear: done
     * launch script should launch files when too old: done
   * VideoJs Plugin: overlay of a 2nd video possibility / for example webcam overlay
+    * see commit https://github.com/imedias/glados/commit/c650c33cedde9b410ab965a883b8086c88fd2280
     * sync the 2 videos
     * simultan play, pause, seek, ...
     * subtitles always in the main window

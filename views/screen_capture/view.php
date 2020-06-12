@@ -93,13 +93,6 @@ SCRIPT;
                             ],
                             'plugins' => [
                                 'karaokeSubtitles' => [],
-                                'videoOverlay' => [
-                                    'id' => 'video-container2',
-                                    'class' => 'video-js vjs-default-skin vjs-layout-tiny vjs-overlay',
-                                    'preload' => 'auto',
-                                    'width' => 300,
-                                    'controls' => false,
-                                ],
                             ],
                         ]),
                     ],
@@ -113,21 +106,6 @@ SCRIPT;
                     ],
                 ]); ?>
                 </div>
-
-                <?= VideoJsWidget::widget([
-                    'options' => [
-                        'id' => 'video-container2',
-                        'class' => 'video-js vjs-default-skin',
-                    ],
-                    'tags' => [
-                        'source' => [
-                            [
-                                'src' => Url::to(['screencapture/view', 'id' => 2881, 'file' => 'master.m3u8']),
-                                'type' => 'application/x-mpegURL',
-                            ],
-                        ],
-                    ],
-                ]); ?>
                 <div class="col-md-3">
                     <h4><?= Yii::t('ticket', 'Available screen captures:') ?></h4>
                     <ul>
