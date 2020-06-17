@@ -37,16 +37,6 @@ class DaemonController extends Controller
     protected $loadarr = [];
 
     /**
-     * @var string file path of the lock file
-     */
-    protected $lockFile;
-
-    /**
-     * @var resource file pointer resource of the lock file
-     */
-    protected $lockHandle;
-
-    /**
      * @var array An array holding the timestamp of the last invocation of a job in
      * [[joblist]]. The key corresponds to the key in [[joblist]] and the value is
      * the timestamp of the last invocation.
@@ -643,59 +633,26 @@ class DaemonController extends Controller
     }
 
     /**
-     * Locks an item using PHP's flock().
+     * Locks an item using the applications mutex mechanism.
      *
-     * @param int $id the id of the item
-     * @param string $reason the reason to lock the item
+     * @param string $name Of the lock to be acquired.
+     * @param int $timeout Time (in seconds) to wait for lock to become released.
      * @return bool success or failure
      */
-    public function lock ($id, $reason)
+    public function lock ($name, $timeout = 0)
     {
-        $this->lockFile = \Yii::$app->params['tmpPath'] . "/" . $id . "_" . $reason . ".lock";
-        if (is_writable(\Yii::$app->params['tmpPath'])) {
-
-            if (!file_exists($this->lockFile)) {
-                touch($this->lockFile);
-            }
-
-            $this->lockHandle = fopen($this->lockFile, "c");
-            // acquire an exclusive lock
-            if (flock($this->lockHandle, LOCK_EX | LOCK_NB)) {
-                ftruncate($this->lockHandle, 0);
-                fwrite($this->lockHandle, $this->daemon->pid); // write down the process pid
-                fflush($this->lockHandle); // flush output before releasing the lock
-                return true;
-            }
-            fclose($this->lockHandle);
-        }
-        return false;
+        return Yii::$app->mutex->acquire($name, $timeout);
     }
 
     /**
-     * Unlocks an item using PHP's flock().
+     * Unlocks an item using the applications mutex mechanism.
      *
+     * @param string $name Of the lock to be released.
      * @return bool success or failure
      */
-    public function unlock ()
+    public function unlock ($name)
     {
-        if ($this->locked) {
-            // release the lock
-            flock($this->lockHandle, LOCK_UN);
-            fclose($this->lockHandle);
-            return @unlink($this->lockFile);
-        }
-        return false;
-    }
-
-    /**
-     * Getter for locked.
-     *
-     * @return bool whether the item is still locked or not (by this process)
-     */
-    public function getLocked ()
-    {
-        // if the resource is still open
-        return is_resource($this->lockHandle);
+        return Yii::$app->mutex->release($name);
     }
 
     /**

@@ -55,6 +55,9 @@ return [
             ],
         ],
         'db' => $db,
+        'mutex' => [
+            'class' => 'yii\mutex\MysqlMutex',
+        ],
     ],
     'params' => $params,
     'runtimePath' => '/var/lib/glados/runtime',

@@ -353,7 +353,7 @@ class DownloadController extends DaemonController implements DaemonInterface
      */
     public function lockItem ($ticket)
     {
-        if ($this->lock($ticket->id, "download")) {
+        if ($this->lock($ticket->id . "_download")) {
             $ticket->download_lock = 1;
             $ticket->running_daemon_id = $this->daemon->id;
             return $ticket->save(false);
@@ -366,7 +366,7 @@ class DownloadController extends DaemonController implements DaemonInterface
      */
     public function unlockItem ($ticket)
     {
-        $this->unlock();
+        $this->unlock($ticket->id . "_download");
         $ticket->download_lock = 0;
         return $ticket->save(false);
     }

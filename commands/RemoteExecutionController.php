@@ -116,7 +116,7 @@ class RemoteExecutionController extends DaemonController implements DaemonInterf
      */
     public function lockItem ($remote_execution)
     {
-        return $this->lock($remote_execution->id, "remote_execution");
+        return $this->lock($remote_execution->id . "_remote_execution");
     }
 
     /**
@@ -124,7 +124,7 @@ class RemoteExecutionController extends DaemonController implements DaemonInterf
      */
     public function unlockItem ($remote_execution)
     {
-        return $this->unlock() && $remote_execution->delete();
+        return $this->unlock($remote_execution->id . "_remote_execution") && $remote_execution->delete();
     }
 
     /**

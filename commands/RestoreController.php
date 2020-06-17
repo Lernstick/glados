@@ -89,7 +89,7 @@ class RestoreController extends DaemonController
             return;
         }
 
-        if ($this->lock($id, 'restore') === false) {
+        if ($this->lock($id . "_restore") === false) {
             $this->logError('Error: ticket with id ' . $id . ' is already in processing (flock).');
             return;
         }
@@ -114,7 +114,7 @@ class RestoreController extends DaemonController
                 'severity' => Activity::SEVERITY_WARNING,
             ]);
             $act->save();
-            $this->unlock();
+            $this->unlock($this->ticket->id . "_restore");
             return;
         } else {
             $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? true : false;
@@ -159,7 +159,7 @@ class RestoreController extends DaemonController
                 ]);
                 $act->save();
 
-                $this->unlock();
+                $this->unlock($this->ticket->id . "_restore");
                 return;
             }
         } else {
@@ -167,7 +167,7 @@ class RestoreController extends DaemonController
             $this->logInfo($this->ticket->restore_state);
             $this->ticket->restore_lock = 0;
             $this->ticket->save(false);
-            $this->unlock();
+            $this->unlock($this->ticket->id . "_restore");
             return;
         }
 
@@ -273,7 +273,7 @@ class RestoreController extends DaemonController
 
         $this->ticket->restore_lock = 0;
         $this->ticket->save(false);
-        $this->unlock();
+        $this->unlock($this->ticket->id . "_restore");
     }
 
     /**

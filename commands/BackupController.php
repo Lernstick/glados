@@ -516,7 +516,7 @@ class BackupController extends DaemonController implements DaemonInterface
      */
     public function lockItem ($ticket)
     {
-        if ($this->lock($ticket->id, "backup")) {
+        if ($this->lock($ticket->id . "_backup")) {
             $ticket->backup_lock = 1;
             $ticket->running_daemon_id = $this->daemon->id;
             return $ticket->save();
@@ -529,7 +529,7 @@ class BackupController extends DaemonController implements DaemonInterface
      */
     public function unlockItem ($ticket)
     {
-        $this->unlock();
+        $this->unlock($ticket->id . "_backup");
         $ticket->backup_lock = 0;
         return $ticket->save(false);
     }
