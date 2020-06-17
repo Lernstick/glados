@@ -144,17 +144,6 @@ class DaemonController extends Controller
     public $errorLogFile;
 
     /**
-     * @var boolean Variable holding the value whether the log file is writable.
-     * The path `\Yii::$app->params['daemonLogFilePath']` should be set writable 
-     * for the user of the web server process (`www-data` in debian)
-     * 
-     * See also:
-     *  * [Glados config files](guide:config-files.md)
-     * 
-     */
-    public $logFileIsWritable = true;
-
-    /**
      * The initializing function.
      *
      * This init() function does the following tasks:
@@ -218,8 +207,7 @@ class DaemonController extends Controller
     {
 
         posix_getpwuid($this->uid);
-        if (!is_writable(\Yii::$app->params['daemonLogFilePath'])) {
-            $this->logFileIsWritable = false;
+        if (!$this->logFileIsWritable()) {
             $this->logError('Warning: ' . \Yii::$app->params['daemonLogFilePath'] . '/ is '
                 . 'not writable. '
                 . 'Please make sure the directory is writable for the user under which '
@@ -317,6 +305,21 @@ class DaemonController extends Controller
     }
 
     /**
+     * The path `\Yii::$app->params['daemonLogFilePath']` should be set writable
+     * for the user of the web server process (`www-data` in debian).
+     *
+     * See also:
+     *  * [Glados config files](guide:config-files.md)
+     *
+     * @return boolean whether the log file is writable.
+     *
+     */
+    public function logFileIsWritable()
+    {
+        return is_writable(\Yii::$app->params['daemonLogFilePath']);
+    }
+
+    /**
      * Cleans daemons that are still runnning according to the database, but
      * are not (because of a reboot maybe).
      * Thus it removes all database entries whose pid are not present in the system.
@@ -373,7 +376,7 @@ class DaemonController extends Controller
             $this->daemon->save(false);
         }
 
-        if ($toFile === true && $this->logFileIsWritable === true) {
+        if ($toFile === true && $this->logFileIsWritable() === true) {
 
             if ($this->logFile === null || $this->errorLogFile === null) {
                 $this->logFile = \Yii::$app->params['daemonLogFilePath'] . '/glados.' . date('Y-m-dO') . '.log';
