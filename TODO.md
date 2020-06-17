@@ -52,3 +52,16 @@ TODO:
   
 * daemons
   * have a look at https://github.com/yiisoft/yii2-queue
+  * use mutex to accuire a lock (locking also works via DB), see https://www.yiiframework.com/doc/api/2.0/yii-mutex-mysqlmutex
+    * mysqlMutex uses mysql db to get a lock "SELECT GET_LOCK(name)", see https://mariadb.com/kb/en/get_lock/
+    * fileMutex uses flock(), but it resticted to being local (same machine)
+    * needs component config in console.php (see https://www.yiiframework.com/doc/api/2.0/yii-mutex-mysqlmutex)
+    * remove fields from table ticket:
+      * backup_lock
+      * restore_lock
+      * download_lock
+    * getNextItem() in daemons should then not query ->one(), instead:
+      * query->all()
+      * loop through models and try to accuire lock via Yii::$app->mutex->acquire('nameOfLock')
+      * return first model that evaluates true
+      * if all models evaluate to false -> return null
