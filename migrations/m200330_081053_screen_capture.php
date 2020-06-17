@@ -96,7 +96,7 @@ class m200330_081053_screen_capture extends Migration
                 'type' => $this->text(),
                 'default' => $this->text(),
                 'description_data' => $this->string(1024)->defaultValue(null),
-                'description_id' => $this->integer(11)->notNull(),
+                'description_id' => $this->integer(11)->notNull()->defaultValue(0),
                 'name_data' => $this->string(1024)->defaultValue(null),
                 'name_id' => $this->integer(11)->notNull(),
                 'belongs_to' => $this->integer(11),
@@ -515,8 +515,9 @@ class m200330_081053_screen_capture extends Migration
             $this->dropTable($this->availableSettingTable);
         }
 
-        $this->alterColumn($this->translationTable, 'en', $this->string(255)->notNull());
-        $this->alterColumn($this->translationTable, 'de', $this->string(255));
+        //commented, because in mysql, the fields would be truncated and mysql does not allow that
+        //$this->alterColumn($this->translationTable, 'en', $this->string(255)->notNull());
+        //$this->alterColumn($this->translationTable, 'de', $this->string(255));
 
         $this->dropColumn($this->historyTable, 'type');
         $this->dropColumn($this->ticketTable, 'sc_size');
