@@ -22,7 +22,7 @@ function add_dash_entry()
 
   # place ${entry} in "favorite apps" of Gnome3's dash in the user-db
   cp -p /home/user/.config/dconf/user /home/user/.config/dconf/user.bak
-  cp -p ${initrd}/newroot/home/user/.config/dconf/user /home/user/.config/dconf/
+  [ -e "${initrd}/newroot/home/user/.config/dconf/user" ] && cp -p ${initrd}/newroot/home/user/.config/dconf/user /home/user/.config/dconf/
   sync
 
   oldvalue="$(sudo -u user dconf read /org/gnome/shell/favorite-apps)"
@@ -35,6 +35,7 @@ function add_dash_entry()
   sudo -u user dconf write "/org/gnome/shell/favorite-apps" "${newvalue}"
   sync
 
+  [ -e "${initrd}/newroot/home/user/.config/dconf/" ] || mkdir -p "${initrd}/newroot/home/user/.config/dconf/"
   cp -p /home/user/.config/dconf/user ${initrd}/newroot/home/user/.config/dconf/user
   cp -p /home/user/.config/dconf/user.bak /home/user/.config/dconf/user
 
