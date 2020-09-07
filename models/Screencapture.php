@@ -29,12 +29,22 @@ class Screencapture extends Model
     public $masters;
 
     /* hls headers and tags */
-    const HLS_HEADER_SUBTITLES = '#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="{name}",DEFAULT=YES,AUTOSELECT=YES,FORCED=NO,LANGUAGE="en",URI="subtitles{timestamp}.m3u8"';
+    const HLS_HEADER_SUBTITLES = '#EXT-X-MEDIA:' .
+        'TYPE=SUBTITLES,' .
+        'GROUP-ID="subs",' .
+        'NAME="{name}",' .
+        'DEFAULT=YES,' .
+        'AUTOSELECT=YES,' .
+        'FORCED=NO,' .
+        'LANGUAGE="en",' .
+        'CHARACTERISTICS="public.accessibility.transcribes-spoken-dialog, public.accessibility.describes-music-and-sound",' .
+        'URI="subtitles{timestamp}.m3u8"';
     const HLS_TAG_VOD = '#EXT-X-PLAYLIST-TYPE:VOD';
     const HLS_TAG_LIVE = '#EXT-X-PLAYLIST-TYPE:EVENT';
     const HLS_TAG_ENDLIST = '#EXT-X-ENDLIST';
     const HLS_TAG_DISCONTINUITY = '#EXT-X-DISCONTINUITY';
     const HLS_TAG_VERSION = '#EXT-X-VERSION:3';
+    const HLS_TAG_DURATION = '#EXTINF'; #Format is #EXTINF:<duration>,[<title>]
 
     public $ticket;
 
@@ -313,7 +323,8 @@ class Screencapture extends Model
     }
 
     /**
-     * Gets the timestamp of the video chunk [[delta]] steps away given the current chunk start timestamp
+     * Gets the timestamp of the video chunk [[delta]] steps away given the current chunk start
+     * timestamp
      *
      * @param integer $start current timestamp
      * @param integer $delta number of steps to go
@@ -332,6 +343,56 @@ class Screencapture extends Model
         return $delta > 0 ? 99999999999999 : 0;
     }
 
+
+    /**
+     * Calculate the lenth of a file given by its name
+     *
+     * @param string $file name of the file
+     * @return integer length in seconds
+     */
+    public function length($file)
+    {
+        $length = 0.0;
+        $deeper = true;
+        $contents = $this->getFile($file);
+        foreach (explode(PHP_EOL, $contents) as $line) {
+            if (substr($line, 0, strlen(self::HLS_TAG_DURATION)) === self::HLS_TAG_DURATION) {
+                if ( preg_match('/' . self::HLS_TAG_DURATION . ':([0-9\.]+)/', $line, $matches) === 1){
+                    $length += floatval($matches[1]);
+                }
+                $deeper = false;
+            } else if ($deeper === true && !empty($line) && substr($line, 0, 1) !== "#") {
+                $length += $this->length($line);
+            }
+        }
+        return $length;
+    }
+
+    /**
+     * Getter for the lengths array. For each master-playlist item  in [[masters]] calculate
+     * the length.
+     *
+     * @return array list of lengths in seconds
+     */
+    public function getLengths()
+    {
+        $lengths = [];
+        foreach ($this->masters as $key => $master) {
+            $lengths[] = $this->length($master);
+        }
+        return $lengths;
+    }
+
+    public function getScreencaptures()
+    {
+        return array_map(function($master, $length) {
+            return [
+                'master' => $master,
+                'length' => $length,
+            ];
+        }, $this->masters, $this->lengths);
+    }
+
     /**
      * Converts milliseconds into time indicators in a webvtt file
      * Example: 1715123 will be converted into "00:28:35.123".
@@ -341,8 +402,6 @@ class Screencapture extends Model
      */
     public function format_time($ms)
     {
-
-        //$seconds = floor($ms/1000);
         $hours = floor($ms/3600000);
         $ms -= $hours*3600000;
         $mins = floor($ms/60000);

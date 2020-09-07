@@ -251,6 +251,7 @@ class RdiffFileSystem extends Model
 
     /**
      * Getter for the versions array
+     * Format: a list of timestamps (eg: 2020-09-07T13:29:56+02:00)
      *
      * @return array
      */

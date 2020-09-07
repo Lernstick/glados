@@ -18,11 +18,11 @@ var KaraokeSubtitles = videojs.extend(Plugin, {
 
             // when a cue is changed
             track.on('cuechange', function (e) {
-                var ac = track.activeCues;
+                var activeCues = track.activeCues;
 
                 // if there is an active cue
-                if (0 in ac) {
-                    var cue = ac[0];
+                if (0 in activeCues) {
+                    var cue = activeCues[0];
 
                     // if the cue is set
                     if (typeof cue !== 'undefined') {
@@ -72,7 +72,7 @@ var KaraokeSubtitles = videojs.extend(Plugin, {
                     }
                 }
             });
-            track.mode = 'hidden';
+            //track.mode = 'hidden'; /* This causes subtitles to not be shown on default */
         }
     });
 

@@ -5,7 +5,9 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 use app\components\VideoJsWidget;
 use yii\bootstrap\Modal;
+use yii\widgets\ListView;
 use yii\widgets\Pjax;
+use yii\data\ArrayDataProvider;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Ticket */
@@ -29,9 +31,6 @@ $(".js-playlist__item-button").on('click', function () {
 });
 
 SCRIPT;
-
-    // Initialze the videojs player
-    $this->registerJs($js, \yii\web\View::POS_READY);
 
 }
 
@@ -72,15 +71,24 @@ SCRIPT;
         </div>
         <div class="row">
 
-            <?php if ($model->screencapture !== null) { ?>
+            <?php if ($model->screencapture !== null) {
+
+                $ScreenCapturesDataProvider = new ArrayDataProvider([
+                    'allModels' => $model->screencapture->screencaptures,
+                ]);
+                $ScreenCapturesDataProvider->pagination->pageSize = 5;
+
+                ?>
 
                 <div class="col-md-9">
+
                 <?= VideoJsWidget::widget([
                     'options' => [
+                        //'tag' => 'span',
                         'id' => 'video-container',
                         'class' => 'video-js vjs-default-skin vjs-big-play-centered vjs-fluid',
                         'controls' => true,
-                        'preload' => 'auto',
+                        //'preload' => 'auto',
                         //'fluid' => true,
                         //'responsive' => true,
                         
@@ -99,8 +107,12 @@ SCRIPT;
                     'tags' => [
                         'source' => [
                             [
-                                'src' => Url::to(['screencapture/view', 'id' => $model->id, 'file' => $model->screencapture->masters[0]]),
                                 'type' => 'application/x-mpegURL',
+                                'src' => Url::to([
+                                    'screencapture/view',
+                                    'id' => $model->id,
+                                    'file' => $model->screencapture->masters[0]
+                                ]),
                             ],
                         ],
                     ],
@@ -108,11 +120,57 @@ SCRIPT;
                 </div>
                 <div class="col-md-3">
                     <h4><?= Yii::t('ticket', 'Available screen captures:') ?></h4>
-                    <ul>
-                        <?php foreach ($model->screencapture->masters as $key => $master) { ?>
-                            <li><a class='js-playlist__item-button' data-src='<?= Url::to(['screencapture/view', 'id' => $model->id, 'file' => $master]) ?>'><?= $master ?></a></li>
-                        <?php } ?>
-                    </ul>
+
+                    <?php Pjax::begin([
+                        'id' => 'w102',
+                        'options' => [
+                            'tag' => 'ul',
+                            'class' => 'list-unstyled timeline widget',
+                        ],
+                    ]); ?>
+
+                    <?= ListView::widget([
+                        'dataProvider' => $ScreenCapturesDataProvider,
+                        'options' => [
+                            'tag' => false,
+                        ],
+                        'itemOptions' => [
+                            'tag' => 'li',
+                        ],
+                        'viewParams' => ['ticket' => $model],
+                        'itemView' => function ($sc, $key, $index, $widget) use ($model) {
+                            return '<div class="block"><div class="block-content"><h2 class="title">' . Html::a(
+                                \Yii::t('ticket', 'Capture #{key}', [
+                                    'key' => $widget->dataProvider->totalCount - $key,
+                                ]),
+                                null,
+                                [
+                                    'class' => 'js-playlist__item-button',
+                                    'data-src' => Url::to([
+                                        'screencapture/view',
+                                        'id' => $model->id,
+                                        'file' => $sc['master']])
+                                ]
+                            ) . '</h2><div class="byline">' . \Yii::t('ticket', 'Length: {length}', [
+                                'length' => yii::$app->formatter->format($sc['length'], 'duration')
+                            ]) . '</div></div></div>';
+                        },
+                        'emptyText' => \Yii::t('ticket', 'No video file(s) found.'),
+                        'emptyTextOptions' => [
+                            'tag' => 'li',
+                        ],
+                        'layout' => '{items} {summary} {pager}',
+                        'pager' => [
+                            'maxButtonCount' => 3,
+                            'options' => [
+                                'class' => 'pagination pagination-sm',
+                                'style' => 'padding: 3px 20px;'
+                            ]
+                        ],
+                    ]); ?>
+                    <?php $this->registerJs($js, \yii\web\View::POS_READY); ?>
+                    <?php Pjax::end() ?>
+
                 </div>
                 <div class="col-md-3 js-keylogger__log">
                 </div>

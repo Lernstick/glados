@@ -58,7 +58,7 @@ class VideoJsWidget extends Widget
         $view = $this->getView();
         $obj = VideoJsAsset::register($view);
 
-        echo "\n" . Html::beginTag('video', $this->options);
+        echo "\n" . Html::beginTag('video-js', $this->options);
         if (!empty($this->tags) && is_array($this->tags)) {
             foreach ($this->tags as $tagName => $tags) {
                 if (is_array($this->tags[$tagName])) {
@@ -75,7 +75,7 @@ class VideoJsWidget extends Widget
                 }
             }
         }
-        echo "\n" . Html::endTag('video');
+        echo "\n" . Html::endTag('video-js');
 
         if (!empty($this->jsOptions)) {
             $js = 'videojs("#' . $this->options['id'] . '").ready(' . Json::encode($this->jsOptions). ');';
