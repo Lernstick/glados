@@ -22,21 +22,21 @@ path="${path}"
 keymap="${keymap}"
 chunk="10" # in seconds
 
-# find the keymap file from the locale
+# find the keymap file from the currently running Xorg process
 if [ "\${keymap}" = "auto" ]; then
-    set -o allexport
-    . <(locale) 
-    set +o allexport
+    export $(strings /proc/$(pgrep Xorg)/environ | grep -P "^LANG=" | head -1)
     keymap="\${LANG%%.*}"
 fi
 
 # fall back if keymap does not exist
 if [ ! -r "/usr/share/logkeys/keymaps/\${keymap}.map" ]; then
-    keymap="en_US"
+    keymap="--us-keymap" # default keymap
+else
+    keymap="--keymap /usr/share/logkeys/keymaps/\${keymap}.map"
 fi
 mkdir -p "${path}"
 
-logkeys --start --no-daemon --no-timestamps --keymap "/usr/share/logkeys/keymaps/\${keymap}.map" -o - | while read -n1 char; do
+logkeys --start --no-daemon --no-timestamps \$keymap -o - | while read -n1 char; do
     # outputs enclosed in square brackets like <enter> should be on one line
     if [ "\$char" = "<" ]; then
         concat="yes"
