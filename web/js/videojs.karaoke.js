@@ -102,36 +102,10 @@ var KaraokeSubtitles = videojs.extend(Plugin, {
         }
     });
 
-    /*player.on('loadeddata', function() {
-        textTracks = player.textTracks();
-        if (1 in textTracks) {
-            var track = textTracks[1];
-            track.on('cuechange', function (e) {
-                var ac = track.activeCues;
-                if (0 in ac) {
-                    var cue = ac[0];
-                    if (typeof cue !== 'undefined') {
-                        var time = cue.text.match(/\<[0-9]+\:[0-9]+\:[0-9]+\.[0-9]+\>/);
-                        var texts = cue.text.split(time);
-                        //console.log(time, texts)
-                        if (time !== null) {
-                            [tot, h, m, s, ms] = time[0].match(/\<([0-9]+)\:([0-9]+)\:([0-9]+)\.([0-9]+)\>/);
-                            int = parseInt(ms)/1000 + parseInt(s) + parseInt(m)*60 + parseInt(h)*60*60;
-                            var start = cue.startTime;
-                            var end = cue.endTime;
-                            track.removeCue(cue);
-                            track.addCue(new window.VTTCue(start, int, texts[0]));
-                            track.addCue(new window.VTTCue(int, end, texts[0] + texts[1]));
-                        } else {
-                            console.log(texts[0])
-                            //$(".js-keylogger__log").append(texts[0] + "<br>");
-                        }
-                    }
-                }
-            });
-            track.mode = 'hidden';
-        }
-    });*/
+    player.on('seeking', function() {
+        // empty the processed cues after seeking, else subtitles are incorrect
+        processedCues = [];
+    });
 
   }
 });

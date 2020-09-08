@@ -14,22 +14,35 @@ use yii\data\ArrayDataProvider;
 
 if ($model->screencapture !== null) {
     $js = <<< SCRIPT
-/*var player = videojs('video-container', {
-    liveui: true,
-    html5: {
-        nativeTextTracks: false
-    },
-    plugins: {
-        karaokeSubtitles: {},
-        videoOverlay: {}
-    }
-});*/
-
 var player = videojs('video-container');
 $(".js-playlist__item-button").on('click', function () {
-    player.src({type: 'application/x-mpegURL', src: $(this).data("src") });
+    player.src({type: 'application/x-mpegURL', src: $(this).data("src")});
 });
 
+player.on('loadstart', function() {
+    $("a.js-playlist__item-button span").addClass('hidden');
+});
+
+player.on('loadeddata', function() {
+    $("a.js-playlist__item-button[data-src='"+player.currentSrc()+"'] span").removeClass('hidden');
+});
+
+// TODO: put in a plugin
+document.addEventListener('keydown', function(event) {
+    if(event.keyCode == 37) {
+        if (event.ctrlKey) {
+            player.currentTime(player.currentTime() - 60);
+        } else {
+            player.currentTime(player.currentTime() - 10);
+        }
+    } else if(event.keyCode == 39) {
+        if (event.ctrlKey) {
+            player.currentTime(player.currentTime() + 60);
+        } else {
+            player.currentTime(player.currentTime() + 10);
+        }
+    }
+});
 SCRIPT;
 
 }
@@ -101,6 +114,9 @@ SCRIPT;
                             ],
                             'plugins' => [
                                 'karaokeSubtitles' => [],
+                                'playlist' => [
+                                    'playlist' => $model->screencapture->screencaptures,
+                                ],
                             ],
                         ]),
                     ],
@@ -113,6 +129,7 @@ SCRIPT;
                                     'id' => $model->id,
                                     'file' => $model->screencapture->masters[0]
                                 ]),
+                                'data-id' => '0',
                             ],
                         ],
                     ],
@@ -140,16 +157,19 @@ SCRIPT;
                         'viewParams' => ['ticket' => $model],
                         'itemView' => function ($sc, $key, $index, $widget) use ($model) {
                             return '<div class="block"><div class="block-content"><h2 class="title">' . Html::a(
+                                '<span class="glyphicon glyphicon-play hidden" aria-hidden="true"></span>&nbsp;' . 
                                 \Yii::t('ticket', 'Capture #{key}', [
                                     'key' => $widget->dataProvider->totalCount - $key,
                                 ]),
                                 null,
                                 [
                                     'class' => 'js-playlist__item-button',
+                                    'data-id' => $widget->dataProvider->totalCount - $key,
                                     'data-src' => Url::to([
                                         'screencapture/view',
                                         'id' => $model->id,
-                                        'file' => $sc['master']])
+                                        'file' => $sc['master']
+                                    ])
                                 ]
                             ) . '</h2><div class="byline">' . \Yii::t('ticket', 'Length: {length}', [
                                 'length' => yii::$app->formatter->format($sc['length'], 'duration')
