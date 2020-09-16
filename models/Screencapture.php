@@ -420,22 +420,24 @@ class Screencapture extends Model
      * Example: <ctrl> will be formatted into "&lt;ctrl&gt;".
      *
      * @param string $subtitle string to format
+     * @param bool $format whether to format/encode the output or not
      * @return string
      */
-    public function format_subtitle($subtitle)
+    public function format_subtitle($subtitle, $format = true)
     {
         $chars = [
             '&' => '&amp;',
             '<' => '&lt;',
             '>' => '&gt;',
-            '␣' => '&nbsp;',
-            PHP_EOL => '&nbsp;',
+            ' ' => '&nbsp;',
         ];
 
         if ($subtitle == '') {
-            $subtitle = PHP_EOL;
+            $subtitle = ' ';
         }
-        return str_replace(array_keys($chars), array_values($chars), $subtitle);
+        return $format
+            ? str_replace(array_keys($chars), array_values($chars), $subtitle)
+            : $subtitle;
     }
 
     /**
@@ -480,9 +482,10 @@ class Screencapture extends Model
     /**
      * Getter for the keylogger log
      *
+     * @param bool $format whether to format/encode the output or not
      * @return array
      */
-    public function getKeyloggerLog()
+    public function getKeyloggerLog($format = false)
     {
         $keyloggerFiles = glob($this->screencaptureDir . '/' . self::GLOB_KEYLOGGER);
         $i=1;
@@ -491,7 +494,7 @@ class Screencapture extends Model
             $lines = file($file, FILE_IGNORE_NEW_LINES);
             foreach ($lines as $nl => $line) {
                 list($time, $msg) = explode(' ', $line, 2);
-                $log .= $msg;
+                $log .= $this->format_subtitle($msg, $format);
             }
         }
         return $log;

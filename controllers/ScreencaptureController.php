@@ -98,7 +98,7 @@ class ScreencaptureController extends Controller
     {
         if (($screencapture = Screencapture::findOne($ticket_id)) !== null) {
             return $this->renderAjax('/screen_capture/keylogger', [
-                'log' => $screencapture->format_subtitle($screencapture->keyloggerLog),
+                'log' => $screencapture->getKeyloggerLog(true),
             ]);
         } else {
             throw new NotFoundHttpException(\Yii::t('ticket', 'The keylogger log file does not exist.'));
@@ -113,7 +113,7 @@ class ScreencaptureController extends Controller
     public function actionDownload($ticket_id)
     {
         if (($screencapture = Screencapture::findOne($ticket_id)) !== null) {
-            return \Yii::$app->response->sendContentAsFile($screencapture->keyloggerLog, 'keylogger.txt', [
+            return \Yii::$app->response->sendContentAsFile($screencapture->getKeyloggerLog(false), 'keylogger.txt', [
                 'mimeType' => 'application/octet-stream',
                 'inline' => true
             ]);
