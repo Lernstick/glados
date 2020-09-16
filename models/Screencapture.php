@@ -69,7 +69,7 @@ class Screencapture extends Model
     {
         if ( ($ticket = Ticket::findOne($id)) !== null) {
             $masters = glob(\Yii::$app->params['scPath'] . '/' . $ticket->token . '/' . self::GLOB_MASTER);
-            rsort($masters);
+            //rsort($masters);
             array_walk($masters, function(&$item){
                 $item = basename($item);
             });
@@ -389,6 +389,10 @@ class Screencapture extends Model
             return [
                 'master' => $master,
                 'length' => $length,
+                'url' => Url::to(['screencapture/view', 
+                    'id' => $this->ticket->id,
+                    'file' => basename($master),
+                ]),
             ];
         }, $this->masters, $this->lengths);
     }

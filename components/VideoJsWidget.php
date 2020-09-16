@@ -16,12 +16,14 @@ use yii\base\InvalidConfigException;
 class VideoJsWidget extends Widget
 {
     /**
-     * @var array
+     * @var array options array for the <video-js> html tag
+     * @see https://www.yiiframework.com/doc/api/2.0/yii-helpers-basehtml#beginTag()-detail
      */
     public $options = [];
 
     /**
-     * @var array
+     * @var array videojs options array
+     * @see https://docs.videojs.com/tutorial-options.html
      */
     public $jsOptions = [];
 
@@ -29,6 +31,11 @@ class VideoJsWidget extends Widget
      * @var array
      */
     public $tags = [];
+
+    /**
+     * @var string the default class(es) of the video-js element
+     */
+    public $defaultClass = 'video-js vjs-default-skin vjs-big-play-centered';
 
     /**
      * @inheritdoc
@@ -47,6 +54,10 @@ class VideoJsWidget extends Widget
     {
         if (!isset($this->options['id'])) {
             $this->options['id'] = 'videojs-' . $this->getId();
+        }
+
+        if (!isset($this->options['class'])) {
+            $this->options['class'] = $this->defaultClass;
         }
     }
 
@@ -78,7 +89,7 @@ class VideoJsWidget extends Widget
         echo "\n" . Html::endTag('video-js');
 
         if (!empty($this->jsOptions)) {
-            $js = 'videojs("#' . $this->options['id'] . '").ready(' . Json::encode($this->jsOptions). ');';
+            $js = 'videojs("' . $this->options['id'] . '", ' . Json::encode($this->jsOptions). ');';
             $view->registerJs($js);
         }
     }

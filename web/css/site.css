@@ -600,3 +600,25 @@ span.view--state[data-state="1"]::after { content: attr(data-text-1); }
 span.view--state[data-state="2"]::after { content: attr(data-text-2); }
 span.view--state[data-state="3"]::after { content: attr(data-text-3); }
 span.view--state[data-state="4"]::after { content: attr(data-text-4); }
+
+/* the next button in videojs */
+.video-js .vjs-next-item-control .vjs-icon-placeholder:before {
+  content:"\f11f"
+}
+
+.video-js .vjs-next-item-control .vjs-icon-placeholder {
+  font-family: VideoJS;
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* the previous button in videojs */
+.video-js .vjs-previous-item-control .vjs-icon-placeholder:before {
+  content:"\f120"
+}
+
+.video-js .vjs-previous-item-control .vjs-icon-placeholder {
+  font-family: VideoJS;
+  font-weight: 400;
+  font-style: normal;
+}

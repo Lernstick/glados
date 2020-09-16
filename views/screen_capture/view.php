@@ -89,36 +89,29 @@ SCRIPT;
                 $ScreenCapturesDataProvider = new ArrayDataProvider([
                     'allModels' => $model->screencapture->screencaptures,
                 ]);
-                $ScreenCapturesDataProvider->pagination->pageSize = 5;
+                $ScreenCapturesDataProvider->pagination->pageSize = -1;
 
                 ?>
 
                 <div class="col-md-9">
 
                 <?= VideoJsWidget::widget([
-                    'options' => [
-                        //'tag' => 'span',
-                        'id' => 'video-container',
-                        'class' => 'video-js vjs-default-skin vjs-big-play-centered vjs-fluid',
+                    'jsOptions' => [
+                        'fluid' => true,
                         'controls' => true,
-                        //'preload' => 'auto',
-                        //'fluid' => true,
-                        //'responsive' => true,
-                        
-                        // By default, when your web page finishes loading, Video.js will scan for media elements that have
-                        // the data-setup attribute. The data-setup attribute is used to pass options to Video.js.
-                        'data-setup' => json_encode([
-                            'liveui' => true,
-                            'html5' => [
-                                'nativeTextTracks' => false,
+                        'liveui' => true,
+                        'html5' => [
+                            'nativeTextTracks' => false,
+                        ],
+                        'plugins' => [
+                            'karaokeSubtitles' => [],
+                            'playlist' => [
+                                'playlist' => $model->screencapture->screencaptures,
                             ],
-                            'plugins' => [
-                                'karaokeSubtitles' => [],
-                                'playlist' => [
-                                    'playlist' => $model->screencapture->screencaptures,
-                                ],
-                            ],
-                        ]),
+                        ],
+                    ],
+                    'options' => [
+                        'id' => 'video-container',
                     ],
                     'tags' => [
                         'source' => [
@@ -127,7 +120,9 @@ SCRIPT;
                                 'src' => Url::to([
                                     'screencapture/view',
                                     'id' => $model->id,
-                                    'file' => $model->screencapture->masters[0]
+                                    'file' => $model->state == app\models\Ticket::STATE_RUNNING
+                                        ? end($model->screencapture->masters)
+                                        : $model->screencapture->masters[0]
                                 ]),
                                 'data-id' => '0',
                             ],
@@ -142,7 +137,7 @@ SCRIPT;
                         'id' => 'w102',
                         'options' => [
                             'tag' => 'ul',
-                            'class' => 'list-unstyled timeline widget',
+                            'class' => 'list-unstyled timeline widget video-playlist',
                         ],
                     ]); ?>
 
@@ -159,12 +154,12 @@ SCRIPT;
                             return '<div class="block"><div class="block-content"><h2 class="title">' . Html::a(
                                 '<span class="glyphicon glyphicon-play hidden" aria-hidden="true"></span>&nbsp;' . 
                                 \Yii::t('ticket', 'Capture #{key}', [
-                                    'key' => $widget->dataProvider->totalCount - $key,
+                                    'key' => $key+1,
                                 ]),
                                 null,
                                 [
                                     'class' => 'js-playlist__item-button',
-                                    'data-id' => $widget->dataProvider->totalCount - $key,
+                                    'data-id' => $key+1,
                                     'data-src' => Url::to([
                                         'screencapture/view',
                                         'id' => $model->id,
