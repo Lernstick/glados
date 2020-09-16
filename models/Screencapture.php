@@ -429,9 +429,11 @@ class Screencapture extends Model
             '<' => '&lt;',
             '>' => '&gt;',
             '␣' => '&nbsp;',
+            PHP_EOL => '&nbsp;',
         ];
+
         if ($subtitle == '') {
-            $subtitle = '␣';
+            $subtitle = PHP_EOL;
         }
         return str_replace(array_keys($chars), array_values($chars), $subtitle);
     }
@@ -475,4 +477,23 @@ class Screencapture extends Model
         return $log;
     }
 
+    /**
+     * Getter for the keylogger log
+     *
+     * @return array
+     */
+    public function getKeyloggerLog()
+    {
+        $keyloggerFiles = glob($this->screencaptureDir . '/' . self::GLOB_KEYLOGGER);
+        $i=1;
+        $log = '';
+        foreach($keyloggerFiles as $file) {
+            $lines = file($file, FILE_IGNORE_NEW_LINES);
+            foreach ($lines as $nl => $line) {
+                list($time, $msg) = explode(' ', $line, 2);
+                $log .= $msg;
+            }
+        }
+        return $log;
+    }
 }

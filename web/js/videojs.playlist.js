@@ -36,8 +36,8 @@ class previousItemButton extends VjsButton {
   }
 }
 
-nextItemButton.prototype.controlText_ = 'Next item in playlist';
-previousItemButton.prototype.controlText_ = 'Previous item in playlist';
+nextItemButton.prototype.controlText_ = 'Next';
+previousItemButton.prototype.controlText_ = 'Previous';
 videojs.registerComponent('nextItemButton', nextItemButton);
 videojs.registerComponent('previousItemButton', previousItemButton);
 

@@ -67,6 +67,26 @@ SCRIPT;
                     <ul class="dropdown-menu dropdown-menu-right">
                         <li>
                             <?= Html::a(
+                                '<span class="glyphicon glyphicon-search"></span> '. \Yii::t('ticket', 'Show keylogger output'),
+                                Url::to([
+                                    'screencapture/keylogger',
+                                    'ticket_id' => $model->id,
+                                ]),
+                                [
+                                    'id' => 'keylogger-log-show',
+                                    'title' => \Yii::t('ticket', 'Show keylogger output')
+                                ]
+                            ); ?>
+                        </li>
+                        <li>
+                            <?= Html::a(
+                                '<span class="glyphicon glyphicon-save-file"></span> ' . \Yii::t('ticket', 'Download keylogger output as text file'),
+                                ['screencapture/download', 'ticket_id' => $model->id],
+                                ['data-pjax' => 0]
+                            ) ?>
+                        </li>
+                        <li>
+                            <?= Html::a(
                                 '<span class="glyphicon glyphicon-paperclip"></span> '. \Yii::t('ticket', 'Show Log File'),
                                 Url::to([
                                     'screencapture/log',
@@ -137,7 +157,7 @@ SCRIPT;
                         'id' => 'w102',
                         'options' => [
                             'tag' => 'ul',
-                            'class' => 'list-unstyled timeline widget video-playlist',
+                            'class' => 'list-unstyled timeline widget',
                         ],
                     ]); ?>
 
@@ -213,6 +233,13 @@ $screencaptureLogButton = "
         $('#screencaptureLogModal').modal('show');
         $.pjax({url: this.href, container: '#screencaptureLogModalContent', push: false, async:false})
     });
+
+    $('#keylogger-log-show').click(function(event) {
+        event.preventDefault();
+        $('#keyloggerLogModal').modal('show');
+        $.pjax({url: this.href, container: '#keyloggerLogModalContent', push: false, async:false})
+    });
+
 ";
 $this->registerJs($screencaptureLogButton);
 
@@ -225,6 +252,20 @@ Modal::begin([
 
     Pjax::begin([
         'id' => 'screencaptureLogModalContent',
+    ]);
+    Pjax::end();
+
+Modal::end();
+
+Modal::begin([
+    'id' => 'keyloggerLogModal',
+    'header' => '<h4>' . \Yii::t('ticket', 'Keylogger Log') . '</h4>',
+    'footer' => Html::Button(\Yii::t('ticket', 'Close'), ['data-dismiss' => 'modal', 'class' => 'btn btn-default']),
+    'size' => \yii\bootstrap\Modal::SIZE_LARGE
+]);
+
+    Pjax::begin([
+        'id' => 'keyloggerLogModalContent',
     ]);
     Pjax::end();
 

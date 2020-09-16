@@ -89,4 +89,37 @@ class ScreencaptureController extends Controller
         }
     }
 
+    /**
+     * Displays the keylogger log by Screencapture model.
+     * @param integer $ticket_id id of the Ticket model.
+     * @return The response object
+     */
+    public function actionKeylogger($ticket_id)
+    {
+        if (($screencapture = Screencapture::findOne($ticket_id)) !== null) {
+            return $this->renderAjax('/screen_capture/keylogger', [
+                'log' => $screencapture->format_subtitle($screencapture->keyloggerLog),
+            ]);
+        } else {
+            throw new NotFoundHttpException(\Yii::t('ticket', 'The keylogger log file does not exist.'));
+        }
+    }
+
+    /**
+     * Displays the keylogger log by Screencapture model.
+     * @param integer $ticket_id id of the Ticket model.
+     * @return The response object
+     */
+    public function actionDownload($ticket_id)
+    {
+        if (($screencapture = Screencapture::findOne($ticket_id)) !== null) {
+            return \Yii::$app->response->sendContentAsFile($screencapture->keyloggerLog, 'keylogger.txt', [
+                'mimeType' => 'application/octet-stream',
+                'inline' => true
+            ]);
+        } else {
+            throw new NotFoundHttpException(\Yii::t('ticket', 'The keylogger log file does not exist.'));
+        }
+    }
+
 }
