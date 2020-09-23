@@ -142,7 +142,9 @@ class Screencapture extends Model
         if (file_exists($path)) {
             $contents = file_get_contents($path);
 
-            if ( array_search("master" . $timestamp . ".m3u8", $this->masters) === 0) {
+            # if it's the last element in the array
+            $last_key = array_keys($this->masters)[count($this->masters)-1];
+            if ( array_search("master" . $timestamp . ".m3u8", $this->masters) === $last_key) {
                 if ($this->ticket->state == Ticket::STATE_RUNNING) {
                     // simulate a live stream
                     $contents = str_replace(self::HLS_TAG_VOD, self::HLS_TAG_LIVE, $contents);
@@ -496,6 +498,7 @@ class Screencapture extends Model
                 list($time, $msg) = explode(' ', $line, 2);
                 $log .= $this->format_subtitle($msg, $format);
             }
+            $log .= PHP_EOL;
         }
         return $log;
     }

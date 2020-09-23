@@ -219,7 +219,7 @@ class Ticket extends LiveActiveRecord
             [['time_limit'], 'integer', 'min' => 0, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['exam_id'], 'validateExam', 'skipOnEmpty' => false, 'skipOnError' => false, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['start', 'end', 'test_taker', 'ip', 'state', 'download_lock'], 'safe', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
-            [['start', 'end', 'test_taker', 'ip', 'state', 'download_lock', 'backup_lock', 'restore_lock', 'bootup_lock'], 'safe', 'on' => self::SCENARIO_DEV],
+            [['start', 'end', 'test_taker', 'ip', 'state', 'download_lock', 'backup_lock', 'restore_lock', 'bootup_lock', 'last_backup'], 'safe', 'on' => self::SCENARIO_DEV],
             [['token'], 'unique', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['token'], 'string', 'max' => 16, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['token'], 'checkIfClosed', 'on' => self::SCENARIO_SUBMIT],

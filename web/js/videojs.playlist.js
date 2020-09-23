@@ -10,10 +10,16 @@ class nextItemButton extends VjsButton {
     super(player, options);
   }
 
+  /**
+   * @inheritdoc
+   */
   buildCSSClass() {
     return 'vjs-next-item-control vjs-control vjs-button';
   }
 
+  /**
+   * @inheritdoc
+   */
   handleClick(event) {
     this.player().playlist().next();
   }
@@ -27,10 +33,16 @@ class previousItemButton extends VjsButton {
     super(player, options);
   }
 
+  /**
+   * @inheritdoc
+   */
   buildCSSClass() {
     return 'vjs-previous-item-control vjs-control vjs-button';
   }
 
+  /**
+   * @inheritdoc
+   */
   handleClick(event) {
     this.player().playlist().prev();
   }
@@ -43,6 +55,10 @@ videojs.registerComponent('previousItemButton', previousItemButton);
 
 /**
  * playlist for videojs
+ *
+ * @property active the active playlist item
+ * @property autoplay whether to automatically start playing when the source is changed
+ * @property options the options array
  */
 class playlist extends Plugin {
   constructor(player, options) {
@@ -75,6 +91,11 @@ class playlist extends Plugin {
     });
   }
 
+  /**
+   * Load the previous playlist item
+   *
+   * @return void
+   */
   prev() {
     if (typeof this.options.playlist[this.active - 1] !== 'undefined') {
         this.player.src({
@@ -84,6 +105,11 @@ class playlist extends Plugin {
     }
   }
 
+  /**
+   * Load the next playlist item
+   *
+   * @return void
+   */
   next() {
     if (typeof this.options.playlist[this.active + 1] !== 'undefined') {
         this.player.src({

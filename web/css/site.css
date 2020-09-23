@@ -589,6 +589,10 @@ span.past {
   cursor: pointer;
 }
 
+.js-playlist__item-active {
+  font-weight: bold;
+}
+
 span.view--state[data-state="0"] { background-color: #5cb85c; } /* label-success */
 span.view--state[data-state="1"] { background-color: #5bc0de; } /* label-info    */
 span.view--state[data-state="2"] { background-color: #d9534f; } /* label-danger  */

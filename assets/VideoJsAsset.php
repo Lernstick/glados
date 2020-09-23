@@ -13,5 +13,6 @@ class VideoJsAsset extends AssetBundle
         'app\assets\VideoJsCoreAsset',
         'app\assets\VideoJsKaraokeAsset',
         'app\assets\VideoJsPlaylistAsset',
+        'app\assets\VideoJsHotkeysAsset',
     ];
 }

@@ -19,30 +19,12 @@ $(".js-playlist__item-button").on('click', function () {
     player.src({type: 'application/x-mpegURL', src: $(this).data("src")});
 });
 
+// mark the relevant link in the playlist as active
 player.on('loadstart', function() {
-    $("a.js-playlist__item-button span").addClass('hidden');
+    $("a.js-playlist__item-button").removeClass('js-playlist__item-active');
+    $("a.js-playlist__item-button[data-src='"+player.currentSrc()+"']").addClass('js-playlist__item-active');
 });
 
-player.on('loadeddata', function() {
-    $("a.js-playlist__item-button[data-src='"+player.currentSrc()+"'] span").removeClass('hidden');
-});
-
-// TODO: put in a plugin
-document.addEventListener('keydown', function(event) {
-    if(event.keyCode == 37) {
-        if (event.ctrlKey) {
-            player.currentTime(player.currentTime() - 60);
-        } else {
-            player.currentTime(player.currentTime() - 10);
-        }
-    } else if(event.keyCode == 39) {
-        if (event.ctrlKey) {
-            player.currentTime(player.currentTime() + 60);
-        } else {
-            player.currentTime(player.currentTime() + 10);
-        }
-    }
-});
 SCRIPT;
 
 }
@@ -120,6 +102,7 @@ SCRIPT;
                         'fluid' => true,
                         'controls' => true,
                         'liveui' => true,
+                        'preload' => 'metadata',
                         'html5' => [
                             'nativeTextTracks' => false,
                         ],
@@ -127,6 +110,15 @@ SCRIPT;
                             'karaokeSubtitles' => [],
                             'playlist' => [
                                 'playlist' => $model->screencapture->screencaptures,
+                            ],
+                            'hotkeys' => [
+                                'fullscreenToggle' => 'f',
+                                'plusShort' => 'ArrowRight',
+                                'plusMedium' => 'Ctrl+ArrowRight',
+                                'plusLong' => 'Ctrl+Alt+ArrowRight',
+                                'minusShort' => 'ArrowLeft',
+                                'minusMedium' => 'Ctrl+ArrowLeft',
+                                'minusLong' => 'Ctrl+Alt+ArrowLeft',
                             ],
                         ],
                     ],
@@ -172,7 +164,6 @@ SCRIPT;
                         'viewParams' => ['ticket' => $model],
                         'itemView' => function ($sc, $key, $index, $widget) use ($model) {
                             return '<div class="block"><div class="block-content"><h2 class="title">' . Html::a(
-                                '<span class="glyphicon glyphicon-play hidden" aria-hidden="true"></span>&nbsp;' . 
                                 \Yii::t('ticket', 'Capture #{key}', [
                                     'key' => $key+1,
                                 ]),
