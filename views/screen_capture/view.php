@@ -84,7 +84,7 @@ SCRIPT;
                 </div>
             </div>
         </div>
-        <div class="row">
+        <div class="row video-container">
 
             <?php if ($model->screencapture !== null) {
 
@@ -95,7 +95,7 @@ SCRIPT;
 
                 ?>
 
-                <div class="col-md-9">
+                <div class="video-main-content col-md-9">
 
                 <?= VideoJsWidget::widget([
                     'jsOptions' => [
@@ -142,7 +142,7 @@ SCRIPT;
                     ],
                 ]); ?>
                 </div>
-                <div class="col-md-3">
+                <div class="video-playlist-content col-md-3">
                     <h4><?= Yii::t('ticket', 'Available screen captures:') ?></h4>
 
                     <?php Pjax::begin([
@@ -197,8 +197,6 @@ SCRIPT;
                     <?php $this->registerJs($js, \yii\web\View::POS_READY); ?>
                     <?php Pjax::end() ?>
 
-                </div>
-                <div class="col-md-3 js-keylogger__log">
                 </div>
 
             <?php } else { ?>

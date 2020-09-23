@@ -626,3 +626,18 @@ span.view--state[data-state="4"]::after { content: attr(data-text-4); }
   font-weight: 400;
   font-style: normal;
 }
+
+.video-container {
+  position: relative;
+}
+
+.video-main-content {
+}
+
+.video-playlist-content {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: scroll;
+}
