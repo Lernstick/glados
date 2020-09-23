@@ -865,22 +865,14 @@ class TicketController extends Controller
         if (!$model) {
             throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
         } else if ($request->isGet) {
-
-                /* @TODO put into if clause below */
-                $eventItem = new EventItem([
-                    'event' => 'agent/' . $model->token,
-                    'priority' => 0,
-                    'data' => 'startLive'
-                ]);
-                $eventItem->generate();
-
             if ($model->bootup_lock == 0 && $model->state == Ticket::STATE_RUNNING
                 && (file_exists($file) && time() - filemtime($file) > 10) || !file_exists($file)
             ){
                 $model->runCommandAsync('service live_overview start');
                 /*$eventItem = new EventItem([
-                    'event' => 'startLiveStream/' . $model->token,
+                    'event' => 'agent/' . $model->token,
                     'priority' => 0,
+                    'data' => 'startLive'
                 ]);
                 $eventItem->generate();*/
             }
