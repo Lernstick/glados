@@ -39,6 +39,7 @@ SCRIPT;
 $this->registerJs($js, \yii\web\View::POS_READY);
 
 ?>
+
 <div class="exam-view container">
 
     <h1><?= Html::encode($this->title) ?></h1>

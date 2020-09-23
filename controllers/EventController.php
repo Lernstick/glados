@@ -7,6 +7,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use app\models\EventItem;
 use app\models\EventStream;
+use app\models\Ticket;
 
 /**
  * EventController implements the stream actions for Event model.
@@ -15,25 +16,45 @@ class EventController extends Controller
 {
 
     /**
-     * Streams all Event models.
+     * Streams all Event models to the client browser.
      * @return mixed
      */
     public function actionStream($uuid)
     {
-    
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
         $stream = $this->findModel($uuid);
+        return $this->setupStream($stream);
+    }
 
+
+    /**
+     * Streams all Event models for the client agent.
+     * @return mixed
+     */
+    public function actionAgent($uuid, $token)
+    {
+        $ticket = $this->findTicket($token);
+        if (($stream = EventStream::findOne(['uuid' => $uuid])) === null) {
+            $stream = new EventStream(['uuid' => $uuid]);
+            $stream->listenEvents = implode(',', [
+                'agent/' . $token,
+            ]);
+            $stream->save();
+        }
+        return $this->setupStream($stream);
+    }
+
+
+    /**
+     * Sets up the stream with its start/stop and resume events with the listener
+     * for new live events
+     *
+     * @return mixed
+     */
+    public function setupStream($stream)
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
+        $uuid = $stream->uuid;
         $stream->timeLimit = YII_ENV_DEV ? 30 : 300;
-
-        //$user_id = \Yii::$app->user->id;
-        //$user_id = 1;
-        $pathPrefixes = array_merge(
-            []
-            //[ 'user/' . $user_id ],
-            //array_keys(\Yii::$app->authManager->getRolesByUser($user_id))
-        );
-        $stream->pathPrefixes = $pathPrefixes;
 
         $stream->on(EventStream::EVENT_STREAM_STARTED, function() use ($uuid) {
             $event = new EventItem(['event' => 'meta', 'data' => json_encode(['state' => 'event stream started'])]);
@@ -97,7 +118,6 @@ class EventController extends Controller
         exit(); # or return ob_get_clean();
     }
 
-
     public function sendMessage($message, $uuid)
     {
         echo $message;
@@ -120,7 +140,22 @@ class EventController extends Controller
         if (($model = EventStream::findOne(['uuid' => $uuid])) !== null) {
             return $model;
         }
-        throw new NotFoundHttpException('The requested page does not exist.');
+        throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
+    }
+
+    /**
+     * Finds the Ticket model based on token.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param string $token
+     * @return EventStream the loaded model
+     * @throws NotFoundHttpException if the model cannot be found.
+     */
+    protected function findTicket($token)
+    {
+        if (($model = Ticket::findOne(['token' => $token])) !== null) {
+            return $model;
+        }
+        throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
     }
 
 }

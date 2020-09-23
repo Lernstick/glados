@@ -46,6 +46,14 @@ class EventItem extends \yii\db\ActiveRecord
     /**
      * @inheritdoc
      */
+    public function init()
+    {
+        $this->on(self::EVENT_BEFORE_DELETE, [$this, 'deleteEvent']);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public static function tableName()
     {
         return 'event';
@@ -96,6 +104,7 @@ class EventItem extends \yii\db\ActiveRecord
          */
         foreach ($this->tableSchema->columns as $key => $column) {
             if($column->name == "data") {
+                //var_dump($this->event, strlen($this->data) > $column->size, strlen($this->data), $column->size);die();
                 if (strlen($this->data) > $column->size) {
                     if (is_writable(\Yii::$app->params['tmpPath'])) {
                         $filename = FileHelper::normalizePath(\Yii::$app->params['tmpPath'] . "/event-" . md5($this->data));
@@ -213,6 +222,23 @@ class EventItem extends \yii\db\ActiveRecord
             $roles = array_merge($roles, $r);
         }
         return array_unique($roles);
+    }
+
+    /**
+     * When the event item is deleted
+     * 
+     * @return bool success or failure
+     */
+    public function deleteEvent()
+    {
+        // the the data payload was a file
+        if (strpos($this->data, "file://") === 0) {
+            $file = substr($this->data, strlen("file://"));
+            if (is_readable($file)) {
+                return @unlink($file);
+            }
+        }
+        return true;
     }
 
 }

@@ -150,7 +150,7 @@ class EventStream extends EventItem
 
         if (isset($this->stopped_at)) {
             $this->stopListeningTime = $this->stopped_at;
-            $this->_resumeTime = microtime(true);
+            #$this->_resumeTime = microtime(true);
             $this->_lastEvent = new EventItem([
                 'generated_at' => $this->stopped_at,
                 'id' => 0,
@@ -320,18 +320,19 @@ class EventStream extends EventItem
      * This function waits on all streams for an event and generates one or multiple event items.
      * 
      * The first job of this function is to determine if there are events missing. This can happen when the 
-     * client browser restarted the event stream. This will take up to 5 seconds, depending on the connection
+     * client browser restarted the event stream. This can take up to ~5 seconds, depending on the connection
      * quality. In that time, events can occur. Also, if an event is generated at the exact time when an event 
      * is processed, another event can occur. All events are stored in the database, which is queried for 
-     * such lost events. So, if [[_resumeTime]] and [[_lastEvent]] are set, we have to query the db for lost 
-     * events. If not or the db returns no record, we continue (or start) listening on the streams.
+     * such events, called "lost events". So, if [[_resumeTime]] and [[_lastEvent]] are set, we have to query the
+     * db for lost events. If not or the db returns no record, we continue (or start) listening on the streams.
      * 
      * The function then blocks in the call of [[stream_select()]] until an event happend. If that's the case
      * the file now contains the event [[id]] of the db record. This is done by [[EventItem::generate()]]. The
      * db is queried and an [[EventItem]] is appended to the [[events]] array.
      * 
      * @return bool true means there was an event during a watch, false means the timeout was exceeded without
-     * an event. This is usually the end of the stream.
+     * an event. This is usually the end of this stream instance. If the browser resumes the stream, we regain
+     * the stream instance via the uuid from the database.
      */
     public function onEvent(){
         while ($this->calcTimeout() > 0) {
@@ -344,7 +345,7 @@ class EventStream extends EventItem
             if ($this->stopListeningTime != null) {
                 // search for lost events, that occured while sending other events or 
                 // while the event stream was reestablished.
-                $this->queryEvents(true);
+                $this->queryEvents($this->stopListeningTime, true);
                 if (!empty($this->events)) {
                     return true;
                 }
@@ -383,7 +384,7 @@ class EventStream extends EventItem
                         }
 
                         // bail out with return value true
-                        $this->queryEvents(false, $inotifyEvents[0]);
+                        $this->queryEvents($this->_resumeTime, false, $inotifyEvents[0]);
                         return true;
 
                         // TODO unused block ???
@@ -447,11 +448,13 @@ class EventStream extends EventItem
      * [[events]] array to the found events. If the array is not empty, after
      * invocation of this function, the logic should return true.
      * 
+     * @param float $resume timestamp in seconds with microseconds from which 
+     * events should be queried from the database
      * @return void
      */
-    public function queryEvents($lost = false, $inotifyEvent = null)
+    public function queryEvents($resume, $lost = false, $inotifyEvent = null)
     {
-        $time = $this->queryTime != null ? $this->queryTime : $this->_resumeTime;
+        $time = $this->queryTime != null ? $this->queryTime : $resume;
         $this->queryTime = microtime(true);
 
         // search for events
@@ -473,7 +476,7 @@ class EventStream extends EventItem
                     $file = substr($event->data, strlen("file://"));
                     if (is_readable($file)) {
                         $event->data = file_get_contents($file);
-                        @unlink($file);
+                        //@unlink($file); # do not delete the file here
                     }
                 }
                 $this->sentEvents++;
