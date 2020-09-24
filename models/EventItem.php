@@ -44,6 +44,12 @@ class EventItem extends \yii\db\ActiveRecord
     public $trigger_attributes = [];
 
     /**
+     * @const priority constants
+     */
+    const PRIORITY_GUARANTEE = 0;
+    const PRIORITY_LAZY = 1;
+
+    /**
      * @inheritdoc
      */
     public function init()

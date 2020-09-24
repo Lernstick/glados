@@ -871,7 +871,7 @@ class TicketController extends Controller
                 $model->runCommandAsync('service live_overview start');
                 /*$eventItem = new EventItem([
                     'event' => 'agent/' . $model->token,
-                    'priority' => 0,
+                    'priority' => EventItem::PRIORITY_GUARANTEE,
                     'data' => 'startLive'
                 ]);
                 $eventItem->generate();*/
