@@ -39,8 +39,10 @@ class hotkeys extends Plugin {
 
         // only trigger events when the player is in the visible part of the user
         if (playerObj.hotkeys().visible) {
-          if (playerObj.hotkeys().keypressed(event, options.fullscreenToggle)) {
-            playerObj.hotkeys().fullscreenToggle();
+          if (playerObj.hotkeys().keypressed(event, options.toggleFullscreen)) {
+            playerObj.hotkeys().toggleFullscreen();
+          } else if (playerObj.hotkeys().keypressed(event, options.togglePause)) {
+            playerObj.hotkeys().togglePause();
           } else if (playerObj.hotkeys().keypressed(event, options.plusShort)) {
             playerObj.hotkeys().deltaTime(+10);
           } else if (playerObj.hotkeys().keypressed(event, options.minusShort)) {
@@ -87,14 +89,12 @@ class hotkeys extends Plugin {
   /**
    * Toggle the fullscreen of the player
    *
-   * @return void
+   * @return mixed
+   * @see https://docs.videojs.com/docs/api/player.html#MethodsrequestFullscreen
+   * @see https://docs.videojs.com/docs/api/player.html#MethodsexitFullscreen
    */
-  fullscreenToggle() {
-    if (!this.player.isFullscreen()) {
-      this.player.requestFullscreen();
-    } else {
-      this.player.exitFullscreen();
-    }
+  toggleFullscreen() {
+    return this.player.isFullscreen() ? this.player.exitFullscreen() : this.player.requestFullscreen();
   }
 
   /**
@@ -102,9 +102,21 @@ class hotkeys extends Plugin {
    *
    * @param int delta the amount of seconds to shift (can be positive or negative)
    * @return void
+   * @see https://docs.videojs.com/docs/api/player.html#MethodscurrentTime
    */
   deltaTime($delta) {
     this.player.currentTime(this.player.currentTime() + $delta);
+  }
+
+  /**
+   * Toggle play/pause
+   *
+   * @return mixed
+   * @see https://docs.videojs.com/docs/api/player.html#Methodsplay
+   * @see https://docs.videojs.com/docs/api/player.html#Methodspause
+   */
+  togglePause() {
+    return this.player.paused() ? this.player.play() : this.player.pause();
   }
 
 }

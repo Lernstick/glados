@@ -112,7 +112,8 @@ SCRIPT;
                                 'playlist' => $model->screencapture->screencaptures,
                             ],
                             'hotkeys' => [
-                                'fullscreenToggle' => 'f',
+                                'toggleFullscreen' => 'f',
+                                'togglePause' => ' ',
                                 'plusShort' => 'ArrowRight',
                                 'plusMedium' => 'Ctrl+ArrowRight',
                                 'plusLong' => 'Ctrl+Alt+ArrowRight',
