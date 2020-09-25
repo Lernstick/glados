@@ -35,6 +35,11 @@ SCRIPT;
     'model' => $model,
     'attributes' => [
         'sc_size:shortSize',
+        [
+            'attribute' => 'sc_length',
+            'value' => $model->screencapture === null ? 0 : array_sum($model->screencapture->lengths),
+            'format' => 'duration',
+        ],
     ],
 ]) ?>
 

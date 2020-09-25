@@ -1,0 +1,19 @@
+{
+    "listen": [
+        {
+            "event": "agent/*",
+            "data": "startLive",
+            "command": "service live_overview start"
+        },
+        {
+            "event": "agent/*",
+            "data": "stopLive",
+            "command": "service live_overview stop"
+        },
+        {
+            "event": "meta",
+            "data": "*",
+            "command": "echo \"Meta event raised with data ${ENV_data}\""
+        }
+    ]
+}

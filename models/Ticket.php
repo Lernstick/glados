@@ -261,7 +261,8 @@ class Ticket extends LiveActiveRecord
             'backup_interval' => \Yii::t('ticket', 'Backup Interval'),
             'backup_size' => \Yii::t('ticket', 'Current Backup Size'),
             'running_daemon_id' => \Yii::t('ticket', 'ID of the running daemon'),
-            'sc_size' => \Yii::t('ticket', 'Current Screen Capture Size'),
+            'sc_size' => \Yii::t('ticket', 'Total Screen Capture Size'),
+            'sc_length' => \Yii::t('ticket', 'Total Screen Capture Length'),
         ];
     }
 
