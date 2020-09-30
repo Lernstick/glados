@@ -77,18 +77,18 @@ class ActiveEventField extends Pjax
                 var listener = function(e) {
                     var jsonSelector = JSON.parse('" . json_encode($this->jsonSelector) . "');
                     data = JSON.parse(e.data);
-                    if(jsonSelector in data.data){
+                    if (typeof data.data != 'string' && jsonSelector in data.data) {
                         var value = data.data[jsonSelector];
-                    }else{
+                    } else {
                         var value = data.data;
                     }
-                    if(value.status == 'stopped'){
+                    if (value.status == 'stopped') {
                         debugHandler(e, listener);
                         " . ( empty($this->onStop) ? null : "(" . $this->onStop . ")(value, $('#" . $this->id . "')[0]);" ) . "
-                    }else if(value.status == 'started'){
+                    } else if(value.status == 'started') {
                         debugHandler(e, listener);
                         " . ( empty($this->onStart) ? null : "(" . $this->onStart . ")(value, $('#" . $this->id . "')[0]);" ) . "
-                    }else if(jsonSelector == '' || jsonSelector in data.data){
+                    } else if(jsonSelector == '' || jsonSelector == '*' || jsonSelector in data.data) {
                         debugHandler(e, listener);
                         " . ( empty($this->jsHandler) ? null : "(" . $this->jsHandler . ")(value, $('#" . $this->id . "')[0]);" ) . "
                     }

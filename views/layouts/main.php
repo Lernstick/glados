@@ -201,6 +201,26 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
             ],
 
             [
+                'label' => 'DEV',
+                'visible' => YII_ENV_DEV,
+                'options' => ['class' => 'dev_item'],
+                'items' => [
+                    [
+                        'label' => 'Send Events',
+                        'url' => ['/test/send'],
+                        'options' => ['class' => 'dev_item'],
+                        'visible' => YII_ENV_DEV,
+                    ],
+                    [
+                        'label' => 'Listen to Events',
+                        'url' => ['/test/listen'],
+                        'options' => ['class' => 'dev_item'],
+                        'visible' => YII_ENV_DEV,
+                    ],
+                ]
+            ],
+
+            [
                 'label' => \Yii::t('main', 'Help'),
                 'url' => ['/howto/index.md'],
                 'visible' => !Yii::$app->user->isGuest,

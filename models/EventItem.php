@@ -97,8 +97,10 @@ class EventItem extends \yii\db\ActiveRecord
      */
     public function generate()
     {
-        $oldData = $this->data;
-        $this->data = json_encode($oldData);
+        $this->validate();
+
+        $origData = $this->data;
+        $this->data = json_encode($origData);
         $translate_data = $this->translate_data;
         $this->translate_data = json_encode($translate_data);
         $this->generated_at = microtime(true);
@@ -106,7 +108,7 @@ class EventItem extends \yii\db\ActiveRecord
             ? 1 : 0;
 
         /* Store the data in a file if the data payload too large for the database.
-         * Can happen sometimes in case of images.
+         * Can happen sometimes in the case of images. 
          */
         foreach ($this->tableSchema->columns as $key => $column) {
             if($column->name == "data") {
@@ -121,7 +123,13 @@ class EventItem extends \yii\db\ActiveRecord
             }
         }
 
-        $this->save();
+        $this->save(false);
+
+        /* This is for the form EventItemSend only.
+         * Set the data value back to its original value such that
+         * [[data]] still is a string.
+         */
+        $this->data = is_array($origData) ? $this->data : $origData;
 
         //this part can be removed later
         if (basename($this->event) == '*') {

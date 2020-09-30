@@ -56,22 +56,40 @@ class EventController extends Controller
         $uuid = $stream->uuid;
         $stream->timeLimit = YII_ENV_DEV ? 30 : 300;
 
-        $stream->on(EventStream::EVENT_STREAM_STARTED, function() use ($uuid) {
-            $event = new EventItem(['event' => 'meta', 'data' => json_encode(['state' => 'event stream started'])]);
+        $stream->on(EventStream::EVENT_STREAM_STARTED, function() use ($uuid, $stream) {
+            $event = new EventItem([
+                'event' => 'meta',
+                'data' => json_encode([
+                    'state' => 'event stream started',
+                    'timeLimit' => $stream->timeLimit,
+                ])
+            ]);
             $this->sendMessage($this->renderPartial('/event/message', [
                 'model' => $event,
             ]), $uuid);
         });
 
         $stream->on(EventStream::EVENT_STREAM_STOPPED, function() use ($uuid) {
-            $event = new EventItem(['event' => 'meta', 'data' => json_encode(['state' => 'event stream finished']), 'retry' => 1000]);
+            $event = new EventItem([
+                'event' => 'meta',
+                'data' => json_encode([
+                    'state' => 'event stream finished'
+                ]),
+                'retry' => 1000
+            ]);
             $this->sendMessage($this->renderPartial('/event/message', [
                 'model' => $event,
             ]), $uuid);
         });
 
-        $stream->on(EventStream::EVENT_STREAM_RESUMED, function() use ($uuid) {
-            $event = new EventItem(['event' => 'meta', 'data' => json_encode(['state' => 'event stream resumed'])]);
+        $stream->on(EventStream::EVENT_STREAM_RESUMED, function() use ($uuid, $stream) {
+            $event = new EventItem([
+                'event' => 'meta',
+                'data' => json_encode([
+                    'state' => 'event stream resumed',
+                    'timeLimit' => $stream->timeLimit,
+                ])
+            ]);
             $this->sendMessage($this->renderPartial('/event/message', [
                 'model' => $event,
             ]), $uuid);
