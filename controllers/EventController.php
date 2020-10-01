@@ -37,6 +37,7 @@ class EventController extends Controller
             $stream = new EventStream(['uuid' => $uuid]);
             $stream->listenEvents = implode(',', [
                 'agent/' . $token,
+                'meta'
             ]);
             $stream->save();
         }

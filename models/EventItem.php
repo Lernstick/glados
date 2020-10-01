@@ -16,10 +16,7 @@ use yii\helpers\FileHelper;
  * @property string $data data payload
  * @property string $event
  * @property float $generated_at
- * @property integer $priority A value representing the importance of the event. A value of 0
- * is the highest priority, thus the event will be sent, no matter what happens. A value >0 
- * indicates that the event has lower priority, and therefore will only be sent if 
- * [EventStream::maxEventsPerSecond] is not exceeded.
+ * @property integer $priority A value representing the importance of the event. Has no meaning anymore
  *
  */
 class EventItem extends \yii\db\ActiveRecord
@@ -32,7 +29,7 @@ class EventItem extends \yii\db\ActiveRecord
      *      'users' => [12, 13, 14],
      *      'roles' => ['admin'],
      *  ]
-     * the 'user' array can also contain 'ALL' to address all users (multicast event), role is then ignored.
+     * the 'users' array can also contain 'ALL' to address all users (multicast event), 'roles' is then ignored.
      */
     public $concerns = [];
 
@@ -42,6 +39,11 @@ class EventItem extends \yii\db\ActiveRecord
     public $debug;
     public $path = '/tmp/events';
     public $trigger_attributes = [];
+
+    /**
+     * @var string path to the folder structure being monitored by inotify
+     */
+    public $inotifyDir;
 
     /**
      * @const priority constants
@@ -54,6 +56,7 @@ class EventItem extends \yii\db\ActiveRecord
      */
     public function init()
     {
+        $this->inotifyDir = \Yii::$app->params['tmpPath'] . '/inotify/';
         $this->on(self::EVENT_BEFORE_DELETE, [$this, 'deleteEvent']);
     }
 
@@ -133,9 +136,9 @@ class EventItem extends \yii\db\ActiveRecord
 
         //this part can be removed later
         if (basename($this->event) == '*') {
-            $file = '/tmp/user/' . dirname($this->event) . '/' . 'ALL';
-        }else{
-            $file = '/tmp/user/' . $this->event;
+            $file = $this->inotifyDir . '/' . dirname($this->event) . '/' . 'ALL';
+        } else {
+            $file = $this->inotifyDir . '/' . $this->event;
         }
         $this->touchFile($file, $this->id);
 

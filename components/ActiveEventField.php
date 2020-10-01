@@ -51,6 +51,10 @@ class ActiveEventField extends Pjax
     public $onStart;
     public $onStop;
 
+    /**
+     * @var string path to the folder structure being monitored by inotify
+     */
+    public $inotifyDir;
 
     /**
      * @inheritdoc
@@ -58,6 +62,7 @@ class ActiveEventField extends Pjax
     public function init()
     {
         parent::init();
+        $this->inotifyDir = \Yii::$app->params['tmpPath'] . '/inotify/';
 
         if(empty($this->jsHandler)){
             $this->jsHandler = 'function(d, s){
@@ -153,7 +158,7 @@ class ActiveEventField extends Pjax
             } else {
                 $stream = new EventStream(['uuid' => $uuid]);
                 $yiiEvent->data->view->registerJs("uuid = '" . $uuid . "';" . PHP_EOL .
-                    "event = new EventStream('" . 
+                    "var event = new EventStream('" . 
                     Url::to([
                         '/event/stream',
                         'uuid' => $uuid,
@@ -178,11 +183,12 @@ class ActiveEventField extends Pjax
             $stream->save();
             $yiiEvent->data->view->registerJs($script);
 
+            // trigger the bump event for any listening event stream
             $eventItem = new EventItem([
                 'event' => 'event/' . $uuid,
                 'data' => 'bump',
             ]);
-            $eventItem->touchFile('/tmp/user/event/' . $uuid, 'bump');
+            $eventItem->touchFile($this->inotifyDir . '/event/' . $uuid, 'bump');
 
 
         } else {
@@ -202,7 +208,7 @@ class ActiveEventField extends Pjax
                 $stream->save();
 
                 $yiiEvent->data->view->registerJs("uuid = '" . $uuid . "';" . PHP_EOL .
-                    "event = new EventStream('" . 
+                    "var event = new EventStream('" . 
                     Url::to([
                         '/event/stream',
                         'uuid' => $uuid,

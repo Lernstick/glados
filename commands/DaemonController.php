@@ -134,6 +134,11 @@ class DaemonController extends Controller
     public $errorLogFile;
 
     /**
+     * @var string path to the folder structure being monitored by inotify
+     */
+    public $inotifyDir;
+
+    /**
      * The initializing function.
      *
      * This init() function does the following tasks:
@@ -182,6 +187,7 @@ class DaemonController extends Controller
         # Determine daemon info, e.g: [daemon:1234].
         $tmp = explode('\\', str_replace('controller', '', strtolower(get_called_class())));
         $this->daemonInfo = end($tmp) . ':' . getmypid();
+        $this->inotifyDir = \Yii::$app->params['tmpPath'] . '/inotify/';
     }
 
     /**
@@ -240,7 +246,7 @@ class DaemonController extends Controller
 
         $this->cleanupVanished();
 
-        $this->_pidfile = fopen('/tmp/user/daemon/' . $this->daemon->pid, 'w');
+        $this->_pidfile = fopen($this->inotifyDir . '/daemon/' . $this->daemon->pid, 'w');
         $this->logInfo('Started with pid: ' . $this->daemon->pid);
     }
 
@@ -273,7 +279,7 @@ class DaemonController extends Controller
         $eventItem->generate();
 
         @fclose($this->_pidfile);
-        @unlink('/tmp/user/daemon/' . $this->daemon->pid);
+        @unlink($this->inotifyDir . '/daemon/' . $this->daemon->pid);
 
         $pid = $this->daemon->pid;
         $this->daemon->delete();

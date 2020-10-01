@@ -86,7 +86,10 @@ $this->registerJs($js, \yii\web\View::POS_READY);
                     var lines = parseInt(s.data("lines"));
                     var milli = now.getTime();
                     var delta = (milli - last)/1000;
-                    var txt = "#" + lines + "; " + delta + "; " + now.toLocaleString() + "." + now.getMilliseconds() + "; " + JSON.stringify(d) + "\n";
+                    var txt = "#" + lines + "; "
+                        + delta + "; "
+                        + now.toLocaleString() + "." + now.getMilliseconds() + "; "
+                        + JSON.stringify(d) + "\n";
                     s.val(s.val() + txt);
                     s.scrollTop(s[0].scrollHeight);
                     s.data("last", milli);
