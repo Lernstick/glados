@@ -64,7 +64,8 @@ echo $this->{$render}($view, [
 if ($view != $setting->key) {
     $i = 'a';
     foreach ($members as $setting) {
-        $idx = $id . $i;
+        $idx = strpos($id, 'new') === 0 ? $id . $i : $setting->id;
+
         echo $this->render('key_hidden', [
             'id' => $idx,
             'belongs_to' => $id,

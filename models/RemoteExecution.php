@@ -36,8 +36,9 @@ class RemoteExecution extends \yii\db\ActiveRecord
     }
 
     /**
-     * Insert the command into the database inside the queue and 
-     * or update the existing entry if it already exists.
+     * Insert the command into the database inside the queue or update the existing entry if it already exists.
+     *
+     * @return bool Whether the saving to the database succeeded (i.e. no validation errors occurred).
      */
     public function request()
     {

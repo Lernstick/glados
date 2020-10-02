@@ -372,7 +372,6 @@ class Ticket extends LiveActiveRecord
                 'ticket_id' => $this->id,
                 'description' => yiit('activity', 'Client state changed: {client_state}'),
                 'description_params' => [
-                    //'old' => Translation::findOne($this->presaveAttributes['client_state_id'])->en,
                     'client_state' => $this->client_state,
                 ],
                 'severity' => Activity::SEVERITY_INFORMATIONAL,
@@ -562,8 +561,8 @@ class Ticket extends LiveActiveRecord
     {
         return (
             (
-                $this->state == self::STATE_CLOSED ||
-                $this->state == self::STATE_SUBMITTED
+                $this->state == self::STATE_CLOSED
+                || $this->state == self::STATE_SUBMITTED
             ) &&
             $this->last_backup == 0 &&
             $this->abandoned
@@ -590,6 +589,11 @@ class Ticket extends LiveActiveRecord
         return Backup::findAll($this->token);
     }
 
+    /**
+     * TODO
+     *
+     * @return bool
+     */
     public function getLimit()
     {
         if($this->state == self::STATE_OPEN || $this->state == self::STATE_RUNNING){
@@ -711,7 +715,7 @@ class Ticket extends LiveActiveRecord
     }
 
     /**
-     * Runs a command in the shell of the system.
+     * Runs a command in the shell of the system (blocking).
      * 
      * @param string $cmd the command to run
      * @param string $lc_all the value of the `LC_ALL` environment variable
@@ -767,7 +771,7 @@ class Ticket extends LiveActiveRecord
      * @param array $params
      * @return void
      */
-    public function validateExam ($attribute, $params)
+    public function validateExam($attribute, $params)
     {
 
         $exam = Exam::findOne(['id' => $this->$attribute]);

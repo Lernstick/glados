@@ -214,7 +214,7 @@ class Exam extends Base
     }
 
     /**
-     * @return \yii\db\ActiveQuery[]
+     * @return \yii\db\ActiveQuery
      */
     public function getExam_setting()
     {

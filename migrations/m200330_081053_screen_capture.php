@@ -236,16 +236,6 @@ class m200330_081053_screen_capture extends Migration
         ]);
         $screen_capture_fps->save(false);
 
-        // create screen_capture_quality
-        $screen_capture_quality = new ExamSettingAvail([
-            'key' => 'screen_capture_quality',
-            'name' => yiit('exam_setting_avail', 'Quality'),
-            'type' => 'percent',
-            'default' => 0.7,
-            'belongs_to' => $screen_capture->id,
-        ]);
-        $screen_capture_quality->save(false);
-
         // create screen_capture_chunk
         $screen_capture_chunk = new ExamSettingAvail([
             'key' => 'screen_capture_chunk',

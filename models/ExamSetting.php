@@ -53,7 +53,6 @@ class ExamSetting extends Base
                     "screen_capture"            => "boolean",
                     "screen_capture_command"    => "ntext",
                     "screen_capture_fps"        => "integer",
-                    "screen_capture_quality"    => "percent",
                     "screen_capture_chunk"      => "integer",
                     "screen_capture_bitrate"    => "text",
                     "screen_capture_path"       => "text",
@@ -70,24 +69,49 @@ class ExamSetting extends Base
      */
     public function rules()
     {
-        return [
+        $rules = [
             [['value', 'key', 'belongs_to'], 'safe'],
             [['key'], 'required'],
+        ];
+        foreach ($this->settingRules() as $key => $rule) {
+            $field = $rule[0];
+            $validator = $rule[1];
+            unset($rule[0]);
+            unset($rule[1]);
+            $parameters = $rule;
+            $entry = [
+                'value',
+                $validator,
+                'when' => function($m) use ($field) { return $m->key == $field; }
+            ];
+            foreach ($parameters as $key => $value) {
+                $entry[$key] = $value;
+            }
+            $rules[] = $entry;
+        }
+        return $rules;
+    }
 
-            ['value', 'boolean', 'when' => function($m) { return $m->key == 'libre_autosave'; }],
-            ['value', 'required', 'when' => function($m) { return $m->key == 'libre_autosave_path'; }],
-            ['value', 'required', 'when' => function($m) { return $m->key == 'libre_autosave_interval'; }],
-            ['value', 'integer', 'min' => 1, 'when' => function($m) { return $m->key == 'libre_autosave_interval'; }],
-            ['value', 'boolean', 'when' => function($m) { return $m->key == 'libre_createbackup'; }],
-            ['value', 'required', 'when' => function($m) { return $m->key == 'libre_createbackup_path'; }],
-            ['value', 'boolean', 'when' => function($m) { return $m->key == 'screenshots'; }],
-            ['value', 'required', 'when' => function($m) { return $m->key == 'screenshots_interval'; }],
-            ['value', 'integer', 'min' => 1, 'max' => 100, 'when' => function($m) { return $m->key == 'screenshots_interval'; }],
-            ['value', 'required', 'when' => function($m) { return $m->key == 'max_brightness'; }],
-            ['value', 'integer', 'min' => 1, 'max' => 100, 'when' => function($m) { return $m->key == 'max_brightness'; }],
-            ['value', 'filter', 'filter' => function ($v) { return $v/100;}, 'when' => function($m) { return $m->key == 'max_brightness'; }],
-            ['value', 'required', 'when' => function($m) { return $m->key == 'url_whitelist'; }],
-            ['value', 'filter', 'filter' => function ($v) { return $v/100;}, 'when' => function($m) { return $m->key == 'screen_capture_quality'; }],
+    /**
+     * Rules for the settings.
+     */
+    public function settingRules()
+    {
+        return [
+            ['libre_autosave', 'boolean'],
+            ['libre_autosave_path', 'required'],
+            ['libre_autosave_interval', 'required'],
+            ['libre_autosave_interval', 'integer', 'min' => 1],
+            ['libre_createbackup', 'boolean'],
+            ['libre_createbackup_path', 'required'],
+            ['screenshots', 'boolean'],
+            ['screenshots_interval', 'required'],
+            ['screenshots_interval', 'integer','min' => 1, 'max' => 100],
+            ['max_brightness', 'required'],
+            ['max_brightness', 'integer', 'min' => 1, 'max' => 100],
+            ['max_brightness', 'filter', 'filter' => function ($v) { return $v/100;}],
+            ['url_whitelist', 'required'],
+            ['keylogger_keymap', 'required'],
         ];
     }
 
@@ -108,7 +132,6 @@ class ExamSetting extends Base
             'screen_capture_command' => function($v){return implode(PHP_EOL, preg_split("/\r\n|\n|\r/", $v, null, PREG_SPLIT_NO_EMPTY));},
             'screen_capture_chunk' => 'intval',
             'screen_capture_fps' => 'intval',
-            'screen_capture_quality' => function($v){return intval($v*100);},
             'keylogger' => 'boolval',
         ];
     }

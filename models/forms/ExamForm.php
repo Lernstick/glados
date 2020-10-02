@@ -11,9 +11,19 @@ use app\models\ExamSetting;
 class ExamForm extends Model
 {
 
+    /**
+     * @var Exam the exam model
+     */
     private $_exam;
-    private $_settings;
 
+    /**
+     * @var \yii\db\ActiveQuery|ExamSetting[] array of exam setting models
+     */
+    private $_settings = null;
+
+    /**
+     * @inheritdoc
+     */
     public function rules()
     {
         return [
@@ -22,6 +32,9 @@ class ExamForm extends Model
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
     public function afterValidate()
     {
         if (!Model::validateMultiple($this->getAllModels())) {
@@ -30,6 +43,28 @@ class ExamForm extends Model
         parent::afterValidate();
     }
 
+    /**
+     * @inheritdoc
+     *
+     * This fixes that when an exam is updated and all settings are removed, the post() data has
+     * no ExamSettings property, therefore examSettings is never set. Here we set it manually for
+     * this case, such that later in [[saveSettings()]] the absent settings can be removed.
+     */
+    public function setAttributes($values, $safeOnly = true)
+    {
+        if (array_key_exists("Exam", $values) && !array_key_exists("ExamSettings", $values) ) {
+            $this->examSettings = [];
+        }
+
+        return parent::setAttributes($values, $safeOnly);
+    }
+
+    /**
+     * This function will call save() on the Exam model and [[saveSettings()]] in a transaction.
+     *
+     * @return bool Whether the saving succeeded (i.e. no validation errors occurred).
+     * @throws yii\db\Exception if the transaction is not active
+     */
     public function save()
     {
         if (!$this->validate()) {
@@ -51,28 +86,41 @@ class ExamForm extends Model
         return true;
     }
 
+    /**
+     * Save all settings given by post()
+     *
+     * @return bool Whether the saving of all models succeeded
+     * @throws yii\base\InvalidCallException if the method is unable to link two models in link().
+     */
     public function saveSettings() 
     {
         $keep = [];
         foreach ($this->examSettings as $setting) {
             $setting->exam_id = $this->exam->id;
-            if (!$setting->save(false)) {
+            if ($setting->save(false) === false) {
                 return false;
             }
-            if ($setting->detail->belongs_to !== null && $setting->belongs_to !== null) {
+            $keep[] = $setting->id;
+        }
+        foreach ($this->examSettings as $setting) {
+            // create the relation in the database
+            if ($setting->belongs_to !== null) {
                 if (array_key_exists($setting->belongs_to, $this->examSettings)) {
                     $setting->link('belongsTo', $this->examSettings[$setting->belongs_to]);
                 }
             }
-            $keep[] = $setting->id;
         }
+
+        // remove the settings that where not in the post() data
         $query = ExamSetting::find()->andWhere(['exam_id' => $this->exam->id]);
-        if ($keep) {
+        if (!empty($keep)) {
             $query->andWhere(['not in', 'exam_setting.id', $keep]);
         }
         foreach ($query->all() as $setting) {
-            $setting->delete();
-        }        
+            if ($setting->delete() === false) {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -90,14 +138,12 @@ class ExamForm extends Model
         }
     }
 
-    public function getExamSettings()
-    {
-        if ($this->_settings === null) {
-            $this->_settings = $this->exam->isNewRecord ? [] : $this->exam->exam_setting;
-        }
-        return $this->_settings;
-    }
-
+    /**
+     * Gets a ExamSetting model from the database or creates a new one with default values
+     *
+     * @param string|integer $key the id of the ExamSetting model
+     * @return ExamSetting
+     */
     private function getExamSetting($key)
     {
         $setting = $key && strpos($key, 'new') === false ? ExamSetting::findOne($key) : false;
@@ -113,6 +159,26 @@ class ExamForm extends Model
         return ExamSetting::find()->where(['exam_id' => null])->all();
     }
 
+    /**
+     * Getter for [[examSettings]].
+     * Returns an array of ExamSetting models if they are already aggregated or an ActiveQuery
+     * instance. The array can also be empty.
+     *
+     * @return \yii\db\ActiveQuery|ExamSetting[]
+     */
+    public function getExamSettings()
+    {
+        if ($this->_settings === null) {
+            $this->_settings = $this->exam->isNewRecord ? [] : $this->exam->exam_setting;
+        }
+        return $this->_settings;
+    }
+
+    /**
+     * Setter for [[examSettings]].
+     * Sets the [[_settings]] to an array of app\models\ExamSetting models
+     * @return void
+     */
     public function setExamSettings($settings)
     {
         unset($settings['__id__']); // remove the hidden "new ExamSetting" row
@@ -121,7 +187,7 @@ class ExamForm extends Model
             if (is_array($setting)) {
                 $this->_settings[$key] = $this->getExamSetting($key);
                 $this->_settings[$key]->setAttributes($setting);
-            } elseif ($setting instanceof ExamSetting) {
+            } else if ($setting instanceof ExamSetting) {
                 $this->_settings[$setting->id] = $setting;
             }
         }
