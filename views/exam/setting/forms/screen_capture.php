@@ -194,7 +194,7 @@ $this->registerJs($js);
                 ])->textInput([
                     'id' => "ExamSettings_{$id3}_value",
                     'name' => "ExamSettings[$id3][value]",
-                    'type' => 'number',
+                    //'type' => 'number',
                     'readonly' => !$setting->value,
                 ])->label($screen_capture_fps->detail->name)->hint($screen_capture_fps->detail->description); ?>
             </div>
@@ -206,7 +206,7 @@ $this->registerJs($js);
                 ])->textInput([
                     'id' => "ExamSettings_{$id5}_value",
                     'name' => "ExamSettings[$id5][value]",
-                    'type' => 'number',
+                    //'type' => 'number',
                     'readonly' => !$setting->value,
                 ])->label($screen_capture_chunk->detail->name)->hint($screen_capture_chunk->detail->description); ?>
             </div>

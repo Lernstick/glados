@@ -19,7 +19,7 @@ class ExamForm extends Model
     /**
      * @var \yii\db\ActiveQuery|ExamSetting[] array of exam setting models
      */
-    private $_settings = null;
+    private $_settings;
 
     /**
      * @inheritdoc

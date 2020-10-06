@@ -9,6 +9,7 @@ use yii\base\ViewNotFoundException;
 /* @var $id integer */
 /* @var $form yii\widgets\ActiveForm */
 /* @var $setting app\models\ExamSetting */
+/* @var $model app\models\forms\ExamForm */
 
 // the hints should be reinitialized (ajax request)
 Yii::$app->request->isAjax ? $this->registerJs('initializeHints();') : null;
@@ -31,19 +32,29 @@ $type = $setting->detail === null ? 'default' : $setting->detail->type;
 $label = $setting->detail === null ? \Yii::t('exams', 'Value') : $setting->detail->name;
 $hint = $setting->detail === null ? null : $setting->detail->description;
 
-if (empty($setting->members) && $setting->detail !== null) {
-    $members = [];
-    foreach ($setting->detail->members as $detail) {
-        $members[$detail->key] = new app\models\ExamSetting([
-            'key' => $detail->key,
-        ]);
-        $members[$detail->key]->loadDefaultValue();
+// if there are no members set, retrieve the member default values from the database
+// and combine them as ['key' => ExamSetting]
+$members = array_filter($model->examSettings, function($el) use ($id) {
+    return $id == $el->belongs_to;
+});
+$keys = array_map(function($v){return $v->key;}, $members);
+$members = array_combine($keys, $members);
+
+if (empty($members)) {
+    if (empty($setting->members) && $setting->detail !== null) {
+        $members = [];
+        foreach ($setting->detail->members as $detail) {
+            $members[$detail->key] = new app\models\ExamSetting([
+                'key' => $detail->key,
+            ]);
+            $members[$detail->key]->loadDefaultValue();
+        }
+    } else {
+        $members = array_combine(
+            array_map(function($v){return $v->key;}, $setting->members),
+            array_map(function($v){return $v;}, $setting->members)
+        );
     }
-} else {
-    $members = array_combine(
-        array_map(function($v){return $v->key;}, $setting->members),
-        array_map(function($v){return $v;}, $setting->members)
-    );
 }
 
 if (is_file(Yii::getAlias('@app/views/exam/setting/forms/' . $setting->key) . '.php')) {
@@ -63,20 +74,21 @@ echo $this->{$render}($view, [
 
 if ($view != $setting->key) {
     $i = 'a';
-    foreach ($members as $setting) {
-        $idx = strpos($id, 'new') === 0 ? $id . $i : $setting->id;
+    foreach ($members as $subSetting) {
+        $idx = strpos($id, 'new') === 0 ? $id . $i : $subSetting->id;
 
         echo $this->render('key_hidden', [
             'id' => $idx,
             'belongs_to' => $id,
             'form' => $form,
-            'setting' => $setting,
+            'setting' => $subSetting,
         ]);
 
         echo $this->render('value', [
             'id' => $idx,
             'form' => $form,
-            'setting' => $setting,
+            'setting' => $subSetting,
+            'model' => $model,
         ]);
         $i++;
     }

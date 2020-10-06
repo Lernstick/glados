@@ -7,6 +7,7 @@ use yii\widgets\Pjax;
 /* @var $id integer */
 /* @var $form yii\widgets\ActiveForm */
 /* @var $setting app\models\ExamSetting */
+/* @var $model app\models\forms\ExamForm */
 
 ?>
 
@@ -30,6 +31,7 @@ use yii\widgets\Pjax;
                 'id' => $id,
                 'form' => $form,
                 'setting' => $setting,
+                'model' => $model,
             ]); ?>
 
         <?php Pjax::end(); ?>

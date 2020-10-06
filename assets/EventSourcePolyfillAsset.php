@@ -4,6 +4,9 @@ namespace app\assets;
 
 use yii\web\AssetBundle;
 
+/**
+ * This is a polyfill for internet explorer or native edge
+ */
 class EventSourcePolyfillAsset extends AssetBundle
 {
 

@@ -25,5 +25,8 @@ use kartik\switchinput\SwitchInput;
         'id' => "ExamSettings_{$id}_value",
         'name' => "ExamSettings[$id][value]",
         'label' => $label,
+        'labelOptions' => [
+            'class' => 'control-label',
+        ]
     ],
 ])->label(false)->hint($hint); ?>

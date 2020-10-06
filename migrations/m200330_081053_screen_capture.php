@@ -229,9 +229,9 @@ class m200330_081053_screen_capture extends Migration
         $screen_capture_fps = new ExamSettingAvail([
             'key' => 'screen_capture_fps',
             'name' => yiit('exam_setting_avail', 'FPS'),
-            'type' => 'integer',
+            'type' => 'decimal',
             'default' => 10,
-            'description' => yiit('exam_setting_avail', 'Frames per second. A positive number denoting the desired number framerate.'),
+            'description' => yiit('exam_setting_avail', 'Set frame rate (Hz value or fraction). A positive number denoting the desired framerate.'),
             'belongs_to' => $screen_capture->id,
         ]);
         $screen_capture_fps->save(false);
@@ -240,9 +240,9 @@ class m200330_081053_screen_capture extends Migration
         $screen_capture_chunk = new ExamSettingAvail([
             'key' => 'screen_capture_chunk',
             'name' => yiit('exam_setting_avail', 'Chunk length'),
-            'type' => 'integer',
+            'type' => 'decimal',
             'default' => 10,
-            'description' => yiit('exam_setting_avail', 'The length of one chunk in seconds.'),
+            'description' => yiit('exam_setting_avail', 'The length of one chunk in seconds (can be a fraction).'),
             'belongs_to' => $screen_capture->id,
         ]);
         $screen_capture_chunk->save(false);

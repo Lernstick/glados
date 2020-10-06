@@ -73,6 +73,7 @@ class ExamSetting extends Base
             [['value', 'key', 'belongs_to'], 'safe'],
             [['key'], 'required'],
         ];
+        // contruct the rules according to [[settingRules()]]
         foreach ($this->settingRules() as $key => $rule) {
             $field = $rule[0];
             $validator = $rule[1];
@@ -94,6 +95,7 @@ class ExamSetting extends Base
 
     /**
      * Rules for the settings.
+     * @return array rules as if the settings where active fields
      */
     public function settingRules()
     {
@@ -106,17 +108,35 @@ class ExamSetting extends Base
             ['libre_createbackup_path', 'required'],
             ['screenshots', 'boolean'],
             ['screenshots_interval', 'required'],
-            ['screenshots_interval', 'integer','min' => 1, 'max' => 100],
+            ['screenshots_interval', 'integer', 'min' => 1, 'max' => 100],
             ['max_brightness', 'required'],
             ['max_brightness', 'integer', 'min' => 1, 'max' => 100],
             ['max_brightness', 'filter', 'filter' => function ($v) { return $v/100;}],
             ['url_whitelist', 'required'],
+            ['keylogger', 'boolean'],
             ['keylogger_keymap', 'required'],
+            ['keylogger_keymap', 'string', 'length' => [1, 65535]],
+            ['keylogger_path', 'required'],
+            ['keylogger_path', 'string', 'length' => [1, 65535]],
+            ['screen_capture', 'boolean'],
+            ['screen_capture_fps', 'required'],
+            ['screen_capture_fps', 'double', 'min' => 0.1, 'max' => 50],
+            ['screen_capture_chunk', 'required'],
+            ['screen_capture_chunk', 'double', 'min' => 1, 'max' => 300],
+            ['screen_capture_bitrate', 'required'],
+            ['screen_capture_bitrate', 'match', 'pattern' => '/^[0-9]{1,4}[\k|\K|\m|\M]$/'],
+            ['screen_capture_overflow_threshold', 'required'],
+            ['screen_capture_overflow_threshold', 'match', 'pattern' => '/(^[0-9]{1,4}\m$)|(^[0-9]{1,2}\%$)/'],
+            ['screen_capture_command', 'required'],
+            ['screen_capture_command', 'string', 'length' => [1, 65535]],
+            ['screen_capture_path', 'required'],
+            ['screen_capture_path', 'string', 'length' => [1, 65535]],
         ];
     }
 
     /**
-     * @TODO
+     * The rules how to format the settings in the json configuration object
+     * @return array rules as if the settings
      */
     public function jsonRules()
     {
@@ -130,8 +150,8 @@ class ExamSetting extends Base
             'url_whitelist' => function($v){return implode(PHP_EOL, preg_split("/\r\n|\n|\r/", $v, null, PREG_SPLIT_NO_EMPTY));},
             'screen_capture' => 'boolval',
             'screen_capture_command' => function($v){return implode(PHP_EOL, preg_split("/\r\n|\n|\r/", $v, null, PREG_SPLIT_NO_EMPTY));},
-            'screen_capture_chunk' => 'intval',
-            'screen_capture_fps' => 'intval',
+            'screen_capture_chunk' => 'floatval',
+            'screen_capture_fps' => 'floatval',
             'keylogger' => 'boolval',
         ];
     }
@@ -144,6 +164,11 @@ class ExamSetting extends Base
         if (empty($this->_attributeLabels)) {
             $models = ExamSettingAvail::find()->all();
             $this->_attributeLabels = array_combine(array_column($models, 'key'), array_column($models, 'name'));
+        }
+
+        // set the current label
+        if ($this->key !== null && array_key_exists($this->key, $this->_attributeLabels)) {
+            $this->_attributeLabels['value'] = $this->_attributeLabels[$this->key];
         }
         return $this->_attributeLabels;
     }

@@ -379,6 +379,7 @@ $this->registerJs($js);
                                 'id' => $id,
                                 'form' => $form,
                                 'setting' => $_setting,
+                                'model' => $model,
                             ]);
                         }
                     }
