@@ -14,6 +14,7 @@ use yii\web\JsExpression;
 /* @var $model app\models\Exam */
 /* @var $historySearchModel app\models\HistorySearch */
 /* @var $historyDataProvider yii\data\ActiveDataProvider */
+/* @var $settingsDataProvider yii\data\ArrayDataProvider */
 
 $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => \Yii::t('exams', 'Exams'), 'url' => ['index']];

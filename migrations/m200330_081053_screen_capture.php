@@ -205,7 +205,7 @@ class m200330_081053_screen_capture extends Migration
             'name' => yiit('exam_setting_avail', 'Screen capturing'),
             'type' => 'boolean',
             'default' => true,
-            'description' => yiit('exam_setting_avail', 'TODO'),
+            'description' => yiit('exam_setting_avail', 'Activates screen capturing, <b>a digital recording of computer screen output</b>. The video output can be accessed in the overview of the corresponding ticket. This produces a lot of data and traffic and is usually activated in exams that need to be recourse-proof. It serves as well as a backstop for unsaved documents. Various adjustments can be configured. If keylogger is enabled as well, the keystrokes will be aggregated into subtitles of the video stream (see image).<br><img src="../../howto/img/screen_capture.gif">'),
         ]);
         $screen_capture->save(false);
         $screen_capture->refresh();
@@ -283,10 +283,10 @@ class m200330_081053_screen_capture extends Migration
         // create keylogger
         $keylogger = new ExamSettingAvail([
             'key' => 'keylogger',
-            'name' => yiit('exam_setting_avail', 'Activate keylogger'),
+            'name' => yiit('exam_setting_avail', 'Keylogger'),
             'type' => 'boolean',
             'default' => true,
-            'description' => yiit('exam_setting_avail', 'Activates a keylogger software (logkeys) that captures all input via the keyboard of the student and log them.'),
+            'description' => yiit('exam_setting_avail', 'Activates recording (logging) of the keys struck on the students keyboard. This is usually used to retrace the students steps and serves as an additional safety net when the student forgets to save his/her workings. If screen capturing is enabled as well, the keystrokes will be aggregated into subtitles of the video stream.'),
         ]);
         $keylogger->save(false);
         $keylogger->refresh();

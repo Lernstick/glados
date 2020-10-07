@@ -459,6 +459,10 @@ ul.nav-special > li.active > a > div {
     cursor: pointer;
 }
 
+.exam-settings-index tr.disabled {
+    display: none;
+}
+
 .exam-settings-index tr.disabled td {
     color: #333;
     background: #fff;
@@ -627,6 +631,11 @@ span.view--state[data-state="4"]::after { content: attr(data-text-4); }
   font-style: normal;
 }
 
+/* fixes subtitle overflows */
+.vjs-text-track-display div {
+  line-break: anywhere;
+}
+
 .video-container {
   position: relative;
 }
@@ -640,4 +649,8 @@ span.view--state[data-state="4"]::after { content: attr(data-text-4); }
   right: 0;
   bottom: 0;
   overflow-y: scroll;
+}
+
+.popover img {
+  max-width: 100%;
 }

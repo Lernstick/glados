@@ -27,6 +27,8 @@ class ExamSettingAvail extends TranslatedActiveRecord
 
     public $noPermissionCheck = true;
 
+    public $searchstring;
+
     /**
      * @inheritdoc
      */
@@ -47,17 +49,17 @@ class ExamSettingAvail extends TranslatedActiveRecord
     }
 
     /**
-     * Lists an attribute
-     * @param string attr attribute to list
-     * @param string q query
-     * @param int page
-     * @param int per_page
-     * @param int id which attribute should be the id
-     * @param bool showQuery whether the query itself should be shown in the 
-     *                  output list.
-     * @param string the attribute to order by
-     *
-     * @return array
+     * @inheritdoc 
+     */
+    public function rules()
+    {
+        return [
+            [['searchstring'], 'safe'],
+        ];
+    }
+
+    /**
+     * @inheritdoc
      */
     public function selectList($attr, $q, $page = 1, $per_page = 10, $id = null, $showQuery = true, $orderBy = null)
     {
@@ -126,6 +128,7 @@ class ExamSettingAvail extends TranslatedActiveRecord
     {
         $query = ExamSettingAvail::find();
 
+        // applies always (only search for settings that are not subsettings)
         $query->where(['belongs_to' => null]);
 
         $dataProvider = new ActiveDataProvider([
@@ -153,9 +156,8 @@ class ExamSettingAvail extends TranslatedActiveRecord
             // $query->where('0=1');
             return $dataProvider;
         }
-
-        $query->andFilterWhere(['like', 'name', $this->name])
-            ->andFilterWhere(['like', 'description', $this->description]);
+        // grid filtering conditions
+        $query->andFilterHaving(['like', 'CONCAT(name, " ", description)', $this->searchstring]);
 
         return $dataProvider;
     }

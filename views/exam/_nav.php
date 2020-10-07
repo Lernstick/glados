@@ -33,6 +33,13 @@ $this->registerJs($active_tabs);
     </li>
     <li>
         <?= Html::a(
+            '<i class="glyphicon glyphicon-cog"></i> ' . \Yii::t('exams', 'Settings'),
+            Url::to(['exam/view', 'id' => $model->id, '#' => 'settings']),
+            ['data-toggle' => '']
+        ); ?>
+    </li>
+    <li>
+        <?= Html::a(
             '<i class="glyphicon glyphicon-file"></i> ' . \Yii::t('exams', 'Exam Files'),
             Url::to(['exam/view', 'id' => $model->id, '#' => 'file']),
             ['data-toggle' => '']
@@ -42,13 +49,6 @@ $this->registerJs($active_tabs);
         <?= Html::a(
             '<i class="glyphicon glyphicon-exclamation-sign"></i> ' . \Yii::t('exams', 'Expert Settings'),
             Url::to(['exam/view', 'id' => $model->id, '#' => 'expert']),
-            ['data-toggle' => '']
-        ); ?>
-    </li>
-    <li>
-        <?= Html::a(
-            '<i class="glyphicon glyphicon-cog"></i> ' . \Yii::t('exams', 'Settings'),
-            Url::to(['exam/view', 'id' => $model->id, '#' => 'settings']),
             ['data-toggle' => '']
         ); ?>
     </li>

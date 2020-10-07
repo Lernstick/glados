@@ -44,7 +44,6 @@ class SettingSearch extends Setting
         $query = Setting::find();
 
         // add conditions that should always apply here
-
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => array(

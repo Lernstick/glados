@@ -96,8 +96,7 @@ class ExamController extends Controller
                     $params = Yii::$app->request->queryParams;
                     $searchModel = new ExamSettingAvail();
                     $dataProvider = $searchModel->search($params);
-                    //$out = $searchModel->selectList('name', $q, $page, $per_page, 'key', false);
-                    return $this->renderAjax('setting/index', [
+                    return $this->renderAjax('/exam/setting/index', [
                         'searchModel' => $searchModel,
                         'dataProvider' => $dataProvider,
                     ]);

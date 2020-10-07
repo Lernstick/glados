@@ -7,4 +7,6 @@
 
 ?>
 
-<?= yii::$app->formatter->format($model->value, $model->detail->type); ?>
+<code>
+	<?= yii::$app->formatter->format($model->value, $model->detail->type) ?>
+</code>

@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use kartik\dynagrid\DynaGrid;
+use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\ExamSettingAvail */
@@ -47,11 +48,30 @@ $(".settingClick:not(.disabled)").each(function () {
     });
 });
 
+$("[name*='searchstring']").focus().select();
+
 SCRIPT;
 $this->registerJs($js);
 
 ?>
 <div class="exam-settings-index">
+
+    <div class="exam-settings-search">
+        <?php $form = ActiveForm::begin([
+            'method' => 'get',
+            'options' => [
+                'data-pjax' => '',
+            ],
+        ]); ?>
+
+        <?= $form->field($searchModel, 'searchstring', [
+            'template' => '<div class="input-group">{input}<span class="input-group-btn">' .
+            Html::submitButton(\Yii::t('app', 'Search'), ['class' => 'btn btn-default']) .
+            '</span></div>',
+        ])->textInput(['placeholder' => \Yii::t('app', 'Search')]); ?>
+
+        <?php ActiveForm::end(); ?>
+    </div>
 
     <?= DynaGrid::widget([
         'showPersonalize' => false,

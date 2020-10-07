@@ -14,7 +14,6 @@ use yii\web\JsExpression;
 
 $this->title = \Yii::t('setting', 'Settings');
 $this->params['breadcrumbs'][] = $this->title;
-
 ?>
 <div class="setting-index">
 

@@ -164,14 +164,17 @@ $this->registerJs($js);
             ])->label(false)->hint(false); ?>
         </div>
 
-        <div class="cols-sm-12">
-            <?= Html::label(\Yii::t('exam_setting', 'Mode')); ?>
-            <?= Html::dropdownList('mode', 'options', [
-                'options' => 'Use options',
-                'command' => 'Provide a command',
-            ], [
-                'id' => 'mode'
-            ]) ?>
+        <div class="row">
+            <div class="col-sm-6 form-inline form-group">
+                <?= Html::label(\Yii::t('exam_setting', 'Mode')); ?>
+                <?= Html::dropdownList('mode', 'options', [
+                    'options' => \Yii::t('exam_setting', 'Use options'),
+                    'command' => \Yii::t('exam_setting', 'Provide a command'),
+                ], [
+                    'id' => 'mode',
+                    'class' => 'form-control',
+                ]) ?>
+            </div>
         </div>
 
         <div class="parent">

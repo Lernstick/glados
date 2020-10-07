@@ -50,15 +50,14 @@ class Base extends \yii\db\ActiveRecord
     }
 
     /**
-     * Lists an attribute
-     * @param string attr attribute to list
-     * @param string q query
-     * @param int page
-     * @param int per_page
-     * @param int id which attribute should be the id
-     * @param bool showQuery whether the query itself should be shown in the 
-     *                  output list.
-     * @param string the attribute to order by
+     * Lists an attribute for a dropdown select list.
+     * @param string $attr attribute to list
+     * @param string $q search query 
+     * @param int $page page number
+     * @param int $per_page how many items per page
+     * @param int $id which attribute should be the id
+     * @param bool $showQuery whether the query itself should be shown in the output list.
+     * @param string the attribute to sort by
      *
      * @return array
      */

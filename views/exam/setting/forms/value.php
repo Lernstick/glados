@@ -63,6 +63,11 @@ if (is_file(Yii::getAlias('@app/views/exam/setting/forms/' . $setting->key) . '.
     $view = $type;
 }
 
+// if there are members, wrap the setting in a panel
+if (!empty($members) && $view !== $setting->key) {
+    echo '<div class="panel panel-default"><div class="panel-heading">';
+}
+
 echo $this->{$render}($view, [
     'id' => $id,
     'form' => $form,
@@ -71,6 +76,10 @@ echo $this->{$render}($view, [
     'label' => $label,
     'hint' => $hint,
 ]);
+
+if (!empty($members) && $view !== $setting->key) {
+    echo '</div><div class="panel-body">';
+}
 
 if ($view != $setting->key) {
     $i = 'a';
@@ -92,6 +101,10 @@ if ($view != $setting->key) {
         ]);
         $i++;
     }
+}
+
+if (!empty($members) && $view !== $setting->key) {
+    echo '</div></div>';
 }
 
 ?>

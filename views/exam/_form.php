@@ -183,6 +183,10 @@ select2_config = {
     templateSelection: function (q) { return q.text; },
 };
 
+$('#keyModal').on('shown.bs.modal', function (e) {
+    $("[name*='searchstring']").focus();
+})
+
 // new setting button
 $('#exam-new-setting-button').on('click', function (event) {
     event.preventDefault();
@@ -349,7 +353,7 @@ $this->registerJs($js);
     <div class="panel panel-warning">
         <div class="panel-heading">
             <i class="glyphicon glyphicon-warning-sign"></i> <?= \Yii::t('exams', 'Please notice, all the settings below will <b>override</b> the settings configured in the <b>exam file</b>!') ?>
-            <?= Html::a('<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>&nbsp;' . \Yii::t('exams', 'New Setting'),
+            <?= Html::a('<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>&nbsp;' . \Yii::t('exams', 'Add Setting'),
                 Url::to([
                     'exam/index',
                     'mode' => 'list',
@@ -548,7 +552,7 @@ $this->registerJs($js);
 
     Modal::begin([
         'id' => 'keyModal',
-        'header' => '<h4>Title</h4>',
+        'header' => '<h4>' . \Yii::t('exams', 'Please choose a setting') . '</h4>',
         //'footer' => Html::Button(\Yii::t('exam', 'Close'), ['data-dismiss' => 'modal', 'class' => 'btn btn-default']),
         'size' => \yii\bootstrap\Modal::SIZE_LARGE,
     ]);
