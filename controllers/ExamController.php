@@ -277,7 +277,7 @@ class ExamController extends Controller
                 'id' => Yii::$app->request->post('setting')['id'],
                 'form' => null,
                 'setting' => $setting,
-                'members' => [],
+                'model' => $model,
             ]);
         }
 
