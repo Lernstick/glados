@@ -28,6 +28,7 @@ $this->title = \Yii::t('ticket', 'Ticket') . ' #' . $model->id;
 $this->params['breadcrumbs'][] = ['label' => \Yii::t('ticket', 'Tickets'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
+
 ?>
 
 <div class="ticket-view">

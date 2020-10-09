@@ -5,7 +5,7 @@ $params = require(__DIR__ . '/params.php');
 $config = [
     'id' => 'basic',
     'name' => 'GLaDOS',
-    'version' => '1.0.7',
+    'version' => '1.0.8',
     'basePath' => dirname(__DIR__),
     'bootstrap' => [
         'log',

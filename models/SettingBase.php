@@ -91,6 +91,7 @@ class SettingBase extends TranslatedActiveRecord
         return [
             'id' => \Yii::t('setting', 'ID'),
             'key' => \Yii::t('setting', 'Key'),
+            'date' => \Yii::t('setting', 'Date'),
             'name' => \Yii::t('setting', 'Name'),
             'value' => \Yii::t('setting', 'Value'),
             'null' => \Yii::t('setting', 'Use default value'),

@@ -46,7 +46,7 @@ class m200330_081029_settings2 extends Migration
             'key' => 'tokenChars',
             'name' => yiit('setting', 'Token characters'),
             'type' => 'string',
-            'default_value' => '0123456789abcdef',
+            'default_value' => yiit('setting', '0123456789abcdef'),
             'description' => yiit('setting', 'A set of characters from which the token should be generated.'),
         ]);
         $tokenChars->save(false);
