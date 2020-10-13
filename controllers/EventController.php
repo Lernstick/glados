@@ -40,6 +40,55 @@ class EventController extends Controller
             ]);
             $stream->save();
         }
+
+        $stream->on(EventStream::EVENT_STREAM_STARTED, function() use ($ticket, $uuid) {
+            $eventItem = new EventItem([
+                'event' => 'ticket/' . $ticket->id,
+                'priority' => 0,
+                'data' => [
+                    'agent_online' => true,
+                ],
+            ]);
+            $eventItem->generate();
+            $ticket->agent_uuid = $uuid;
+            $ticket->save(false);
+        });
+
+        $stream->on(EventStream::EVENT_STREAM_RESUMED, function() use ($ticket, $uuid) {
+            $eventItem = new EventItem([
+                'event' => 'ticket/' . $ticket->id,
+                'priority' => 0,
+                'data' => [
+                    'agent_online' => true,
+                ],
+            ]);
+            $eventItem->generate();
+            $ticket->agent_uuid = $uuid;
+            $ticket->save(false);
+        });
+
+        $stream->on(EventStream::EVENT_STREAM_STOPPED, function() use ($ticket) {
+            $eventItem = new EventItem([
+                'event' => 'ticket/' . $ticket->id,
+                'priority' => 0,
+                'data' => [
+                    'agent_online' => false,
+                ],
+            ]);
+            $eventItem->generate();
+        });
+
+        $stream->on(EventStream::EVENT_STREAM_ABORTED, function() use ($ticket) {
+            $eventItem = new EventItem([
+                'event' => 'ticket/' . $ticket->id,
+                'priority' => 0,
+                'data' => [
+                    'agent_online' => false,
+                ],
+            ]);
+            $eventItem->generate();
+        });
+
         return $this->setupStream($stream);
     }
 
@@ -95,9 +144,13 @@ class EventController extends Controller
             ]), $uuid);
         });
 
-        ob_end_flush();
-        ob_start();
-        $stream->start();
+        $stream->on(EventStream::EVENT_STREAM_ABORTED, function() use ($uuid, $stream) {
+            exit();
+        });
+
+        if ($stream->start() === false) {
+            exit();
+        }
 
         while ($stream->onEvent() === true) {
             $message = '';

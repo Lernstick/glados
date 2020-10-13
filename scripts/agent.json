@@ -14,6 +14,11 @@
             "event": "meta",
             "data": "*",
             "command": "echo \"Meta event raised with data ${ENV_data}\""
+        },
+        {
+            "event": "agent/*",
+            "data": "*",
+            "command": "echo \"Event ${ENV_event} raised with data ${ENV_data}\""
         }
     ]
 }

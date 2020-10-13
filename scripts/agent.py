@@ -8,7 +8,7 @@ from types import SimpleNamespace # json to python object
 
 CONFIG_FILE = 'agent.json'
 DEBUG = True
-retry = 1000
+retry = 5000
 
 def truncate(string, at = 27, suffix = '...'):
     return (string[:at] + suffix) if len(string) > at else string
@@ -17,7 +17,7 @@ class Event:
     id = "None";
     event = "None";
     data = "None";
-    retry = 1000;
+    retry = 5000;
     command = "None";
 
     def __init__(self, event):
@@ -35,9 +35,9 @@ class Event:
         self.process = subprocess.Popen(
             ["sh", "-c", self.command],
             env = {
-                "ENV_data": self.dataToJSON(),
+                "ENV_id": str(self.id),
                 "ENV_event": str(self.event),
-                "ENV_id": str(self.id)
+                "ENV_data": self.dataToJSON()
             }
         )
 
@@ -51,13 +51,11 @@ class Event:
         return False
 
     def dataToJSON(self):
-        if not hasattr(self, '_jsonData'):
-            if isinstance(self.data, str):
-                self._jsonData = self.data
-            else:
-                self._jsonData = json.dumps(self.data, default=lambda o: o.__dict__)
+        if isinstance(self.data, str):
+            return  self.data
+        else:
+            return json.dumps(self.data, default=lambda o: o.__dict__)
 
-        return self._jsonData
 
 # get the argument from the command line
 try:

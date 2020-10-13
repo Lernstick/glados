@@ -28,7 +28,6 @@ $this->title = \Yii::t('ticket', 'Ticket') . ' #' . $model->id;
 $this->params['breadcrumbs'][] = ['label' => \Yii::t('ticket', 'Tickets'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
-
 ?>
 
 <div class="ticket-view">
@@ -167,6 +166,32 @@ $this->params['breadcrumbs'][] = $this->title;
                     Html::a(\Yii::t('ticket', 'Probe'), ['view', 'id' => $model->id, 'mode' => 'probe']),
             ],
             [
+                'attribute' => 'agent_online',
+                'format' => 'raw',
+                'value' => ActiveEventField::widget([
+                    'options' => [
+                        'tag' => 'span',
+                        'class' => 'label label-' . ( $model->agent_online ? 'success' : 'danger' )
+                    ],
+                    'content' => $model->agent_online ? \Yii::t('ticket', 'Agent Online') : \Yii::t('ticket', 'Agent Offline'),
+                    'event' => 'ticket/' . $model->id,
+                    'jsonSelector' => 'agent_online',
+                    'jsHandler' => 'function(d, s){
+                        if (d) {
+                            s.innerHTML = "' . \Yii::t('ticket', 'Agent Online') . '";
+                            s.classList.add("label-success");
+                            s.classList.remove("label-danger");
+                            s.classList.remove("label-warning");
+                        } else {
+                            s.innerHTML = "' . \Yii::t('ticket', 'Agent Offline') . '";
+                            s.classList.add("label-danger");
+                            s.classList.remove("label-success");
+                            s.classList.remove("label-warning");
+                        }
+                    }',
+                ])
+            ],
+            [
                 'attribute' => 'client_state',
                 'format' => 'raw',
                 'value' =>  ActiveEventField::widget([
@@ -277,7 +302,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     'event' => 'ticket/' . $model->id,
                     'jsonSelector' => 'restore_state',
                 ]),
-            ],         
+            ],
+            [
+                'attribute' => 'agent_uuid',
+                'format' => 'raw',
+                'value' =>  yii::$app->formatter->format($model->agent_uuid, 'ntext'),
+                'visible' => YII_ENV_DEV,
+                'captionOptions' => ['class' => 'dev_item']
+            ],
             [
                 'attribute' => 'bootup_lock',
                 'format' => 'raw',
@@ -288,7 +320,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 ]),
                 'visible' => YII_ENV_DEV,
                 'captionOptions' => ['class' => 'dev_item']
-            ],           
+            ],
         ],
 
     ]) ?>

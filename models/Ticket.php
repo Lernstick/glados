@@ -187,6 +187,7 @@ class Ticket extends LiveActiveRecord
                     'restore_lock' => 'boolean',
                     'download_lock' => 'boolean',
                     'bootup_lock' => 'boolean',
+                    'agent_uuid' => 'text',
                     'backup_size' => 'shortSize',
                     'time_limit' => 'text',
                     'download_state' => 'text',
@@ -251,6 +252,7 @@ class Ticket extends LiveActiveRecord
             'download_finished' => \Yii::t('ticket', 'Download finshed at'),
             'client_state' => \Yii::t('ticket', 'Client State'),
             'online' => \Yii::t('ticket', 'Online'),
+            'agent_online' => \Yii::t('ticket', 'Agent'),
             'ip' => \Yii::t('ticket', 'IP Address'),
             'test_taker' => \Yii::t('ticket', 'Test Taker'),
             'backup' => \Yii::t('ticket', 'Backup'),
@@ -762,6 +764,24 @@ class Ticket extends LiveActiveRecord
             'host' => $this->ip,
         ]);
         return $r->request();
+    }
+
+    /**
+     * Getter for the agent_online flag.
+     * 
+     * @return boolean whether the agent is online or not
+     */
+    public function getAgent_online()
+    {
+        if ($this->agent_uuid !== null) {
+            $retval = Yii::$app->mutex->acquire($this->agent_uuid);
+            if ($retval) {
+                Yii::$app->mutex->release($this->agent_uuid);
+            }
+            return !$retval;
+        }
+
+        return false;
     }
 
     /**
