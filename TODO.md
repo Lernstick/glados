@@ -34,6 +34,7 @@ TODO:
 
 * keylogger
   * check script: it starts too early (no Xorg running already), then keymap is not set correctly
+  * backup browse view broken
 
 * multiple filessystems for exams
   * option to upload squashfs/zip files detached from exam context
