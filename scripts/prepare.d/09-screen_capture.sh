@@ -21,27 +21,6 @@ function screen_capture()
 
     if [ "${command}" != "" ]; then
 
-    # create screen_capture systemd daemon
-    cat <<EOF2 >"${initrd}/newroot/etc/systemd/system/screen_capture.service"
-[Unit]
-Description=screen_capture
-
-[Service]
-Type=simple
-WorkingDirectory=${path}
-ExecStart=/usr/bin/screen_capture
-ExecStop=/bin/bash -c 'kill \$1; tail --pid=\$1 -f /dev/null' sh \$MAINPID
-ExecStopPost=/usr/bin/launch screen_capture
-Restart=always
-RestartSec=10
-StandardOutput=syslog
-StandardError=syslog
-SyslogIdentifier=screen_capture
-
-[Install]
-WantedBy=graphical.target
-EOF2
-
     chroot ${initrd}/newroot mkdir "${path}"
     chroot ${initrd}/newroot systemctl enable screen_capture.service
 

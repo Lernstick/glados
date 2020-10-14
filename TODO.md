@@ -32,6 +32,9 @@ TODO:
     * Button: switch the two videos
       * test in fullscreen
 
+* keylogger
+  * check script: it starts too early (no Xorg running already), then keymap is not set correctly
+
 * multiple filessystems for exams
   * option to upload squashfs/zip files detached from exam context
      * name field (ex: "Brackets v1.14.2")
