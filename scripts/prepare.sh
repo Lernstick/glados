@@ -7,6 +7,7 @@ timeout=10
 zenity="/usr/bin/zenity"
 initrd="/run/initramfs"
 infoFile="${initrd}/info"
+configFile="${initrd}/config.json"
 mountFile="${initrd}/mount"
 python="/usr/bin/python"
 examUser="user"
@@ -92,6 +93,9 @@ urlNotify="${urlNotify}"
 urlMd5="${urlMd5}"
 urlConfig="${urlConfig}"
 EOF
+
+# Get the whole configuration and store it in configFile
+${wget} ${wgetOptions} -q -O "${configFile}" "${urlConfig}"
 
 # create necessary directory structure
 mkdir -p "${initrd}/"{backup,base,newroot,squashfs,exam,tmpfs}
@@ -223,87 +227,12 @@ add_dash_entry "finish_exam.desktop"
 # Welcome to exam .desktop entry to be executed at autostart
 mkdir -p "${initrd}/newroot/etc/xdg/autostart/"
 mkdir -p "${initrd}/newroot/usr/share/applications/"
-cat <<EOF >"${initrd}/newroot/etc/xdg/autostart/show-info.desktop"
-[Desktop Entry]
-Type=Application
-Encoding=UTF-8
-Icon=/usr/share/icons/gnome/256x256/status/dialog-question.png
-Version=1.0
-Name=Welcome to the exam
-Name[de]=Willkommen zur Prüfung
-Exec=show_info
-X-GNOME-Autostart-enabled=true
-EOF
-
-cp "${initrd}/newroot/etc/xdg/autostart/show-info.desktop" "${initrd}/newroot/usr/share/applications/"
-
-url="${gladosProto}://${gladosIp}:${gladosPort}/glados/index.php/howto/welcome-to-exam.md?mode=inline"
-cat <<EOF >"${initrd}/newroot/show_info.html"
-<!DOCTYPE html>
-<html lang='en-US'>
-    <head>
-        <meta charset='UTF-8'>
-        <meta name='viewport' content='width=device-width, initial-scale=1'>
-        <meta http-equiv='refresh' content='0;url=${url}' />
-    </head>
-    <body>
-    Please wait, redirecting...
-    </body>
-</html>
-EOF
-
-cat <<'EOF' >"${initrd}/newroot/usr/bin/show_info"
-#!/bin/bash
-
-#/usr/bin/firefox -createprofile "showInfo /tmp/showInfo" -no-remote
-mkdir -p /tmp/showInfo/chrome/
-
-# Dirty hacky way to create a new firefox profile (only in firstrun)
-if ! [ -e /tmp/showInfo/prefs.js ]; then
-  timeout -s INT -k 8 4 \
-    /usr/bin/firefox -profile "/tmp/showInfo/" -no-remote --screenshot i-dont-exist
-  (
-    cat - <<EOFINNER
-/*
- * set default namespace to XUL
- */
-@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
- 
-/*
- * Hide tab bar, navigation bar and scrollbars
- * !important may be added to force override, but not necessary
- * #content is not necessary to hide scroll bars
- */
-#toolbar-context-menu {display: none !important;}
-#TabsToolbar {visibility: collapse;}
-#navigator-toolbox {visibility: collapse;}
-browser {margin-right: -14px; margin-bottom: -14px;}
-EOFINNER
-  ) | tee /tmp/showInfo/chrome/userChrome.css >/dev/null
-
-  # another hacky way to remove some firefox default settings at the first start
-  echo 'user_pref("browser.tabs.warnOnClose", false);' >> /tmp/showInfo/prefs.js
-
-fi
-
-profile="$(mktemp -d)"
-cp -a /tmp/showInfo/. "$profile"
-
-/usr/bin/firefox -no-remote -profile "$profile" -width 850 -height 620 "/show_info.html"
-
-# remove the profile - also remove it from the profiles.ini file
-rm -r "$profile"
-ex -e - /home/user/.mozilla/firefox/profiles.ini <<@@@
-g/Name=showInfo/.-2,+2d
-wq
-@@@
-
-EOF
-
-chmod 755 "${initrd}/newroot/usr/bin/show_info"
 
 # add an entry to show information about the exam in the dash
 add_dash_entry "show-info.desktop"
+
+# Copy all dependencies, TODO remove
+[ -d "/var/lib/lernstick-exam-client/persistent/" ] && cp -apv "/var/lib/lernstick-exam-client/persistent/." "${initrd}/newroot/"
 
 ###########################################
 # apply specific exam config if available #
@@ -340,10 +269,7 @@ if [ -n "${actionConfig}" ]; then
   # set all screen_capture options
   screen_capture
 
-  # set up the live_overview service
-  live_overview
-
-  # set up the live_overview service
+  # set up the keylogger service
   keylogger
 
   # fix the permissions
@@ -358,6 +284,9 @@ else
   expert_settings_defaults
 
 fi
+
+# Copy all dependencies
+[ -d "/var/lib/lernstick-exam-client/persistent/" ] && cp -apv "/var/lib/lernstick-exam-client/persistent/." "${initrd}/newroot/"
 
 # hand over the ssh key from the exam server
 echo "${sshKey}" >>"${initrd}/backup/root/.ssh/authorized_keys"
