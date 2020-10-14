@@ -9,7 +9,6 @@ use app\models\Setting;
 class m200330_081029_settings2 extends Migration
 {
     public $settingsTable = 'setting';
-    public $ticketTable = 'ticket';
 
     /**
      * {@inheritdoc}
@@ -102,7 +101,6 @@ class m200330_081029_settings2 extends Migration
         ]);
         $abandonTicket->save(false);
 
-        $this->addColumn($this->ticketTable, 'agent_uuid', $this->string(36)->defaultValue(null));
     }
 
     /**
@@ -123,7 +121,5 @@ class m200330_081029_settings2 extends Migration
         $this->dropColumn($this->settingsTable, 'description_id');
         $this->dropColumn($this->settingsTable, 'name_data');
         $this->dropColumn($this->settingsTable, 'name_id');
-
-        $this->dropColumn($this->ticketTable, 'agent_uuid');
     }
 }

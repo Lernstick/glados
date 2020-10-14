@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\ConflictHttpException;
 use app\models\EventItem;
 use app\models\EventStream;
 use app\models\Ticket;
@@ -17,10 +18,12 @@ class EventController extends Controller
 
     /**
      * Streams all Event models to the client browser.
+     * @param $uuid string the uuid of the event stream
      * @return mixed
      */
     public function actionStream($uuid)
     {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
         $stream = $this->findModel($uuid);
         return $this->setupStream($stream);
     }
@@ -28,20 +31,22 @@ class EventController extends Controller
 
     /**
      * Streams all Event models for the client agent.
+     * @param $token string the token
      * @return mixed
      */
-    public function actionAgent($uuid, $token)
+    public function actionAgent($token)
     {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
         $ticket = $this->findTicket($token);
-        if (($stream = EventStream::findOne(['uuid' => $uuid])) === null) {
-            $stream = new EventStream(['uuid' => $uuid]);
+        if (($stream = EventStream::findOne(['uuid' => $ticket->agent_uuid])) === null) {
+            $stream = new EventStream(['uuid' => $ticket->agent_uuid]);
             $stream->listenEvents = implode(',', [
                 'agent/' . $token,
             ]);
             $stream->save();
         }
 
-        $stream->on(EventStream::EVENT_STREAM_STARTED, function() use ($ticket, $uuid) {
+        $stream->on(EventStream::EVENT_STREAM_STARTED, function() use ($ticket) {
             $eventItem = new EventItem([
                 'event' => 'ticket/' . $ticket->id,
                 'priority' => 0,
@@ -50,11 +55,9 @@ class EventController extends Controller
                 ],
             ]);
             $eventItem->generate();
-            $ticket->agent_uuid = $uuid;
-            $ticket->save(false);
         });
 
-        $stream->on(EventStream::EVENT_STREAM_RESUMED, function() use ($ticket, $uuid) {
+        $stream->on(EventStream::EVENT_STREAM_RESUMED, function() use ($ticket) {
             $eventItem = new EventItem([
                 'event' => 'ticket/' . $ticket->id,
                 'priority' => 0,
@@ -63,8 +66,6 @@ class EventController extends Controller
                 ],
             ]);
             $eventItem->generate();
-            $ticket->agent_uuid = $uuid;
-            $ticket->save(false);
         });
 
         $stream->on(EventStream::EVENT_STREAM_STOPPED, function() use ($ticket) {
@@ -101,11 +102,9 @@ class EventController extends Controller
      */
     public function setupStream($stream)
     {
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
-        $uuid = $stream->uuid;
         $stream->timeLimit = YII_ENV_DEV ? 30 : 300;
 
-        $stream->on(EventStream::EVENT_STREAM_STARTED, function() use ($uuid, $stream) {
+        $stream->on(EventStream::EVENT_STREAM_STARTED, function() use ($stream) {
             $event = new EventItem([
                 'event' => 'meta',
                 'data' => json_encode([
@@ -115,10 +114,10 @@ class EventController extends Controller
             ]);
             $this->sendMessage($this->renderPartial('/event/message', [
                 'model' => $event,
-            ]), $uuid);
+            ]), $stream->uuid);
         });
 
-        $stream->on(EventStream::EVENT_STREAM_STOPPED, function() use ($uuid) {
+        $stream->on(EventStream::EVENT_STREAM_STOPPED, function() use ($stream) {
             $event = new EventItem([
                 'event' => 'meta',
                 'data' => json_encode([
@@ -128,10 +127,10 @@ class EventController extends Controller
             ]);
             $this->sendMessage($this->renderPartial('/event/message', [
                 'model' => $event,
-            ]), $uuid);
+            ]), $stream->uuid);
         });
 
-        $stream->on(EventStream::EVENT_STREAM_RESUMED, function() use ($uuid, $stream) {
+        $stream->on(EventStream::EVENT_STREAM_RESUMED, function() use ($stream) {
             $event = new EventItem([
                 'event' => 'meta',
                 'data' => json_encode([
@@ -141,15 +140,15 @@ class EventController extends Controller
             ]);
             $this->sendMessage($this->renderPartial('/event/message', [
                 'model' => $event,
-            ]), $uuid);
+            ]), $stream->uuid);
         });
 
-        $stream->on(EventStream::EVENT_STREAM_ABORTED, function() use ($uuid, $stream) {
+        $stream->on(EventStream::EVENT_STREAM_ABORTED, function() {
             exit();
         });
 
         if ($stream->start() === false) {
-            exit();
+            throw new ConflictHttpException(\Yii::t('app', 'The ressource is exclusively locked, please try again later.'));
         }
 
         while ($stream->onEvent() === true) {
@@ -181,7 +180,7 @@ class EventController extends Controller
             }
 
             if(!empty($message)){
-                $this->sendMessage($message, $uuid);
+                $this->sendMessage($message, $stream->uuid);
             }
         }
 

@@ -63,6 +63,11 @@ class Ticket extends LiveActiveRecord
      */
     private $_state;
 
+    /**
+     * @var string the uuid of the ticket based on the token.
+     */
+    private $_agent_uuid;
+
     public $tduration;
 
     /* db translated fields */
@@ -187,7 +192,6 @@ class Ticket extends LiveActiveRecord
                     'restore_lock' => 'boolean',
                     'download_lock' => 'boolean',
                     'bootup_lock' => 'boolean',
-                    'agent_uuid' => 'text',
                     'backup_size' => 'shortSize',
                     'time_limit' => 'text',
                     'download_state' => 'text',
@@ -767,21 +771,30 @@ class Ticket extends LiveActiveRecord
     }
 
     /**
+     * Getter for the uuid agent_uuid based on the token
+     * 
+     * @return string the unique uuid
+     */
+    public function getAgent_uuid()
+    {
+        if ($this->_agent_uuid === null) {
+            $this->_agent_uuid = generate_uuid3($this->token);
+        }
+        return $this->_agent_uuid;
+    }
+
+    /**
      * Getter for the agent_online flag.
      * 
      * @return boolean whether the agent is online or not
      */
     public function getAgent_online()
     {
-        if ($this->agent_uuid !== null) {
-            $retval = Yii::$app->mutex->acquire($this->agent_uuid);
-            if ($retval) {
-                Yii::$app->mutex->release($this->agent_uuid);
-            }
-            return !$retval;
+        $retval = Yii::$app->mutex->acquire($this->agent_uuid);
+        if ($retval) {
+            Yii::$app->mutex->release($this->agent_uuid);
         }
-
-        return false;
+        return !$retval;
     }
 
     /**
