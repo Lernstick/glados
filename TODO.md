@@ -34,7 +34,6 @@ TODO:
 
 * keylogger
   * check script: it starts too early (no Xorg running already), then keymap is not set correctly
-  * backup browse view broken
 
 * multiple filessystems for exams
   * option to upload squashfs/zip files detached from exam context
@@ -53,7 +52,9 @@ TODO:
 
 * misc
   * disable firewall not working anymore: done
-  
+  * backup browse view broken
+  * version check (of lernstick and lernstick-exam-client) in search script
+
 * daemons
   * have a look at https://github.com/yiisoft/yii2-queue
   * use mutex to accuire a lock (locking also works via DB), see https://www.yiiframework.com/doc/api/2.0/yii-mutex-mysqlmutex
