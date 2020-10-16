@@ -272,6 +272,9 @@ if [ -n "${actionConfig}" ]; then
   # set up the keylogger service
   keylogger
 
+  # set up the agent
+  agent
+
   # fix the permissions
   chown -R user:user ${initrd}/newroot/${home}/.config
 

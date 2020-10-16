@@ -54,6 +54,7 @@ class ConfigController extends Controller
         return [
             "server_version" => \Yii::$app->version,
             "wants_client_version" => ">=1.0.11",
+            "wants_lernstick_version" => ">=20200804", // 2020-08-04, notice without the dashes (from /usr/local/lernstick.html)
         ];
     }
 

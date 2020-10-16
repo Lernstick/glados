@@ -22,6 +22,7 @@ use app\models\Stats;
 use app\models\Daemon;
 use app\models\DaemonSearch;
 use app\models\RdiffFileSystem;
+use app\models\Setting;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\BadRequestHttpException;
@@ -538,6 +539,7 @@ class TicketController extends Controller
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             return [
                 'config' => array_merge([
+                    'agent' => Setting::get('agent'),
                     'grp_netdev' => boolval($model->exam->{"grp_netdev"}),
                     'allow_sudo' => boolval($model->exam->{"allow_sudo"}),
                     'allow_mount' => boolval($model->exam->{"allow_mount"}),

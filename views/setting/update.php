@@ -45,18 +45,39 @@ SCRIPT;
 $this->registerJs($js);
 
 $js = <<< 'SCRIPT'
+// @param object jquery object
+// @return the value
+function get_val (object) {
+    if (object.is(':checkbox')) {
+        return object.is(':checked');
+    } else {
+        return object.val();
+    }
+}
+
+// @param object jquery object
+// @param object the value
+// @return void
+function set_val (object, value) {
+    if (object.is(':checkbox')) {
+        object.prop('checked', value);
+    } else {
+        object.val(value);
+    }
+}
+
 var pre;
 $("input[name='Setting[null]']").click(function(){
     if ($(this).is(':checked')) {
-        pre = $('#setting-value').val();
-        $('#setting-value').val($('#setting-default_value').val());
+        pre = get_val($('#setting-value'));
+        set_val($('#setting-value'), get_val($('#setting-default_value')));
     } else {
-        $('#setting-value').val(pre);
+        set_val($('#setting-value'), pre);
     }
 });
 
 $("#setting-value").on('change keyup paste', function(){
-    if ($(this).val() == $("input[name='Setting[default_value]']").val()) {
+    if (get_val($(this)) == get_val($("input[name='Setting[default_value]']"))) {
         $("input[name='Setting[null]']").prop( "checked", true );
     } else {
         $("input[name='Setting[null]']").prop( "checked", false );        
@@ -70,9 +91,9 @@ function reload() {
             fragment: "body",
             type: 'POST',
             data: {
-                'preview[value]': $("#setting-value").val(),
-                'preview[key]': $("#setting-key").val(),
-                '_csrf': $("input[name='_csrf']").val()
+                'preview[value]': get_val($("#setting-value")),
+                'preview[key]': get_val($("#setting-key")),
+                '_csrf': get_val($("input[name='_csrf']"))
             },
             async:true
         });

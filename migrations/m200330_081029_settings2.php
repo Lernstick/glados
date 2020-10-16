@@ -101,6 +101,16 @@ class m200330_081029_settings2 extends Migration
         ]);
         $abandonTicket->save(false);
 
+        // create agent
+        $agent = new Setting([
+            'key' => 'agent',
+            'name' => yiit('setting', 'Client agent'),
+            'type' => 'boolean',
+            'default_value' => true,
+            'description' => yiit('setting', 'Whether the client agent should be running after bootup or not.'),
+        ]);
+        $agent->save(false);
+
     }
 
     /**
@@ -116,6 +126,7 @@ class m200330_081029_settings2 extends Migration
         Setting::deleteAll(['key' => 'upperBound']);
         Setting::deleteAll(['key' => 'lowerBound']);
         Setting::deleteAll(['key' => 'abandonTicket']);
+        Setting::deleteAll(['key' => 'agent']);
 
         $this->dropColumn($this->settingsTable, 'description_data');
         $this->dropColumn($this->settingsTable, 'description_id');

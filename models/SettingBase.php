@@ -124,6 +124,7 @@ class SettingBase extends TranslatedActiveRecord
         return [
             'markdown' => ['textArea', ['maxlength' => true, 'rows' => 5], \Yii::t('setting', 'In this field, you can write <a target="_new" href="{link}">Markdown</a>.', ['link' => 'https://guides.github.com/features/mastering-markdown/'])],
             'integer' => ['textInput', ['type' => 'number']],
+            'boolean' => ['checkbox', []],
             'string' => ['textInput', ['maxlength' => true]],
         ];
     }
@@ -192,6 +193,8 @@ class SettingBase extends TranslatedActiveRecord
     {
         if ($type == "markdown") {
             return Markdown::process($value, 'gfm');
+        } else if ($type == "boolean") {
+            return boolval($value);
         } else {
             return $value;
         }
