@@ -1,7 +1,7 @@
 glados for Debian
 -----------------
 
-* In controllers/configController.php actionInfo(), set needed client version
+* In controllers/configController.php actionInfo(), set needed lernstick-exam-client version and Lernstick OS version
 
 * First create new yii-glados package: https://github.com/chaoos/yii2-glados/
 
