@@ -1,6 +1,8 @@
 glados for Debian
 -----------------
 
+* In controllers/configController.php actionInfo(), set needed client version
+
 * First create new yii-glados package: https://github.com/chaoos/yii2-glados/
 
 * Tag a new release with the new version (create a pre-release and publish it)
