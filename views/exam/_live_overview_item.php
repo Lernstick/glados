@@ -17,7 +17,7 @@ use app\components\ActiveEventField;
                 'tag' => 'img',
                 'class' => 'live-thumbnail',
                 'alt' => \Yii::t('ticket', 'Please wait, while the live image is being produced...'),
-                'src' => Url::to(['ticket/live', 'token' => $model->token, '_ts']),
+                'src' => Url::to(['ticket/live', 'token' => $model->token]),
                 'data-time' => intval(microtime(true)),
                 'data-url' => Url::to(['ticket/live', 'token' => $model->token]),
                 'data-toggle' => 'modal',
@@ -27,19 +27,44 @@ use app\components\ActiveEventField;
             ],
             'event' => 'ticket/' . $model->id,
             'jsonSelector' => 'live',
+            // reload image when a new has arrived
             'jsHandler' => 'function(d, s) {
-                // reload image when a new has arrived
                 s.src = "data:image/jpg;base64," + d.base64;
-                $(s).attr("data-time", parseInt(new Date().getTime()/1000));
-                $(s).next().find(">:first-child").addClass("live");
-                $(s).next().find(">:first-child").attr("title", "' . \Yii::t('ticket', 'Currently playing live') . '");
+                var now = parseFloat(new Date().getTime()/1000);
+                $(s).attr("data-time", now);
             }',
         ]); ?>
 
-        <?= Html::a("<span class='glyphicon glyphicon-circle' title='" . \Yii::t('ticket', 'Currently behind live') . "'></span>" . (empty($model->test_taker) ? $model->token : $model->test_taker), Url::to(['ticket/view', 'id' => $model->id]), [
+        <?= Html::a(ActiveEventField::widget([
+                'options' => [
+                    'tag' => 'span',
+                    'class' => 'glyphicon glyphicon-circle',
+                    'title' => \Yii::t('ticket', 'Currently behind live'),
+                ],
+                'event' => 'ticket/' . $model->id,
+                'jsonSelector' => 'live',
+                // change the live indicator
+                'jsHandler' => 'function(d, s) {
+                    $(s).addClass("live");
+                    $(s).attr("title", "' . \Yii::t('ticket', 'Currently playing live') . '");
+                }',
+            ]) . (empty($model->test_taker) ? $model->token : $model->test_taker) .
+            ActiveEventField::widget([
+                'options' => [
+                    'tag' => 'span',
+                    'class' => 'live-overview-item-info',
+                    'title' => '',
+                ],
+                'event' => 'ticket/' . $model->id,
+                'jsonSelector' => 'live',
+                // show the active window
+                'jsHandler' => 'function(d, s) {
+                    $(s).html(" // " + d.window);
+                    $(s).attr("title", d.window);
+                }',
+            ]), Url::to(['ticket/view', 'id' => $model->id]), [
             'class' => 'live-overview-item-title'
         ]); ?>
+
         <span class='live-overview-fullscreen glyphicon glyphicon-fullscreen'></span>
 </div>
-
-

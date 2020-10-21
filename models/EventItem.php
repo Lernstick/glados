@@ -96,6 +96,13 @@ class EventItem extends \yii\db\ActiveRecord
     }
 
     /**
+     * Generates the event.
+     * [[data]] is converted to json and translated. If the data payload is too large
+     * (it exceeds the column size in the database), it will be outsourced in a temporary
+     * file and the data field will contain the absolute path (ex: "file:///path/to/file").
+     * The needed files are touched, such that the [[EventStream]] triggers the events and
+     * the database record is created.
+     *
      * @return void
      */
     public function generate()
@@ -134,7 +141,7 @@ class EventItem extends \yii\db\ActiveRecord
          */
         $this->data = is_array($origData) ? $this->data : $origData;
 
-        //this part can be removed later
+        // @todo this part can be removed later
         if (basename($this->event) == '*') {
             $file = $this->inotifyDir . '/' . dirname($this->event) . '/' . 'ALL';
         } else {

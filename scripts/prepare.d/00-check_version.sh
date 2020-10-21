@@ -1,6 +1,8 @@
 #!/bin/bash
 #
 # Server side version check
+# @todo maybe the time comes to remove this, because the client already has a version check. This is only necessary when the client has none (for client versions <=1.0.10)
+# 
 #
 
 function verToNr()

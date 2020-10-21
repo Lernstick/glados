@@ -39,6 +39,12 @@ class Exam extends Base
     public $filePath;
 
     /**
+     * @const float idle time in seconds in the monitor view until the live image
+     * is refreshed.
+     */
+    const MONITOR_IDLE_TIME = 5.0;
+
+    /**
      * @inheritdoc
      */
     public static function tableName()

@@ -13,17 +13,18 @@ $this->params['breadcrumbs'][] = ['label' => \Yii::t('exams', 'Exams'), 'url' =>
 $this->params['breadcrumbs'][] = $this->title;
 
 $title = \Yii::t('ticket', 'Currently behind live');
+$n = $model::MONITOR_IDLE_TIME;
 
+// reload images if no new image for [[MONITOR_IDLE_TIME]] seconds
 $js = <<< SCRIPT
-// reload images if no new image for 10 seconds
 setInterval(function(){
     $('img.live-thumbnail').each(function() {
     var img = $(this);
     var src = img.attr('data-url');
-    var time = parseInt(img.attr("data-time"));
-    var now = parseInt(new Date().getTime()/1000);
-    if (now - time > 10) {
-        img.attr('src', src + '?_ts=' + now);
+    var then = parseFloat(img.attr("data-time"));
+    var now = parseFloat(new Date().getTime()/1000);
+    if (now - then > $n) {
+        img.attr('src', src + '?_ts=' + parseInt(now));
         img.attr("data-time", now);
         img.next().find(">:first-child").removeClass("live");
         img.next().find(">:first-child").attr("title", "$title");

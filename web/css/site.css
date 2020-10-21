@@ -547,7 +547,11 @@ ul.nav-special > li.active > a > div {
     padding: 1rem;
 }
 
-.live-overview-item-title span:not(.live) {
+.live-overview-item-title {
+  white-space: nowrap;
+}
+
+.live-overview-item-title span.glyphicon:not(.live) {
     margin-right: .5em;
     color: #888;
 }
