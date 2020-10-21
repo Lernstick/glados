@@ -255,16 +255,30 @@ class DownloadController extends DaemonController implements DaemonInterface
 
                 $retval = $cmd->run();
 
-                $eventItem = new EventItem([
-                    'event' => 'ticket/' . $this->ticket->id,
-                    'priority' => 0,
-                    'data' => [
-                        'setup_complete' => true,
-                    ],
-                ]);
-                $eventItem->generate();
-                $this->ticket->client_state = yiit('ticket', 'setup complete');
-                $this->ticket->save();
+                // success
+                if ($retval == "0") {
+                    $eventItem = new EventItem([
+                        'event' => 'ticket/' . $this->ticket->id,
+                        'priority' => 0,
+                        'data' => [
+                            'setup_complete' => true,
+                        ],
+                    ]);
+                    $eventItem->generate();
+                    $this->ticket->client_state = yiit('ticket', 'setup complete');
+                    $this->ticket->save();
+                } else {
+                    $eventItem = new EventItem([
+                        'event' => 'ticket/' . $this->ticket->id,
+                        'priority' => 0,
+                        'data' => [
+                            'setup_failed' => true,
+                        ],
+                    ]);
+                    $eventItem->generate();
+                    $this->ticket->client_state = yiit('ticket', 'setup failed');
+                    $this->ticket->save();
+                }
 
             }
 

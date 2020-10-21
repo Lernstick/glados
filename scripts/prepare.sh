@@ -36,21 +36,38 @@ function clientState()
   $DEBUG && >&2 echo "New client state: $1"
 }
 
+# retrieves the configuration json and stores it to $configFile
+function get_config()
+{
+  url=${1}
+  ${wget} ${wgetOptions} -q -O "${configFile}" "${url}"
+  
+  retval=$?
+  if [ ${retval} -ne 0 ]; then
+    >&2 echo "wget failed while fetching the system config (return value: ${retval})."
+    ${zenity} --error --width=300 --title "Wget error" --text "wget failed while fetching the system config (return value: ${retval})."
+    do_exit 1
+  fi
+}
+
+# Echo the configuration value from the config json
+# @param $1 the config value to return
+# @param $2 the default value if the config value is not set
 function config_value()
 {
-  if [ -n "${config}" ]; then
-    config="$(${wget} ${wgetOptions} -qO- "${urlConfig}")"
-    retval=$?
-    if [ ${retval} -ne 0 ]; then
-      >&2 echo "wget failed while fetching the system config (return value: ${retval})."
-      ${zenity} --error --title "Wget error" --text "wget failed while fetching the system config (return value: ${retval})."
-      do_exit
-    fi
+  if [ ! -r "${configFile}" ]; then
+    get_config "${urlConfig}"
   fi
 
-  v="$(echo "${config}" | ${python} -c 'import sys, json; print json.load(sys.stdin)["config"]["'${1}'"]')"
-  $DEBUG && >&2 echo "${1} is set to ${v}"
-  echo "$v"
+  v="$(cat "${configFile}" | ${python} -c 'import sys, json; print json.load(sys.stdin)["config"]["'${1}'"]' 2>/dev/null)"
+  retval=$?
+  if [ ${retval} -ne 0 ]; then
+    $DEBUG && >&2 echo "${1} not found in config file"
+    echo "${2}" #return default value
+  else
+    $DEBUG && >&2 echo "${1} is set to ${v}"
+    echo "$v"
+  fi
 }
 
 function do_exit()
@@ -63,9 +80,9 @@ function do_exit()
   # unmount the filesystem
   umount ${initrd}/newroot
   umount -l ${initrd}/{base,exam,tmpfs}
-  exit
+  # exit with failure (1) if nothing has been given to $1
+  exit ${1:-1}
 }
-trap do_exit EXIT
 
 # get DISPLAY and XAUTHORITY env vars to display the firefox window
 set -o allexport
@@ -95,7 +112,7 @@ urlConfig="${urlConfig}"
 EOF
 
 # Get the whole configuration and store it in configFile
-${wget} ${wgetOptions} -q -O "${configFile}" "${urlConfig}"
+get_config "${urlConfig}"
 
 # create necessary directory structure
 mkdir -p "${initrd}/"{backup,base,newroot,squashfs,exam,tmpfs}
@@ -244,9 +261,12 @@ if [ -n "${actionConfig}" ]; then
   retval=$?
   if [ ${retval} -ne 0 ]; then
     >&2 echo "wget failed while fetching the system config (return value: ${retval})."
-    ${zenity} --error --title "Wget error" --text "wget failed while fetching the system config (return value: ${retval})."
-    do_exit
+    ${zenity} --error --width=300 --title "Wget error" --text "wget failed while fetching the system config (return value: ${retval})."
+    do_exit 1
   fi
+
+  # perform the version check server side
+  check_version
 
   # setup the expert settings
   expert_settings
@@ -360,4 +380,5 @@ screen -d -m bash -c '
 '
 
 >&2 echo "done"
-exit
+# exit successfully
+do_exit 0
