@@ -5,6 +5,14 @@
 use yii\helpers\Html;
 use yii\helpers\Markdown;
 
+$this->title = $model->title;
+
+// froces wxbrowser to resize the window
+$js = <<< 'SCRIPT'
+window.location.href = '#wxbrowser:resize:800x800'
+SCRIPT;
+$this->registerJs($js);
+
 ?>
 
 <div class="howto-view markdown-view">

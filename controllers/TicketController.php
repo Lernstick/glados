@@ -870,7 +870,7 @@ class TicketController extends Controller
             throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
         } else if ($request->isGet) {
             // check if the ticket is running and booted
-            if ($model->bootup_lock == 0 && $model->state == Ticket::STATE_RUNNING
+            if ($model->bootup_lock == 0 /* && $model->state == Ticket::STATE_RUNNING */
                 && (! file_exists($file) || time() - filemtime($file) > Exam::MONITOR_IDLE_TIME)
             ){
                 $agentEvent = new AgentEvent([
@@ -889,28 +889,24 @@ class TicketController extends Controller
                 throw new NotFoundHttpException(Yii::t('app', 'File not found.'));
             }
         } else if ($request->isPost) {
-            if ($model->state == Ticket::STATE_RUNNING){
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
-                if (!is_dir($path)) {
-                    mkdir($path);
-                }
-                $img = UploadedFile::getInstanceByName('img');
-                $img->saveAs($file);
-
-                $eventItem = new EventItem([
-                    'event' => 'ticket/' . $model->id,
-                    'priority' => 0,
-                    'data' => [
-                        'live' => [
-                            'window' => Yii::$app->request->post()['window'],
-                            'base64' => base64_encode(file_get_contents($file)),
-                        ],
-                    ],
-                ]);
-                $eventItem->generate();
-            } else {
-                throw new BadRequestHttpException(Yii::t('app', 'Ticket is not in running state.'));
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
+            if (!is_dir($path)) {
+                mkdir($path);
             }
+            $img = UploadedFile::getInstanceByName('img');
+            $img->saveAs($file);
+
+            $eventItem = new EventItem([
+                'event' => 'ticket/' . $model->id,
+                'priority' => 0,
+                'data' => [
+                    'live' => [
+                        'window' => Yii::$app->request->post()['window'],
+                        'base64' => base64_encode(file_get_contents($file)),
+                    ],
+                ],
+            ]);
+            $eventItem->generate();
         }
     }
 

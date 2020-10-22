@@ -8,6 +8,8 @@ use app\components\ActiveEventField;
 /* @var $this yii\web\View */
 /* @var $model app\models\Ticket */
 
+$this->title = \Yii::t('client', 'Exam Client');
+
 if ($model->client_state == 'setup complete') {
     $this->registerJs('$("#dialog").modal("show");');
 }

@@ -356,8 +356,8 @@ screen -d -m bash -c '
 
   # export DISPLAY and XAUTHORITY env vars
   set -o allexport
-  eval $(strings /proc/$(pgrep -n firefox)/environ | grep "DISPLAY=")
-  eval $(strings /proc/$(pgrep -n firefox)/environ | grep "XAUTHORITY=")
+  . <(strings /proc/*/environ 2>/dev/null | grep -P "^DISPLAY\=*" | head -1) 
+  . <(strings /proc/*/environ 2>/dev/null | grep -P "^XAUTHORITY\=*" | head -1) 
   set +o allexport
 
   if $DEBUG; then
