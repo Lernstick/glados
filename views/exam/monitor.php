@@ -1,43 +1,17 @@
 <?php
 
 use yii\helpers\Html;
-use yii\helpers\Url;
 use yii\widgets\ListView;
 use yii\bootstrap\Modal;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Exam */
+/* @var $searchModel app\models\TicketSearch */
+/* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => \Yii::t('exams', 'Exams'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
-
-$title = \Yii::t('ticket', 'Currently behind live');
-$n = $model::MONITOR_IDLE_TIME;
-
-// reload images if no new image for [[MONITOR_IDLE_TIME]] seconds
-$js = <<< SCRIPT
-setInterval(function(){
-    $('img.live-thumbnail').each(function() {
-    var img = $(this);
-    var src = img.attr('data-url');
-    var then = parseFloat(img.attr("data-time"));
-    var now = parseFloat(new Date().getTime()/1000);
-    if (now - then > $n) {
-        img.attr('src', src + '?_ts=' + parseInt(now));
-        img.attr("data-time", now);
-        img.next().find(">:first-child").removeClass("live");
-        img.next().find(">:first-child").attr("title", "$title");
-    }
-});
-},1000);
-
-$('#galleryModal').on('show.bs.modal', function(e) {
-    $('#galleryModal img').attr("src", "");
-    $('#galleryModal img').attr("src", $(e.relatedTarget).data('src') + "&" + new Date().getTime());
-});
-SCRIPT;
-$this->registerJs($js, \yii\web\View::POS_READY);
 
 ?>
 
@@ -58,35 +32,14 @@ $this->registerJs($js, \yii\web\View::POS_READY);
 
             <?php $_GET = array_merge($_GET, ['#' => 'tab_monitor']); ?>
 
-            <?= ListView::widget([
+            <?= $this->render('/monitor/_monitor', [
+                'model' => $model,
+                'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
-                'options' => ['class' => 'row'],
-                'itemOptions' => ['class' => 'col-xs-6 col-md-3 live-overview-item-container'],
-                'itemView' => '_live_overview_item',
-                'summaryOptions' => [
-                    'class' => 'summary col-xs-12 col-md-12',
-                ],
-                'emptyText' => \Yii::t('ticket', 'No tickets found.'),
-                'layout' => '{items} <br>{summary} {pager}',
-            ]); ?>
+            ]) ?>
 
         </div>
 
     </div>
-
-<?php Modal::begin([
-    'id' => 'galleryModal',
-    'header' => false,
-    'footer' => Html::Button(\Yii::t('app', 'Close'), ['data-dismiss' => 'modal', 'class' => 'btn btn-default']),
-    'size' => \yii\bootstrap\Modal::SIZE_LARGE
-]); ?>
-
-
-    <div class="live-overview-detail">
-        <span class="live-overview-detail-title"><i class="gly-spin glyphicon glyphicon-cog"></i> Please wait...</span>
-        <img src="#" alt="Image not found.">
-    </div>
-
-<?php Modal::end(); ?>
 
 </div>

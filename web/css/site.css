@@ -479,6 +479,7 @@ ul.nav-special > li.active > a > div {
     height: 100%;
     object-fit: contain;
     opacity: 1;
+    background-color: black;
 }
 
 .live-overview-item:hover img {
@@ -500,7 +501,7 @@ ul.nav-special > li.active > a > div {
 }
 
 .live-overview-item:hover .live-overview-item-title {
-    opacity:0.5;
+    opacity:0.2;
 }
 
 .live-overview-item:hover span.live-overview-fullscreen {
@@ -526,7 +527,7 @@ ul.nav-special > li.active > a > div {
     position: relative;
     display: inline-block;
     /* 16:10 ratio */
-    width: 260px;
+    width: 100%;
     height: 162.5px;
 }
 
@@ -538,13 +539,25 @@ ul.nav-special > li.active > a > div {
     position: relative;
 }
 
-.live-overview-detail-title {
+.live-overview-detail-loading {
     text-align: center;
     position: absolute;
     display: block;
     width: 100%;
     top: 0;
-    padding: 1rem;
+}
+
+.live-overview-detail-img {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    z-index: 101
+}
+
+.live-overview-detail-error {
+    text-align: center;
+    position: relative;
+    z-index: 100
 }
 
 .live-overview-item-title {

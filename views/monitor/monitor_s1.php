@@ -10,10 +10,10 @@ use yii\web\JsExpression;
 /* @var $form yii\widgets\ActiveForm */
 /* @var $searchModel app\models\TicketSearch */
 
-$this->title = \Yii::t('results', 'Generate Result - Choose Exam');
-$this->params['breadcrumbs'][] = ['label' => \Yii::t('exams', 'Exams'), 'url' => ['exam/index']];
-$this->params['breadcrumbs'][] = ['label' => \Yii::t('results', 'Generate Result'), 'url' => ['result/generate']];
-$this->params['breadcrumbs'][] = \Yii::t('exams', 'Choose Exam');
+$this->title = \Yii::t('monitor', 'Monitoring - Choose Exam');
+$this->params['breadcrumbs'][] = ['label' => \Yii::t('exam', 'Exams'), 'url' => ['exam/index']];
+$this->params['breadcrumbs'][] = ['label' => \Yii::t('monitor', 'Monitoring'), 'url' => ['monitor/']];
+$this->params['breadcrumbs'][] = \Yii::t('exam', 'Choose Exam');
 
 $js = <<< 'SCRIPT'
 /* To initialize BS3 popovers set this below */
@@ -51,19 +51,19 @@ $this->registerJs($js);
     <div class="alert alert-success" role="alert">
         <span class="glyphicon glyphicon-alert"></span>
         <span><?= \Yii::t('app', 'For more information, please visit {link}.', [
-            'link' => Html::a('Manual / Generate results', ['/howto/view', 'id' => 'generate-results.md'], ['class' => 'alert-link'])
+            'link' => Html::a('Manual / Monitoring exams', ['/howto/view', 'id' => 'monitoring-exams.md'], ['class' => 'alert-link'])
         ]) ?></span>
 
     </div>
 
     <div class="result-form">
 
-        <?= Html::beginForm(['result/generate'], 'get', ['enctype' => 'multipart/form-data']); ?>
+        <?= Html::beginForm(['monitor/view'], 'get', ['enctype' => 'multipart/form-data']); ?>
         <div class="row">
             <div class="col-md-12">
 
                 <?= Select2::widget([
-                    'name' => 'exam_id',
+                    'name' => 'id',
                     'options' => ['placeholder' => \Yii::t('exam', 'Choose an Exam ...')],
                     'pluginOptions' => [
                         'dropdownAutoWidth' => true,

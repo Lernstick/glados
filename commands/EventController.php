@@ -6,7 +6,6 @@ use yii;
 use yii\console\Controller;
 use yii\console\ExitCode;
 use app\models\forms\EventItemSend;
-use app\models\forms\EventStreamListen;
 
 /**
  * Event Daemon

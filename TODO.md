@@ -32,9 +32,6 @@ TODO:
     * Button: switch the two videos
       * test in fullscreen
 
-* keylogger
-  * check script: it starts too early (no Xorg running already), then keymap is not set correctly
-
 * multiple filessystems for exams
   * option to upload squashfs/zip files detached from exam context
      * name field (ex: "Brackets v1.14.2")
@@ -49,11 +46,17 @@ TODO:
 * Live overview
   * new URL in avahi service file
      * <txt-record>actionLive='glados/index.php/ticket/live/{token}'</txt-record>
+  * manual for monitoring monitoring-exams.md
+
+* keylogger
+  * form field keymap -> dropdown field
 
 * misc
+  * translations
   * disable firewall not working anymore: done
-  * backup browse view broken
-  * version check (of lernstick and lernstick-exam-client) in search script
+  * backup browse view broken: done
+  * backup browse view broken: http://192.168.0.17/glados/index.php/ticket/2941?path=%2FDokumente&date=all&showDotFiles=0#tab_browse
+  * version check (of lernstick and lernstick-exam-client) in search script: done
 
 * daemons
   * have a look at https://github.com/yiisoft/yii2-queue

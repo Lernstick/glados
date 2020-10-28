@@ -104,7 +104,8 @@ SCRIPT;
 
                 <?= VideoJsWidget::widget([
                     'jsOptions' => [
-                        'fluid' => true,
+                        #'fluid' => true, # to make aspectRatio dynamic based on the video
+                        'aspectRatio' => '16:10', # fixed ratio
                         'controls' => true,
                         'liveui' => true,
                         'preload' => 'metadata',
@@ -152,7 +153,6 @@ SCRIPT;
                     <h4><?= Yii::t('ticket', 'Available screen captures:') ?></h4>
 
                     <?php Pjax::begin([
-                        'id' => 'w102',
                         'options' => [
                             'tag' => 'ul',
                             'class' => 'list-unstyled timeline widget',

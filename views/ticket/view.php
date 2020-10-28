@@ -4,7 +4,6 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\widgets\ListView;
 use yii\widgets\Pjax;
-use yii\helpers\Url;
 use yii\bootstrap\Modal;
 use app\components\ActiveEventField;
 use app\components\Editable;

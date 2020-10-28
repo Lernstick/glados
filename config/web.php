@@ -76,6 +76,7 @@ $config = [
                 'ticket/<action:(config|download|finish|notify|md5|status|live)>/<token:.*>' => 'ticket/<action>',
                 'backup/<action:file>/<ticket_id:\d+>' => 'backup/<action>',
                 'event/<action:(agent)>/<token:.*>' => 'event/<action>',
+                'monitor' => 'monitor/view'
             ]
         ],
         'i18n' => [

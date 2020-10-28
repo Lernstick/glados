@@ -27,7 +27,7 @@ class TestController extends Controller
                 ],
                 'rules' => [
                     [
-                        'allow' => YII_ENV_DEV && YII_DEBUG,
+                        'allow' => YII_ENV_DEV,
                     ],
                 ],
             ],

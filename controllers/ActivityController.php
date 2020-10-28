@@ -10,8 +10,6 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\CookieCollection;
 use yii\db\Expression;
-use app\models\EventItem;
-use app\models\EventStream;
 use app\components\AccessRule;
 use app\models\User;
 

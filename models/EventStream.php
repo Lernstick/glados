@@ -227,7 +227,13 @@ class EventStream extends EventItem
         $this->refresh();
 
         $this->_listenEvents = explode(',', $this->listenEvents);
-        $this->_listenEvents = preg_replace('/\:.*$/', '', $this->_listenEvents); #??
+
+        # remove the group name if present
+        $this->_listenEvents = preg_replace('/^.+\:/', '', $this->_listenEvents);
+
+        // Also listen to the bump event "event/{uuid}". This is the event describing that something about
+        // the current stream has changed (for example new events to listen to or old events to stop listen
+        // to).
         $this->_listenEvents[] = 'event/' . $this->uuid;
 
         foreach ($this->_listenEvents as $event) {
@@ -373,10 +379,10 @@ class EventStream extends EventItem
                     /*
                      * @param array|false $inotifyEvents array of events. Each event is an array with the
                      * following keys:
-                     * * wd is a watch descriptor returned by inotify_add_watch()
-                     * * mask is a bit mask of events (https://www.php.net/manual/en/inotify.constants.php)
-                     * * cookie is a unique id to connect related events (e.g. IN_MOVE_FROM and IN_MOVE_TO)
-                     * * name is the name of a file (e.g. if a file was modified in a watched directory)
+                     * - wd is a watch descriptor returned by inotify_add_watch()
+                     * - mask is a bit mask of events (https://www.php.net/manual/en/inotify.constants.php)
+                     * - cookie is a unique id to connect related events (e.g. IN_MOVE_FROM and IN_MOVE_TO)
+                     * - name is the name of a file (e.g. if a file was modified in a watched directory)
                      */
                     $inotifyEvents = inotify_read($socket);
 
@@ -386,9 +392,9 @@ class EventStream extends EventItem
                     $mask = $inotifyEvents[0]['mask'];
                     $wd = $inotifyEvents[0]['wd'];
 
-                    // File opened for writing was closed or File or directory created in watched directory
+                    // File opened for writing was closed or file or directory created in watched directory
                     if ($mask == IN_CLOSE_WRITE || $mask == IN_CREATE) {
-                        if ($this->listening($wd)) {
+                        if ($this->isListening($wd)) {
                             $this->queryEvents(false, $inotifyEvents[0]);
                             return true;
                         }
@@ -456,7 +462,7 @@ class EventStream extends EventItem
      * @param resource $descriptor the descritor to check
      * @return bool true or false
      */
-    public function listening ($descriptor)
+    public function isListening ($descriptor)
     {
         return array_search($descriptor, $this->_fwd) !== false
             || array_search($descriptor, $this->_dwd) !== false;

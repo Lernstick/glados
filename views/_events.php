@@ -12,8 +12,8 @@ $script = '';
 if (extension_loaded('inotify') && isset($this->params['listenEvents']) && isset($this->params['uuid'])) {
 
     foreach($this->params['listenEvents'] as $event){
-        $e[] = $event[0];
-        $script .= $event[1];
+        $e[] = $event['name'];
+        $script .= $event['register'];
     }
     $e = implode(',', array_unique($e));
 
@@ -30,7 +30,7 @@ if (extension_loaded('inotify') && isset($this->params['listenEvents']) && isset
             'uuid' => $stream->uuid,
     //        'listenEvents' => isset($e) ? $e : null,
         ]) . "');" . PHP_EOL . 
-        "eventListeners = [];" . PHP_EOL
+        "eventListeners = {};" . PHP_EOL
     );
 
     $this->registerJs($script);
