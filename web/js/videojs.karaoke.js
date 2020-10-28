@@ -4,17 +4,19 @@ var Plugin = videojs.getPlugin('plugin');
 /**
  * Hash a string (fast & cheap)
  */
-Object.defineProperty(String.prototype, 'hashCode', {
-  value: function() {
-    var hash = 0, i, chr;
-    for (i = 0; i < this.length; i++) {
-      chr   = this.charCodeAt(i);
-      hash  = ((hash << 5) - hash) + chr;
-      hash |= 0; // Convert to 32bit integer
-    }
-    return hash;
-  }
-});
+if (String.prototype.hasOwnProperty('hashCode') === false) {
+    Object.defineProperty(String.prototype, 'hashCode', {
+      value: function() {
+        var hash = 0, i, chr;
+        for (i = 0; i < this.length; i++) {
+          chr   = this.charCodeAt(i);
+          hash  = ((hash << 5) - hash) + chr;
+          hash |= 0; // Convert to 32bit integer
+        }
+        return hash;
+      }
+    });
+}
 
 /**
  * simulate karaoke style subtitles (mozilla's vtt.js seems not to support them)
