@@ -858,31 +858,37 @@ class TicketController extends Controller
      * @param string $token
      * @return The response object or an array with the error description
      */
-    public function actionLive($token)
+    public function actionLive($token, $mode = 'default')
     {
 
         $model = Ticket::findOne(['token' => $token]);
         $request = Yii::$app->request;
         $path = \Yii::$app->params['uploadPath'] . '/live';
         $dfile = $path . '/' . $token . '.jpg';
-        $ifile = $path . '/' . $token . '_icon.png';
+        $ifile = $path . '/' . $token . '_icon.gif';
+        $wfile = $path . '/' . $token . '_window.txt';
 
         if (!$model) {
             throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
         } else if ($request->isGet) {
-            // check if the ticket is running and booted
-            if ($model->bootup_lock == 0 /* && $model->state == Ticket::STATE_RUNNING */
-                && (! file_exists($dfile) || time() - filemtime($dfile) > Exam::MONITOR_IDLE_TIME)
-            ){
-                $agentEvent = new AgentEvent([
-                    'ticket' => $model,
-                    'data' => 'startLive',
-                ]);
-                $agentEvent->generate();
+            if ($mode == 'default') {
+                // check if the ticket is running and booted
+                if ($model->bootup_lock == 0 /* && $model->state == Ticket::STATE_RUNNING */
+                    && (! file_exists($dfile) || time() - filemtime($dfile) > Exam::MONITOR_IDLE_TIME)
+                ){
+                    $agentEvent = new AgentEvent([
+                        'ticket' => $model,
+                        'data' => 'startLive',
+                    ]);
+                    $agentEvent->generate();
+                }
+                $file = $dfile;
+            } else if ($mode == 'icon') {
+                $file = $ifile;
             }
 
-            if (file_exists($dfile)) {
-                return \Yii::$app->response->sendFile($dfile, 'live.jpg', [
+            if (file_exists($file)) {
+                return \Yii::$app->response->sendFile($file, 'live.jpg', [
                     'mimeType' => 'image/jpeg',
                     'inline' => true
                 ]);
@@ -896,20 +902,22 @@ class TicketController extends Controller
             }
             $img = UploadedFile::getInstanceByName('img');
             $img->saveAs($dfile);
+            $live = ['base64' => base64_encode(file_get_contents($dfile))];
 
-            $icon = UploadedFile::getInstanceByName('icon');
-            $icon->saveAs($ifile);
+            if ( ($icon = UploadedFile::getInstanceByName('icon')) !== null ) {
+                $icon->saveAs($ifile);
+                $live['icon'] = base64_encode(file_get_contents($ifile));
+            }
+
+            if (array_key_exists('window', Yii::$app->request->post())) {
+                $model->liveWindowName = Yii::$app->request->post()['window'];
+                $live['window'] = Yii::$app->request->post()['window'];
+            }
 
             $eventItem = new EventItem([
                 'event' => 'ticket/' . $model->id,
                 'priority' => 0,
-                'data' => [
-                    'live' => [
-                        'window' => Yii::$app->request->post()['window'],
-                        'base64' => base64_encode(file_get_contents($dfile)),
-                        'icon' => base64_encode(file_get_contents($ifile)),
-                    ],
-                ],
+                'data' => ['live' => $live],
             ]);
             $eventItem->generate();
         }

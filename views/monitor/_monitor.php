@@ -70,6 +70,7 @@ $this->registerJs($js, \yii\web\View::POS_READY);
             'class' => 'summary col-xs-12 col-md-12',
         ],
         'emptyText' => \Yii::t('ticket', 'No tickets found.'),
+        'emptyTextOptions' => ['class' => 'col-md-12 text-center'],
         'layout' => '{pager} {summary}<br>{items}',
     ]); ?>
 

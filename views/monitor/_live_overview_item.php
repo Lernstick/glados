@@ -13,8 +13,8 @@ use app\components\ActiveEventField;
 
 <div class="live-overview-item">
     <?= ActiveEventField::widget([
+        'id' => generate_uuid(),
         'options' => [
-            'id' => generate_uuid(),
             'tag' => 'img',
             'class' => 'live-thumbnail',
             'alt' => \Yii::t('ticket', 'Please wait, while the live image is being produced...'),
@@ -38,8 +38,8 @@ use app\components\ActiveEventField;
 
     <?= Html::a(
         ActiveEventField::widget([
+            'id' => generate_uuid(),
             'options' => [
-                'id' => generate_uuid(),
                 'tag' => 'span',
                 'class' => 'glyphicon glyphicon-circle',
                 'title' => \Yii::t('ticket', 'Currently behind live'),
@@ -54,12 +54,12 @@ use app\components\ActiveEventField;
         ]) . (empty($model->test_taker) ? $model->token : $model->test_taker) .
         ' // ' .
         ActiveEventField::widget([
+            'id' => generate_uuid(),
             'options' => [
-                'id' => generate_uuid(),
                 'tag' => 'img',
                 'class' => 'live-overview-item-icon',
                 'alt' => ' ',
-                'href' => '#',
+                'src' => Url::to(['ticket/live', 'token' => $model->token, 'mode' => 'icon']),
             ],
             'event' => 'monitor:ticket/' . $model->id,
             'jsonSelector' => 'live',
@@ -70,12 +70,13 @@ use app\components\ActiveEventField;
         ]) .
         ' ' .
         ActiveEventField::widget([
+            'id' => generate_uuid(),
             'options' => [
-                'id' => generate_uuid(),
                 'tag' => 'span',
                 'class' => 'live-overview-item-info',
                 'title' => '',
             ],
+            'content' => $model->liveWindowName,
             'event' => 'monitor:ticket/' . $model->id,
             'jsonSelector' => 'live',
             // show the active window

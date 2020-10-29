@@ -68,6 +68,8 @@ class Ticket extends LiveActiveRecord
      */
     private $_agent_uuid;
 
+    private $_liveWindowName;
+
     public $tduration;
 
     /* db translated fields */
@@ -731,6 +733,34 @@ class Ticket extends LiveActiveRecord
     public function getScreencapture()
     {
         return Screencapture::findOne($this->id);
+    }
+
+    /**
+     * Getter for the live window name
+     *
+     * @return string
+     */
+    public function getLiveWindowName()
+    {
+        $path = \Yii::$app->params['uploadPath'] . '/live/' . $this->token . '_window.txt';
+        if ($this->_liveWindowName == null) {
+            $this->_liveWindowName = @file_get_contents($path);
+        }
+        return $this->_liveWindowName;
+    }
+
+    /**
+     * Setter for the live window name
+     *
+     * @param string
+     */
+    public function setLiveWindowName($value)
+    {
+        $path = \Yii::$app->params['uploadPath'] . '/live/' . $this->token . '_window.txt';
+        if ($this->_liveWindowName != $value) {
+            $this->_liveWindowName = $value;
+            file_put_contents($path, $value);
+        }
     }
 
     /**
