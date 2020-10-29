@@ -5,6 +5,7 @@ use yii\widgets\ListView;
 use yii\widgets\Pjax;
 use yii\bootstrap\Modal;
 use yii\helpers\Url;
+use app\components\ActiveEventField;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Exam */
@@ -33,8 +34,6 @@ setInterval(function(){
 },1000);
 
 $('#galleryModal').on('show.bs.modal', function(e) {
-    //$('#galleryModal img').attr("src", "");
-    //$('#galleryModal img').attr("src", $(e.relatedTarget).data('src') + "&" + new Date().getTime());
     $('#galleryModal object').attr("data", "");
     $('#galleryModal object').attr("data", $(e.relatedTarget).data('src') + "&" + new Date().getTime());    
 });
@@ -43,8 +42,17 @@ $this->registerJs($js, \yii\web\View::POS_READY);
 
 ?>
 
+<?= ActiveEventField::widget([
+    'event' => 'exam/' . $model->id,
+    'jsonSelector' => 'runningTickets',
+    'jsHandler' => 'function(d, s) { $.pjax.reload({container: "#live_monitor"}); }',
+]); ?>
+
 <div class="row">
-    <div class="col-sm-12 text-right">
+    <div class="col-sm-9">
+        <span><?= \Yii::t('monitor', 'Only tickets in running state will be shown here.'); ?></span>
+    </div>
+    <div class="col-sm-3 text-right">
         <a class="btn btn-default" onClick='$.pjax.reload({container:"#live_monitor"});'><i class="glyphicon glyphicon-refresh"></i>&nbsp;<?= Yii::t('app', 'Reload') ?></a>
     </div>
 </div>

@@ -361,7 +361,7 @@ class Ticket extends LiveActiveRecord
      */
     public function updateEvent_old()
     {
-        if($this->attributesChanged([ 'start', 'end', 'test_taker', 'result' ])){
+        if ($this->attributesChanged([ 'start', 'end', 'test_taker', 'result' ])) {
             $eventItem = new EventItem([
                 'event' => 'ticket/' . $this->id,
                 'priority' => 0,
@@ -373,7 +373,20 @@ class Ticket extends LiveActiveRecord
             $eventItem->generate();
         }
 
-        if($this->attributesChanged([ 'client_state_id', 'client_state_data' ])){
+        // for the monitor view to reload, when a ticket state has changed
+        if ($this->attributesChanged([ 'start', 'end' ])) {
+            $eventItem = new EventItem([
+                'event' => 'exam/' . $this->exam->id,
+                'priority' => 0,
+                'concerns' => $this->concerns,
+                'data' => [
+                    'runningTickets' => $this->exam->runningTickets,
+                ],
+            ]);
+            $eventItem->generate();
+        }
+
+        if ($this->attributesChanged([ 'client_state_id', 'client_state_data' ])) {
             $act = new Activity([
                 'ticket_id' => $this->id,
                 'description' => yiit('activity', 'Client state changed: {client_state}'),

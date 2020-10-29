@@ -86,7 +86,7 @@ $this->registerJs($active_tabs);
                     [
                         'class' => 'btn',
                         'style' => ['text-align' => 'left'],
-                        'disabled' => $model->runningTicketCount != 0,
+                        'disabled' => $model->runningTickets != 0,
                         'data-pjax' => 0
                     ]
                 ) ?>
@@ -124,9 +124,9 @@ $this->registerJs($active_tabs);
                     [
                         'class' => 'btn',
                         'style' => ['text-align' => 'left'],
-                        'disabled' => $model->openTicketCount == 0,
+                        'disabled' => $model->openTickets == 0,
                         'data' => [
-                            'confirm' => \Yii::t('exams', 'Are you sure you want to delete ALL {n} Open tickets associated to this exam?', ['n' => $model->openTicketCount]),
+                            'confirm' => \Yii::t('exams', 'Are you sure you want to delete ALL {n} Open tickets associated to this exam?', ['n' => $model->openTickets]),
                             'method' => 'post',
                         ],
                     ]

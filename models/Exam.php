@@ -25,9 +25,10 @@ use app\components\HistoryBehavior;
  * 
  * @property Ticket[] $tickets
  * @property integer ticketCount
- * @property integer openTicketCount
- * @property integer runningTicketCount
- * @property integer closedTicketCount
+ * @property integer openTickets
+ * @property integer runningTickets
+ * @property integer closedTickets
+ * @property integer submittedTickets
  */
 class Exam extends Base
 {
@@ -139,10 +140,10 @@ class Exam extends Base
             'backup_path' => \Yii::t('exams', 'Remote Backup Path'),
             'ticketInfo' => \Yii::t('exams', 'Related Tickets'),
             'ticketCount' => \Yii::t('exams', '# Tickets'),
-            'openTicketCount' => \Yii::t('exams', 'Open Tickets'),
-            'runningTicketCount' => \Yii::t('exams', 'Running Tickets'),
-            'closedTicketCount' => \Yii::t('exams', 'Closed Tickets'),
-            'submittedTicketCount' => \Yii::t('exams', 'Submitted Tickets'),
+            'openTickets' => \Yii::t('exams', 'Open Tickets'),
+            'runningTickets' => \Yii::t('exams', 'Running Tickets'),
+            'closedTickets' => \Yii::t('exams', 'Closed Tickets'),
+            'submittedTickets' => \Yii::t('exams', 'Submitted Tickets'),
         ];
     }
 
@@ -258,35 +259,50 @@ class Exam extends Base
     /**
      * @return int
      */
-    public function getOpenTicketCount()
+    public function getOpenTickets()
     {
-        return intval($this->getTickets()->where(["NULLIF(start, '')" => null, "NULLIF(end, '')" => null ])->count());
+        return intval($this->getTickets()->where([
+            "NULLIF(start, '')" => null,
+            "NULLIF(end, '')" => null
+        ])->count());
     }
 
     /**
      * @return int
      */
-    public function getRunningTicketCount()
+    public function getRunningTickets()
     {
-        return intval($this->getTickets()->where([ 'and', [ 'not', [ "NULLIF(start, '')" => null ] ], [ "NULLIF(end, '')" => null ] ])->count());
+        return intval($this->getTickets()->where([
+            'and',
+            [ 'not', [ "NULLIF(start, '')" => null ] ],
+            [ "NULLIF(end, '')" => null ]
+        ])->count());
     }
 
     /**
      * @return int
      */
-    public function getClosedTicketCount()
+    public function getClosedTickets()
     {
-        return intval($this->getTickets()->where([ 'and', [ 'not', [ "NULLIF(start, '')" => null ] ], [ 'not', [ "NULLIF(end, '')" => null ] ], [ "NULLIF(test_taker, '')" => null ] ])->count());
-
+        return intval($this->getTickets()->where([
+            'and',
+            [ 'not', [ "NULLIF(start, '')" => null ] ],
+            [ 'not', [ "NULLIF(end, '')" => null ] ],
+            [ "NULLIF(test_taker, '')" => null ]
+        ])->count());
     }
 
     /**
      * @return int
      */
-    public function getSubmittedTicketCount()
+    public function getSubmittedTickets()
     {
-        return intval($this->getTickets()->where([ 'and', [ 'not', [ "NULLIF(start, '')" => null ] ], [ 'not', [ "NULLIF(end, '')" => null ] ], [ 'not', [ "NULLIF(test_taker, '')" => null ] ] ])->count());
-
+        return intval($this->getTickets()->where([
+            'and',
+            [ 'not', [ "NULLIF(start, '')" => null ] ],
+            [ 'not', [ "NULLIF(end, '')" => null ] ],
+            [ 'not', [ "NULLIF(test_taker, '')" => null ] ]
+        ])->count());
     }
 
     /**
@@ -382,8 +398,8 @@ class Exam extends Base
     {
         $a = array();
 
-        $this->openTicketCount != 0 ?
-            $a[] = Html::a($this->openTicketCount, [
+        $this->openTickets != 0 ?
+            $a[] = Html::a($this->openTickets, [
                 'ticket/index',
                 'TicketSearch[examId]' => $this->id,
                 'TicketSearch[state]' => 0
@@ -392,8 +408,8 @@ class Exam extends Base
                 'class' => 'bg-success text-success',
                 'title' => \Yii::t('exams', 'Number of Tickets in open state')
             ]) : null;
-        $this->runningTicketCount != 0 ?
-            $a[] = Html::a($this->runningTicketCount, [
+        $this->runningTickets != 0 ?
+            $a[] = Html::a($this->runningTickets, [
                 'ticket/index',
                 'TicketSearch[examId]' => $this->id,
                 'TicketSearch[state]' => 1
@@ -402,8 +418,8 @@ class Exam extends Base
                 'class' => 'bg-info text-info',
                 'title' => \Yii::t('exams', 'Number of Tickets in running state')
             ]) : null;
-        $this->closedTicketCount != 0 ?
-            $a[] = Html::a($this->closedTicketCount, [
+        $this->closedTickets != 0 ?
+            $a[] = Html::a($this->closedTickets, [
                 'ticket/index',
                 'TicketSearch[examId]' => $this->id,
                 'TicketSearch[state]' => 2
@@ -412,8 +428,8 @@ class Exam extends Base
                 'class' => 'bg-danger text-danger',
                 'title' => \Yii::t('exams', 'Number of Tickets in closed state')
             ]) : null;
-        $this->submittedTicketCount != 0 ? 
-            $a[] = Html::a($this->submittedTicketCount, [
+        $this->submittedTickets != 0 ?
+            $a[] = Html::a($this->submittedTickets, [
                 'ticket/index',
                 'TicketSearch[examId]' => $this->id,
                 'TicketSearch[state]' => 3
@@ -430,7 +446,7 @@ class Exam extends Base
                     ( '(' . implode(',', $a) . ')/' )
                 )
             ) . 
-            ( $this->ticketCount != 0 ? 
+            ( $this->ticketCount != 0 ?
                 Html::a($this->ticketCount, [
                     'ticket/index',
                     'TicketSearch[examId]' => $this->id,
@@ -452,8 +468,8 @@ class Exam extends Base
 
     public function validateRunningTickets($attribute, $params)
     {
-        $this->runningTicketCount != 0 ? $this->addError($attribute, \Yii::t('exams', 'Exam edit is disabled while there {n,plural,=1{is one ticket} other{are # tickets}} in "Running" state.', [
-            'n' => $this->runningTicketCount
+        $this->runningTickets != 0 ? $this->addError($attribute, \Yii::t('exams', 'Exam edit is disabled while there {n,plural,=1{is one ticket} other{are # tickets}} in "Running" state.', [
+            'n' => $this->runningTickets
         ])) : null;
     }
 

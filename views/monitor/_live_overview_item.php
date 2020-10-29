@@ -14,6 +14,7 @@ use app\components\ActiveEventField;
 <div class="live-overview-item">
     <?= ActiveEventField::widget([
         'options' => [
+            'id' => generate_uuid(),
             'tag' => 'img',
             'class' => 'live-thumbnail',
             'alt' => \Yii::t('ticket', 'Please wait, while the live image is being produced...'),
@@ -38,6 +39,7 @@ use app\components\ActiveEventField;
     <?= Html::a(
         ActiveEventField::widget([
             'options' => [
+                'id' => generate_uuid(),
                 'tag' => 'span',
                 'class' => 'glyphicon glyphicon-circle',
                 'title' => \Yii::t('ticket', 'Currently behind live'),
@@ -53,6 +55,7 @@ use app\components\ActiveEventField;
         ' // ' .
         ActiveEventField::widget([
             'options' => [
+                'id' => generate_uuid(),
                 'tag' => 'img',
                 'class' => 'live-overview-item-icon',
                 'alt' => ' ',
@@ -68,6 +71,7 @@ use app\components\ActiveEventField;
         ' ' .
         ActiveEventField::widget([
             'options' => [
+                'id' => generate_uuid(),
                 'tag' => 'span',
                 'class' => 'live-overview-item-info',
                 'title' => '',

@@ -326,29 +326,29 @@ $this->params['breadcrumbs'][] = $this->title;
                         'data' => [
                             [
                                 'name' => \Yii::t('exams', 'Open'),
-                                'y' => $model->openTicketCount,
+                                'y' => $model->openTickets,
                                 'color' => '#5cb85c'
                             ],
                             [
                                 'name' => \Yii::t('exams', 'Running'),
-                                'y' => $model->runningTicketCount,
+                                'y' => $model->runningTickets,
                                 'color' => '#286090',
                                 'sliced' => true,
                                 'selected' => true
                             ],
                             [
                                 'name' => \Yii::t('exams', 'Closed'),
-                                'y' => $model->closedTicketCount,
+                                'y' => $model->closedTickets,
                                 'color' => '#d9534f'
                             ],
                             [
                                 'name' => \Yii::t('exams', 'Submitted'),
-                                'y' => $model->submittedTicketCount,
+                                'y' => $model->submittedTickets,
                                 'color' => '#f0ad4e'
                             ],
                             [
                                 'name' => \Yii::t('exams', 'Unknown'),
-                                'y' => $model->ticketCount - $model->openTicketCount - $model->runningTicketCount - $model->closedTicketCount - $model->submittedTicketCount,
+                                'y' => $model->ticketCount - $model->openTickets - $model->runningTickets - $model->closedTickets - $model->submittedTickets,
                                 'color' => '#dddddd'
                             ]
 

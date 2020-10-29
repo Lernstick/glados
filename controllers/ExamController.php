@@ -196,23 +196,23 @@ class ExamController extends Controller
             return [
                 [
                     'name' => yii::$app->formatter->format(0, 'state'),
-                    'y' => $model->openTicketCount,
+                    'y' => $model->openTickets,
                 ],
                 [
                     'name' => yii::$app->formatter->format(1, 'state'),
-                    'y' => $model->runningTicketCount,
+                    'y' => $model->runningTickets,
                 ],
                 [
                     'name' => yii::$app->formatter->format(2, 'state'),
-                    'y' => $model->closedTicketCount,
+                    'y' => $model->closedTickets,
                 ],
                 [
                     'name' => yii::$app->formatter->format(3, 'state'),
-                    'y' => $model->submittedTicketCount,
+                    'y' => $model->submittedTickets,
                 ],
                 [
                     'name' => yii::$app->formatter->format(4, 'state'),
-                    'y' => $model->ticketCount - $model->openTicketCount - $model->runningTicketCount - $model->closedTicketCount - $model->submittedTicketCount,
+                    'y' => $model->ticketCount - $model->openTickets - $model->runningTickets - $model->closedTickets - $model->submittedTickets,
                 ]
             ];
 
@@ -306,9 +306,9 @@ class ExamController extends Controller
         $model->setAttributes(Yii::$app->request->post());
 
         if ($mode === 'default') {
-            if ($model->exam->runningTicketCount != 0){
+            if ($model->exam->runningTickets != 0){
                 Yii::$app->session->addFlash('danger', \Yii::t('exams', 'Exam edit is disabled while there {n,plural,=1{is one ticket} other{are # tickets}} in "Running" state.',
-                    [ 'n' => $model->exam->runningTicketCount ]
+                    [ 'n' => $model->exam->runningTickets ]
                 ));
                 return $this->redirect(['view', 'id' => $model->exam->id]);
             }

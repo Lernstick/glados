@@ -106,11 +106,10 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
                         'visible' => Yii::$app->user->can('ticket/update'),                    
                     ],
                     [
-                        'label' => \Yii::t('main', 'Start Daemon'),
-                        'url' => ['/daemon/create', 'type' => 'daemon'],
-                        'visible' => Yii::$app->user->can('daemon/create'),
+                        'label' => \Yii::t('main', 'Monitor exams'),
+                        'url' => ['/monitor'],
+                        'visible' => Yii::$app->user->can('ticket/view'),
                     ],
-
                     [
                         'label' => \Yii::t('main', 'Generate results'),
                         'url' => ['/result/generate'],

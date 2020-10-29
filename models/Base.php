@@ -8,25 +8,6 @@ use yii\db\ActiveRecord;
 /**
  * This is the base model class.
  *
- * @property integer $id
- * @property string $name
- * @property string $subject
- * @property boolean $grp_netdev
- * @property boolean $allow_sudo
- * @property boolean $allow_mount
- * @property boolean $firewall_off
- * @property boolean $screenshots
- * @property string $file
- * @property integer $user_id
- * @property string $file_list
- *
- * @property User $user
- * 
- * @property Ticket[] $tickets
- * @property integer ticketCount
- * @property integer openTicketCount
- * @property integer runningTicketCount
- * @property integer closedTicketCount
  */
 class Base extends \yii\db\ActiveRecord
 {
