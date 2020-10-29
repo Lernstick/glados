@@ -59,9 +59,9 @@ class BackupController extends Controller
         } else {
             throw new NotFoundHttpException($path . ': No such file or directory.');
         }
-        
+
         return Yii::$app->response->sendContentAsFile($contents, $fs->slash($path)->basename, [
-            'mimeType' => $mimeType,
+            'mimeType' => 'application/octet-stream',
             'inline' => false,
         ]);
     }
