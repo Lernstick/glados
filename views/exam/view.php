@@ -307,7 +307,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ])
                 ],
                 'tooltip' => [
-                    'pointFormat' => '{series.name}: <b>{point.percentage:.1f}%</b>'
+                    'pointFormat' => '{series.name}: <b>{point.y}</b> ({point.percentage:.1f}%)'
                 ],
                 'plotOptions' => [
                     'pie' => [
