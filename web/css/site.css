@@ -474,7 +474,7 @@ ul.nav-special > li.active > a > div {
     font-weight: bold;
 }
 
-.live-overview-item img {
+.live-overview-item img.live-thumbnail {
     width: 100%;
     height: 100%;
     object-fit: contain;
@@ -482,7 +482,7 @@ ul.nav-special > li.active > a > div {
     background-color: black;
 }
 
-.live-overview-item:hover img {
+.live-overview-item:hover img.live-thumbnail {
     opacity: 1;
 }
 
@@ -498,6 +498,11 @@ ul.nav-special > li.active > a > div {
     background: -o-linear-gradient(left, rgba(85, 67, 70, 0.85), rgba(69, 80, 91, 0.85)) !important;
     background: -ms-linear-gradient(left, rgba(85, 67, 70, 0.85), rgba(69, 80, 91, 0.85)) !important;
     background: linear-gradient(left, rgba(85, 67, 70, 0.85), rgba(69, 80, 91, 0.85)) !important;
+}
+
+.live-overview-item-icon {
+    width: 16px;
+    height: 16px;
 }
 
 .live-overview-item:hover .live-overview-item-title {

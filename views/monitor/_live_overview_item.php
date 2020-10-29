@@ -50,6 +50,22 @@ use app\components\ActiveEventField;
                 $(s).attr("title", "' . \Yii::t('ticket', 'Currently playing live') . '");
             }',
         ]) . (empty($model->test_taker) ? $model->token : $model->test_taker) .
+        ' // ' .
+        ActiveEventField::widget([
+            'options' => [
+                'tag' => 'img',
+                'class' => 'live-overview-item-icon',
+                'alt' => ' ',
+                'href' => '#',
+            ],
+            'event' => 'monitor:ticket/' . $model->id,
+            'jsonSelector' => 'live',
+            // show the icon of the active window
+            'jsHandler' => 'function(d, s) {
+                s.src = "data:image/jpg;base64," + d.icon;
+            }',
+        ]) .
+        ' ' .
         ActiveEventField::widget([
             'options' => [
                 'tag' => 'span',
@@ -60,7 +76,7 @@ use app\components\ActiveEventField;
             'jsonSelector' => 'live',
             // show the active window
             'jsHandler' => 'function(d, s) {
-                $(s).html(" // " + d.window);
+                $(s).html(d.window);
                 $(s).attr("title", d.window);
             }',
         ]), Url::to(['ticket/view', 'id' => $model->id]),

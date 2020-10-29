@@ -864,14 +864,15 @@ class TicketController extends Controller
         $model = Ticket::findOne(['token' => $token]);
         $request = Yii::$app->request;
         $path = \Yii::$app->params['uploadPath'] . '/live';
-        $file = $path . '/' . $token . '.jpg';
+        $dfile = $path . '/' . $token . '.jpg';
+        $ifile = $path . '/' . $token . '_icon.png';
 
         if (!$model) {
             throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
         } else if ($request->isGet) {
             // check if the ticket is running and booted
             if ($model->bootup_lock == 0 /* && $model->state == Ticket::STATE_RUNNING */
-                && (! file_exists($file) || time() - filemtime($file) > Exam::MONITOR_IDLE_TIME)
+                && (! file_exists($dfile) || time() - filemtime($dfile) > Exam::MONITOR_IDLE_TIME)
             ){
                 $agentEvent = new AgentEvent([
                     'ticket' => $model,
@@ -880,8 +881,8 @@ class TicketController extends Controller
                 $agentEvent->generate();
             }
 
-            if (file_exists($file)) {
-                return \Yii::$app->response->sendFile($file, 'live.jpg', [
+            if (file_exists($dfile)) {
+                return \Yii::$app->response->sendFile($dfile, 'live.jpg', [
                     'mimeType' => 'image/jpeg',
                     'inline' => true
                 ]);
@@ -894,7 +895,10 @@ class TicketController extends Controller
                 mkdir($path);
             }
             $img = UploadedFile::getInstanceByName('img');
-            $img->saveAs($file);
+            $img->saveAs($dfile);
+
+            $icon = UploadedFile::getInstanceByName('icon');
+            $icon->saveAs($ifile);
 
             $eventItem = new EventItem([
                 'event' => 'ticket/' . $model->id,
@@ -902,7 +906,8 @@ class TicketController extends Controller
                 'data' => [
                     'live' => [
                         'window' => Yii::$app->request->post()['window'],
-                        'base64' => base64_encode(file_get_contents($file)),
+                        'base64' => base64_encode(file_get_contents($dfile)),
+                        'icon' => base64_encode(file_get_contents($ifile)),
                     ],
                 ],
             ]);
