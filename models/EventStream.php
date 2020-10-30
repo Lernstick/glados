@@ -188,6 +188,20 @@ class EventStream extends EventItem
     }
 
     /**
+     * Getter for the isActive flag.
+     *
+     * @return boolean whether the stream is active or not
+     */
+    public function getIsActive()
+    {
+        $retval = Yii::$app->mutex->acquire($this->uuid);
+        if ($retval) {
+            Yii::$app->mutex->release($this->uuid);
+        }
+        return !$retval;
+    }
+
+    /**
      * @return float amount of seconds with microseconds to stream from now on.
      * For example: 9.345 means 9 seconds and 345 ms.
      * 

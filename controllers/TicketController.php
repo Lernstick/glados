@@ -870,7 +870,9 @@ class TicketController extends Controller
 
         if (!$model) {
             throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+
         } else if ($request->isGet) {
+
             if ($mode == 'default') {
                 // check if the ticket is running and booted
                 if ($model->bootup_lock == 0 /* && $model->state == Ticket::STATE_RUNNING */
@@ -895,8 +897,10 @@ class TicketController extends Controller
             } else {
                 throw new NotFoundHttpException(Yii::t('app', 'File not found.'));
             }
+
         } else if ($request->isPost) {
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
+
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             if (!is_dir($path)) {
                 mkdir($path);
             }
@@ -920,6 +924,15 @@ class TicketController extends Controller
                 'data' => ['live' => $live],
             ]);
             $eventItem->generate();
+
+            $ret = [];
+            if (!$model->hasActiveEventStream("monitor")) {
+                $ret['stop'] = true;
+            }
+            #$ret['interval'] = 1;
+            #$ret['width'] = 260;
+
+            return $ret;
         }
     }
 

@@ -11,6 +11,7 @@ use yii\base\Event;
 use app\models\Backup;
 use app\models\Restore;
 use app\models\EventItem;
+use app\models\EventStream;
 use app\models\RemoteExecution;
 use app\components\HistoryBehavior;
 
@@ -838,6 +839,27 @@ class Ticket extends LiveActiveRecord
             Yii::$app->mutex->release($this->agent_uuid);
         }
         return !$retval;
+    }
+
+    /**
+     * Checks if the ticket has a running EventStream instance
+     * @param string $group the group indentifier in front of the event name
+     * @return boolean
+     */
+    public function hasActiveEventStream($group = null)
+    {
+        if ($group != null) {
+            $event = $group . ':' . $this->tableName() . '/' . $this->id;
+        } else {
+            $event = $this->tableName() . '/' . $this->id;
+        }
+        $models = EventStream::find()->where(['like', 'listenEvents', $event])->all();
+        foreach ($models as $stream) {
+            if ($stream->isActive) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
