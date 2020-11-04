@@ -7,18 +7,16 @@ use yii\base\Model;
 use yii\db\ActiveRecord;
 use app\models\User;
 use app\models\AuthItem;
+use yii\helpers\FileHelper;
 
 /**
  * This is the model class for event streams.
  *
  * @property integer $id
- * @property string $data
+ * @property string $data data payload
  * @property string $event
  * @property float $generated_at
- * @property integer $priority A value representing the importance of the event. A value of 0
- * is the highest priority, thus the event will be sent, no matter what happens. A value >0 
- * indicates that the event has lower priority, and therefore will only be sent if 
- * [EventStream::maxEventsPerSecond] is not exceeded.
+ * @property integer $priority A value representing the importance of the event. Has no meaning anymore
  *
  */
 class EventItem extends \yii\db\ActiveRecord
@@ -31,7 +29,7 @@ class EventItem extends \yii\db\ActiveRecord
      *      'users' => [12, 13, 14],
      *      'roles' => ['admin'],
      *  ]
-     * the 'user' array can also contain 'ALL' to address all users (multicast event), role is then ignored.
+     * the 'users' array can also contain 'ALL' to address all users (multicast event), 'roles' is then ignored.
      */
     public $concerns = [];
 
@@ -40,6 +38,27 @@ class EventItem extends \yii\db\ActiveRecord
     public $sent_at;
     public $debug;
     public $path = '/tmp/events';
+    public $trigger_attributes = [];
+
+    /**
+     * @var string path to the folder structure being monitored by inotify
+     */
+    public $inotifyDir;
+
+    /**
+     * @const priority constants
+     */
+    const PRIORITY_GUARANTEE = 0;
+    const PRIORITY_LAZY = 1;
+
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        $this->inotifyDir = \Yii::$app->params['tmpPath'] . '/inotify/';
+        $this->on(self::EVENT_BEFORE_DELETE, [$this, 'deleteEvent']);
+    }
 
     /**
      * @inheritdoc
@@ -77,24 +96,56 @@ class EventItem extends \yii\db\ActiveRecord
     }
 
     /**
+     * Generates the event.
+     * [[data]] is converted to json and translated. If the data payload is too large
+     * (it exceeds the column size in the database), it will be outsourced in a temporary
+     * file and the data field will contain the absolute path (ex: "file:///path/to/file").
+     * The needed files are touched, such that the [[EventStream]] triggers the events and
+     * the database record is created.
+     *
      * @return void
      */
     public function generate()
     {
-        $oldData = $this->data;
-        $this->data = json_encode($oldData);
+        $this->validate();
+
+        $origData = $this->data;
+        $this->data = json_encode($origData);
         $translate_data = $this->translate_data;
         $this->translate_data = json_encode($translate_data);
         $this->generated_at = microtime(true);
         $this->broadcast = (array_key_exists('users', $this->concerns) && in_array('ALL', $this->concerns['users']))
             ? 1 : 0;
-        $this->save();
 
-        //this part can be removed later
+        /* Store the data in a file if the data payload too large for the database.
+         * Can happen sometimes in the case of images. 
+         */
+        foreach ($this->tableSchema->columns as $key => $column) {
+            if($column->name == "data") {
+                //var_dump($this->event, strlen($this->data) > $column->size, strlen($this->data), $column->size);die();
+                if (strlen($this->data) > $column->size) {
+                    if (is_writable(\Yii::$app->params['tmpPath'])) {
+                        $filename = FileHelper::normalizePath(\Yii::$app->params['tmpPath'] . "/event-" . md5($this->data));
+                        file_put_contents($filename, $this->data);
+                        $this->data = "file://" . $filename;
+                    }
+                }
+            }
+        }
+
+        $this->save(false);
+
+        /* This is for the form EventItemSend only.
+         * Set the data value back to its original value such that
+         * [[data]] still is a string.
+         */
+        $this->data = is_array($origData) ? $this->data : $origData;
+
+        // @todo this part can be removed later
         if (basename($this->event) == '*') {
-            $file = '/tmp/user/' . dirname($this->event) . '/' . 'ALL';
-        }else{
-            $file = '/tmp/user/' . $this->event;
+            $file = $this->inotifyDir . '/' . dirname($this->event) . '/' . 'ALL';
+        } else {
+            $file = $this->inotifyDir . '/' . $this->event;
         }
         $this->touchFile($file, $this->id);
 
@@ -195,6 +246,23 @@ class EventItem extends \yii\db\ActiveRecord
             $roles = array_merge($roles, $r);
         }
         return array_unique($roles);
+    }
+
+    /**
+     * When the event item is deleted
+     * 
+     * @return bool success or failure
+     */
+    public function deleteEvent()
+    {
+        // the the data payload was a file
+        if (strpos($this->data, "file://") === 0) {
+            $file = substr($this->data, strlen("file://"));
+            if (is_readable($file)) {
+                return @unlink($file);
+            }
+        }
+        return true;
     }
 
 }

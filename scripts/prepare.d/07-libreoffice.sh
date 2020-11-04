@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Swetup for libreoffice
+# Setup for libreoffice
 #
 
 function libreoffice()

@@ -12,5 +12,7 @@ class EventAsset extends AssetBundle
     public $js = [
         'js/events.js',
     ];
-    public $depends = [];
+    public $depends = [
+        "app\assets\EventSourcePolyfillAsset"
+    ];
 }

@@ -145,9 +145,6 @@ connection_method_change = function(){
     if (selected == null) {
         selected = "{$model->connection_method}";
     }
-    console.log(ldap_uri);
-    console.log(ldap_scheme);
-    console.log(ldap_port);
     if (selected == "connect_via_uri") {
         ldap_uri.show();
         ldap_port.hide();

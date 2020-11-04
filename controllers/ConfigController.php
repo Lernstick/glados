@@ -29,6 +29,13 @@ class ConfigController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
+                        'actions' => [
+                            'info',  // public accessible information
+                        ],
+                        'roles' => ['?', '@'],
+                    ],
+                    [
+                        'allow' => true,
                         'roles' => ['rbac'],
                     ],
                 ],
@@ -37,7 +44,22 @@ class ConfigController extends Controller
     }
 
     /**
-     * Displays a single Screenshot thumbnail.
+     * Displays public accessible information about the server, such as its version.
+     *
+     * @return mixed
+     */
+    public function actionInfo()
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        return [
+            "server_version" => \Yii::$app->version,
+            "wants_client_version" => ">=1.0.11",
+            "wants_lernstick_version" => ">=20200804", // 2020-08-04, notice without the dashes (from /usr/local/lernstick.html)
+        ];
+    }
+
+    /**
+     * Displays the system configuration.
      *
      * @return mixed
      * @throws NotFoundHttpException if the config file cannot be found/parsed

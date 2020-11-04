@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\AuthTestForm */
+/* @var $model app\models\forms\AuthTestForm */
 /* @var $searchmodel app\models\AuthSearch */
 
 $this->title = \Yii::t('auth', 'Test Authentication Method');

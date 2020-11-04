@@ -106,11 +106,10 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
                         'visible' => Yii::$app->user->can('ticket/update'),                    
                     ],
                     [
-                        'label' => \Yii::t('main', 'Start Daemon'),
-                        'url' => ['/daemon/create', 'type' => 'daemon'],
-                        'visible' => Yii::$app->user->can('daemon/create'),
+                        'label' => \Yii::t('main', 'Monitor exams'),
+                        'url' => ['/monitor'],
+                        'visible' => Yii::$app->user->can('ticket/view'),
                     ],
-
                     [
                         'label' => \Yii::t('main', 'Generate results'),
                         'url' => ['/result/generate'],
@@ -198,6 +197,26 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
                         'visible' => Yii::$app->user->can('auth/index'),
                     ],
                 ],
+            ],
+
+            [
+                'label' => 'DEV',
+                'visible' => YII_ENV_DEV,
+                'options' => ['class' => 'dev_item'],
+                'items' => [
+                    [
+                        'label' => 'Send Events',
+                        'url' => ['/test/send'],
+                        'options' => ['class' => 'dev_item'],
+                        'visible' => YII_ENV_DEV,
+                    ],
+                    [
+                        'label' => 'Listen to Events',
+                        'url' => ['/test/listen'],
+                        'options' => ['class' => 'dev_item'],
+                        'visible' => YII_ENV_DEV,
+                    ],
+                ]
             ],
 
             [

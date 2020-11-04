@@ -11,9 +11,9 @@ use yii\web\JsExpression;
 /* @var $searchModel app\models\TicketSearch */
 
 $this->title = \Yii::t('results', 'Generate Result - Choose Exam');
-$this->params['breadcrumbs'][] = ['label' => \Yii::t('results', 'Exams'), 'url' => ['exam/index']];
+$this->params['breadcrumbs'][] = ['label' => \Yii::t('exams', 'Exams'), 'url' => ['exam/index']];
 $this->params['breadcrumbs'][] = ['label' => \Yii::t('results', 'Generate Result'), 'url' => ['result/generate']];
-$this->params['breadcrumbs'][] = \Yii::t('results', 'Choose Exam');
+$this->params['breadcrumbs'][] = \Yii::t('exams', 'Choose Exam');
 
 $js = <<< 'SCRIPT'
 /* To initialize BS3 popovers set this below */
@@ -50,7 +50,7 @@ $this->registerJs($js);
 
     <div class="alert alert-success" role="alert">
         <span class="glyphicon glyphicon-alert"></span>
-        <span><?= \Yii::t('results', 'For more information, please visit {link}.', [
+        <span><?= \Yii::t('app', 'For more information, please visit {link}.', [
             'link' => Html::a('Manual / Generate results', ['/howto/view', 'id' => 'generate-results.md'], ['class' => 'alert-link'])
         ]) ?></span>
 
@@ -64,7 +64,7 @@ $this->registerJs($js);
 
                 <?= Select2::widget([
                     'name' => 'exam_id',
-                    'options' => ['placeholder' => \Yii::t('results', 'Choose an Exam ...')],
+                    'options' => ['placeholder' => \Yii::t('exams', 'Choose an Exam ...')],
                     'pluginOptions' => [
                         'dropdownAutoWidth' => true,
                         'width' => 'auto',
@@ -101,7 +101,7 @@ $this->registerJs($js);
         </div>
         <br>
         <div class="form-group">
-            <?= Html::submitButton(\Yii::t('results', 'Next step'), ['class' => 'btn btn-success']) ?>
+            <?= Html::submitButton(\Yii::t('app', 'Next step'), ['class' => 'btn btn-success']) ?>
         </div>
 
         <?= Html::endForm() ?>

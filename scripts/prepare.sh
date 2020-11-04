@@ -7,6 +7,7 @@ timeout=10
 zenity="/usr/bin/zenity"
 initrd="/run/initramfs"
 infoFile="${initrd}/info"
+configFile="${initrd}/config.json"
 mountFile="${initrd}/mount"
 python="/usr/bin/python"
 examUser="user"
@@ -35,21 +36,38 @@ function clientState()
   $DEBUG && >&2 echo "New client state: $1"
 }
 
+# retrieves the configuration json and stores it to $configFile
+function get_config()
+{
+  url=${1}
+  ${wget} ${wgetOptions} -q -O "${configFile}" "${url}"
+  
+  retval=$?
+  if [ ${retval} -ne 0 ]; then
+    >&2 echo "wget failed while fetching the system config (return value: ${retval})."
+    ${zenity} --error --width=300 --title "Wget error" --text "wget failed while fetching the system config (return value: ${retval})."
+    do_exit 1
+  fi
+}
+
+# Echo the configuration value from the config json
+# @param $1 the config value to return
+# @param $2 the default value if the config value is not set
 function config_value()
 {
-  if [ -n "${config}" ]; then
-    config="$(${wget} ${wgetOptions} -qO- "${urlConfig}")"
-    retval=$?
-    if [ ${retval} -ne 0 ]; then
-      >&2 echo "wget failed while fetching the system config (return value: ${retval})."
-      ${zenity} --error --title "Wget error" --text "wget failed while fetching the system config (return value: ${retval})."
-      do_exit
-    fi
+  if [ ! -r "${configFile}" ]; then
+    get_config "${urlConfig}"
   fi
 
-  v="$(echo "${config}" | ${python} -c 'import sys, json; print json.load(sys.stdin)["config"]["'${1}'"]')"
-  $DEBUG && >&2 echo "${1} is set to ${v}"
-  echo "$v"
+  v="$(cat "${configFile}" | ${python} -c 'import sys, json; print json.load(sys.stdin)["config"]["'${1}'"]' 2>/dev/null)"
+  retval=$?
+  if [ ${retval} -ne 0 ]; then
+    $DEBUG && >&2 echo "${1} not found in config file"
+    echo "${2}" #return default value
+  else
+    $DEBUG && >&2 echo "${1} is set to ${v}"
+    echo "$v"
+  fi
 }
 
 function do_exit()
@@ -62,9 +80,9 @@ function do_exit()
   # unmount the filesystem
   umount ${initrd}/newroot
   umount -l ${initrd}/{base,exam,tmpfs}
-  exit
+  # exit with failure (1) if nothing has been given to $1
+  exit ${1:-1}
 }
-trap do_exit EXIT
 
 # get DISPLAY and XAUTHORITY env vars to display the firefox window
 set -o allexport
@@ -93,8 +111,11 @@ urlMd5="${urlMd5}"
 urlConfig="${urlConfig}"
 EOF
 
+# Get the whole configuration and store it in configFile
+get_config "${urlConfig}"
+
 # create necessary directory structure
-mkdir -p "${initrd}/"{backup,base,newroot,squashfs,exam}
+mkdir -p "${initrd}/"{backup,base,newroot,squashfs,exam,tmpfs}
 mkdir -p "${initrd}/backup/etc/NetworkManager/"{system-connections,dispatcher.d}
 mkdir -p "${initrd}/backup/${desktop}/"
 mkdir -p "${initrd}/backup/usr/bin/"
@@ -223,87 +244,12 @@ add_dash_entry "finish_exam.desktop"
 # Welcome to exam .desktop entry to be executed at autostart
 mkdir -p "${initrd}/newroot/etc/xdg/autostart/"
 mkdir -p "${initrd}/newroot/usr/share/applications/"
-cat <<EOF >"${initrd}/newroot/etc/xdg/autostart/show-info.desktop"
-[Desktop Entry]
-Type=Application
-Encoding=UTF-8
-Icon=/usr/share/icons/gnome/256x256/status/dialog-question.png
-Version=1.0
-Name=Welcome to the exam
-Name[de_DE]=Willkommen zur Prüfung
-Exec=show_info
-X-GNOME-Autostart-enabled=true
-EOF
-
-cp "${initrd}/newroot/etc/xdg/autostart/show-info.desktop" "${initrd}/newroot/usr/share/applications/"
-
-url="${gladosProto}://${gladosIp}:${gladosPort}/glados/index.php/howto/welcome-to-exam.md?mode=inline"
-cat <<EOF >"${initrd}/newroot/show_info.html"
-<!DOCTYPE html>
-<html lang='en-US'>
-    <head>
-        <meta charset='UTF-8'>
-        <meta name='viewport' content='width=device-width, initial-scale=1'>
-        <meta http-equiv='refresh' content='0;url=${url}' />
-    </head>
-    <body>
-    Please wait, redirecting...
-    </body>
-</html>
-EOF
-
-cat <<'EOF' >"${initrd}/newroot/usr/bin/show_info"
-#!/bin/bash
-
-#/usr/bin/firefox -createprofile "showInfo /tmp/showInfo" -no-remote
-mkdir -p /tmp/showInfo/chrome/
-
-# Dirty hacky way to create a new firefox profile (only in firstrun)
-if ! [ -e /tmp/showInfo/prefs.js ]; then
-  timeout -s INT -k 8 4 \
-    /usr/bin/firefox -profile "/tmp/showInfo/" -no-remote --screenshot i-dont-exist
-  (
-    cat - <<EOFINNER
-/*
- * set default namespace to XUL
- */
-@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
- 
-/*
- * Hide tab bar, navigation bar and scrollbars
- * !important may be added to force override, but not necessary
- * #content is not necessary to hide scroll bars
- */
-#toolbar-context-menu {display: none !important;}
-#TabsToolbar {visibility: collapse;}
-#navigator-toolbox {visibility: collapse;}
-browser {margin-right: -14px; margin-bottom: -14px;}
-EOFINNER
-  ) | tee /tmp/showInfo/chrome/userChrome.css >/dev/null
-
-  # another hacky way to remove some firefox default settings at the first start
-  echo 'user_pref("browser.tabs.warnOnClose", false);' >> /tmp/showInfo/prefs.js
-
-fi
-
-profile="$(mktemp -d)"
-cp -a /tmp/showInfo/. "$profile"
-
-/usr/bin/firefox -no-remote -profile "$profile" -width 850 -height 620 "/show_info.html"
-
-# remove the profile - also remove it from the profiles.ini file
-rm -r "$profile"
-ex -e - /home/user/.mozilla/firefox/profiles.ini <<@@@
-g/Name=showInfo/.-2,+2d
-wq
-@@@
-
-EOF
-
-chmod 755 "${initrd}/newroot/usr/bin/show_info"
 
 # add an entry to show information about the exam in the dash
 add_dash_entry "show-info.desktop"
+
+# Copy all dependencies, TODO remove
+[ -d "/var/lib/lernstick-exam-client/persistent/" ] && cp -apv "/var/lib/lernstick-exam-client/persistent/." "${initrd}/newroot/"
 
 ###########################################
 # apply specific exam config if available #
@@ -315,9 +261,12 @@ if [ -n "${actionConfig}" ]; then
   retval=$?
   if [ ${retval} -ne 0 ]; then
     >&2 echo "wget failed while fetching the system config (return value: ${retval})."
-    ${zenity} --error --title "Wget error" --text "wget failed while fetching the system config (return value: ${retval})."
-    do_exit
+    ${zenity} --error --width=300 --title "Wget error" --text "wget failed while fetching the system config (return value: ${retval})."
+    do_exit 1
   fi
+
+  # perform the version check server side
+  check_version
 
   # setup the expert settings
   expert_settings
@@ -333,6 +282,19 @@ if [ -n "${actionConfig}" ]; then
   # set all libreoffice options
   libreoffice
 
+  # set up the launch timer service if keylogger or screen_capture is active
+  rm "${initrd}/newroot/etc/launch.conf"
+  launch
+
+  # set all screen_capture options
+  screen_capture
+
+  # set up the keylogger service
+  keylogger
+
+  # set up the agent
+  agent
+
   # fix the permissions
   chown -R user:user ${initrd}/newroot/${home}/.config
 
@@ -345,6 +307,9 @@ else
   expert_settings_defaults
 
 fi
+
+# Copy all dependencies
+[ -d "/var/lib/lernstick-exam-client/persistent/" ] && cp -apv "/var/lib/lernstick-exam-client/persistent/." "${initrd}/newroot/"
 
 # hand over the ssh key from the exam server
 echo "${sshKey}" >>"${initrd}/backup/root/.ssh/authorized_keys"
@@ -391,8 +356,8 @@ screen -d -m bash -c '
 
   # export DISPLAY and XAUTHORITY env vars
   set -o allexport
-  eval $(strings /proc/$(pgrep -n firefox)/environ | grep "DISPLAY=")
-  eval $(strings /proc/$(pgrep -n firefox)/environ | grep "XAUTHORITY=")
+  . <(strings /proc/*/environ 2>/dev/null | grep -P "^DISPLAY\=*" | head -1) 
+  . <(strings /proc/*/environ 2>/dev/null | grep -P "^XAUTHORITY\=*" | head -1) 
   set +o allexport
 
   if $DEBUG; then
@@ -415,4 +380,5 @@ screen -d -m bash -c '
 '
 
 >&2 echo "done"
-exit
+# exit successfully
+do_exit 0

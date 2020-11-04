@@ -14,7 +14,6 @@ use yii\web\JsExpression;
 
 $this->title = \Yii::t('setting', 'Settings');
 $this->params['breadcrumbs'][] = $this->title;
-
 ?>
 <div class="setting-index">
 
@@ -24,8 +23,6 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DynaGrid::widget([
         'showPersonalize' => true,
         'columns' => [
-            ['class' => 'kartik\grid\SerialColumn', 'order' => DynaGrid::ORDER_FIX_LEFT],
-
             [
                 'attribute' => 'date',
                 'format' => 'timeago',
@@ -45,18 +42,15 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'raw',
                 'visible' => false,
             ],
-            [
-                'attribute' => 'key',
-                'format' => 'raw',
-                'value' => function ($model) {
-                    return \Yii::t('setting', $model->key);
-                },
-            ],
+            'name',
+            'description',
             [
                 'attribute' => 'value',
                 'format' => 'raw',
                 'value' => function ($model) {
-                    return $model->value === null ? null : $model->renderSetting($model->value, $model->type);
+                    return $model->value === null
+                        ? $model->renderSetting($model->default_value, $model->type)
+                        : $model->renderSetting($model->value, $model->type);
                 },
             ],
             [
@@ -65,6 +59,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => function ($model) {
                     return $model->renderSetting($model->default_value, $model->type);
                 },
+                'visible' => false,
             ],
             [
                 'class' => 'yii\grid\ActionColumn',

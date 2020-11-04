@@ -46,15 +46,22 @@ class BackupController extends Controller
         $ticket = Ticket::findOne($ticket_id);
 
         $fs = new RdiffFileSystem([
-            'root' => '/home/user',
+            'root' => $ticket->exam->backup_path,
             'location' => \Yii::$app->params['backupPath'] . '/' . $ticket->token,
             'restoreUser' => 'root',
             'restoreHost' => $ticket->ip,
         ]);
 
-        $contents = $fs->slash($path)->versionAt($date)->restore(true);
+        $file = $fs->slash($path);
+
+        if ($file !== null) {
+            $contents = $file->versionAt($date)->restore(true);
+        } else {
+            throw new NotFoundHttpException($path . ': No such file or directory.');
+        }
 
         return Yii::$app->response->sendContentAsFile($contents, $fs->slash($path)->basename, [
+            'mimeType' => 'application/octet-stream',
             'inline' => false,
         ]);
     }

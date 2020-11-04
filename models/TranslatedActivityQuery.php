@@ -34,7 +34,7 @@ class TranslatedActivityQuery extends \yii\db\ActiveQuery
                 ) as ' . $value . '_db,
                 `' . $value . '`.`en` as ' . $value . '_orig');
         }, $class::getTranslatedFields());
-        $select = array_merge(['`' . $class::tableName() . '`.*'], $select);
+        $select = array_merge(['' . $class::tableName() . '.*'], $select);
 
         return $this->addSelect($select);
     }

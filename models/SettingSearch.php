@@ -19,6 +19,7 @@ class SettingSearch extends Setting
     {
         return [
             [['id'], 'integer'],
+            [['name', 'description'], 'safe'],
         ];
     }
 
@@ -43,7 +44,6 @@ class SettingSearch extends Setting
         $query = Setting::find();
 
         // add conditions that should always apply here
-
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => array(
@@ -52,10 +52,10 @@ class SettingSearch extends Setting
         ]);
 
         $dataProvider->setSort([
-            'defaultOrder' => ['key' => SORT_DESC],
+            'defaultOrder' => ['name' => SORT_ASC],
             'attributes' => [
                 'date',
-                'key',
+                'name',
             ]
         ]);
 
@@ -68,8 +68,8 @@ class SettingSearch extends Setting
         }
 
         // grid filtering conditions
-        $query->andFilterWhere(['key' => $this->key]);
-        $query->andFilterWhere(['value' => $this->value]);
+        $query->andFilterHaving(['like', 'description', $this->description]);
+        $query->andFilterHaving(['like', 'name', $this->name]);
 
         $dateEnd = new \DateTime($this->date);
         $dateEnd->modify('+1 day');

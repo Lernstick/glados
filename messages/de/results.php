@@ -18,7 +18,6 @@
  */
 return [
     'After the submitting process, the test taker will have access to the result as a ZIP-file likewise. The contents of each ZIP-file will be <b><i>everything</i></b> inside the corresponding directory of the Results ZIP-file. So make sure there is no secret content in it.' => 'Nach dem Einreichungsprozess, wird der Prüfungskandidat Zugriff auf das Resultat ebenfalls in Form einer ZIP-Datei haben. Die Inhalte jeder ZIP-Datei wird folgendes sein: <b><i>alles</i></b> im korrespondierenden Verzeichnis der Resultate ZIP-Datei. Vergewissern Sie sich, dass kein Inhalt geheimer Natur in diesem Verzeichnis ist.',
-    'Choose Exam' => 'Wählen Sie eine Prüfung',
     'Choose an Exam ...' => 'Wählen Sie eine Prüfung ...',
     'Choose the exam to generate results from.' => 'Wählen Sie die Prüfung, für die Sie Resultate generieren möchten.',
     'Directories are included, even if they are empty.' => 'Verzeichnisse werden hinzugefügt, auch wenn sie leer sind.',
@@ -45,7 +44,6 @@ return [
     'Include screenshots' => 'Bildschirmfotos hinzufügen',
     'Insert your token here!' => 'Geben Sie hier Ihren Token ein!',
     'Next Step' => 'Nächster Schritt',
-    'Next step' => 'Nächster Schritt',
     'No results found in zip file. Please upload a zip file with the same directory structure as the result.zip file.' => 'Keine Resultate in der ZIP-Datei gefunden. Bitte laden Sie eine ZIP-Datei hoch mit derselben Verzeichnisstruktur wie die result.zip Datei.',
     'Notice' => 'Beachten Sie',
     'Options' => 'Optionen',

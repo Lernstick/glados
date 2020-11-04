@@ -5,7 +5,6 @@ The main configuration can be found in the file `config/params.php`. This is a l
 Config Item             | Default Value              | Description
 ------------            | -------------              | -------------
 `itemsPerPage`          | `10`                       | Defines the number of rows displayed in the ticket, exam and user index view.
-`tokenLength`           | `10`                       | The number of characters in a generated token.
 `uploadPath`            | `/var/lib/glados/uploads/` | The full directory path in the filesystem of the server, where the uploaded exam image files should be stored. This directory must be writable for the webserver user.
 `backupPath`            | `/var/lib/glados/backups/` | The full directory path in the filesystem of the server, where the backups should be stored. This directory must be writable for the webserver user.
 `resultPath`            | `/var/lib/glados/results/` | The full directory path in the filesystem of the server, where the handed back results should be stored. This directory must be writable for the webserver user.

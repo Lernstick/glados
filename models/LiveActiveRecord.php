@@ -42,7 +42,7 @@ class LiveActiveRecord extends TranslatedActiveRecord
 
     /**
      * The default configuration for a live field if no other is given.
-     * These field are merged with the provided array in a way that the
+     * These fields are merged with the provided array in a way that the
      * values of the given array overwrite the ones below.
      * 
      * @return array The default configuration
@@ -81,16 +81,64 @@ class LiveActiveRecord extends TranslatedActiveRecord
      * A list of attributes whose modification triggers the event
      * 
      * @param string $field The live field
+     * @param string $config its configuration
      * @return array List of properties
      */
-    private function triggerAttributes($field) {
-        return in_array($field, $this->translatedFields) ? [$field . '_id', $field . '_data'] : [$field];
+    private function triggerAttributes($field, $config) {
+        $list = [];
+        /* if there are more additional fields, that trigger a change, add them to the list */
+        if (array_key_exists('trigger_attributes', $config)) {
+            foreach ($config['trigger_attributes'] as $key => $attribute) {
+
+                if (in_array($attribute, $this->translatedFields)) {
+                    $list[] = $attribute . '_id';
+                    $list[] = $attribute . '_data';
+                } else {
+                    $list[] = $attribute;
+                }
+            }
+        }
+        if (in_array($field, $this->translatedFields)) {
+            $list[] = $field . '_id';
+            $list[] = $field . '_data';
+        } else {
+            $list[] = $field;
+        }
+        return $list;
     }
 
     /**
-     * A list of database fields that are live
+     * A list of database fields that are live. This should return something of the form:
      * 
-     * TODO: explanantion
+     *  [
+     *      'field1' => [
+     *          # the event identifier, @see [[EventItem::event]]
+     *          'event' => 'table/id',
+     *          # @see [[EventItem::priority]]
+     *          'priority' => integer,
+     *          # if it is a pseudo field (calculated), these fields tell when a change is triggered
+     *          'trigger_attributes' => ['fieldA', 'fieldB'],
+     *          # @see [[EventItem::data]]
+     *          'data' => [
+     *              'field1' => 'value',
+     *          ],
+     *          ...
+     *      ],
+     *      # not all config fields must be set (the rest if filled by [[defaultConfig()]])
+     *      'field2' => [
+     *          # this example has a post-processed value for the field
+     *          # @param $field the field name ("field2" in this example)
+     *          # @param $model the current model
+     *          'data' => [
+     *              'field2' => function($field, $model){..},
+     *          ],
+     *          ...
+     *      ],
+     *      # can also be only a string, if no special config is needed (@see [[defaultConfig()]])
+     *      'field3',
+     *      ...
+     *  ]
+     * 
      * @return array
      */
     public function getLiveFields()
@@ -129,7 +177,7 @@ class LiveActiveRecord extends TranslatedActiveRecord
             $field = $event->data[0];
             $config = $event->data[1];
 
-            if ($this->attributesChanged($this->triggerAttributes($field))) {
+            if ($this->attributesChanged($this->triggerAttributes($field, $config))) {
 
                 // merge the default config with the provided one
                 $realConfig = array_merge($this->defaultConfig(), $config);

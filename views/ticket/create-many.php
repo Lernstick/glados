@@ -8,7 +8,7 @@ use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Ticket */
-/* @var $examModel app\models\Exam|null */ 
+/* @var $examModel app\models\Exam|null */
 /* @var $form yii\widgets\ActiveForm */
 
 $js = <<< 'SCRIPT'

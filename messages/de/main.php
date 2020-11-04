@@ -33,11 +33,11 @@ return [
     'Login' => 'Anmelden',
     'Logout' => 'Abmelden',
     'Profile' => 'Profil',
-    'Start Daemon' => 'Hintergrundprozess starten',
+    'Settings' => 'Einstellungen',
     'Submit Ticket' => 'Ticket zuweisen',
     'Submit results' => 'Resultate einreichen',
     'System' => 'System',
     'Tickets' => 'Tickets',
     'Users' => 'Benutzer',
-    'Settings' => 'Einstellungen',
+    'Monitor exams' => 'Prüfungen überwachen',
 ];

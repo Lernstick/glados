@@ -4,7 +4,6 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\widgets\ListView;
 use yii\widgets\Pjax;
-use yii\helpers\Url;
 use yii\bootstrap\Modal;
 use app\components\ActiveEventField;
 use app\components\Editable;
@@ -82,10 +81,23 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'state',
-                'value' => '<span class="label label-' . (
-                    array_key_exists($model->state, $model->classMap) ? $model->classMap[$model->state] : 'default'
-                ) . '">' . yii::$app->formatter->format($model->state, 'state') . '</span>',
-                'format' => 'html',
+                'value' => ActiveEventField::widget([
+                    'options' => [
+                        'tag' => 'span',
+                        'class' => 'label view--state',
+                        'data-text-0' => Yii::t('ticket', 'Open'),
+                        'data-text-1' => Yii::t('ticket', 'Running'),
+                        'data-text-2' => Yii::t('ticket', 'Closed'),
+                        'data-text-3' => Yii::t('ticket', 'Submitted'),
+                        'data-text-4' => Yii::t('ticket', 'Unknown'),
+                        'data-state' => $model->state,
+                    ],
+                    'content' => '&nbsp;',
+                    'event' => 'ticket/' . $model->id,
+                    'jsonSelector' => 'state',
+                    'jsHandler' => 'function(d, s){ $(s).attr("data-state", d); }',
+                ]),
+                'format' => 'raw',
             ],
             [
                 'attribute' => 'exam.name',
@@ -97,7 +109,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     ['data-pjax' => 0]
                 )
             ],
-
             'start:timeago',
             'end:timeago',
             'duration:duration',
@@ -152,6 +163,32 @@ $this->params['breadcrumbs'][] = $this->title;
                         }',
                     ]) . ' ' .
                     Html::a(\Yii::t('ticket', 'Probe'), ['view', 'id' => $model->id, 'mode' => 'probe']),
+            ],
+            [
+                'attribute' => 'agent_online',
+                'format' => 'raw',
+                'value' => ActiveEventField::widget([
+                    'options' => [
+                        'tag' => 'span',
+                        'class' => 'label label-' . ( $model->agent_online ? 'success' : 'danger' )
+                    ],
+                    'content' => $model->agent_online ? \Yii::t('ticket', 'Agent Online') : \Yii::t('ticket', 'Agent Offline'),
+                    'event' => 'ticket/' . $model->id,
+                    'jsonSelector' => 'agent_online',
+                    'jsHandler' => 'function(d, s){
+                        if (d) {
+                            s.innerHTML = "' . \Yii::t('ticket', 'Agent Online') . '";
+                            s.classList.add("label-success");
+                            s.classList.remove("label-danger");
+                            s.classList.remove("label-warning");
+                        } else {
+                            s.innerHTML = "' . \Yii::t('ticket', 'Agent Offline') . '";
+                            s.classList.add("label-danger");
+                            s.classList.remove("label-success");
+                            s.classList.remove("label-warning");
+                        }
+                    }',
+                ])
             ],
             [
                 'attribute' => 'client_state',
@@ -264,7 +301,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     'event' => 'ticket/' . $model->id,
                     'jsonSelector' => 'restore_state',
                 ]),
-            ],         
+            ],
+            [
+                'attribute' => 'agent_uuid',
+                'format' => 'raw',
+                'value' =>  yii::$app->formatter->format($model->agent_uuid, 'ntext'),
+                'visible' => YII_ENV_DEV,
+                'captionOptions' => ['class' => 'dev_item']
+            ],
             [
                 'attribute' => 'bootup_lock',
                 'format' => 'raw',
@@ -275,7 +319,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 ]),
                 'visible' => YII_ENV_DEV,
                 'captionOptions' => ['class' => 'dev_item']
-            ],           
+            ],
         ],
 
     ]) ?>
@@ -298,23 +342,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php ActiveEventField::begin([
         'event' => 'ticket/' . $model->id,
-        'jsonSelector' => 'backup_lock',
-        'jsHandler' => 'function(d, s){if(d == "0"){
-            $.pjax.reload({container: "#backups", async:false});
-            $.pjax.reload({container: "#screenshots", async:false});
-        }}'
-    ]) ?>
-    <?php ActiveEventField::end(); ?>
-
-    <?php ActiveEventField::begin([
-        'event' => 'ticket/' . $model->id,
         'jsonSelector' => 'restore_lock',
         'jsHandler' => 'function(d, s){if(d == "0"){
             $.pjax.reload({container: "#restores", async:false});
         }}'
     ]) ?>
     <?php ActiveEventField::end(); ?>
-
 
     <?php Pjax::begin([
         'id' => 'backups',
@@ -355,6 +388,19 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php Pjax::end() ?>
     <?php } ?>
+
+    <?php Pjax::begin([
+        'id' => 'screencapture',
+        'options' => ['class' => 'tab-pane fade'],
+    ]); ?>
+
+
+        <?php $_GET = array_merge($_GET, ['#' => 'tab_browse']); ?>
+        <?= $this->render('/screen_capture/view', [
+            'model' => $model,
+        ]); ?>
+
+    <?php Pjax::end() ?>
 
     <?php Pjax::begin([
         'id' => 'browse',

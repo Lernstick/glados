@@ -56,6 +56,7 @@ foreach ($model->columns as $key => $column) {
                 'column' => $pname,
                 'table' => $model->table,
                 'row' => $model->row,
+                'type' => $model->types[$key],
             ]);
         } else if ($last == 'data') {
             continue;
@@ -70,6 +71,7 @@ foreach ($model->columns as $key => $column) {
             'column' => $model->columns[$key],
             'table' => $model->table,
             'row' => $model->row,
+            'type' => $model->types[$key],
         ]);
     }
 }
@@ -113,6 +115,9 @@ $model->searchColumn = $searchModel->column;
                     'columns' => [
                         [
                             'attribute' => 'column',
+                            /**
+                             * @param app\models\History
+                             */
                             'value' => function ($model) use ($itemModel) {
                                 $icon = $itemModel->getBehavior("HistoryBehavior")->iconOf($model);
                                 return $icon . '&nbsp;' . $itemModel->getAttributeLabel($model->column);
@@ -121,7 +126,13 @@ $model->searchColumn = $searchModel->column;
                         ],
                         [
                             'attribute' => 'new_value',
+                            /**
+                             * @param app\models\History
+                             */
                             'value' => function ($model) use ($itemModel) {
+                                if ($model->type === History::TYPE_DELETE) {
+                                    return '<span class="not-set">' . \Yii::t('app', '(not set)') . '</span>';
+                                }
                                 $format = $itemModel->getBehavior("HistoryBehavior")->formatOf($model->column);
                                 return yii::$app->formatter->format($model->new_value, $format);
                             },
@@ -129,7 +140,13 @@ $model->searchColumn = $searchModel->column;
                         ],
                         [
                             'attribute' => 'old_value',
+                            /**
+                             * @param app\models\History
+                             */
                             'value' => function ($model) use ($itemModel) {
+                                if ($model->type === History::TYPE_INSERT) {
+                                    return '<span class="not-set">' . \Yii::t('app', '(not set)') . '</span>';
+                                }
                                 $format = $itemModel->getBehavior("HistoryBehavior")->formatOf($model->column);
                                 return yii::$app->formatter->format($model->old_value, $format);
                             },

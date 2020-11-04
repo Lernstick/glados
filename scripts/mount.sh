@@ -92,6 +92,7 @@ if [ -f "/restore" ]; then
 
   [ -e "/mount" ] && sh "/mount" || mount -t aufs -o br=/backup=rw:/exam=ro:/base=ro none "/newroot"
   cp /info /newroot/info
+  cp /config.json /newroot/config.json
 
   # mount the overlay inside the filesystem
   mkdir /newroot/overlay

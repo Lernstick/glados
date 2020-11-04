@@ -201,29 +201,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 'visible'=>false
             ],
             [
-                'attribute' => 'screenshots',
-                'format' => 'boolean',
-                'visible'=>false
-            ],
-            [
-                'attribute' => 'screenshots_interval',
-                'label' => 'Screenshot Interval',
-                'value' => function($model){
-                    return $model->screenshots_interval*60; # in seconds
-                },
-                'format' => 'duration',
-                'visible'=>false
-            ],
-            [
-                'attribute' => 'max_brightness',
-                'label' => \Yii::t('exams', 'Maximum brightness'),
-                'value' => function($model){
-                    return $model->max_brightness/100;
-                },
-                'format' => 'percent',
-                'visible'=>false
-            ],
-            [
                 'class' => 'yii\grid\ActionColumn',
                 'order' => DynaGrid::ORDER_FIX_RIGHT,
                 'contentOptions' => [

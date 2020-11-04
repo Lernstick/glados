@@ -56,6 +56,16 @@ class RestoreController extends DaemonController
     }
 
     /**
+     * Restores files.
+     *
+     * @var array $args array of arguments
+     * @var int $id id of the ticket ($args[0])
+     * @var string $file absolute path to file within the rdiffbackup tree ($args[1]), if prepended with "rsync://"
+     * the file is restored by rsync, not rdiff-backup
+     * @var string $date date of the state of the file to be restored ($args[2])
+     * @var string $restorePath absolute path where to restore on the client ($args[3]), if not set
+     * exam->backup_path is taken
+     * 
      * @inheritdoc
      */
     public function doJob ()
@@ -79,7 +89,7 @@ class RestoreController extends DaemonController
             return;
         }
 
-        if ($this->lock($id, 'restore') === false) {
+        if ($this->lock($id . "_restore") === false) {
             $this->logError('Error: ticket with id ' . $id . ' is already in processing (flock).');
             return;
         }
@@ -104,7 +114,7 @@ class RestoreController extends DaemonController
                 'severity' => Activity::SEVERITY_WARNING,
             ]);
             $act->save();
-            $this->unlock();
+            $this->unlock($this->ticket->id . "_restore");
             return;
         } else {
             $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? true : false;
@@ -113,10 +123,14 @@ class RestoreController extends DaemonController
 
         $this->remotePath = FileHelper::normalizePath($this->remotePath . '/' . $this->ticket->exam->backup_path);
 
+        $rsync = false;
         if ($file == '::Desktop::') {
             $file = trim($this->ticket->runCommand('sudo -u user xdg-user-dir DESKTOP')[0]);
         } else if ($file == '::Documents::') {
             $file = trim($this->ticket->runCommand('sudo -u user xdg-user-dir DOCUMENTS')[0]);
+        } else if ($file == '::All::') {
+            $file = "/";
+            $rsync = true;
         }
         if (substr($file, 0, strlen($this->remotePath)) == $this->remotePath) {
             $file = FileHelper::normalizePath('/' . substr($file, strlen($this->remotePath)));
@@ -145,7 +159,7 @@ class RestoreController extends DaemonController
                 ]);
                 $act->save();
 
-                $this->unlock();
+                $this->unlock($this->ticket->id . "_restore");
                 return;
             }
         } else {
@@ -153,13 +167,12 @@ class RestoreController extends DaemonController
             $this->logInfo($this->ticket->restore_state);
             $this->ticket->restore_lock = 0;
             $this->ticket->save(false);
-            $this->unlock();
+            $this->unlock($this->ticket->id . "_restore");
             return;
         }
 
         $datetime = new \DateTime('now', new \DateTimeZone(\Yii::$app->formatter->defaultTimeZone));
 
-        #$file = FileHelper::normalizePath($this->remotePath . '/' . $file);
         $file = empty($file) ? '/' : $file;
 
         $this->restore = new Restore([
@@ -173,28 +186,22 @@ class RestoreController extends DaemonController
         $this->ticket->save(false);
 
         $restorePath = $restorePath !== null ? $restorePath : '/overlay/' . $this->ticket->exam->backup_path;
+        $output = "";
+        $logFile = Yii::getAlias('@runtime/logs/restore.' . $this->ticket->token . '.' . date('c') . '.log');
 
-        /* first command */
+        /* 1st command: rdiff-backup */
         $this->_cmd = "rdiff-backup --terminal-verbosity=5 --force --remote-schema "
                 . "'ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
                 . "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -C %s rdiff-backup --server' "
              . "--create-full-path "
+             . (empty($exclude) ? '' : (' --exclude ' . implode($exclude, ' --exclude '))) . " "
              . "--restore-as-of " . escapeshellarg($date) . " "
              . escapeshellarg(FileHelper::normalizePath(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token . "/" . $file)) . " "
-             . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . "::" . FileHelper::normalizePath($restorePath . '/' . $file)) . " "
-             . "2>&1;" . " ";
-             /* second command */
-             //. "ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
-             //. "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "
-             //. escapeshellarg($this->remoteUser . "@" . $this->ticket->ip) . " "
-             //. "mount -o remount,rw / ";
+             . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . "::" . FileHelper::normalizePath($restorePath . '/' . $file)) . " ";
 
         $this->logInfo('Executing rdiff-backup: ' . $this->_cmd);
 
         $cmd = new ShellCommand($this->_cmd);
-
-        $output = "";
-        $logFile = Yii::getAlias('@runtime/logs/restore.' . $this->ticket->token . '.' . date('c') . '.log');
 
         $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use (&$output, $logFile) {
             echo $this->ansiFormat($event->line, $event->channel == ShellCommand::STDOUT ? Console::NORMAL : Console::FG_RED);
@@ -206,7 +213,7 @@ class RestoreController extends DaemonController
 
         $this->ticket->runCommand('mount -o remount,rw /');
 
-        if($retval != 0) {
+        if ($retval != 0) {
             $this->ticket->restore_state = yiit('ticket', 'rdiff-backup failed (retval: {retval}), output: {output}');
             $this->ticket->restore_state_params = [
                 'retval' => $retval,
@@ -223,7 +230,7 @@ class RestoreController extends DaemonController
             ]);
             $act->save();
         } else {
-            $this->logInfo($output);
+            //$this->logInfo($output);
             $this->ticket->restore_state = yiit('ticket', 'restore successful.');
             $this->restore->finishedAt = new Expression('NOW()');
             $this->restore->save();
@@ -239,9 +246,34 @@ class RestoreController extends DaemonController
             $act->save();
         }
 
+        /* rsync the screen_capture files (only log and m3u8 manifest files) back */
+        $rsyncFile = FileHelper::normalizePath(\Yii::$app->params['scPath'] . "/" . $this->ticket->token) . '/*.m3u8';
+        $glob = glob($rsyncFile, GLOB_BRACE);
+        if ($rsync && array_key_exists('screen_capture', $this->ticket->exam->settings) && $this->ticket->exam->settings['screen_capture'] && !empty($glob)) {
+
+            /* 2nd command: rsync restore screen_capture.log */
+            $this->_cmd = "rsync --rsync-path=\"mkdir -p /run/initramfs/backup/var/log/ && rsync\" "
+                . "-L --checksum --partial --progress --protect-args "
+                . "--rsh='ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
+                . " -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' "
+                . FileHelper::normalizePath(\Yii::$app->params['scPath'] . "/" . $this->ticket->token . "/screen_capture.log") . " "
+                . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . ":/run/initramfs/backup/var/log/screen_capture.log");
+
+            $this->logInfo('Executing rsync: ' . $this->_cmd);
+
+            $cmd = new ShellCommand($this->_cmd);
+            $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use (&$output, $logFile) {
+                echo $this->ansiFormat($event->line, $event->channel == ShellCommand::STDOUT ? Console::NORMAL : Console::FG_RED);
+                $output .= $event->line;
+                file_put_contents($logFile, $event->line, FILE_APPEND);
+            });
+
+            $retval = $cmd->run();
+        }
+
         $this->ticket->restore_lock = 0;
         $this->ticket->save(false);
-        $this->unlock();
+        $this->unlock($this->ticket->id . "_restore");
     }
 
     /**

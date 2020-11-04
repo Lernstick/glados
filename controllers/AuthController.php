@@ -6,7 +6,7 @@ use Yii;
 use yii\web\Controller;
 use app\models\Auth;
 use app\models\AuthSearch;
-use app\models\AuthTestForm;
+use app\models\forms\AuthTestForm;
 use app\models\AuthMigrateForm;
 use app\models\UserSearch;
 use app\models\AuthLdapQueryForm;

@@ -119,6 +119,11 @@ class Daemon extends \yii\db\ActiveRecord
         return $this->start('restore/run', $args, $background);
     }
 
+    public function startFetch($id, $background = true)
+    {
+        return $this->start('fetch/run', [escapeshellarg($id)], $background);
+    }
+
     public function start($command, $arguments = [], $background = true)
     {
 
