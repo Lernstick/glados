@@ -13,12 +13,11 @@ use app\components\ActiveEventField;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $title = \Yii::t('ticket', 'Currently behind live');
-$n = $model::MONITOR_IDLE_TIME;
+$n = $model::monitor_idle_time();
 
-// reload images if no new image for [[MONITOR_IDLE_TIME]] seconds
-// reload the whole thing all [[MONITOR_RELOAD_TIME]]
+// reload images if no new image for [[monitor_idle_time()]] seconds
 $js = <<< SCRIPT
-setInterval(function(){
+function check_images() {
     $('img.live-thumbnail').each(function() {
         var img = $(this);
         var src = img.attr('data-url');
@@ -27,39 +26,68 @@ setInterval(function(){
         if (now - then > $n) {
             img.attr('src', src + '?_ts=' + parseInt(now));
             img.attr("data-time", now);
-            img.next().find(">:first-child").removeClass("live");
-            img.next().find(">:first-child").attr("title", "$title");
+            img.siblings("a").find(".live-indicator").removeClass("live");
+            img.siblings("a").find(".live-indicator").attr("title", "$title");
         }
     });
-},1000);
+}
+setInterval(check_images,1000);
+
+// ensures this works for some older browsers
+MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+
+$('img.live-thumbnail').each(function(){
+    var img = this;
+    new MutationObserver(function() {
+        $("<img/>").on('load', function() {
+            // succesful loaded image
+            $(img).show();
+            $(img).next("div").hide();
+        }).on('error', function() {
+            // error loading image
+            $(img).hide();
+            $(img).next("div").show();
+        }).attr("src", $(img).attr("src"));
+    }).observe(img, {
+        attributes:true,
+        attributeFilter:["src"]
+    });
+});
+
+check_images();
 
 $('#galleryModal').on('show.bs.modal', function(e) {
+    var el = $(e.relatedTarget).parent().children('img').first();
     $('#galleryModal object').attr("data", "");
-    $('#galleryModal object').attr("data", $(e.relatedTarget).data('src') + "&" + new Date().getTime());    
+    $('#galleryModal object').attr("data", el.data('src') + "&" + new Date().getTime());
 });
 SCRIPT;
-$this->registerJs($js, \yii\web\View::POS_READY);
 
 ?>
 
 <?= ActiveEventField::widget([
     'event' => 'exam/' . $model->id,
     'jsonSelector' => 'runningTickets',
-    'jsHandler' => 'function(d, s) { $.pjax.reload({container: "#live_monitor"}); }',
+    'jsHandler' => 'function(d, s) {
+        $("#reload").click();
+    }',
 ]); ?>
-
-<div class="row">
-    <div class="col-sm-9">
-        <span><?= \Yii::t('monitor', 'Only tickets in running state will be shown here.'); ?></span>
-    </div>
-    <div class="col-sm-3 text-right">
-        <a class="btn btn-default" onClick='$.pjax.reload({container:"#live_monitor"});'><i class="glyphicon glyphicon-refresh"></i>&nbsp;<?= Yii::t('app', 'Reload') ?></a>
-    </div>
-</div>
 
 <?php Pjax::begin([
     'id' => 'live_monitor'
 ]); ?>
+
+<div class="row">
+    <div class="col-sm-9">
+        <span><?= \Yii::t('monitor', 'Only tickets in {state} state will be shown here.', [
+            'state' => '<span data-state="1" class="label view--state">' . Yii::t('ticket', 'Running') . '</span>'
+        ]); ?></span>
+    </div>
+    <div class="col-sm-3 text-right">
+        <a class="btn btn-default" id="reload" href=""><i class="glyphicon glyphicon-refresh"></i>&nbsp;<?= Yii::t('app', 'Reload') ?></a>
+    </div>
+</div>
+    <?php $this->registerJs($js, \yii\web\View::POS_READY); ?>
 
     <?= ListView::widget([
         'dataProvider' => $dataProvider,
@@ -69,7 +97,7 @@ $this->registerJs($js, \yii\web\View::POS_READY);
         'summaryOptions' => [
             'class' => 'summary col-xs-12 col-md-12',
         ],
-        'emptyText' => \Yii::t('ticket', 'No tickets found.'),
+        'emptyText' => \Yii::t('ticket', 'No running exams found.'),
         'emptyTextOptions' => ['class' => 'col-md-12 text-center'],
         'layout' => '{pager} {summary}<br>{items}',
     ]); ?>

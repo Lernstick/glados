@@ -286,7 +286,7 @@ class m200330_081053_screen_capture extends Migration
             'name' => yiit('exam_setting_avail', 'Keylogger'),
             'type' => 'boolean',
             'default' => true,
-            'description' => yiit('exam_setting_avail', 'Activates recording (logging) of the keys struck on the students keyboard. This is usually used to retrace the students steps and serves as an additional safety net when the student forgets to save his/her workings. If screen capturing is enabled as well, the keystrokes will be aggregated into subtitles of the video stream.'),
+            'description' => yiit('exam_setting_avail', 'Activates <b>recording (logging) of the keys struck</b> on the students keyboard. This is usually used to retrace the students steps and serves as an additional safety net when the student forgets to save his/her workings. If screen capturing is enabled as well, the keystrokes will be aggregated into subtitles of the video stream.'),
         ]);
         $keylogger->save(false);
         $keylogger->refresh();

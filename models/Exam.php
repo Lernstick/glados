@@ -40,12 +40,6 @@ class Exam extends Base
     public $filePath;
 
     /**
-     * @const float idle time in seconds in the monitor view until the live image
-     * is refreshed.
-     */
-    const MONITOR_IDLE_TIME = 5.0;
-
-    /**
      * @inheritdoc
      */
     public static function tableName()
@@ -164,6 +158,16 @@ class Exam extends Base
             'file' => \Yii::t('exams', 'Use a <b>squashfs-Filesystem or a ZIP-File</b> for the exam. Squashfs is a highly compressed read-only filesystem for Linux. This file contains all files, settings and applications for the exam (all changes made on the original machine). These changes are applied to the exam system as soon as the exam starts. See <b>Help</b> for more information on how to create those files.'),
             'ticketInfo' => \Yii::t('exams', 'Related Tickets (# open, # running, # closed, # submitted)/# total tickets')
         ];
+    }
+
+    /**
+     * Returns the idle time in the monitor view
+     * @return float idle time in seconds in the monitor view until the live image
+     * is refreshed.
+     */
+    static public function monitor_idle_time()
+    {
+        return max(5.0, 3*\Yii::$app->params['monitorInterval']);
     }
 
     /**

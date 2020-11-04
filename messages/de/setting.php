@@ -17,10 +17,13 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
+    '0123456789abcdef' => '0123456789abcdef',
     'A hint that is show in the login form for users attempting to login.' => 'Ein Hinweis am Login Formular für Benutzer, die einloggen wollen.',
     'A set of characters from which the token should be generated.' => 'Eine Menge an Zeichen, aus denen die Token generiert werden sollen.',
     'Apply' => 'Übernehmen',
+    'Client agent' => 'Client Agent',
     'Create' => 'Erstellen',
+    'Date' => 'Datum',
     'Default value' => 'Standardwert',
     'Description' => 'Beschreibung',
     'Duplicate character found. All characters must be unique.' => 'Doppelte Zeichen gefunden. Alle Zeichen müssen eindeutig sein.',
@@ -55,6 +58,8 @@ return [
     'Upper bound' => 'Obere Grenze',
     'Use default value' => 'Nehme Standardwert',
     'Value' => 'Wert',
+    'Whether the client agent should be running after bootup or not.' => 'Soll der Client Agent beim Booten gestartet werden oder nicht.',
     'You may login with **admin/admin** or **teacher/teacher**.<br>To modify the users, please login as **admin**.' => 'Sie können mit **admin/admin** oder **teacher/teacher** einloggen.<br>Um Benutzer zu verändern, loggen Sie bitte als **admin** ein.',
-    'Date' => 'Datum',
+    'Monitor refresh interval' => '',
+    'The refresh interval in seconds in which the clients should send new images to the "monitor exams" view.' => 'Der Interval in Sekunden, indem die Clients neue Bilder zur Prüfungsüberwachungs-Ansicht senden sollen.',
 ];

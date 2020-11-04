@@ -111,6 +111,16 @@ class m200330_081029_settings2 extends Migration
         ]);
         $agent->save(false);
 
+        // create agent
+        $agent = new Setting([
+            'key' => 'monitorInterval',
+            'name' => yiit('setting', 'Monitor refresh interval'),
+            'type' => 'integer',
+            'default_value' => 1,
+            'description' => yiit('setting', 'The refresh interval in seconds in which the clients should send new images to the "monitor exams" view.'),
+        ]);
+        $agent->save(false);
+
     }
 
     /**
@@ -127,6 +137,7 @@ class m200330_081029_settings2 extends Migration
         Setting::deleteAll(['key' => 'lowerBound']);
         Setting::deleteAll(['key' => 'abandonTicket']);
         Setting::deleteAll(['key' => 'agent']);
+        Setting::deleteAll(['key' => 'monitor_interval']);
 
         $this->dropColumn($this->settingsTable, 'description_data');
         $this->dropColumn($this->settingsTable, 'description_id');

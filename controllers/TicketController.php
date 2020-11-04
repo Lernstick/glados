@@ -876,7 +876,7 @@ class TicketController extends Controller
             if ($mode == 'default') {
                 // check if the ticket is running and booted
                 if ($model->bootup_lock == 0 /* && $model->state == Ticket::STATE_RUNNING */
-                    && (! file_exists($dfile) || time() - filemtime($dfile) > Exam::MONITOR_IDLE_TIME)
+                    && (! file_exists($dfile) || time() - filemtime($dfile) > Exam::monitor_idle_time())
                 ){
                     $agentEvent = new AgentEvent([
                         'ticket' => $model,
@@ -929,7 +929,7 @@ class TicketController extends Controller
             if (!$model->hasActiveEventStream("monitor")) {
                 $ret['stop'] = true;
             }
-            #$ret['interval'] = 1;
+            $ret['interval'] = Setting::get('monitorInterval');
             #$ret['width'] = 260;
 
             return $ret;

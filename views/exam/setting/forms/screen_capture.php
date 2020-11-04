@@ -1,7 +1,6 @@
 <?php
 
 use kartik\switchinput\SwitchInput;
-use kartik\range\RangeInput;
 use yii\helpers\Html;
 
 /* @var $id integer */

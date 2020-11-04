@@ -42,7 +42,7 @@ function check_version()
     # check version
     >&2 echo "check version"
     client_version="$(dpkg-query --showformat='${Version}' --show lernstick-exam-client)"
-    lernstick_version="$(grep -oP '[0-9,\-]{8,}' /usr/local/lernstick.html | sed 's/-//g' | head -1)"
+    lernstick_version="$(grep -ohP '[0-9,\-]{8,}' /run/live/rootfs/filesystem.squashfs/usr/local/lernstick.html /usr/local/lernstick.html 2>/dev/null | sed 's/-//g' | head -1)"
     wants_client_version="$(echo "$jsonInfo" | ${python} -c 'import sys, json; print json.load(sys.stdin)["wants_client_version"]')"
     wants_lernstick_version="$(echo "$jsonInfo" | ${python} -c 'import sys, json; print json.load(sys.stdin)["wants_lernstick_version"]')"
     >&2 echo "client_version = $client_version"

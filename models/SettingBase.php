@@ -195,6 +195,8 @@ class SettingBase extends TranslatedActiveRecord
             return Markdown::process($value, 'gfm');
         } else if ($type == "boolean") {
             return boolval($value);
+        } else if ($type == "integer") {
+            return intval($value);
         } else {
             return $value;
         }

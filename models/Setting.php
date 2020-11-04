@@ -53,6 +53,8 @@ class Setting extends SettingBase
             ['maxDaemons', 'integer', 'min' => 1, 'max' => 100],
             ['abandonTicket', 'required'],
             ['abandonTicket', 'integer', 'min' => 1800, 'max' => 36000],
+            ['monitorInterval', 'required'],
+            ['monitorInterval', 'integer', 'min' => 1, 'max' => 100],
         ];
     }
 }

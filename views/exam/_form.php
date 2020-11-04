@@ -553,7 +553,6 @@ $this->registerJs($js);
     Modal::begin([
         'id' => 'keyModal',
         'header' => '<h4>' . \Yii::t('exams', 'Please choose a setting') . '</h4>',
-        //'footer' => Html::Button(\Yii::t('exam', 'Close'), ['data-dismiss' => 'modal', 'class' => 'btn btn-default']),
         'size' => \yii\bootstrap\Modal::SIZE_LARGE,
     ]);
 

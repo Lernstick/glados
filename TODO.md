@@ -48,16 +48,13 @@ TODO:
      * <txt-record>actionLive='glados/index.php/ticket/live/{token}'</txt-record>
   * manual for monitoring monitoring-exams.md
 
-* keylogger
-  * form field keymap -> dropdown field
-
 * misc
   * translations
   * disable firewall not working anymore: done
   * backup browse view broken: done
   * backup browse view broken: http://192.168.0.17/glados/index.php/ticket/2941?path=%2FDokumente&date=all&showDotFiles=0#tab_browse: done
   * version check (of lernstick and lernstick-exam-client) in search script: done
-  * version check looking at the base system (not persistent)
+  * version check looking at the base system (not persistent): done
 
 * daemons
   * have a look at https://github.com/yiisoft/yii2-queue

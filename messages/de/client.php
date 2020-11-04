@@ -25,4 +25,7 @@ return [
     'Please wait, while your system is prepared' => 'Bitte warten Sie, während Ihr System vorbereitet wird.',
     'Request download again' => 'Download erneut anfordern',
     'The system setup is done. You can close this window now.' => 'Die Systemeinrichtung ist abgeschlossen. Sie könne dieses Fenster nun schliessen.',
+    'Abort' => 'Abbrechen',
+    'Exam Client' => 'Prüfungsclient',
+    'The system setup has failed.' => 'Das Systemeinrichtung îst fehlgeschlagen.',
 ];

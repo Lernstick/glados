@@ -17,31 +17,35 @@ use app\components\ActiveEventField;
         'options' => [
             'tag' => 'img',
             'class' => 'live-thumbnail',
-            'alt' => \Yii::t('ticket', 'Please wait, while the live image is being produced...'),
-            'src' => Url::to(['ticket/live', 'token' => $model->token]),
-            'data-time' => intval(microtime(true)),
+            'data-time' => 0,
             'data-url' => Url::to(['ticket/live', 'token' => $model->token]),
             'data-toggle' => 'modal',
             'data-target' => '#galleryModal',
             'data-src' => Url::to(['screenshot/snap', 'token' => $model->token]),
-            'data-alt' => Url::to(['ticket/live', 'token' => $model->token]),
         ],
         'event' => 'monitor:ticket/' . $model->id,
         'jsonSelector' => 'live',
         // reload image when a new has arrived
         'jsHandler' => 'function(d, s) {
-            s.src = "data:image/jpg;base64," + d.base64;
-            var now = parseFloat(new Date().getTime()/1000);
-            $(s).attr("data-time", now);
+            fetch("data:image/jpg;base64," + d.base64)
+                .then(res => res.blob())
+                .then(blob => {
+                    var urlCreator = window.URL || window.webkitURL;
+                    url = urlCreator.createObjectURL(blob);
+                    s.src = url;
+                    var now = parseFloat(new Date().getTime()/1000);
+                    $(s).attr("data-time", now);
+                });
         }',
     ]); ?>
+    <div class="live-overview-detail-error alert alert-info" data-toggle="modal" data-target="#galleryModal" style="display:none;"><?= \Yii::t('ticket', 'Please wait, while the live image is being produced...'); ?></div>
 
     <?= Html::a(
         ActiveEventField::widget([
             'id' => generate_uuid(),
             'options' => [
                 'tag' => 'span',
-                'class' => 'glyphicon glyphicon-circle',
+                'class' => 'live-indicator glyphicon glyphicon-circle',
                 'title' => \Yii::t('ticket', 'Currently behind live'),
             ],
             'event' => 'monitor:ticket/' . $model->id,
@@ -65,7 +69,9 @@ use app\components\ActiveEventField;
             'jsonSelector' => 'live',
             // show the icon of the active window
             'jsHandler' => 'function(d, s) {
-                s.src = "data:image/jpg;base64," + d.icon;
+                if (typeof d.icon !== "undefined") {
+                    s.src = "data:image/jpg;base64," + d.icon;
+                }
             }',
         ]) .
         ' ' .
@@ -81,8 +87,10 @@ use app\components\ActiveEventField;
             'jsonSelector' => 'live',
             // show the active window
             'jsHandler' => 'function(d, s) {
-                $(s).html(d.window);
-                $(s).attr("title", d.window);
+                if (typeof d.window !== "undefined") {
+                    $(s).html(d.window);
+                    $(s).attr("title", d.window);
+                }
             }',
         ]), Url::to(['ticket/view', 'id' => $model->id]),
         [
@@ -91,5 +99,5 @@ use app\components\ActiveEventField;
         ]
     ); ?>
 
-    <span class='live-overview-fullscreen glyphicon glyphicon-fullscreen'></span>
+    <span class='live-overview-fullscreen glyphicon glyphicon-fullscreen' data-toggle="modal" data-target="#galleryModal"></span>
 </div>

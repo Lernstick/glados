@@ -11,9 +11,9 @@ use yii\web\JsExpression;
 /* @var $searchModel app\models\TicketSearch */
 
 $this->title = \Yii::t('monitor', 'Monitoring - Choose Exam');
-$this->params['breadcrumbs'][] = ['label' => \Yii::t('exam', 'Exams'), 'url' => ['exam/index']];
+$this->params['breadcrumbs'][] = ['label' => \Yii::t('exams', 'Exams'), 'url' => ['exam/index']];
 $this->params['breadcrumbs'][] = ['label' => \Yii::t('monitor', 'Monitoring'), 'url' => ['monitor/']];
-$this->params['breadcrumbs'][] = \Yii::t('exam', 'Choose Exam');
+$this->params['breadcrumbs'][] = \Yii::t('exams', 'Choose Exam');
 
 $js = <<< 'SCRIPT'
 /* To initialize BS3 popovers set this below */
@@ -64,7 +64,7 @@ $this->registerJs($js);
 
                 <?= Select2::widget([
                     'name' => 'id',
-                    'options' => ['placeholder' => \Yii::t('exam', 'Choose an Exam ...')],
+                    'options' => ['placeholder' => \Yii::t('exams', 'Choose an Exam ...')],
                     'pluginOptions' => [
                         'dropdownAutoWidth' => true,
                         'width' => 'auto',

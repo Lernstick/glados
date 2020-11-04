@@ -64,7 +64,7 @@ $this->registerJs($js);
 
                 <?= Select2::widget([
                     'name' => 'exam_id',
-                    'options' => ['placeholder' => \Yii::t('exam', 'Choose an Exam ...')],
+                    'options' => ['placeholder' => \Yii::t('exams', 'Choose an Exam ...')],
                     'pluginOptions' => [
                         'dropdownAutoWidth' => true,
                         'width' => 'auto',

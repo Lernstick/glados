@@ -474,7 +474,7 @@ ul.nav-special > li.active > a > div {
     font-weight: bold;
 }
 
-.live-overview-item img.live-thumbnail {
+.live-overview-item .live-thumbnail {
     width: 100%;
     height: 100%;
     object-fit: contain;
@@ -482,7 +482,7 @@ ul.nav-special > li.active > a > div {
     background-color: black;
 }
 
-.live-overview-item:hover img.live-thumbnail {
+.live-overview-item:hover .live-thumbnail {
     opacity: 1;
 }
 
@@ -549,20 +549,21 @@ ul.nav-special > li.active > a > div {
     position: absolute;
     display: block;
     width: 100%;
+    height: 100%;
     top: 0;
 }
 
 .live-overview-detail-img {
     width: 100%;
-    height: 100%;
     position: relative;
-    z-index: 101
 }
 
 .live-overview-detail-error {
     text-align: center;
     position: relative;
-    z-index: 100
+    width: 100%;
+    height: 100%;
+    margin-bottom: 0px;
 }
 
 .live-overview-item-title {
