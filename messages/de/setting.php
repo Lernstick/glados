@@ -60,6 +60,6 @@ return [
     'Value' => 'Wert',
     'Whether the client agent should be running after bootup or not.' => 'Soll der Client Agent beim Booten gestartet werden oder nicht.',
     'You may login with **admin/admin** or **teacher/teacher**.<br>To modify the users, please login as **admin**.' => 'Sie können mit **admin/admin** oder **teacher/teacher** einloggen.<br>Um Benutzer zu verändern, loggen Sie bitte als **admin** ein.',
-    'Monitor refresh interval' => '',
+    'Monitor refresh interval' => 'Aktualisierungsinterval in der Überwachungsansicht',
     'The refresh interval in seconds in which the clients should send new images to the "monitor exams" view.' => 'Der Interval in Sekunden, indem die Clients neue Bilder zur Prüfungsüberwachungs-Ansicht senden sollen.',
 ];
