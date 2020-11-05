@@ -49,6 +49,7 @@ TODO:
   * new URL in avahi service file
      * <txt-record>actionLive='glados/index.php/ticket/live/{token}'</txt-record>
   * manual for monitoring monitoring-exams.md
+  * not reloading correctly (events), when initially there was no ticket running
 
 * misc
   * translations
