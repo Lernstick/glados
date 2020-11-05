@@ -41,7 +41,9 @@ TODO:
   * order of mount?
   * in the download process, all these files are rsync to the client
   * in the mount process, these files are mounted/unzipped in the given order before that "main" squashfs/zip files are mounted over them
-
+  
+* squashfs
+  * oplace version inside squashfs and check agains lernstick version (also exam or standard)
 
 * Live overview
   * new URL in avahi service file
