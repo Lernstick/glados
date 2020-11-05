@@ -57,6 +57,7 @@ TODO:
   * backup browse view broken: http://192.168.0.17/glados/index.php/ticket/2941?path=%2FDokumente&date=all&showDotFiles=0#tab_browse: done
   * version check (of lernstick and lernstick-exam-client) in search script: done
   * version check looking at the base system (not persistent): done
+  * version check looking at grub config string to distinguish exam/non-exam
 
 * daemons
   * have a look at https://github.com/yiisoft/yii2-queue
