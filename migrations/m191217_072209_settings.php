@@ -1,7 +1,7 @@
 <?php
 
 use yii\db\Migration;
-use app\models\Setting;
+use yii\db\Query;
 
 
 /**
@@ -11,6 +11,7 @@ class m191217_072209_settings extends Migration
 {
 
     public $settingsTable = 'setting';
+    public $translationTable = 'translation';
     public $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
 
     /**
@@ -31,12 +32,26 @@ class m191217_072209_settings extends Migration
             ], $this->tableOptions);
         }
 
-        $loginHint = new Setting([
+        $en = yiit('setting', "You may login with **admin/admin** or **teacher/teacher**.<br>To modify the users, please login as **admin**.");
+        $de = \Yii::t('setting', "You may login with **admin/admin** or **teacher/teacher**.<br>To modify the users, please login as **admin**.");
+
+        // create initial translation manually
+        $this->insert($this->translationTable, ['en' => $en, 'de' => $de]);
+
+        // get its id
+        $query = new Query;
+        $id = $query->select('id')
+            ->where(['en' => $en])
+            ->from($this->translationTable)
+            ->one()['id'];
+
+        // conduct the settings entry manually
+        $this->insert($this->settingsTable, [
             'key' => yiit('setting', 'Login hint'),
             'type' => 'markdown',
-            'default_value' => yiit('setting', "You may login with **admin/admin** or **teacher/teacher**.<br>To modify the users, please login as **admin**."),
+            'default_value_data' => null,
+            'default_value_id' => $id,
         ]);
-        $loginHint->save(false);
 
         $auth = Yii::$app->authManager;
 
@@ -63,6 +78,10 @@ class m191217_072209_settings extends Migration
         if ($this->db->schema->getTableSchema($this->settingsTable, true) !== null) {
             $this->dropTable($this->settingsTable);
         }
+
+        // remove the translation
+        $en = yiit('setting', "You may login with **admin/admin** or **teacher/teacher**.<br>To modify the users, please login as **admin**.");
+        $this->delete($this->translationTable, ['en' => $en]);
 
         $auth = Yii::$app->authManager;
 

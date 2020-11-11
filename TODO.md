@@ -45,6 +45,9 @@ TODO:
 * squashfs
   * place version inside squashfs and check against lernstick version (also check if it's the exam version or standard version)
 
+* Screenshots
+  * Own service via systemd
+
 * Live overview
   * new URL in avahi service file
      * <txt-record>actionLive='glados/index.php/ticket/live/{token}'</txt-record>
