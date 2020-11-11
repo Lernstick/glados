@@ -1,6 +1,6 @@
 # Glados
 
-Glados is a fully configurable webinterface to take, manage and create exams using the [Lernstick](https://imedias.ch/themen/lernstick/index.cfm).
+Glados is a fully configurable webinterface to take, manage and create exams using the [Lernstick](https://www.digitale-nachhaltigkeit.unibe.ch/dienstleistungen/lernstick).
 
 ## Features
 
