@@ -128,6 +128,15 @@ class m200330_081029_settings2 extends Migration
      */
     public function safeDown()
     {
+
+        // edit loginHint back
+        $loginHint = Setting::find()->where(['or',
+            ['key' => 'Login hint'],
+            ['key' => 'loginHint'],
+        ])->one();
+        $loginHint->key = 'Login hint';
+        $loginHint->save();
+
         Setting::deleteAll(['key' => 'Token length']);
         Setting::deleteAll(['key' => 'tokenLength']);
         Setting::deleteAll(['key' => 'tokenChars']);

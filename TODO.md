@@ -14,7 +14,7 @@ TODO:
 * screen capturing
   * remove video files when storage space exceeds (overflow): done
   * run fetching not every backup interval, only when traffic allows
-  * for last backup: fetch must run
+  * for last backup: fetch must run: done
   * when service ends -> launch all files: done
   * restore \*.m3u8 and \*.log files
     * No: the stream should not resume, instead start from new with video2.m3u8, ... done
@@ -52,7 +52,7 @@ TODO:
   * not reloading correctly (events), when initially there was no ticket running: done
 
 * misc
-  * translations
+  * translations: done
   * update README.md: done
   * disable firewall not working anymore: done
   * backup browse view broken: done
