@@ -1,3 +1,33 @@
+glados (1.0.8-deb10) unstable; urgency=low
+
+  * New Features:
+    - Many new global settings
+    - **Screen Capturing** added of exams (+ an embedded videojs player in the ticket view)
+    - **Keylogger** added for exams
+    - **Live overview** to monitor exams
+    - Live event support for Microsoft browsers added
+    - Client system has now an agent
+    - Version check added: this checks Lernstick, lernstick-exam-client and GLaDOS versions against each other
+  * Support:
+    - **Debian 10** Client support for Lernstick >=2020-08-04
+    - **No more Debian 9 Client support!**
+  * Fixed several bugs:
+    - Creating multiple tickets form fixed
+    - Fixed a bug where the backup stays locked if client crashed during backup and the daemon hangs, and the student restarts the exam before the daemon crash could be handled (ca. 90 seconds after hang detection)
+    - Range input box fixed
+    - Filtering by state fixed
+    - Optimized database requests by decreasing the number of queries in the history view
+    - Performace issue fixed (RBAC is cached now)
+    - Debian 10 boot issues fixed
+    - Fixed a bug where for long value texts the history was cut off
+    - Fixed isNewRecord leading to connection_method being always set to CONNECT_VIA_DOMAIN
+    - Fixed some errors appearing in the apache error.log file
+    - Fixed a bug causing a headers already sent error in PHP
+    - Disable Firewall is working now
+    - The "finish exam" item now appears in the dash board
+
+ -- Roman Gruber <roman.gruber@inf.unibe.ch>  Wed, 11 Nov 2020 17:38:11 +0100
+
 glados (1.0.7-deb10) unstable; urgency=low
 
   * Fixed several bugs:

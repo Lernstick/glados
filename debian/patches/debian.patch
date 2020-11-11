@@ -4,7 +4,7 @@ Index: glados/config/web.php
 ===================================================================
 --- glados.orig/config/web.php
 +++ glados/config/web.php
-@@ -117,21 +117,4 @@ $config = [
+@@ -129,21 +129,4 @@ $config = [
      'runtimePath' => '/var/lib/glados/runtime',
  ];
  
