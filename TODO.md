@@ -55,6 +55,7 @@ TODO:
   * not reloading correctly (events), when initially there was no ticket running: done
 
 * misc
+  * Undefined index: scPath
   * translations: done
   * update README.md: done
   * disable firewall not working anymore: done
