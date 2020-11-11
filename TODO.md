@@ -59,7 +59,7 @@ TODO:
   * backup browse view broken: http://192.168.0.17/glados/index.php/ticket/2941?path=%2FDokumente&date=all&showDotFiles=0#tab_browse: done
   * version check (of lernstick and lernstick-exam-client) in search script: done
   * version check looking at the base system (not persistent): done
-  * version check looking at grub config string to distinguish exam/non-exam
+  * version check looking at grub config string to distinguish exam/non-exam: done
 
 * daemons
   * remove onStart and onStop from ActiveEventField (only used in /views/daemon/index.php)
