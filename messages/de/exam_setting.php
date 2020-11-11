@@ -24,7 +24,7 @@ return [
     'English (United States) dvorak' => 'Englisch (Vereinigte Staaten) dvorak',
     'English (United States) for Ubuntu 12.04' => 'Englisch (Vereinigte Staaten) für Ubuntu 12.04',
     'French' => 'Französisch',
-    'French (Canada)' => '@@Französisch (Kanada)@@',
+    'French (Canada)' => 'Französisch (Kanada)',
     'French (Switzerland)' => 'Französisch (Schweiz)',
     'French dvorak' => 'Französisch dvorak',
     'German' => 'Deutsch',
