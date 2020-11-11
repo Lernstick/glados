@@ -43,16 +43,17 @@ TODO:
   * in the mount process, these files are mounted/unzipped in the given order before that "main" squashfs/zip files are mounted over them
   
 * squashfs
-  * oplace version inside squashfs and check agains lernstick version (also exam or standard)
+  * place version inside squashfs and check against lernstick version (also check if it's the exam versino or standard version)
 
 * Live overview
   * new URL in avahi service file
      * <txt-record>actionLive='glados/index.php/ticket/live/{token}'</txt-record>
-  * manual for monitoring monitoring-exams.md
+  * manual for monitoring monitoring-exams.md: done
   * not reloading correctly (events), when initially there was no ticket running: done
 
 * misc
   * translations
+  * update README.md
   * disable firewall not working anymore: done
   * backup browse view broken: done
   * backup browse view broken: http://192.168.0.17/glados/index.php/ticket/2941?path=%2FDokumente&date=all&showDotFiles=0#tab_browse: done

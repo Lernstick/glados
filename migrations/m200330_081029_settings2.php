@@ -137,7 +137,7 @@ class m200330_081029_settings2 extends Migration
         Setting::deleteAll(['key' => 'lowerBound']);
         Setting::deleteAll(['key' => 'abandonTicket']);
         Setting::deleteAll(['key' => 'agent']);
-        Setting::deleteAll(['key' => 'monitor_interval']);
+        Setting::deleteAll(['key' => 'monitorInterval']);
 
         $this->dropColumn($this->settingsTable, 'description_data');
         $this->dropColumn($this->settingsTable, 'description_id');

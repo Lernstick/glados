@@ -163,6 +163,13 @@ $this->registerJs($js);
             ])->label(false)->hint(false); ?>
         </div>
 
+        <div class="alert alert-success" role="alert">
+            <span class="glyphicon glyphicon-alert"></span>
+            <span><?= \Yii::t('exams', 'For more information, please visit {link}.', [
+                'link' => Html::a('Manual / Screen Capturing', ['/howto/view', 'id' => 'screen-capturing.md'], ['data-pjax' => 0, 'class' => 'alert-link', 'target' => '_new'])
+            ]) ?></span>
+        </div>
+
         <div class="row">
             <div class="col-sm-6 form-inline form-group">
                 <?= Html::label(\Yii::t('exam_setting', 'Mode')); ?>

@@ -24,7 +24,7 @@ $this->title .= ' - ' . \Yii::t('results', 'Summary');
     <div class="alert alert-info" role="alert">
         <span class="glyphicon glyphicon-alert"></span>
         <span><?= \Yii::t('results', 'Please visit {link} to learn how the student can receive his/her exam result.', [
-            'link' => Html::a('Manual / Get the exam result as a student', ['/howto/view', 'id' => 'get-exam-result.md'], ['class' => 'alert-link'])
+            'link' => Html::a('Manual / Get the exam result as a student', ['/howto/view', 'id' => 'get-exam-result.md'], ['class' => 'alert-link', 'target' => '_new'])
         ]) ?></span>
     </div>
 

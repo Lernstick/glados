@@ -111,7 +111,7 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
                         'encode' => false,
                     ],
                     [
-                        'label' => '<i class="glyphicon glyphicon-eye-open"></i> ' . \Yii::t('main', 'Monitor exams'),
+                        'label' => '<i class="glyphicon glyphicon-eye-open"></i> ' . \Yii::t('main', 'Monitor Exams'),
                         'url' => ['/monitor'],
                         'visible' => Yii::$app->user->can('ticket/view'),
                         'encode' => false,

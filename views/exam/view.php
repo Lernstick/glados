@@ -98,7 +98,7 @@ $this->params['breadcrumbs'][] = $this->title;
               <p class="text-muted">
                 <span><?= \Yii::t('exams', 'You have to provide at least one exam file.') ?></span><br>
                 <span class="glyphicon glyphicon-alert"></span>
-                <span><?= \Yii::t('exams', 'For more information, please visit ') ?><?= Html::a(\Yii::t('exams', 'Manual / Create an exam'), ['/howto/view', 'id' => 'create-exam.md'], ['class' => 'alert-link']) ?>.</span>
+                <span><?= \Yii::t('exams', 'For more information, please visit ') ?><?= Html::a(\Yii::t('exams', 'Manual / Create an exam'), ['/howto/view', 'id' => 'create-exam.md'], ['data-pjax' => 0, 'class' => 'alert-link', 'target' => '_new']) ?>.</span>
               </p>
               <p>
                   <?= Html::a(

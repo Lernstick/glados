@@ -80,7 +80,7 @@ use app\components\ActiveEventField;
             'options' => [
                 'tag' => 'span',
                 'class' => 'live-overview-item-info',
-                'title' => '',
+                'title' => $model->liveWindowName,
             ],
             'content' => $model->liveWindowName,
             'event' => 'monitor:ticket/' . $model->id,

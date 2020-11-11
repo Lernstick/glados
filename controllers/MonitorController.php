@@ -75,13 +75,14 @@ class MonitorController extends Controller
             $model = $this->findModel($id);
 
             $params["TicketSearch"]["exam_id"] = $model->id;
-            $params["sort"] = 'token';
             $params["TicketSearch"]["state"] = Ticket::STATE_RUNNING;
 
             $searchModel = new TicketSearch();
             $dataProvider = $searchModel->search($params);
             $dataProvider->pagination->pageParam = 'mon-page';
             $dataProvider->pagination->pageSize = 12;
+            // sort by start date 
+            $dataProvider->setSort(['defaultOrder' => ['start' => SORT_ASC]]);
 
             return $this->render('monitor', [
                 'model' => $model,
