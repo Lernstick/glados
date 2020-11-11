@@ -25,5 +25,5 @@ phpunit.phar
 #/web/assets
 /web/docs
 
-config/auth.php
-config/auth_backup.php
+/config/auth.php
+/config/auth_backup.php
