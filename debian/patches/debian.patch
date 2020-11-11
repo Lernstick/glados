@@ -1,35 +1,34 @@
-Subject: Remove dev environment
-From: Roman Gruber <roman.gruber@inf.unibe.ch>
+Remove dev environment
 Index: glados/config/web.php
 ===================================================================
---- glados.orig/config/web.php
-+++ glados/config/web.php
-@@ -129,21 +129,4 @@ $config = [
+--- glados.orig/config/web.php	2020-11-11 17:35:56.471270048 +0100
++++ glados/config/web.php	2020-11-11 18:14:16.777130925 +0100
+@@ -129,21 +129,4 @@
      'runtimePath' => '/var/lib/glados/runtime',
  ];
  
 -if (YII_ENV_DEV) {
 -    // configuration adjustments for 'dev' environment
--    if($_SERVER['PATH_INFO'] != '/event/stream') {
+-    if(array_key_exists('PATH_INFO', $_SERVER) && $_SERVER['PATH_INFO'] != '/event/stream') {
 -        $config['bootstrap'][] = 'debug';
 -        $config['modules']['debug'] = [
 -            'class' => 'yii\debug\Module',
--            'allowedIPs' => ['10.16.0.222', '192.168.0.115', '127.0.0.1']
+-            'allowedIPs' => ['10.16.0.222', '192.168.0.248', '127.0.0.1']
 -        ];
 -    }
 -
 -    $config['bootstrap'][] = 'gii';
 -    $config['modules']['gii'] = [
 -        'class' => 'yii\gii\Module',
--        'allowedIPs' => ['10.16.0.222', '192.168.0.115', '127.0.0.1']
+-        'allowedIPs' => ['10.16.0.222', '192.168.0.248', '127.0.0.1']
 -    ];
 -}
 -
  return $config;
 Index: glados/web/index.php
 ===================================================================
---- glados.orig/web/index.php
-+++ glados/web/index.php
+--- glados.orig/web/index.php	2020-11-11 17:35:56.507269745 +0100
++++ glados/web/index.php	2020-11-11 18:14:43.169221024 +0100
 @@ -4,8 +4,8 @@
  setlocale(LC_CTYPE, "C.UTF-8") || setlocale(LC_CTYPE, "en_US.UTF-8");
  
