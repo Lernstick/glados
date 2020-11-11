@@ -49,7 +49,7 @@ TODO:
   * new URL in avahi service file
      * <txt-record>actionLive='glados/index.php/ticket/live/{token}'</txt-record>
   * manual for monitoring monitoring-exams.md
-  * not reloading correctly (events), when initially there was no ticket running
+  * not reloading correctly (events), when initially there was no ticket running: done
 
 * misc
   * translations
@@ -61,6 +61,8 @@ TODO:
   * version check looking at grub config string to distinguish exam/non-exam
 
 * daemons
+  * remove onStart and onStop from ActiveEventField (only used in /views/daemon/index.php)
+  * refactor daemon view
   * have a look at https://github.com/yiisoft/yii2-queue
   * use mutex to accuire a lock (locking also works via DB), see https://www.yiiframework.com/doc/api/2.0/yii-mutex-mysqlmutex
     * mysqlMutex uses mysql db to get a lock "SELECT GET_LOCK(name)", see https://mariadb.com/kb/en/get_lock/

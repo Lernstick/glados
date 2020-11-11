@@ -63,19 +63,31 @@ $('#galleryModal').on('show.bs.modal', function(e) {
 });
 SCRIPT;
 
-?>
-
-<?= ActiveEventField::widget([
+echo ActiveEventField::widget([
     'event' => 'exam/' . $model->id,
     'jsonSelector' => 'runningTickets',
     'jsHandler' => 'function(d, s) {
         $("#reload").click();
     }',
-]); ?>
+]);
 
-<?php Pjax::begin([
+Pjax::begin([
     'id' => 'live_monitor'
-]); ?>
+]);
+
+/**
+ * A dummy event in the group "monitor", such that if no event in the group "monitor" is active
+ * the new js event handlers won't be registered. Also they won't be unregistered if the last
+ * element is disappearing from the view. Using this a event of type "monitor" will always be 
+ * present in the view.
+ */
+echo ActiveEventField::widget([
+    'event' => 'monitor:exam/' . $model->id,
+    'jsonSelector' => 'dummy',
+    'jsHandler' => 'function(d, s){}', // do nothing
+]);
+
+?>
 
 <div class="row">
     <div class="col-sm-9">
@@ -84,6 +96,7 @@ SCRIPT;
         ]); ?></span>
     </div>
     <div class="col-sm-3 text-right">
+        <!-- Don't remove this button! Make it invisible instead. -->
         <a class="btn btn-default" id="reload" href=""><i class="glyphicon glyphicon-refresh"></i>&nbsp;<?= Yii::t('app', 'Reload') ?></a>
     </div>
 </div>
