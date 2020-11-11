@@ -21,5 +21,4 @@ return [
     'Howto' => 'Howto',
     'Howtos' => 'Howtos',
     'Navigation' => 'Navigation',
-    'Help' => '@@Hilfe@@',
 ];

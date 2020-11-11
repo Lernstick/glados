@@ -19,6 +19,8 @@
 return [
     '(invalid date)' => '(ungültiges Datum)',
     '(not set)' => '(nicht gesetzt)',
+    '<small>You have </small>{n_formatted}<small> exam{n,plural,=0{s} =1{} other{s}} created</small>' => '<small>Sie haben </small>{n_formatted}<small> Prüfung{n,plural,=0{en} =1{} other{en}} erstellt</small>',
+    '<small>You have </small>{n_formatted}<small> new activit{n,plural,=0{ies} =1{y} other{ies}}</small>' => '<small> Sie haben </small>{n_formatted}<small> neue Aktivität{n,plural,=0{en} =1{} other{en}}</small>',
     'Check your exam result!' => 'Sehen Sie Ihr Prüfungsresultat an!',
     'Close' => 'Schliessen',
     'File not found.' => 'Datei nicht gefunden.',
@@ -45,7 +47,4 @@ return [
     'hour{n,plural,=0{s} =1{} other{s}} spent in exams' => 'Stund{n,plural,=0{en} =1{e} other{en}} in Prüfungen verbracht',
     'keystrokes from Keylogger' => 'Tastatureingaben vom Keylogger',
     'running exam{n,plural,=0{s} =1{} other{s}}' => 'laufende Prüfung{n,plural,=0{en} =1{} other{en}}',
-    '<small>You have </small>{n_formatted}<small> exam{n,plural,=0{s} =1{} other{s}} created</small>' => '<small>Sie haben </small>{n_formatted}<small> Prüfung{n,plural,=0{en} =1{} other{en}} erstellt</small>',
-    '<small>You have </small>{n_formatted}<small> new activit{n,plural,=0{ies} =1{y} other{ies}}</small>' => '<small> Sie haben </small>{n_formatted}<small> neue Aktivität{n,plural,=0{en} =1{} other{en}}</small>',
-    'Ticket is not in running state.' => '@@Das Ticket ist nicht im laufenden Status.@@',
 ];

@@ -43,7 +43,7 @@ TODO:
   * in the mount process, these files are mounted/unzipped in the given order before that "main" squashfs/zip files are mounted over them
   
 * squashfs
-  * place version inside squashfs and check against lernstick version (also check if it's the exam versino or standard version)
+  * place version inside squashfs and check against lernstick version (also check if it's the exam version or standard version)
 
 * Live overview
   * new URL in avahi service file
