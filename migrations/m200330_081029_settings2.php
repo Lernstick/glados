@@ -116,7 +116,7 @@ class m200330_081029_settings2 extends Migration
             'key' => 'monitorInterval',
             'name' => yiit('setting', 'Monitor refresh interval'),
             'type' => 'integer',
-            'default_value' => 1,
+            'default_value' => 2,
             'description' => yiit('setting', 'The refresh interval in seconds in which the clients should send new images to the "monitor exams" view.'),
         ]);
         $agent->save(false);

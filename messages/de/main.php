@@ -39,5 +39,5 @@ return [
     'System' => 'System',
     'Tickets' => 'Tickets',
     'Users' => 'Benutzer',
-    'Monitor exams' => 'Prüfungen überwachen',
+    'Monitor Exams' => 'Prüfungen überwachen',
 ];

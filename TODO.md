@@ -53,7 +53,7 @@ TODO:
 
 * misc
   * translations
-  * update README.md
+  * update README.md: done
   * disable firewall not working anymore: done
   * backup browse view broken: done
   * backup browse view broken: http://192.168.0.17/glados/index.php/ticket/2941?path=%2FDokumente&date=all&showDotFiles=0#tab_browse: done
