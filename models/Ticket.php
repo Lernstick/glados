@@ -11,6 +11,8 @@ use yii\base\Event;
 use app\models\Backup;
 use app\models\Restore;
 use app\models\EventItem;
+use app\models\EventStream;
+use app\models\RemoteExecution;
 use app\components\HistoryBehavior;
 
 /**
@@ -60,7 +62,14 @@ class Ticket extends LiveActiveRecord
      * @var integer A value from 0 to 4 representing the state of the ticket.
      * @see ticket state constants below.
      */
-    public $state;
+    private $_state;
+
+    /**
+     * @var string the uuid of the ticket based on the token.
+     */
+    private $_agent_uuid;
+
+    private $_liveWindowName;
 
     public $tduration;
 
@@ -100,10 +109,10 @@ class Ticket extends LiveActiveRecord
     public function init()
     {
         $this->on(self::EVENT_AFTER_UPDATE, [$this, 'updateEvent_old']);
-        $this->on(self::EVENT_AFTER_DELETE, [$this, 'deleteEvent']);
+        $this->on(self::EVENT_BEFORE_DELETE, [$this, 'deleteEvent']);
 
         /* generate the token if it's a new record */
-        $this->token = $this->isNewRecord ? bin2hex(openssl_random_pseudo_bytes(\Yii::$app->params['tokenLength']/2)) : $this->token;
+        $this->token = $this->isNewRecord ? $this->generateRandomToken() : $this->token;
 
         // set default values, but only in this context, not in TicketSearch context
         // this would overwrite values to search
@@ -161,6 +170,7 @@ class Ticket extends LiveActiveRecord
             'restore_lock' => [ 'priority' => 0 ],
             'online',
             'last_backup',
+            'state' => [ 'trigger_attributes' => [ 'start', 'end', 'test_taker' ], ],
         ];
     }
 
@@ -195,6 +205,7 @@ class Ticket extends LiveActiveRecord
                     'backup_state' => 'text',
                     'restore_state' => 'text',
                     'running_daemon_id' => 'text',
+                    'sc_size' => 'shortSize',
                 ],
             ],
         ];
@@ -216,9 +227,9 @@ class Ticket extends LiveActiveRecord
             [['time_limit'], 'integer', 'min' => 0, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['exam_id'], 'validateExam', 'skipOnEmpty' => false, 'skipOnError' => false, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['start', 'end', 'test_taker', 'ip', 'state', 'download_lock'], 'safe', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
-            [['start', 'end', 'test_taker', 'ip', 'state', 'download_lock', 'backup_lock', 'restore_lock', 'bootup_lock'], 'safe', 'on' => self::SCENARIO_DEV],
+            [['start', 'end', 'test_taker', 'ip', 'state', 'download_lock', 'backup_lock', 'restore_lock', 'bootup_lock', 'last_backup'], 'safe', 'on' => self::SCENARIO_DEV],
             [['token'], 'unique', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
-            [['token'], 'string', 'max' => 32, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
+            [['token'], 'string', 'max' => 16, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['token'], 'checkIfClosed', 'on' => self::SCENARIO_SUBMIT],
         ];
     }
@@ -248,6 +259,7 @@ class Ticket extends LiveActiveRecord
             'download_finished' => \Yii::t('ticket', 'Download finshed at'),
             'client_state' => \Yii::t('ticket', 'Client State'),
             'online' => \Yii::t('ticket', 'Online'),
+            'agent_online' => \Yii::t('ticket', 'Agent'),
             'ip' => \Yii::t('ticket', 'IP Address'),
             'test_taker' => \Yii::t('ticket', 'Test Taker'),
             'backup' => \Yii::t('ticket', 'Backup'),
@@ -258,6 +270,8 @@ class Ticket extends LiveActiveRecord
             'backup_interval' => \Yii::t('ticket', 'Backup Interval'),
             'backup_size' => \Yii::t('ticket', 'Current Backup Size'),
             'running_daemon_id' => \Yii::t('ticket', 'ID of the running daemon'),
+            'sc_size' => \Yii::t('ticket', 'Total Screen Capture Size'),
+            'sc_length' => \Yii::t('ticket', 'Total Screen Capture Length'),
         ];
     }
 
@@ -279,6 +293,27 @@ class Ticket extends LiveActiveRecord
         ];
     }
 
+    public function setState($state)
+    {
+        $this->_state = (int) $state;
+    }
+
+    public function getState()
+    {
+        $s = 4;
+        if (!empty($this->start)) {
+            if (!empty($this->end)) {
+                $s = !empty($this->test_taker) ? 3 : 2;
+            } else {
+                $s = 1;
+            }
+        } else if (empty($this->end)) {
+            $s = 0;
+        }
+        $this->setState($s);
+        return $this->_state;
+    }
+
     public function getOwn()
     {
         return $this->exam->user->id == \Yii::$app->user->id ? true : false;
@@ -294,6 +329,22 @@ class Ticket extends LiveActiveRecord
                 'ticket/view/all', //concerns all users with the ticket/view/all permission
             ],
         ];
+    }
+
+    /**
+     * Generate a random token.
+     * 
+     * @return string the randomly generated token
+     */
+    public function generateRandomToken()
+    {
+        $characters = Setting::get('tokenChars');
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < Setting::get('tokenLength'); $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randomString;
     }
 
     public function getName()
@@ -313,7 +364,7 @@ class Ticket extends LiveActiveRecord
      */
     public function updateEvent_old()
     {
-        if($this->attributesChanged([ 'start', 'end', 'test_taker', 'result' ])){
+        if ($this->attributesChanged([ 'start', 'end', 'test_taker', 'result' ])) {
             $eventItem = new EventItem([
                 'event' => 'ticket/' . $this->id,
                 'priority' => 0,
@@ -325,12 +376,24 @@ class Ticket extends LiveActiveRecord
             $eventItem->generate();
         }
 
-        if($this->attributesChanged([ 'client_state_id', 'client_state_data' ])){
+        // for the monitor view to reload, when a ticket state has changed
+        if ($this->attributesChanged([ 'start', 'end' ])) {
+            $eventItem = new EventItem([
+                'event' => 'exam/' . $this->exam->id,
+                'priority' => 0,
+                'concerns' => $this->concerns,
+                'data' => [
+                    'runningTickets' => $this->exam->runningTickets,
+                ],
+            ]);
+            $eventItem->generate();
+        }
+
+        if ($this->attributesChanged([ 'client_state_id', 'client_state_data' ])) {
             $act = new Activity([
                 'ticket_id' => $this->id,
                 'description' => yiit('activity', 'Client state changed: {client_state}'),
                 'description_params' => [
-                    //'old' => Translation::findOne($this->presaveAttributes['client_state_id'])->en,
                     'client_state' => $this->client_state,
                 ],
                 'severity' => Activity::SEVERITY_INFORMATIONAL,
@@ -359,6 +422,10 @@ class Ticket extends LiveActiveRecord
 
         if ($this->backup == true) {
             $this->backups[0]->delete();
+        }
+
+        if ($this->screencapture !== null) {
+            $this->screencapture->delete();
         }
 
         return;
@@ -516,8 +583,8 @@ class Ticket extends LiveActiveRecord
     {
         return (
             (
-                $this->state == self::STATE_CLOSED ||
-                $this->state == self::STATE_SUBMITTED
+                $this->state == self::STATE_CLOSED
+                || $this->state == self::STATE_SUBMITTED
             ) &&
             $this->last_backup == 0 &&
             $this->abandoned
@@ -544,6 +611,11 @@ class Ticket extends LiveActiveRecord
         return Backup::findAll($this->token);
     }
 
+    /**
+     * TODO
+     *
+     * @return bool
+     */
     public function getLimit()
     {
         if($this->state == self::STATE_OPEN || $this->state == self::STATE_RUNNING){
@@ -655,7 +727,45 @@ class Ticket extends LiveActiveRecord
     }
 
     /**
-     * Runs a command in the shell of the system.
+     * Returns the Screencapture model
+     *
+     * @return \app\models\Screencapture|null
+     */
+    public function getScreencapture()
+    {
+        return Screencapture::findOne($this->id);
+    }
+
+    /**
+     * Getter for the live window name
+     *
+     * @return string
+     */
+    public function getLiveWindowName()
+    {
+        $path = \Yii::$app->params['uploadPath'] . '/live/' . $this->token . '_window.txt';
+        if ($this->_liveWindowName == null) {
+            $this->_liveWindowName = @file_get_contents($path);
+        }
+        return $this->_liveWindowName;
+    }
+
+    /**
+     * Setter for the live window name
+     *
+     * @param string
+     */
+    public function setLiveWindowName($value)
+    {
+        $path = \Yii::$app->params['uploadPath'] . '/live/' . $this->token . '_window.txt';
+        if ($this->_liveWindowName != $value) {
+            $this->_liveWindowName = $value;
+            file_put_contents($path, $value);
+        }
+    }
+
+    /**
+     * Runs a command in the shell of the system (blocking).
      * 
      * @param string $cmd the command to run
      * @param string $lc_all the value of the `LC_ALL` environment variable
@@ -688,13 +798,78 @@ class Ticket extends LiveActiveRecord
     }
 
     /**
+     * Runs a command in the shell of the system asynchonously and thus not blocking the web request.
+     *
+     * @param string $cmd the command to run
+     * @param string $lc_all the value of the `LC_ALL` environment variable
+     * @return boolean Whether the saving succeeded (i.e. no validation errors occurred).
+     */
+    public function runCommandAsync($cmd, $lc_all = "C")
+    {
+        $r = new RemoteExecution([
+            'cmd' => $cmd,
+            'env' => "LC_ALL=" . $lc_all,
+            'host' => $this->ip,
+        ]);
+        return $r->request();
+    }
+
+    /**
+     * Getter for the uuid agent_uuid based on the token
+     * 
+     * @return string the unique uuid
+     */
+    public function getAgent_uuid()
+    {
+        if ($this->_agent_uuid === null) {
+            $this->_agent_uuid = generate_uuid3($this->token);
+        }
+        return $this->_agent_uuid;
+    }
+
+    /**
+     * Getter for the agent_online flag.
+     * 
+     * @return boolean whether the agent is online or not
+     */
+    public function getAgent_online()
+    {
+        $retval = Yii::$app->mutex->acquire($this->agent_uuid);
+        if ($retval) {
+            Yii::$app->mutex->release($this->agent_uuid);
+        }
+        return !$retval;
+    }
+
+    /**
+     * Checks if the ticket has a running EventStream instance
+     * @param string $group the group indentifier in front of the event name
+     * @return boolean
+     */
+    public function hasActiveEventStream($group = null)
+    {
+        if ($group != null) {
+            $event = $group . ':' . $this->tableName() . '/' . $this->id;
+        } else {
+            $event = $this->tableName() . '/' . $this->id;
+        }
+        $models = EventStream::find()->where(['like', 'listenEvents', $event])->all();
+        foreach ($models as $stream) {
+            if ($stream->isActive) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * TODO
      *
      * @param string $attribute the attribute
      * @param array $params
      * @return void
      */
-    public function validateExam ($attribute, $params)
+    public function validateExam($attribute, $params)
     {
 
         $exam = Exam::findOne(['id' => $this->$attribute]);
@@ -715,7 +890,7 @@ class Ticket extends LiveActiveRecord
     }
 
     /**
-     * Generates an error message when the ticket is in closed state
+     * Generates an error message when the ticket is not in closed state
      *
      * @param string $attribute - the attribute
      * @param array $params
@@ -738,7 +913,7 @@ class Ticket extends LiveActiveRecord
         $c = \Yii::$app->language;
         $query = new TicketQuery(get_called_class());
 
-        $query->addSelect(['`ticket`.*', new \yii\db\Expression('(case
+        $query->addSelect([new \yii\db\Expression('(case
             WHEN (start is not null and end is not null and test_taker > "") THEN
                 3 # submitted
             WHEN (start is not null and end is not null) THEN

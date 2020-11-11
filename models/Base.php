@@ -8,48 +8,37 @@ use yii\db\ActiveRecord;
 /**
  * This is the base model class.
  *
- * @property integer $id
- * @property string $name
- * @property string $subject
- * @property boolean $grp_netdev
- * @property boolean $allow_sudo
- * @property boolean $allow_mount
- * @property boolean $firewall_off
- * @property boolean $screenshots
- * @property string $file
- * @property integer $user_id
- * @property string $file_list
- *
- * @property User $user
- * 
- * @property Ticket[] $tickets
- * @property integer ticketCount
- * @property integer openTicketCount
- * @property integer runningTicketCount
- * @property integer closedTicketCount
  */
 class Base extends \yii\db\ActiveRecord
 {
 
     /**
+     * @var bool disables the permissions check in [[selectList]]
+     */
+    public $noPermissionCheck = false;
+
+    /**
      * List of tables that are able to join
      *
-     * @return array an array with join tables in format [ "table1 alias1", "table2 alias2" ]
+     * @return array an array with join tables in format
+     * [
+     *     "table1 alias1",
+     *     "table2 alias2",
+     * ]
      */
     public function joinTables() {
         return [];
     }
 
     /**
-     * Lists an attribute
-     * @param string attr attribute to list
-     * @param string q query
-     * @param int page
-     * @param int per_page
-     * @param int id which attribute should be the id
-     * @param bool showQuery whether the query itself should be shown in the 
-     *                  output list.
-     * @param string the attribute to order by
+     * Lists an attribute for a dropdown select list.
+     * @param string $attr attribute to list
+     * @param string $q search query 
+     * @param int $page page number
+     * @param int $per_page how many items per page
+     * @param int $id which attribute should be the id
+     * @param bool $showQuery whether the query itself should be shown in the output list.
+     * @param string the attribute to sort by
      *
      * @return array
      */
@@ -76,16 +65,14 @@ class Base extends \yii\db\ActiveRecord
             $query->having(['like', $attr, $q]);
         }
 
-        if (is_null($orderBy)) {
-            $query->orderBy($attr);
-        } else {
-            $query->orderBy($orderBy);
-        }
+        is_null($orderBy) ? $query->orderBy($attr) : $query->orderBy($orderBy);
 
         $query->groupBy($attr); // distincts even a calculated field
 
         if ($this->tableName() != "user") {
-            Yii::$app->user->can($this->tableName() . '/index/all') ?: $query->own();
+            if (!$this->noPermissionCheck) {
+                Yii::$app->user->can($this->tableName() . '/index/all') ?: $query->own();
+            }
         }
 
         $out = ['results' => []];

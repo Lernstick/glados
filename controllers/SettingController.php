@@ -8,6 +8,7 @@ use app\models\SettingSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
+use yii\base\ViewNotFoundException;
 use app\components\AccessRule;
 
 /**
@@ -58,16 +59,49 @@ class SettingController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $contents = null;
+
+        if ($this->preview_exists($model)) {
+            if (is_array(Yii::$app->request->post('preview'))) {
+                if (array_key_exists('value', Yii::$app->request->post('preview'))) {
+                    $value = Yii::$app->request->post('preview')['value'];
+                    $key = Yii::$app->request->post('preview')['key'];
+                    $type = Setting::findByKey($key)->type;
+                    Setting::set($key, $value, $type);
+                }
+            }
+
+            $this->layout = 'preview';
+
+            $contents = $this->render('previews/' . $model->key, [
+                'model' => $model,
+            ]);
+            $this->layout = 'main';
+
+            // reset the breadcrumbs after preview rendering
+            $this->view->params['breadcrumbs'] = [];
+        }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index', 'id' => $model->id]);
         } else {
             return $this->render('update', [
                 'model' => $model,
+                'contents' => $contents,
             ]);
         }
     }
 
+    /**
+     * If the preview view file exists
+     *
+     * @param Setting $model
+     * @return bool
+     */
+    protected function preview_exists($model)
+    {
+        return is_file(Yii::getAlias('@app/views/setting/previews/' . $model->key) . '.php');
+    }
 
     /**
      * Finds the Setting model based on its primary key value.

@@ -8,6 +8,8 @@ use app\components\ActiveEventField;
 /* @var $this yii\web\View */
 /* @var $model app\models\Ticket */
 
+$this->title = \Yii::t('client', 'Exam Client');
+
 if ($model->client_state == 'setup complete') {
     $this->registerJs('$("#dialog").modal("show");');
 }
@@ -32,15 +34,13 @@ if ($model->client_state == 'setup complete') {
                             <li>
                                 <?= Html::a(
                                     '<span class="glyphicon glyphicon-backward"></span> ' . \Yii::t('client', 'Back to token submission'),
-                                    ['download', 'token' => $model->token, 'step' => 1],
-                                    ['id' => 'backup-now']
+                                    ['download', 'token' => $model->token, 'step' => 1]
                                 ) ?>
                             </li>            
                             <li>
                                 <?= Html::a(
                                     '<span class="glyphicon glyphicon-retweet"></span> ' . \Yii::t('client', 'Request download again'),
-                                    ['download', 'token' => $model->token, 'step' => 2],
-                                    ['id' => 'backup-now']
+                                    ['download', 'token' => $model->token, 'step' => 2]
                                 ) ?>
                             </li>
                             <li>
@@ -86,7 +86,7 @@ if ($model->client_state == 'setup complete') {
                         'aria-valuemin' => '0',
                         'aria-valuemax' => '100',
                         'style' => [
-                            'width' => yii::$app->formatter->format($model->download_progress, 'percent'),
+                            'width' => $model->download_progress*100 . '%',
                             'min-width' => '2em',
                         ]
                     ]
@@ -153,12 +153,22 @@ if ($model->client_state == 'setup complete') {
         'jsonSelector' => 'setup_complete',
         'jsHandler' => 'function(d, s){
             if (d == true) {
-                $("#dialog").modal("show");
+                $("#success").modal("show");
             }
-        }'        
+        }'
     ]); ?>
 
-    <div id="dialog" class="modal fade" tabindex="-1" role="dialog">
+    <?= ActiveEventField::widget([
+        'event' => 'ticket/' . $model->id,
+        'jsonSelector' => 'setup_failed',
+        'jsHandler' => 'function(d, s){
+            if (d == true) {
+                $("#fail").modal("show");
+            }
+        }'
+    ]); ?>
+
+    <div id="success" class="modal fade" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
 
@@ -169,6 +179,30 @@ if ($model->client_state == 'setup complete') {
 
                 <div class="modal-body">
                     <p><?= \Yii::t('client', 'The system setup is done. You can close this window now.') ?></p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="fail" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4><?= \Yii::t('client', 'Abort') ?></h4>
+                </div>
+
+                <div class="modal-body">
+                    <p><?= \Yii::t('client', 'The system setup has failed.') ?></p>
+                </div>
+                <div class="modal-footer">
+                    <?= Html::a(
+                        '<span class="glyphicon glyphicon-retweet"></span> ' . \Yii::t('client', 'Request download again'),
+                        ['download', 'token' => $model->token, 'step' => 2],
+                        ['class' => 'btn btn-danger']
+                    ) ?>
                 </div>
 
             </div>

@@ -32,6 +32,7 @@ function expert_settings()
     chroot ${initrd}/newroot systemctl enable lernstick-firewall.service
   else
     chroot ${initrd}/newroot systemctl disable lernstick-firewall.service
+    chroot ${initrd}/newroot /lib/systemd/lernstick-firewall stop
   fi
 }
 

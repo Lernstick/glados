@@ -1,9 +1,11 @@
 <?php
 
-namespace app\models;
+namespace app\models\forms;
 
 use Yii;
 use yii\base\Model;
+use app\models\LoginForm;
+use app\models\Auth;
 use app\models\UserAuth;
 
 /**

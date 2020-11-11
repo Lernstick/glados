@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\AuthTestForm */
+/* @var $model app\models\forms\AuthTestForm */
 /* @var $searchmodel app\models\AuthSearch */
 
 $this->title = \Yii::t('auth', 'Test Authentication Method');
@@ -48,7 +48,7 @@ $this->registerJs($js);
     <div class="alert alert-success" role="alert">
         <span class="glyphicon glyphicon-alert"></span>
         <span><?= \Yii::t('auth', 'For more information, please visit the {link}.', [
-            'link' => Html::a('Manual / Test Login', ['/howto/view', 'id' => 'test-login.md'], ['class' => 'alert-link'])
+            'link' => Html::a('Manual / Test Login', ['/howto/view', 'id' => 'test-login.md'], ['class' => 'alert-link', 'target' => '_new'])
         ]) ?></span>
     </div>
 

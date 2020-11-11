@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="alert alert-success" role="alert">
         <span class="glyphicon glyphicon-alert"></span>
         <span><?= \Yii::t('ticket', 'For more information, please visit {link}.', [
-            'link' => Html::a('Manual / Create single ticket', ['/howto/view', 'id' => 'create-single-ticket.md'], ['class' => 'alert-link'])
+            'link' => Html::a('Manual / Create single ticket', ['/howto/view', 'id' => 'create-single-ticket.md'], ['class' => 'alert-link', 'target' => '_new'])
         ]) ?></span>
     </div>
 

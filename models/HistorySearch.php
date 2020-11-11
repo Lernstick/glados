@@ -15,6 +15,7 @@ class HistorySearch extends History
 {
 
     public $userName;
+    private $_columnList;
 
     /**
      * @inheritdoc
@@ -45,7 +46,7 @@ class HistorySearch extends History
      */
     public function search($params)
     {
-        $query = History::find();
+        $query = History::find()->with('user');
 
         // add conditions that should always apply here
 
@@ -86,27 +87,30 @@ class HistorySearch extends History
      */
     public function getColumnList($model)
     {
-        $query = History::find();
-        $query->where(['table' => $model->tableName(), 'row' => $model->id]);
+        if (empty($this->_columnList)) {
+            $query = History::find();
+            $query->where(['table' => $model->tableName(), 'row' => $model->id]);
 
-        // filter out all _data fields
-        $query->andWhere(['not like', 'column', ['%_data'], false]);
-        $query->groupBy('column');
-        $items = $query->asArray()->all();
+            // filter out all _data fields
+            $query->andWhere(['not like', 'column', ['%_data'], false]);
+            $query->groupBy('column');
+            $items = $query->asArray()->all();
 
-        return ArrayHelper::map($items, 'column', function($items) use ($model) {
-                $parts = explode('_', $items['column']);
-                $last = array_pop($parts);
-                $pname = implode('_', $parts);
-                if ($last == 'id'
-                    && $model->hasMethod('getTranslatedFields')
-                    && in_array($pname, $model->translatedFields)
-                ) {
-                    return $model->getAttributeLabel($pname);
-                } else {
-                    return $model->getAttributeLabel($items['column']);
+            $this->_columnList = ArrayHelper::map($items, 'column', function($items) use ($model) {
+                    $parts = explode('_', $items['column']);
+                    $last = array_pop($parts);
+                    $pname = implode('_', $parts);
+                    if ($last == 'id'
+                        && $model->hasMethod('getTranslatedFields')
+                        && in_array($pname, $model->translatedFields)
+                    ) {
+                        return $model->getAttributeLabel($pname);
+                    } else {
+                        return $model->getAttributeLabel($items['column']);
+                    }
                 }
-            }
-        );
+            );
+        }
+        return $this->_columnList;
     }
 }

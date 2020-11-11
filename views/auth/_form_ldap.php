@@ -145,9 +145,6 @@ connection_method_change = function(){
     if (selected == null) {
         selected = "{$model->connection_method}";
     }
-    console.log(ldap_uri);
-    console.log(ldap_scheme);
-    console.log(ldap_port);
     if (selected == "connect_via_uri") {
         ldap_uri.show();
         ldap_port.hide();
@@ -181,7 +178,7 @@ JS;
 <div class="alert alert-success" role="alert">
     <span class="glyphicon glyphicon-alert"></span>
     <span><?= \Yii::t('auth', 'For more information, please visit the {link}.', [
-        'link' => Html::a('Manual / LDAP Authentication', ['/howto/view', 'id' => 'ldap-authentication.md'], ['class' => 'alert-link'])
+        'link' => Html::a('Manual / LDAP Authentication', ['/howto/view', 'id' => 'ldap-authentication.md'], ['class' => 'alert-link', 'target' => '_new'])
     ]) ?></span>
 </div>
 

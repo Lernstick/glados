@@ -105,7 +105,7 @@ class BackupController extends DaemonController implements DaemonInterface
             $this->remotePath = '/overlay';
 
             if ($id != '') {
-                if (($this->ticket =  Ticket::findOne(['ticket.id' => $id, 'backup_lock' => 0, 'restore_lock' => 0])) == null){
+                if (($this->ticket = Ticket::findOne(['ticket.id' => $id, 'backup_lock' => 0, 'restore_lock' => 0])) == null){
                     $this->logError('Error: ticket with id ' . $id . ' not found, it is already in processing, or locked while booting.');
                     return;
                 }
@@ -189,11 +189,29 @@ class BackupController extends DaemonController implements DaemonInterface
             }
             $this->ticket->save(false);
 
+            # disable screen capture service on the client
+            if ($this->finishBackup == true) {
+                $this->ticket->runCommand('service screen_capture stop; service keylogger stop', 'C', 20);
+            }
+
+            /* Exclude screen_capture_path from backup */
+            if (array_key_exists('screen_capture', $this->ticket->exam->settings)
+                && $this->ticket->exam->settings['screen_capture']
+            ) {
+                $this->excludeList[] = FileHelper::normalizePath(
+                    $this->remotePath . '/' . $this->ticket->exam->settings['screen_capture_path']);
+            }
+
             $this->remotePath = FileHelper::normalizePath($this->remotePath . '/' . $this->ticket->exam->backup_path);
 
             /* Generate exclude list based on remotePath */
             $exclude = array_filter($this->excludeList, function($v){
                 return (strpos($v, $this->remotePath) === 0);
+            });
+
+            /* Escape the whole excludeList */
+            array_walk($exclude, function(&$e, $key){
+                $e = escapeshellarg($e);
             });
 
             $this->_cmd = "rdiff-backup --remote-schema 'ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
@@ -218,7 +236,7 @@ class BackupController extends DaemonController implements DaemonInterface
 
             $retval = $cmd->run();
 
-            if($retval != 0){
+            if ($retval != 0) {
                 $this->ticket->backup_state = yiit('ticket', 'rdiff-backup failed (retval: {retval}), output: {output}');
                 $this->ticket->backup_state_params = [
                     'retval' => $retval,
@@ -239,7 +257,13 @@ class BackupController extends DaemonController implements DaemonInterface
                 if ($this->finishBackup == true) {
                     $this->ticket->runCommand('echo "backup failed, waiting for next try..." > /home/user/shutdown');
                 }
-            }else{
+            } else {
+
+                /* run the fetch daemon in the foreground */
+                $this->logInfo("Fetching data...");
+                $fetchDaemon = new Daemon();
+                $pid = $fetchDaemon->startFetch($this->ticket->id, false);
+
                 $this->ticket->backup_last = new Expression('NOW()');
                 $this->ticket->backup_state = yiit('ticket', 'backup successful.');
 
@@ -264,11 +288,13 @@ class BackupController extends DaemonController implements DaemonInterface
                 # Calculate the size
                 $this->logInfo("Calculate backup size...");
                 $this->ticket->backup_size = $this->directorySize(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token) - $this->directorySize(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token . '/rdiff-backup-data');
+                if (is_dir(\Yii::$app->params['scPath'] . "/" . $this->ticket->token)) {
+                    $this->ticket->sc_size = $this->directorySize(\Yii::$app->params['scPath'] . "/" . $this->ticket->token);
+                }
             }
 
             $this->ticket->backup_last_try = new Expression('NOW()');
             $this->unlockItem($this->ticket);
-
         }
 
         $this->ticket = null;
@@ -338,12 +364,14 @@ class BackupController extends DaemonController implements DaemonInterface
         foreach ($tickets as $ticket) {
             if (($daemon = Daemon::findOne($ticket->running_daemon_id)) !== null) {
                 if ($daemon->running != true) {
+                    $this->logInfo("Unlocking item (token=" . $ticket->token . ")...");
                     $ticket->backup_lock = $ticket->restore_lock = 0;
                     $ticket->save(false);
                     //$daemon->delete();
                 }
             } else {
                 $ticket->backup_lock = $ticket->restore_lock = 0;
+                $this->logInfo("Unlocking item (token=" . $ticket->token . ")...");
                 $ticket->save(false);
             }
         }
@@ -488,7 +516,7 @@ class BackupController extends DaemonController implements DaemonInterface
      */
     public function lockItem ($ticket)
     {
-        if ($this->lock($ticket->id, "backup")) {
+        if ($this->lock($ticket->id . "_backup")) {
             $ticket->backup_lock = 1;
             $ticket->running_daemon_id = $this->daemon->id;
             return $ticket->save();
@@ -501,7 +529,7 @@ class BackupController extends DaemonController implements DaemonInterface
      */
     public function unlockItem ($ticket)
     {
-        $this->unlock();
+        $this->unlock($ticket->id . "_backup");
         $ticket->backup_lock = 0;
         return $ticket->save(false);
     }

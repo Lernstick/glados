@@ -5,6 +5,10 @@ namespace app\controllers;
 use Yii;
 use app\models\Exam;
 use app\models\ExamSearch;
+use app\models\ExamSetting;
+use app\models\ExamSettingAvail;
+use app\models\ScreenCapture;
+use app\models\forms\ExamForm;
 use app\models\Ticket;
 use app\models\TicketSearch;
 use app\models\History;
@@ -73,19 +77,32 @@ class ExamController extends Controller
                 'dataProvider' => $dataProvider,
             ]);
         } else if ($mode == 'list') {
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             $out = [];
             if (!is_null($attr)) {
-                $searchModel = new ExamSearch();
                 if ($attr == 'name') {
+                    $searchModel = new ExamSearch();
                     $out = $searchModel->selectList('name', $q, $page, $per_page);
                 } else if ($attr == 'subject') {
+                    $searchModel = new ExamSearch();
                     $out = $searchModel->selectList('subject', $q, $page, $per_page);
                 } else if ($attr == 'resultExam') {
+                    $searchModel = new ExamSearch();
                     $attr = 'CONCAT(name, " - ", subject)';
                     $out = $searchModel->selectList($attr, $q, $page, $per_page, 'id', false, 'name');
+                } else if ($attr == 'settings') {
+                    $searchModel = new ExamSettingAvail();
+                    $out = $searchModel->selectList('name', $q, $page, $per_page, 'key', false);
+                } else if ($attr == 'settings2') {
+                    $params = Yii::$app->request->queryParams;
+                    $searchModel = new ExamSettingAvail();
+                    $dataProvider = $searchModel->search($params);
+                    return $this->renderAjax('/exam/setting/index', [
+                        'searchModel' => $searchModel,
+                        'dataProvider' => $dataProvider,
+                    ]);
                 }
             }
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             return $out;
         } 
     }
@@ -101,15 +118,7 @@ class ExamController extends Controller
         $model = $this->findModel($id);
 
         if ($mode === 'default') {
-
-            $models = preg_split("/\r\n|\n|\r/", $model->{"url_whitelist"}, null, PREG_SPLIT_NO_EMPTY);
-            $models = array_merge($models, preg_split("/\r\n|\n|\r/", $model->{"sq_url_whitelist"}, null, PREG_SPLIT_NO_EMPTY));
-            $urlWhitelistDataProvider = new ArrayDataProvider([
-                'allModels' => $models,
-            ]);
-            $urlWhitelistDataProvider->pagination->pageParam = 'url-page';
-            $urlWhitelistDataProvider->pagination->pageSize = 10;            
-
+            
             $historySearchModel = new HistorySearch();
             $historyQueryParams = array_key_exists('HistorySearch', Yii::$app->request->queryParams)
                 ? Yii::$app->request->queryParams['HistorySearch']
@@ -123,11 +132,15 @@ class ExamController extends Controller
             $historyDataProvider->pagination->pageParam = 'hist-page';
             $historyDataProvider->pagination->pageSize = 10;
 
+            $settingsDataProvider = new ArrayDataProvider([
+                'allModels' => $model->exam_setting,
+            ]);
+
             return $this->render('view', [
                 'model' => $model,
-                'urlWhitelistDataProvider' => $urlWhitelistDataProvider,
                 'historySearchModel' => $historySearchModel,
                 'historyDataProvider' => $historyDataProvider,
+                'settingsDataProvider' => $settingsDataProvider,
             ]);
 
         } else if ($mode == "browse"){
@@ -165,11 +178,12 @@ class ExamController extends Controller
         } else if ($mode == "monitor"){
             $params["TicketSearch"]["exam_id"] = $model->id;
             $params["sort"] = 'token';
+            $params["TicketSearch"]["state"] = Ticket::STATE_RUNNING;
 
             $searchModel = new TicketSearch();
             $dataProvider = $searchModel->search($params);
             $dataProvider->pagination->pageParam = 'mon-page';
-            $dataProvider->pagination->pageSize = 9;
+            $dataProvider->pagination->pageSize = 12;
 
             return $this->render('monitor', [
                 'model' => $model,
@@ -182,23 +196,23 @@ class ExamController extends Controller
             return [
                 [
                     'name' => yii::$app->formatter->format(0, 'state'),
-                    'y' => $model->openTicketCount,
+                    'y' => $model->openTickets,
                 ],
                 [
                     'name' => yii::$app->formatter->format(1, 'state'),
-                    'y' => $model->runningTicketCount,
+                    'y' => $model->runningTickets,
                 ],
                 [
                     'name' => yii::$app->formatter->format(2, 'state'),
-                    'y' => $model->closedTicketCount,
+                    'y' => $model->closedTickets,
                 ],
                 [
                     'name' => yii::$app->formatter->format(3, 'state'),
-                    'y' => $model->submittedTicketCount,
+                    'y' => $model->submittedTickets,
                 ],
                 [
                     'name' => yii::$app->formatter->format(4, 'state'),
-                    'y' => $model->ticketCount - $model->openTicketCount - $model->runningTicketCount - $model->closedTicketCount - $model->submittedTicketCount,
+                    'y' => $model->ticketCount - $model->openTickets - $model->runningTickets - $model->closedTickets - $model->submittedTickets,
                 ]
             ];
 
@@ -250,10 +264,25 @@ class ExamController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Exam();
+        $model = new ExamForm();
+        $model->exam = new Exam();
+        $model->setAttributes(Yii::$app->request->post());
 
-        if ($model->load(\Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['update', 'id' => $model->id, 'step' => 2]);
+        if (is_array(Yii::$app->request->post('setting'))) {
+            $setting = new ExamSetting([
+                'key' => Yii::$app->request->post('setting')['key']
+            ]);
+            $setting->loadDefaultValue();
+            return $this->renderAjax('setting/forms/value', [
+                'id' => Yii::$app->request->post('setting')['id'],
+                'form' => null,
+                'setting' => $setting,
+                'model' => $model,
+            ]);
+        }
+
+        if (Yii::$app->request->post() && $model->save()) {
+            return $this->redirect(['update', 'id' => $model->exam->id, 'step' => 2]);
         } else {
             return $this->render('create', [
                 'model' => $model,
@@ -272,19 +301,35 @@ class ExamController extends Controller
      */
     public function actionUpdate($id, $mode = 'default', $step = 0)
     {
-        $model = $this->findModel($id);
+        $model = new ExamForm();
+        $model->exam = $this->findModel($id);
+        $model->setAttributes(Yii::$app->request->post());
 
         if ($mode === 'default') {
-            if ($model->runningTicketCount != 0){
+            if ($model->exam->runningTickets != 0){
                 Yii::$app->session->addFlash('danger', \Yii::t('exams', 'Exam edit is disabled while there {n,plural,=1{is one ticket} other{are # tickets}} in "Running" state.',
-                    [ 'n' => $model->runningTicketCount ]
+                    [ 'n' => $model->exam->runningTickets ]
                 ));
-                return $this->redirect(['view', 'id' => $model->id]);
+                return $this->redirect(['view', 'id' => $model->exam->id]);
             }
 
-            if ($model->load(Yii::$app->request->post()) && $model->save()){
-                return $this->redirect(['view', 'id' => $model->id]);
-            }else{
+            if (is_array(Yii::$app->request->post('setting'))) {
+                $setting = new ExamSetting([
+                    'key' => Yii::$app->request->post('setting')['key']
+                ]);
+                $setting->loadDefaultValue();
+                return $this->renderAjax('setting/forms/value', [
+                    'id' => Yii::$app->request->post('setting')['id'],
+                    'form' => null,
+                    'setting' => $setting,
+                    'model' => $model,
+                ]);
+            }
+
+            if (Yii::$app->request->post() && $model->save()) {
+                return $this->redirect(['view', 'id' => $model->exam->id]);
+            } else {
+
                 if ($step == 0) {
                     return $this->render('update', [
                         'model' => $model,
@@ -296,8 +341,10 @@ class ExamController extends Controller
                         'step' => $step,
                     ]);
                 }
+
             }
-        }else if ($mode === 'upload') {
+        } else if ($mode === 'upload') {
+            $model = $model->exam;
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
             $file = UploadedFile::getInstanceByName('file');
@@ -357,7 +404,7 @@ class ExamController extends Controller
                         'error' => $model->errors['id'][0],
                     ]]];
                 }
-            }else{
+            } else {
                 @unlink($file);
                 return [ 'files' => [[
                     'name' => basename($file),
@@ -410,7 +457,6 @@ class ExamController extends Controller
         }
 
     }
-
 
     /**
      * Finds the Exam model based on its primary key value.

@@ -180,6 +180,7 @@ class TranslatedActiveRecord extends Base
 
     /**
      * Automatic insertion/update of the data in the translation table
+     * when the correspongding record is updated.
      *
      * @return void
      */
@@ -208,6 +209,7 @@ class TranslatedActiveRecord extends Base
                         $translation = new Translation([
                             'en' => \Yii::t($category, $this->{$field . '_orig'}, $params, 'en'),
                             'de' => \Yii::t($category, $this->{$field . '_orig'}, $params, 'de'),
+                            'category' => $category,
                         ]);
 
                         $translation->save();

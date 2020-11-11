@@ -7,8 +7,15 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model app\models\Ticket */
 
-?>
+$this->title = \Yii::t('client', 'Exam Client');
 
+// froces wxbrowser to resize the window
+$js = <<< 'SCRIPT'
+window.location.href = '#wxbrowser:resize:800x310'
+SCRIPT;
+$this->registerJs($js);
+
+?>
 <div class="token-request-view">
     <div class="row">
         <div class="col-md-6">

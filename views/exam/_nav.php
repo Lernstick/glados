@@ -33,13 +33,6 @@ $this->registerJs($active_tabs);
     </li>
     <li>
         <?= Html::a(
-            '<i class="glyphicon glyphicon-file"></i> ' . \Yii::t('exams', 'Exam Files'),
-            Url::to(['exam/view', 'id' => $model->id, '#' => 'file']),
-            ['data-toggle' => '']
-        ); ?>
-    </li>
-    <li>
-        <?= Html::a(
             '<i class="glyphicon glyphicon-cog"></i> ' . \Yii::t('exams', 'Settings'),
             Url::to(['exam/view', 'id' => $model->id, '#' => 'settings']),
             ['data-toggle' => '']
@@ -47,7 +40,21 @@ $this->registerJs($active_tabs);
     </li>
     <li>
         <?= Html::a(
-            '<i class="glyphicon glyphicon-th"></i> ' . \Yii::t('exams', 'Monitor'),
+            '<i class="glyphicon glyphicon-file"></i> ' . \Yii::t('exams', 'Exam Files'),
+            Url::to(['exam/view', 'id' => $model->id, '#' => 'file']),
+            ['data-toggle' => '']
+        ); ?>
+    </li>
+    <li>
+        <?= Html::a(
+            '<i class="glyphicon glyphicon-exclamation-sign"></i> ' . \Yii::t('exams', 'Expert Settings'),
+            Url::to(['exam/view', 'id' => $model->id, '#' => 'expert']),
+            ['data-toggle' => '']
+        ); ?>
+    </li>
+    <li>
+        <?= Html::a(
+            '<i class="glyphicon glyphicon-eye-open"></i> ' . \Yii::t('exams', 'Monitor'),
             Url::to(['exam/view', 'id' => $model->id, 'mode' => 'monitor', '#' => 'monitor']),
             ['data-toggle' => '']
         ); ?>
@@ -56,7 +63,7 @@ $this->registerJs($active_tabs);
         <?= Html::a(
             '<i class="glyphicon glyphicon-book"></i> ' . \Yii::t('ticket', 'History'),
             Url::to(['exam/view', 'id' => $model->id, '#' => 'history']),
-            ['data-toggle' => 'tab']
+            ['data-toggle' => '']
         ); ?>
     </li>
     <li>
@@ -79,7 +86,7 @@ $this->registerJs($active_tabs);
                     [
                         'class' => 'btn',
                         'style' => ['text-align' => 'left'],
-                        'disabled' => $model->runningTicketCount != 0,
+                        'disabled' => $model->runningTickets != 0,
                         'data-pjax' => 0
                     ]
                 ) ?>
@@ -117,9 +124,9 @@ $this->registerJs($active_tabs);
                     [
                         'class' => 'btn',
                         'style' => ['text-align' => 'left'],
-                        'disabled' => $model->openTicketCount == 0,
+                        'disabled' => $model->openTickets == 0,
                         'data' => [
-                            'confirm' => \Yii::t('exams', 'Are you sure you want to delete ALL {n} Open tickets associated to this exam?', ['n' => $model->openTicketCount]),
+                            'confirm' => \Yii::t('exams', 'Are you sure you want to delete ALL {n} Open tickets associated to this exam?', ['n' => $model->openTickets]),
                             'method' => 'post',
                         ],
                     ]

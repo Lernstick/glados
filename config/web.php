@@ -5,7 +5,7 @@ $params = require(__DIR__ . '/params.php');
 $config = [
     'id' => 'basic',
     'name' => 'GLaDOS',
-    'version' => '1.0.7',
+    'version' => '1.0.8',
     'basePath' => dirname(__DIR__),
     'bootstrap' => [
         'log',
@@ -13,6 +13,11 @@ $config = [
             'class' => 'app\components\LanguageSelector',
             'supportedLanguages' => ['en', 'de'],
         ],
+        [
+            'class' => 'app\components\BootstrapSettings',
+            'params' => $params,
+        ],
+        'app\components\BootstrapHistory',
     ],
     'timezone' => 'Europe/Zurich',
     'vendorPath' => '/usr/share/yii2',
@@ -55,6 +60,7 @@ $config = [
         ],
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
+            'cache' => 'cache',
         ],
         'urlManager' => [
             'enablePrettyUrl' => true,
@@ -62,11 +68,15 @@ $config = [
             'rules' => [
                 'activities' => 'activity/index',
                 '<controller>s' => '<controller>/index',
+                'screencapture/<id:\d+>/<file:[\w\.]+>' => 'screencapture/view',
                 '<controller>/<id:\d+>' => '<controller>/view',
                 '<controller>/<action:(update|delete|backup|restore|stop|kill)>/<id:\d+>' => '<controller>/<action>',
                 'howto/img/<id>' => 'howto/img',
                 'howto/<id>' => 'howto/view',
-                'ticket/<action:(config|download|finish|notify|md5|status)>/<token:.*>' => 'ticket/<action>',
+                'ticket/<action:(config|download|finish|notify|md5|status|live)>/<token:.*>' => 'ticket/<action>',
+                'backup/<action:file>/<ticket_id:\d+>' => 'backup/<action>',
+                'event/<action:(agent)>/<token:.*>' => 'event/<action>',
+                'monitor' => 'monitor/view'
             ]
         ],
         'i18n' => [
@@ -110,27 +120,29 @@ $config = [
                 ],
             ],
         ],
+        'mutex' => [
+            'class' => 'yii\mutex\MysqlMutex',
+        ],
         'db' => require(__DIR__ . '/db.php'),
         'auth' => require(__DIR__ . '/auth.php'),
     ],
-    'params' => $params,
     'runtimePath' => '/var/lib/glados/runtime',
 ];
 
 if (YII_ENV_DEV) {
     // configuration adjustments for 'dev' environment
-    if($_SERVER['PATH_INFO'] != '/event/stream') {
+    if(array_key_exists('PATH_INFO', $_SERVER) && $_SERVER['PATH_INFO'] != '/event/stream') {
         $config['bootstrap'][] = 'debug';
         $config['modules']['debug'] = [
             'class' => 'yii\debug\Module',
-            'allowedIPs' => ['10.16.0.222', '192.168.0.115', '127.0.0.1']
+            'allowedIPs' => ['10.16.0.222', '192.168.0.248', '127.0.0.1']
         ];
     }
 
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
         'class' => 'yii\gii\Module',
-        'allowedIPs' => ['10.16.0.222', '192.168.0.115', '127.0.0.1']
+        'allowedIPs' => ['10.16.0.222', '192.168.0.248', '127.0.0.1']
     ];
 }
 

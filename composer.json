@@ -22,13 +22,16 @@
         "kartik-v/yii2-widget-growl": "@dev",
         "kartik-v/yii2-widget-select2": "@dev",
         "kartik-v/yii2-widget-rangeinput": "*",
+        "kartik-v/yii2-widget-switchinput": "dev-master",
         "kartik-v/yii2-dynagrid": "dev-master",
         "miloschuman/yii2-highcharts-widget": "*",
         "limion/yii2-jquery-fileupload-widget": "~1.0",
         "fxp/composer-asset-plugin": "^1.4.1",
         "yiidoc/yii2-timeago": "dev-master",
         "yiisoft/yii2-imagine": "~2.0.0",
-        "russ666/yii2-countdown": "*"
+        "russ666/yii2-countdown": "*",
+        "videojs/video.js": "*",
+        "npm-asset/event-source-polyfill": "*"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",
@@ -37,6 +40,23 @@
         "yiisoft/yii2-faker": "*",
         "yiisoft/yii2-apidoc": "~2.1.0"
     },
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "videojs/video.js",
+                "version": "7.7.6",
+                "dist": {
+                    "type": "zip",
+                    "url": "https://github.com/videojs/video.js/releases/download/v7.7.6/video-js-7.7.6.zip",
+                    "reference": "master"
+                },
+                "autoload": {
+                    "classmap": ["."]
+                }
+            }
+        }
+    ],
     "config": {
         "process-timeout": 1800,
         "vendor-dir": "/usr/share/yii2",

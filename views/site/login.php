@@ -42,6 +42,6 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php ActiveForm::end(); ?>
 
     <div class="col-lg-offset-1" style="color:#999;">
-        <?= Setting::get('Login hint'); ?>
+        <?= Setting::get('loginHint'); ?>
     </div>
 </div>

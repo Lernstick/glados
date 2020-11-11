@@ -182,7 +182,7 @@ class DownloadController extends DaemonController implements DaemonInterface
             @unlink($tempDir . "/mount.sh");
             @rmdir($tempDir);
 
-            if($retval != 0) {
+            if ($retval != 0) {
                 $this->logError('rsync failed (retval: ' . $retval . '), output: ' . PHP_EOL . $output);
 
                 $act = new Activity([
@@ -231,7 +231,8 @@ class DownloadController extends DaemonController implements DaemonInterface
                 if ($backupDataProvider->totalCount > 0) {
                     $restoreDaemon = new Daemon();
                     /* run the restore daemon in the foreground */
-                    $pid = $restoreDaemon->startRestore($this->ticket->id, '/', 'now', false, '/run/initramfs/backup/' . $this->ticket->exam->backup_path);
+                    /* restore all that was backed up AND the screen_capture files as well */
+                    $pid = $restoreDaemon->startRestore($this->ticket->id, '::All::', 'now', false, '/run/initramfs/backup/' . $this->ticket->exam->backup_path);
                 }
 
                 $this->ticket->client_state = yiit('ticket', 'preparing system');
@@ -254,16 +255,30 @@ class DownloadController extends DaemonController implements DaemonInterface
 
                 $retval = $cmd->run();
 
-                $eventItem = new EventItem([
-                    'event' => 'ticket/' . $this->ticket->id,
-                    'priority' => 0,
-                    'data' => [
-                        'setup_complete' => true,
-                    ],
-                ]);
-                $eventItem->generate();
-                $this->ticket->client_state = yiit('ticket', 'setup complete');
-                $this->ticket->save();
+                // success
+                if ($retval == "0") {
+                    $eventItem = new EventItem([
+                        'event' => 'ticket/' . $this->ticket->id,
+                        'priority' => 0,
+                        'data' => [
+                            'setup_complete' => true,
+                        ],
+                    ]);
+                    $eventItem->generate();
+                    $this->ticket->client_state = yiit('ticket', 'setup complete');
+                    $this->ticket->save();
+                } else {
+                    $eventItem = new EventItem([
+                        'event' => 'ticket/' . $this->ticket->id,
+                        'priority' => 0,
+                        'data' => [
+                            'setup_failed' => true,
+                        ],
+                    ]);
+                    $eventItem->generate();
+                    $this->ticket->client_state = yiit('ticket', 'setup failed');
+                    $this->ticket->save();
+                }
 
             }
 
@@ -352,7 +367,7 @@ class DownloadController extends DaemonController implements DaemonInterface
      */
     public function lockItem ($ticket)
     {
-        if ($this->lock($ticket->id, "download")) {
+        if ($this->lock($ticket->id . "_download")) {
             $ticket->download_lock = 1;
             $ticket->running_daemon_id = $this->daemon->id;
             return $ticket->save(false);
@@ -365,7 +380,7 @@ class DownloadController extends DaemonController implements DaemonInterface
      */
     public function unlockItem ($ticket)
     {
-        $this->unlock();
+        $this->unlock($ticket->id . "_download");
         $ticket->download_lock = 0;
         return $ticket->save(false);
     }

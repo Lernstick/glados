@@ -81,45 +81,52 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
                 'visible' => !Yii::$app->user->isGuest,
                 'items' => [
                     [
-                        'label' => \Yii::t('main', 'Create User'),
+                        'label' => '<i class="glyphicon glyphicon-user"></i> ' . \Yii::t('main', 'Create User'),
                         'url' => ['/user/create'],
                         'visible' => Yii::$app->user->can('user/create'),
-                    ],                
+                        'encode' => false,
+                    ],
                     [
-                        'label' => \Yii::t('main', 'Create Exam'),
+                        'label' => '<i class="glyphicon glyphicon-education"></i> ' . \Yii::t('main', 'Create Exam'),
                         'url' => ['/exam/create'],
                         'visible' => Yii::$app->user->can('exam/create'),
+                        'encode' => false,
                     ],
                     [
-                        'label' => \Yii::t('main', 'Create single Ticket'),
+                        'label' => '<i class="glyphicon glyphicon-file"></i> ' . \Yii::t('main', 'Create single Ticket'),
                         'url' => ['/ticket/create', 'mode' => 'single'],
                         'visible' => Yii::$app->user->can('ticket/create'),
+                        'encode' => false,
                     ],
                     [
-                        'label' => \Yii::t('main', 'Create multiple Tickets'),
+                        'label' => '<i class="glyphicon glyphicon-duplicate"></i> ' . \Yii::t('main', 'Create multiple Tickets'),
                         'url' => ['/ticket/create', 'mode' => 'many', 'type' => 'assigned'],
                         'visible' => Yii::$app->user->can('ticket/create'),
-                    ],                    
+                        'encode' => false,
+                    ],
                     [
-                        'label' => \Yii::t('main', 'Submit Ticket'),
+                        'label' => '<i class="glyphicon glyphicon-barcode"></i> ' . \Yii::t('main', 'Submit Ticket'),
                         'url' => ['/ticket/update', 'mode' => 'submit'],
-                        'visible' => Yii::$app->user->can('ticket/update'),                    
+                        'visible' => Yii::$app->user->can('ticket/update'),
+                        'encode' => false,
                     ],
                     [
-                        'label' => \Yii::t('main', 'Start Daemon'),
-                        'url' => ['/daemon/create', 'type' => 'daemon'],
-                        'visible' => Yii::$app->user->can('daemon/create'),
+                        'label' => '<i class="glyphicon glyphicon-eye-open"></i> ' . \Yii::t('main', 'Monitor Exams'),
+                        'url' => ['/monitor'],
+                        'visible' => Yii::$app->user->can('ticket/view'),
+                        'encode' => false,
                     ],
-
                     [
-                        'label' => \Yii::t('main', 'Generate results'),
+                        'label' => '<i class="glyphicon glyphicon-cloud-download"></i> ' . \Yii::t('main', 'Generate results'),
                         'url' => ['/result/generate'],
                         'visible' => Yii::$app->user->can('exam/view'),
+                        'encode' => false,
                     ],
                     [
-                        'label' => \Yii::t('main', 'Submit results'),
+                        'label' => '<i class="glyphicon glyphicon-cloud-upload"></i> ' . \Yii::t('main', 'Submit results'),
                         'url' => ['/result/submit'],
                         'visible' => Yii::$app->user->can('result/submit'),
+                        'encode' => false,
                     ],
                 ],
             ],
@@ -198,6 +205,26 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
                         'visible' => Yii::$app->user->can('auth/index'),
                     ],
                 ],
+            ],
+
+            [
+                'label' => 'DEV',
+                'visible' => YII_ENV_DEV,
+                'options' => ['class' => 'dev_item'],
+                'items' => [
+                    [
+                        'label' => 'Send Events',
+                        'url' => ['/test/send'],
+                        'options' => ['class' => 'dev_item'],
+                        'visible' => YII_ENV_DEV,
+                    ],
+                    [
+                        'label' => 'Listen to Events',
+                        'url' => ['/test/listen'],
+                        'options' => ['class' => 'dev_item'],
+                        'visible' => YII_ENV_DEV,
+                    ],
+                ]
             ],
 
             [

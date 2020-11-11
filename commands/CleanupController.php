@@ -9,9 +9,9 @@ use yii\db\Expression;
 
 /**
  * DB Clean Daemon
- * Cleans up the database
+ * Cleans up the database and other stuff
  */
-class DbcleanController extends DaemonController implements DaemonInterface
+class CleanupController extends DaemonController implements DaemonInterface
 {
 
     /**
@@ -78,6 +78,17 @@ class DbcleanController extends DaemonController implements DaemonInterface
 
         $this->dbcleaned = microtime(true);
         $this->logInfo('Database cleaned.', true, false, true);
+
+        // remove event payload files that are older than 60 seconds
+        if (is_writable(\Yii::$app->params['tmpPath'])) {
+            foreach (glob(\Yii::$app->params['tmpPath'] . "/event-*") as $file) {
+                if (filemtime($file) + 60 < microtime(true)) {
+                    @unlink($file);
+                }
+            }
+        }
+
+        $this->logInfo('tmpPath cleaned.', true, false, true);
     }
 
     /**

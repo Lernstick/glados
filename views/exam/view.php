@@ -14,6 +14,7 @@ use yii\web\JsExpression;
 /* @var $model app\models\Exam */
 /* @var $historySearchModel app\models\HistorySearch */
 /* @var $historyDataProvider yii\data\ActiveDataProvider */
+/* @var $settingsDataProvider yii\data\ArrayDataProvider */
 
 $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => \Yii::t('exams', 'Exams'), 'url' => ['index']];
@@ -97,7 +98,7 @@ $this->params['breadcrumbs'][] = $this->title;
               <p class="text-muted">
                 <span><?= \Yii::t('exams', 'You have to provide at least one exam file.') ?></span><br>
                 <span class="glyphicon glyphicon-alert"></span>
-                <span><?= \Yii::t('exams', 'For more information, please visit ') ?><?= Html::a(\Yii::t('exams', 'Manual / Create an exam'), ['/howto/view', 'id' => 'create-exam.md'], ['class' => 'alert-link']) ?>.</span>
+                <span><?= \Yii::t('exams', 'For more information, please visit ') ?><?= Html::a(\Yii::t('exams', 'Manual / Create an exam'), ['/howto/view', 'id' => 'create-exam.md'], ['data-pjax' => 0, 'class' => 'alert-link', 'target' => '_new']) ?>.</span>
               </p>
               <p>
                   <?= Html::a(
@@ -218,62 +219,44 @@ $this->params['breadcrumbs'][] = $this->title;
         'options' => ['class' => 'tab-pane fade'],
     ]); ?>
 
+    <?= ListView::widget([
+        'dataProvider' => $settingsDataProvider,
+        'itemOptions' => [ 'tag' => 'tr' ],
+        'itemView' => 'setting/value',
+        'itemView' => function ($model, $key, $index, $widget) {
+            if ($model->belongs_to === null) {
+                return '<td>' . $model->detail->name . '</td><td>' . $this->render('setting/value', [
+                    'model' => $model,
+                    'key' => $key,
+                    'index' => $index,
+                    'widget' => $widget,
+                ]) . '</td>';
+            }
+        },
+        'emptyText' => '<table class="table table-bordered table-hover"><tr><th>Settings</th></tr><tr><td>' . \Yii::t('exams', 'No settings found.') . '</td></tr></table>',
+        'layout' => '<table class="table table-bordered table-hover"><tr><th colspan="2">Settings</th></tr>{items}</table> {pager} {summary}',
+    ]); ?>
+
+    <?php Pjax::end(); ?>
+
+    <?php Pjax::begin([
+        'id' => 'expert',
+        'options' => ['class' => 'tab-pane fade'],
+    ]); ?>
+
     <div class="alert alert-warning" role="alert"><i class="glyphicon glyphicon-warning-sign"></i> <?= \Yii::t('exams', 'Please notice, all these settings will <b>override</b> the settings configured in the exam file!') ?></div>
 
     <?= DetailView::widget([
         'model' => $model,
         'template' => '<tr><th{captionOptions}>{value}</th><td{contentOptions}>{label}</td></tr>',
         'attributes' => [
+            'backup_path',
             'grp_netdev:boolean',
             'allow_sudo:boolean',
             'allow_mount:boolean',
             'firewall_off:boolean',
-            'screenshots:boolean',
-            [
-                'label' => \Yii::t('exams', 'Screenshot Interval'),
-                'value' => $model->screenshots_interval*60, # in seconds
-                'format' => 'duration'
-            ],
-            [
-                'label' => \Yii::t('exams', 'Maximum brightness'),
-                'value' => $model->max_brightness/100,
-                'format' => 'percent'
-            ],            
         ],
     ]) ?>
-
-    <?= DetailView::widget([
-        'model' => $model,
-        'template' => '<tr><th{captionOptions}>{value}</th><td{contentOptions}>{label}</td></tr>',
-        'attributes' => [
-            [
-                'label' => \Yii::t('exams', 'Libreoffice: Save AutoRecovery information (to <code>{path}</code> every <code>{interval}</code>)', [
-                    'path' => yii::$app->formatter->format($model->libre_autosave_path, 'text'),
-                    'interval' => yii::$app->formatter->format($model->libre_autosave_interval*60, 'duration'),
-                ]),
-                'value' => $model->libre_autosave,
-                'format' => 'boolean'
-            ],
-            [
-                'label' => \Yii::t('exams', 'Libreoffice: Always create backup copy (to <code>{path}</code>)', [
-                    'path' => yii::$app->formatter->format($model->libre_createbackup_path, 'text'),
-                ]),
-                'value' => $model->libre_createbackup,
-                'format' => 'boolean'
-            ],
-        ],
-    ]) ?>
-
-    <?= ListView::widget([
-        'dataProvider' => $urlWhitelistDataProvider,
-        #'options' => [ 'tag' => 'table', 'class' => 'table table-bordered table-hover'],
-        'itemOptions' => [ 'tag' => 'tr' ],
-        'itemView' => function ($model, $key, $index, $widget) {
-            return '<td>' . $model . '</td>';
-        },
-        'emptyText' => '<table class="table table-bordered table-hover"><tr><th>HTTP URL Whitelist</th></tr><tr><td>' . \Yii::t('exams', 'No URLs found.') . '</td></tr></table>',
-        'layout' => '<table class="table table-bordered table-hover"><tr><th>' . \Yii::t('exams', 'HTTP URL Whitelist') . '</th></tr>{items}</table> {pager} {summary}',
-    ]); ?>
 
     <?php Pjax::end(); ?>
 
@@ -309,7 +292,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             var s = this.series[0];
                             //vat t = this;
                             setInterval(function () {
-                                $.getJSON('index.php?r=exam/view&mode=json&id=$model->id', function (jsondata) {
+                                $.getJSON('" . Url::to(['exam/view', 'mode' => 'json', 'id' => $model->id]) . "', function (jsondata) {
                                     s.setData(jsondata);
                                     //t.setData(jsondata);
                                 });
@@ -324,7 +307,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ])
                 ],
                 'tooltip' => [
-                    'pointFormat' => '{series.name}: <b>{point.percentage:.1f}%</b>'
+                    'pointFormat' => '{series.name}: <b>{point.y}</b> ({point.percentage:.1f}%)'
                 ],
                 'plotOptions' => [
                     'pie' => [
@@ -343,29 +326,29 @@ $this->params['breadcrumbs'][] = $this->title;
                         'data' => [
                             [
                                 'name' => \Yii::t('exams', 'Open'),
-                                'y' => $model->openTicketCount,
+                                'y' => $model->openTickets,
                                 'color' => '#5cb85c'
                             ],
                             [
                                 'name' => \Yii::t('exams', 'Running'),
-                                'y' => $model->runningTicketCount,
+                                'y' => $model->runningTickets,
                                 'color' => '#286090',
                                 'sliced' => true,
                                 'selected' => true
                             ],
                             [
                                 'name' => \Yii::t('exams', 'Closed'),
-                                'y' => $model->closedTicketCount,
+                                'y' => $model->closedTickets,
                                 'color' => '#d9534f'
                             ],
                             [
                                 'name' => \Yii::t('exams', 'Submitted'),
-                                'y' => $model->submittedTicketCount,
+                                'y' => $model->submittedTickets,
                                 'color' => '#f0ad4e'
                             ],
                             [
                                 'name' => \Yii::t('exams', 'Unknown'),
-                                'y' => $model->ticketCount - $model->openTicketCount - $model->runningTicketCount - $model->closedTicketCount - $model->submittedTicketCount,
+                                'y' => $model->ticketCount - $model->openTickets - $model->runningTickets - $model->closedTickets - $model->submittedTickets,
                                 'color' => '#dddddd'
                             ]
 

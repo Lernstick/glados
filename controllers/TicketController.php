@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use Yii;
+use yii\web\Controller;
 use app\models\Ticket;
 use app\models\TicketSearch;
 use app\models\Activity;
@@ -17,13 +18,16 @@ use app\models\History;
 use app\models\HistorySearch;
 use app\models\Exam;
 use app\models\EventItem;
+use app\models\AgentEvent;
 use app\models\Stats;
 use app\models\Daemon;
 use app\models\DaemonSearch;
 use app\models\RdiffFileSystem;
-use yii\web\Controller;
+use app\models\Setting;
+use yii\web\UploadedFile;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
+use yii\web\BadRequestHttpException;
 use yii\web\ServerErrorHttpException;
 use yii\filters\VerbFilter;
 use yii\db\Expression;
@@ -33,7 +37,6 @@ use app\components\customResponse;
 use app\components\AccessRule;
 use yii\data\ArrayDataProvider;
 use yii\widgets\ActiveForm;
-
 
 /**
  * TicketController implements the CRUD actions for Ticket model.
@@ -51,6 +54,7 @@ class TicketController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['post'],
+                    'live' => ['get', 'post'],
                 ],
             ],
             'access' => [
@@ -62,7 +66,6 @@ class TicketController extends Controller
                     [
                         'allow' => true,
                         'actions' => [
-                            'download2', // download/start exam (old)
                             'download',  // request download of exam
                             'md5',       // verify exam file (old)
                             'config',    // retrieve exam config
@@ -70,6 +73,7 @@ class TicketController extends Controller
                             'notify',    // notify a new client status
                             'finish',    // finish exam
                             'status',    // show the status of the exam
+                            'live',      // post the live stream
                         ],
                         'roles' => ['?', '@'],
                     ],
@@ -422,7 +426,7 @@ class TicketController extends Controller
                 return $this->render('submit', [
                     'model' => $model,
                 ]);
-            }else if ($test_taker === null) {
+            } else if ($test_taker === null) {
                 $model->scenario = Ticket::SCENARIO_SUBMIT;
                 $model->load(Yii::$app->request->post());
                 $model->validate(['token'], true);
@@ -431,7 +435,7 @@ class TicketController extends Controller
                 return $this->render('submit', [
                     'model' => $model,
                 ]);
-            }else{
+            } else {
                 $model->scenario = Ticket::SCENARIO_SUBMIT;
                 $this->checkRbac($model);
                 if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -455,11 +459,17 @@ class TicketController extends Controller
     public function actionDelete($id = null, $mode = 'single', $exam_id = null)
     {
         if ($mode == 'single') {
-            $this->findModel($id)->delete();
-            Yii::$app->session->addFlash('danger', Yii::t('ticket', 'The Ticket has been deleted successfully.'));
+            $model = $this->findModel($id);
 
-            return $this->redirect(Yii::$app->session['ticketViewReturnURL']);
-        }else if ($mode == 'manyOpen' || $mode == 'many') {
+            if ($model->backup_lock == 0 && $model->restore_lock == 0 &&  $model->download_lock == 0) {
+                $model->delete();
+                Yii::$app->session->addFlash('danger', Yii::t('ticket', 'The Ticket has been deleted successfully.'));
+                return $this->redirect(Yii::$app->session['ticketViewReturnURL']);
+            } else {
+                Yii::$app->session->addFlash('danger', \Yii::t('ticket', 'The ticket is still locked by a daemon and can therefore not be deleted.'));
+                return $this->redirect(['ticket/view', 'id' => $id]);
+            }
+        } else if ($mode == 'manyOpen' || $mode == 'many') {
             $query = Ticket::find()->where(['exam_id' => $exam_id]);
             Yii::$app->user->can('ticket/delete/all') ?: $query->own();
             $models = $query->all();
@@ -530,30 +540,22 @@ class TicketController extends Controller
         } else {
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             return [
-                'config' => [
+                'config' => array_merge([
+                    'agent' => Setting::get('agent'),
                     'grp_netdev' => boolval($model->exam->{"grp_netdev"}),
                     'allow_sudo' => boolval($model->exam->{"allow_sudo"}),
                     'allow_mount' => boolval($model->exam->{"allow_mount"}),
                     'firewall_off' => boolval($model->exam->{"firewall_off"}),
-                    'screenshots' => boolval($model->exam->{"screenshots"}),
-                    'screenshots_interval' => intval($model->exam->{"screenshots_interval"}),
-                    'libre_autosave' => boolval($model->exam->{"libre_autosave"}),
-                    'libre_autosave_path' => $model->exam->{"libre_autosave_path"},
-                    'libre_autosave_interval' => intval($model->exam->{"libre_autosave_interval"}),
-                    'libre_createbackup' => boolval($model->exam->{"libre_createbackup"}),
-                    'libre_createbackup_path' => $model->exam->{"libre_createbackup_path"},
-                    'url_whitelist' => implode(PHP_EOL, preg_split("/\r\n|\n|\r/", $model->exam->{"url_whitelist"}, null, PREG_SPLIT_NO_EMPTY)),
-                    'max_brightness' => intval($model->exam->{"max_brightness"}),
-                ]
+                ], $model->exam->settings)
             ];
         }
     }
 
     /**
-     * TODO.
+     * Renders the exam download prompt.
      *
      * @param string $token
-     * @return mixed TODO
+     * @return mixed
      */
     public function actionDownload($token = null, $step = 1)
     {
@@ -593,6 +595,20 @@ class TicketController extends Controller
                 return $this->render('token-request', [
                     'model' => $model,
                 ]);                
+            } else if ($model->backup_lock != 0) {
+                $model->addError('token', \Yii::t('ticket', 'The ticket is currently in processing for backup. '
+                                        . 'Please try again in a minute.'));
+                $this->startDaemon();
+                return $this->render('token-request', [
+                    'model' => $model,
+                ]);
+            } else if ($model->restore_lock != 0) {
+                $model->addError('token', \Yii::t('ticket', 'The ticket is currently in processing for restore. '
+                                        . 'Please try again in a minute.'));
+                $this->startDaemon();
+                return $this->render('token-request', [
+                    'model' => $model,
+                ]);
             } else {
 
                 $model->scenario = Ticket::SCENARIO_DOWNLOAD;
@@ -627,16 +643,7 @@ class TicketController extends Controller
                 }
                 $act->save();
 
-                # saerch for running daemons
-                $daemonSearchModel = new DaemonSearch();
-                $daemonDataProvider = $daemonSearchModel->search(['DaemonSearch' => ['description' => 'Daemon base controller']]);
-                $count = $daemonDataProvider->getTotalCount();
-
-                # if no daemon is running already, start one
-                if($count == 0){
-                    $daemon = new Daemon();
-                    $daemon->startDaemon();
-                }
+                $this->startDaemon();
 
                 return $this->redirect(['download', 'token' => $model->token, 'step' => 3]);
             }
@@ -648,7 +655,7 @@ class TicketController extends Controller
     }
 
     /**
-     * TODO.
+     * Returns the exam status view for the student.
      *
      * @param string $token
      * @return mixed 
@@ -669,6 +676,7 @@ class TicketController extends Controller
      *
      * @param string $token
      * @param string $state
+     * @return array JSON response
      */
     public function actionNotify($token, $state)
     {
@@ -839,6 +847,107 @@ class TicketController extends Controller
         }
     }
 
+
+    /**
+     * Receive the uploaded POST raw data from ffmpeg and save it to
+     * [[uploadPath]]/live/$token.jpg or send the stored image in case
+     * of a GET request. If the stored file exceeds the age of 10 seconds
+     * the command "service live_overview start" is requested to be
+     * executed on the client.
+     *
+     * @param string $token
+     * @return The response object or an array with the error description
+     */
+    public function actionLive($token, $mode = 'default')
+    {
+
+        $model = Ticket::findOne(['token' => $token]);
+        $request = Yii::$app->request;
+        $path = \Yii::$app->params['uploadPath'] . '/live';
+        $dfile = $path . '/' . $token . '.jpg';
+        $ifile = $path . '/' . $token . '_icon.gif';
+        $wfile = $path . '/' . $token . '_window.txt';
+
+        if (!$model) {
+            throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+
+        } else if ($request->isGet) {
+
+            if ($mode == 'default') {
+                // check if the ticket is running and booted
+                if ($model->bootup_lock == 0 /* && $model->state == Ticket::STATE_RUNNING */
+                    && (! file_exists($dfile) || time() - filemtime($dfile) > Exam::monitor_idle_time())
+                ){
+                    $agentEvent = new AgentEvent([
+                        'ticket' => $model,
+                        'data' => 'startLive',
+                    ]);
+                    $agentEvent->generate();
+                }
+                $file = $dfile;
+            } else if ($mode == 'icon') {
+                $file = $ifile;
+            }
+
+            if (file_exists($file)) {
+                return \Yii::$app->response->sendFile($file, 'live.jpg', [
+                    'mimeType' => 'image/jpeg',
+                    'inline' => true
+                ]);
+            } else {
+                throw new NotFoundHttpException(Yii::t('app', 'File not found.'));
+            }
+
+        } else if ($request->isPost) {
+
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            if (!is_dir($path)) {
+                mkdir($path);
+            }
+            $img = UploadedFile::getInstanceByName('img');
+            $img->saveAs($dfile);
+            $live = ['base64' => base64_encode(file_get_contents($dfile))];
+
+            if ( ($icon = UploadedFile::getInstanceByName('icon')) !== null ) {
+                $icon->saveAs($ifile);
+                $live['icon'] = base64_encode(file_get_contents($ifile));
+            }
+
+            if (array_key_exists('window', Yii::$app->request->post())) {
+                $model->liveWindowName = Yii::$app->request->post()['window'];
+                $live['window'] = Yii::$app->request->post()['window'];
+            }
+
+            $eventItem = new EventItem([
+                'event' => 'ticket/' . $model->id,
+                'priority' => 0,
+                'data' => ['live' => $live],
+            ]);
+            $eventItem->generate();
+
+            $ret = [];
+            if (!$model->hasActiveEventStream("monitor")) {
+                $ret['stop'] = true;
+            }
+            $ret['interval'] = Setting::get('monitorInterval');
+            #$ret['width'] = 260;
+
+            return $ret;
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function beforeAction($action) 
+    { 
+        // Remove CSRF validation on actionLive calls
+        if ($action->id == 'live') {
+            $this->enableCsrfValidation = false; 
+        }
+        return parent::beforeAction($action); 
+    }
+
     /**
      * Finds the Ticket model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
@@ -877,4 +986,24 @@ class TicketController extends Controller
             return false;
         }
     }
+
+    /**
+     * Starts a daemon if none is running already
+     *
+     * @return void
+     */
+    public function startDaemon()
+    {
+        # search for running daemons
+        $daemonSearchModel = new DaemonSearch();
+        $daemonDataProvider = $daemonSearchModel->search(['DaemonSearch' => ['description' => 'Daemon base controller']]);
+        $count = $daemonDataProvider->getTotalCount();
+
+        # if no daemon is running already, start one
+        if($count == 0){
+            $daemon = new Daemon();
+            $daemon->startDaemon();
+        }
+    }
+
 }

@@ -35,6 +35,11 @@ body {
     font-style: italic;
 }
 
+.invalid {
+    color: orange;
+    font-style: italic;
+}
+
 /* add sorting icons to gridview sort links */
 a.asc:after, a.desc:after {
     position: relative;
@@ -176,24 +181,16 @@ a.desc:after {
   display: initial;
 }
 
-#backupLogModal .modal-dialog{
+#backupLogModal .modal-dialog, #restoreLogModal .modal-dialog, #screencaptureLogModal .modal-dialog, #keyModal .modal-dialog {
     overflow-y: initial !important
 }
-#backupLogModal .modal-body{
+#backupLogModal .modal-body, #restoreLogModal .modal-body, #screencaptureLogModal .modal-body, #keyModal .modal-body {
     max-height: calc(100vh - 200px);
     overflow-y: auto;
 }
 
-#restoreLogModal .modal-dialog{
-    overflow-y: initial !important
-}
-#restoreLogModal .modal-body{
-    max-height: calc(100vh - 200px);
-    overflow-y: auto;
-}
-
-.dev_item {
-  background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="50px" width="100px"><text x="0" y="50" transform="rotate(-45)" fill="red" fill-opacity="0.4" font-size="20">YII_ENV_DEV</text></svg>');
+.dev_item, .dev_item *{
+  background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="50px" width="100px"><text x="0" y="40" transform="rotate(-15)" fill="red" fill-opacity="0.4" font-size="20">YII_ENV_DEV</text></svg>') !important;
 }
 
 table.detail-view th {
@@ -366,4 +363,317 @@ ul.timeline li {
     font-size: .9375em;
     line-height: 1.3;
     color: #aab6aa
+}
+
+.loading {
+  background-color: rgba(255,255,255,0.5);
+  opacity: 0.4;
+  filter: Alpha(opacity=40); /* IE8 and earlier */
+}
+
+.preview {
+  pointer-events: none;        /* disable all interaction */
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Opera and Firefox */
+  overflow:hidden;
+  height:auto;
+}
+
+.highlight {
+    -moz-animation: highlight 1s ease 0s 1 alternate ;
+    -webkit-animation: highlight 1s ease 0s 1 alternate;
+    animation: highlight 1s ease 0s 1 alternate;
+}
+
+@-webkit-keyframes highlight {
+    from { background-color: #F6F6BC; }
+    to { background-color: white; }
+}
+
+@-moz-keyframes highlight {
+    from { background-color: #F6F6BC; }
+    to { background-color: white; }
+}
+
+@keyframes your-animation-name {
+    from { background-color: #F6F6BC; }
+    to { background-color: #fff; }
+}
+
+.item:first-child hr {
+    display: none !important;
+}
+
+ul.nav-special > li:not(.active) > a > div > span {
+    display:none;
+}
+
+ul.nav-special > li.active > a > div {
+    width: 100px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/*.bigdrop > li.select2-results {
+    max-height: : 20px !important;
+}*/
+
+.bigdrop > .select2-results > ul.select2-results__options {
+  max-height: 300px !important;
+}
+
+/* side by side effect*/
+/*.bigdrop > .select2-results > ul.select2-results__options > li.select2-results__option {
+  width: 33.333% !important;
+  float: left;
+}*/
+
+.bigdrop > .select2-results > ul.select2-results__options > li.select2-results__option > div {
+  max-height: 60px !important;
+  overflow: hidden;
+  position: relative;
+}
+
+.bigdrop > .select2-results > ul.select2-results__options > li.select2-results__option > div > div {
+  position: absolute; 
+  bottom: 0px;
+  right: 12px;
+  background-color: white;
+}
+
+.select2-container--krajee .select2-results__option--highlighted[aria-selected] > div > div {
+    background-color: #337ab7 !important;
+    color: #fff !important;
+
+}
+
+.exam-settings-index tr:not(.disabled):hover td {
+    background-color: #337ab7 !important;
+    color: #fff;
+    cursor: pointer;
+}
+
+.exam-settings-index tr.disabled {
+    display: none;
+}
+
+.exam-settings-index tr.disabled td {
+    color: #333;
+    background: #fff;
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+
+.exam-settings-index tr td:first-child {
+    font-weight: bold;
+}
+
+.live-overview-item .live-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 1;
+    background-color: black;
+}
+
+.live-overview-item:hover .live-thumbnail {
+    opacity: 1;
+}
+
+.live-overview-item-title {
+    position: absolute;
+    display: block;
+    width: 100%;
+    bottom: 0;
+    padding: 1rem;
+    color: #fff;
+    background: -webkit-linear-gradient(left, rgba(85, 67, 70, 0.85), rgba(69, 80, 91, 0.85)) !important;
+    background: -moz-linear-gradient(left, rgba(85, 67, 70, 0.85), rgba(69, 80, 91, 0.85)) !important;
+    background: -o-linear-gradient(left, rgba(85, 67, 70, 0.85), rgba(69, 80, 91, 0.85)) !important;
+    background: -ms-linear-gradient(left, rgba(85, 67, 70, 0.85), rgba(69, 80, 91, 0.85)) !important;
+    background: linear-gradient(left, rgba(85, 67, 70, 0.85), rgba(69, 80, 91, 0.85)) !important;
+}
+
+.live-overview-item-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.live-overview-item:hover .live-overview-item-title {
+    opacity:0.2;
+}
+
+.live-overview-item:hover span.live-overview-fullscreen {
+    position: absolute;
+    display: block;
+    top: 10px;
+    right: 10px;
+    color: gray;
+}
+
+.live-overview-item span.live-overview-fullscreen {
+    display: none;
+}
+
+.live-overview-item:hover .live-overview-item-title:hover, .live-overview-item .live-overview-item-title:focus {
+    opacity:1;
+    color: #fff !important;
+    text-decoration: none;
+}
+
+.live-overview-item {
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+    /* 16:10 ratio */
+    width: 100%;
+    height: 162.5px;
+}
+
+.live-overview-detail img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 1;
+    position: relative;
+}
+
+.live-overview-detail-loading {
+    text-align: center;
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 100%;
+    top: 0;
+}
+
+.live-overview-detail-img {
+    width: 100%;
+    position: relative;
+}
+
+.live-overview-detail-error {
+    text-align: center;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    margin-bottom: 0px;
+}
+
+.live-overview-item-title {
+  white-space: nowrap;
+}
+
+.live-overview-item-title span.glyphicon:not(.live) {
+    margin-right: .5em;
+    color: #888;
+}
+
+.live-overview-item-title span.live {
+    margin-right: .5em;
+    color: red;
+}
+
+.live-overview-detail {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    min-height: 50px;
+}
+
+.live-overview-item-container {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.glyphicon.glyphicon-circle:before {
+    content: "\25cf";
+    font-size: 1em;
+}
+
+span.future {
+    visibility: hidden;
+    display:none;
+}
+
+span.now {
+    color:white;
+}
+
+
+span.past {
+    color:gray;
+}
+
+.js-playlist__item-button {
+  cursor: pointer;
+}
+
+.js-playlist__item-active {
+  font-weight: bold;
+}
+
+span.view--state[data-state="0"] { background-color: #5cb85c; } /* label-success */
+span.view--state[data-state="1"] { background-color: #5bc0de; } /* label-info    */
+span.view--state[data-state="2"] { background-color: #d9534f; } /* label-danger  */
+span.view--state[data-state="3"] { background-color: #f0ad4e; } /* label-warning */
+span.view--state[data-state="4"] { background-color: #777777; } /* label-default */
+span.view--state[data-state] { display: inline-block; }
+span.view--state[data-state="0"]::after { content: attr(data-text-0); }
+span.view--state[data-state="1"]::after { content: attr(data-text-1); }
+span.view--state[data-state="2"]::after { content: attr(data-text-2); }
+span.view--state[data-state="3"]::after { content: attr(data-text-3); }
+span.view--state[data-state="4"]::after { content: attr(data-text-4); }
+
+/* the next button in videojs */
+.video-js .vjs-next-item-control .vjs-icon-placeholder:before {
+  content:"\f11f"
+}
+
+.video-js .vjs-next-item-control .vjs-icon-placeholder {
+  font-family: VideoJS;
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* the previous button in videojs */
+.video-js .vjs-previous-item-control .vjs-icon-placeholder:before {
+  content:"\f120"
+}
+
+.video-js .vjs-previous-item-control .vjs-icon-placeholder {
+  font-family: VideoJS;
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* fixes subtitle overflows */
+.vjs-text-track-display div {
+  line-break: anywhere;
+}
+
+.video-container {
+  position: relative;
+}
+
+.video-main-content {
+}
+
+.video-playlist-content {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: scroll;
+}
+
+.popover img {
+  max-width: 100%;
 }

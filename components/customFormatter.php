@@ -4,7 +4,9 @@ namespace app\components;
  
 use Yii;
 use yii\i18n\Formatter;
+use yii\helpers\Html;
 use yii\base\InvalidConfigException;
+use yii\base\InvalidArgumentException;
  
 class customFormatter extends \yii\i18n\Formatter
 {
@@ -78,9 +80,33 @@ class customFormatter extends \yii\i18n\Formatter
     public static function asTimeago($value)
     {
         if (empty($value)){
-            $value = '<span class="not-set">' . \Yii::t('app', '(not set)') . '</span>';
+            $value = Html::tag('time', \Yii::t('app', '(not set)'), [
+                'class' => 'not-set',
+                'datetime' => '',
+                'data-invalid' => \Yii::t('app', '(invalid date)'),
+                'data-notset' => \Yii::t('app', '(not set)'),
+                'title' => '',
+            ]);
         } else {
-            $value = \yii\timeago\TimeAgo::widget(['timestamp' => $value]);
+            try {
+                $value = \yii\timeago\TimeAgo::widget([
+                    'timestamp' => $value,
+                    'options' =>  [
+                        'data-invalid' => \Yii::t('app', '(invalid date)'),
+                        'data-notset' => \Yii::t('app', '(not set)'),
+                    ],
+                ]);
+            }
+            // just catch the error
+            catch (InvalidArgumentException $e) {
+                $value = Html::tag('time', \Yii::t('app', '(invalid date)'), [
+                    'class' => 'invalid',
+                    'datetime' => '',
+                    'data-invalid' => \Yii::t('app', '(invalid date)'),
+                    'data-notset' => \Yii::t('app', '(not set)'),
+                    'title' => $value,
+                ]);
+            }
         }
         return $value;
     }

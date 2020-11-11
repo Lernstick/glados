@@ -6,7 +6,15 @@
 function mount_rootfs()
 {
   newroot="$1"
-  mount /lib/live/mount/medium/live/filesystem.squashfs ${initrd}/base
+  # determine where filesystem.squashfs is
+  filesystem_squashfs="$(awk '$2~/filesystem.squashfs/{print $2; exit}' /proc/mounts)"
+
+  if [ -d "${filesystem_squashfs}" ]; then
+    mount --bind "${filesystem_squashfs}" "${initrd}"/base
+  else
+    mount "${filesystem_squashfs}" "${initrd}"/base
+  fi
+
   if [ -e ${initrd}/squashfs/exam.squashfs ]; then
     mount ${initrd}/squashfs/exam.squashfs ${initrd}/exam
     # find out whether the squashfs is an overlayfs
@@ -47,6 +55,10 @@ EOF
   else
     # in all other cases the filesystem in treated as overlay
     mount -t overlay overlay -o lowerdir=${initrd}/tmpfs:${initrd}/exam:${initrd}/base,upperdir=${initrd}/backup,workdir=${initrd}/work ${initrd}/${newroot}
+
+    # remount /run with bigger size (50% of physical RAM)
+    mount -n -o remount,size=50% /run
+
     cat <<EOF >"${mountFile}"
 mount -t overlay overlay -o lowerdir=/tmpfs:/exam:/base,upperdir=/backup,workdir=/work /${newroot}
 EOF

@@ -7,6 +7,7 @@ use yii\console\Controller;
 use app\models\EventItem;
 use app\models\Daemon;
 use app\models\DaemonSearch;
+use app\models\Setting;
 use yii\db\Expression;
 use yii\helpers\Console;
 
@@ -34,16 +35,6 @@ class DaemonController extends Controller
      * to calculate the load/business of the daemon in the last 5 minutes.
      */
     protected $loadarr = [];
-
-    /**
-     * @var string file path of the lock file
-     */
-    protected $lockFile;
-
-    /**
-     * @var resource file pointer resource of the lock file
-     */
-    protected $lockHandle;
 
     /**
      * @var array An array holding the timestamp of the last invocation of a job in
@@ -96,11 +87,12 @@ class DaemonController extends Controller
      * ```
      */
     public $joblist = [
-        0 => ['download', 'run-once'],
-        1 => ['backup', 'run-once'],
-        2 => ['analyze', 'run-once'],
-        3 => ['dbclean', 'run-once', 300],
-        4 => ['unlock', 'run-once', 120],
+        0 => ['download',           'run-once'],
+        1 => ['backup',             'run-once'],
+        2 => ['analyze',            'run-once'],
+        3 => ['remote-execution',   'run-once'],
+        4 => ['cleanup',            'run-once', 300],
+        5 => ['unlock',             'run-once', 120],
     ];
 
     /**
@@ -142,15 +134,9 @@ class DaemonController extends Controller
     public $errorLogFile;
 
     /**
-     * @var boolean Variable holding the value whether the log file is writable.
-     * The path `\Yii::$app->params['daemonLogFilePath']` should be set writable 
-     * for the user of the web server process (`www-data` in debian)
-     * 
-     * See also:
-     *  * [Glados config files](guide:config-files.md)
-     * 
+     * @var string path to the folder structure being monitored by inotify
      */
-    public $logFileIsWritable = true;
+    public $inotifyDir;
 
     /**
      * The initializing function.
@@ -201,6 +187,7 @@ class DaemonController extends Controller
         # Determine daemon info, e.g: [daemon:1234].
         $tmp = explode('\\', str_replace('controller', '', strtolower(get_called_class())));
         $this->daemonInfo = end($tmp) . ':' . getmypid();
+        $this->inotifyDir = \Yii::$app->params['tmpPath'] . '/inotify/';
     }
 
     /**
@@ -216,8 +203,7 @@ class DaemonController extends Controller
     {
 
         posix_getpwuid($this->uid);
-        if (!is_writable(\Yii::$app->params['daemonLogFilePath'])) {
-            $this->logFileIsWritable = false;
+        if (!$this->logFileIsWritable()) {
             $this->logError('Warning: ' . \Yii::$app->params['daemonLogFilePath'] . '/ is '
                 . 'not writable. '
                 . 'Please make sure the directory is writable for the user under which '
@@ -260,7 +246,7 @@ class DaemonController extends Controller
 
         $this->cleanupVanished();
 
-        $this->_pidfile = fopen('/tmp/user/daemon/' . $this->daemon->pid, 'w');
+        $this->_pidfile = fopen($this->inotifyDir . '/daemon/' . $this->daemon->pid, 'w');
         $this->logInfo('Started with pid: ' . $this->daemon->pid);
     }
 
@@ -293,7 +279,7 @@ class DaemonController extends Controller
         $eventItem->generate();
 
         @fclose($this->_pidfile);
-        @unlink('/tmp/user/daemon/' . $this->daemon->pid);
+        @unlink($this->inotifyDir . '/daemon/' . $this->daemon->pid);
 
         $pid = $this->daemon->pid;
         $this->daemon->delete();
@@ -312,6 +298,21 @@ class DaemonController extends Controller
 
         $this->logInfo('Stopped, cause: ' . $cause);
         #exit;
+    }
+
+    /**
+     * The path `\Yii::$app->params['daemonLogFilePath']` should be set writable
+     * for the user of the web server process (`www-data` in debian).
+     *
+     * See also:
+     *  * [Glados config files](guide:config-files.md)
+     *
+     * @return boolean whether the log file is writable.
+     *
+     */
+    public function logFileIsWritable()
+    {
+        return is_writable(\Yii::$app->params['daemonLogFilePath']);
     }
 
     /**
@@ -371,7 +372,7 @@ class DaemonController extends Controller
             $this->daemon->save(false);
         }
 
-        if ($toFile === true && $this->logFileIsWritable === true) {
+        if ($toFile === true && $this->logFileIsWritable() === true) {
 
             if ($this->logFile === null || $this->errorLogFile === null) {
                 $this->logFile = \Yii::$app->params['daemonLogFilePath'] . '/glados.' . date('Y-m-dO') . '.log';
@@ -617,13 +618,18 @@ class DaemonController extends Controller
         $sum = Daemon::find()->where(['description' => 'Daemon base controller'])->sum('`load`');
         $count = Daemon::find()->where(['description' => 'Daemon base controller'])->count();
         $workload = $count != 0 ? round(100*$sum/$count) : 0;
+        Setting::repopulateSettings();
+        $minDaemons = \Yii::$app->params['minDaemons'];
+        $maxDaemons = \Yii::$app->params['maxDaemons'];
+        $upperBound = \Yii::$app->params['upperBound'];
+        $lowerBound = \Yii::$app->params['lowerBound'];
 
-        if (($workload > \Yii::$app->params['upperBound'] && $count < \Yii::$app->params['maxDaemons']) || $count < \Yii::$app->params['minDaemons']) {
+        if (($workload > $upperBound && $count < $maxDaemons) || $count < $minDaemons) {
             # start a new daemon
             $this->logInfo('Start new daemon, workload: ' . $workload . '%, count: ' . $count . '.', true);
             $daemon = new Daemon();
             $daemon->startDaemon();
-        } else if ($workload < \Yii::$app->params['lowerBound'] && $count > \Yii::$app->params['minDaemons']) {
+        } else if ($workload < $lowerBound && $count > $minDaemons) {
             # stop after 5 minutes
             if (time() - strtotime($this->daemon->started_at) > 300) {
                 $this->stop('Load threshold');
@@ -633,59 +639,26 @@ class DaemonController extends Controller
     }
 
     /**
-     * Locks an item using PHP's flock().
+     * Locks an item using the applications mutex mechanism.
      *
-     * @param int $id the id of the item
-     * @param string $reason the reason to lock the item
+     * @param string $name Of the lock to be acquired.
+     * @param int $timeout Time (in seconds) to wait for lock to become released.
      * @return bool success or failure
      */
-    public function lock ($id, $reason)
+    public function lock ($name, $timeout = 0)
     {
-        $this->lockFile = \Yii::$app->params['tmpPath'] . "/" . $id . "_" . $reason . ".lock";
-        if (is_writable(\Yii::$app->params['tmpPath'])) {
-
-            if (!file_exists($this->lockFile)) {
-                touch($this->lockFile);
-            }
-
-            $this->lockHandle = fopen($this->lockFile, "c");
-            // acquire an exclusive lock
-            if (flock($this->lockHandle, LOCK_EX | LOCK_NB)) {
-                ftruncate($this->lockHandle, 0);
-                fwrite($this->lockHandle, $this->daemon->pid); // write down the process pid
-                fflush($this->lockHandle); // flush output before releasing the lock
-                return true;
-            }
-            fclose($this->lockHandle);
-        }
-        return false;
+        return Yii::$app->mutex->acquire($name, $timeout);
     }
 
     /**
-     * Unlocks an item using PHP's flock().
+     * Unlocks an item using the applications mutex mechanism.
      *
+     * @param string $name Of the lock to be released.
      * @return bool success or failure
      */
-    public function unlock ()
+    public function unlock ($name)
     {
-        if ($this->locked) {
-            // release the lock
-            flock($this->lockHandle, LOCK_UN);
-            fclose($this->lockHandle);
-            return @unlink($this->lockFile);
-        }
-        return false;
-    }
-
-    /**
-     * Getter for locked.
-     *
-     * @return bool whether the item is still locked or not (by this process)
-     */
-    public function getLocked ()
-    {
-        // if the resource is still open
-        return is_resource($this->lockHandle);
+        return Yii::$app->mutex->release($name);
     }
 
     /**

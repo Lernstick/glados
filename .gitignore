@@ -24,3 +24,6 @@ phpunit.phar
 /pwsafe.sublime-project
 #/web/assets
 /web/docs
+
+/config/auth.php
+/config/auth_backup.php
