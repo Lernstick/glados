@@ -55,6 +55,8 @@ TODO:
   * not reloading correctly (events), when initially there was no ticket running: done
 
 * misc
+  * Undefined index: scPath
+  * lernstick-exam-client dependency 1.0.12, not 11
   * translations: done
   * update README.md: done
   * disable firewall not working anymore: done
