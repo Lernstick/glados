@@ -84,9 +84,9 @@ function do_exit()
   exit ${1:-1}
 }
 
-# get DISPLAY and XAUTHORITY env vars to display the firefox window
+# get DISPLAY and XAUTHORITY env vars from the wxbrowser window
 set -o allexport
-. <(strings /proc/$(pgrep firefox)/environ | awk -F= '$1=="DISPLAY"||$1=="XAUTHORITY"') 
+. <(strings /proc/$(pgrep -n -f wxbrowser)/environ | awk -F= '$1=="DISPLAY"||$1=="XAUTHORITY"') 
 set +o allexport
 
 echo 0 > ${initrd}/restore
@@ -147,7 +147,6 @@ done <<< "${con}" | LC_ALL=C xargs -I{} cp -p "/etc/NetworkManager/system-connec
 
 # copy needed scripts and files
 cp -p "/etc/NetworkManager/dispatcher.d/02searchExamServer" "${initrd}/backup/etc/NetworkManager/dispatcher.d/02searchExamServer"
-cp -p "/usr/bin/finishExam" "${initrd}/backup/usr/bin/finishExam"
 
 # those should be removed as fast as possible
 cp -p "/usr/bin/lernstick_backup" "${initrd}/backup/usr/bin/lernstick_backup" #TODO: remove
@@ -159,10 +158,6 @@ cp -p "/etc/lernstick-firewall/lernstick-firewall.conf" "${initrd}/backup/etc/le
 cp -p "/etc/lernstickWelcome" "${initrd}/backup/etc/lernstickWelcome"
 sed -i 's/ShowNotUsedInfo=.*/ShowNotUsedInfo=false/g' "${initrd}/backup/etc/lernstickWelcome"
 sed -i 's/AutoStartInstaller=.*/AutoStartInstaller=false/g' "${initrd}/backup/etc/lernstickWelcome"
-#echo "ShowExamInfo=true" >>"${initrd}/backup/etc/lernstickWelcome" #TODO: replace with sed
-cp -p "/usr/share/applications/finish_exam.desktop" "${initrd}/backup/usr/share/applications/"
-chmod 644 "${initrd}/backup/usr/share/applications/finish_exam.desktop"
-chown user:user "${initrd}/backup/${desktop}/finish_exam.desktop" 2>/dev/null
 
 # This is to fix an issue when the DNS name of the exam server ends in .local (which is the
 # case in most Microsoft domain environments). In case of a .local name the mDNS policy in
@@ -283,7 +278,7 @@ if [ -n "${actionConfig}" ]; then
   libreoffice
 
   # set up the launch timer service if keylogger or screen_capture is active
-  rm "${initrd}/newroot/etc/launch.conf"
+  rm -f "${initrd}/newroot/etc/launch.conf" 2>/dev/null
   launch
 
   # set all screen_capture options
