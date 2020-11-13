@@ -2,6 +2,7 @@ etc/glados
 usr/share/glados
 var/lib/glados
 var/lib/glados/backups
+var/lib/glados/sc
 var/lib/glados/results
 var/lib/glados/uploads
 var/lib/glados/tmp
