@@ -17,10 +17,6 @@ function expert_settings()
   if [ "$(config_value "allow_sudo")" = "False" ]; then
     rm "${initrd}/newroot/etc/sudoers.d/01-lernstick-exam"
   fi
-    #sed '/user  ALL=(ALL) PASSWD: ALL/ s/^/#/' /etc/sudoers >${initrd}/backup/etc/sudoers
-  #else
-    #sed '/^#user  ALL=(ALL) PASSWD: ALL/ s/^#//' /etc/sudoers >${initrd}/backup/etc/sudoers
-  #fi
 
   # config->allow_mount
   if [ "$(config_value "allow_mount")" = "False" ]; then
@@ -43,9 +39,6 @@ function expert_settings_defaults()
   # remove user from the netdev group to prevent him from changing network connections
   chroot ${initrd}/newroot gpasswd -d user netdev
   sed -i 's/netdev//' ${initrd}/newroot/etc/live/config.conf.d/user-setup.conf
-
-  # remove sudo privileges
-  #sed '/user  ALL=(ALL) PASSWD: ALL/ s/^/#/' /etc/sudoers >${initrd}/backup/etc/sudoers
 
   # prevent user from mounting external media
   chroot ${initrd}/newroot sed -i 's/^ResultAny=.*/ResultAny=auth_admin/;s/^ResultInactive=.*/ResultInactive=auth_admin/;s/^ResultActive=.*/ResultActive=auth_admin/' /etc/polkit-1/localauthority/50-local.d/10-udisks2-mount.pkla /etc/polkit-1/localauthority/50-local.d/10-udisks2-mount-system.pkla
