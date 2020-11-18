@@ -3,6 +3,7 @@
 Yii::setAlias('@tests', dirname(__DIR__) . '/tests');
 
 $params = require(__DIR__ . '/params.php');
+$defaultParams = require(__DIR__ . '/defaultParams.php');
 $db = require(__DIR__ . '/db.php');
 
 require(__DIR__ . '/../functions.php');
@@ -16,6 +17,7 @@ return [
         [
             'class' => 'app\components\BootstrapSettings',
             'params' => $params,
+            'defaultParams' => $defaultParams,
         ],
     ],
     'language' => 'en',
