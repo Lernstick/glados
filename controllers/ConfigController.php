@@ -4,7 +4,6 @@ namespace app\controllers;
 
 use Yii;
 use yii\filters\AccessControl;
-use yii\web\Controller;
 use app\models\Config;
 use app\components\AccessRule;
 use yii\web\NotFoundHttpException;
@@ -12,7 +11,7 @@ use yii\web\NotFoundHttpException;
 /**
  * ConfigController implements the CRUD actions for Config model.
  */
-class ConfigController extends Controller
+class ConfigController extends BaseController
 {
 
     /**

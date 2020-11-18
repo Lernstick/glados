@@ -5,7 +5,6 @@ namespace app\controllers;
 use Yii;
 use app\models\Setting;
 use app\models\SettingSearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\base\ViewNotFoundException;
@@ -14,7 +13,7 @@ use app\components\AccessRule;
 /**
  * SettingController implements the CRUD actions for Setting model.
  */
-class SettingController extends Controller
+class SettingController extends BaseController
 {
     public function behaviors()
     {

@@ -3,7 +3,6 @@
 namespace app\controllers;
 
 use Yii;
-use yii\web\Controller;
 use app\models\Auth;
 use app\models\AuthSearch;
 use app\models\forms\AuthTestForm;
@@ -17,7 +16,7 @@ use yii\helpers\StringHelper;
 use yii\data\ActiveDataProvider;
 
 
-class AuthController extends Controller
+class AuthController extends BaseController
 {
 
     public function behaviors()

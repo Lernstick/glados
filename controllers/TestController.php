@@ -3,7 +3,6 @@
 namespace app\controllers;
 
 use Yii;
-use yii\web\Controller;
 use app\models\forms\EventItemSend;
 use app\models\forms\EventStreamListen;
 use app\components\AccessRule;
@@ -11,7 +10,7 @@ use app\components\AccessRule;
 /**
  * TestController
  */
-class TestController extends Controller
+class TestController extends BaseController
 {
 
     /**
@@ -33,8 +32,6 @@ class TestController extends Controller
             ],
         ];
     }
-
-
 
     /**
      * Send event test page.

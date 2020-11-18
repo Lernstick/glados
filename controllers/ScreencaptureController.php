@@ -5,14 +5,13 @@ namespace app\controllers;
 use Yii;
 use app\models\Screencapture;
 use app\models\Ticket;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use app\components\AccessRule;
 
 /**
  * ScreencaptureController implements the CRUD actions for Screencapture model.
  */
-class ScreencaptureController extends Controller
+class ScreencaptureController extends BaseController
 {
 
     /**

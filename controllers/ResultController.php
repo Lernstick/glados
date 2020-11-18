@@ -4,10 +4,10 @@ namespace app\controllers;
 
 use Yii;
 use app\models\Result;
-use yii\web\Controller;
 use yii\filters\VerbFilter;
 use app\components\AccessRule;
 use yii\web\UploadedFile;
+use app\models\Exam;
 use app\models\Ticket;
 use app\models\TicketSearch;
 use yii\web\NotFoundHttpException;
@@ -16,7 +16,7 @@ use yii\helpers\ArrayHelper;
 /**
  * ResultController implements the CRUD actions for Result model.
  */
-class ResultController extends Controller
+class ResultController extends BaseController
 {
     public function behaviors()
     {
@@ -59,7 +59,6 @@ class ResultController extends Controller
      */
     public function actionView($token = null)
     {
-
         if ($token === null){
             $model = new Ticket();
             $model->token = $token;
@@ -85,7 +84,6 @@ class ResultController extends Controller
      */
     public function actionGenerate($exam_id = null, $path = '/')
     {
-
         if ($exam_id === null) {
             $params = Yii::$app->request->get('Ticket');
             $exam_id = (isset($params['exam_id']) && !empty($params['exam_id'])) ? $params['exam_id'] : null;
@@ -98,6 +96,10 @@ class ResultController extends Controller
                 'searchModel' => $searchModel,
             ]);
         } else {
+            if (($exam = Exam::findOne($exam_id)) !== null) {
+                $this->checkRbac($exam->user_id);
+            }
+
             $model = new Result([
                 'scenario' => 'generate',
                 'exam_id' => $exam_id,

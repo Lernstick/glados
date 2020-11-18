@@ -6,14 +6,13 @@ use Yii;
 use app\models\Screenshot;
 use app\models\ScreenshotSearch;
 use app\models\Ticket;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use app\components\AccessRule;
 
 /**
  * ScreenshotController implements the CRUD actions for Screenshot model.
  */
-class ScreenshotController extends Controller
+class ScreenshotController extends BaseController
 {
 
     /**
