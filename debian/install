@@ -14,8 +14,9 @@ scripts     usr/share/glados
 views       usr/share/glados
 web         usr/share/glados
 
-config/console.php  usr/share/glados/config
-config/web.php      usr/share/glados/config
+config/defaultParams.php usr/share/glados/config
+config/console.php       usr/share/glados/config
+config/web.php           usr/share/glados/config
 
 debian/conf/*   etc/glados
 

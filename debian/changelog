@@ -25,6 +25,7 @@ glados (1.0.8-deb10) unstable; urgency=low
     - Fixed a bug causing a headers already sent error in PHP
     - Disable Firewall is working now
     - The "finish exam" item now appears in the dash board
+    - Fixed a security issue, where a user was able to generate results of exams not belonging to him/her
 
  -- Roman Gruber <roman.gruber@inf.unibe.ch>  Wed, 11 Nov 2020 17:38:11 +0100
 

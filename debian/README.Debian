@@ -38,8 +38,13 @@ glados for Debian
 * Add new dependencies (if some) to debian/control
 
 * Have a look at debian/patches if files in the patches have changed
+   * work in the debian/ directory!
+   * https://www.debian.org/doc/manuals/maint-guide/modify.en.html
+   * https://wiki.debian.org/UsingQuilt)
 
 * Finalize the changelog entry
+
+* Push the changes to the debian branch
 
 * Build the package by
 

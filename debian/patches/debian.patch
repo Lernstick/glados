@@ -1,9 +1,9 @@
 Remove dev environment
 Index: glados/config/web.php
 ===================================================================
---- glados.orig/config/web.php	2020-11-11 17:35:56.471270048 +0100
-+++ glados/config/web.php	2020-11-11 18:14:16.777130925 +0100
-@@ -129,21 +129,4 @@
+--- glados.orig/config/web.php	2020-11-18 16:42:31.648324820 +0100
++++ glados/config/web.php	2020-11-18 16:52:04.673817273 +0100
+@@ -131,21 +131,4 @@
      'runtimePath' => '/var/lib/glados/runtime',
  ];
  
@@ -27,8 +27,8 @@ Index: glados/config/web.php
  return $config;
 Index: glados/web/index.php
 ===================================================================
---- glados.orig/web/index.php	2020-11-11 17:35:56.507269745 +0100
-+++ glados/web/index.php	2020-11-11 18:14:43.169221024 +0100
+--- glados.orig/web/index.php	2020-11-18 16:42:31.680324901 +0100
++++ glados/web/index.php	2020-11-18 16:51:43.881761731 +0100
 @@ -4,8 +4,8 @@
  setlocale(LC_CTYPE, "C.UTF-8") || setlocale(LC_CTYPE, "en_US.UTF-8");
  
