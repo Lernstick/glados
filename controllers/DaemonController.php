@@ -5,7 +5,6 @@ namespace app\controllers;
 use Yii;
 use app\models\Daemon;
 use app\models\DaemonSearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\components\AccessRule;
@@ -13,7 +12,7 @@ use app\components\AccessRule;
 /**
  * DaemonController implements the CRUD actions for Daemon model.
  */
-class DaemonController extends Controller
+class DaemonController extends BaseController
 {
     /**
      * @inheritdoc

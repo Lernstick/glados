@@ -6,7 +6,6 @@ use Yii;
 use app\models\User;
 use app\models\UserSearch;
 use app\models\AuthSearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\filters\VerbFilter;
@@ -17,7 +16,7 @@ use yii\data\ArrayDataProvider;
 /**
  * UserController implements the CRUD actions for User model.
  */
-class UserController extends Controller
+class UserController extends BaseController
 {
     /**
      * @inheritdoc
@@ -197,33 +196,11 @@ class UserController extends Controller
      */
     protected function findModel($id)
     {
-
         if (($model = User::findOne($id)) !== null) {
-            if ($this->checkRbac($model)) {
+            if ($this->checkRbac($model->id)) {
                 return $model;
             }
         }
         throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
-
-        /*if (($model = User::findOne($id)) !== null) {
-            return $model;
-        } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
-        }*/
     }
-
-    protected function checkRbac($model)
-    {
-        $r = \Yii::$app->controller->id . '/' . \Yii::$app->controller->action->id;
-        if(Yii::$app->user->can($r . '/all') || $model->id == Yii::$app->user->id){
-            return true;
-        }else{
-            throw new ForbiddenHttpException(\Yii::t('app', 'You are not allowed to {action} this {item}.', [
-                'action' => \Yii::$app->controller->action->id,
-                'item' => \Yii::$app->controller->id
-            ]));
-            return false;
-        }
-    }
-
 }

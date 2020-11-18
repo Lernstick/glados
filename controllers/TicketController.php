@@ -3,7 +3,6 @@
 namespace app\controllers;
 
 use Yii;
-use yii\web\Controller;
 use app\models\Ticket;
 use app\models\TicketSearch;
 use app\models\Activity;
@@ -26,7 +25,6 @@ use app\models\RdiffFileSystem;
 use app\models\Setting;
 use yii\web\UploadedFile;
 use yii\web\NotFoundHttpException;
-use yii\web\ForbiddenHttpException;
 use yii\web\BadRequestHttpException;
 use yii\web\ServerErrorHttpException;
 use yii\filters\VerbFilter;
@@ -41,7 +39,7 @@ use yii\widgets\ActiveForm;
 /**
  * TicketController implements the CRUD actions for Ticket model.
  */
-class TicketController extends Controller
+class TicketController extends BaseController
 {
 
     /*
@@ -430,14 +428,14 @@ class TicketController extends Controller
                 $model->scenario = Ticket::SCENARIO_SUBMIT;
                 $model->load(Yii::$app->request->post());
                 $model->validate(['token'], true);
-                $this->checkRbac($model);
+                $this->checkRbac($model->exam->user_id);
 
                 return $this->render('submit', [
                     'model' => $model,
                 ]);
             } else {
                 $model->scenario = Ticket::SCENARIO_SUBMIT;
-                $this->checkRbac($model);
+                $this->checkRbac($model->exam->user_id);
                 if ($model->load(Yii::$app->request->post()) && $model->save()) {
                     return $this->redirect(['view', 'id' => $model->id]);
                 }else{
@@ -959,32 +957,11 @@ class TicketController extends Controller
     protected function findModel($id)
     {
         if (($model = Ticket::findOne($id)) !== null) {
-            if ($this->checkRbac($model)) {
+            if ($this->checkRbac($model->exam->user_id)) {
                 return $model;
             }
         }
         throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
-    }
-
-    /**
-     * Checks RBAC permission on a Ticket
-     *
-     * @param Ticket $model the Ticket model
-     * @return boolean whether access is allowed or not
-     * @throws ForbiddenHttpException if the access control failed.
-     */
-    protected function checkRbac($model)
-    {
-        $r = \Yii::$app->controller->id . '/' . \Yii::$app->controller->action->id;
-        if(Yii::$app->user->can($r . '/all') || $model->exam->user_id == Yii::$app->user->id){
-            return true;
-        }else{
-            throw new ForbiddenHttpException(\Yii::t('app', 'You are not allowed to {action} this {item}.', [
-                'action' => \Yii::$app->controller->action->id,
-                'item' => \Yii::$app->controller->id
-            ]));
-            return false;
-        }
     }
 
     /**

@@ -13,9 +13,7 @@ use app\models\Ticket;
 use app\models\TicketSearch;
 use app\models\History;
 use app\models\HistorySearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\web\ForbiddenHttpException;
 use yii\filters\VerbFilter;
 use app\components\AccessRule;
 use yii\web\UploadedFile;
@@ -28,7 +26,7 @@ use yii\helpers\Url;
 /**
  * ExamController implements the CRUD actions for Exam model.
  */
-class ExamController extends Controller
+class ExamController extends BaseController
 {
     public function behaviors()
     {
@@ -464,19 +462,12 @@ class ExamController extends Controller
      * @param integer $id
      * @return Exam the loaded model
      * @throws NotFoundHttpException if the model cannot be found.
-     * @throws ForbiddenHttpException if access control failed.
      */
     protected function findModel($id)
     {
         if (($model = Exam::findOne($id)) !== null) {
-            $r = \Yii::$app->controller->id . '/' . \Yii::$app->controller->action->id;
-            if(Yii::$app->user->can($r . '/all') || $model->user_id == Yii::$app->user->id){
+            if ($this->checkRbac($model->user_id)) {
                 return $model;
-            }else{
-                throw new ForbiddenHttpException(\Yii::t('app', 'You are not allowed to {action} this {item}.', [
-                    'action' => \Yii::$app->controller->action->id,
-                    'item' => \Yii::$app->controller->id
-                ]));
             }
         }
         throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));

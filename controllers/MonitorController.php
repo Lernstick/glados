@@ -7,7 +7,6 @@ use app\models\Exam;
 use app\models\ExamSearch;
 use app\models\Ticket;
 use app\models\TicketSearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\filters\VerbFilter;
@@ -16,7 +15,7 @@ use app\components\AccessRule;
 /**
  * MonitorController.
  */
-class MonitorController extends Controller
+class MonitorController extends BaseController
 {
 
     /**
@@ -103,14 +102,8 @@ class MonitorController extends Controller
     protected function findModel($id)
     {
         if (($model = Exam::findOne($id)) !== null) {
-            $r = \Yii::$app->controller->id . '/' . \Yii::$app->controller->action->id;
-            if(Yii::$app->user->can($r . '/all') || $model->user_id == Yii::$app->user->id){
+            if ($this->checkRbac($model->user_id)) {
                 return $model;
-            }else{
-                throw new ForbiddenHttpException(\Yii::t('app', 'You are not allowed to {action} this {item}.', [
-                    'action' => \Yii::$app->controller->action->id,
-                    'item' => \Yii::$app->controller->id
-                ]));
             }
         }
         throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));

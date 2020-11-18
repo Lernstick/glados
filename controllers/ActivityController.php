@@ -5,7 +5,6 @@ namespace app\controllers;
 use Yii;
 use app\models\Activity;
 use app\models\ActivitySearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\CookieCollection;
@@ -16,7 +15,7 @@ use app\models\User;
 /**
  * ActivityController implements the CRUD actions for Activity model.
  */
-class ActivityController extends Controller
+class ActivityController extends BaseController
 {
     public function behaviors()
     {
