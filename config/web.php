@@ -1,6 +1,7 @@
 <?php
 
 $params = require(__DIR__ . '/params.php');
+$defaultParams = require(__DIR__ . '/defaultParams.php');
 
 $config = [
     'id' => 'basic',
@@ -16,6 +17,7 @@ $config = [
         [
             'class' => 'app\components\BootstrapSettings',
             'params' => $params,
+            'defaultParams' => $defaultParams,
         ],
         'app\components\BootstrapHistory',
     ],
