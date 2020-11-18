@@ -43,17 +43,26 @@ function check_version()
     >&2 echo "check version"
     client_version="$(dpkg-query --showformat='${Version}' --show lernstick-exam-client)"
     lernstick_version="$(grep -ohP '[0-9,\-]{8,}' /run/live/rootfs/filesystem.squashfs/usr/local/lernstick.html /usr/local/lernstick.html 2>/dev/null | sed 's/-//g' | head -1)"
+    # TODO: better check for flavor
     if [ -r "/run/live/medium/boot/grub/themes/lernstick/theme.txt" ]; then
       lernstick_flavor="$(grep -qP "title-text.*Prüfung" /run/live/medium/boot/grub/themes/lernstick/theme.txt 2>/dev/null && echo exam || echo standard)"
     else
-      lernstick_flavor="exam" # fallback to exam if the file does not exist
+      # fallback to exam if the file does not exist
+      if [ -e "/usr/bin/lernstick_backup" ]; then
+        lernstick_flavor="exam"
+      else
+        lernstick_flavor="standard"
+      fi
     fi
     wants_client_version="$(echo "$jsonInfo" | ${python} -c 'import sys, json; print json.load(sys.stdin)["wants_client_version"]')"
     wants_lernstick_version="$(echo "$jsonInfo" | ${python} -c 'import sys, json; print json.load(sys.stdin)["wants_lernstick_version"]')"
     wants_lernstick_flavor="$(echo "$jsonInfo" | ${python} -c 'import sys, json; print json.load(sys.stdin)["wants_lernstick_flavor"]')"
     >&2 echo "client_version = $client_version"
+    >&2 echo "lernstick_version = $lernstick_version"
+    >&2 echo "lernstick_flavor = $lernstick_flavor"
     >&2 echo "wants_server_version = $wants_server_version"
     >&2 echo "wants_client_version = $wants_client_version"
+    >&2 echo "wants_lernstick_flavor = $wants_lernstick_flavor"
 
     if ! [ "$lernstick_flavor" = "$wants_lernstick_flavor" ]; then
       >&2 echo "Lernstick version mismatch. Got ${lernstick_flavor}, but server needs ${wants_lernstick_flavor}."
