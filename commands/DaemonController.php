@@ -369,7 +369,7 @@ class DaemonController extends Controller
 
         if ($toDB === true){
             $this->daemon->state = $message;
-            $this->daemon->save(false);
+            $this->daemon->save();
         }
 
         if ($toFile === true && $this->logFileIsWritable() === true) {

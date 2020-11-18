@@ -86,7 +86,7 @@ function do_exit()
 
 # get DISPLAY and XAUTHORITY env vars from the wxbrowser window
 set -o allexport
-. <(strings /proc/$(pgrep -n -f wxbrowser)/environ | awk -F= '$1=="DISPLAY"||$1=="XAUTHORITY"') 
+. <(strings /proc/$(pgrep -n -f wxbrowser || pgrep -n -f firefox)/environ | awk -F= '$1=="DISPLAY"||$1=="XAUTHORITY"') 
 set +o allexport
 
 echo 0 > ${initrd}/restore

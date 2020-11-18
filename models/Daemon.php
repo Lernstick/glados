@@ -40,7 +40,7 @@ class Daemon extends \yii\db\ActiveRecord
             [['pid', 'uuid', 'description'], 'required'],
             [['pid'], 'integer'],
             [['running'], 'boolean'],
-            [['state'], 'string', 'max' => 60],
+            [['state'], 'string', 'max' => 254],
             [['started_at', 'load'], 'safe'], 
             [['description'], 'string', 'max' => 254], 
         ];
