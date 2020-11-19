@@ -47,6 +47,7 @@
 * [LDAP Authentication](ldap-authentication.md)
 * [Active Directory Authentication (Simple)](ad-authentication-simple.md)
 * [Active Directory Authentication (Advanced)](ad-authentication-advanced.md)
+* [LDAP with SSL](ldap-ssl.md)
 * [Test Login](test-login.md)
 * [User Migration](user-migration.md)
 * [Multiple LDAP Servers and/or Active Directories](multiple-ldaps.md)
