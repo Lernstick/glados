@@ -1,4 +1,4 @@
-#LDAP with SSL
+## LDAP with SSL
 
 If the Glados server does not trust the certificate chain of a secure LDAP server the [test login](test-login.md) form issues a error `Can't contact LDAP server`.
 
