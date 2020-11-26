@@ -480,6 +480,7 @@ ul.nav-special > li.active > a > div {
     object-fit: contain;
     opacity: 1;
     background-color: black;
+    border-radius: 3px;
 }
 
 .live-overview-item:hover .live-thumbnail {
@@ -493,6 +494,9 @@ ul.nav-special > li.active > a > div {
     bottom: 0;
     padding: 1rem;
     color: #fff;
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    overflow: hidden;
     background: -webkit-linear-gradient(left, rgba(85, 67, 70, 0.85), rgba(69, 80, 91, 0.85)) !important;
     background: -moz-linear-gradient(left, rgba(85, 67, 70, 0.85), rgba(69, 80, 91, 0.85)) !important;
     background: -o-linear-gradient(left, rgba(85, 67, 70, 0.85), rgba(69, 80, 91, 0.85)) !important;
