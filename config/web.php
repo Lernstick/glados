@@ -104,6 +104,15 @@ $config = [
             'class' => 'app\components\customFormatter',
             'defaultTimeZone' => 'Europe/Zurich',
         ],
+        'elasticsearch' => [
+            'class' => 'yii\elasticsearch\Connection',
+            'nodes' => [
+                [
+                    'http_address' => '127.0.0.1:9200'
+                ],
+            ],
+            'dslVersion' => 7, // default is 5
+        ],
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
@@ -138,7 +147,12 @@ if (YII_ENV_DEV) {
         $config['bootstrap'][] = 'debug';
         $config['modules']['debug'] = [
             'class' => 'yii\debug\Module',
-            'allowedIPs' => ['10.16.0.222', '192.168.0.248', '127.0.0.1']
+            'allowedIPs' => ['10.16.0.222', '192.168.0.248', '127.0.0.1'],
+            'panels' => [
+                'elasticsearch' => [
+                    'class' => 'yii\\elasticsearch\\DebugPanel',
+                ],
+            ],
         ];
     }
 

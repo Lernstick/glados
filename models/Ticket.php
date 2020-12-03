@@ -293,6 +293,20 @@ class Ticket extends LiveActiveRecord
         ];
     }
 
+    /**
+     * @return array This model's mapping
+     */
+    public static function mapping()
+    {
+        return [
+            // Field types: https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#field-datatypes
+            'properties' => [
+                'token'           => ['type' => 'text'],
+                'test_taker'      => ['type' => 'text'],
+            ]
+        ];
+    }
+
     public function setState($state)
     {
         $this->_state = (int) $state;
