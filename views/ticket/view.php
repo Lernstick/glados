@@ -27,27 +27,6 @@ $this->title = \Yii::t('ticket', 'Ticket') . ' #' . $model->id;
 $this->params['breadcrumbs'][] = ['label' => \Yii::t('ticket', 'Tickets'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
-//$test = new \app\models\elasticsearch\Test();
-//$test->_id = 1; // setting primary keys is only allowed for new records
-//$test->attributes = ['test_taker' => 'Jane'];
-//var_dump($test->save());
-#$m = \app\models\elasticsearch\Test::findOne(1);
-$m = \app\models\Ticket::findOne(2942);
-$test = new \app\models\elasticsearch\Test();
-#$test->_id = $m->id;
-foreach ($test->attributes() as $key => $attr) {
-    $test->{$attr} = $m->{$attr};
-    //$test->save();
-}
-//\app\models\elasticsearch\Test::deleteIndex();
-//\app\models\elasticsearch\Test::createIndex();
-/*$query = new \yii\elasticsearch\Query();
-$query->from('test');
-$query->addOptions(['track_total_hits' => 'true']);
-var_dump($query->all());*/
-$test = \app\models\elasticsearch\Test::find()->all();
-var_dump($test);
-
 ?>
 
 <div class="ticket-view">

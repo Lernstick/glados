@@ -14,6 +14,7 @@ use app\models\EventItem;
 use app\models\EventStream;
 use app\models\RemoteExecution;
 use app\components\HistoryBehavior;
+use app\components\ElasticsearchBehavior;
 
 /**
  * This is the model class for table "ticket".
@@ -206,6 +207,16 @@ class Ticket extends LiveActiveRecord
                     'restore_state' => 'text',
                     'running_daemon_id' => 'text',
                     'sc_size' => 'shortSize',
+                ],
+            ],
+            'ElasticsearchBehavior' => [
+                'class' => ElasticsearchBehavior::className(),
+                'index' => self::tableName(),
+                'attributes' => [
+                    /*'createdAt' => 'date',
+                    'start' => 'date',
+                    'end' => 'date',*/
+                    'test_taker' => 'text',
                 ],
             ],
         ];

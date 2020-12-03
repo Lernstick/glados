@@ -18,7 +18,7 @@ class HistoryBehavior extends Behavior
      * ```php
      * [
      *     'attribute1' => 'text',
-     *     'attribute2' => 'duration'],
+     *     'attribute2' => 'duration',
      *     ...
      * ]
      * ```
