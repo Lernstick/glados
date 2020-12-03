@@ -1,15 +1,29 @@
 <?php
 
-namespace app\models;
+namespace app\models\elasticsearch;
 
 use Yii;
 use yii\elasticsearch\ActiveRecord;
+use app\models\Ticket;
 
 /**
- * This is the base model class for elasticsearch.
+ * This is the ticket model class for elasticsearch.
  */
-class BaseElasticsearch extends \yii\elasticsearch\ActiveRecord
+class Test extends \yii\elasticsearch\ActiveRecord
 {
+
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return \app\models\Ticket::tableName();
+    }
+
+    public function attributes()
+    {
+        return ['test_taker'];
+    }
 
     /**
      * @return array This model's mapping
@@ -18,7 +32,12 @@ class BaseElasticsearch extends \yii\elasticsearch\ActiveRecord
     {
         return [
             // Field types: https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#field-datatypes
-            'properties' => [],
+            'properties' => [            
+                'test_taker'     => ['type' => 'text'],
+                'createdAt'      => ['type' => 'date'],
+                'start'          => ['type' => 'date'],
+                'end'            => ['type' => 'date'],
+            ],
         ];
     }
 
