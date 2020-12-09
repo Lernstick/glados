@@ -8,6 +8,7 @@ TODO:
     * network bandwidth
     * connection details/type (lan, wlan, card, ...)
     * device details (dmidecode, lspci, ...)
+    * systemd-detect-virt — Detect execution in a virtualized environment
   * store in table ticket_properties similar to exam_settings
   * show in the ticket view
 
