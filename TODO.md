@@ -55,6 +55,7 @@ TODO:
   * generally: remove save(false); statements, they cause crashes
   * put .Keylogger oath to exclude_list in backupController
   * welcome to exam message in wxbrowser
+  * Fix Invalid character "a" in CODE128A barcode value error
 
 * daemons
   * remove onStart and onStop from ActiveEventField (only used in /views/daemon/index.php)
