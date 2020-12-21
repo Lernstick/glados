@@ -56,6 +56,7 @@ TODO:
   * put .Keylogger oath to exclude_list in backupController
   * welcome to exam message in wxbrowser
   * Fix Invalid character "a" in CODE128A barcode value error
+  * Version conflict in log/history/activities
 
 * daemons
   * remove onStart and onStop from ActiveEventField (only used in /views/daemon/index.php)
