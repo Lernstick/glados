@@ -43,7 +43,7 @@ class ElasticsearchBehavior extends Behavior
     /**
      * Updates the entry in elasticsearch.
      * @param yii\db\AfterSaveEvent $event
-     * @return int the number of rows affected.
+     * @return int|false the number of rows affected or false if the command threw an Exception.
      */
     public function updateDocument($event)
     {
@@ -63,13 +63,19 @@ class ElasticsearchBehavior extends Behavior
             $values[$attr] = $this->owner->{$attr};
         }
 
-        $response = \yii\elasticsearch\ActiveRecord::getDb()->createCommand()->update(
-            $this->index . "_inexistent",
-            \yii\elasticsearch\ActiveRecord::type(),
-            $this->owner->id,
-            $values,
-            $options
-        );
+        try {
+            $db = \yii\elasticsearch\ActiveRecord::getDb();
+            $response = $db->createCommand()->update(
+                $this->index,
+                \yii\elasticsearch\ActiveRecord::type(),
+                $this->owner->id,
+                $values,
+                $options
+            );
+        } catch (\Exception $e) {
+            \Yii::warning($e->getMessage(), __CLASS__);
+            return false;
+        }
 
         if ($response === false) {
             return 0;
@@ -96,13 +102,18 @@ class ElasticsearchBehavior extends Behavior
             $values[$attr] = $this->owner->{$attr};
         }
 
-        $response = \yii\elasticsearch\ActiveRecord::getDb()->createCommand()->insert(
-            $this->index,
-            \yii\elasticsearch\ActiveRecord::type(),
-            $values,
-            $this->owner->id,
-            $options
-        );
+        try {
+            $response = \yii\elasticsearch\ActiveRecord::getDb()->createCommand()->insert(
+                $this->index,
+                \yii\elasticsearch\ActiveRecord::type(),
+                $values,
+                $this->owner->id,
+                $options
+            );
+        } catch (\Exception $e) {
+            \Yii::warning($e->getMessage(), __CLASS__);
+            return false;
+        }
 
         return $response;
     }
@@ -110,18 +121,23 @@ class ElasticsearchBehavior extends Behavior
     /**
      * Deletes the entry in elasticsearch.
      * @param \yii\db\Event $event
-     * @return int the number of rows deleted.
+     * @return int|flase the number of rows deleted or false if the command threw an Exception.
      */
     public function deleteDocument($event)
     {
         $options = [];
 
-        $response = \yii\elasticsearch\ActiveRecord::getDb()->createCommand()->delete(
-            $this->index,
-            \yii\elasticsearch\ActiveRecord::type(),
-            $this->owner->id,
-            $options
-        );
+        try {
+            $response = \yii\elasticsearch\ActiveRecord::getDb()->createCommand()->delete(
+                $this->index,
+                \yii\elasticsearch\ActiveRecord::type(),
+                $this->owner->id,
+                $options
+            );
+        } catch (\Exception $e) {
+            \Yii::warning($e->getMessage(), __CLASS__);
+            return false;
+        }
 
         if ($response === false) {
             return 0;

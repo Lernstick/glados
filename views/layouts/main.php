@@ -4,6 +4,7 @@
 /* @var $content string */
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
@@ -69,6 +70,13 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
     if (YII_ENV_DEV) {
         echo "<p class='navbar-text' style='color:red; font-size:7px; margin:10px;'>YII_ENV_DEV=true<br>YII_DEBUG=" . (YII_DEBUG ? 'true' : 'false') . "<br>LANG=" . \Yii::$app->language . "</p>";
     }
+    ?>
+    <form class="navbar-form navbar-inverse" role="search" action="<?= Url::to(['search']); ?>">
+        <div class="form-group">
+            <input type="text" name="q" class="form-control navbar-inverse navbar-inverse-input" placeholder="Search">
+        </div>
+    </form>
+    <?php
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [

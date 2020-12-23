@@ -677,3 +677,8 @@ span.view--state[data-state="4"]::after { content: attr(data-text-4); }
 .popover img {
   max-width: 100%;
 }
+
+.navbar-inverse-input, .navbar-inverse-input:focus {
+  background-color: #404040;
+  color: #999999;
+}

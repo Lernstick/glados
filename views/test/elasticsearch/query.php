@@ -2,18 +2,24 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use yii\helpers\Json;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\forms\ElasticsearchQuery */
 /* @var $response mixed */
+/* @var $host mixed */
 
 $this->title = 'Query Elasticsearch';
 $this->params['breadcrumbs'][] = $this->title;
 
 if ($model->isNewRecord) {
     $model->method = 'get';
-    $model->url = 'ticket/_doc/2964?pretty';
+    $model->url = '_cat/indices';
     $model->data = '';
+}
+
+if ($online !== true) {
+    echo '<div class="alert alert-danger" role="alert">There is something wrong with the elasticsearch configuration!</div>';
 }
 
 ?>
@@ -38,14 +44,12 @@ if ($model->isNewRecord) {
     </div>
 </div>
 
-
-
 <hr>
 
 cURL command: <br>
 <pre style="white-space: pre-wrap;">
 <?php
-echo 'curl -X ' . strtoupper($model->method) . ' "' . \Yii::$app->elasticsearch->nodes[0]['http_address'] . "/" . $model->url . '"';
+echo 'curl -X ' . strtoupper($model->method) . ' "' . $host . "/" . $model->url . '"';
 if (!empty($model->data)) {
     $d = json_encode(json_decode($model->data));
     echo " -H 'Content-Type: application/json' -d'" . $d . "'";
@@ -58,12 +62,12 @@ Response: <br>
 <?php 
 if (is_string($response)){
     try {
-        echo json_encode(json_decode($response), JSON_PRETTY_PRINT);
+        echo JSON::encode(JSON::decode($response), JSON_PRETTY_PRINT);
     } catch (Exception $e) {
         echo $response;
     }
 } else if (is_array($response)){
-    echo json_encode($response, JSON_PRETTY_PRINT);
+    echo JSON::encode($response, JSON_PRETTY_PRINT);
 } else {
     var_dump($response);
 }

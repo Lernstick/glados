@@ -213,9 +213,9 @@ class Ticket extends LiveActiveRecord
                 'class' => ElasticsearchBehavior::className(),
                 'index' => self::tableName(),
                 'attributes' => [
-                    /*'createdAt' => 'date',
+                    'createdAt' => 'date',
                     'start' => 'date',
-                    'end' => 'date',*/
+                    'end' => 'date',
                     'test_taker' => 'text',
                 ],
             ],

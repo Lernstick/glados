@@ -95,15 +95,37 @@ class TestController extends BaseController
     {
         $model = new ElasticsearchQuery();
         $response = null;
+        $host = 'localhost:9200';
+        try {
+            $es = \Yii::$app->get('elasticsearch');
+            $online = true;
+        } catch (\Exception $e) {
+            $online = false;
+        }
+
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             $raw = !empty($model->data);
             $method = strtolower($model->method);
-            $response = $model->getDb()->{$method}($model->url, [], $model->data, $raw);
+
+            try {
+                $response = $model->getDb()->{$method}($model->url, [], $model->data, $raw);
+                if (property_exists($es, 'nodes') && array_key_exists(0, $es->nodes) && array_key_exists('http_address', $es->nodes[0])) {
+                    $host = \Yii::$app->get('elasticsearch')->nodes[0]['http_address'];
+                }
+                $online = true;
+            } catch (\Exception $e) {
+                \Yii::warning($e->getMessage(), __CLASS__);
+                $response = $e->getMessage();
+                $online = false;
+            }
+
             $model->isNewRecord = false;
         }
 
         return $this->render('elasticsearch/query', [
             'model' => $model,
+            'host' => $host,
+            'online' => $online,
             'response' => $response,
         ]);
     }

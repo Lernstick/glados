@@ -12,6 +12,8 @@ use app\models\TicketSearch;
 use app\models\Stats;
 use app\models\Activity;
 use app\models\ExamSearch;
+use yii\elasticsearch\Query;
+use yii\elasticsearch\ActiveDataProvider;
 
 class SiteController extends Controller
 {
@@ -105,4 +107,36 @@ class SiteController extends Controller
 
         return $this->goHome();
     }
+
+
+    public function actionSearch($q)
+    {
+        $query = new Query;
+        $query->from('ticket') # null means all indices are being queried
+            ->limit(10);
+
+        if (strpos($q, ':') !== false) {
+            $query->query(['query_string' => [
+                'query' => $q,
+            ]]);
+        } else {
+            $query->query(['multi_match' => [
+                'query' => $q,
+                'fuzziness' => 'AUTO',
+                'fields' => ['*']
+            ]]);
+        }
+
+        $query->highlight(['fields' =>  ['*' => [ "pre_tags" => ["<em>"], "post_tags" => ["</em>"] ]]]);
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => [ 'pageSize' => 10, ]
+        ]);
+
+        return $this->render('search', [
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
 }
