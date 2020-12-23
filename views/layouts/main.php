@@ -230,6 +230,12 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
                         'options' => ['class' => 'dev_item'],
                         'visible' => YII_ENV_DEV,
                     ],
+                    [
+                        'label' => 'Query Elasticsearch',
+                        'url' => ['/test/query'],
+                        'options' => ['class' => 'dev_item'],
+                        'visible' => YII_ENV_DEV,
+                    ],
                 ]
             ],
 

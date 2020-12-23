@@ -6,6 +6,7 @@ use Yii;
 use app\models\forms\EventItemSend;
 use app\models\forms\AgentEventSend;
 use app\models\forms\EventStreamListen;
+use app\models\forms\ElasticsearchQuery;
 use app\components\AccessRule;
 use yii\web\NotFoundHttpException;
 
@@ -83,6 +84,27 @@ class TestController extends BaseController
 
         return $this->render('event/listen', [
             'stream' => $stream,
+        ]);
+    }
+
+    /**
+     * Run an Elasticsearch query.
+     * @return mixed
+     */
+    public function actionQuery()
+    {
+        $model = new ElasticsearchQuery();
+        $response = null;
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            $raw = !empty($model->data);
+            $method = strtolower($model->method);
+            $response = $model->getDb()->{$method}($model->url, [], $model->data, $raw);
+            $model->isNewRecord = false;
+        }
+
+        return $this->render('elasticsearch/query', [
+            'model' => $model,
+            'response' => $response,
         ]);
     }
 

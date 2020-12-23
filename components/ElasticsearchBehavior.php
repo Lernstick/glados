@@ -34,75 +34,100 @@ class ElasticsearchBehavior extends Behavior
     public function events()
     {
         return [
-            \yii\db\ActiveRecord::EVENT_AFTER_UPDATE => 'changeEvent',
-            \yii\db\ActiveRecord::EVENT_AFTER_INSERT => 'insertEvent',
-            \yii\db\ActiveRecord::EVENT_AFTER_DELETE => 'deleteEvent',
+            \yii\db\ActiveRecord::EVENT_AFTER_UPDATE => 'updateDocument',
+            \yii\db\ActiveRecord::EVENT_AFTER_INSERT => 'insertDocument',
+            \yii\db\ActiveRecord::EVENT_AFTER_DELETE => 'deleteDocument',
         ];
     }
 
     /**
      * Updates the entry in elasticsearch.
-     * @param Event $event
+     * @param yii\db\AfterSaveEvent $event
+     * @return int the number of rows affected.
      */
-    public function changeEvent($event)
+    public function updateDocument($event)
     {
+        $options = [];
         $attributes = (array) array_keys($this->attributes);
 
-        $class = "\\app\\models\\elasticsearch\\" . Inflector::id2camel($this->index);
-        $obj = new $class();
-        $obj->_attributes = $attributes;
-        $obj->_id = $this->owner->id;
-        #$obj->tableName = $this->owner->tableName();
-
-        // Intersection of both arrays are attributes with history entry.
+        // Intersection of both arrays are attributes with that should be propagated to elasticsearch.
         // These are changed according to $event->changedAttributes
-        $changedAttr = array_intersect($attributes, array_keys($this->owner->dirtyAttributes));
+        $changedAttr = array_intersect($attributes, array_keys($event->changedAttributes));
 
-        foreach ($changedAttr as $key => $attribute) {
-            $obj->{$attribute} = $this->owner->{$attribute};
+        if (empty($changedAttr)) {
+            return 0;
         }
-        //var_dump($obj::index());
-        $obj->save();
-        return;
+
+        $values = [];
+        foreach ($changedAttr as $attr) {
+            $values[$attr] = $this->owner->{$attr};
+        }
+
+        $response = \yii\elasticsearch\ActiveRecord::getDb()->createCommand()->update(
+            $this->index . "_inexistent",
+            \yii\elasticsearch\ActiveRecord::type(),
+            $this->owner->id,
+            $values,
+            $options
+        );
+
+        if ($response === false) {
+            return 0;
+        } else {
+            return 1;
+        }
     }
 
     /**
      * Inserts the entry in elasticsearch.
-     * @param Event $event
+     * @param yii\db\AfterSaveEvent $event
+     * @return bool whether the record is inserted successfully.
      */
-    public function insertEvent($event)
+    public function insertDocument($event)
     {
-        //$test = new \app\models\elasticsearch\Test();
-        //$test->_id = 1; // setting primary keys is only allowed for new records
-        //$test->attributes = ['test_taker' => 'Jane'];
-        //var_dump($test->save());
-        #$m = \app\models\elasticsearch\Test::findOne(1);
-        //$m = \app\models\Ticket::findOne(2942);
-        //$test = new \app\models\elasticsearch\Test();
-        #$test->_id = $m->id;
-        /*foreach ($test->attributes() as $key => $attr) {
-            $test->{$attr} = $m->{$attr};
-            //$test->save();
-        }*/
-        //\app\models\elasticsearch\Test::deleteIndex();
-        //\app\models\elasticsearch\Test::createIndex();
-        /*$query = new \yii\elasticsearch\Query();
-        $query->from('test');
-        $query->addOptions(['track_total_hits' => 'true']);
-        var_dump($query->all());*/
-        //$test = \app\models\elasticsearch\Test::find()->all();
-        //var_dump($test);
+        $options = [
+            'op_type' => 'create',
+        ];
 
-        return;
+        $attributes = (array) array_keys($this->attributes);
+
+        $values = [];
+        foreach ($attributes as $attr) {
+            $values[$attr] = $this->owner->{$attr};
+        }
+
+        $response = \yii\elasticsearch\ActiveRecord::getDb()->createCommand()->insert(
+            $this->index,
+            \yii\elasticsearch\ActiveRecord::type(),
+            $values,
+            $this->owner->id,
+            $options
+        );
+
+        return $response;
     }
 
     /**
      * Deletes the entry in elasticsearch.
-     * @param Event $event
+     * @param \yii\db\Event $event
+     * @return int the number of rows deleted.
      */
-    public function deleteEvent($event)
+    public function deleteDocument($event)
     {
-        return;
+        $options = [];
+
+        $response = \yii\elasticsearch\ActiveRecord::getDb()->createCommand()->delete(
+            $this->index,
+            \yii\elasticsearch\ActiveRecord::type(),
+            $this->owner->id,
+            $options
+        );
+
+        if ($response === false) {
+            return 0;
+        } else {
+            return 1;
+        }
     }
 
 }
