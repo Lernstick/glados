@@ -53,9 +53,8 @@ TODO:
   * move expert settings to the client
   * models/Daemon.php rules -> maybe truncate a too long state/description
   * generally: remove save(false); statements, they cause crashes
-  * put .Keylogger oath to exclude_list in backupController
+  * put .Keylogger path to exclude_list in backupController
   * welcome to exam message in wxbrowser
-  * Fix Invalid character "a" in CODE128A barcode value error
   * Version conflict in log/history/activities
 
 * daemons
