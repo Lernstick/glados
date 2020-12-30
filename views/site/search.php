@@ -33,6 +33,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     'ticket' => \Yii::t('seach', 'Only tickets'),
                     'backup' => \Yii::t('seach', 'Only backups'),
                     'restore' => \Yii::t('seach', 'Only restores'),
+                    'howto' => \Yii::t('seach', 'Only howtos'),
+                    'log' => \Yii::t('seach', 'Only logs'),
+                    'file' => \Yii::t('seach', 'Only files'),
                 ]); ?>
         </div>
     </div>

@@ -190,7 +190,7 @@ class RdiffFileSystem extends Model
 
         if (count($this->versions) != 0) {
             return $this;
-        }else{
+        } else {
             //throw new NotFoundHttpException($this->path . ': No such file or directory.');
             return null;
         }

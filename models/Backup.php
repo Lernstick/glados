@@ -56,8 +56,8 @@ class Backup extends Model
                 'fields' => [
                     'date',
                     'errors',
-                    'errorLog' => function($m){ return implode('', $m->errorLog); },
-                    'backupLog' => function($m){ return implode('', $m->backupLog); },
+                    //'errorLog' => function($m){ return implode('', $m->errorLog); },
+                    //'backupLog' => function($m){ return implode('', $m->backupLog); },
                     'ticket' => function($m){ return $m->ticket->id; },
                     'token',
                 ],
@@ -65,18 +65,42 @@ class Backup extends Model
                 'properties' => [
                     'date'      => ['type' => 'text'], // @todo: change to date
                     'errors'    => ['type' => 'integer'],
-                    'errorLog'  => ['type' => 'text'],
-                    'backupLog' => ['type' => 'text'],
+                    //'errorLog'  => ['type' => 'text'],
+                    //'backupLog' => ['type' => 'text'],
                     'token'     => ['type' => 'text'],
                     'ticket'    => ['type' => 'integer'],
-                    'files'     => [
-                        'type' => 'object',
-                        'properties' => [
-                            'path'     => ['type' => 'text'],
-                            'mimetype' => ['type' => 'text'],
-                            'content'  => ['type' => 'text'],
-                        ]
-                    ],
+                ]
+            ],
+            'ElasticsearchBehaviorLog' => [
+                'class' => ElasticsearchBehavior::className(),
+                'index' => 'log',
+                // what the attributes mean
+                'fields' => [
+                    'errorLog' => function($m){ return implode('', $m->errorLog); },
+                    'backupLog' => function($m){ return implode('', $m->backupLog); },
+                    'backup' => function($m){ return $m->id; },
+                ],
+                // mapping of elasticsearch
+                'properties' => [
+                    'errorLog'  => ['type' => 'text'],
+                    'backupLog' => ['type' => 'text'],
+                    'backup'    => ['type' => 'text'],
+                ]
+            ],
+            'ElasticsearchBehaviorFile' => [
+                'class' => ElasticsearchBehavior::className(),
+                'index' => 'file',
+                // what the attributes mean
+                'fields' => [
+                    'path',
+                    'mimetype',
+                    'content',
+                ],
+                // mapping of elasticsearch
+                'properties' => [
+                    'path'     => ['type' => 'text'],
+                    'mimetype' => ['type' => 'text'],
+                    'content'  => ['type' => 'text'],
                 ]
             ],
         ];

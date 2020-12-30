@@ -164,6 +164,7 @@ class ElasticsearchBehavior extends Behavior
             );
         } catch (\Exception $e) {
             \Yii::warning($e->getMessage(), __CLASS__);
+            var_dump($e->getMessage());
             return false;
         }
 
