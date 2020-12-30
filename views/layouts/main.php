@@ -11,6 +11,8 @@ use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
 use app\models\Activity;
 use app\models\DaemonSearch;
+use app\models\forms\Search;
+use yii\widgets\ActiveForm;
 use app\components\ActiveEventField;
 
 AppAsset::register($this);
@@ -20,6 +22,9 @@ $newActivities = $activity->newActivities();
 
 $daemons = new DaemonSearch();
 $runningDaemons = $daemons->search([])->totalCount;
+
+$searchModel = new Search();
+$searchModel->load(Yii::$app->request->queryParams);
 
 /* register the global YII_ENV variables */
 $this->registerJs('var YII_ENV_DEV = ' . (YII_ENV_DEV ? 'true' : 'false') . ';', \yii\web\View::POS_HEAD);
@@ -58,6 +63,10 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
 <body>
 <?php $this->beginBody() ?>
 
+<?php if (YII_ENV_DEV) {
+    echo "<p class='navbar-main-text'>YII_ENV_DEV=true<br>YII_DEBUG=" . (YII_DEBUG ? 'true' : 'false') . "<br>LANG=" . \Yii::$app->language . "</p>";
+} ?>
+
 <div class="wrap">
     <?php
     NavBar::begin([
@@ -67,15 +76,26 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
-    if (YII_ENV_DEV) {
-        echo "<p class='navbar-text' style='color:red; font-size:7px; margin:10px;'>YII_ENV_DEV=true<br>YII_DEBUG=" . (YII_DEBUG ? 'true' : 'false') . "<br>LANG=" . \Yii::$app->language . "</p>";
-    }
+    $searchForm = ActiveForm::begin([
+        'method' => 'get',
+        'id' => 'search-nav-form',
+        'action' => Url::to(['site/search']),
+        'options' => [
+            'class' => 'navbar-form navbar-inverse navbar-left',
+            'role' => 'search',
+        ],
+        'fieldConfig' => [
+            'template' => "{input}",
+        ],
+    ]);
     ?>
-    <form class="navbar-form navbar-inverse" role="search" action="<?= Url::to(['search']); ?>">
-        <div class="form-group">
-            <input type="text" name="q" class="form-control navbar-inverse navbar-inverse-input" placeholder="Search">
-        </div>
-    </form>
+    <div class="form-group">
+        <?= $searchForm->field($searchModel, 'q')->textInput([
+            'class' => 'form-control navbar-inverse navbar-inverse-input',
+            'placeholder' => \Yii::t('search', 'Search'),
+        ])->label(false)->hint(false); ?>
+    </div>
+    <?php ActiveForm::end(); ?>
     <?php
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],

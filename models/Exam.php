@@ -6,6 +6,7 @@ use Yii;
 use app\models\Base;
 use yii\helpers\Html;
 use app\components\HistoryBehavior;
+use app\components\ElasticsearchBehavior;
 
 /**
  * This is the model class for table "exam".
@@ -88,6 +89,30 @@ class Exam extends Base
                     'backup_path' => 'text',
                     'time_limit' => 'text',
                 ],
+            ],
+            'ElasticsearchBehavior' => [
+                'class' => ElasticsearchBehavior::className(),
+                'index' => self::tableName(),
+                // what the attributes mean
+                'fields' => [
+                    'createdAt', // this field has CURRENT_TIMESTAMP
+                    'name',
+                    'subject',
+                    // calculated field
+                    'fileInfo' => ['trigger_attributes' => ['file']],
+                    'file2Info' => ['trigger_attributes' => ['file']],
+                    'user' => ['trigger_attributes' => ['user_id'], 'value_from' => 'user_id'],
+                ],
+                // mapping of elasticsearch
+                'properties' => [
+                    'createdAt'  => ['type' => 'text'], // @todo: change to date
+                    'name'       => ['type' => 'text'],
+                    'subject'    => ['type' => 'text'],
+                    'fileInfo'   => ['type' => 'text'],
+                    'file2Info'  => ['type' => 'text'],
+                    'user'       => ['type' => 'integer'],
+
+                ]
             ],
         ];
     }
@@ -330,7 +355,11 @@ class Exam extends Base
      */
     public function getFileInfo()
     {
-        return str_replace(',', '<br>', Yii::$app->file->set($this->file)->info);
+        if (!empty($this->file)) {
+            return str_replace(',', '<br>', Yii::$app->file->set($this->file)->info);
+        } else {
+            return null;
+        }
     }
 
     /**

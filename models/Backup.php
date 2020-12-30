@@ -7,6 +7,7 @@ use yii\base\Model;
 use yii\helpers\FileHelper;
 use app\models\Ticket;
 use app\models\RdiffFileSystem;
+use app\components\ElasticsearchBehavior;
 
 /**
  * This is the model class for the backup directory.
@@ -40,6 +41,47 @@ class Backup extends Model
     public $totalDestinationSizeChange;
     public $errors;
 
+    public $id; // only used in commands/IndexController.php
+
+    /**
+     * @inheritdoc 
+     */
+    public function behaviors()
+    {
+        return [
+            'ElasticsearchBehavior' => [
+                'class' => ElasticsearchBehavior::className(),
+                'index' => 'backup',
+                // what the attributes mean
+                'fields' => [
+                    'date',
+                    'errors',
+                    'errorLog' => function($m){ return implode('', $m->errorLog); },
+                    'backupLog' => function($m){ return implode('', $m->backupLog); },
+                    'ticket' => function($m){ return $m->ticket->id; },
+                    'token',
+                ],
+                // mapping of elasticsearch
+                'properties' => [
+                    'date'      => ['type' => 'text'], // @todo: change to date
+                    'errors'    => ['type' => 'integer'],
+                    'errorLog'  => ['type' => 'text'],
+                    'backupLog' => ['type' => 'text'],
+                    'token'     => ['type' => 'text'],
+                    'ticket'    => ['type' => 'integer'],
+                    'files'     => [
+                        'type' => 'object',
+                        'properties' => [
+                            'path'     => ['type' => 'text'],
+                            'mimetype' => ['type' => 'text'],
+                            'content'  => ['type' => 'text'],
+                        ]
+                    ],
+                ]
+            ],
+        ];
+    }
+
     /**
      * @return array the validation rules.
      */
@@ -66,7 +108,6 @@ class Backup extends Model
             'incrementFiles' => Yii::t('backups', 'Increment Files'),
             'totalDestinationSizeChange' => Yii::t('backups', 'Total Destination Size Change'),
             'errors' => Yii::t('backups', 'Errors'),
-
         ];
     }
 
@@ -171,15 +212,20 @@ class Backup extends Model
      */
     public function findAll($token)
     {
+        $ticket = Ticket::findOne(['token' => $token]);
         $dir = \Yii::$app->params['backupPath'] . '/' . $token . '/rdiff-backup-data/';
         $models = [];
 
+        $i = 0;
         if (file_exists($dir)) {
             $files = scandir($dir, SCANDIR_SORT_DESCENDING);
             foreach ($files as $file) {
                 if (preg_match('/^session_statistics\.(.*)\.data$/', $file, $matches)) {
                     if (isset($matches[1])) {
-                        $models[] = Backup::findOne($token, $matches[1]);
+                        $model = Backup::findOne($token, $matches[1]);
+                        $model->id = $ticket->id . ":" . $i;
+                        $models[] = $model;
+                        $i = $i+1;
                     }
                 }
             }

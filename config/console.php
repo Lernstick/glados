@@ -19,6 +19,7 @@ return [
             'params' => $params,
             'defaultParams' => $defaultParams,
         ],
+        'app\components\BootstrapElasticsearch',
     ],
     'language' => 'en',
     'timezone' => 'Europe/Zurich',
@@ -46,6 +47,9 @@ return [
                     'sourceLanguage' => 'en',
                 ],
             ],
+        ],
+        'file' => [
+            'class' => 'app\components\File',
         ],
         'log' => [
             'targets' => [

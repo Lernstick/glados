@@ -171,7 +171,7 @@ class Ticket extends LiveActiveRecord
             'restore_lock' => [ 'priority' => 0 ],
             'online',
             'last_backup',
-            'state' => [ 'trigger_attributes' => [ 'start', 'end', 'test_taker' ], ],
+            'state' => ['trigger_attributes' => ['start', 'end', 'test_taker']],
         ];
     }
 
@@ -212,12 +212,33 @@ class Ticket extends LiveActiveRecord
             'ElasticsearchBehavior' => [
                 'class' => ElasticsearchBehavior::className(),
                 'index' => self::tableName(),
-                'attributes' => [
-                    'createdAt' => 'date',
-                    'start' => 'date',
-                    'end' => 'date',
-                    'test_taker' => 'text',
+                // what the attributes mean
+                'fields' => [
+                    'createdAt', // this field has CURRENT_TIMESTAMP
+                    'start',
+                    'end',
+                    'token',
+                    'ip',
+                    'test_taker',
+                    'exam' => ['trigger_attributes' => ['exam_id'], 'value_from' => 'exam_id'],
+                    // relational field
+                    'user' => function($m){ return $m->exam->user_id; },
+                    // field based on other database attributes
+                    'state' => ['trigger_attributes' => ['start', 'end', 'test_taker']]
                 ],
+                // mapping of elasticsearch
+                'properties' => [
+                    'createdAt'  => ['type' => 'text'], // @todo: change to date
+                    'start'      => ['type' => 'text'], // @todo: change to date
+                    'end'        => ['type' => 'text'], // @todo: change to date
+                    'token'      => ['type' => 'text'],
+                    'ip'         => ['type' => 'ip'],
+                    'test_taker' => ['type' => 'text'],
+                    'name'       => ['type' => 'text'],
+                    'exam'       => ['type' => 'integer'],
+                    'user'       => ['type' => 'integer'],
+                    'state'      => ['type' => 'integer'],
+                ]
             ],
         ];
     }
