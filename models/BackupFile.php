@@ -43,12 +43,19 @@ class BackupFile extends Model
                     'ticket' => function($m) { return $m->ticket_id; },
                 ],
                 // mapping of elasticsearch
-                'properties' => [
-                    'path'     => ['type' => 'text'],
-                    'mimetype' => ['type' => 'text'],
-                    'content'  => ['type' => 'text'],
-                    'date'     => ['type' => 'text'], // @todo: change back to date
-                    'ticket'   => ['type' => 'integer'],
+                'mappings' => [
+                    'properties' => [
+                        'path'     => ['type' => 'text'],
+                        'mimetype' => ['type' => 'text'],
+                        'content'  => ['type' => 'text'],
+                        'date'  => [
+                            'type' => 'date',
+                            # yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ or yyyy-MM-dd or timestamp
+                            # @see https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html
+                            'format' => 'date_optional_time||epoch_millis',
+                        ],
+                        'ticket'   => ['type' => 'integer'],
+                    ],
                 ]
             ],
         ];

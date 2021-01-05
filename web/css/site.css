@@ -692,3 +692,17 @@ span.view--state[data-state="4"]::after { content: attr(data-text-4); }
   margin:10px;
   z-index:9999;
 }
+
+/* fix the height of select2 multi-select boxes */
+.select2-container--krajee .select2-selection--multiple {
+  line-height: 0px;
+}
+
+/* fix padding of text inside select2 boxes */
+.select2-container--krajee .select2-selection--multiple .select2-search--inline .select2-search__field {
+  padding: 0 12px;
+}
+
+.search-body.loading {
+  opacity: 0.2;
+}

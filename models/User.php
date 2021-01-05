@@ -94,12 +94,14 @@ class User extends Base implements IdentityInterface
                     'authMethod' => function($m){ return $m->authMethod !== null ? $m->authMethod->name : null; },
                 ],
                 // mapping of elasticsearch
-                'properties' => [
-                    'username'   => ['type' => 'text'],
-                    'role'       => ['type' => 'text'],
-                    'type'       => ['type' => 'text'],
-                    'authMethod' => ['type' => 'text'],
-                ]
+                'mappings' => [
+                    'properties' => [
+                        'username'   => ['type' => 'text'],
+                        'role'       => ['type' => 'text'],
+                        'type'       => ['type' => 'text'],
+                        'authMethod' => ['type' => 'text'],
+                    ],
+                ],
             ],
         ];
     }

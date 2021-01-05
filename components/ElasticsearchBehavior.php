@@ -24,15 +24,44 @@ class ElasticsearchBehavior extends Behavior
     public $fields = [];
 
     /**
-     * @var array field types
+     * @var array mappings
      * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#field-datatypes
      */
-    public $properties = [];
+    public $mappings = [];
 
     /**
-     * @var string the index
+     * @var array settings
+     * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#index-modules-settings
+     */
+    public $settings = [];
+
+    /**
+     * @var callable|array function or array to find all models
+     * If it's a function, it must have the following signature:
+     *   @param $class the class name
+     *   @return $class[] an array of $class objects
+     * By default the function returns (see [[init()]]):
+     * ```$class::find()->all();```
+     *
+     * If it's an array it must have the following structure:
+     * ```
+     * [
+     *      'foreach' => function($class) {} // function that returns a list of $models
+     *      'models'  => function($model) {} // this function is called with each model in $models
+     * ]
+     * ```
+     */
+    public $allModels;
+
+    /**
+     * @var string the name of the index
      */
     public $index;
+
+    /**
+     * @var string|int the value that should be taken for the _id field
+     */
+    public $id;
 
     /**
      * @var array An array holding the attribute names as key and their values as value before changing
@@ -48,6 +77,24 @@ class ElasticsearchBehavior extends Behavior
      * @var array An array holding all attributes that cause a change
      */
     private $_trigger_attributes = [];
+
+    /**
+     * @inheritdoc 
+     */
+    public function init()
+    {
+        if ($this->allModels == null) {
+            $this->allModels = function($class) { return $class::find()->all(); };
+        }
+    }
+
+    /**
+     * @return string the id of the document
+     */
+    public function getIdField()
+    {
+        return $this->id === null ? $this->owner->id : call_user_func($this->id, $this->owner);
+    }
 
     /**
      * @inheritdoc 
@@ -158,7 +205,7 @@ class ElasticsearchBehavior extends Behavior
             $response = $db->createCommand()->update(
                 $this->index,
                 \yii\elasticsearch\ActiveRecord::type(),
-                $this->owner->id,
+                $this->idField,
                 $values,
                 $options
             );
@@ -205,7 +252,7 @@ class ElasticsearchBehavior extends Behavior
             $response = \yii\elasticsearch\ActiveRecord::getDb()->createCommand()->delete(
                 $this->index,
                 \yii\elasticsearch\ActiveRecord::type(),
-                $this->owner->id,
+                $this->idField,
                 $options
             );
         } catch (\Exception $e) {
@@ -231,7 +278,7 @@ class ElasticsearchBehavior extends Behavior
             $this->index,
             \yii\elasticsearch\ActiveRecord::type(),
             [
-                'properties' => $this->properties,
+                'properties' => $this->mappings['properties'],
             ]
         );
     }
@@ -241,15 +288,16 @@ class ElasticsearchBehavior extends Behavior
      */
     public function createIndex()
     {
+        $configuration = [
+            'mappings' => $this->mappings,
+        ];
+
+        if (!empty($this->settings)) {
+            $configuration['settings'] = $this->settings;
+        }
         \yii\elasticsearch\ActiveRecord::getDb()->createCommand()->createIndex(
             $this->index,
-            [
-                //'aliases' => [ /* ... */ ],
-                'mappings' => [
-                    'properties' => $this->properties,
-                ],
-                //'settings' => [ /* ... */ ],
-            ]
+            $configuration
         );
     }
 

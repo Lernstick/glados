@@ -22,9 +22,14 @@ class Search extends \yii\elasticsearch\ActiveRecord
     public $q;
 
     /**
-     * @var string the index to search, defaults to all.
+     * @var array the indexes to search, defaults to empty, which means all.
      */
     public $index;
+
+    /**
+     * @var array all indexes
+     */
+    public $indexes = ['user', 'exam', 'ticket', 'backup', 'restore', 'howto', 'log', 'file'];
 
     /**
      * @inheritdoc
@@ -50,6 +55,7 @@ class Search extends \yii\elasticsearch\ActiveRecord
         return [
             ['q', 'filter', 'filter' => 'trim', 'skipOnArray' => true],
             ['index', 'default', 'value' => null],
+            ['index', 'each', 'rule' => ['in', 'range' => $this->indexes, 'skipOnEmpty' => false]],
         ];
     }
 

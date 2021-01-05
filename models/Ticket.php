@@ -227,18 +227,29 @@ class Ticket extends LiveActiveRecord
                     'state' => ['trigger_attributes' => ['start', 'end', 'test_taker']]
                 ],
                 // mapping of elasticsearch
-                'properties' => [
-                    'createdAt'  => ['type' => 'text'], // @todo: change to date
-                    'start'      => ['type' => 'text'], // @todo: change to date
-                    'end'        => ['type' => 'text'], // @todo: change to date
-                    'token'      => ['type' => 'text'],
-                    'ip'         => ['type' => 'ip'],
-                    'test_taker' => ['type' => 'text'],
-                    'name'       => ['type' => 'text'],
-                    'exam'       => ['type' => 'integer'],
-                    'user'       => ['type' => 'integer'],
-                    'state'      => ['type' => 'integer'],
-                ]
+                'mappings' => [
+                    'properties' => [
+                        'createdAt'  => [
+                            'type' => 'date',
+                            'format' => 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis',
+                        ],
+                        'start'      => [
+                            'type' => 'date',
+                            'format' => 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis',
+                        ],
+                        'end'        => [
+                            'type' => 'date',
+                            'format' => 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis',
+                        ],
+                        'token'      => ['type' => 'text'],
+                        'ip'         => ['type' => 'ip'],
+                        'test_taker' => ['type' => 'text'],
+                        'name'       => ['type' => 'text'],
+                        'exam'       => ['type' => 'integer'],
+                        'user'       => ['type' => 'integer'],
+                        'state'      => ['type' => 'integer'],
+                    ],
+                ],
             ],
         ];
     }

@@ -104,15 +104,19 @@ class Exam extends Base
                     'user' => ['trigger_attributes' => ['user_id'], 'value_from' => 'user_id'],
                 ],
                 // mapping of elasticsearch
-                'properties' => [
-                    'createdAt'  => ['type' => 'text'], // @todo: change to date
-                    'name'       => ['type' => 'text'],
-                    'subject'    => ['type' => 'text'],
-                    'fileInfo'   => ['type' => 'text'],
-                    'file2Info'  => ['type' => 'text'],
-                    'user'       => ['type' => 'integer'],
-
-                ]
+                'mappings' => [
+                    'properties' => [
+                        'createdAt'  => [
+                            'type' => 'date',
+                            'format' => 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis',
+                        ],
+                        'name'       => ['type' => 'text'],
+                        'subject'    => ['type' => 'text'],
+                        'fileInfo'   => ['type' => 'text'],
+                        'file2Info'  => ['type' => 'text'],
+                        'user'       => ['type' => 'integer'],
+                    ],
+                ],
             ],
         ];
     }

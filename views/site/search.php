@@ -7,9 +7,65 @@
 use yii\helpers\Html;
 use yii\widgets\ListView;
 use yii\widgets\ActiveForm;
+use kartik\select2\Select2;
+use yii\widgets\Pjax;
 
 $this->title = \Yii::t('search', 'Search results');
 $this->params['breadcrumbs'][] = $this->title;
+
+$data = [
+    'user' => \Yii::t('search', 'users'),
+    'exam' => \Yii::t('search', 'exams'),
+    'ticket' => \Yii::t('search', 'tickets'),
+    'backup' => \Yii::t('search', 'backups'),
+    'restore' => \Yii::t('search', 'restores'),
+    'howto' => \Yii::t('search', 'howtos'),
+    'log' => \Yii::t('search', 'logs'),
+    'file' => \Yii::t('search', 'files'),
+];
+
+$enter_submit = <<< SCRIPT
+// submit form on enter key
+$(".site-search input#q").on("keypress", function(event) {
+    if (event.which == 13) {
+        event.preventDefault();
+        $("form#search-form").submit();
+    }
+});
+
+// submit form when changing select2 field
+$('#index').on('change', function (e) {
+    $("form#search-form").submit();
+});
+
+// focus and move cursor to the end
+input = $("input#q");
+input.focus();
+var tmp = input.val();
+input.val('');
+input.val(tmp);
+
+// only load the search-body on form submit
+$(document).on('submit', 'form#search-form', function(event) {
+  $.pjax.submit(event, '#search-body');
+})
+
+$(document).on('pjax:send', function(event) {
+    $("#search-body").addClass('loading');
+})
+
+$(document).on('pjax:complete', function(event) {
+    $("#search-body").removeClass('loading');
+})
+
+$(document).on('pjax:timeout', function(event) {
+    $("#search-body").removeClass('loading');
+})
+
+SCRIPT;
+
+$this->registerJs($enter_submit);
+
 ?>
 
 <div class="site-search">
@@ -26,17 +82,13 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= $form->field($searchModel, 'q')->textInput(); ?>
         </div>
         <div class="col-md-6">
-            <?= $form->field($searchModel, 'index')->dropdownList([
-                    '' => \Yii::t('search', 'All'),
-                    'user' => \Yii::t('seach', 'Only users'),
-                    'exam' => \Yii::t('seach', 'Only exams'),
-                    'ticket' => \Yii::t('seach', 'Only tickets'),
-                    'backup' => \Yii::t('seach', 'Only backups'),
-                    'restore' => \Yii::t('seach', 'Only restores'),
-                    'howto' => \Yii::t('seach', 'Only howtos'),
-                    'log' => \Yii::t('seach', 'Only logs'),
-                    'file' => \Yii::t('seach', 'Only files'),
-                ]); ?>
+            <?= $form->field($searchModel, 'index')->widget(Select2::classname(), [
+                'data' => $data,
+                'options' => [
+                    'placeholder' => \Yii::t('search', 'Select categories ...'),
+                    'multiple' => true,
+                ],
+            ]); ?>
         </div>
     </div>
 
@@ -44,21 +96,28 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php ActiveForm::end(); ?>
 
-    <?php
-    try {
-        echo ListView::widget([
-            'dataProvider' => $dataProvider,
-            'itemView' => '_search_result',
-            'emptyText' => \Yii::t('search', 'No search results.'),
-            'pager' => [
-                'options' => [
-                    'class' => 'pagination pagination-sm',
-                ]
-            ],
-        ]);
-    } catch (\Exception $e) {
-        echo $e->getMessage();
-    }
-    ?>
+    <?php Pjax::begin([
+        'id' => 'search-body',
+        'class' => 'search-body',
+    ]); ?>
+
+        <?php
+        try {
+            echo ListView::widget([
+                'dataProvider' => $dataProvider,
+                'itemView' => '_search_result',
+                'emptyText' => \Yii::t('search', 'No search results.'),
+                'pager' => [
+                    'options' => [
+                        'class' => 'pagination pagination-sm',
+                    ]
+                ],
+            ]);
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+        }
+        ?>
+
+    <?php Pjax::end(); ?>
    
 </div>
