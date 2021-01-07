@@ -18,13 +18,13 @@ class IndexController extends DaemonController
 {
 
     public $list = [
-        //'howto'   => 'app\models\Howto',
-        //'user'    => 'app\models\User',
-        //'exam'    => 'app\models\Exam',
-        //'ticket'  => 'app\models\Ticket',
-        'restore' => 'app\models\Restore',
-        'backup'  => 'app\models\Backup',
-        //'file'    => 'app\models\RdiffFileSystem',
+        #'howto'   => 'app\models\Howto',
+        #'user'    => 'app\models\User',
+        'exam'    => 'app\models\Exam',
+        #'ticket'  => 'app\models\Ticket',
+        #'restore' => 'app\models\Restore',
+        #'backup'  => 'app\models\Backup',
+        #'file'    => 'app\models\RdiffFileSystem',
     ];
 
     /**
@@ -91,13 +91,15 @@ class IndexController extends DaemonController
     {
         $model = new $class();
         $behavior = $model->getBehavior($name);
-        $this->logInfo('deleting index ' . $behavior->index);
-        $behavior->deleteIndex();
-        $this->logInfo('creating index ' . $behavior->index);
-        $behavior->createIndex();
+        if ($behavior->index !== false) {
+            $this->logInfo('deleting index ' . $behavior->index);
+            $behavior->deleteIndex();
+            $this->logInfo('creating index ' . $behavior->index);
+            $behavior->createIndex();
+        }
     }
 
-    public function insertAllModels($models, $name, $log = 'element:{id}')
+    public function insertAllModels($models, $name)
     {
         if (!empty($models)) {
             $behavior = $models[0]->getBehavior($name);

@@ -64,6 +64,11 @@ class ElasticsearchBehavior extends Behavior
     public $id;
 
     /**
+     * @var callable|bool condition, model is only indexed if this evalutes to true
+     */
+    public $onlyIndexIf = true;
+
+    /**
      * @var array An array holding the attribute names as key and their values as value before changing
      */
     private $presaveAttributes = [];
@@ -169,57 +174,61 @@ class ElasticsearchBehavior extends Behavior
      */
     public function updateDocument($event)
     {
-        //$this->deleteIndex();
-        //$this->createIndex();
-        /**
-         * @var array options to be appended to the query URL, such as "search_type" for search or
-         * "timeout" for delete
-         */
-        $options = [
-            'doc_as_upsert' => 'true', // If the document does not already exist, it will be inserted
-        ]; 
+        if ((is_callable($this->onlyIndexIf) && call_user_func($this->onlyIndexIf, $this->owner))
+            || (is_bool($this->onlyIndexIf) && $this->onlyIndexIf))
+        {
 
-        $this->attributes = $this->owner->getAttributes($this->trigger_attributes);
+            /**
+             * @var array options to be appended to the query URL, such as "search_type" for search or
+             * "timeout" for delete
+             */
+            $options = [
+                'doc_as_upsert' => 'true', // If the document does not already exist, it will be inserted
+            ]; 
 
-        $values = [];
-        if ($this->attributesChanged()) {
-            foreach ($this->fields as $key => $value) {
-                if (is_int($key)) {
-                    $values[$value] = $this->attributes[$value];
-                } elseif (is_array($value)) {
-                    if (array_key_exists('value_from', $value)) {
-                        $values[$key] = $this->owner->{$value['value_from']};
+            $this->attributes = $this->owner->getAttributes($this->trigger_attributes);
+
+            $values = [];
+            if ($this->attributesChanged()) {
+                foreach ($this->fields as $key => $value) {
+                    if (is_int($key)) {
+                        $values[$value] = $this->attributes[$value];
+                    } elseif (is_array($value)) {
+                        if (array_key_exists('value_from', $value)) {
+                            $values[$key] = $this->owner->{$value['value_from']};
+                        } else {
+                            $values[$key] = $this->owner->{$key};
+                        }
+                    } elseif (is_callable($value)) {
+                        $values[$key] = $value($this->owner);
                     } else {
-                        $values[$key] = $this->owner->{$key};
+                        $values[$key] = $this->owner->{$value};
                     }
-                } elseif (is_callable($value)) {
-                    $values[$key] = $value($this->owner);
-                } else {
-                    $values[$key] = $this->owner->{$value};
                 }
             }
-        }
 
-        try {
-            $db = \yii\elasticsearch\ActiveRecord::getDb();
-            $response = $db->createCommand()->update(
-                $this->index,
-                \yii\elasticsearch\ActiveRecord::type(),
-                $this->idField,
-                $values,
-                $options
-            );
-        } catch (\Exception $e) {
-            \Yii::warning($e->getMessage(), __CLASS__);
-            var_dump($e->getMessage());
-            return false;
-        }
+            try {
+                $db = \yii\elasticsearch\ActiveRecord::getDb();
+                $response = $db->createCommand()->update(
+                    $this->index,
+                    \yii\elasticsearch\ActiveRecord::type(),
+                    $this->idField,
+                    $values,
+                    $options
+                );
+            } catch (\Exception $e) {
+                \Yii::warning($e->getMessage(), __CLASS__);
+                var_dump($e->getMessage());
+                return false;
+            }
 
-        if ($response === false) {
-            return 0;
-        } else {
-            return 1;
+            if ($response === false) {
+                return 0;
+            } else {
+                return 1;
+            }
         }
+        return 0;
     }
 
     /**

@@ -5,6 +5,8 @@ namespace app\models;
 use Yii;
 use app\models\Base;
 use yii\helpers\Html;
+use yii\helpers\ArrayHelper;
+use app\models\file\ZipFile;
 use app\components\HistoryBehavior;
 use app\components\ElasticsearchBehavior;
 
@@ -100,7 +102,7 @@ class Exam extends Base
                     'subject',
                     // calculated field
                     'fileInfo' => ['trigger_attributes' => ['file']],
-                    'file2Info' => ['trigger_attributes' => ['file']],
+                    'file2Info' => ['trigger_attributes' => ['file2']],
                     'user' => ['trigger_attributes' => ['user_id'], 'value_from' => 'user_id'],
                 ],
                 // mapping of elasticsearch
@@ -117,6 +119,39 @@ class Exam extends Base
                         'user'       => ['type' => 'integer'],
                     ],
                 ],
+            ],
+            'ElasticsearchZip' => [
+                'class' => ElasticsearchBehavior::className(),
+                'index' => 'file',
+                'onlyIndexIf' => function($m) { return $m->zipFile->exists; },
+                'fields' => [
+                    'path' => function($m) { return $m->zipFile->path; },
+                    'mimetype' => function($m) { return $m->zipFile->mimetype; },
+                    'content' => function($m) { return $m->zipFile->toText; },
+                    'size' => function($m) { return $m->zipFile->size; },
+                    'exam' => function($m) { return $m->id; },
+                    'user' => function($m) { return $m->user_id; },
+                ],
+                // mapping of elasticsearch
+                'mappings' => [
+                    'properties' => [
+                        'path'     => ['type' => 'text'],
+                        'mimetype' => ['type' => 'text'],
+                        'content' =>  ['type' => 'text'],
+                        'size'     => ['type' => 'integer'],
+                        'exam'     => ['type' => 'integer'],
+                        'user'     => ['type' => 'integer'],
+                    ],
+                ],
+            ],
+            'ExamZipContents' => [
+                'class' => ElasticsearchBehavior::className(),
+                'index' => false, // look in FileInArchive model for fields and mappings
+                'allModels' => [
+                    'foreach' => function($class) { return ArrayHelper::getColumn(Exam::find()->all(), 'zipFile'); },
+                    'allModels' => function($zipFile) { return $zipFile->files; },
+                ],
+                'onlyIndexIf' => function($exam) { return $exam->zipFile->exists; },
             ],
         ];
     }
@@ -344,6 +379,17 @@ class Exam extends Base
     public function getTickets()
     {
         return $this->hasMany(Ticket::className(), ['exam_id' => 'id']);
+    }
+
+    /**
+     * @return ZipFile
+     */
+    public function getZipFile()
+    {
+        return new ZipFile([
+            'path' => $this->file2,
+            'relation' => $this,
+        ]);
     }
 
     /**

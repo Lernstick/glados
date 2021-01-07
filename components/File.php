@@ -5,7 +5,6 @@ namespace app\components;
 use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
-
  
 class File extends Component
 {
@@ -18,7 +17,7 @@ class File extends Component
     }
 
     /**
-     * @var array object instances array with key set to $_filepath
+     * @var array object instances array with key set to $path
      */
     private static $_instances = array();
 
@@ -92,7 +91,6 @@ class File extends Component
         $info = $this->exists ? exec('/usr/bin/file -b ' . escapeshellarg($this->path)) : null;
         return $info;
     }
-
 
 }
 
