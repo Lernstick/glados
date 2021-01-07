@@ -5,8 +5,8 @@ namespace app\models;
 use Yii;
 use app\models\Base;
 use yii\helpers\Html;
-use yii\helpers\ArrayHelper;
 use app\models\file\ZipFile;
+use app\models\file\SquashfsFile;
 use app\components\HistoryBehavior;
 use app\components\ElasticsearchBehavior;
 
@@ -120,7 +120,7 @@ class Exam extends Base
                     ],
                 ],
             ],
-            'ElasticsearchZip' => [
+            /*'ElasticsearchZip' => [
                 'class' => ElasticsearchBehavior::className(),
                 'index' => 'file',
                 'onlyIndexIf' => function($m) { return $m->zipFile->exists; },
@@ -143,16 +143,7 @@ class Exam extends Base
                         'user'     => ['type' => 'integer'],
                     ],
                 ],
-            ],
-            'ExamZipContents' => [
-                'class' => ElasticsearchBehavior::className(),
-                'index' => false, // look in FileInArchive model for fields and mappings
-                'allModels' => [
-                    'foreach' => function($class) { return ArrayHelper::getColumn(Exam::find()->all(), 'zipFile'); },
-                    'allModels' => function($zipFile) { return $zipFile->files; },
-                ],
-                'onlyIndexIf' => function($exam) { return $exam->zipFile->exists; },
-            ],
+            ],*/
         ];
     }
 
@@ -388,6 +379,17 @@ class Exam extends Base
     {
         return new ZipFile([
             'path' => $this->file2,
+            'relation' => $this,
+        ]);
+    }
+
+    /**
+     * @return SquashfsFile
+     */
+    public function getSquashfsFile()
+    {
+        return new SquashfsFile([
+            'path' => $this->file,
             'relation' => $this,
         ]);
     }

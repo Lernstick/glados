@@ -20,11 +20,14 @@ class IndexController extends DaemonController
     public $list = [
         #'howto'   => 'app\models\Howto',
         #'user'    => 'app\models\User',
-        'exam'    => 'app\models\Exam',
+        #'exam'    => 'app\models\Exam',
         #'ticket'  => 'app\models\Ticket',
         #'restore' => 'app\models\Restore',
         #'backup'  => 'app\models\Backup',
         #'file'    => 'app\models\RdiffFileSystem',
+        'file'    => 'app\models\file\ZipFile',
+        'file'    => 'app\models\file\SquashfsFile',
+        'file'    => 'app\models\file\FileInArchive',
     ];
 
     /**

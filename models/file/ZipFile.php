@@ -27,6 +27,40 @@ class ZipFile extends RegularFile implements ContainsFilesInterface
     private $_tmpdir;
 
     /**
+     * @inheritdoc 
+     */
+    public function behaviors()
+    {
+        return [
+            'ExamZip' => [
+                'class' => ElasticsearchBehavior::className(),
+                'index' => 'file',
+                'allModels' => function($class) { return ArrayHelper::getColumn(\app\models\Exam::find()->all(), 'zipFile'); },
+                'onlyIndexIf' => function($m) { return $m->exists; },
+                'fields' => [
+                    'path',
+                    'mimetype',
+                    'content' => function($m) { return $m->toText; },
+                    'size',
+                    'exam' => function($m) { return $m->relation->id; },
+                    'user' => function($m) { return $m->relation->user_id; },
+                ],
+                // mapping of elasticsearch
+                'mappings' => [
+                    'properties' => [
+                        'path'     => ['type' => 'text'],
+                        'mimetype' => ['type' => 'text'],
+                        'content' =>  ['type' => 'text'],
+                        'size'     => ['type' => 'integer'],
+                        'exam'     => ['type' => 'integer'],
+                        'user'     => ['type' => 'integer'],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
      * @inheritdoc
      */
     public function getId()
@@ -85,9 +119,10 @@ class ZipFile extends RegularFile implements ContainsFilesInterface
             FileHelper::createDirectory($this->tmpdir);
             exec(substitute('{binary} {path} -d {dir}', [
                 'binary' => $this->binary,
-                'path' => $this->physicalPath,
-                'dir' => $this->tmpdir,
+                'path' => escapeshellarg($this->physicalPath),
+                'dir' => escapeshellarg($this->tmpdir),
             ]), $output, $retval);
+            return $retval;
         }
         return true;
     }
@@ -114,7 +149,7 @@ class ZipFile extends RegularFile implements ContainsFilesInterface
         if (empty($this->_file_info) && $this->exists) {
             exec(substitute('{binary} -v {path}', [
                 'binary' => $this->binary,
-                'path' => $this->physicalPath,
+                'path' => escapeshellarg($this->physicalPath),
             ]), $output, $retval);
 
             for ($i=3;$i<=count($output) - 3;$i++){
