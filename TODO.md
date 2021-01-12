@@ -57,6 +57,7 @@ TODO:
   * welcome to exam message in wxbrowser
   * Version conflict in log/history/activities
   * In google chrome settings->Login hint preview not visible
+  * corporate identity: possibility to write text/logo in front page + colors of theme?
 
 * daemons
   * remove onStart and onStop from ActiveEventField (only used in /views/daemon/index.php)
