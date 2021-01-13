@@ -7,6 +7,7 @@ use app\models\file\RegularFile;
 use app\models\file\ContainsFilesInterface;
 use yii\helpers\FileHelper;
 use yii\helpers\ArrayHelper;
+use app\components\ElasticsearchBehavior;
 
 class ZipFile extends RegularFile implements ContainsFilesInterface
 {
@@ -89,7 +90,8 @@ class ZipFile extends RegularFile implements ContainsFilesInterface
     public function physicalPathOf($path)
     {
         $physicalPath = FileHelper::normalizePath($this->tmpdir . '/' . $path);
-        if ($this->extract() && file_exists($physicalPath)) {
+        $this->extract();
+        if (file_exists($physicalPath)) {
             return $physicalPath;
         }
         return null;
@@ -117,7 +119,7 @@ class ZipFile extends RegularFile implements ContainsFilesInterface
     {
         if (!file_exists($this->tmpdir)) {
             FileHelper::createDirectory($this->tmpdir);
-            exec(substitute('{binary} {path} -d {dir}', [
+            exec(substitute('{binary} {path} -d {dir} 2>/dev/null', [
                 'binary' => $this->binary,
                 'path' => escapeshellarg($this->physicalPath),
                 'dir' => escapeshellarg($this->tmpdir),
@@ -175,6 +177,14 @@ class ZipFile extends RegularFile implements ContainsFilesInterface
             }
         }
         return $this->_file_info;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getToText()
+    {
+        return ArrayHelper::getColumn($this->fileInfo, 'path');
     }
 
     /**

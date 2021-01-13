@@ -7,6 +7,7 @@ use app\models\file\RegularFile;
 use app\models\file\ContainsFilesInterface;
 use yii\helpers\FileHelper;
 use yii\helpers\ArrayHelper;
+use app\components\ElasticsearchBehavior;
 
 class SquashfsFile extends RegularFile implements ContainsFilesInterface
 {
@@ -89,7 +90,8 @@ class SquashfsFile extends RegularFile implements ContainsFilesInterface
     public function physicalPathOf($path)
     {
         $physicalPath = FileHelper::normalizePath($this->tmpdir . '/' . $path);
-        if ($this->extract() && file_exists($physicalPath)) {
+        $this->extract();
+        if (file_exists($physicalPath)) {
             return $physicalPath;
         }
         return null;
@@ -117,7 +119,7 @@ class SquashfsFile extends RegularFile implements ContainsFilesInterface
     {
         if (!file_exists($this->tmpdir)) {
             FileHelper::removeDirectory($this->tmpdir);
-            exec(substitute('{binary} -d {dir} {path}', [
+            exec(substitute('{binary} -d {dir} {path} 2>/dev/null', [
                 'binary' => $this->binary,
                 'path' => escapeshellarg($this->physicalPath),
                 'dir' => escapeshellarg($this->tmpdir),
@@ -173,7 +175,6 @@ class SquashfsFile extends RegularFile implements ContainsFilesInterface
         }
         return $this->_file_info;
     }
-
 
     /**
      * @inheritdoc

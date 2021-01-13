@@ -83,7 +83,6 @@ class FileInArchive extends RegularFile implements FileInterface
                     ],
                 ],
             ],
-
         ];
     }
 
@@ -92,7 +91,16 @@ class FileInArchive extends RegularFile implements FileInterface
      */
     public function fileMatches()
     {
-        return StringHelper::endsWith($this->path, '.txt') && strstr($this->path, '/.') === false;
+        if (strstr($this->path, '/.') === false) {
+            foreach ($this->types as $name => $config) {
+                foreach ($config['endings'] as $ending) {
+                    if (StringHelper::endsWith($this->path, '.'.$ending)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
 

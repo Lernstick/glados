@@ -5,6 +5,7 @@ namespace app\models\file;
 use Yii;
 use yii\base\Model;
 use yii\helpers\FileHelper;
+use yii\helpers\StringHelper;
 use app\models\file\FileInterface;
 
 class RegularFile extends Model implements FileInterface
@@ -14,6 +15,24 @@ class RegularFile extends Model implements FileInterface
      * @var mixed object to which the file is related to.
      */
     public $relation;
+
+    /**
+     * @var array file endings and corresponding models.
+     */
+    public $types = [
+        /*'text' => [
+            'class' => '\app\models\file\TextFile',
+            'endings' => ['txt'],
+        ],
+        'pdf' => [
+            'class' => '\app\models\file\PdfFile',
+            'endings' => ['pdf'],
+        ],*/
+        'office' => [
+            'class' => '\app\models\file\OfficeFile',
+            'endings' => ['odt', /*'doc', 'xls', 'ppt'*/],
+        ],
+    ];
 
     /**
      * @var string the path of the file in the filesystem.
@@ -101,7 +120,13 @@ class RegularFile extends Model implements FileInterface
      */
     public function getToText()
     {
+        foreach ($this->types as $name => $config) {
+            foreach ($config['endings'] as $ending) {
+                if (StringHelper::endsWith($this->path, '.'.$ending)) {
+                    return (new $config['class'](['path' => $this->physicalPath]))->toText;
+                }
+            }
+        }
         return null;
     }
-
 }

@@ -24,10 +24,10 @@ class IndexController extends DaemonController
         #'ticket'  => 'app\models\Ticket',
         #'restore' => 'app\models\Restore',
         #'backup'  => 'app\models\Backup',
-        #'file'    => 'app\models\RdiffFileSystem',
-        'file'    => 'app\models\file\ZipFile',
-        'file'    => 'app\models\file\SquashfsFile',
-        'file'    => 'app\models\file\FileInArchive',
+        #'file1'    => 'app\models\RdiffFileSystem',
+        #'file2'    => 'app\models\file\ZipFile',
+        #'file3'    => 'app\models\file\SquashfsFile',
+        'file4'    => 'app\models\file\FileInArchive',
     ];
 
     /**
