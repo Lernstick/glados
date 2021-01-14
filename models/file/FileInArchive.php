@@ -113,9 +113,13 @@ class FileInArchive extends RegularFile implements FileInterface
      */
     public function onlyIndexIf()
     {
-        $only_index = ['odt', 'pdf', 'txt', 'doc', 'docx', 'ppt', 'zip'];
-        $ext = strtolower(pathinfo($this->path, PATHINFO_EXTENSION));
-        return in_array($ext, $only_index);
+        // only if the file is a dot-file or inside a dot-dir
+        if (strstr($this->path, '/.') === false) {
+            $only_index = ['odt', 'pdf', 'txt', 'doc', 'docx', 'ppt', 'zip'];
+            $ext = strtolower(pathinfo($this->path, PATHINFO_EXTENSION));
+            return in_array($ext, $only_index);
+        }
+        return false;
     }
 
     /**

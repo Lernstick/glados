@@ -13,7 +13,7 @@ class OfficeFile extends RegularFile implements FileInterface
      * @var string command to extract text from pdf
      * @see https://github.com/unoconv/unoconv#problems-running-unoconv-from-nginxapachephp
      */
-    public $cmd = "HOME={home} unoconv -n --stdout -f txt {path}";
+    public $cmd = "HOME={home} unoconv --stdout -f txt {path}";
 
     /**
      * @inheritdoc

@@ -27,7 +27,7 @@ class IndexController extends DaemonController
         #'file1'         => 'app\models\RdiffFileSystem',
         #'exam_zip'      => 'app\models\file\ZipFile',
         #'exam_squashfs' => 'app\models\file\SquashfsFile',
-        'archive'       => 'app\models\file\FileInArchive',
+        #'archive'       => 'app\models\file\FileInArchive',
     ];
 
     /**

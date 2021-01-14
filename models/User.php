@@ -106,8 +106,13 @@ class User extends Base implements IdentityInterface
                 // mapping of elasticsearch
                 'mappings' => [
                     'properties' => [
-                        'username'   => ['type' => 'text',
-                                         'analyzer' => 'letter'],
+                        'username'   => [
+                            'type' => 'text',
+                            'analyzer' => 'letter',
+                            'fields' => [
+                                'keyword' => ['type' => 'keyword', 'ignore_above' => 256],
+                            ],
+                        ],
                         'role'       => ['type' => 'text'],
                         'type'       => ['type' => 'text'],
                         'authMethod' => ['type' => 'text'],

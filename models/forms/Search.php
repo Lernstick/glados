@@ -96,7 +96,9 @@ class Search extends \yii\elasticsearch\ActiveRecord
 
         // https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html
         $query->query(['query_string' => [
-            'query' => implode('~ ', explode(' ', $this->q)) . '~',
+            #'query' => implode('~ ', explode(' ', $this->q)) . '~',
+            'query' => $this->q,
+            'quote_field_suffix' => '.keyword',
             'fuzziness' => 'AUTO',
         ]]);
         // add ~ after every word
@@ -112,7 +114,7 @@ class Search extends \yii\elasticsearch\ActiveRecord
         // https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html#simple-query-string-syntax
         /*$query->query(['simple_query_string' => [
             'query' => $this->q,
-            'analyze_wildcard' => true,
+            'quote_field_suffix' => '.keyword',
         ]]);*/
         /*if (strpos($this->q, ':') !== false) {
             $query->query(['query_string' => [
