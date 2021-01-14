@@ -94,7 +94,27 @@ class Search extends \yii\elasticsearch\ActiveRecord
         $query->from($this->index) # null means all indices are being queried
             ->limit(10);
 
-        if (strpos($this->q, ':') !== false) {
+        // https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html
+        $query->query(['query_string' => [
+            'query' => implode('~ ', explode(' ', $this->q)) . '~',
+            'fuzziness' => 'AUTO',
+        ]]);
+        // add ~ after every word
+        // but not when the word is quoted "test" --> "test", but test -> test~
+
+        // https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html
+        /*$query->query(['multi_match' => [
+            'query' => $this->q,
+            'fuzziness' => 'AUTO',
+            'fields' => ['*']
+        ]]);*/
+
+        // https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html#simple-query-string-syntax
+        /*$query->query(['simple_query_string' => [
+            'query' => $this->q,
+            'analyze_wildcard' => true,
+        ]]);*/
+        /*if (strpos($this->q, ':') !== false) {
             $query->query(['query_string' => [
                 'query' => $this->q,
             ]]);
@@ -104,7 +124,7 @@ class Search extends \yii\elasticsearch\ActiveRecord
                 'fuzziness' => 'AUTO',
                 'fields' => ['*']
             ]]);
-        }
+        }*/
 
         $query->highlight(['fields' =>  ['*' => [ "pre_tags" => ["<em>"], "post_tags" => ["</em>"] ]]]);
 

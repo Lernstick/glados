@@ -28,6 +28,14 @@ class ZipFile extends RegularFile implements ContainsFilesInterface
     private $_tmpdir;
 
     /**
+     * @inheritdoc
+     */
+    public static function endings()
+    {
+        return ['zip'];
+    }
+
+    /**
      * @inheritdoc 
      */
     public function behaviors()

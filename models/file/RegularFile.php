@@ -17,21 +17,15 @@ class RegularFile extends Model implements FileInterface
     public $relation;
 
     /**
-     * @var array file endings and corresponding models.
+     * @var array possible file models.
      */
     public $types = [
-        /*'text' => [
-            'class' => '\app\models\file\TextFile',
-            'endings' => ['txt'],
-        ],
-        'pdf' => [
-            'class' => '\app\models\file\PdfFile',
-            'endings' => ['pdf'],
-        ],*/
-        'office' => [
-            'class' => '\app\models\file\OfficeFile',
-            'endings' => ['odt', /*'doc', 'xls', 'ppt'*/],
-        ],
+        '\app\models\file\TextFile',
+        '\app\models\file\PdfFile',
+        '\app\models\file\OfficeFile',
+        '\app\models\file\ZipFile',
+        '\app\models\file\SquashfsFile',
+        '\app\models\file\ImageFile',
     ];
 
     /**
@@ -120,13 +114,23 @@ class RegularFile extends Model implements FileInterface
      */
     public function getToText()
     {
-        foreach ($this->types as $name => $config) {
-            foreach ($config['endings'] as $ending) {
+
+        foreach ($this->types as $class) {
+            foreach ($class::endings() as $ending) {
                 if (StringHelper::endsWith($this->path, '.'.$ending)) {
-                    return (new $config['class'](['path' => $this->physicalPath]))->toText;
+                    return (new $class(['path' => $this->physicalPath]))->toText;
                 }
             }
         }
         return null;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public static function endings()
+    {
+        return [];
+    }
+
 }

@@ -93,10 +93,21 @@ class User extends Base implements IdentityInterface
                     'type',
                     'authMethod' => function($m){ return $m->authMethod !== null ? $m->authMethod->name : null; },
                 ],
+                /* see https://www.elastic.co/guide/en/elasticsearch/reference/current/index-templates.html */
+                'settings' => [
+                    'analysis' => [
+                        'analyzer' => [
+                            'letter' => [
+                                'tokenizer' => 'lowercase',
+                            ],
+                        ],
+                    ],
+                ],
                 // mapping of elasticsearch
                 'mappings' => [
                     'properties' => [
-                        'username'   => ['type' => 'text'],
+                        'username'   => ['type' => 'text',
+                                         'analyzer' => 'letter'],
                         'role'       => ['type' => 'text'],
                         'type'       => ['type' => 'text'],
                         'authMethod' => ['type' => 'text'],

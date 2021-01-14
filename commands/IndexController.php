@@ -18,16 +18,16 @@ class IndexController extends DaemonController
 {
 
     public $list = [
-        #'howto'   => 'app\models\Howto',
-        #'user'    => 'app\models\User',
-        #'exam'    => 'app\models\Exam',
-        #'ticket'  => 'app\models\Ticket',
-        #'restore' => 'app\models\Restore',
-        #'backup'  => 'app\models\Backup',
-        #'file1'    => 'app\models\RdiffFileSystem',
-        #'file2'    => 'app\models\file\ZipFile',
-        #'file3'    => 'app\models\file\SquashfsFile',
-        'file4'    => 'app\models\file\FileInArchive',
+        #'howto'         => 'app\models\Howto',
+        'user'          => 'app\models\User',
+        #'exam'          => 'app\models\Exam',
+        #'ticket'        => 'app\models\Ticket',
+        #'restore'       => 'app\models\Restore',
+        #'backup'        => 'app\models\Backup',
+        #'file1'         => 'app\models\RdiffFileSystem',
+        #'exam_zip'      => 'app\models\file\ZipFile',
+        #'exam_squashfs' => 'app\models\file\SquashfsFile',
+        'archive'       => 'app\models\file\FileInArchive',
     ];
 
     /**
@@ -60,32 +60,37 @@ class IndexController extends DaemonController
             }
 
             /* fill the indices */
+            $tot = 0;
             foreach ($this->list as $index => $class) {
                 $model = new $class();
+                $i = 0;
                 foreach ($model->behaviors() as $name => $config) {
                     if ($config['class'] == "app\components\ElasticsearchBehavior") {
                         $model = new $class();
                         $behavior = $model->getBehavior($name);
                         if (is_callable($behavior->allModels)) {
                             $models = call_user_func($behavior->allModels, $class);
-                            $this->insertAllModels($models, $name);
+                            $i += $this->insertAllModels($models, $name);
                         } elseif (is_array($behavior->allModels)) {
                             foreach (call_user_func($behavior->allModels['foreach'], $class) as $outerModel) {
                                 if (is_callable($behavior->allModels['allModels'])) {
                                     $models = call_user_func($behavior->allModels['allModels'], $outerModel);
-                                    $this->insertAllModels($models, $name);
+                                    $i += $this->insertAllModels($models, $name);
                                 } elseif (is_array($behavior->allModels['allModels'])) {
                                     foreach (call_user_func($behavior->allModels['allModels']['foreach'], $outerModel) as $innerModel) {
                                         $models = call_user_func($behavior->allModels['allModels']['allModels'], $innerModel);
-                                        $this->insertAllModels($models, $name);
+                                        $i += $this->insertAllModels($models, $name);
                                     }
                                 }
                             }
                         }
                     }
                 }
+                $tot += $i;
+                $this->logInfo('updated ' . $i . ' documents (' . $index . ')');
             }
 
+            $this->logInfo('updated ' . $tot . ' documents total');
             $this->unlock('index');
         }
     }
@@ -107,7 +112,6 @@ class IndexController extends DaemonController
         if (!empty($models)) {
             $behavior = $models[0]->getBehavior($name);
             $n = count($models);
-            $this->logInfo('inserting ' . $n . ' documents to index ' . $behavior->index);
 
             $i = 0;
             $event = new yii\db\AfterSaveEvent();
@@ -116,7 +120,7 @@ class IndexController extends DaemonController
                 $r = $behavior->insertDocument($event);
                 $i += intval($r);
             }
-            $this->logInfo('inserted ' . $i . '/' . $n . ' documents to index ' . $behavior->index);
+            return $i;
         }
     }
 

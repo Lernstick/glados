@@ -30,7 +30,7 @@ class FileInArchive extends RegularFile implements FileInterface
                     'foreach' => function($class) { return ArrayHelper::getColumn(\app\models\Exam::find()->all(), 'zipFile'); },
                     'allModels' => function($zipFile) { return $zipFile->files; },
                 ],
-                'onlyIndexIf' => function($m) { return $m->fileMatches(); },
+                'onlyIndexIf' => function($m) { return $m->onlyIndexIf(); },
                 'fields' => [
                     'path',
                     'mimetype',
@@ -40,10 +40,21 @@ class FileInArchive extends RegularFile implements FileInterface
                     'exam' => function($m) { return $m->archive->relation->id; },
                     'user' => function($m) { return $m->archive->relation->user_id; },
                 ],
+                /* see https://www.elastic.co/guide/en/elasticsearch/reference/current/index-templates.html */
+                'settings' => [
+                    'analysis' => [
+                        'analyzer' => [
+                            'letter' => [
+                                'tokenizer' => 'lowercase',
+                            ],
+                        ],
+                    ],
+                ],
                 // mapping of elasticsearch
                 'mappings' => [
                     'properties' => [
-                        'path'     => ['type' => 'text'],
+                        'path'     => ['type' => 'text',
+                                       'analyzer' => 'letter'],
                         'mimetype' => ['type' => 'text'],
                         'content'  => ['type' => 'text'],
                         'size'     => ['type' => 'integer'],
@@ -60,7 +71,7 @@ class FileInArchive extends RegularFile implements FileInterface
                     'foreach' => function($class) { return ArrayHelper::getColumn(\app\models\Exam::find()->all(), 'squashfsFile'); },
                     'allModels' => function($squashfsFile) { return $squashfsFile->files; },
                 ],
-                'onlyIndexIf' => function($m) { return $m->fileMatches(); },
+                'onlyIndexIf' => function($m) { return $m->onlyIndexIf(); },
                 'fields' => [
                     'path',
                     'mimetype',
@@ -70,10 +81,21 @@ class FileInArchive extends RegularFile implements FileInterface
                     'exam' => function($m) { return $m->archive->relation->id; },
                     'user' => function($m) { return $m->archive->relation->user_id; },
                 ],
+                /* see https://www.elastic.co/guide/en/elasticsearch/reference/current/index-templates.html */
+                'settings' => [
+                    'analysis' => [
+                        'analyzer' => [
+                            'letter' => [
+                                'tokenizer' => 'lowercase',
+                            ],
+                        ],
+                    ],
+                ],
                 // mapping of elasticsearch
                 'mappings' => [
                     'properties' => [
-                        'path'     => ['type' => 'text'],
+                        'path'     => ['type' => 'text',
+                                       'analyzer' => 'letter'],
                         'mimetype' => ['type' => 'text'],
                         'content'  => ['type' => 'text'],
                         'size'     => ['type' => 'integer'],
@@ -87,22 +109,14 @@ class FileInArchive extends RegularFile implements FileInterface
     }
 
     /**
-     * @inheritdoc
+     * @return bool only index the file if it matches one of the file endings
      */
-    public function fileMatches()
+    public function onlyIndexIf()
     {
-        if (strstr($this->path, '/.') === false) {
-            foreach ($this->types as $name => $config) {
-                foreach ($config['endings'] as $ending) {
-                    if (StringHelper::endsWith($this->path, '.'.$ending)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+        $only_index = ['odt', 'pdf', 'txt', 'doc', 'docx', 'ppt', 'zip'];
+        $ext = strtolower(pathinfo($this->path, PATHINFO_EXTENSION));
+        return in_array($ext, $only_index);
     }
-
 
     /**
      * @inheritdoc

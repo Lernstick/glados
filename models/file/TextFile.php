@@ -8,6 +8,15 @@ use app\models\file\FileInterface;
  
 class TextFile extends RegularFile implements FileInterface
 {
+
+    /**
+     * @inheritdoc
+     */
+    public static function endings()
+    {
+        return ['txt', 'md'];
+    }
+
     /**
      * @inheritdoc
      */

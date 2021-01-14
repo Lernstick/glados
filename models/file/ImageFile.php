@@ -6,20 +6,20 @@ use Yii;
 use app\models\file\RegularFile;
 use app\models\file\FileInterface;
  
-class PdfFile extends RegularFile implements FileInterface
+class ImageFile extends RegularFile implements FileInterface
 {
 
     /**
-     * @var string command to extract text from pdf
+     * @var string command to extract text from image
      */
-    public $cmd = "pdftotext {path} -";
+    public $cmd = "tesseract {path} -";
 
     /**
      * @inheritdoc
      */
     public static function endings()
     {
-        return ['pdf'];
+        return ['jpg', 'jpeg', 'png', 'gif', 'bmp'];
     }
 
     /**
@@ -27,7 +27,10 @@ class PdfFile extends RegularFile implements FileInterface
      */
     public function getToText()
     {
-        exec(substitute($this->cmd, ['path' => escapeshellarg($this->physicalPath)]), $output, $retval);
+        exec(substitute($this->cmd, [
+            'home' => escapeshellarg(\Yii::$app->params['tmpPath']),
+            'path' => escapeshellarg($this->physicalPath),
+        ]), $output, $retval);
         if ($retval == 0) {
             return array_values(array_filter($output)); # removes empty array elements
         }

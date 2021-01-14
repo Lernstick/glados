@@ -73,10 +73,17 @@ interface FileInterface
     /**
      * The contents of the file in UTF8 text format.
      * 
-     * @return string|null the contents or null if the contents cannot be 
-     * translated to text or if the file does not exist
+     * @return string|array|null the contents as string or array line by line  or null 
+     * if the contents cannot be translated to text or if the file does not exist
      */
     public function getToText();
+
+    /**
+     * Returns a list of file endings that match this file type.
+     * 
+     * @return array file endings
+     */
+    public static function endings();
 
 }
 
