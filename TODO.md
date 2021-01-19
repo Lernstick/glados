@@ -55,6 +55,10 @@ TODO:
   * put .Keylogger oath to exclude_list in backupController
   * welcome to exam message in wxbrowser
 
+* elasticsearch
+  * put exam settings on index (+ description)
+  * put settings on index (+description)
+
 * daemons
   * remove onStart and onStop from ActiveEventField (only used in /views/daemon/index.php)
   * refactor daemon view
