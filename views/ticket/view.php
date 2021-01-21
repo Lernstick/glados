@@ -27,6 +27,10 @@ $this->title = \Yii::t('ticket', 'Ticket') . ' #' . $model->id;
 $this->params['breadcrumbs'][] = ['label' => \Yii::t('ticket', 'Tickets'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
+\Yii::$app->language = 'en';
+echo "---->" . $model->__get('client_state');
+\Yii::$app->language = 'de';
+
 ?>
 
 <div class="ticket-view">

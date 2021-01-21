@@ -19,7 +19,8 @@ class IndexController extends DaemonController
 
     public $list = [
         #'howto'         => 'app\models\Howto',
-        'user'          => 'app\models\User',
+        #'user'          => 'app\models\User',
+        'exam_setting'          => 'app\models\ExamSettingAvail',
         #'exam'          => 'app\models\Exam',
         #'ticket'        => 'app\models\Ticket',
         #'restore'       => 'app\models\Restore',
@@ -68,6 +69,9 @@ class IndexController extends DaemonController
                     if ($config['class'] == "app\components\ElasticsearchBehavior") {
                         $model = new $class();
                         $behavior = $model->getBehavior($name);
+                        if ($behavior->language !== null) {
+                            \Yii::$app->language = $behavior->language;
+                        }
                         if (is_callable($behavior->allModels)) {
                             $models = call_user_func($behavior->allModels, $class);
                             $i += $this->insertAllModels($models, $name);

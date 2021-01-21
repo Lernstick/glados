@@ -64,6 +64,12 @@ class ElasticsearchBehavior extends Behavior
     public $id;
 
     /**
+     * @var string state explicitly the language to index
+     * @see [[\app\components\LanguageSelector]]
+     */
+    public $language;
+
+    /**
      * @var callable|bool condition, model is only indexed if this evalutes to true
      */
     public $onlyIndexIf = true;
@@ -174,6 +180,10 @@ class ElasticsearchBehavior extends Behavior
      */
     public function updateDocument($event)
     {
+        if ($this->language !== null) {
+            \Yii::$app->language = $this->language;
+        }
+
         if ((is_callable($this->onlyIndexIf) && call_user_func($this->onlyIndexIf, $this->owner))
             || (is_bool($this->onlyIndexIf) && $this->onlyIndexIf))
         {
@@ -192,7 +202,8 @@ class ElasticsearchBehavior extends Behavior
             if ($this->attributesChanged()) {
                 foreach ($this->fields as $key => $value) {
                     if (is_int($key)) {
-                        $values[$value] = $this->attributes[$value];
+                        $values[$value] = $this->owner->{$value};
+                        //$values[$value] = $this->attributes[$value]; // not multi lang
                     } elseif (is_array($value)) {
                         if (array_key_exists('value_from', $value)) {
                             $values[$key] = $this->owner->{$value['value_from']};

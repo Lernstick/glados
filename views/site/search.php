@@ -22,6 +22,8 @@ $data = [
     'howto' => \Yii::t('search', 'howtos'),
     'log' => \Yii::t('search', 'logs'),
     'file' => \Yii::t('search', 'files'),
+    'exam_setting_de' => \Yii::t('search', 'exam settings (de)'),
+    'exam_setting_en' => \Yii::t('search', 'exam settings (en)'),
 ];
 
 $enter_submit = <<< SCRIPT

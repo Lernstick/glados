@@ -160,7 +160,7 @@ class TranslatedActiveRecord extends Base
      *          @param array Array of key value pair to replace the placeholders with
      *          @return void
      *   - obj->getDescription_translation @return \yii\db\ActiveQuery The relation to the translaton table
-     *   - obj->getDescription_db @return string The translated string from directly from the database
+     *   - obj->getDescription_db @return string The translated string directly from the database
      *   - obj->getDescription_orig @return string The string in original language directly from the database
      */
     public function getTranslatedFields()
