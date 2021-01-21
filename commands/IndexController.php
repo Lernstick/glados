@@ -20,7 +20,7 @@ class IndexController extends DaemonController
     public $list = [
         #'howto'         => 'app\models\Howto',
         #'user'          => 'app\models\User',
-        'exam_setting'          => 'app\models\ExamSettingAvail',
+        #'exam_setting'          => 'app\models\ExamSettingAvail',
         #'exam'          => 'app\models\Exam',
         #'ticket'        => 'app\models\Ticket',
         #'restore'       => 'app\models\Restore',
@@ -28,7 +28,7 @@ class IndexController extends DaemonController
         #'file1'         => 'app\models\RdiffFileSystem',
         #'exam_zip'      => 'app\models\file\ZipFile',
         #'exam_squashfs' => 'app\models\file\SquashfsFile',
-        #'archive'       => 'app\models\file\FileInArchive',
+        'archive'       => 'app\models\file\FileInArchive',
     ];
 
     /**

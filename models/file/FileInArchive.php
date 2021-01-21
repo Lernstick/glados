@@ -33,6 +33,8 @@ class FileInArchive extends RegularFile implements FileInterface
                 'onlyIndexIf' => function($m) { return $m->onlyIndexIf(); },
                 'fields' => [
                     'path',
+                    'filename' => function($m) { return basename($m->path); },
+                    'directory' => function($m) { return dirname($m->path); },
                     'mimetype',
                     'content' => function($m) { return $m->toText; },
                     'size',
@@ -42,19 +44,40 @@ class FileInArchive extends RegularFile implements FileInterface
                 ],
                 /* see https://www.elastic.co/guide/en/elasticsearch/reference/current/index-templates.html */
                 'settings' => [
-                    'analysis' => [
-                        'analyzer' => [
-                            'letter' => [
-                                'tokenizer' => 'lowercase',
+                    "index" => [
+                        "analysis" => [
+                           "analyzer" => [
+                                "path_analyzer" => [
+                                    "type" => "custom",
+                                    "tokenizer" => "path_tokenizer",
+                                    "filter" => "lowercase"
+                                ],
+                                "quoted_path_analyzer" => [
+                                    "type" => "custom",
+                                    "tokenizer" => "keyword",
+                                    "filter" => "lowercase"
+                                ]
                             ],
-                        ],
-                    ],
+                            "tokenizer" => [
+                                "path_tokenizer" => [
+                                    "type" => "char_group",
+                                    "tokenize_on_chars" => ["/", "punctuation"]
+                                ]
+                            ]
+                        ]
+                    ]
                 ],
                 // mapping of elasticsearch
                 'mappings' => [
                     'properties' => [
-                        'path'     => ['type' => 'text',
-                                       'analyzer' => 'letter'],
+                        'path' => ['type' => 'text', 'analyzer' => 'path_analyzer'],
+                        'directory' => ['type' => 'text', 'analyzer' => 'path_analyzer'],
+                        'filename' => [
+                            'type' => 'text',
+                            'analyzer' => 'path_analyzer',
+                            'search_quote_analyzer' => 'quoted_path_analyzer',
+                            'fields' => ['raw' => ['type' => 'keyword']]
+                        ],
                         'mimetype' => ['type' => 'text'],
                         'content'  => ['type' => 'text'],
                         'size'     => ['type' => 'integer'],
@@ -64,7 +87,7 @@ class FileInArchive extends RegularFile implements FileInterface
                     ],
                 ],
             ],
-            'ExamSquashfsContents' => [
+            /*'ExamSquashfsContents' => [
                 'class' => ElasticsearchBehavior::className(),
                 'index' => 'file',
                 'allModels' => [
@@ -81,7 +104,7 @@ class FileInArchive extends RegularFile implements FileInterface
                     'exam' => function($m) { return $m->archive->relation->id; },
                     'user' => function($m) { return $m->archive->relation->user_id; },
                 ],
-                /* see https://www.elastic.co/guide/en/elasticsearch/reference/current/index-templates.html */
+                // see https://www.elastic.co/guide/en/elasticsearch/reference/current/index-templates.html
                 'settings' => [
                     'analysis' => [
                         'analyzer' => [
@@ -104,7 +127,7 @@ class FileInArchive extends RegularFile implements FileInterface
                         'user'     => ['type' => 'integer'],
                     ],
                 ],
-            ],
+            ],*/
         ];
     }
 
