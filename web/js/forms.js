@@ -1,7 +1,7 @@
 function initializeHints(){
 
-    /* To initialize BS3 popovers set this below */
-    $(function () { 
+    /* To initialize BS3 popovers */
+    $(function () {
         $("[data-toggle='popover']").popover(); 
     });
 

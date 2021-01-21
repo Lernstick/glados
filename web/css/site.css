@@ -678,11 +678,6 @@ span.view--state[data-state="4"]::after { content: attr(data-text-4); }
   max-width: 100%;
 }
 
-.navbar-inverse-input, .navbar-inverse-input:focus {
-  background-color: #404040;
-  color: #999999;
-}
-
 .navbar-main-text {
   color:red;
   position: absolute;
@@ -706,3 +701,86 @@ span.view--state[data-state="4"]::after { content: attr(data-text-4); }
 .search-body.loading {
   opacity: 0.2;
 }
+
+/**
+ * search box BEGIN
+ * @see https://stackoverflow.com/a/18839305/2768341
+ **/
+.navbar-inverse-input, .navbar-inverse-input:focus {
+  background-color: #404040;
+  color: #999999;
+}
+.popover span.search-hint {
+  color: #9d9d9d;
+  line-height: 1.7;
+}
+.search-input-icon {
+  color: #999999;
+}
+.search-hint-block {
+  display: none;
+}
+.search-popover {
+  width: 650px;
+  max-width: 100%;
+  white-space: nowrap;
+  display: inline-block;
+}
+.has-feedback .form-control {
+  padding-right: 34px;
+}
+.has-feedback .form-control.input-sm,
+.has-feedback.form-group-sm .form-control {
+  padding-right: 30px;
+}
+.has-feedback .form-control.input-lg,
+.has-feedback.form-group-lg .form-control {
+  padding-right: 46px;
+}
+.has-feedback-left .form-control {
+  padding-right: 12px;
+  padding-left: 34px;
+}
+.has-feedback-left .form-control.input-sm,
+.has-feedback-left.form-group-sm .form-control {
+  padding-left: 30px;
+}
+.has-feedback-left .form-control.input-lg,
+.has-feedback-left.form-group-lg .form-control {
+  padding-left: 46px;
+}
+.has-feedback-left .form-control-feedback {
+  left: 0;
+}
+.form-control-feedback {
+  line-height: 34px !important;
+}
+.input-sm + .form-control-feedback,
+.form-horizontal .form-group-sm .form-control-feedback {
+  width: 30px;
+  height: 30px;
+  line-height: 30px !important;
+}
+.input-lg + .form-control-feedback,
+.form-horizontal .form-group-lg .form-control-feedback {
+  width: 46px;
+  height: 46px;
+  line-height: 46px !important;
+}
+.has-feedback label.sr-only ~ .form-control-feedback,
+.has-feedback label.sr-only ~ div .form-control-feedback {
+  top: 0;
+}
+@media (min-width: 768px) {
+  .form-inline .inline-feedback {
+    position: relative;
+    display: inline-block;
+  }
+  .form-inline .has-feedback .form-control-feedback {
+    top: 0;
+  }
+}
+.form-horizontal .has-feedback-left .form-control-feedback {
+  left: 15px;
+}
+/* search box END */

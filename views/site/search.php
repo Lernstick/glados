@@ -10,7 +10,7 @@ use yii\widgets\ActiveForm;
 use kartik\select2\Select2;
 use yii\widgets\Pjax;
 
-$this->title = \Yii::t('search', 'Search results');
+$this->title = \Yii::t('search', 'Search Results');
 $this->params['breadcrumbs'][] = $this->title;
 
 $data = [

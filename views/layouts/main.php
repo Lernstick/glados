@@ -29,8 +29,27 @@ $searchModel->load(Yii::$app->request->queryParams);
 /* register the global YII_ENV variables */
 $this->registerJs('var YII_ENV_DEV = ' . (YII_ENV_DEV ? 'true' : 'false') . ';', \yii\web\View::POS_HEAD);
 $this->registerJs('var YII_DEBUG = ' . (YII_DEBUG ? 'true' : 'false') . ';', \yii\web\View::POS_HEAD);
-
 $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\View::POS_END);
+
+$search_hint = <<< 'SCRIPT'
+$('.search-hint-block').each(function () {
+    var $hint = $(this);
+    $hint.parent().find('input#q').popover({
+        html: true,
+        trigger: 'focus',
+        placement: 'bottom',
+        toggle: 'popover',
+        container: '.collapse',
+        content: $hint.html(),
+        viewport: '.collapse',
+        template: '<div class="popover search-popover" role="tooltip"><div class="popover-content"></div></div>'
+    });
+
+    $hint.remove()
+});
+
+SCRIPT;
+$this->registerJs($search_hint);
 
 ?>
 <?php $this->beginPage() ?>
@@ -89,21 +108,47 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
         ],
     ]);
     ?>
-    <div class="form-group">
+    <div class="form-group has-feedback has-feedback-left search">
         <?= $searchForm->field($searchModel, 'q')->textInput([
             'class' => 'form-control navbar-inverse navbar-inverse-input',
-            'placeholder' => \Yii::t('search', 'Search'),
+            'placeholder' => \Yii::t('search', 'Search ...'),
         ])->label(false)->hint(false); ?>
+        <i class='glyphicon glyphicon-search form-control-feedback search-input-icon'></i>
+        <div class='search-hint-block'>
+            <div class='row'>
+                <div class='col-md-6'>
+                    <span class="search-hint">
+                        <?= \Yii::t('search', '<code>"words here"</code> exact phrase'); ?><br>
+                        <?= \Yii::t('search', '<code>(quick OR brown) AND fox</code> logic and grouping'); ?><br>
+                        <?= \Yii::t('search', '<code>date:[2012-01-01 TO 2012-12-31]</code> date range'); ?><br>
+                        <?= \Yii::t('search', '<code>date:{* TO 2012-01-01}</code> dates before 2012'); ?><br>
+                    </span>
+                </div>
+                <div class='col-md-6'>
+                    <span class="search-hint">
+                        <?= \Yii::t('search', '<code>quick -brown +fox</code> must / must not'); ?><br>
+                        <?= \Yii::t('search', '<code>user:1234</code> search by user'); ?><br>
+                        <?= \Yii::t('search', '<code>test_taker:steve</code> search by student'); ?><br>
+                        <?= \Yii::t('search', '<code>username:"John Smith"</code> exact phrase in field'); ?><br>
+                    </span>
+                </div>
+            </div>
+            <div class='row'><hr></div>
+            <div class='row'>
+                <div class='col-md-6'></div>
+                <div class='col-md-6'>
+                    <span class='pull-right'>
+                        <?= Html::a(\Yii::t('search', 'search help'), Url::to(['howto/searching.md'])); ?>
+                    </span>
+                </div>
+            </div>
+        </div>
     </div>
     <?php ActiveForm::end(); ?>
     <?php
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
-            [
-                'label' => \Yii::t('main', 'Home'),
-                'url' => ['/site/index']
-            ],
             [
                 'label' => \Yii::t('main', 'Actions'),
                 'visible' => !Yii::$app->user->isGuest,
