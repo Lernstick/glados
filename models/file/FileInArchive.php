@@ -25,7 +25,7 @@ class FileInArchive extends RegularFile implements FileInterface
         return [
             'ExamZipContents' => [
                 'class' => ElasticsearchBehavior::className(),
-                'index' => 'file',
+                'index' => ['class' => '\app\models\indexes\FileIndex'],
                 'allModels' => [
                     'foreach' => function($class) { return ArrayHelper::getColumn(\app\models\Exam::find()->all(), 'zipFile'); },
                     'allModels' => function($zipFile) { return $zipFile->files; },
@@ -42,54 +42,10 @@ class FileInArchive extends RegularFile implements FileInterface
                     'exam' => function($m) { return $m->archive->relation->id; },
                     'user' => function($m) { return $m->archive->relation->user_id; },
                 ],
-                /* see https://www.elastic.co/guide/en/elasticsearch/reference/current/index-templates.html */
-                'settings' => [
-                    "index" => [
-                        "analysis" => [
-                           "analyzer" => [
-                                "path_analyzer" => [
-                                    "type" => "custom",
-                                    "tokenizer" => "path_tokenizer",
-                                    "filter" => "lowercase"
-                                ],
-                                "quoted_path_analyzer" => [
-                                    "type" => "custom",
-                                    "tokenizer" => "keyword",
-                                    "filter" => "lowercase"
-                                ]
-                            ],
-                            "tokenizer" => [
-                                "path_tokenizer" => [
-                                    "type" => "char_group",
-                                    "tokenize_on_chars" => ["/", "punctuation"]
-                                ]
-                            ]
-                        ]
-                    ]
-                ],
-                // mapping of elasticsearch
-                'mappings' => [
-                    'properties' => [
-                        'path' => ['type' => 'text', 'analyzer' => 'path_analyzer'],
-                        'directory' => ['type' => 'text', 'analyzer' => 'path_analyzer'],
-                        'filename' => [
-                            'type' => 'text',
-                            'analyzer' => 'path_analyzer',
-                            'search_quote_analyzer' => 'quoted_path_analyzer',
-                            'fields' => ['raw' => ['type' => 'keyword']]
-                        ],
-                        'mimetype' => ['type' => 'text'],
-                        'content'  => ['type' => 'text'],
-                        'size'     => ['type' => 'integer'],
-                        'archive'  => ['type' => 'text'],
-                        'exam'     => ['type' => 'integer'],
-                        'user'     => ['type' => 'integer'],
-                    ],
-                ],
             ],
-            /*'ExamSquashfsContents' => [
+            'ExamSquashfsContents' => [
                 'class' => ElasticsearchBehavior::className(),
-                'index' => 'file',
+                'index' => ['class' => '\app\models\indexes\FileIndex'],
                 'allModels' => [
                     'foreach' => function($class) { return ArrayHelper::getColumn(\app\models\Exam::find()->all(), 'squashfsFile'); },
                     'allModels' => function($squashfsFile) { return $squashfsFile->files; },
@@ -104,30 +60,7 @@ class FileInArchive extends RegularFile implements FileInterface
                     'exam' => function($m) { return $m->archive->relation->id; },
                     'user' => function($m) { return $m->archive->relation->user_id; },
                 ],
-                // see https://www.elastic.co/guide/en/elasticsearch/reference/current/index-templates.html
-                'settings' => [
-                    'analysis' => [
-                        'analyzer' => [
-                            'letter' => [
-                                'tokenizer' => 'lowercase',
-                            ],
-                        ],
-                    ],
-                ],
-                // mapping of elasticsearch
-                'mappings' => [
-                    'properties' => [
-                        'path'     => ['type' => 'text',
-                                       'analyzer' => 'letter'],
-                        'mimetype' => ['type' => 'text'],
-                        'content'  => ['type' => 'text'],
-                        'size'     => ['type' => 'integer'],
-                        'archive'  => ['type' => 'text'],
-                        'exam'     => ['type' => 'integer'],
-                        'user'     => ['type' => 'integer'],
-                    ],
-                ],
-            ],*/
+            ],
         ];
     }
 

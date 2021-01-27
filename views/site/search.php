@@ -103,6 +103,10 @@ $this->registerJs($enter_submit);
         'class' => 'search-body',
     ]); ?>
 
+        <?php var_dump($searchModel->is_query_string() ? 'query_string' : 'multi_match'); ?>
+        <?php var_dump($searchModel->is_notouch() ? 'notouch' : 'rewrite'); ?>
+        <pre><?= $searchModel->rewrite_query($searchModel->q); ?></pre>
+
         <?php
         try {
             echo ListView::widget([

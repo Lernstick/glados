@@ -224,7 +224,8 @@ class Ticket extends LiveActiveRecord
                     // relational field
                     'user' => function($m){ return $m->exam->user_id; },
                     // field based on other database attributes
-                    'state' => ['trigger_attributes' => ['start', 'end', 'test_taker']]
+                    'state' => ['trigger_attributes' => ['start', 'end', 'test_taker']],
+                    'keylogger' => function($m){ return $m->screencapture === null ? null : $m->screencapture->getKeyloggerLog(true); },
                 ],
                 // mapping of elasticsearch
                 'mappings' => [
@@ -248,6 +249,7 @@ class Ticket extends LiveActiveRecord
                         'exam'       => ['type' => 'integer'],
                         'user'       => ['type' => 'integer'],
                         'state'      => ['type' => 'integer'],
+                        'keylogger'  => ['type' => 'text'],
                     ],
                 ],
             ],

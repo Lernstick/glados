@@ -24,16 +24,16 @@ class ElasticsearchBehavior extends Behavior
     public $fields = [];
 
     /**
-     * @var array mappings
+     * @var array|string array of mappings or a string containing the class that holds the mappings
      * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#field-datatypes
      */
-    public $mappings = [];
+    public $mappings;
 
     /**
      * @var array settings
      * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#index-modules-settings
      */
-    public $settings = [];
+    public $settings;
 
     /**
      * @var callable|array function or array to find all models
@@ -54,7 +54,8 @@ class ElasticsearchBehavior extends Behavior
     public $allModels;
 
     /**
-     * @var string the name of the index
+     * @var string|array the name of the index if a string given, or an array of type ['class' => 'path/to/index.php']
+     * with information about the index such as name, mappings, settings, ...
      */
     public $index;
 
@@ -96,6 +97,12 @@ class ElasticsearchBehavior extends Behavior
     {
         if ($this->allModels == null) {
             $this->allModels = function($class) { return $class::find()->all(); };
+        }
+
+        if (is_array($this->index)) {
+            $this->mappings = is_array($this->mappings) ? $this->mappings : $this->index['class']::$mappings;
+            $this->settings = is_array($this->settings) ? $this->settings : $this->index['class']::$settings;
+            $this->index = $this->index['class']::$index;
         }
     }
 
@@ -331,5 +338,4 @@ class ElasticsearchBehavior extends Behavior
             \yii\elasticsearch\ActiveRecord::type()
         );
     }
-
 }

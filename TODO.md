@@ -58,6 +58,7 @@ TODO:
 * elasticsearch
   * put exam settings on index (+ description)
   * put settings on index (+description)
+  * "foo bar baz" AND blubb is wrongly translated to "foo~ bar~ baz" AND blubb~, but should be "foo bar baz" AND blubb~
 
 * daemons
   * remove onStart and onStop from ActiveEventField (only used in /views/daemon/index.php)
