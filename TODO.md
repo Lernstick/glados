@@ -47,13 +47,18 @@ TODO:
   * locking screen in markdown
   * lock keyboard and mouse
 
+* lernstick-exam-client
+  * remove scripts/mount.sh -> move to the client (already done see /lib/systemd/lernstick-exam-shutdown, /lib/systemd/system-shutdown/lernstick) (see commits from version 1.0.12 to 1.0.14)
+  * remove all mount.sh occurings in scripts/prepare.sh
+  * move expert settings to the client
+
 * misc
   * "new activity; click to reload" on all tabs in the ticket view
-  * move expert settings to the client
   * models/Daemon.php rules -> maybe truncate a too long state/description
   * generally: remove save(false); statements, they cause crashes
   * put .Keylogger oath to exclude_list in backupController
   * welcome to exam message in wxbrowser
+  * keylogger not working without a screencapture present ?!?
 
 * elasticsearch
   * put exam settings on index (+ description)
