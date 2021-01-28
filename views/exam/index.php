@@ -191,7 +191,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 'visible'=>false
             ],
             [
-                'attribute' => 'allow_mount',
+                'attribute' => 'allow_mount_external',
+                'format' => 'boolean',
+                'visible'=>false
+            ],
+            [
+                'attribute' => 'allow_mount_system',
                 'format' => 'boolean',
                 'visible'=>false
             ],

@@ -542,7 +542,8 @@ class TicketController extends BaseController
                     'agent' => Setting::get('agent'),
                     'grp_netdev' => boolval($model->exam->{"grp_netdev"}),
                     'allow_sudo' => boolval($model->exam->{"allow_sudo"}),
-                    'allow_mount' => boolval($model->exam->{"allow_mount"}),
+                    'allow_mount_external' => boolval($model->exam->{"allow_mount_external"}),
+                    'allow_mount_system' => boolval($model->exam->{"allow_mount_system"}),
                     'firewall_off' => boolval($model->exam->{"firewall_off"}),
                 ], $model->exam->settings)
             ];
