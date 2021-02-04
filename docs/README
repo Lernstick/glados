@@ -1,0 +1,18 @@
+README
+
+inside this directory, use
+
+ make clean # to cleanup the documentation build
+ make html  # to generate the documentation as in readthedocs
+
+The generated documentation is in _build/html/
+
+The build information for ReadTheDocs is in ../.readthedocs.yml
+
+To make it public in the current glados instance, call in glados root:
+
+ ln -s ../docs/_build/html web/docs
+
+and go to 
+
+http://<ip>/glados/docs/index.html
