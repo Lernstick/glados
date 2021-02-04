@@ -17,7 +17,6 @@ import recommonmark
 import sphinx_rtd_theme
 import sphinx_markdown_tables
 from recommonmark.parser import CommonMarkParser
-import subprocess
 
 # -- Project information -----------------------------------------------------
 
@@ -26,8 +25,7 @@ copyright = '2021, Roman Gruber'
 author = 'Roman Gruber'
 
 # The full version, including alpha/beta/rc tags
-_result = subprocess.run(['php', '-r', '$c = require_once("../config/web.php"); echo $c["version"];'], stdout=subprocess.PIPE)
-release = str(_result.stdout) # = '1.0.8'
+release = '1.0.8' # TODO: read out the version from config/web.php
 
 
 # -- General configuration ---------------------------------------------------
