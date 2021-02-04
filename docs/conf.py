@@ -14,7 +14,9 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 import recommonmark
-from recommonmark.transform import AutoStructify
+import sphinx_rtd_theme
+import sphinx_markdown_tables
+from recommonmark.parser import CommonMarkParser
 
 # -- Project information -----------------------------------------------------
 
@@ -32,7 +34,7 @@ release = '1.0.8' # TODO: read out the version programmatically from composer.js
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 # see https://www.sphinx-doc.org/en/master/usage/markdown.html
-extensions = ['recommonmark']
+extensions = ['recommonmark', 'sphinx_rtd_theme', 'sphinx_markdown_tables']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -41,7 +43,11 @@ templates_path = ['_templates']
 # You can specify multiple suffix as a list of string:
 #
 # source_suffix = ['.rst', '.md']
-source_suffix = '.md'
+source_suffix = ['.rst', '.md']
+
+source_parsers = {
+    '.md': 'recommonmark.parser.CommonMarkParser',
+}
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -52,14 +58,14 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'web/assets']
 highlight_language = "php"
 
 # The master toctree document.
-master_doc = 'howtos/index'
+master_doc = 'index'
 
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'classic'
+html_theme = 'sphinx_rtd_theme'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -72,18 +78,10 @@ html_theme_options = {
     'prev_next_buttons_location': 'bottom',
     'style_external_links': True,
     'vcs_pageview_mode': '',
-    'style_nav_header_background': 'white',
     # Toc options
     'collapse_navigation': False,
     'sticky_navigation': True,
-    'navigation_depth': 4,
+    'navigation_depth': 3,
     'includehidden': True,
     'titles_only': False
 }
-
-def setup(app):
-    app.add_config_value('recommonmark_config', {
-            'url_resolver': lambda url: github_doc_root + url,
-            'auto_toc_tree_section': 'Contents',
-            }, True)
-    app.add_transform(AutoStructify)

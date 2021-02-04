@@ -13,19 +13,19 @@ Examples:
 
 The follwing table gives some more detailed examples on how the `Login Scheme` affects user authentication:
 
-Login Scheme			| Example Login 		| Authenticated?| Extracted Username 	| Notes				|
--------------			| ---------------		| ------------  | ------------------ 	|					|
-`{username}`			| `alice`				| yes			| `alice`				| no excluded usernames	|
-`{username}`			| `bob`					| yes			| `bob`					| no excluded usernames |
-`{username}`			| `alice@example.com`	| yes			| `alice@example.com`	| no excluded usernames |
-`{username}@foo`		| `alice`				| no			| none					| only usernames ending with `@foo` |
-`{username}@foo`		| `alice@foo`			| yes			| `alice`				| only usernames ending with `@foo` |
-`{username}@foo`		| `bob@foo`				| yes			| `bob`					| only usernames ending with `@foo` |
-`foo\{username}`		| `alice`				| no			| none					| only usernames starting with `foo\` |
-`foo\{username}`		| `foo\alice`			| yes			| `alice`				| only usernames starting with `foo\` |
-`{username}@{domain}`	| `alice`				| no 			| none					| where `Domain` is `example.com` |
-`{username}@{domain}`	| `alice@example.com`   | yes 			| `alice`				| where `Domain` is `example.com` |
-`{username}@{domain}`	| `alice@example.com`   | yes 			| `alice`				| where `Domain` is `example.com` |
+Login Scheme            | Example Login         | Authenticated?| Extracted Username    | Notes             |
+-------------           | ---------------       | ------------  | ------------------    |                   |
+`{username}`            | `alice`               | yes           | `alice`               | no excluded usernames |
+`{username}`            | `bob`                 | yes           | `bob`                 | no excluded usernames |
+`{username}`            | `alice@example.com`   | yes           | `alice@example.com`   | no excluded usernames |
+`{username}@foo`        | `alice`               | no            | none                  | only usernames ending with `@foo` |
+`{username}@foo`        | `alice@foo`           | yes           | `alice`               | only usernames ending with `@foo` |
+`{username}@foo`        | `bob@foo`             | yes           | `bob`                 | only usernames ending with `@foo` |
+`foo\{username}`        | `alice`               | no            | none                  | only usernames starting with `foo\` |
+`foo\{username}`        | `foo\alice`           | yes           | `alice`               | only usernames starting with `foo\` |
+`{username}@{domain}`   | `alice`               | no            | none                  | where `Domain` is `example.com` |
+`{username}@{domain}`   | `alice@example.com`   | yes           | `alice`               | where `Domain` is `example.com` |
+`{username}@{domain}`   | `alice@example.com`   | yes           | `alice`               | where `Domain` is `example.com` |
 
 ----
 

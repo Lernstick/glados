@@ -35,14 +35,14 @@ Create a config file `/etc/lernstick-exam-client.conf` with the following conten
 
 The below table explaines the keys and values:
 
-Config Item     | Description
-------------    | -------------
-`gladosIp`      | The IP-address of the exam server.
-`gladosHost`    | The DNS name of the exam server.
-`gladosPort`    | The port, under which the webserver is running. (Don't use double quotes `"` here)
-`gladosProto`   | The protocol to use. Can either be `http` or `https`.
-`gladosDesc`    | A short description of the host (for example `Exam Server School A`)
-`action*`       | Those variables should mostly be left as in the config above. They describe the URL for the different actions a client can take. Adjust them to the corresponding configuration of your webserver. For example the download URL `actionDownload` will be made up of the hosts IP-address, the port, the protocol and the given relative path. `${gladosProto}://${gladosIp}:${gladosPort}/${actionDownload}` will then be translated to `http://1.2.3.4:80/glados/index.php/ticket/download/{token}` in the example configuration above. That URL must point to the exam server token prompt.
+| Config Item     | Description |
+| ------------    | ------------- |
+| `gladosIp`      | The IP-address of the exam server. |
+| `gladosHost`    | The DNS name of the exam server. |
+| `gladosPort`    | The port, under which the webserver is running. (Don't use double quotes `"` here) |
+| `gladosProto`   | The protocol to use. Can either be `http` or `https`. |
+| `gladosDesc`    | A short description of the host (for example `Exam Server School A`) |
+| `action*`       | Those variables should mostly be left as in the config above. They describe the URL for the different actions a client can take. Adjust them to the corresponding configuration of your webserver. For example the download URL `actionDownload` will be made up of the hosts IP-address, the port, the protocol and the given relative path. `${gladosProto}://${gladosIp}:${gladosPort}/${actionDownload}` will then be translated to `http://1.2.3.4:80/glados/index.php/ticket/download/{token}` in the example configuration above. That URL must point to the exam server token prompt. |
 
 ----
 
