@@ -6,6 +6,7 @@ use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Setting */
+/* @var $contents string rendered previews/key.php contents */
 
 $this->title = \Yii::t('setting', 'Edit Setting: {setting}', [
     'setting' => \Yii::t('setting', $model->name)
@@ -101,8 +102,8 @@ function reload() {
 }
 
 $("#preview-button").click(function(event) {
-    $('#preview-button').attr("disabled", true);
     $("#setting-form").on('beforeSubmit', function(event) {
+        $('#preview-button').attr("disabled", true);
         $("#setting-form").off('beforeSubmit');
         reload();
         return false;

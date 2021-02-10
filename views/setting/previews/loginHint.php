@@ -5,8 +5,6 @@
 
 ?>
 
-<object type="text/html">
-    <?= $this->render('/site/login', [
-        'model' => new \app\models\LoginForm()
-    ]); ?>
-</object>
+<?= $this->render('/site/login', [
+    'model' => new \app\models\LoginForm()
+]); ?>
