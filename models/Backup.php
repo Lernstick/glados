@@ -52,7 +52,7 @@ class Backup extends Model
         return [
             'Elasticsearch' => [
                 'class' => ElasticsearchBehavior::className(),
-                'index' => 'backup',
+                'index' => ['class' => '\app\models\indexes\BackupIndex'], // mappings are defined there
                 'allModels' => [
                     'foreach' => function($class) { return Ticket::find()->all(); },
                     'allModels' => function($model) { return $model->backups; },
@@ -70,30 +70,10 @@ class Backup extends Model
                     'totalDestinationSizeChange',
                     'ticket' => function($m){ return $m->ticket->id; },
                 ],
-                // mapping of elasticsearch
-                'mappings' => [
-                    'properties' => [
-                        'date'  => [
-                            'type' => 'date',
-                            # yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ or yyyy-MM-dd or timestamp
-                            # @see https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html
-                            'format' => 'date_optional_time||epoch_millis',
-                        ],
-                        'errors'                     => ['type' => 'integer'],
-                        'elapsedTime'                => ['type' => 'float'],
-                        'sourceFiles'                => ['type' => 'integer'],
-                        'mirrorFiles'                => ['type' => 'integer'],
-                        'deletedFiles'               => ['type' => 'integer'],
-                        'changedFiles'               => ['type' => 'integer'],
-                        'incrementFiles'             => ['type' => 'integer'],
-                        'totalDestinationSizeChange' => ['type' => 'integer'],
-                        'ticket'                     => ['type' => 'integer'],
-                    ],
-                ],
             ],
             'ElasticsearchErrorLog' => [
                 'class' => ElasticsearchBehavior::className(),
-                'index' => 'log',
+                'index' => ['class' => '\app\models\indexes\LogIndex'], // mappings are defined there
                 'id' => function($m){ return 'ticket:'.$m->ticket->id.'->backup:'.$m->nr.'->errorLog'; },
                 'allModels' => [
                     'foreach' => function($class) { return Ticket::find()->all(); },
@@ -106,19 +86,10 @@ class Backup extends Model
                     'ticket' => function($m){ return $m->ticket->id; },
                     'type' => function($m){ return 'error'; },
                 ],
-                // mapping of elasticsearch
-                'mappings' => [
-                    'properties' => [
-                        'logentries' => ['type' => 'text'],
-                        'type'       => ['type' => 'text'],
-                        'backup'     => ['type' => 'text'],
-                        'ticket'     => ['type' => 'integer'],
-                    ],
-                ],
             ],
             'ElasticsearchBackupLog' => [
                 'class' => ElasticsearchBehavior::className(),
-                'index' => 'log',
+                'index' => ['class' => '\app\models\indexes\LogIndex'], // mappings are defined there
                 'id' => function($m){ return 'ticket:'.$m->ticket->id.'->backup:'.$m->nr.'->backupLog'; },
                 'allModels' => [
                     'foreach' => function($class) { return Ticket::find()->all(); },
@@ -130,15 +101,6 @@ class Backup extends Model
                     'backup' => function($m){ return $m->id; },
                     'ticket' => function($m){ return $m->ticket->id; },
                     'type' => function($m){ return 'info'; },
-                ],
-                // mapping of elasticsearch
-                'mappings' => [
-                    'properties' => [
-                        'logentries' => ['type' => 'text'],
-                        'type'       => ['type' => 'text'],
-                        'backup'     => ['type' => 'text'],
-                        'ticket'     => ['type' => 'integer'],
-                    ],
                 ],
             ],
         ];

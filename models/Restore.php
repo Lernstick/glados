@@ -37,7 +37,7 @@ class Restore extends \yii\db\ActiveRecord
         return [
             'ElasticsearchBehavior' => [
                 'class' => ElasticsearchBehavior::className(),
-                'index' => self::tableName(),
+                'index' => ['class' => '\app\models\indexes\RestoreIndex'], // mappings are defined there
                 // what the attributes mean
                 'fields' => [
                     'startedAt',
@@ -48,49 +48,16 @@ class Restore extends \yii\db\ActiveRecord
                     'exam' => function($m){ return $m->ticket->exam_id; },
                     'user' => function($m){ return $m->ticket->exam->user_id; },
                 ],
-                // mapping of elasticsearch
-                'mappings' => [
-                    'properties' => [
-                        'startedAt'   => [
-                            'type' => 'date',
-                            'format' => 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis'
-                        ],
-                        'finishedAt'  => [
-                            'type' => 'date',
-                            'format' => 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis'
-                        ],
-                        'restoreDate' => [
-                            'type' => 'date',
-                            'ignore_malformed' => true,
-                            # yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ or yyyy-MM-dd or timestamp
-                            # @see https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html
-                            'format' => 'date_optional_time||epoch_millis',
-                        ],
-                        'file'        => ['type' => 'text'],
-                        'ticket'      => ['type' => 'integer'],
-                        'exam'        => ['type' => 'integer'],
-                        'user'        => ['type' => 'integer'],
-                    ],
-                ],
             ],
             'ElasticsearchRestoreLog' => [
                 'class' => ElasticsearchBehavior::className(),
-                'index' => 'log',
+                'index' => ['class' => '\app\models\indexes\LogIndex'], // mappings are defined there
                 // what the attributes mean
                 'fields' => [
                     'logentries' => function($m){ return empty($m->restoreLog) ? null : implode('', $m->restoreLog); },
                     'restore' => function($m){ return $m->id; },
                     'ticket' => function($m){ return $m->ticket->id; },
                     'type' => function($m){ return 'info'; },
-                ],
-                // mapping of elasticsearch
-                'mappings' => [
-                    'properties' => [
-                        'logentries' => ['type' => 'text'],
-                        'type'       => ['type' => 'text'],
-                        'restore'    => ['type' => 'text'],
-                        'ticket'     => ['type' => 'integer'],
-                    ],
                 ],
             ],
         ];

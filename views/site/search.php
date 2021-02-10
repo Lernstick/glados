@@ -5,13 +5,19 @@
 /* @var $dataProvider yii\elasticsearch\ActiveDataProvider */
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\ListView;
 use yii\widgets\ActiveForm;
-use kartik\select2\Select2;
 use yii\widgets\Pjax;
+use kartik\select2\Select2;
+use kartik\typeahead\Typeahead;
+use yii\web\JsExpression;
+use app\assets\SearchAsset;
 
 $this->title = \Yii::t('search', 'Search Results');
 $this->params['breadcrumbs'][] = $this->title;
+
+SearchAsset::register($this);
 
 $data = [
     'user' => \Yii::t('search', 'users'),
@@ -69,7 +75,6 @@ SCRIPT;
 $this->registerJs($enter_submit);
 
 ?>
-
 <div class="site-search">
     <h1><?= Html::encode($this->title) ?></h1>
 
@@ -77,13 +82,44 @@ $this->registerJs($enter_submit);
         'method' => 'get',
         'id' => 'search-form',
         'action' => [''],
+        'options' => [
+            'autocomplete' => 'off', //disable autocomplete, we do it manually
+        ]
     ]); ?>
 
     <div class="row">
         <div class="col-md-6">
-            <?= $form->field($searchModel, 'q')->textInput(); ?>
+            <?= $form->field($searchModel, 'q')->widget(Typeahead::classname(), [
+                'pluginOptions' => ['highlight' => true],
+                'dataset' => [
+                    [
+                        'datumTokenizer' => "Bloodhound.tokenizers.obj.whitespace('value')",
+                        'display' => 'value',
+                        'remote' => [
+                            'cache' => false, // solves the issue that cached content is tranformed again ...
+                            'prepare' => new JsExpression('function(q, settings) {
+                                var cur = $("#q")[0].selectionStart
+                                var pos = getWordAt(q, cur);
+                                q = q.slice(pos[0], pos[1]);
+                                url = settings.url.replace("__QUERY__", q);
+                                return url.replace("__INDEX__", $("#index").val());
+                            }'),
+                            'url' => Url::to(['site/autocomplete', 'q' => '__QUERY__', 'index' => '__INDEX__']),
+                            'transform' => new JsExpression('function(response) {
+                                var q = $("#q").val();
+                                var pos = getWordAt(q, $("#q")[0].selectionStart);
+                                response.forEach(function(e){
+                                    e.value = q.substr(0, pos[0]) + e.value + q.substr(pos[1]);
+                                });
+                                return response;
+                            }'),
+                        ],
+                        'limit' => 10
+                    ]
+                ]
+            ]); ?>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 autocomplete">
             <?= $form->field($searchModel, 'index')->widget(Select2::classname(), [
                 'data' => $data,
                 'options' => [

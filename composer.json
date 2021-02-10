@@ -25,6 +25,7 @@
         "kartik-v/yii2-widget-rangeinput": "*",
         "kartik-v/yii2-widget-switchinput": "dev-master",
         "kartik-v/yii2-dynagrid": "dev-master",
+        "kartik-v/yii2-widget-typeahead": "dev-master",
         "miloschuman/yii2-highcharts-widget": "*",
         "limion/yii2-jquery-fileupload-widget": "~1.0",
         "fxp/composer-asset-plugin": "^1.4.1",

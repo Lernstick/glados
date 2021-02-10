@@ -110,6 +110,7 @@ $this->registerJs($search_hint);
     ?>
     <div class="form-group has-feedback has-feedback-left search">
         <?= $searchForm->field($searchModel, 'q')->textInput([
+            'id' => 'nav-q', // must be different from the one in search.php
             'class' => 'form-control navbar-inverse navbar-inverse-input',
             'placeholder' => \Yii::t('search', 'Search ...'),
         ])->label(false)->hint(false); ?>

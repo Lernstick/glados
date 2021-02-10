@@ -94,7 +94,7 @@ class Exam extends Base
             ],
             'ElasticsearchBehavior' => [
                 'class' => ElasticsearchBehavior::className(),
-                'index' => self::tableName(),
+                'index' => ['class' => '\app\models\indexes\ExamIndex'], // mappings are defined there
                 // what the attributes mean
                 'fields' => [
                     'createdAt', // this field has CURRENT_TIMESTAMP
@@ -104,20 +104,6 @@ class Exam extends Base
                     'fileInfo' => ['trigger_attributes' => ['file']],
                     'file2Info' => ['trigger_attributes' => ['file2']],
                     'user' => ['trigger_attributes' => ['user_id'], 'value_from' => 'user_id'],
-                ],
-                // mapping of elasticsearch
-                'mappings' => [
-                    'properties' => [
-                        'createdAt'  => [
-                            'type' => 'date',
-                            'format' => 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis',
-                        ],
-                        'name'       => ['type' => 'text'],
-                        'subject'    => ['type' => 'text'],
-                        'fileInfo'   => ['type' => 'text'],
-                        'file2Info'  => ['type' => 'text'],
-                        'user'       => ['type' => 'integer'],
-                    ],
                 ],
             ],
             /*'ElasticsearchZip' => [

@@ -211,7 +211,7 @@ class Ticket extends LiveActiveRecord
             ],
             'ElasticsearchBehavior' => [
                 'class' => ElasticsearchBehavior::className(),
-                'index' => self::tableName(),
+                'index' => ['class' => '\app\models\indexes\TicketIndex'], // mappings are defined there
                 // what the attributes mean
                 'fields' => [
                     'createdAt', // this field has CURRENT_TIMESTAMP
@@ -226,31 +226,6 @@ class Ticket extends LiveActiveRecord
                     // field based on other database attributes
                     'state' => ['trigger_attributes' => ['start', 'end', 'test_taker']],
                     'keylogger' => function($m){ return $m->screencapture === null ? null : $m->screencapture->getKeyloggerLog(true); },
-                ],
-                // mapping of elasticsearch
-                'mappings' => [
-                    'properties' => [
-                        'createdAt'  => [
-                            'type' => 'date',
-                            'format' => 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis',
-                        ],
-                        'start'      => [
-                            'type' => 'date',
-                            'format' => 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis',
-                        ],
-                        'end'        => [
-                            'type' => 'date',
-                            'format' => 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis',
-                        ],
-                        'token'      => ['type' => 'text'],
-                        'ip'         => ['type' => 'ip'],
-                        'test_taker' => ['type' => 'text'],
-                        'name'       => ['type' => 'text'],
-                        'exam'       => ['type' => 'integer'],
-                        'user'       => ['type' => 'integer'],
-                        'state'      => ['type' => 'integer'],
-                        'keylogger'  => ['type' => 'text'],
-                    ],
                 ],
             ],
         ];

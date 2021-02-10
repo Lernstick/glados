@@ -35,27 +35,18 @@ class SquashfsFile extends RegularFile implements ContainsFilesInterface
         return [
             'ExamSquashfs' => [
                 'class' => ElasticsearchBehavior::className(),
-                'index' => 'file',
+                'index' => ['class' => '\app\models\indexes\FileIndex'],
                 'allModels' => function($class) { return ArrayHelper::getColumn(\app\models\Exam::find()->all(), 'squashfsFile'); },
                 'onlyIndexIf' => function($m) { return $m->exists; },
                 'fields' => [
                     'path',
+                    'filename' => function($m) { return basename($m->path); },
+                    'directory' => function($m) { return dirname($m->path); },
                     'mimetype',
                     'content' => function($m) { return $m->toText; },
                     'size',
                     'exam' => function($m) { return $m->relation->id; },
                     'user' => function($m) { return $m->relation->user_id; },
-                ],
-                // mapping of elasticsearch
-                'mappings' => [
-                    'properties' => [
-                        'path'     => ['type' => 'text'],
-                        'mimetype' => ['type' => 'text'],
-                        'content' =>  ['type' => 'text'],
-                        'size'     => ['type' => 'integer'],
-                        'exam'     => ['type' => 'integer'],
-                        'user'     => ['type' => 'integer'],
-                    ],
                 ],
             ],
         ];

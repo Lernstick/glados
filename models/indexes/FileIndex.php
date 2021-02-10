@@ -6,7 +6,7 @@ use Yii;
 use app\models\indexes\BaseIndex;
 
 /**
- * TODO
+ * Index definitions for the "file" index
  */
 class FileIndex extends BaseIndex
 {
@@ -90,6 +90,7 @@ class FileIndex extends BaseIndex
                 'analyzer' => 'path_analyzer',
                 'search_quote_analyzer' => 'quoted_path_analyzer',
                 'fields' => [
+                    'keyword' => ['type' => 'keyword'],
                     'raw' => ['type' => 'text', 'analyzer' => 'quoted_path_analyzer'],
                     'de' =>  ['type' => 'text', 'analyzer' => 'german_path'],
                     'en' =>  ['type' => 'text', 'analyzer' => 'english']
@@ -102,6 +103,13 @@ class FileIndex extends BaseIndex
             'exam'     => ['type' => 'integer'],
             'user'     => ['type' => 'integer'],
         ],
+    ];
+
+    /**
+     * @inheritdoc
+     */
+    static public $autocomplete = [
+        'filename',
     ];
 
 }

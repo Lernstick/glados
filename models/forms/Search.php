@@ -27,9 +27,19 @@ class Search extends \yii\elasticsearch\ActiveRecord
     public $index;
 
     /**
-     * @var array all indexes
+     * @var array all indexes and their definitions
      */
-    public $indexes = ['user', 'exam', 'ticket', 'backup', 'restore', 'howto', 'log', 'file'];
+    public $indexes = [
+        'user' => '\app\models\indexes\UserIndex',
+        'exam' => '\app\models\indexes\ExamIndex',
+        'ticket' => '\app\models\indexes\TicketIndex',
+        'backup' => '\app\models\indexes\BackupIndex',
+        'restore' => '\app\models\indexes\RestoreIndex',
+        'howto' => '\app\models\indexes\HowtoIndex',
+        'log' => '\app\models\indexes\LogIndex',
+        'file'   => '\app\models\indexes\FileIndex',
+        'meta'   => '\app\models\indexes\MetaIndex',
+    ];
 
     /**
      * @var array list of reserved word regexes, when the query string matches one of these
@@ -117,8 +127,9 @@ class Search extends \yii\elasticsearch\ActiveRecord
             ['q', 'filter', 'skipOnArray' => true, 'filter' => function ($value) {
                 return trim($value);
             }],
-            ['index', 'default', 'value' => null],
-            ['index', 'each', 'rule' => ['in', 'range' => $this->indexes, 'skipOnEmpty' => false]],
+            ['index', 'default', 'value' => []],
+            ['index', 'filter', 'filter' => function($v) { return is_string($v) ? explode(',', $v) : $v; }, 'skipOnEmpty' => false],
+            ['index', 'each', 'rule' => ['in', 'range' => array_keys($this->indexes), 'skipOnEmpty' => false]],
         ];
     }
 
@@ -158,6 +169,13 @@ class Search extends \yii\elasticsearch\ActiveRecord
         $query->from($this->index) # null means all indices are being queried
             ->limit(10);
 
+
+        /*$query->query(['prefix' => [
+            '*' => [
+                'value' => $this->q,
+            ]
+        ]]);*/
+
         $q = $this->rewrite_query($this->q);
 
         // https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html
@@ -175,9 +193,11 @@ class Search extends \yii\elasticsearch\ActiveRecord
                 'query' => $q,
                 'fuzziness' => 'AUTO',
                 //'type' => 'most_fields',
+                //'type' => 'phrase_prefix', // prefix query on multiple fields
                 'fields' => ['*']
             ]]);
         }
+
 
         // https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html#simple-query-string-syntax
         /*$query->query(['simple_query_string' => [
@@ -213,6 +233,99 @@ class Search extends \yii\elasticsearch\ActiveRecord
         //Yii::$app->user->can('ticket/index/all') ?: $query->own();
 
         return $dataProvider;
+    }
+
+    /**
+     * Creates data provider instance with search query applied
+     *
+     * @param array $params
+     *
+     * @return array
+     */
+    public function autocomplete($params)
+    {
+        $this->load($params, '');
+
+        $query = new Query;
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => [ 'pageSize' => 10, ]
+        ]);
+
+        if (!$this->validate()) {
+            return $dataProvider;
+        }
+        if (empty($this->index)) {
+            $this->index = array_merge(array_keys($this->indexes));
+        } else {
+            array_unshift($this->index, 'meta');
+        }
+
+        $query->from($this->index)->limit(10);
+
+        /* default fields to search for when autocompleting */
+        $fields = [];
+
+        if (str_contains($this->q, ' ')) {
+            $this->q = substr($this->q, strrpos($this->q, ' ') + 1); // get last element after splitting the string
+        }
+
+        if (str_contains($this->q, ':')) {
+            list($field, $value) = explode(':', $this->q, 2);
+            $this->q = $value;
+            $fields[] = $field;
+            $singleField = true;
+        } else {
+            /**
+             * Check the index definitions for autocomplete fields to search in
+             * this specific indices
+             */
+            foreach ($this->indexes as $index => $class) {
+                if ($class !== null && (empty($this->index) || in_array($index, $this->index))) {
+                    $fields = array_merge($fields, $class::$autocomplete);
+                }
+            }
+            $singleField = false;
+        }
+
+        $query->query(['multi_match' => [
+            'query' => $this->q,
+            'type' => 'phrase_prefix', // prefix query
+            'fields' => $fields,
+        ]]);
+
+        foreach ($fields as $field) {
+            $query->addAggregate($field, ['terms' => ['field' => $field.'.keyword']]);
+        }
+
+        // @todo only query own elements
+        //Yii::$app->user->can('ticket/index/all') ?: $query->own();
+
+        /* build the return array with aggregated results */
+        $ret = [];
+        foreach ($dataProvider->getAggregations() as $field => $agg) {
+            foreach ($agg['buckets'] as $bucket) {
+                $value = $bucket['key'];
+                if (count($fields) == 1) {
+                    $template = str_contains($value, ' ') ? '{field}:"{value}"' : '{field}:{value}';
+                    $field = $fields[0];
+                } else if ($field == 'fieldname') {
+                    $template = '{value}:';
+                } else {
+                    $template = str_contains($value, ' ') ? '"{value}"' : '{value}';
+                }
+
+                $ret[] = [
+                    'value' => substitute($template, [
+                        'value' => $value,
+                        'field' => $field
+                    ]),
+                ];
+            }
+        }
+
+        return $ret;
     }
 
     /**

@@ -25,19 +25,12 @@ class Howto extends Model
         return [
             'ElasticsearchBehavior' => [
                 'class' => ElasticsearchBehavior::className(),
-                'index' => 'howto',
+                'index' => ['class' => '\app\models\indexes\HowtoIndex'], // mappings are defined there
                 'allModels' => function($class) { return $class::findAll(); },
                 // what the attributes mean
                 'fields' => [
                     'title',
                     'content',
-                ],
-                // mapping of elasticsearch
-                'mappings' => [
-                    'properties' => [
-                        'title'      => ['type' => 'text'],
-                        'content'    => ['type' => 'text'],
-                    ],
                 ],
             ],
         ];

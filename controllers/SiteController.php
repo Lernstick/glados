@@ -121,4 +121,11 @@ class SiteController extends Controller
         ]);
     }
 
+    public function actionAutocomplete()
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $searchModel = new Search();
+        return $searchModel->autocomplete(Yii::$app->request->queryParams);
+    }
+
 }

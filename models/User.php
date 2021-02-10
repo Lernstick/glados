@@ -85,38 +85,13 @@ class User extends Base implements IdentityInterface
         return [
             'ElasticsearchBehavior' => [
                 'class' => ElasticsearchBehavior::className(),
-                'index' => self::tableName(),
+                'index' => ['class' => '\app\models\indexes\UserIndex'], // mappings are defined there
                 // what the attributes mean
                 'fields' => [
                     'username',
                     'role',
                     'type',
                     'authMethod' => function($m){ return $m->authMethod !== null ? $m->authMethod->name : null; },
-                ],
-                /* see https://www.elastic.co/guide/en/elasticsearch/reference/current/index-templates.html */
-                'settings' => [
-                    'analysis' => [
-                        'analyzer' => [
-                            'letter' => [
-                                'tokenizer' => 'lowercase',
-                            ],
-                        ],
-                    ],
-                ],
-                // mapping of elasticsearch
-                'mappings' => [
-                    'properties' => [
-                        'username'   => [
-                            'type' => 'text',
-                            'analyzer' => 'letter',
-                            'fields' => [
-                                'keyword' => ['type' => 'keyword', 'ignore_above' => 256],
-                            ],
-                        ],
-                        'role'       => ['type' => 'text'],
-                        'type'       => ['type' => 'text'],
-                        'authMethod' => ['type' => 'text'],
-                    ],
                 ],
             ],
         ];

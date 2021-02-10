@@ -45,7 +45,7 @@ class FileInArchive extends RegularFile implements FileInterface
             ],
             'ExamSquashfsContents' => [
                 'class' => ElasticsearchBehavior::className(),
-                'index' => ['class' => '\app\models\indexes\FileIndex'],
+                'index' => ['class' => '\app\models\indexes\FileIndex'], // no mappings needed anymore
                 'allModels' => [
                     'foreach' => function($class) { return ArrayHelper::getColumn(\app\models\Exam::find()->all(), 'squashfsFile'); },
                     'allModels' => function($squashfsFile) { return $squashfsFile->files; },

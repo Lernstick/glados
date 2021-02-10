@@ -56,7 +56,7 @@ TODO:
   * "new activity; click to reload" on all tabs in the ticket view
   * models/Daemon.php rules -> maybe truncate a too long state/description
   * generally: remove save(false); statements, they cause crashes
-  * put .Keylogger oath to exclude_list in backupController
+  * put .Keylogger path to exclude_list in backupController
   * welcome to exam message in wxbrowser
   * keylogger not working without a screencapture present ?!?
 

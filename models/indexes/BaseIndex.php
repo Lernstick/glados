@@ -6,7 +6,7 @@ use Yii;
 use yii\base\Model;
 
 /**
- * TODO
+ * Base index definitions
  */
 class BaseIndex extends Model
 {
@@ -27,5 +27,13 @@ class BaseIndex extends Model
      * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html
      */
     static public $mappings = [];
+
+    /**
+     * @var array the fields that should be autocompleted while typing. A phrase_prefix search is 
+     * performed on these fields. Each of these field should have a subfield caleed "field.keyword"
+     * to be able to create buckets in aggregations.
+     * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html#type-phrase
+     */
+    static public $autocomplete = [];
 
 }
