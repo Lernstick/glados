@@ -20,11 +20,53 @@ class UserIndex extends BaseIndex
 	 * @inheritdoc
 	 */
     static public $settings = [
-        'analysis' => [
-            'analyzer' => [
-                'letter' => [
-                    'tokenizer' => 'lowercase',
+        "index" => [
+            'analysis' => [
+                'analyzer' => [
+                    'letter' => [
+                        'tokenizer' => 'lowercase',
+                    ],
+                    "username_analyzer" => [
+                        "type" => "custom",
+                        "tokenizer" => "username_tokenizer",
+                        "filter" => "lowercase"
+                    ],
+                    'german_username' => [
+                        "tokenizer" => "letter",
+                        "filter" => [
+                            "lowercase",
+                            "german_stop",
+                            "german_keywords",
+                            "german_normalization",
+                            "german_stemmer"
+                        ]
+                    ],
+                    "quoted_username_analyzer" => [
+                        "type" => "custom",
+                        "tokenizer" => "keyword",
+                        "filter" => "lowercase"
+                    ]
                 ],
+                "tokenizer" => [
+                    "username_tokenizer" => [
+                        "type" => "char_group",
+                        "tokenize_on_chars" => ["@", "punctuation"],
+                    ]
+                ],
+                'filter' => [
+                    "german_stop" => [
+                      "type" => "stop",
+                      "stopwords" => "_german_"
+                    ],
+                    "german_keywords" => [
+                      "type" => "keyword_marker",
+                      "keywords" => []
+                    ],
+                    "german_stemmer" => [
+                      "type" => "stemmer",
+                      "language" => "light_german"
+                    ]
+                ]
             ],
         ],
     ];
@@ -34,15 +76,18 @@ class UserIndex extends BaseIndex
 	 */
     static public $mappings = [
         'properties' => [
-            'username'   => [
+            'username' => [
                 'type' => 'text',
-                'analyzer' => 'letter',
+                'analyzer' => 'username_analyzer',
+                'search_quote_analyzer' => 'quoted_username_analyzer',
                 'fields' => [
-                    'keyword' => ['type' => 'keyword', 'ignore_above' => 256],
+                    'letter' => ['type' => 'text', 'analyzer' => 'letter'],
+                    'keyword' => ['type' => 'keyword'],
                     'suggest' => ['type' => 'search_as_you_type'],
+                    'raw' => ['type' => 'text', 'analyzer' => 'quoted_username_analyzer'],
                     'de' =>  [
                         'type' => 'text',
-                        'analyzer' => 'german',
+                        'analyzer' => 'german_username',
                         'fields' => ['suggest' => ['type' => 'search_as_you_type']],
                     ],
                     'en' =>  [

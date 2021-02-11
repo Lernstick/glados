@@ -316,8 +316,8 @@ class Search extends \yii\elasticsearch\ActiveRecord
             'fields' => $fields,
         ]]);
 
-        foreach ($fields as $field) {
-            $query->addAggregate($field, ['terms' => ['field' => $field.'.keyword']]);
+        foreach ($baseFields as $baseField) {
+            $query->addAggregate($baseField, ['terms' => ['field' => $baseField.'.keyword']]);
         }
 
         // @todo only query own elements

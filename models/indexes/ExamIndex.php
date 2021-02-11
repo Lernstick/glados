@@ -30,9 +30,10 @@ class ExamIndex extends BaseIndex
                 'type' => 'date',
                 'format' => 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis',
             ],
-            'name'       => [
+            'name' => [
                 'type' => 'text',
                 'fields' => [
+                    'keyword' => ['type' => 'keyword'],
                     'suggest' => ['type' => 'search_as_you_type'],
                     'de' =>  [
                         'type' => 'text',
@@ -46,9 +47,10 @@ class ExamIndex extends BaseIndex
                     ],
                 ],
             ],
-            'subject'       => [
+            'subject' => [
                 'type' => 'text',
                 'fields' => [
+                    'keyword' => ['type' => 'keyword'],
                     'suggest' => ['type' => 'search_as_you_type'],
                     'de' =>  [
                         'type' => 'text',

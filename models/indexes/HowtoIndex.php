@@ -26,10 +26,11 @@ class HowtoIndex extends BaseIndex
 	 */
     static public $mappings = [
         'properties' => [
-            'title'      => [
+            'title' => [
                 'type' => 'text',
                 'analyzer' => 'english',
                 'fields' => [
+                    'keyword' => ['type' => 'keyword'],
                     'suggest' => ['type' => 'search_as_you_type'],
                 ],
             ],
