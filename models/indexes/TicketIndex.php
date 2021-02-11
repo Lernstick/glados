@@ -44,6 +44,17 @@ class TicketIndex extends BaseIndex
                 'type' => 'text',
                 'fields' => [
                     'keyword' => ['type' => 'keyword'],
+                    'suggest' => ['type' => 'search_as_you_type'],
+                    'de' =>  [
+                        'type' => 'text',
+                        'analyzer' => 'german',
+                        'fields' => ['suggest' => ['type' => 'search_as_you_type']]
+                    ],
+                    'en' =>  [
+                        'type' => 'text',
+                        'analyzer' => 'english',
+                        'fields' => ['suggest' => ['type' => 'search_as_you_type']]
+                    ],
                 ],
             ],
             'exam'       => ['type' => 'integer'],
@@ -57,7 +68,20 @@ class TicketIndex extends BaseIndex
      * @inheritdoc
      */
     static public $autocomplete = [
-        'test_taker',
+        'test_taker' => [
+            'test_taker',
+            'test_taker.suggest',
+            'test_taker.suggest._2gram',
+            'test_taker.suggest._3gram',
+            'test_taker.de',
+            'test_taker.de.suggest',
+            'test_taker.de.suggest._2gram',
+            'test_taker.de.suggest._3gram',
+            'test_taker.en',
+            'test_taker.en.suggest',
+            'test_taker.en.suggest._2gram',
+            'test_taker.en.suggest._3gram',
+        ],
     ];
 
 }

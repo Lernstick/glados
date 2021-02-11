@@ -91,10 +91,19 @@ class FileIndex extends BaseIndex
                 'search_quote_analyzer' => 'quoted_path_analyzer',
                 'fields' => [
                     'keyword' => ['type' => 'keyword'],
+                    'suggest' => ['type' => 'search_as_you_type'],
                     'raw' => ['type' => 'text', 'analyzer' => 'quoted_path_analyzer'],
-                    'de' =>  ['type' => 'text', 'analyzer' => 'german_path'],
-                    'en' =>  ['type' => 'text', 'analyzer' => 'english']
-                ]
+                    'de' =>  [
+                        'type' => 'text',
+                        'analyzer' => 'german_path',
+                        'fields' => ['suggest' => ['type' => 'search_as_you_type']],
+                    ],
+                    'en' =>  [
+                        'type' => 'text',
+                        'analyzer' => 'english',
+                        'fields' => ['suggest' => ['type' => 'search_as_you_type']],
+                    ],
+                ],
             ],
             'mimetype' => ['type' => 'text'],
             'content'  => ['type' => 'text'],
@@ -109,7 +118,20 @@ class FileIndex extends BaseIndex
      * @inheritdoc
      */
     static public $autocomplete = [
-        'filename',
+        'filename' => [
+            'filename',
+            'filename.suggest',
+            'filename.suggest._2gram',
+            'filename.suggest._3gram',
+            'filename.de',
+            'filename.de.suggest',
+            'filename.de.suggest._2gram',
+            'filename.de.suggest._3gram',
+            'filename.en',
+            'filename.en.suggest',
+            'filename.en.suggest._2gram',
+            'filename.en.suggest._3gram',
+        ]
     ];
 
 }

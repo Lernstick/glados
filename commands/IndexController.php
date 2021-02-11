@@ -18,17 +18,17 @@ class IndexController extends DaemonController
 {
 
     public $list = [
-        #'howto'         => 'app\models\Howto',
+        'howto'         => 'app\models\Howto',
         'user'          => 'app\models\User',
         #'exam_setting'  => 'app\models\ExamSettingAvail',
-        #'exam'          => 'app\models\Exam',
-        #'ticket'        => 'app\models\Ticket',
-        #'restore'       => 'app\models\Restore',
-        #'backup'        => 'app\models\Backup',
+        'exam'          => 'app\models\Exam',
+        'ticket'        => 'app\models\Ticket',
+        'restore'       => 'app\models\Restore',
+        'backup'        => 'app\models\Backup',
         #'file1'         => 'app\models\RdiffFileSystem',
-        #'exam_zip'      => 'app\models\file\ZipFile',
-        #'exam_squashfs' => 'app\models\file\SquashfsFile',
-        #'archive'       => 'app\models\file\FileInArchive',
+        'exam_zip'      => 'app\models\file\ZipFile',
+        'exam_squashfs' => 'app\models\file\SquashfsFile',
+        'archive'       => 'app\models\file\FileInArchive',
         'meta'           => 'app\models\indexes\MetaIndex',
     ];
 

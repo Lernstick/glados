@@ -26,7 +26,13 @@ class HowtoIndex extends BaseIndex
 	 */
     static public $mappings = [
         'properties' => [
-            'title'      => ['type' => 'text', 'analyzer' => 'english'],
+            'title'      => [
+                'type' => 'text',
+                'analyzer' => 'english',
+                'fields' => [
+                    'suggest' => ['type' => 'search_as_you_type'],
+                ],
+            ],
             'content'    => ['type' => 'text', 'analyzer' => 'english'],
         ],
     ];
@@ -35,6 +41,11 @@ class HowtoIndex extends BaseIndex
      * @inheritdoc
      */
     static public $autocomplete = [
-        'title',
+        'title' => [
+            'title',
+            'title.suggest',
+            'title.suggest._2gram',
+            'title.suggest._3gram',
+        ],
     ];
 }

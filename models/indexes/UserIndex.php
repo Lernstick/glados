@@ -39,6 +39,17 @@ class UserIndex extends BaseIndex
                 'analyzer' => 'letter',
                 'fields' => [
                     'keyword' => ['type' => 'keyword', 'ignore_above' => 256],
+                    'suggest' => ['type' => 'search_as_you_type'],
+                    'de' =>  [
+                        'type' => 'text',
+                        'analyzer' => 'german',
+                        'fields' => ['suggest' => ['type' => 'search_as_you_type']],
+                    ],
+                    'en' =>  [
+                        'type' => 'text',
+                        'analyzer' => 'english',
+                        'fields' => ['suggest' => ['type' => 'search_as_you_type']],
+                    ],
                 ],
             ],
             'role'       => ['type' => 'text'],
@@ -51,6 +62,19 @@ class UserIndex extends BaseIndex
      * @inheritdoc
      */
     static public $autocomplete = [
-        'username',
+        'username' => [
+            'username',
+            'username.suggest',
+            'username.suggest._2gram',
+            'username.suggest._3gram',
+            'username.de',
+            'username.de.suggest',
+            'username.de.suggest._2gram',
+            'username.de.suggest._3gram',
+            'username.en',
+            'username.en.suggest',
+            'username.en.suggest._2gram',
+            'username.en.suggest._3gram',
+        ]
     ];
 }

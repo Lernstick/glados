@@ -84,9 +84,12 @@ class Search extends \yii\elasticsearch\ActiveRecord
         # "foo" AND bar -> "foo" AND bar~
         # field:foo*bar -> field:foo*bar~ but the tilda has no meaning together with the wildcard *
         # "foo bar baz" AND blubb -> "foo bar baz" AND blubb~
+        # _exists_:field should stay as it is
         '/((?<!^)(?<!AND)(?<!TO)(?<!\&\&)(?<!OR)(?<!\|\|)(?<!\s)(?<!\*)(?<!\/)(?<!\~)(?<!\^)(?<!\])(?<!\})(?<!\))(?<!\>)(?<!\<)(?<!\")(?<!\&))(\s|\)|$)(?!TO)/' => '$1~$2',
-        # field:foo -> field:foo OR field.\*:foo
-        '/([^\s\:]+)(\:)([\"][^\"]+[\"]|[\(][^\(]+[\)]|[\{][^\{]+[\}]|[\[][^\[]+[\]]|[^\s\"]+)/' => '($1:$3 OR $1.\*:$3)',
+        # field:* and field: -> _exists_:field
+        '/([^\s\:]+)\:[\*\~]?([\s]|$)/' => '_exists_:$1$2',
+        # field:foo -> (field:foo OR field.\*:foo)
+        '/([^\s\:]+)(\:)([\"][^\"]+[\"]|[\(][^\(]+[\)]|[\{][^\{]+[\}]|[\[][^\[]+[\]]|[^\s\"]+)/' => '($1:$3 OR $1.\\*:$3)',
     ];
 
     /**
@@ -266,32 +269,50 @@ class Search extends \yii\elasticsearch\ActiveRecord
 
         /* default fields to search for when autocompleting */
         $fields = [];
+        $baseFields = [];
 
         if (str_contains($this->q, ' ')) {
-            $this->q = substr($this->q, strrpos($this->q, ' ') + 1); // get last element after splitting the string
+            #$this->q = substr($this->q, strrpos($this->q, ' ') + 1); // get last element after splitting the string
         }
 
         if (str_contains($this->q, ':')) {
             list($field, $value) = explode(':', $this->q, 2);
             $this->q = $value;
-            $fields[] = $field;
-            $singleField = true;
+            $baseFields[] = $field;
+            foreach ($this->index as $index) {
+                if (array_key_exists($index, $this->indexes)) {
+                    $class = $this->indexes[$index];
+                    if ($class !== null) {
+                        if (array_key_exists($field, $class::$autocomplete)) {
+                            $fields = array_merge($fields, $class::$autocomplete[$field]);
+                        }
+                    }
+                }
+            }
         } else {
             /**
              * Check the index definitions for autocomplete fields to search in
              * this specific indices
              */
-            foreach ($this->indexes as $index => $class) {
-                if ($class !== null && (empty($this->index) || in_array($index, $this->index))) {
-                    $fields = array_merge($fields, $class::$autocomplete);
+            foreach ($this->index as $index) {
+                if (array_key_exists($index, $this->indexes)) {
+                    $class = $this->indexes[$index];
+                    if ($class !== null) {
+                        foreach ($class::$autocomplete as $baseField => $autocompleteFields) {
+                            $baseFields[] = $baseField;
+                            $fields = array_merge($fields, $autocompleteFields);
+                        }
+                    }
                 }
             }
-            $singleField = false;
         }
 
+        // use a search-as-you-type query, a suggest query won't work over multiple indices
+        // with multiple fields.
         $query->query(['multi_match' => [
             'query' => $this->q,
-            'type' => 'phrase_prefix', // prefix query
+            'type' => 'bool_prefix', // search-as-you-type query
+            'zero_terms_query' => empty($this->q) ? 'all' : 'none', // if the query q is empty, return all documents
             'fields' => $fields,
         ]]);
 
@@ -304,12 +325,12 @@ class Search extends \yii\elasticsearch\ActiveRecord
 
         /* build the return array with aggregated results */
         $ret = [];
-        foreach ($dataProvider->getAggregations() as $field => $agg) {
-            foreach ($agg['buckets'] as $bucket) {
+        foreach ($dataProvider->getAggregations() as $field => $aggregate) {
+            foreach ($aggregate['buckets'] as $bucket) {
                 $value = $bucket['key'];
-                if (count($fields) == 1) {
+                if (count($baseFields) == 1) {
                     $template = str_contains($value, ' ') ? '{field}:"{value}"' : '{field}:{value}';
-                    $field = $fields[0];
+                    $field = $baseFields[0];
                 } else if ($field == 'fieldname') {
                     $template = '{value}:';
                 } else {

@@ -45,6 +45,7 @@ class MetaIndex extends BaseIndex
                 'type' => 'text',
                 'fields' => [
                     'keyword' => ['type' => 'keyword'],
+                    'suggest' => ['type' => 'search_as_you_type'],
                 ],
             ],
             'index'     => ['type' => 'keyword'],
@@ -55,7 +56,12 @@ class MetaIndex extends BaseIndex
      * @inheritdoc
      */
     static public $autocomplete = [
-        'fieldname',
+        'fieldname' => [
+            'fieldname',
+            'fieldname.suggest',
+            'fieldname.suggest._2gram',
+            'fieldname.suggest._3gram',
+        ],
     ];
 
     /**
