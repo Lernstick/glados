@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use app\models\User;
+use app\models\Auth;
 use yii\web\IdentityInterface;
 
 /**
@@ -27,8 +28,8 @@ class UserAuth extends User implements IdentityInterface
         });
 
         foreach (Yii::$app->auth->methods as $key => $config) {
-            $method = Yii::createObject($config);
-            if ($method->authenticate($username, $password)) {
+            $method = Auth::findOne($key); #Yii::createObject($config);
+            if ($method !== null && $method->authenticate($username, $password)) {
 
                 // return existing user column from database
                 if (($user = static::findOne(['identifier' => $method->identifier, 'type' => $key])) === null) {
