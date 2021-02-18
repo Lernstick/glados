@@ -45,7 +45,7 @@ use yii\bootstrap\Modal;
         [
             'class' => 'yii\grid\ActionColumn',
             'order' => DynaGrid::ORDER_FIX_RIGHT,
-            'template' => '{view}',
+            'template' => '{view} {download}',
             'buttons' => [
                 'view' => function ($url, $model, $key)  {
                     $logButton = "
@@ -61,11 +61,24 @@ use yii\bootstrap\Modal;
                         'title' => \Yii::t('log', 'Show Logfile')
                     ]);
                 },
+                'download' => function ($url, $model, $key)  {
+                    return Html::a('<span class="glyphicon glyphicon-download-alt"></span>', $url, [
+                        'title' => \Yii::t('log', 'Download Logfile'),
+                        'data-pjax' => '0',
+                    ]);
+                },
             ],
             'urlCreator' => function ($action, $model, $key, $index) {
                 if ($action === 'view') {
                     return Url::toRoute([
                         'log/view',
+                        'type' => $model->type,
+                        'date' => $model->date,
+                        'token' => $model->token,
+                    ]);
+                } else if ($action === 'download') {
+                    return Url::toRoute([
+                        'log/download',
                         'type' => $model->type,
                         'date' => $model->date,
                         'token' => $model->token,
