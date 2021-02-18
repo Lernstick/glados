@@ -263,7 +263,7 @@ class Backup extends Model
      * Return the Backup model related to the token and the date
      *
      * @param string $token - token
-     * @param string $date - date
+     * @param string $date date in iso-8601 format with seconds, example 2020-05-27T14:04:33+02:00
      * @return Backup
      */
     public function findOne($token, $date)

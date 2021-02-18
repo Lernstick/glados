@@ -21,6 +21,8 @@ use app\models\AgentEvent;
 use app\models\Stats;
 use app\models\Daemon;
 use app\models\DaemonSearch;
+use app\models\Log;
+use app\models\LogSearch;
 use app\models\RdiffFileSystem;
 use app\models\Setting;
 use yii\web\UploadedFile;
@@ -171,6 +173,17 @@ class TicketController extends BaseController
             $restoreDataProvider->pagination->pageParam = 'rest-page';
             $restoreDataProvider->pagination->pageSize = 5;
 
+            $logSearchModel = new LogSearch();
+            if (array_key_exists('LogSearch', Yii::$app->request->queryParams)) {
+                $logsearch = Yii::$app->request->queryParams['LogSearch'];
+                $logsearch['token'] = $model->token;
+            } else {
+                $logsearch = ['token' => $model->token];
+            }
+            $logDataProvider = $logSearchModel->search(['LogSearch' => $logsearch]);
+            $logDataProvider->pagination->pageParam = 'log-page';
+            $logDataProvider->pagination->pageSize = 10;
+
             $historySearchModel = new HistorySearch();
             $historyQueryParams = array_key_exists('HistorySearch', Yii::$app->request->queryParams)
                 ? Yii::$app->request->queryParams['HistorySearch']
@@ -235,6 +248,8 @@ class TicketController extends BaseController
                 'screenshotDataProvider' => $screenshotDataProvider,
                 'restoreSearchModel' => $restoreSearchModel,
                 'restoreDataProvider' => $restoreDataProvider,
+                'logDataProvider' => $logDataProvider,
+                'logSearchModel' => $logSearchModel,
                 'historySearchModel' => $historySearchModel,
                 'historyDataProvider' => $historyDataProvider,
                 'ItemsDataProvider' => $ItemsDataProvider,
