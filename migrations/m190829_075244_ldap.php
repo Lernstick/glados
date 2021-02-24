@@ -103,9 +103,6 @@ class m190829_075244_ldap extends Migration
             }
         }
 
-        $this->dropColumn($this->userTable, 'type');
-        $this->dropColumn($this->userTable, 'identifier');
-
         $auth = Yii::$app->authManager;
 
         $indexAuth = $auth->getPermission('auth/index');
@@ -136,6 +133,9 @@ class m190829_075244_ldap extends Migration
 
         /* drop the combined unique index from user table */
         $this->dropIndex('uc_username_type', $this->userTable);
+
+        $this->dropColumn($this->userTable, 'type');
+        $this->dropColumn($this->userTable, 'identifier');
 
         /* add unique index for username  */
         $this->createIndex('username', $this->userTable, 'username', true);
