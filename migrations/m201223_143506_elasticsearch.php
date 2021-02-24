@@ -18,7 +18,8 @@ class m201223_143506_elasticsearch extends Migration
             'key' => 'elasticsearch',
             'name' => yiit('setting', 'Enable Elasticsearch'),
             'type' => 'boolean',
-            'default_value' => false,
+            'value' => false, // needed because default_value=false will not work
+            'default_value' => true,
             'description' => yiit('setting', 'Enable data indexing with <a target="_blank" href="https://www.elastic.co/">Elasticsearch</a> providing powerful search possibilities.'),
         ]);
         $agent->save(false);
