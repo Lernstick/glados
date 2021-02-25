@@ -4,6 +4,8 @@ GLaDOS Documentation
 
 GLaDOS is a fully configurable webinterface to take, manage and create exams using the `Lernstick <https://www.digitale-nachhaltigkeit.unibe.ch/dienstleistungen/lernstick>`_.
 
+The Project is available on `GitHub <https://github.com/imedias/glados>`_.
+
 Features
 ==========
 
