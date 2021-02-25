@@ -14,6 +14,14 @@ Glados is a fully configurable webinterface to take, manage and create exams usi
 * Generate conveniently [exam results](https://github.com/imedias/glados/blob/master/howtos/generate-results.md) from the backups as a zip file
 * [Submit](https://github.com/imedias/glados/blob/master/howtos/submit-results.md) corrected exams back to the student
 
+## Documentation
+
+* **See [Manual](https://glados-doc.readthedocs.io/) on Read the Docs**
+* See [Manual](https://github.com/imedias/glados/tree/master/howtos) on Github.
+* See the [Manual](https://github.com/imedias/glados/tree/master/howtos/README.md) overview page.
+
+
+
 ## Installation
 
 * [Manual Installation](https://github.com/imedias/glados/blob/master/howtos/manual-install.md) (Using the source package)
@@ -24,7 +32,4 @@ Glados is a fully configurable webinterface to take, manage and create exams usi
 * [Softwareupdate on Debian](https://github.com/imedias/glados/blob/master/howtos/deb-update.md)
 * [Upgrade from Debian 8 to 9](https://github.com/imedias/glados/blob/master/howtos/deb-8to9-upgrade.md)
 
-## Documentation
 
-* See [Manual](https://github.com/imedias/glados/tree/master/howtos) on Github.
-* See the [Manual](https://github.com/imedias/glados/tree/master/howtos/README.md) overview page.
