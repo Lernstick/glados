@@ -39,6 +39,8 @@ use yii\bootstrap\Modal;
                 'download' => 'download',
                 'fetch' => 'fetch',
                 'restore' => 'restore',
+                'screen_capture' => 'screen_capture',
+                'keylogger' => 'keylogger',
             ),
         ],
         'path',
