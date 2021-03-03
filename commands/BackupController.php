@@ -166,15 +166,17 @@ class BackupController extends DaemonController implements DaemonInterface
         $this->ticket->backup_state = yiit('ticket', 'connecting to client...');
         $this->ticket->save(false);
 
-        if ($this->checkPort(22, 3) === false) {
-            $this->ticket->backup_state = yiit('ticket', 'network error.');
+        if ($this->checkPort(22, 3, $emsg) === false) {
+            $this->ticket->backup_state = yiit('ticket', 'network error: {error}.');
+            $this->ticket->backup_state_params = ['error' => $emsg];
             $this->ticket->backup_last_try = new Expression('NOW()');
             $this->ticket->online = false;
             $this->unlockItem($this->ticket);
-            
+
             $act = new Activity([
                 'ticket_id' => $this->ticket->id,
-                'description' => yiit('activity', 'Backup failed: network error.'),
+                'description' => yiit('activity', 'Backup failed: network error, {error}.'),
+                'description_params' => ['error' => $emsg],
                 'severity' => Activity::SEVERITY_WARNING,
             ]);
             $act->save();
@@ -225,8 +227,8 @@ class BackupController extends DaemonController implements DaemonInterface
             $this->logInfo('Executing rdiff-backup: ' . $this->_cmd);
 
             $cmd = new ShellCommand($this->_cmd);
-            $output = "";
             $logFile = Yii::getAlias('@runtime/logs/backup.' . $this->ticket->token . '.' . date('c') . '.log');
+            $output = "";
 
             $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use (&$output, $logFile) {
                 echo $this->ansiFormat($event->line, $event->channel == ShellCommand::STDOUT ? Console::NORMAL : Console::FG_RED);
@@ -266,6 +268,13 @@ class BackupController extends DaemonController implements DaemonInterface
 
                 $this->ticket->backup_last = new Expression('NOW()');
                 $this->ticket->backup_state = yiit('ticket', 'backup successful.');
+
+                $act = new Activity([
+                    'ticket_id' => $this->ticket->id,
+                    'description' => yiit('activity', 'Backup successful.'),
+                    'severity' => Activity::SEVERITY_INFORMATIONAL,
+                ]);
+                $act->save();
 
                 # If it's the last backup, tell the client and set last_backup to 1
                 if ($this->finishBackup == true) {
@@ -328,15 +337,26 @@ class BackupController extends DaemonController implements DaemonInterface
      * Determines if a given port on the target system is open or not
      *
      * @param integer $port The port to check
-     * @param integer $times The number to times to try (with 5 seconds delay inbetween every check)
+     * @param integer $tries The number to times to try (with 5 seconds delay inbetween every check)
+     * @param integer $errstr contains the error message of the last try from fsockopen()
+     * @param integer $errno the error code of the last try from connect()
      * @return boolean Whether the port is open or not
      */
-    private function checkPort($port, $times = 1)
+    private function checkPort($port, $tries = 1, &$errstr = null, &$errno = null)
     {
-        for($c=1;$c<=$times;$c++){
+        for($c=1;$c<=$tries;$c++){
             $fp = @fsockopen($this->ticket->ip, $port, $errno, $errstr, 10);
             if (!$fp) {
-                $this->logError('Port ' . $port . ' is closed or blocked. (try ' . $c . '/' . $times . ')');
+                //$this->logError('Port ' . $port . ' is closed or blocked. (try ' . $c . '/' . $tries . ')');
+                $this->logError(substitute('Port {port} is closed to blocked on ticket with token {token} and ip {ip}, error code: {code}, error message: {error}. (try {try}/{tries})', [
+                    'port' => $port,
+                    'token' => $this->ticket->token,
+                    'ip' => $this->ticket->ip,
+                    'code' => $errno,
+                    'error' => $errstr,
+                    'try' => $c,
+                    'tries' => $tries,
+                ]));
                 sleep(5);
             } else {
                 // port is open and available

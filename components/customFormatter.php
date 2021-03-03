@@ -5,6 +5,7 @@ namespace app\components;
 use Yii;
 use yii\i18n\Formatter;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\base\InvalidConfigException;
 use yii\base\InvalidArgumentException;
  
@@ -184,6 +185,33 @@ class customFormatter extends \yii\i18n\Formatter
             ],
             'layout' => '{items} {pager}',
         ]);
+    }
+
+    /**
+     * Formats the links in the input as actual links.
+     * 
+     * links are given by {url:{name}:{controller}:{action}:variable1={value1},variable2={value2}}
+     * they becomes:
+     * Html::a('{name}', Url::to('{controller}/{action}', [
+     *     'variable1' => '{value1}',
+     *     'variable2' => '{value2}',
+     * ]));
+     *
+     * @param integer $value the value to be formatted in minutes.
+     * @return string the formatted result.
+     */
+    public static function asLinks($value)
+    {
+        return preg_replace_callback('/\{url\:([^\:]+)\:([^\:]+)\:([^\:]+)\:([^\}]*)\}/', function($m){
+            $params = [];
+            $p = explode(',', $m[4]);
+            foreach ($p as $param) {
+                list($key, $val) = explode('=', $param, 2);
+                $params[$key] = $val;
+            }
+            $params[0] = $m[2].'/'.$m[3];
+            return Html::a($m[1], Url::to($params));
+        }, $value);
     }
 
 }

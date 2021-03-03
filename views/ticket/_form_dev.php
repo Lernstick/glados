@@ -13,6 +13,7 @@ use kartik\datetime\DateTimePicker;
 <hr>
 <div class="row dev_item">
     <div class="col-md-6">
+    	<?= $form->field($model, 'ip')->textInput(); ?>
         <?= $form->field($model, 'download_lock')->checkBox(); ?>
         <?= $form->field($model, 'backup_lock')->checkbox() ?>
         <?= $form->field($model, 'restore_lock')->checkbox() ?>
