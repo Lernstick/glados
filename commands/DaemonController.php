@@ -88,7 +88,7 @@ class DaemonController extends Controller
      */
     public $joblist = [
         0 => ['download',           'run-once'],
-        //1 => ['backup',             'run-once'],
+        1 => ['backup',             'run-once'],
         2 => ['analyze',            'run-once'],
         3 => ['remote-execution',   'run-once'],
         4 => ['cleanup',            'run-once', 300],
