@@ -5,10 +5,7 @@ namespace app\models;
 use Yii;
 use app\models\Base;
 use yii\helpers\Html;
-use app\models\file\ZipFile;
-use app\models\file\SquashfsFile;
 use app\components\HistoryBehavior;
-use app\components\ElasticsearchBehavior;
 
 /**
  * This is the model class for table "exam".
@@ -94,44 +91,6 @@ class Exam extends Base
                     'time_limit' => 'text',
                 ],
             ],
-            'ElasticsearchBehavior' => [
-                'class' => ElasticsearchBehavior::className(),
-                'index' => ['class' => '\app\models\indexes\ExamIndex'], // mappings are defined there
-                // what the attributes mean
-                'fields' => [
-                    'createdAt', // this field has CURRENT_TIMESTAMP
-                    'name',
-                    'subject',
-                    // calculated field
-                    'fileInfo' => ['trigger_attributes' => ['file']],
-                    'file2Info' => ['trigger_attributes' => ['file2']],
-                    'user' => ['trigger_attributes' => ['user_id'], 'value_from' => 'user_id'],
-                ],
-            ],
-            /*'ElasticsearchZip' => [
-                'class' => ElasticsearchBehavior::className(),
-                'index' => 'file',
-                'onlyIndexIf' => function($m) { return $m->zipFile->exists; },
-                'fields' => [
-                    'path' => function($m) { return $m->zipFile->path; },
-                    'mimetype' => function($m) { return $m->zipFile->mimetype; },
-                    'content' => function($m) { return $m->zipFile->toText; },
-                    'size' => function($m) { return $m->zipFile->size; },
-                    'exam' => function($m) { return $m->id; },
-                    'user' => function($m) { return $m->user_id; },
-                ],
-                // mapping of elasticsearch
-                'mappings' => [
-                    'properties' => [
-                        'path'     => ['type' => 'text'],
-                        'mimetype' => ['type' => 'text'],
-                        'content' =>  ['type' => 'text'],
-                        'size'     => ['type' => 'integer'],
-                        'exam'     => ['type' => 'integer'],
-                        'user'     => ['type' => 'integer'],
-                    ],
-                ],
-            ],*/
         ];
     }
 
@@ -363,28 +322,6 @@ class Exam extends Base
     }
 
     /**
-     * @return ZipFile
-     */
-    public function getZipFile()
-    {
-        return new ZipFile([
-            'path' => $this->file2,
-            'relation' => $this,
-        ]);
-    }
-
-    /**
-     * @return SquashfsFile
-     */
-    public function getSquashfsFile()
-    {
-        return new SquashfsFile([
-            'path' => $this->file,
-            'relation' => $this,
-        ]);
-    }
-
-    /**
      * @return string
      */
     public function getFileSize()
@@ -397,11 +334,7 @@ class Exam extends Base
      */
     public function getFileInfo()
     {
-        if (!empty($this->file)) {
-            return str_replace(',', '<br>', Yii::$app->file->set($this->file)->info);
-        } else {
-            return null;
-        }
+        return str_replace(',', '<br>', Yii::$app->file->set($this->file)->info);
     }
 
     /**

@@ -5,14 +5,39 @@ use yii\widgets\ActiveForm;
 use kartik\datetime\DateTimePicker;
 use kartik\select2\Select2;
 use yii\web\JsExpression;
-use app\assets\FormAsset;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Ticket */
 /* @var $form yii\widgets\ActiveForm */
 /* @var $searchModel app\models\TicketSearch */
 
-FormAsset::register($this);
+$js = <<< 'SCRIPT'
+/* To initialize BS3 popovers set this below */
+$(function () { 
+    $("[data-toggle='popover']").popover(); 
+});
+
+$('.hint-block').each(function () {
+    var $hint = $(this);
+
+    $hint.parent().find('label').after('&nbsp<a tabindex="0" role="button" class="hint glyphicon glyphicon-question-sign"></a>');
+
+    $hint.parent().find('a.hint').popover({
+        html: true,
+        trigger: 'focus',
+        placement: 'right',
+        //title:  $hint.parent().find('label').html(),
+        title:  'Description',
+        toggle: 'popover',
+        container: 'body',
+        content: $hint.html()
+    });
+
+    $hint.remove()
+});
+SCRIPT;
+// Register tooltip/popover initialization javascript
+$this->registerJs($js, \yii\web\View::POS_READY);
 
 if (Yii::$app->request->isAjax) {
     $ajax = <<< 'SCRIPT'

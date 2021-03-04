@@ -5,7 +5,6 @@ use yii\widgets\ActiveForm;
 use kartik\select2\Select2;
 use yii\web\JsExpression;
 use yii\helpers\FileHelper;
-use app\assets\FormAsset;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Result */
@@ -20,7 +19,33 @@ $this->params['breadcrumbs'][] = ['label' => $model->exam->name, 'url' => [
     'id' => $model->exam->id,
 ]];
 
-FormAsset::register($this);
+$js = <<< 'SCRIPT'
+/* To initialize BS3 popovers set this below */
+$(function () { 
+    $("[data-toggle='popover']").popover(); 
+});
+
+$('.hint-block').each(function () {
+    var $hint = $(this);
+
+    $hint.parent().find('label').after('&nbsp<a tabindex="0" role="button" class="hint glyphicon glyphicon-question-sign"></a>');
+
+    $hint.parent().find('a.hint').popover({
+        html: true,
+        trigger: 'focus',
+        placement: 'right',
+        //title:  $hint.parent().find('label').html(),
+        title:  'Description',
+        toggle: 'popover',
+        container: 'body',
+        content: $hint.html()
+    });
+
+    $hint.remove()
+});
+SCRIPT;
+// Register tooltip/popover initialization javascript
+$this->registerJs($js);
 
 $format_pt = <<< SCRIPT
 function format_pt(state) {

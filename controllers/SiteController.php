@@ -12,9 +12,6 @@ use app\models\TicketSearch;
 use app\models\Stats;
 use app\models\Activity;
 use app\models\ExamSearch;
-use app\models\forms\Search;
-use yii\elasticsearch\Query;
-use yii\elasticsearch\ActiveDataProvider;
 
 class SiteController extends Controller
 {
@@ -108,24 +105,4 @@ class SiteController extends Controller
 
         return $this->goHome();
     }
-
-
-    public function actionSearch()
-    {
-        $searchModel = new Search();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        return $this->render('search', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
-    }
-
-    public function actionAutocomplete()
-    {
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $searchModel = new Search();
-        return $searchModel->autocomplete(Yii::$app->request->queryParams);
-    }
-
 }

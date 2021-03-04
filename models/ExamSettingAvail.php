@@ -7,7 +7,6 @@ use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 use app\models\ExamSetting;
 use yii\data\ActiveDataProvider;
-use app\components\ElasticsearchBehavior;
 
 /**
  * This is the base model class for exam_setting_avail tables.
@@ -56,73 +55,6 @@ class ExamSettingAvail extends TranslatedActiveRecord
     {
         return [
             [['searchstring'], 'safe'],
-        ];
-    }
-
-    /**
-     * @inheritdoc 
-     */
-    public function behaviors()
-    {
-        return [
-            'ElasticsearchBehaviorDe' => [
-                'class' => ElasticsearchBehavior::className(),
-                'index' => 'exam_setting_de',
-                'language' => 'de',
-                // what the attributes mean
-                'fields' => [
-                    'key',
-                    'type',
-                    'default',
-                    'name',
-                    'description',
-                ],
-                // mapping of elasticsearch
-                'mappings' => [
-                    'properties' => [
-                        'key' => ['type' => 'text'],
-                        'type' => ['type' => 'text'],
-                        'default' => ['type' => 'text'],
-                        'name' => [
-                            'type' => 'text',
-                            "analyzer" => "german",
-                        ],
-                        'description' => [
-                            'type' => 'text',
-                            "analyzer" => "german",
-                        ],
-                    ],
-                ],
-            ],
-            'ElasticsearchBehaviorEn' => [
-                'class' => ElasticsearchBehavior::className(),
-                'index' => 'exam_setting_en',
-                'language' => 'en',
-                // what the attributes mean
-                'fields' => [
-                    'key',
-                    'type',
-                    'default',
-                    'name',
-                    'description',
-                ],
-                // mapping of elasticsearch
-                'mappings' => [
-                    'properties' => [
-                        'key' => ['type' => 'text'],
-                        'type' => ['type' => 'text'],
-                        'default' => ['type' => 'text'],
-                        'name' => [
-                            'type' => 'text',
-                            "analyzer" => "german",
-                        ],
-                        'description' => [
-                            'type' => 'text',
-                            "analyzer" => "german",
-                        ],
-                    ],
-                ],
-            ],
         ];
     }
 

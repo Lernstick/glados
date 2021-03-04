@@ -3,7 +3,6 @@
 namespace app\models;
 
 use Yii;
-use app\components\ElasticsearchBehavior;
 
 /**
  * This is the model class for table "restore".
@@ -27,40 +26,6 @@ class Restore extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'restore';
-    }
-
-    /**
-     * @inheritdoc 
-     */
-    public function behaviors()
-    {
-        return [
-            'ElasticsearchBehavior' => [
-                'class' => ElasticsearchBehavior::className(),
-                'index' => ['class' => '\app\models\indexes\RestoreIndex'], // mappings are defined there
-                // what the attributes mean
-                'fields' => [
-                    'startedAt',
-                    'finishedAt',
-                    'restoreDate',
-                    'file',
-                    'ticket' => ['trigger_attributes' => ['ticket_id'], 'value_from' => 'ticket_id'],
-                    'exam' => function($m){ return $m->ticket->exam_id; },
-                    'user' => function($m){ return $m->ticket->exam->user_id; },
-                ],
-            ],
-            'ElasticsearchRestoreLog' => [
-                'class' => ElasticsearchBehavior::className(),
-                'index' => ['class' => '\app\models\indexes\LogIndex'], // mappings are defined there
-                // what the attributes mean
-                'fields' => [
-                    'logentries' => function($m){ return empty($m->restoreLog) ? null : implode('', $m->restoreLog); },
-                    'restore' => function($m){ return $m->id; },
-                    'ticket' => function($m){ return $m->ticket->id; },
-                    'type' => function($m){ return 'info'; },
-                ],
-            ],
-        ];
     }
 
     /**

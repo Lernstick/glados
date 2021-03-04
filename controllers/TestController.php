@@ -6,7 +6,6 @@ use Yii;
 use app\models\forms\EventItemSend;
 use app\models\forms\AgentEventSend;
 use app\models\forms\EventStreamListen;
-use app\models\forms\ElasticsearchQuery;
 use app\components\AccessRule;
 use yii\web\NotFoundHttpException;
 
@@ -84,49 +83,6 @@ class TestController extends BaseController
 
         return $this->render('event/listen', [
             'stream' => $stream,
-        ]);
-    }
-
-    /**
-     * Run an Elasticsearch query.
-     * @return mixed
-     */
-    public function actionQuery()
-    {
-        $model = new ElasticsearchQuery();
-        $response = null;
-        $host = 'localhost:9200';
-        try {
-            $es = \Yii::$app->get('elasticsearch');
-            $online = true;
-        } catch (\Exception $e) {
-            $online = false;
-        }
-
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $raw = !empty($model->data);
-            $method = strtolower($model->method);
-
-            try {
-                $response = $model->getDb()->{$method}($model->url, [], $model->data, $raw);
-                if (property_exists($es, 'nodes') && array_key_exists(0, $es->nodes) && array_key_exists('http_address', $es->nodes[0])) {
-                    $host = \Yii::$app->get('elasticsearch')->nodes[0]['http_address'];
-                }
-                $online = true;
-            } catch (\Exception $e) {
-                \Yii::warning($e->getMessage(), __CLASS__);
-                $response = $e->getMessage();
-                $online = false;
-            }
-
-            $model->isNewRecord = false;
-        }
-
-        return $this->render('elasticsearch/query', [
-            'model' => $model,
-            'host' => $host,
-            'online' => $online,
-            'response' => $response,
         ]);
     }
 

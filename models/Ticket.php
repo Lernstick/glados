@@ -14,7 +14,6 @@ use app\models\EventItem;
 use app\models\EventStream;
 use app\models\RemoteExecution;
 use app\components\HistoryBehavior;
-use app\components\ElasticsearchBehavior;
 
 /**
  * This is the model class for table "ticket".
@@ -209,25 +208,6 @@ class Ticket extends LiveActiveRecord
                     'sc_size' => 'shortSize',
                 ],
             ],
-            'ElasticsearchBehavior' => [
-                'class' => ElasticsearchBehavior::className(),
-                'index' => ['class' => '\app\models\indexes\TicketIndex'], // mappings are defined there
-                // what the attributes mean
-                'fields' => [
-                    'createdAt', // this field has CURRENT_TIMESTAMP
-                    'start',
-                    'end',
-                    'token',
-                    'ip',
-                    'test_taker',
-                    'exam' => ['trigger_attributes' => ['exam_id'], 'value_from' => 'exam_id'],
-                    // relational field
-                    'user' => function($m){ return $m->exam->user_id; },
-                    // field based on other database attributes
-                    'state' => ['trigger_attributes' => ['start', 'end', 'test_taker']],
-                    'keylogger' => function($m){ return $m->screencapture === null ? null : $m->screencapture->getKeyloggerLog(true); },
-                ],
-            ],
         ];
     }
 
@@ -310,20 +290,6 @@ class Ticket extends LiveActiveRecord
             'test_taker' => \Yii::t('ticket', 'Here you can <b>assign the ticket to a student</b>. If left empty, this can also be done later (even when the exam has finished), but it is recommended to set this value as soon as possible, to keep track of the tickets. If not set the ticket will be unassigned/anonymous.'),
             'start' => \Yii::t('ticket', 'The start time of the exam. This should not be manually edited.'),
             'end' => \Yii::t('ticket', 'The finish time of the exam. This should not be manually edited.'),
-        ];
-    }
-
-    /**
-     * @return array This model's mapping
-     */
-    public static function mapping()
-    {
-        return [
-            // Field types: https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#field-datatypes
-            'properties' => [
-                'token'           => ['type' => 'text'],
-                'test_taker'      => ['type' => 'text'],
-            ]
         ];
     }
 
