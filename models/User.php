@@ -7,6 +7,7 @@ use app\models\Base;
 use yii\web\IdentityInterface;
 use app\models\EventItem;
 use app\models\Auth;
+use app\components\ElasticsearchBehavior;
 
 /**
  * This is the model class for table "user".
@@ -73,6 +74,26 @@ class User extends Base implements IdentityInterface
             self::SCENARIO_EXTERNAL => ['username', 'role', 'type', 'identifier'],
             self::SCENARIO_UPDATE => ['username', 'role', 'change_password'],
             self::SCENARIO_PASSWORD_RESET => ['password', 'password_repeat', 'change_password'],
+        ];
+    }
+
+    /**
+     * @inheritdoc 
+     */
+    public function behaviors()
+    {
+        return [
+            'ElasticsearchBehavior' => [
+                'class' => ElasticsearchBehavior::className(),
+                'index' => ['class' => '\app\models\indexes\UserIndex'], // mappings are defined there
+                // what the attributes mean
+                'fields' => [
+                    'username',
+                    'role',
+                    'type',
+                    'authMethod' => function($m){ return $m->authMethod !== null ? $m->authMethod->name : null; },
+                ],
+            ],
         ];
     }
 

@@ -8,6 +8,7 @@ use yii\helpers\FileHelper;
 use yii\helpers\StringHelper;
 use yii\web\NotFoundHttpException;
 use app\models\Daemon;
+use app\components\ElasticsearchBehavior;
 
 /**
  * This is the model class for the rdiff filesystem.
@@ -124,6 +125,71 @@ class RdiffFileSystem extends Model
     }
 
     /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            'ElasticsearchFile' => [
+                'class' => ElasticsearchBehavior::className(),
+                'index' => 'file',
+                // TODO: the inode number?
+                'id' => function($m){ return generate_uuid(); },
+                'allModels' => [
+                    /**
+                     * @param string $class name of the class (app\models\RdiffFileSystem)
+                     * @return Ticket[] array of tickets
+                     */
+                    'foreach'   => function($class) { return Ticket::find()->all(); },
+                    'allModels' => [
+                        /**
+                         * @param Ticket $model the model from foreach
+                         * @return Backup[] array of backups
+                         */
+                        'foreach'   => function($model) { return $model->backups; },
+                        /**
+                         * @param Backup $model the model from foreach
+                         * @return RdiffFileSystem[] array of RdiffFileSystem
+                         */
+                        'allModels' => function($model) {
+                            $fs = new RdiffFileSystem([
+                                'root' => $model->ticket->exam->backup_path,
+                                'location' => \Yii::$app->params['backupPath'] . '/' . $model->ticket->token,
+                                'restoreUser' => 'root',
+                                'restoreHost' => $model->ticket->ip,
+                            ]);
+                            return $fs->slash('/')->versionAt($model->date)->find();
+                        },
+                    ],
+                ],
+                // what the attributes mean
+                'fields' => [
+                    'path',
+                    //'mimetype',
+                    'content' => function($m) { return $m->toText(); },
+                    'version',
+                    'size',
+                ],
+                // mapping of elasticsearch
+                'mappings' => [
+                    'properties' => [
+                        'path'     => ['type' => 'text'],
+                        //'mimetype' => ['type' => 'text'],
+                        'content' =>  ['type' => 'text'],
+                        'size'     => ['type' => 'integer'],
+                        'version'  => [
+                            'type' => 'date',
+                            # yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ or yyyy-MM-dd or timestamp
+                            # @see https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-date-format.html
+                            'format' => 'date_optional_time||epoch_millis',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
      * Getter for the location
      *
      * @return string
@@ -190,7 +256,7 @@ class RdiffFileSystem extends Model
 
         if (count($this->versions) != 0) {
             return $this;
-        }else{
+        } else {
             //throw new NotFoundHttpException($this->path . ': No such file or directory.');
             return null;
         }
@@ -354,8 +420,8 @@ class RdiffFileSystem extends Model
      * Getter for contents
      *
      * @return RdiffFileSystem|RdiffFileSystem[]
-     *                      An array of RdiffFileSystem[] instances if the current path is a directory
-     *                      RdiffFileSystem instance if the current path is a file
+     *                      Array of RdiffFileSystem instances if the current path is a directory
+     *                      Array of RdiffFileSystem instances of all versions if the current path is a file
      */
     public function getContents()
     {
@@ -652,7 +718,7 @@ class RdiffFileSystem extends Model
      * @return string - the real state
      * @see getState()
      */
-    private function getRealState()
+    public function getRealState()
     {
 
         $this->populateFileInfo();
@@ -714,6 +780,40 @@ class RdiffFileSystem extends Model
             }
             throw new NotFoundHttpException(\Yii::t('restores', 'The file could not be restored.') . ' ' . PHP_EOL . $out);
         }
+    }
+
+    /**
+     * Returns the contents of the file as text.
+     *
+     * @return string|null the contents as text or null if the file could not be converted to text
+     */
+    public function toText()
+    {
+        if (StringHelper::endsWith($this->path, 'txt')) {
+            return $this->restore(true);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Finds files with given pattern in their path.
+     *
+     * @param string $pattern file path pattern
+     * @return RdiffFileSystem[] array of RdiffFileSystem instances
+     */
+    public function find($pattern = null)
+    {
+        $r = [];
+        if ($this->type == 'dir') {
+            foreach ($this->contents as $fs) {
+                $r = array_merge($r, $fs->find());
+            }
+        } elseif ($this->type == 'file' && $this->state == 'normal') {
+            $r[] = $this;
+        }
+
+        return $r;
     }
 
 }

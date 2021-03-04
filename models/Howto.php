@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\base\Model;
+use app\components\ElasticsearchBehavior;
 
 /**
  * This is the model class for the howtos.
@@ -15,6 +16,25 @@ class Howto extends Model
     public $id;
     public $title;
     public $content;
+
+    /**
+     * @inheritdoc 
+     */
+    public function behaviors()
+    {
+        return [
+            'ElasticsearchBehavior' => [
+                'class' => ElasticsearchBehavior::className(),
+                'index' => ['class' => '\app\models\indexes\HowtoIndex'], // mappings are defined there
+                'allModels' => function($class) { return $class::findAll(); },
+                // what the attributes mean
+                'fields' => [
+                    'title',
+                    'content',
+                ],
+            ],
+        ];
+    }
 
     /**
      * Returns all Howto models

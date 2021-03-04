@@ -7,6 +7,7 @@ use yii\base\Model;
 use yii\helpers\FileHelper;
 use app\models\Ticket;
 use app\models\RdiffFileSystem;
+use app\components\ElasticsearchBehavior;
 
 /**
  * This is the model class for the backup directory.
@@ -40,6 +41,71 @@ class Backup extends Model
     public $totalDestinationSizeChange;
     public $errors;
 
+    public $id; // only used in commands/IndexController.php
+    public $nr; // only used in commands/IndexController.php
+
+    /**
+     * @inheritdoc 
+     */
+    public function behaviors()
+    {
+        return [
+            'Elasticsearch' => [
+                'class' => ElasticsearchBehavior::className(),
+                'index' => ['class' => '\app\models\indexes\BackupIndex'], // mappings are defined there
+                'allModels' => [
+                    'foreach' => function($class) { return Ticket::find()->all(); },
+                    'allModels' => function($model) { return $model->backups; },
+                ],
+                // what the attributes mean
+                'fields' => [
+                    'date',
+                    'errors',
+                    'elapsedTime',
+                    'sourceFiles',
+                    'mirrorFiles',
+                    'deletedFiles',
+                    'changedFiles',
+                    'incrementFiles',
+                    'totalDestinationSizeChange',
+                    'ticket' => function($m){ return $m->ticket->id; },
+                ],
+            ],
+            'ElasticsearchErrorLog' => [
+                'class' => ElasticsearchBehavior::className(),
+                'index' => ['class' => '\app\models\indexes\LogIndex'], // mappings are defined there
+                'id' => function($m){ return 'ticket:'.$m->ticket->id.'->backup:'.$m->nr.'->errorLog'; },
+                'allModels' => [
+                    'foreach' => function($class) { return Ticket::find()->all(); },
+                    'allModels' => function($model) { return $model->backups; },
+                ],
+                // what the attributes mean
+                'fields' => [
+                    'logentries' => function($m){ return empty($m->errorLog) ? null : implode('', $m->errorLog); },
+                    'backup' => function($m){ return $m->id; },
+                    'ticket' => function($m){ return $m->ticket->id; },
+                    'type' => function($m){ return 'error'; },
+                ],
+            ],
+            'ElasticsearchBackupLog' => [
+                'class' => ElasticsearchBehavior::className(),
+                'index' => ['class' => '\app\models\indexes\LogIndex'], // mappings are defined there
+                'id' => function($m){ return 'ticket:'.$m->ticket->id.'->backup:'.$m->nr.'->backupLog'; },
+                'allModels' => [
+                    'foreach' => function($class) { return Ticket::find()->all(); },
+                    'allModels' => function($model) { return $model->backups; },
+                ],
+                // what the attributes mean
+                'fields' => [
+                    'logentries' => function($m){ return empty($m->backupLog) ? null : implode('', $m->backupLog); },
+                    'backup' => function($m){ return $m->id; },
+                    'ticket' => function($m){ return $m->ticket->id; },
+                    'type' => function($m){ return 'info'; },
+                ],
+            ],
+        ];
+    }
+
     /**
      * @return array the validation rules.
      */
@@ -66,7 +132,6 @@ class Backup extends Model
             'incrementFiles' => Yii::t('backups', 'Increment Files'),
             'totalDestinationSizeChange' => Yii::t('backups', 'Total Destination Size Change'),
             'errors' => Yii::t('backups', 'Errors'),
-
         ];
     }
 
@@ -171,15 +236,21 @@ class Backup extends Model
      */
     public function findAll($token)
     {
+        $ticket = Ticket::findOne(['token' => $token]);
         $dir = \Yii::$app->params['backupPath'] . '/' . $token . '/rdiff-backup-data/';
         $models = [];
 
+        $i = 1;
         if (file_exists($dir)) {
             $files = scandir($dir, SCANDIR_SORT_DESCENDING);
             foreach ($files as $file) {
                 if (preg_match('/^session_statistics\.(.*)\.data$/', $file, $matches)) {
                     if (isset($matches[1])) {
-                        $models[] = Backup::findOne($token, $matches[1]);
+                        $model = Backup::findOne($token, $matches[1]);
+                        $model->id = $ticket->id . ":" . $i;
+                        $model->nr = $i;
+                        $models[] = $model;
+                        $i = $i+1;
                     }
                 }
             }
@@ -192,7 +263,7 @@ class Backup extends Model
      * Return the Backup model related to the token and the date
      *
      * @param string $token - token
-     * @param string $date - date
+     * @param string $date date in iso-8601 format with seconds, example 2020-05-27T14:04:33+02:00
      * @return Backup
      */
     public function findOne($token, $date)

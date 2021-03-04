@@ -4,12 +4,15 @@
 /* @var $content string */
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
 use app\models\Activity;
 use app\models\DaemonSearch;
+use app\models\forms\Search;
+use yii\widgets\ActiveForm;
 use app\components\ActiveEventField;
 
 AppAsset::register($this);
@@ -20,11 +23,33 @@ $newActivities = $activity->newActivities();
 $daemons = new DaemonSearch();
 $runningDaemons = $daemons->search([])->totalCount;
 
+$searchModel = new Search();
+$searchModel->load(Yii::$app->request->queryParams);
+
 /* register the global YII_ENV variables */
 $this->registerJs('var YII_ENV_DEV = ' . (YII_ENV_DEV ? 'true' : 'false') . ';', \yii\web\View::POS_HEAD);
 $this->registerJs('var YII_DEBUG = ' . (YII_DEBUG ? 'true' : 'false') . ';', \yii\web\View::POS_HEAD);
-
 $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\View::POS_END);
+
+$search_hint = <<< 'SCRIPT'
+$('.search-hint-block').each(function () {
+    var $hint = $(this);
+    $hint.parent().find('input#q').popover({
+        html: true,
+        trigger: 'focus',
+        placement: 'bottom',
+        toggle: 'popover',
+        container: '.collapse',
+        content: $hint.html(),
+        viewport: '.collapse',
+        template: '<div class="popover search-popover" role="tooltip"><div class="popover-content"></div></div>'
+    });
+
+    $hint.remove()
+});
+
+SCRIPT;
+$this->registerJs($search_hint);
 
 ?>
 <?php $this->beginPage() ?>
@@ -57,6 +82,10 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
 <body>
 <?php $this->beginBody() ?>
 
+<?php if (YII_ENV_DEV) {
+    echo "<p class='navbar-main-text'>YII_ENV_DEV=true<br>YII_DEBUG=" . (YII_DEBUG ? 'true' : 'false') . "<br>LANG=" . \Yii::$app->language . "</p>";
+} ?>
+
 <div class="wrap">
     <?php
     NavBar::begin([
@@ -66,16 +95,61 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
-    if (YII_ENV_DEV) {
-        echo "<p class='navbar-text' style='color:red; font-size:7px; margin:10px;'>YII_ENV_DEV=true<br>YII_DEBUG=" . (YII_DEBUG ? 'true' : 'false') . "<br>LANG=" . \Yii::$app->language . "</p>";
-    }
+    $searchForm = ActiveForm::begin([
+        'method' => 'get',
+        'id' => 'search-nav-form',
+        'action' => Url::to(['site/search']),
+        'options' => [
+            'class' => 'navbar-form navbar-inverse navbar-left',
+            'role' => 'search',
+        ],
+        'fieldConfig' => [
+            'template' => "{input}",
+        ],
+    ]);
+    ?>
+    <div class="form-group has-feedback has-feedback-left search">
+        <?= $searchForm->field($searchModel, 'q')->textInput([
+            'id' => 'nav-q', // must be different from the one in search.php
+            'class' => 'form-control navbar-inverse navbar-inverse-input',
+            'placeholder' => \Yii::t('search', 'Search ...'),
+        ])->label(false)->hint(false); ?>
+        <i class='glyphicon glyphicon-search form-control-feedback search-input-icon'></i>
+        <div class='search-hint-block'>
+            <div class='row'>
+                <div class='col-md-6'>
+                    <span class="search-hint">
+                        <?= \Yii::t('search', '<code>"words here"</code> exact phrase'); ?><br>
+                        <?= \Yii::t('search', '<code>(quick OR brown) AND fox</code> logic and grouping'); ?><br>
+                        <?= \Yii::t('search', '<code>date:[2012-01-01 TO 2012-12-31]</code> date range'); ?><br>
+                        <?= \Yii::t('search', '<code>date:{* TO 2012-01-01}</code> dates before 2012'); ?><br>
+                    </span>
+                </div>
+                <div class='col-md-6'>
+                    <span class="search-hint">
+                        <?= \Yii::t('search', '<code>quick -brown +fox</code> must / must not'); ?><br>
+                        <?= \Yii::t('search', '<code>user:1234</code> search by user'); ?><br>
+                        <?= \Yii::t('search', '<code>test_taker:steve</code> search by student'); ?><br>
+                        <?= \Yii::t('search', '<code>username:"John Smith"</code> exact phrase in field'); ?><br>
+                    </span>
+                </div>
+            </div>
+            <div class='row'><hr></div>
+            <div class='row'>
+                <div class='col-md-6'></div>
+                <div class='col-md-6'>
+                    <span class='pull-right'>
+                        <?= Html::a(\Yii::t('search', 'search help'), Url::to(['howto/searching.md'])); ?>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php ActiveForm::end(); ?>
+    <?php
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
-            [
-                'label' => \Yii::t('main', 'Home'),
-                'url' => ['/site/index']
-            ],
             [
                 'label' => \Yii::t('main', 'Actions'),
                 'visible' => !Yii::$app->user->isGuest,
@@ -227,6 +301,12 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
                     [
                         'label' => 'Listen to Events',
                         'url' => ['/test/listen'],
+                        'options' => ['class' => 'dev_item'],
+                        'visible' => YII_ENV_DEV,
+                    ],
+                    [
+                        'label' => 'Query Elasticsearch',
+                        'url' => ['/test/query'],
                         'options' => ['class' => 'dev_item'],
                         'visible' => YII_ENV_DEV,
                     ],

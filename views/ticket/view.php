@@ -453,7 +453,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ]); ?>
     <?php Pjax::end() ?>
 
-     <?php Pjax::begin([
+    <?php Pjax::begin([
         'id' => 'logs',
         'options' => ['class' => 'tab-pane fade'],
     ]); ?>

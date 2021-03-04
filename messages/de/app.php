@@ -42,9 +42,11 @@ return [
     'The ressource is exclusively locked, please try again later.' => 'Die Ressource ist momentan gesperrt, bitte versuchen Sie es später noch einmal.',
     'Try out the new live overview to monitor running exams.' => 'Probieren Sie die neue Ansicht um Prüfungen zu überwachen.',
     'Welcome!' => 'Willkommen!',
-    'You are not allowed to {action} this {item}.' => 'Sie sind nicht berechtigt zum {action} dieses {item}.',
     'exam{n,plural,=0{s} =1{} other{s}} completed' => 'Prüfung{n,plural,=0{en} =1{} other{en}} abgeschlossen',
     'hour{n,plural,=0{s} =1{} other{s}} spent in exams' => 'Stund{n,plural,=0{en} =1{e} other{en}} in Prüfungen verbracht',
     'keystrokes from Keylogger' => 'Tastatureingaben vom Keylogger',
     'running exam{n,plural,=0{s} =1{} other{s}}' => 'laufende Prüfung{n,plural,=0{en} =1{} other{en}}',
+    'The ticket does not exist.' => '',
+    'You are not allow to view this page. You need to have the following  permission: "{permission}".' => '',
+    'You are not allowed to {action} this {item}.' => '@@Sie sind nicht berechtigt zum {action} dieses {item}.@@',
 ];
