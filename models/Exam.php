@@ -18,7 +18,8 @@ use app\components\ElasticsearchBehavior;
  * @property string $subject
  * @property boolean $grp_netdev
  * @property boolean $allow_sudo
- * @property boolean $allow_mount
+ * @property boolean $allow_mount_external
+ * @property boolean $allow_mount_system
  * @property boolean $firewall_off
  * @property string $file
  * @property integer $user_id
@@ -86,7 +87,8 @@ class Exam extends Base
                     'file2' => 'text',
                     'grp_netdev' => 'boolean',
                     'allow_sudo' => 'boolean',
-                    'allow_mount' => 'boolean',
+                    'allow_mount_external' => 'boolean',
+                    'allow_mount_system' => 'boolean',
                     'firewall_off' => 'boolean',
                     'backup_path' => 'text',
                     'time_limit' => 'text',
@@ -139,7 +141,7 @@ class Exam extends Base
     public function rules()
     {
         return [
-            [['id', 'name', 'subject', 'examFile', 'user_id', 'grp_netdev', 'allow_sudo', 'allow_mount', 'firewall_off', 'time_limit'], 'validateRunningTickets'],
+            [['id', 'name', 'subject', 'examFile', 'user_id', 'grp_netdev', 'allow_sudo', 'allow_mount_external', 'allow_mount_system', 'firewall_off', 'time_limit'], 'validateRunningTickets'],
             [['name', 'subject', 'backup_path'], 'required'],
             [['time_limit'], 'integer', 'min' => 0],
             [['user_id'], 'integer'],
@@ -169,7 +171,8 @@ class Exam extends Base
             'user_id' => \Yii::t('exams', 'User ID'),
             'grp_netdev' => \Yii::t('exams', 'User can edit network connections'),
             'allow_sudo' => \Yii::t('exams', 'User can gain root privileges by sudo'),
-            'allow_mount' => \Yii::t('exams', 'User has access to external filesystems such as USB Sticks'),
+            'allow_mount_external' => \Yii::t('exams', 'User has access to external filesystems such as USB Sticks'),
+            'allow_mount_system' => \Yii::t('exams', 'User has access to internal filesystems (HDD, SSD)'),
             'firewall_off' => \Yii::t('exams', 'Disable Firewall'),
             'time_limit' => \Yii::t('exams', 'Time Limit'),
             'backup_path' => \Yii::t('exams', 'Remote Backup Path'),
@@ -193,7 +196,8 @@ class Exam extends Base
             'time_limit' => \Yii::t('exams', 'If this value (in minutes) is set, the exam status view of the student will show the time left. This has <b>NO indication</b> elsewhere. It is just of informative purpose. Set to <code>0</code> or leave empty for no time limit.'),
             'grp_netdev' => \Yii::t('exams', 'If set, the exam student will be in the network group <code>netdev</code>. Members of this group can manage network interfaces through the network manager and wicd. Notice, that the student will be able to leave the exam network. <b>This should not be set, unless you know what you are doing.</b>'),
             'allow_sudo' => \Yii::t('exams', 'If set, the exam student will be able to switch to the root user <b>without password</b>. <b>This should not be set, unless you know what you are doing.</b>'),
-            'allow_mount' => \Yii::t('exams', 'If set, the exam student will be able to mount external filesystems such as USB Sticks, Harddrives or Smartcard. <b>This should not be set, unless you know what you are doing.</b>'),
+            'allow_mount_external' => \Yii::t('exams', 'If set, the exam student will be able to mount external filesystems such as USB Sticks, Harddrives or Smartcard. <b>This should not be set, unless you know what you are doing.</b>'),
+            'allow_mount_system' => \Yii::t('exams', 'If set, the exam student will be able to mount internal filesystems such as local HDDs or SSDs. <b>This should not be set, unless you know what you are doing.</b>'),
             'firewall_off' => \Yii::t('exams', 'If set, disables the Firewall and access to all network resourses is given. <b>This should not be set, unless you know what you are doing.</b>'),
             'backup_path' => \Yii::t('exams', 'Specifies the <b>directory to backup</b> at the target machine. This should be an absolute path. Mostly this is set to <code>/home/user</code>, which is the home directory of the user under which the exam is taken. The exam server will then backup the ALL files in <code>/home/user</code> that have changed since the exam started. For more information please visit <code>Manual / Remote Backup Path</code>'),
             'file' => \Yii::t('exams', 'Use a <b>squashfs-Filesystem or a ZIP-File</b> for the exam. Squashfs is a highly compressed read-only filesystem for Linux. This file contains all files, settings and applications for the exam (all changes made on the original machine). These changes are applied to the exam system as soon as the exam starts. See <b>Help</b> for more information on how to create those files.'),

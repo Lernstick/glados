@@ -192,7 +192,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'client_state',
-                'format' => 'raw',
+                'format' => 'links',
                 'value' =>  ActiveEventField::widget([
                     'options' => [ 'tag' => 'span' ],
                     'content' => $model->client_state,

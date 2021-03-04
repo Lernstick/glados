@@ -58,20 +58,20 @@ Examples of `Bind Schemes`:
 
 Assume your domain name is `example.com` and your LDAP allows to bind with the distinguished Name `dn` as well as with `username@example.com`. To illustrate the power of `Bind Scheme` together with `Login Scheme` to rewrite bind credentials, consider the following examples:
 
-Login Scheme			| Bind Scheme  			| Example Login			| Constructed Bind DN | Notes 			|
--------------			| ---------------		| ------------  		| -----------------   | ------------- 	|
-`{username}`			| `{username}@{domain}`	| `alice`				| `alice@example.com` | default setup 	|
-`{username}`			| `{username}`			| `alice`				| `alice`			  |  |
-`{username}`			| `{username}@{domain}`	| `alice@example.com`	| `alice@example.com@example.com` |  	|
-`{username}@{domain}`	| `{username}@{domain}`	| `alice`				| none 				  |  |
-`{username}@{domain}`	| `{username}@{domain}`	| `alice@example.com`   | `alice@example.com` |  |
-`{username}@{domain}`	| `{username}@{domain}`	| `alice@other_domain`  | none				  |  |
-`{username}@other_doman`| `{username}@{domain}`	| `alice@other_domain`  | `alice@example.com` | rewriting of the domain |
-`{username}@other_doman`| `{username}@{domain}`	| `alice@other_domain`  | `alice@example.com` |  |
-`{username}`			| `cn={username},dc=example,dc=com`	| `alice`   | `cn=alice,dc=example,dc=com` | 		|
-`{username}`			| `cn={username},{base}`| `alice`  				| `cn=alice,dc=example,dc=com` 	  		|
-`{username}@{domain}`	| `cn={username},{base}`| `alice`			   	| none 				  | 				|
-`{username}@{domain}`	| `cn={username},{base}`| `alice@example.com`  	| `cn=alice,dc=example,dc=com` | 		|
+Login Scheme            | Bind Scheme           | Example Login         | Constructed Bind DN | Notes           |
+-------------           | ---------------       | ------------          | -----------------   | -------------   |
+`{username}`            | `{username}@{domain}` | `alice`               | `alice@example.com` | default setup   |
+`{username}`            | `{username}`          | `alice`               | `alice`             |  |
+`{username}`            | `{username}@{domain}` | `alice@example.com`   | `alice@example.com@example.com` |     |
+`{username}@{domain}`   | `{username}@{domain}` | `alice`               | none                |  |
+`{username}@{domain}`   | `{username}@{domain}` | `alice@example.com`   | `alice@example.com` |  |
+`{username}@{domain}`   | `{username}@{domain}` | `alice@other_domain`  | none                |  |
+`{username}@other_doman`| `{username}@{domain}` | `alice@other_domain`  | `alice@example.com` | rewriting of the domain |
+`{username}@other_doman`| `{username}@{domain}` | `alice@other_domain`  | `alice@example.com` |  |
+`{username}`            | `cn={username},dc=example,dc=com` | `alice`   | `cn=alice,dc=example,dc=com` |        |
+`{username}`            | `cn={username},{base}`| `alice`               | `cn=alice,dc=example,dc=com`          |
+`{username}@{domain}`   | `cn={username},{base}`| `alice`               | none                |                 |
+`{username}@{domain}`   | `cn={username},{base}`| `alice@example.com`   | `cn=alice,dc=example,dc=com` |        |
 
 where the `Example Login` column denotes a login username given in the login form and `Constructed Bind DN` shows the bind DN that is constructed using the login username and `Login Scheme` together with `Bind Scheme`. A constructed bind DN of `none` means that there is no bind DN contructed, and thus the login has failed.
 

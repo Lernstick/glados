@@ -121,6 +121,13 @@ $config = [
                 [
                     'class' => 'yii\log\FileTarget',
                     'levels' => ['error', 'warning'],
+                    'maskVars' => [
+                        '_POST.LoginForm.password',
+                        '_POST.AuthTestForm.password',
+                        '_POST.AuthActiveDirectory.query_password',
+                        '_POST.AuthOpenLdap.query_password',
+                        '_POST.AuthGenericLdap.query_password'
+                    ],
                 ],
             ],
         ],

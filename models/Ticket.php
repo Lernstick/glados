@@ -805,30 +805,48 @@ class Ticket extends LiveActiveRecord
      * @param string $lc_all the value of the `LC_ALL` environment variable
      * @param integer $timeout the SSH connection timeout
      * @return array the first element contains the output (stdout and stderr),
-     * the second element contains the exit code of the command
+     * the second element contains the exit code of the command, and the third
+     * element contains the actual command issued on the glados server.
      */
     public function runCommand($cmd, $lc_all = "C", $timeout = 30)
     {
 
-        $tmp = sys_get_temp_dir() . '/cmd.' . generate_uuid();
-        $cmd = "ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
+        //$tmp = sys_get_temp_dir() . '/cmd.' . generate_uuid();
+        /*$cmd = "ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
              . "-o UserKnownHostsFile=/dev/null "
              . "-o StrictHostKeyChecking=no "
              . "-o ConnectTimeout=" . $timeout . " "
              . "root@" . $this->ip . " "
-             . escapeshellarg("LC_ALL=" . $lc_all . " " .  $cmd . " 2>&1") . " >" . $tmp;
+             . escapeshellarg("LC_ALL=" . $lc_all . " " .  $cmd . " 2>&1") . " >" . $tmp . ' 2>&1';*/
+
+        $remote_cmd = substitute('LC_ALL={lc_all} {cmd} 2>&1', [
+            'lc_all' => $lc_all,
+            'cmd' => $cmd,
+        ]);
+        $file = substitute('{tmp_path}/cmd.{uuid}', [
+            'tmp_path' => sys_get_temp_dir(),
+            'uuid' => generate_uuid(),
+        ]);
+
+        $cmd = substitute('ssh -i {path}/rsa -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o ConnectTimeout={timeout} root@{ip} {cmd} >{file} 2>&1', [
+            'path' => \Yii::$app->params['dotSSH'],
+            'timeout' => $timeout,
+            'ip' => $this->ip,
+            'cmd' => escapeshellarg($remote_cmd),
+            'file' => $file,
+        ]);
 
         $output = array();
         $lastLine = exec($cmd, $output, $retval);
 
-        if (!file_exists($tmp)) {
+        if (!file_exists($file)) {
             $output = implode(PHP_EOL, $output);
         } else {
-            $output = file_get_contents($tmp);
-            @unlink($tmp);
+            $output = file_get_contents($file);
+            @unlink($file);
         }
 
-        return [ $output, $retval ];
+        return [ $output, $retval, $cmd ];
     }
 
     /**

@@ -23,5 +23,5 @@ Connection        | Service     | Port
 Client to Server  | http/https  | `80` for http, `443` for https (by default)
 Server to Client  | ssh         | `22` (by default)
 
-<br>
+
 If your exam server sits in another subnet than your exam clients, make sure to disable [Network address translation](https://en.wikipedia.org/wiki/Network_address_translation) in the configuration of the router. This is necessary because the server detects the clients IP-address (which is then used in remote backup) over the HTTP headers and/or `$_SERVER` environment variables provided by the webserver. With NAT enabled the header would contain the IP-address of the routing device instead.

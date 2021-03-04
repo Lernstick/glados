@@ -96,7 +96,6 @@ function substitute($string, $params) {
     return str_replace($search, array_values($params), $string);;
 }
 
-
 /* Introduced in PHP8 */
 if (!function_exists('str_contains')) {
     function str_contains($haystack, $needle) {

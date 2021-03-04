@@ -102,15 +102,17 @@ class RestoreController extends DaemonController
         $this->ticket->restore_state = yiit('ticket', 'connecting to client...');
         $this->ticket->save(false);
 
-        if ($this->checkPort(22, 3) === false) {
+        if ($this->checkPort(22, 3, $emsg) === false) {
             $this->ticket->online = false;
-            $this->ticket->restore_state = yiit('ticket', 'network error.');
+            $this->ticket->restore_state = yiit('ticket', 'network error: {error}.');
+            $this->ticket->restore_state_params = ['error' => $emsg];
             $this->ticket->restore_lock = 0;
             $this->ticket->save(false);
 
             $act = new Activity([
                 'ticket_id' => $this->ticket->id,
-                'description' => yiit('activity', 'Restore failed: network error.'),
+                'description' => yiit('activity', 'Restore failed: network error, {error}.'),
+                'description_params' => ['error' => $emsg],
                 'severity' => Activity::SEVERITY_WARNING,
             ]);
             $act->save();
@@ -288,15 +290,26 @@ class RestoreController extends DaemonController
      * Determines if a given port on the target system is open or not
      *
      * @param integer $port The port to check
-     * @param integer $times The number to times to try (with 5 seconds delay inbetween every check)
+     * @param integer $tries The number to times to try (with 5 seconds delay inbetween every check)
+     * @param integer $errstr contains the error message of the last try from fsockopen()
+     * @param integer $errno the error code of the last try from connect()
      * @return boolean Whether the port is open or not
      */
-    private function checkPort($port, $times = 1)
+    private function checkPort($port, $tries = 1, &$errstr = null, &$errno = null)
     {
-        for($c=1;$c<=$times;$c++){
+        for($c=1;$c<=$tries;$c++){
             $fp = @fsockopen($this->ticket->ip, $port, $errno, $errstr, 10);
             if (!$fp) {
-                $this->logError('Port ' . $port . ' is closed or blocked. (try ' . $c . '/' . $times . ')');
+                //$this->logError('Port ' . $port . ' is closed or blocked. (try ' . $c . '/' . $tries . ')');
+                $this->logError(substitute('Port {port} is closed to blocked on ticket with token {token} and ip {ip}, error code: {code}, error message: {error}. (try {try}/{tries})', [
+                    'port' => $port,
+                    'token' => $this->ticket->token,
+                    'ip' => $this->ticket->ip,
+                    'code' => $errno,
+                    'error' => $errstr,
+                    'try' => $c,
+                    'tries' => $tries,
+                ]));
                 sleep(5);
             } else {
                 // port is open and available

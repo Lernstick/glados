@@ -19,4 +19,3 @@ Variable						| Configuration Setting 	| Example Value			| Authentication Method
 `{loginAttribute}`				| `Login Attribute`			| `mail`				| Generic LDAP, OpenLDAP, Active Directory |
 `{bindAttribute}`				| `Bind Attribute`			| `userPrincipalName`	| Generic LDAP, OpenLDAP, Active Directory |
 `{netbiosDomain}`				| derived from `Domain`		| `example`				| Active Directory |
-

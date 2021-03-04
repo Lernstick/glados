@@ -16,13 +16,22 @@ function expert_settings()
   # config->allow_sudo
   if [ "$(config_value "allow_sudo")" = "False" ]; then
     rm "${initrd}/newroot/etc/sudoers.d/01-lernstick-exam"
+  else
+    echo "user ALL=(ALL) NOPASSWD: ALL" > "${initrd}/newroot/etc/sudoers.d/01-lernstick-exam"
   fi
 
-  # config->allow_mount
-  if [ "$(config_value "allow_mount")" = "False" ]; then
-    chroot ${initrd}/newroot sed -i 's/^ResultAny=.*/ResultAny=auth_admin/;s/^ResultInactive=.*/ResultInactive=auth_admin/;s/^ResultActive=.*/ResultActive=auth_admin/' /etc/polkit-1/localauthority/50-local.d/10-udisks2-mount.pkla /etc/polkit-1/localauthority/50-local.d/10-udisks2-mount-system.pkla
+  # config->allow_mount_external
+  if [ "$(config_value "allow_mount_external")" = "False" ]; then
+    chroot ${initrd}/newroot sed -i 's/^ResultAny=.*/ResultAny=auth_admin/;s/^ResultInactive=.*/ResultInactive=auth_admin/;s/^ResultActive=.*/ResultActive=auth_admin/' /etc/polkit-1/localauthority/50-local.d/10-udisks2-mount.pkla
   else
-    chroot ${initrd}/newroot sed -i 's/^ResultAny=.*/ResultAny=yes/;s/^ResultInactive=.*/ResultInactive=yes/;s/^ResultActive=.*/ResultActive=yes/' /etc/polkit-1/localauthority/50-local.d/10-udisks2-mount.pkla /etc/polkit-1/localauthority/50-local.d/10-udisks2-mount-system.pkla
+    chroot ${initrd}/newroot sed -i 's/^ResultAny=.*/ResultAny=yes/;s/^ResultInactive=.*/ResultInactive=yes/;s/^ResultActive=.*/ResultActive=yes/' /etc/polkit-1/localauthority/50-local.d/10-udisks2-mount.pkla
+  fi
+
+  # config->allow_mount_system
+  if [ "$(config_value "allow_mount_system")" = "False" ]; then
+    chroot ${initrd}/newroot sed -i 's/^ResultAny=.*/ResultAny=auth_admin/;s/^ResultInactive=.*/ResultInactive=auth_admin/;s/^ResultActive=.*/ResultActive=auth_admin/' /etc/polkit-1/localauthority/50-local.d/10-udisks2-mount-system.pkla
+  else
+    chroot ${initrd}/newroot sed -i 's/^ResultAny=.*/ResultAny=yes/;s/^ResultInactive=.*/ResultInactive=yes/;s/^ResultActive=.*/ResultActive=yes/' /etc/polkit-1/localauthority/50-local.d/10-udisks2-mount-system.pkla
   fi
 
   # config->firewall_off

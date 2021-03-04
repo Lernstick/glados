@@ -8,6 +8,7 @@ TODO:
     * network bandwidth
     * connection details/type (lan, wlan, card, ...)
     * device details (dmidecode, lspci, ...)
+    * systemd-detect-virt — Detect execution in a virtualized environment
   * store in table ticket_properties similar to exam_settings
   * show in the ticket view
 
@@ -58,6 +59,9 @@ TODO:
   * generally: remove save(false); statements, they cause crashes
   * put .Keylogger path to exclude_list in backupController
   * welcome to exam message in wxbrowser
+  * Version conflict in log/history/activities
+  * In google chrome settings->Login hint preview not visible
+  * corporate identity: possibility to write text/logo in front page + colors of theme?
   * keylogger not working without a screencapture present ?!?
 
 * elasticsearch

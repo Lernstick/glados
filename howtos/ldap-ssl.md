@@ -30,4 +30,4 @@ If the certificate was not trusted instead it may look like this:
 	Verification error: unable to verify the first certificate
 	[...]
 
-When the verification using the `openssl` command is successful you can [authenticate via LDAP](ldap-authentication.md)
+As soon as the verification using the `openssl` command is successful you can [authenticate via LDAP](ldap-authentication.md) using SSL. For this choose `ldaps` as `Connection Method` and `636` as `LDAP Port` or prefix your `LDAP URI` with `ldaps://`.

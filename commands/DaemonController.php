@@ -93,6 +93,7 @@ class DaemonController extends Controller
         3 => ['remote-execution',   'run-once'],
         4 => ['cleanup',            'run-once', 300],
         5 => ['unlock',             'run-once', 120],
+        6 => ['notify',             'run-once', 60],
     ];
 
     /**

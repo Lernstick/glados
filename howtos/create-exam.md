@@ -8,7 +8,9 @@ You can set a *Time Limit* (in minutes). Notice that this can also be set in the
 
 For more information about the *Remote Backup Path*, please visit [this page](remote-backup-path.md).
 
-For then options in the *General* and the *Libreoffice* tab, please read the information given, when clicking the ![Questionmark](img/questionmark.png) aside.
+There are multiple settings in the *Settings* tab. You can add new settings by clicking the *Add Setting* button. Choose the setting you want to add from the appearing list by clicking on it. You will now have the possibility to adjust (various) subsettings for the chosen setting. For more informations about the settings, please refer to the information given by clicking the ![questionmarks](img/questionmark.png) aside.
+
+> For the *Screen capturing* setting, please read [Screen Capturing](screen-capturing.md).
 
 When clicking `Next Step`, a new field called *Exam File* will appear. Here you have to provide an image file holding the information for the exam. Please read the following sections on how to create this file:
 

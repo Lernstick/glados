@@ -49,7 +49,8 @@ $this->title = $model->token;
 <div class="panel panel-default">
   <div class="panel-heading"><?= \Yii::t('ticket', 'Barcode') ?></div>
   <div class="panel-body">
-    <barcode code="<?= Html::encode($model->token) ?>" type="C128A" />
+    <!-- 128B (Code Set B) – ASCII characters 32 to 127 (0–9, A–Z, a–z), special characters, and FNC 1–4 -->
+    <barcode code="<?= Html::encode($model->token) ?>" type="C128B" />
   </div>
 </div>
 
