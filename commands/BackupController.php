@@ -227,7 +227,8 @@ class BackupController extends DaemonController implements DaemonInterface
             $this->logInfo('Executing rdiff-backup: ' . $this->_cmd);
 
             $cmd = new ShellCommand($this->_cmd);
-            $logFile = Yii::getAlias('@runtime/logs/backup.' . $this->ticket->token . '.' . date('c') . '.log');
+            $date = date('c');
+            $logFile = Yii::getAlias('@runtime/logs/backup.' . $this->ticket->token . '.' . $date . '.log');
             $output = "";
 
             $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use (&$output, $logFile) {
@@ -239,17 +240,28 @@ class BackupController extends DaemonController implements DaemonInterface
             $retval = $cmd->run();
 
             if ($retval != 0) {
-                $this->ticket->backup_state = yiit('ticket', 'rdiff-backup failed (retval: {retval}), output: {output}');
+
+                $logfile = substitute('{url:logfile:log:view:type={type},token={token},date={date}}', [
+                    'type' => 'backup',
+                    'token' => $this->ticket->token,
+                    'date' => $date,
+                ]);
+
+                $this->ticket->backup_state = yiit('ticket', 'rdiff-backup failed. For more information, please check the {logfile} (retval: {retval})');
                 $this->ticket->backup_state_params = [
                     'retval' => $retval,
-                    'output' => $output,
+                    //'output' => $output,
+                    'logfile' => $logfile,
                 ];
                 $this->logError($this->ticket->backup_state);
 
                 $act = new Activity([
                     'ticket_id' => $this->ticket->id,
-                    'description' => yiit('activity', 'Backup failed: rdiff-backup failed (retval: {retval})'),
-                    'description_params' => [ 'retval' => $retval ],
+                    'description' => yiit('activity', 'Backup failed: rdiff-backup failed. For more information, please check the {logfile} (retval: {retval})'),
+                    'description_params' => [
+                        'retval' => $retval,
+                        'logfile' => $logfile,
+                    ],
                     'severity' => Activity::SEVERITY_WARNING,
                 ]);
                 $act->save();

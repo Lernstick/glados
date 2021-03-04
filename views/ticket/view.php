@@ -234,7 +234,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'backup_state',
-                'format' => 'raw',
+                'format' => 'links',
                 'value' =>  ActiveEventField::widget([
                     'options' => [
                         'tag' => 'i',
@@ -278,7 +278,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'restore_state',
-                'format' => 'raw',
+                'format' => 'links',
                 'value' =>  ActiveEventField::widget([
                     'options' => [
                         'tag' => 'i',

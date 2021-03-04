@@ -210,7 +210,7 @@ class customFormatter extends \yii\i18n\Formatter
                 $params[$key] = $val;
             }
             $params[0] = $m[2].'/'.$m[3];
-            return Html::a($m[1], Url::to($params));
+            return Html::a($m[1], Url::to($params), ['data-pjax' => 0]);
         }, $value);
     }
 

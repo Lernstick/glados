@@ -113,7 +113,7 @@ class NotifyController extends DaemonController implements DaemonInterface
                 $query->andFilterHaving(['description' => 'No backup since longer than the backup interval of {interval} seconds.']);
 
                 // only trigger if there was no message in the last 60 seconds
-                if ($query->count() == 0) {
+                if ($query->count() == 0 && count($ticket->backups) != 0) {
                     // only the dates are relevant
                     $dates = array_column($ticket->backups, 'date');
                     // sort the maximal date in index 0
