@@ -26,19 +26,4 @@ class RestoreController extends Controller
         return $this->redirect(['ticket/view', 'id' => $ticket_id, '#' => 'tab_restores']);
     }
 
-    /**
-     * Displays the restore log by Restore model.
-     * @param integer $ticket_id id of the Ticket model.
-     * @param string $date date string of the Restore model.
-     * @return The response object
-     */
-    public function actionLog($id)
-    {
-        $restore = Restore::findOne($id);
-
-        return $this->renderAjax('/restore/log', [
-            'log' => $restore->restoreLog,
-        ]);
-    }
-
 }

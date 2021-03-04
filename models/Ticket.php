@@ -170,7 +170,7 @@ class Ticket extends LiveActiveRecord
             'restore_lock' => [ 'priority' => 0 ],
             'online',
             'last_backup',
-            'state' => [ 'trigger_attributes' => [ 'start', 'end', 'test_taker' ], ],
+            'state' => ['trigger_attributes' => ['start', 'end', 'test_taker']],
         ];
     }
 

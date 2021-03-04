@@ -642,8 +642,8 @@ class DaemonController extends Controller
     /**
      * Locks an item using the applications mutex mechanism.
      *
-     * @param string $name Of the lock to be acquired.
-     * @param int $timeout Time (in seconds) to wait for lock to become released.
+     * @param string $name name of the lock to be acquired.
+     * @param int $timeout time (in seconds) to wait for lock to become released.
      * @return bool success or failure
      */
     public function lock ($name, $timeout = 0)

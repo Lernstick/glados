@@ -137,6 +137,13 @@ $this->registerJs($active_tabs);
             ['data-toggle' => 'tab']
         ); ?>
     </li>
+    <li title="<?= \Yii::t('ticket', 'Logs') ?>">
+        <?= Html::a(
+            '<div><i class="glyphicon glyphicon-alert"></i> <span>' . \Yii::t('ticket', 'Logs') . '</span></div>',
+            Url::to(['ticket/view', 'id' => $model->id, '#' => 'logs']),
+            ['data-toggle' => 'tab']
+        ); ?>
+    </li>
     <li class="dropdown">
         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
             <i class="glyphicon glyphicon-list-alt"></i>

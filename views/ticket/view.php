@@ -453,6 +453,18 @@ $this->params['breadcrumbs'][] = $this->title;
         ]); ?>
     <?php Pjax::end() ?>
 
+     <?php Pjax::begin([
+        'id' => 'logs',
+        'options' => ['class' => 'tab-pane fade'],
+    ]); ?>
+        <?php $_GET = array_merge($_GET, ['#' => 'tab_logs']); ?>
+        <?= $this->render('/log/index', [
+            'ticketModel' => $model,
+            'searchModel' => $logSearchModel,
+            'dataProvider' => $logDataProvider,
+        ]); ?>
+    <?php Pjax::end() ?>
+
 </div>
 
 <?php Modal::begin([
