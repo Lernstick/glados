@@ -110,7 +110,7 @@ class NotifyController extends DaemonController implements DaemonInterface
 
                 $query = Activity::find()->where(['ticket_id' => $ticket->id]);
                 $query->andFilterWhere(['between', 'date', $then->format('Y-m-d H:i:s'), $now->format('Y-m-d H:i:s')]);
-                $query->andFilterHaving(['description' => 'No backup since longer than the backup interval of {interval} seconds.']);
+                $query->andFilterHaving(['description' => 'There was no successful backup since {n} minutes (the interval is set to {interval} minutes).']);
 
                 // only trigger if there was no message in the last 60 seconds
                 if ($query->count() == 0 && count($ticket->backups) != 0) {
@@ -126,19 +126,26 @@ class NotifyController extends DaemonController implements DaemonInterface
                     if (abs($now - $last_backup_date) > intval($ticket->backup_interval) + 60) {
                         $act = new Activity([
                                 'ticket_id' => $ticket->id,
-                                'description' => yiit('activity', 'No backup since longer than the backup interval of {interval} seconds.'),
-                                'description_params' => ['interval' => $ticket->backup_interval],
+                                'description' => yiit('activity', 'There was no successful backup since {n} minutes (the interval is set to {interval} minutes).'),
+                                'description_params' => [
+                                    'n' => abs($now - $last_backup_date)/60,
+                                    'interval' => $ticket->backup_interval/60,
+                                ],
                                 'severity' => Activity::SEVERITY_ERROR,
                         ]);
                         $act->save();
 
-                        $ticket->backup_state = 'No backup since longer than the backup interval of {interval} seconds.';
-                        $ticket->backup_state_params = ['interval' => $ticket->backup_interval];
+                        $ticket->backup_state = 'There was no successful backup since {n} minutes (the interval is set to {interval} minutes).';
+                        $ticket->backup_state_params = [
+                            'n' => abs($now - $last_backup_date)/60,
+                            'interval' => $ticket->backup_interval/60,
+                        ];
                         $ticket->save(false);
 
-                        $this->logInfo(substitute('No backup of ticket with token {token} since longer than the backup interval of {interval} seconds.', [
+                        $this->logInfo(substitute('There was no successful backup of ticket with token {token} since {n} minutes (the interval is set to {interval} minutes).', [
                             'token' => $ticket->token,
-                            'interval' => $ticket->backup_interval,
+                            'n' => abs($now - $last_backup_date)/60,
+                            'interval' => $ticket->backup_interval/60,
                         ]), true, true, true);
 
                     }

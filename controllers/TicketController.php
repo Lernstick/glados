@@ -560,6 +560,7 @@ class TicketController extends BaseController
                     'allow_mount_external' => boolval($model->exam->{"allow_mount_external"}),
                     'allow_mount_system' => boolval($model->exam->{"allow_mount_system"}),
                     'firewall_off' => boolval($model->exam->{"firewall_off"}),
+                    'backup_interval' => $model->backup_interval,
                 ], $model->exam->settings)
             ];
         }

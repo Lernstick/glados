@@ -216,13 +216,15 @@ class BackupController extends DaemonController implements DaemonInterface
                 $e = escapeshellarg($e);
             });
 
-            $this->_cmd = "rdiff-backup --remote-schema 'ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
-                 . "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -C %s rdiff-backup --server' "
-                 . "-v5 --print-statistics "
-                 . (empty($exclude) ? '' : (' --exclude ' . implode($exclude, ' --exclude '))) . " "
-                 . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . "::" . $this->remotePath) . " "
-                 . escapeshellarg(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token . "/") . " "
-                 . "";
+            $this->_cmd = substitute("rdiff-backup --remote-schema 'ssh -i {identity} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -C %s {remoteSchema}' -v5 --print-statistics {exclude} {user}@{ip}::{remotePath} {localPath}", [
+                'identity' => FileHelper::normalizePath(\Yii::$app->params['dotSSH'] . '/rsa'),
+                'remoteSchema' => 'rdiff-backup-server',
+                'exclude' => (empty($exclude) ? '' : (' --exclude ' . implode($exclude, ' --exclude '))),
+                'user' => escapeshellarg($this->remoteUser),
+                'ip' => escapeshellarg($this->ticket->ip),
+                'remotePath' => escapeshellarg($this->remotePath),
+                'localPath' => escapeshellarg(FileHelper::normalizePath(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token . "/")),
+            ]);
 
             $this->logInfo('Executing rdiff-backup: ' . $this->_cmd);
 
@@ -253,6 +255,7 @@ class BackupController extends DaemonController implements DaemonInterface
                     //'output' => $output,
                     'logfile' => $logfile,
                 ];
+                $this->ticket->save();
                 $this->logError($this->ticket->backup_state);
 
                 $act = new Activity([

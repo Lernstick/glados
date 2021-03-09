@@ -136,9 +136,10 @@ class UnlockController extends DaemonController implements DaemonInterface
                     $cmd = new ShellCommand($this->_cmd);
                     $output = "";
                     $date = date('c');
-                    $logFile = substitute('{path}/{type}.{date}.log', [
+                    $logFile = substitute('{path}/{type}.{token}.{date}.log', [
                         'path' => Yii::getAlias('@runtime/logs'),
                         'type' => 'unlock',
+                        'token' => $ticket->token,
                         'date' => $date,
                     ]);
 

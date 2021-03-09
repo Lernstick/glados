@@ -187,19 +187,22 @@ class RestoreController extends DaemonController
         $this->ticket->restore_state = yiit('ticket', 'restore in progress...');
         $this->ticket->save(false);
 
+        $remoteSchema = $restorePath !== null ? 'rdiff-backup --server' : 'rdiff-backup-server restore';
         $restorePath = $restorePath !== null ? $restorePath : '/overlay/' . $this->ticket->exam->backup_path;
         $output = "";
         $logFile = Yii::getAlias('@runtime/logs/restore.' . $this->ticket->token . '.' . date('c') . '.log');
 
         /* 1st command: rdiff-backup */
-        $this->_cmd = "rdiff-backup --terminal-verbosity=5 --force --remote-schema "
-                . "'ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
-                . "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -C %s rdiff-backup --server' "
-             . "--create-full-path "
-             . (empty($exclude) ? '' : (' --exclude ' . implode($exclude, ' --exclude '))) . " "
-             . "--restore-as-of " . escapeshellarg($date) . " "
-             . escapeshellarg(FileHelper::normalizePath(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token . "/" . $file)) . " "
-             . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . "::" . FileHelper::normalizePath($restorePath . '/' . $file)) . " ";
+        $this->_cmd = substitute("rdiff-backup --terminal-verbosity=5 --force --remote-schema 'ssh -i {identity} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -C %s {remoteSchema}' --create-full-path {exclude} --restore-as-of {date} {localPath} {user}@{ip}::{remotePath}", [
+            'identity' => FileHelper::normalizePath(\Yii::$app->params['dotSSH'] . '/rsa'),
+            'remoteSchema' => $remoteSchema,
+            'exclude' => (empty($exclude) ? '' : (' --exclude ' . implode($exclude, ' --exclude '))),
+            'date' => escapeshellarg($date),
+            'localPath' => escapeshellarg(FileHelper::normalizePath(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token . "/" . $file)),
+            'user' => escapeshellarg($this->remoteUser),
+            'ip' => escapeshellarg($this->ticket->ip),
+            'remotePath' => escapeshellarg(FileHelper::normalizePath($restorePath . '/' . $file)),
+        ]);
 
         $this->logInfo('Executing rdiff-backup: ' . $this->_cmd);
 

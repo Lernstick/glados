@@ -41,6 +41,7 @@ use yii\bootstrap\Modal;
                 'restore' => 'restore',
                 'screen_capture' => 'screen_capture',
                 'keylogger' => 'keylogger',
+                'unlock' => 'unlock',
             ),
         ],
         'path',
