@@ -168,6 +168,7 @@ class Ticket extends LiveActiveRecord
             'download_state' => [ 'priority' => 2 ],
             'backup_lock' => [ 'priority' => 0 ],
             'restore_lock' => [ 'priority' => 0 ],
+            'ip' => [ 'priority' => 0 ],
             'online',
             'last_backup',
             'state' => ['trigger_attributes' => ['start', 'end', 'test_taker']],
@@ -220,8 +221,8 @@ class Ticket extends LiveActiveRecord
             [['exam_id', 'token', 'backup_interval'], 'required', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['token', 'test_taker'], 'required', 'on' => self::SCENARIO_SUBMIT],
             [['start', 'ip'], 'required', 'on' => self::SCENARIO_DOWNLOAD],
-            [['end'], 'required', 'on' => self::SCENARIO_FINISH],
-            [['token', 'client_state'], 'required', 'on' => self::SCENARIO_NOTIFY],
+            [['end', 'ip'], 'required', 'on' => self::SCENARIO_FINISH],
+            [['token', 'client_state', 'ip'], 'required', 'on' => self::SCENARIO_NOTIFY],
             [['exam_id'], 'integer', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['backup_interval'], 'integer', 'min' => 0, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['time_limit'], 'integer', 'min' => 0, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
@@ -776,15 +777,6 @@ class Ticket extends LiveActiveRecord
      */
     public function runCommand($cmd, $lc_all = "C", $timeout = 30)
     {
-
-        //$tmp = sys_get_temp_dir() . '/cmd.' . generate_uuid();
-        /*$cmd = "ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
-             . "-o UserKnownHostsFile=/dev/null "
-             . "-o StrictHostKeyChecking=no "
-             . "-o ConnectTimeout=" . $timeout . " "
-             . "root@" . $this->ip . " "
-             . escapeshellarg("LC_ALL=" . $lc_all . " " .  $cmd . " 2>&1") . " >" . $tmp . ' 2>&1';*/
-
         $remote_cmd = substitute('LC_ALL={lc_all} {cmd} 2>&1', [
             'lc_all' => $lc_all,
             'cmd' => $cmd,

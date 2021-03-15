@@ -135,8 +135,12 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'ip',
                 'format' => 'raw',
-                'value' => yii::$app->formatter->format($model->ip, 'text') . ' ' . 
-                    ActiveEventField::widget([
+                'value' => ActiveEventField::widget([
+                        'options' => ['tag' => 'span'],
+                        'content' => yii::$app->formatter->format($model->ip, 'text'),
+                        'event' => 'ticket/' . $model->id,
+                        'jsonSelector' => 'ip',
+                    ]) . ' ' . ActiveEventField::widget([
                         'options' => [
                             'tag' => 'span',
                             'class' => 'label label-' . ( $model->online === 1 ? 'success' :

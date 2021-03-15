@@ -44,7 +44,8 @@ class EventStream extends EventItem
     public $timeLimit = 120;
     /**
      * @var integer maximal time in seconds after which the database should be polled/queried even if no inotify
-     * event has triggered
+     * event has triggered. Notice that the read timeout set in lernstick-exam-agent should be a multiple of this
+     * (say 3 times this but NOT less)
      */
     public $pollTime = 5;
     /**

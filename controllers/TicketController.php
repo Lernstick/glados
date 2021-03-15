@@ -630,7 +630,7 @@ class TicketController extends BaseController
                 $model->bootup_lock = 1;
                 $model->download_request = new Expression('NOW()');
                 $model->start = $model->state == 0 ? new Expression('NOW()') : $model->start;
-                $model->ip = Yii::$app->request->userIp;
+                $model->ip = Yii::$app->request->userIp; # set the ip address
                 $model->client_state = yiit('ticket', 'exam requested sccessfully');
                 $model->download_progress = 0;
                 $model->save();
@@ -700,6 +700,8 @@ class TicketController extends BaseController
 
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         if($model !== null) {
+            $model->ip = Yii::$app->request->userIp; # set the ip address
+
             if ($state == yiit('ticket', 'bootup complete.')) {
                 $model->bootup_lock = 0;
             }
@@ -743,6 +745,7 @@ class TicketController extends BaseController
             return [ 'code' => 403, 'msg' => 'The provided ticket is not in running state.' ];
         }
 
+        $model->ip = Yii::$app->request->userIp; # set the ip address
         $model->end = new Expression('NOW()');
         $model->last_backup = 0;
         $model->save();
@@ -914,6 +917,8 @@ class TicketController extends BaseController
             }
 
         } else if ($request->isPost) {
+            $model->ip = Yii::$app->request->userIp; # set the ip address
+            $model->save(false);
 
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             if (!is_dir($path)) {
