@@ -6,7 +6,7 @@ $defaultParams = require(__DIR__ . '/defaultParams.php');
 $config = [
     'id' => 'basic',
     'name' => 'GLaDOS',
-    'version' => '1.0.8',
+    'version' => '1.0.9',
     'basePath' => dirname(__DIR__),
     'bootstrap' => [
         'log',
@@ -131,7 +131,7 @@ $config = [
             ],
         ],
         'mutex' => [
-            'class' => 'yii\mutex\MysqlMutex',
+            'class' => 'yii\mutex\FileMutex',
         ],
         'db' => require(__DIR__ . '/db.php'),
         'auth' => require(__DIR__ . '/auth.php'),

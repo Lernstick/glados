@@ -128,7 +128,7 @@ class NotifyController extends DaemonController implements DaemonInterface
                                 'ticket_id' => $ticket->id,
                                 'description' => yiit('activity', 'There was no successful backup since {n} minutes (the interval is set to {interval} minutes).'),
                                 'description_params' => [
-                                    'n' => abs($now - $last_backup_date)/60,
+                                    'n' => intval(abs($now - $last_backup_date)/60),
                                     'interval' => $ticket->backup_interval/60,
                                 ],
                                 'severity' => Activity::SEVERITY_ERROR,
@@ -137,14 +137,14 @@ class NotifyController extends DaemonController implements DaemonInterface
 
                         $ticket->backup_state = 'There was no successful backup since {n} minutes (the interval is set to {interval} minutes).';
                         $ticket->backup_state_params = [
-                            'n' => abs($now - $last_backup_date)/60,
+                            'n' => intval(abs($now - $last_backup_date)/60),
                             'interval' => $ticket->backup_interval/60,
                         ];
                         $ticket->save(false);
 
                         $this->logInfo(substitute('There was no successful backup of ticket with token {token} since {n} minutes (the interval is set to {interval} minutes).', [
                             'token' => $ticket->token,
-                            'n' => abs($now - $last_backup_date)/60,
+                            'n' => intval(abs($now - $last_backup_date)/60),
                             'interval' => $ticket->backup_interval/60,
                         ]), true, true, true);
 

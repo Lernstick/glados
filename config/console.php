@@ -58,7 +58,7 @@ return [
         ],
         'db' => $db,
         'mutex' => [
-            'class' => 'yii\mutex\MysqlMutex',
+            'class' => 'yii\mutex\FileMutex',
         ],
     ],
     'params' => $params,
