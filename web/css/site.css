@@ -677,3 +677,8 @@ span.view--state[data-state="4"]::after { content: attr(data-text-4); }
 .popover img {
   max-width: 100%;
 }
+
+/* images in the howto should not be larger than their container */
+.howto-view .markdown-view img {
+  max-width: 100%;
+}
