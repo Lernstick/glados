@@ -1,6 +1,6 @@
 ## Login Scheme
 
-Every authentication method has a field called `Login Scheme`. This is a pattern to test the given login username against. A login via the associated authentication method will only be performed, if the given username matches the provided pattern. This is used to manage multiple authentication servers and methods, for example multiple LDAP or Active Directory servers with different domains, but can also be used in an environment with one single LDAP server.
+Every authentication method has a field called `Login Scheme`. This is a pattern to test the given login username against. A login attempt via the associated authentication method will only be performed, if the given username matches the provided pattern. This is used to manage multiple authentication servers and methods, for example multiple LDAP or Active Directory servers with different domains, but can also be used in an environment with one single LDAP server.
 
 `{username}` is extracted from the username provided in the login form according to the `Login Scheme`.
 
@@ -13,7 +13,7 @@ Examples:
 
 The follwing table gives some more detailed examples on how the `Login Scheme` affects user authentication:
 
-Login Scheme            | Example Login         | Authenticated?| Extracted Username    | Notes             |
+Login Scheme            | Example Login         | Authenticated?| Extracted `{username}`| Notes             |
 -------------           | ---------------       | ------------  | ------------------    |                   |
 `{username}`            | `alice`               | yes           | `alice`               | no excluded usernames |
 `{username}`            | `bob`                 | yes           | `bob`                 | no excluded usernames |
@@ -23,9 +23,9 @@ Login Scheme            | Example Login         | Authenticated?| Extracted User
 `{username}@foo`        | `bob@foo`             | yes           | `bob`                 | only usernames ending with `@foo` |
 `foo\{username}`        | `alice`               | no            | none                  | only usernames starting with `foo\` |
 `foo\{username}`        | `foo\alice`           | yes           | `alice`               | only usernames starting with `foo\` |
-`{username}@{domain}`   | `alice`               | no            | none                  | where `Domain` is `example.com` |
-`{username}@{domain}`   | `alice@example.com`   | yes           | `alice`               | where `Domain` is `example.com` |
-`{username}@{domain}`   | `alice@example.com`   | yes           | `alice`               | where `Domain` is `example.com` |
+`{username}@{domain}`   | `alice`               | no            | none                  |                    |
+`{username}@{domain}`   | `alice@example.com`   | yes           | `alice`               | if `Domain` is `example.com` |
+`{username}@{domain}`   | `alice@example.com`   | yes           | `alice`               | if `Domain` is `example.com` |
 
 ----
 
