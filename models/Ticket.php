@@ -868,8 +868,8 @@ class Ticket extends LiveActiveRecord
         } else {
             $event = $this->tableName() . '/' . $this->id;
         }
-        $models = EventStream::find()->where(['like', 'listenEvents', $event])->all();
-        foreach ($models as $stream) {
+        $streams = EventStream::find()->where(['like', 'listenEvents', $event])->all();
+        foreach ($streams as $stream) {
             if ($stream->isActive) {
                 return true;
             }

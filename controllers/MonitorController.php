@@ -54,7 +54,7 @@ class MonitorController extends BaseController
 
     /**
      * Monitors a single Exam model.
-     * @param integer $id
+     * @param integer $id exam id
      * @return mixed
      */
     public function actionView($id = null)
@@ -80,6 +80,7 @@ class MonitorController extends BaseController
             $dataProvider = $searchModel->search($params);
             $dataProvider->pagination->pageParam = 'mon-page';
             $dataProvider->pagination->pageSize = 12;
+
             // sort by start date 
             $dataProvider->setSort(['defaultOrder' => ['start' => SORT_ASC]]);
 
@@ -89,6 +90,20 @@ class MonitorController extends BaseController
                 'dataProvider' => $dataProvider,
             ]);
         }
+    }
+
+    /**
+     * Monitors a single Ticket model.
+     * @param integer $id ticket id
+     * @return mixed
+     */
+    public function actionSingle($id)
+    {
+        $model = $this->findTicket($id);
+        return $this->renderAjax('_live_overview_item', [
+            'model' => $model,
+            'large' => true,
+        ]);
     }
 
     /**
@@ -103,6 +118,24 @@ class MonitorController extends BaseController
     {
         if (($model = Exam::findOne($id)) !== null) {
             if ($this->checkRbac($model->user_id)) {
+                return $model;
+            }
+        }
+        throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
+    }
+
+    /**
+     * Finds the Ticket model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     *
+     * @param integer $id
+     * @return Ticket the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findTicket($id)
+    {
+        if (($model = Ticket::findOne($id)) !== null) {
+            if ($this->checkRbac($model->exam->user_id)) {
                 return $model;
             }
         }

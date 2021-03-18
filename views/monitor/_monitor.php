@@ -56,11 +56,15 @@ $('img.live-thumbnail').each(function(){
 
 check_images();
 
-$('#galleryModal').on('show.bs.modal', function(e) {
+$('#galleryModal').off('show.bs.modal').on('show.bs.modal', function(e) {
     var el = $(e.relatedTarget).parent().children('img').first();
-    $('#galleryModal object').attr("data", "");
-    $('#galleryModal object').attr("data", el.data('src') + "&" + new Date().getTime());
+    $.pjax({url: el.data('src'), container: '#monitorModalContent', push: false, async:false})
 });
+
+$('#galleryModal').off('hide.bs.modal').on('hide.bs.modal', function(e) {
+    $("#reload").click();
+});
+
 SCRIPT;
 
 echo ActiveEventField::widget([
@@ -122,19 +126,11 @@ echo ActiveEventField::widget([
     'header' => false,
     'footer' => Html::Button(\Yii::t('app', 'Close'), ['data-dismiss' => 'modal', 'class' => 'btn btn-default']),
     'size' => \yii\bootstrap\Modal::SIZE_LARGE
-]); ?>
+]);
 
-    <div class="live-overview-detail">
-        <div class="live-overview-detail-loading alert alert-info" role="alert">
-            <i class="gly-spin glyphicon glyphicon-cog" aria-hidden="true"></i>
-             <?= \Yii::t('app', 'Please wait...'); ?>
-        </div>
-        <object class="live-overview-detail-img" data="" type="image/jpg">
-            <div class="live-overview-detail-error alert alert-danger" role="alert">
-                <i class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></i>
-                <?= \Yii::t('app', 'The image could not be loaded.'); ?>
-            </div>
-        </object>
-    </div>
+    Pjax::begin([
+        'id' => 'monitorModalContent',
+    ]);
+    Pjax::end();
 
-<?php Modal::end(); ?>
+Modal::end(); ?>

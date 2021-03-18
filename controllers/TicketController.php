@@ -802,7 +802,7 @@ class TicketController extends BaseController
 
         if(Yii::$app->request->isAjax){
             return $this->runAction('view', ['id' => $id]);
-        }else{
+        } else {
             return $this->redirect(['view', 'id' => $id, '#' => 'backups']);
         }
 
@@ -939,7 +939,7 @@ class TicketController extends BaseController
             }
 
             $eventItem = new EventItem([
-                'event' => 'ticket/' . $model->id,
+                'event' => substitute('ticket/{id}', ['id' => $model->id]),
                 'priority' => 0,
                 'data' => ['live' => $live],
             ]);
@@ -948,9 +948,11 @@ class TicketController extends BaseController
             $ret = [];
             if (!$model->hasActiveEventStream("monitor")) {
                 $ret['stop'] = true;
+                $ret['width'] = 260;
+            } else {
+                $ret['width'] = $model->hasActiveEventStream("monitor_large") ? 860 : 260;
             }
             $ret['interval'] = Setting::get('monitorInterval');
-            #$ret['width'] = 260;
 
             return $ret;
         }
