@@ -7,6 +7,8 @@ use app\models\Exam;
 use app\models\ExamSearch;
 use app\models\Ticket;
 use app\models\TicketSearch;
+use app\models\Issue;
+use app\models\IssueSearch;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\filters\VerbFilter;
@@ -71,23 +73,30 @@ class MonitorController extends BaseController
 
         } else {
 
-            $model = $this->findModel($id);
+            $exam = $this->findModel($id);
 
-            $params["TicketSearch"]["exam_id"] = $model->id;
+            $params["TicketSearch"]["exam_id"] = $exam->id;
             $params["TicketSearch"]["state"] = Ticket::STATE_RUNNING;
+            $params["IssueSearch"]["exam_id"] = $exam->id;
+            $params["IssueSearch"]["solved"] = false;
 
             $searchModel = new TicketSearch();
             $dataProvider = $searchModel->search($params);
             $dataProvider->pagination->pageParam = 'mon-page';
             $dataProvider->pagination->pageSize = 12;
+            $dataProvider->setSort(['defaultOrder' => ['start' => SORT_ASC]]); // sort by start date 
 
-            // sort by start date 
-            $dataProvider->setSort(['defaultOrder' => ['start' => SORT_ASC]]);
+            $issueSearchModel = new IssueSearch();
+            $issueDataProvider = $issueSearchModel->search($params);
+            $issueDataProvider->pagination->pageParam = 'issue-page';
+            $issueDataProvider->pagination->pageSize = 10;
 
             return $this->render('monitor', [
-                'model' => $model,
+                'exam' => $exam,
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
+                'issueSearchModel' => $issueSearchModel,
+                'issueDataProvider' => $issueDataProvider,
             ]);
         }
     }

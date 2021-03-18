@@ -51,6 +51,7 @@ use app\components\HistoryBehavior;
  *
  * @property Exam $exam
  * @property Activity[] $activities
+ * @property Issue[] $issues
  * @property Restore[] $restores
  * @property Exam $exam
  * @property Exam $exam
@@ -713,6 +714,14 @@ class Ticket extends LiveActiveRecord
     public function getRestores()
     {
         return $this->hasMany(Restore::className(), ['ticket_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getIssues()
+    {
+        return $this->hasMany(Issue::className(), ['ticket_id' => 'id']);
     }
 
     /* Getter for exam name */

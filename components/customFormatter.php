@@ -41,6 +41,21 @@ class customFormatter extends \yii\i18n\Formatter
     }
 
     /**
+     * Formats the value as one of the issues or unknown.
+     *
+     * @param integer $value the value to be formatted.
+     * @return string the formatted result.
+     */
+    public static function asIssue($value)
+    {
+        switch ($value) {
+            case \app\models\Issue::CLIENT_OFFLINE:      return Yii::t('ticket', 'Client offline');
+            case \app\models\Issue::LONG_TIME_NO_BACKUP: return Yii::t('ticket', 'No Backup');
+            default: return $value;
+        }
+    }
+
+    /**
      * Shortens the number and append a "k" for thousands and an "m" for millions.
      *
      * @param integer $value the value to be formatted.
@@ -149,7 +164,7 @@ class customFormatter extends \yii\i18n\Formatter
     }
 
     /**
-     * Formats the an associative array as table.
+     * Formats an associative array as table.
      *
      * @param array array the value to be formatted as assiciative array.
      * @param array heading the table heading of the gridview (array with 2 elements)

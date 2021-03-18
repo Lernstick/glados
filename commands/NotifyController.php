@@ -10,6 +10,7 @@ use app\models\Activity;
 use yii\helpers\Console;
 use app\models\DaemonInterface;
 use app\components\ShellCommand;
+use app\models\Issue;
 
 /**
  * Notify Daemon
@@ -66,17 +67,64 @@ class NotifyController extends DaemonController implements DaemonInterface
 
     /**
      * @inheritdoc
-     *
+     */
+    public function processItem ($item = null)
+    {
+        $this->processItemBackup($item); # TODO: same for backup as for ping
+        $this->processItemPing($item);
+    }
+
+    /**
+     * TODO
+     */
+    public function processItemPing ($item = null)
+    {
+        // Query tickets that are in regular running state
+        $query = Ticket::find()
+            // ticket should be in running state
+            ->andWhere(['not', ['start' => null]])
+            ->andWhere(['end' => null])
+            ->andWhere(['not', ['ip' => null]])
+            // bootup_lock should be gone
+            ->andWhere(['bootup_lock' => 0]);
+
+        $tickets = $query->all();
+        foreach ($tickets as $ticket) {
+            if ($this->lockItem($ticket) && !$ticket->abandoned) {
+                $online = $ticket->runCommand('true', 'C', 10)[1] == 0 ? true : false;
+                $ticket->online = $online;
+                $ticket->save(false);
+
+                $issue = Issue::findOne([
+                    'key' => Issue::CLIENT_OFFLINE,
+                    'solvedAt' => null,
+                    'ticket_id' => $ticket->id
+                ]);
+
+                if ($online && $issue !== null) {
+                    $issue->resolved();
+                } else if (!$online && $issue === null) {
+                    $issue = new Issue([
+                        'key' => Issue::CLIENT_OFFLINE,
+                        'ticket_id' => $ticket->id,
+                    ]);
+                    $issue->save();
+                }
+            }
+        }
+    }
+
+    /**
      * Notify all ticket, where the download has finished more
      * than 2 minutes ago, but not longer than one hour ago and
      * there was no message in the last 60 seconds and 
      * (backup_interval + 60 seconds) is over without a backup
      * being made.
      */
-    public function processItem ($item = null)
+    public function processItemBackup ($item = null)
     {
 
-        // Query ticket that had no backup for longer than the backup_interval time
+        // Query tickets that had no backup for longer than the backup_interval time
         $query = Ticket::find()
             // ticket should be in running state
             ->andWhere(['not', ['start' => null]])

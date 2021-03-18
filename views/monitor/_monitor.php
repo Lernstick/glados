@@ -2,18 +2,21 @@
 
 use yii\helpers\Html;
 use yii\widgets\ListView;
+use yii\grid\GridView;
 use yii\widgets\Pjax;
 use yii\bootstrap\Modal;
 use yii\helpers\Url;
 use app\components\ActiveEventField;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Exam */
+/* @var $exam app\models\Exam */
 /* @var $searchModel app\models\TicketSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $issueSearchModel app\models\IssueSearch */
+/* @var $issueDataProvider yii\data\ActiveDataProvider */
 
 $title = \Yii::t('ticket', 'Currently behind live');
-$n = $model::monitor_idle_time();
+$n = $exam::monitor_idle_time();
 
 // reload images if no new image for [[monitor_idle_time()]] seconds
 $js = <<< SCRIPT
@@ -68,12 +71,68 @@ $('#galleryModal').off('hide.bs.modal').on('hide.bs.modal', function(e) {
 SCRIPT;
 
 echo ActiveEventField::widget([
-    'event' => 'exam/' . $model->id,
+    'event' => 'exam/' . $exam->id,
     'jsonSelector' => 'runningTickets',
     'jsHandler' => 'function(d, s) {
         $("#reload").click();
     }',
 ]);
+
+Pjax::begin([
+    'id' => 'live_issues'
+]);
+
+    echo GridView::widget([
+        'dataProvider' => $issueDataProvider,
+        'columns' => [
+            'key:issue',
+            'occuredAt:timeago',
+            'ticket.token',
+            [
+                'attribute' => 'Info',
+                'format' => 'raw',
+                /**
+                 * @param $issue Issue model instance
+                 * @param $key
+                 * @param $index
+                 * @param $grid
+                 */
+                'value' => function($issue, $key, $index, $grid) {
+                    switch ($issue->key) {
+                        case $issue::CLIENT_OFFLINE: return ActiveEventField::widget([
+                            'content' => $issue->ticket->online,
+                            'event' => substitute('ticket/{id}', ['id' => $issue->ticket->id]),
+                            'jsonSelector' => 'online',
+                        ]);
+                        case $issue::LONG_TIME_NO_BACKUP: return ActiveEventField::widget([
+                            'content' => $issue->ticket->backup_state,
+                            'event' => substitute('ticket/{id}', ['id' => $issue->ticket->id]),
+                            'jsonSelector' => 'backup_state',
+                        ]);
+                    }
+                },
+            ],
+            [
+                'class' => yii\grid\ActionColumn::className(),
+                'header' => \Yii::t('ticket', 'Actions'),
+                'template' => '{action}',
+                'buttons' => [
+                    'action' => function ($url, $issue, $key) {
+                        switch ($issue->key) {
+                            case $issue::CLIENT_OFFLINE:  return Html::a('<i class="glyphicon glyphicon-globe"></i>&nbsp;' . Yii::t('issue', 'Check online'), $url, ['class' => 'btn btn-default']);
+                            case $issue::LONG_TIME_NO_BACKUP:  return Html::a('<i class="glyphicon glyphicon-hdd"></i>&nbsp;' . Yii::t('issue', 'Backup now'), $url, ['class' => 'btn btn-default']);
+                            default: return $issue->key;
+                        }
+                    },
+                ],
+            ],
+        ],
+        'emptyText' => \Yii::t('ticket', 'Everything is fine. No issues found.'),
+    ]);
+
+Pjax::end();
+
+echo "<hr>";
 
 Pjax::begin([
     'id' => 'live_monitor'
@@ -82,11 +141,11 @@ Pjax::begin([
 /**
  * A dummy event in the group "monitor", such that if no event in the group "monitor" is active
  * the new js event handlers won't be registered. Also they won't be unregistered if the last
- * element is disappearing from the view. Using this a event of type "monitor" will always be 
+ * element is disappearing from the view. Using this, an event of type "monitor" will always be 
  * present in the view.
  */
 echo ActiveEventField::widget([
-    'event' => 'monitor:exam/' . $model->id,
+    'event' => 'monitor:exam/' . $exam->id,
     'jsonSelector' => 'dummy',
     'jsHandler' => 'function(d, s){}', // do nothing
 ]);
