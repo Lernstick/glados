@@ -14,7 +14,7 @@ To test whether the certificate is trusted, use:
 
 	openssl s_client -showcerts -connect hostname:636
 
-where `hostname` denotes the FQDN of the LDAP server (that occures equally in the certificate file) and `636` is the ldaps port number. You should observe a output like the following if the certificate was trusted:
+where `hostname` denotes the FQDN of the LDAP server (that occures equally in the certificate file) and `636` is the LDAPS port number. You should observe an output like the following if the certificate was trusted:
 
 	CONNECTED(00000003)
 	[...]
