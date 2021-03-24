@@ -14,6 +14,7 @@ use yii\helpers\Console;
 use app\models\BackupSearch;
 use app\models\EventItem;
 use app\models\DaemonInterface;
+use app\models\Issue;
 
 /**
  * Download Daemon (push)
@@ -114,10 +115,13 @@ class DownloadController extends DaemonController implements DaemonInterface
         $this->ticket->save(false);
 
         if ($this->checkPort(22, 3, $emsg) === false) {
+            Issue::markAs(Issue::CLIENT_OFFLINE, $this->ticket->id);
+
             $this->ticket->online = false;
             $this->ticket->download_state = yiit('ticket', 'Download failed: network error, {error}.');
             $this->ticket->download_state_params = ['error' => $emsg];
             $this->unlockItem($this->ticket);
+
 
             $act = new Activity([
                     'ticket_id' => $this->ticket->id,
@@ -128,6 +132,8 @@ class DownloadController extends DaemonController implements DaemonInterface
             $act->save();
 
         } else {
+            Issue::markAsSolved(Issue::CLIENT_OFFLINE, $this->ticket->id);
+
             $this->ticket->scenario = Ticket::SCENARIO_DOWNLOAD;
             $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? true : false;
             $this->ticket->client_state = yiit('ticket', 'download in progress') . ' ...';

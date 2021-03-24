@@ -14,6 +14,7 @@ use app\components\ShellCommand;
 use yii\helpers\FileHelper;
 use yii\helpers\Console;
 use app\models\DaemonInterface;
+use app\models\Issue;
 
 /**
  * Backup Daemon (pull)
@@ -173,6 +174,8 @@ class BackupController extends DaemonController implements DaemonInterface
             $this->ticket->online = false;
             $this->unlockItem($this->ticket);
 
+            Issue::markAs(Issue::CLIENT_OFFLINE, $this->ticket->id);
+
             $act = new Activity([
                 'ticket_id' => $this->ticket->id,
                 'description' => yiit('activity', 'Backup failed: network error, {error}.'),
@@ -184,6 +187,8 @@ class BackupController extends DaemonController implements DaemonInterface
             $this->backup_failed();
 
         } else {
+            Issue::markAsSolved(Issue::CLIENT_OFFLINE, $this->ticket->id);
+
             $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? true : false;
             $this->ticket->backup_state = yiit('ticket', 'backup in progress...');
             if ($this->finishBackup == true) {

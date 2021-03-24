@@ -79,7 +79,7 @@ class Log extends Model
     public static function config()
     {
         return [
-            'backup,restore,download,fetch' => [
+            'backup,restore,download,fetch,unlock' => [
                 'path' => '{dir}/{type}.{token}.{date}.log',
                 'date_fmt' => 'c', # 2004-02-12T15:19:21+00:00
                 'findFiles' => [
@@ -272,7 +272,7 @@ class Log extends Model
      * Return the Log model related to the token and the date
      *
      * @param string $token token
-     * @param string $type log type (can be backup, restore, download, fetch, ...)
+     * @param string $type log type (can be backup, restore, download, fetch, unlock, ...)
      * @param string $date date in iso-8601 format with seconds, example 2020-05-27T14:04:33+02:00
      * @return Log|null
      */

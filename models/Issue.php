@@ -72,12 +72,50 @@ class Issue extends Base
 
 
     /**
-     * Mark the issue as solved.
+     * Add the issue if not yet added.
+     * @param $type int one of the issue contants
+     * @param $ticket_id int the id of the associated ticket
      * @return bool
      */
-    public function resolved()
+    public static function markAs($type, $ticket_id)
     {
-        $this->solvedAt = new Expression('NOW()');
-        return $this->save();
+        $issue = Issue::findOne([
+            'key' => $type,
+            'solvedAt' => null,
+            'ticket_id' => $ticket_id
+        ]);
+
+        if ($issue === null) {
+            $issue = new Issue([
+                'key' => $type,
+                'ticket_id' => $ticket_id,
+            ]);
+            return $issue->save();
+        } else {
+            return true;
+        }
     }
+
+    /**
+     * Mark the issue as solved.
+     * @param $type int one of the issue contants
+     * @param $ticket_id int the id of the associated ticket
+     * @return bool
+     */
+    public static function markAsSolved($type, $ticket_id)
+    {
+        $issue = Issue::findOne([
+            'key' => $type,
+            'solvedAt' => null,
+            'ticket_id' => $ticket_id
+        ]);
+
+        if ($issue !== null) {
+            $issue->solvedAt = new Expression('NOW()');
+            return $issue->save();
+        } else {
+            return true;
+        }
+    }
+
 }

@@ -10,6 +10,7 @@ use app\models\Activity;
 use yii\helpers\Console;
 use app\models\DaemonInterface;
 use app\components\ShellCommand;
+use app\models\Issue;
 
 /**
  * Unlocker Daemon
@@ -153,6 +154,8 @@ class UnlockController extends DaemonController implements DaemonInterface
 
                     if ($retval != 0) {
 
+                        Issue::markAs(Issue::CLIENT_OFFLINE, $ticket->id);
+
                         $logfile = substitute('{url:logfile:log:view:type={type},token={token},date={date}}', [
                             'type' => 'unlock',
                             'token' => $ticket->token,
@@ -185,6 +188,8 @@ class UnlockController extends DaemonController implements DaemonInterface
                         ]), true, true, true);
 
                     } else {
+
+                        Issue::markAsSolved(Issue::CLIENT_OFFLINE, $ticket->id);
 
                         $ticket->bootup_lock = 0;
                         if ($ticket->save()) {

@@ -85,7 +85,7 @@ class NotifyController extends DaemonController implements DaemonInterface
             ->andWhere(['not', ['start' => null]])
             ->andWhere(['end' => null])
             ->andWhere(['not', ['ip' => null]])
-            // bootup_lock should be gone
+            // bootup_lock should be gone, device succesfully booted
             ->andWhere(['bootup_lock' => 0]);
 
         $tickets = $query->all();
@@ -95,21 +95,12 @@ class NotifyController extends DaemonController implements DaemonInterface
                 $ticket->online = $online;
                 $ticket->save(false);
 
-                $issue = Issue::findOne([
-                    'key' => Issue::CLIENT_OFFLINE,
-                    'solvedAt' => null,
-                    'ticket_id' => $ticket->id
-                ]);
-
-                if ($online && $issue !== null) {
-                    $issue->resolved();
-                } else if (!$online && $issue === null) {
-                    $issue = new Issue([
-                        'key' => Issue::CLIENT_OFFLINE,
-                        'ticket_id' => $ticket->id,
-                    ]);
-                    $issue->save();
+                if ($online) {
+                    Issue::markAsSolved(Issue::CLIENT_OFFLINE, $ticket->id);
+                } else {
+                    Issue::markAs(Issue::CLIENT_OFFLINE, $ticket->id);
                 }
+                $this->unlockItem($ticket);
             }
         }
     }
