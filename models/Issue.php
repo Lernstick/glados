@@ -22,6 +22,17 @@ class Issue extends Base
     /**
      * @inheritdoc
      */
+    public function init()
+    {
+        $this->on(self::EVENT_AFTER_UPDATE, [$this, 'newIssue']);
+        $this->on(self::EVENT_AFTER_INSERT, [$this, 'newIssue']);
+        parent::init();
+    }
+
+
+    /**
+     * @inheritdoc
+     */
     public static function tableName()
     {
         return 'issue';
@@ -48,7 +59,7 @@ class Issue extends Base
             'key' => \Yii::t('issues', 'Issue'),
             'occuredAt' => \Yii::t('issues', 'Since'),
             'solvedAt' => \Yii::t('issues', 'Solved At'),
-            'ticket.token' => \Yii::t('issues', 'Ticket'),
+            'ticket.token' => \Yii::t('issues', 'Ticket Token'),
         ];
     }
 
@@ -70,6 +81,11 @@ class Issue extends Base
         return $this->hasOne(Ticket::className(), ['id' => 'ticket_id']);
     }
 
+    /* Getter for exam name */
+    public function getTicket_state()
+    {
+        return $this->ticket->state;
+    }
 
     /**
      * Add the issue if not yet added.
@@ -118,4 +134,20 @@ class Issue extends Base
         }
     }
 
+
+    /**
+     * Triggers the reload of the active issues in the live view.
+     * 
+     * @return void
+     */
+    public function newIssue()
+    {
+        $eventItem = new EventItem([
+            'event' => 'exam/' . $this->ticket->exam->id,
+            'priority' => 0,
+            'concerns' => $this->ticket->concerns,
+            'data' => ['newIssue' => $this->key],
+        ]);
+        return $eventItem->generate();
+    }
 }

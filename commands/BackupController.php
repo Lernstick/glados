@@ -178,8 +178,8 @@ class BackupController extends DaemonController implements DaemonInterface
 
             $act = new Activity([
                 'ticket_id' => $this->ticket->id,
-                'description' => yiit('activity', 'Backup failed: network error, {error}.'),
-                'description_params' => ['error' => $emsg],
+                'description' => yiit('activity', 'Backup failed: network error (ip:{ip}), {error}.'),
+                'description_params' => ['ip' => $this->ticket->ip, 'error' => $emsg],
                 'severity' => Activity::SEVERITY_WARNING,
             ]);
             $act->save();
@@ -288,6 +288,8 @@ class BackupController extends DaemonController implements DaemonInterface
 
                 $this->ticket->backup_last = new Expression('NOW()');
                 $this->ticket->backup_state = yiit('ticket', 'backup successful.');
+
+                Issue::markAsSolved(Issue::LONG_TIME_NO_BACKUP, $this->ticket->id);
 
                 $act = new Activity([
                     'ticket_id' => $this->ticket->id,

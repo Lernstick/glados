@@ -50,7 +50,7 @@ class customFormatter extends \yii\i18n\Formatter
     {
         switch ($value) {
             case \app\models\Issue::CLIENT_OFFLINE:      return Yii::t('ticket', 'Client offline');
-            case \app\models\Issue::LONG_TIME_NO_BACKUP: return Yii::t('ticket', 'No Backup');
+            case \app\models\Issue::LONG_TIME_NO_BACKUP: return Yii::t('ticket', 'Long time no backup');
             default: return $value;
         }
     }

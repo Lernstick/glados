@@ -54,6 +54,29 @@ class NotifyController extends DaemonController implements DaemonInterface
         $this->calcLoad(0);
         while (true) {
             $this->calcLoad(0);
+
+            if ($id != '') {
+                if (($ticket = Ticket::findOne($id)) !== null) {
+                    if ($this->lockItem($ticket) && !$ticket->abandoned) {
+                        $ticket->client_state = 'Connecting to {ip} ...';
+                        $ticket->client_state_params = ['ip' => $ticket->ip];
+                        $ticket->save(false);
+                        list($output, $online) = $this->pingCheck($ticket);
+                        if ($online === true) {
+                            $ticket->client_state = 'Client {ip} is online.';
+                            $ticket->client_state_params = ['ip' => $ticket->ip];
+                            $ticket->save(false);
+                        } else {
+                            $ticket->client_state = 'network error: {output}.';
+                            $ticket->client_state_params = ['output' => $output];
+                            $ticket->save(false);
+                        }
+                        $this->unlockItem($ticket);
+                    }
+                }
+                return;
+            }
+
             if ($this->getNextItem()){
                 $this->processItem();
                 $this->calcLoad(1);
@@ -91,18 +114,29 @@ class NotifyController extends DaemonController implements DaemonInterface
         $tickets = $query->all();
         foreach ($tickets as $ticket) {
             if ($this->lockItem($ticket) && !$ticket->abandoned) {
-                $online = $ticket->runCommand('true', 'C', 10)[1] == 0 ? true : false;
-                $ticket->online = $online;
-                $ticket->save(false);
-
-                if ($online) {
-                    Issue::markAsSolved(Issue::CLIENT_OFFLINE, $ticket->id);
-                } else {
-                    Issue::markAs(Issue::CLIENT_OFFLINE, $ticket->id);
-                }
+                $this->pingCheck($ticket);
                 $this->unlockItem($ticket);
             }
         }
+    }
+
+    /**
+     * @param $ticket Ticket
+     * @return array 
+     */
+    private function pingCheck($ticket)
+    {
+        list($output, $retval, $cmd) = $ticket->runCommand('true', 'C', 10);
+        $online = $retval == 0 ? true : false;
+        $ticket->online = $online;
+        $ticket->save(false);
+
+        if ($online) {
+            Issue::markAsSolved(Issue::CLIENT_OFFLINE, $ticket->id);
+        } else {
+            Issue::markAs(Issue::CLIENT_OFFLINE, $ticket->id);
+        }
+        return [$output, $online];
     }
 
     /**
@@ -130,15 +164,15 @@ class NotifyController extends DaemonController implements DaemonInterface
                 '>=',
                 new Expression('unix_timestamp(`download_finished`)'),
                 new Expression('unix_timestamp(`download_request`)')
-            ])
+            ]);
             // the download should be finished for more than 2 minutes
             // but if it's longer than 1 hour, leave it
-            ->andWhere([
+            /*->andWhere([
                 'between',
                 'download_finished',
                 new Expression('NOW() - INTERVAL 60 MINUTE'),
                 new Expression('NOW() - INTERVAL 2 MINUTE')
-            ]);
+            ]);*/
 
         $tickets = $query->all();
         foreach ($tickets as $ticket) {
@@ -163,6 +197,9 @@ class NotifyController extends DaemonController implements DaemonInterface
                     $now = strtotime('now');
                     // only trigger if the (backup_interval + 60 seconds) is expired
                     if (abs($now - $last_backup_date) > intval($ticket->backup_interval) + 60) {
+
+                        Issue::markAs(Issue::LONG_TIME_NO_BACKUP, $ticket->id);
+
                         $act = new Activity([
                                 'ticket_id' => $ticket->id,
                                 'description' => yiit('activity', 'There was no successful backup since {n} minutes (the interval is set to {interval} minutes).'),
@@ -218,7 +255,7 @@ class NotifyController extends DaemonController implements DaemonInterface
      */
     public function getNextItem ()
     {
-        if ($this->checked < microtime(true) - $this->checkInterval){
+        if ($this->checked < microtime(true) - $this->checkInterval) {
             return true;
         } else {
             return false;

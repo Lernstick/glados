@@ -24,13 +24,18 @@ class IssueSearch extends Issue
     public $solved;
 
     /**
+     * @var integer ticket state ($this->ticket->state)
+     */
+    public $ticket_state;
+
+    /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
             [['id', 'ticket_id', 'exam_id'], 'integer'],
-            [['occuredAt', 'solved', 'key', 'exam_id'], 'safe'],
+            [['occuredAt', 'solved', 'key', 'exam_id', 'ticket_state'], 'safe'],
         ];
     }
 
@@ -70,6 +75,7 @@ class IssueSearch extends Issue
             return $dataProvider;
         }
 
+
         if ($this->solved === true) {
             $query->andWhere(['not', ['solvedAt' => null]]);
         } else if ($this->solved === false) {
@@ -84,8 +90,11 @@ class IssueSearch extends Issue
         ]);
 
         $query->joinWith($this->joinTables());
-        $query->andFilterWhere(['like', 'ticket.exam_id', $this->exam_id]);
-
+        $query->andFilterWhere(['ticket.exam_id' => $this->exam_id]);
+        if ($this->ticket_state == Ticket::STATE_RUNNING) {
+            $query->andWhere(['not', ['ticket.start' => null]]);
+            $query->andWhere(['ticket.end' => null]);
+        }
         return $dataProvider;
     }
 }

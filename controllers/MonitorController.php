@@ -79,6 +79,7 @@ class MonitorController extends BaseController
             $params["TicketSearch"]["state"] = Ticket::STATE_RUNNING;
             $params["IssueSearch"]["exam_id"] = $exam->id;
             $params["IssueSearch"]["solved"] = false;
+            $params["IssueSearch"]["ticket_state"] = Ticket::STATE_RUNNING;
 
             $searchModel = new TicketSearch();
             $dataProvider = $searchModel->search($params);

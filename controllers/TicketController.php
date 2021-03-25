@@ -260,12 +260,17 @@ class TicketController extends BaseController
             ]);
         } else if ($mode == 'probe') {
             //$online = $model->runCommand('source /info; ping -nq -W 10 -c 1 "${gladosIp}"', 'C', 10)[1];
-            $model->online = $model->runCommand('true', 'C', 10)[1] == 0 ? true : false;
-            $model->save(false);
-            return $this->redirect(['ticket/view',
-                'id' => $model->id,
-                #'online' => $online,
-            ]);
+            //$model->online = $model->runCommand('true', 'C', 10)[1] == 0 ? true : false;
+            //$model->save(false);
+
+            $daemon = new Daemon();
+            $pid = $daemon->startNotify($id);
+
+            if(Yii::$app->request->isAjax){
+                return $this->runAction('view', ['id' => $id]);
+            } else {
+                return $this->redirect(['view', 'id' => $id]);
+            }
         } else if ($mode == 'report') {
             $content = $this->renderPartial('report', [
                 'model' => $model,
@@ -720,9 +725,7 @@ class TicketController extends BaseController
                 return [ 'code' => 200, 'msg' => 'Client state changed.' ];
             }
         }
-
         return [ 'code' => 418, 'msg' => 'Client state not changed.' ]; // I'm a teapot
-
     }
 
     /**
@@ -805,7 +808,6 @@ class TicketController extends BaseController
         } else {
             return $this->redirect(['view', 'id' => $id, '#' => 'backups']);
         }
-
     }
 
     /**
