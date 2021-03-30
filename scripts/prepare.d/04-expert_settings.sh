@@ -22,16 +22,44 @@ function expert_settings()
 
   # config->allow_mount_external
   if [ "$(config_value "allow_mount_external")" = "False" ]; then
-    chroot ${initrd}/newroot sed -i 's/^ResultAny=.*/ResultAny=auth_admin/;s/^ResultInactive=.*/ResultInactive=auth_admin/;s/^ResultActive=.*/ResultActive=auth_admin/' /etc/polkit-1/localauthority/50-local.d/10-udisks2-mount.pkla
+    cat << EOF > ${initrd}/newroot/etc/polkit-1/localauthority/90-mandatory.d/10-udisks2-mount.pkla
+[allow user mounting and unmounting of non-system devices with self authentication]
+Identity=unix-user:user
+Action=org.freedesktop.udisks2.filesystem-mount
+ResultAny=auth_admin
+ResultInactive=auth_admin
+ResultActive=auth_admin
+EOF
   else
-    chroot ${initrd}/newroot sed -i 's/^ResultAny=.*/ResultAny=yes/;s/^ResultInactive=.*/ResultInactive=yes/;s/^ResultActive=.*/ResultActive=yes/' /etc/polkit-1/localauthority/50-local.d/10-udisks2-mount.pkla
+    cat << EOF > ${initrd}/newroot/etc/polkit-1/localauthority/90-mandatory.d/10-udisks2-mount.pkla
+[allow user mounting and unmounting of non-system devices with self authentication]
+Identity=unix-user:user
+Action=org.freedesktop.udisks2.filesystem-mount
+ResultAny=yes
+ResultInactive=yes
+ResultActive=yes
+EOF
   fi
 
   # config->allow_mount_system
   if [ "$(config_value "allow_mount_system")" = "False" ]; then
-    chroot ${initrd}/newroot sed -i 's/^ResultAny=.*/ResultAny=auth_admin/;s/^ResultInactive=.*/ResultInactive=auth_admin/;s/^ResultActive=.*/ResultActive=auth_admin/' /etc/polkit-1/localauthority/50-local.d/10-udisks2-mount-system.pkla
+    cat << EOF > ${initrd}/newroot/etc/polkit-1/localauthority/90-mandatory.d/10-udisks2-mount-system.pkla
+[allow user mounting and unmounting of system devices with self authentication]
+Identity=unix-user:user
+Action=org.freedesktop.udisks2.filesystem-mount-system
+ResultAny=auth_admin
+ResultInactive=auth_admin
+ResultActive=auth_admin
+EOF
   else
-    chroot ${initrd}/newroot sed -i 's/^ResultAny=.*/ResultAny=yes/;s/^ResultInactive=.*/ResultInactive=yes/;s/^ResultActive=.*/ResultActive=yes/' /etc/polkit-1/localauthority/50-local.d/10-udisks2-mount-system.pkla
+    cat << EOF > ${initrd}/newroot/etc/polkit-1/localauthority/90-mandatory.d/10-udisks2-mount-system.pkla
+[allow user mounting and unmounting of system devices with self authentication]
+Identity=unix-user:user
+Action=org.freedesktop.udisks2.filesystem-mount-system
+ResultAny=yes
+ResultInactive=yes
+ResultActive=yes
+EOF
   fi
 
   # config->firewall_off

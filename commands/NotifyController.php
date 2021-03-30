@@ -186,14 +186,15 @@ class NotifyController extends DaemonController implements DaemonInterface
                 $query->andFilterHaving(['description' => 'There was no successful backup since {n} minutes (the interval is set to {interval} minutes).']);
 
                 // only trigger if there was no message in the last 60 seconds
-                if ($query->count() == 0 && count($ticket->backups) != 0) {
+                if ($query->count() == 0 /*&& count($ticket->backups) != 0*/) {
                     // only the dates are relevant
                     $dates = array_column($ticket->backups, 'date');
                     // sort the maximal date in index 0
                     usort($dates, function($a, $b) {
                         return strtotime($a) > strtotime($b) ? -1: 1;
                     });
-                    $last_backup_date = strtotime($dates[0]);
+                    #$last_backup_date = strtotime($dates[0]);
+                    $last_backup_date = array_key_exists(0, $dates) ? strtotime($dates[0]) : strtotime($ticket->start);
                     $now = strtotime('now');
                     // only trigger if the (backup_interval + 60 seconds) is expired
                     if (abs($now - $last_backup_date) > intval($ticket->backup_interval) + 60) {

@@ -97,6 +97,18 @@ Pjax::begin([
     'id' => 'live_issues'
 ]);
 
+    /**
+     * A dummy event in the group "issues", such that if no event in the group "issues" is active
+     * the new js event handlers won't be registered. Also they won't be unregistered if the last
+     * element is disappearing from the view. Using this, an event of type "issues" will always be 
+     * present in the view.
+     */
+    echo ActiveEventField::widget([
+        'event' => 'issues:exam/' . $exam->id,
+        'jsonSelector' => 'dummy',
+        'jsHandler' => 'function(d, s){}', // do nothing
+    ]);
+
     echo GridView::widget([
         'dataProvider' => $issueDataProvider,
         'columns' => [
@@ -172,31 +184,32 @@ Pjax::begin([
     'id' => 'live_monitor'
 ]);
 
-/**
- * A dummy event in the group "monitor", such that if no event in the group "monitor" is active
- * the new js event handlers won't be registered. Also they won't be unregistered if the last
- * element is disappearing from the view. Using this, an event of type "monitor" will always be 
- * present in the view.
- */
-echo ActiveEventField::widget([
-    'event' => 'monitor:exam/' . $exam->id,
-    'jsonSelector' => 'dummy',
-    'jsHandler' => 'function(d, s){}', // do nothing
-]);
+    /**
+     * A dummy event in the group "monitor", such that if no event in the group "monitor" is active
+     * the new js event handlers won't be registered. Also they won't be unregistered if the last
+     * element is disappearing from the view. Using this, an event of type "monitor" will always be 
+     * present in the view.
+     */
+    echo ActiveEventField::widget([
+        'event' => 'monitor:exam/' . $exam->id,
+        'jsonSelector' => 'dummy',
+        'jsHandler' => 'function(d, s){}', // do nothing
+    ]);
 
-?>
+    ?>
 
-<div class="row">
-    <div class="col-sm-9">
-        <span><?= \Yii::t('monitor', 'Only tickets in {state} state will be shown here.', [
-            'state' => '<span data-state="1" class="label view--state">' . Yii::t('ticket', 'Running') . '</span>'
-        ]); ?></span>
+    <div class="row">
+        <div class="col-sm-9">
+            <span><?= \Yii::t('monitor', 'Only tickets in {state} state will be shown here.', [
+                'state' => '<span data-state="1" class="label view--state">' . Yii::t('ticket', 'Running') . '</span>'
+            ]); ?></span>
+        </div>
+        <div class="col-sm-3 text-right">
+            <!-- Don't remove this button! Make it invisible instead. -->
+            <a class="btn btn-default" id="reload" href=""><i class="glyphicon glyphicon-refresh"></i>&nbsp;<?= Yii::t('app', 'Reload') ?></a>
+        </div>
     </div>
-    <div class="col-sm-3 text-right">
-        <!-- Don't remove this button! Make it invisible instead. -->
-        <a class="btn btn-default" id="reload" href=""><i class="glyphicon glyphicon-refresh"></i>&nbsp;<?= Yii::t('app', 'Reload') ?></a>
-    </div>
-</div>
+    
     <?php $this->registerJs($js, \yii\web\View::POS_READY); ?>
 
     <?= ListView::widget([

@@ -6,6 +6,11 @@ use app\components\ActiveEventField;
 /* @var $model app\models\Ticket*/
 /* @var $group string */
 
+$event = substitute(empty($group) ? 'ticket/{id}' : '{group}:ticket/{id}', [
+    'group' => $group,
+    'id' => $model->id,
+]);
+
 /* spinning glyphicon */
 echo ActiveEventField::widget([
     'options' => [
@@ -13,7 +18,7 @@ echo ActiveEventField::widget([
         'class' => 'glyphicon glyphicon-cog ' . ($model->backup_lock == 1 ? 'gly-spin' : 'hidden'),
         'style' => 'float: left;',
     ],
-    'event' => substitute('{group}:ticket/{id}', ['group' => $group, 'id' => $model->id]),
+    'event' => $event,
     'jsonSelector' => 'backup_lock',
     'jsHandler' => 'function(d, s){
         if(d == "1"){
@@ -32,7 +37,7 @@ echo ActiveEventField::widget([
         'style' => 'float:left'
     ],
     'content' => yii::$app->formatter->format($model->backup_state, 'ntext'),
-    'event' => substitute('{group}:ticket/{id}', ['group' => $group, 'id' => $model->id]),
+    'event' => $event,
     'jsonSelector' => 'backup_state',
 ]);
 
@@ -44,7 +49,7 @@ echo ActiveEventField::widget([
     'options' => [
         'class' => $model->last_backup == 1 ? '' : 'hidden'
     ],
-    'event' => substitute('{group}:ticket/{id}', ['group' => $group, 'id' => $model->id]),
+    'event' => $event,
     'jsonSelector' => 'last_backup',
     'jsHandler' => 'function(d, s){
         if(d == "1"){

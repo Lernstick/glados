@@ -111,12 +111,13 @@ class BackupController extends DaemonController implements DaemonInterface
                     return;
                 }
                 
-                if ($this->ticket->bootup_lock == 1) {
+                // a manual backup should be triggered anyway
+                /*if ($this->ticket->bootup_lock == 1) {
                     $this->ticket->backup_state = yiit('ticket', 'backup is locked during bootup.');
                     $this->ticket->save(false);
                     $this->ticket = null;
                     return;
-                }
+                }*/
                 if ($this->lockItem($this->ticket)) {
                     $this->manualBackup = true;
                 } else {
