@@ -174,20 +174,8 @@ class ExamController extends BaseController
                 }
             }
         } else if ($mode == "monitor"){
-            $params["TicketSearch"]["exam_id"] = $model->id;
-            $params["sort"] = 'token';
-            $params["TicketSearch"]["state"] = Ticket::STATE_RUNNING;
 
-            $searchModel = new TicketSearch();
-            $dataProvider = $searchModel->search($params);
-            $dataProvider->pagination->pageParam = 'mon-page';
-            $dataProvider->pagination->pageSize = 12;
-
-            return $this->render('monitor', [
-                'model' => $model,
-                'searchModel' => $searchModel,
-                'dataProvider' => $dataProvider,
-            ]);
+            return $this->redirect(['monitor/view', 'id' => $id]);
 
         } else if ($mode == "json"){
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
