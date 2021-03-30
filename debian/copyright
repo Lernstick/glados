@@ -3,7 +3,7 @@ Upstream-Name: glados
 Source: https://github.com/imedias/glados
 
 Files: *
-Copyright: 2020 Roman Gruber <roman.gruber@inf.unibe.ch>
+Copyright: 2021 Roman Gruber <roman.gruber@inf.unibe.ch>
 License: Revised BSD License
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:

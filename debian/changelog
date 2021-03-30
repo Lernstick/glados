@@ -1,3 +1,27 @@
+glados (1.0.9-deb10) unstable; urgency=low
+
+  * New Features:
+    - **Read the Docs** integration (see https://glados-doc.readthedocs.io/en/latest/)
+    - **Issue tracker** in live monitor view (clients offline, backups not running, ...)
+    - Log files of all actions visible in the ticket view (backup, restore, download, unlock, screen_capture, ...)
+    - Daemon that checks online status during exam
+    - System tray icon in the exam, showing online and backup status
+  * Fixed several bugs:
+    - Password appearing in server logfiles are now masked
+    - The Glados server can now deal with changing ip-adresses of the client, due to a change in network connectivity
+    - Allow mounting of devices fixed, when set in the exam settings
+    - Barcodes are now working with all alphanumeric characters
+    - Google Chrome is now showing the settings preview correctly
+    - The interface now work with MySQL strict mode
+  * Changes:
+    - Manual backup triggers even if ticket is still locked due to bootup
+    - More verbosity in error messages
+    - Switched back to FileMutex for locks
+    - In the live monitor view, it is now possible to enlarge a live image (large image is updating as well) 
+    - Split the exam setting allow mounting of devices to "allow mounting of external devices" and "allow mounting of internal devices"
+
+ -- Roman Gruber <roman.gruber@inf.unibe.ch>  Tue, 30 Mar 2021 15:13:40 +0200
+
 glados (1.0.8-deb10) unstable; urgency=low
 
   * New Features:
