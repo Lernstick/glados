@@ -103,7 +103,7 @@ class Log extends Model
                 ],
                 'pattern' => 'TODO',
             ],
-            'keylogger' => [
+            /*'keylogger' => [
                 'path' => '{dir}/{token}/{type}{date}.key',
                 'date_fmt' => 'U', # timestamp
                 'findFiles' => [
@@ -114,7 +114,7 @@ class Log extends Model
                     ],
                 ],
                 'pattern' => 'TODO',
-            ],
+            ],*/
         ];
     }
 
