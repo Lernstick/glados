@@ -32,16 +32,16 @@ Active Directory LDAP servers allow the user to bind with both the `destinguishe
 
 Assume your AD domain name is `example.com`. Below are a few examples how to set up the authentication method for different outcomes:
 
-Login Scheme			| Bind Scheme  			| Example Login			| Constructed Bind DN | Authenticated? 	| Notes 		|
--------------			| ---------------		| ------------  		| -----------------   | --------------- | ------------- |
-`{username}`			| `{username}@{domain}`	| `alice`				| `alice@example.com` | yes				| default setup |
-`{username}`			| `{username}`			| `alice`				| `alice`			  | no 				| |
-`{username}`			| `{username}@{domain}`	| `alice@example.com`	| `alice@example.com@example.com` | no	| |
-`{username}@{domain}`	| `{username}@{domain}`	| `alice`				| none 				  | no				| |
-`{username}@{domain}`	| `{username}@{domain}`	| `alice@example.com`   | `alice@example.com` | yes				| |
-`{username}@{domain}`	| `{username}@{domain}`	| `alice@other_domain`  | none				  | no				| |
-`{username}@other_doman`| `{username}@{domain}`	| `alice@other_domain`  | `alice@example.com` | yes 			| rewriting of the domain |
-`{username}@other_doman`| `{username}@{domain}`	| `alice@example.com`   | none 				  | no  			| |
+Login Scheme            | Bind Scheme           | Example Login         | Constructed Bind DN | Authenticated?  | Notes         |
+-------------           | ---------------       | ------------          | -----------------   | --------------- | ------------- |
+`{username}`            | `{username}@{domain}` | `alice`               | `alice@example.com` | yes             | default setup |
+`{username}`            | `{username}`          | `alice`               | `alice`             | no              | |
+`{username}`            | `{username}@{domain}` | `alice@example.com`   | `alice@example.com@example.com` | no  | |
+`{username}@{domain}`   | `{username}@{domain}` | `alice`               | none                | no              | |
+`{username}@{domain}`   | `{username}@{domain}` | `alice@example.com`   | `alice@example.com` | yes             | |
+`{username}@{domain}`   | `{username}@{domain}` | `alice@other_domain`  | none                | no              | |
+`{username}@other_doman`| `{username}@{domain}` | `alice@other_domain`  | `alice@example.com` | yes             | rewriting of the domain |
+`{username}@other_doman`| `{username}@{domain}` | `alice@example.com`   | none                | no              | |
 
 ###### *Method 2: Bind anonymously*
 

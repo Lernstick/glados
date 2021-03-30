@@ -38,6 +38,9 @@ class EventController extends Controller
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
         $ticket = $this->findTicket($token);
+        $ticket->ip = Yii::$app->request->userIp; # set the ip address
+        $ticket->save(false);
+
         if (($stream = EventStream::findOne(['uuid' => $ticket->agent_uuid])) === null) {
             $stream = new EventStream(['uuid' => $ticket->agent_uuid]);
             $stream->listenEvents = implode(',', [

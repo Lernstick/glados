@@ -14,6 +14,7 @@ use app\components\ShellCommand;
 use yii\helpers\FileHelper;
 use yii\helpers\Console;
 use app\models\DaemonInterface;
+use app\models\Issue;
 
 /**
  * Backup Daemon (pull)
@@ -110,12 +111,13 @@ class BackupController extends DaemonController implements DaemonInterface
                     return;
                 }
                 
-                if ($this->ticket->bootup_lock == 1) {
+                // a manual backup should be triggered anyway
+                /*if ($this->ticket->bootup_lock == 1) {
                     $this->ticket->backup_state = yiit('ticket', 'backup is locked during bootup.');
                     $this->ticket->save(false);
                     $this->ticket = null;
                     return;
-                }
+                }*/
                 if ($this->lockItem($this->ticket)) {
                     $this->manualBackup = true;
                 } else {
@@ -166,15 +168,19 @@ class BackupController extends DaemonController implements DaemonInterface
         $this->ticket->backup_state = yiit('ticket', 'connecting to client...');
         $this->ticket->save(false);
 
-        if ($this->checkPort(22, 3) === false) {
-            $this->ticket->backup_state = yiit('ticket', 'network error.');
+        if ($this->checkPort(22, 3, $emsg) === false) {
+            $this->ticket->backup_state = yiit('ticket', 'network error: {error}.');
+            $this->ticket->backup_state_params = ['error' => $emsg];
             $this->ticket->backup_last_try = new Expression('NOW()');
             $this->ticket->online = false;
             $this->unlockItem($this->ticket);
-            
+
+            Issue::markAs(Issue::CLIENT_OFFLINE, $this->ticket->id);
+
             $act = new Activity([
                 'ticket_id' => $this->ticket->id,
-                'description' => yiit('activity', 'Backup failed: network error.'),
+                'description' => yiit('activity', 'Backup failed: network error (ip:{ip}), {error}.'),
+                'description_params' => ['ip' => $this->ticket->ip, 'error' => $emsg],
                 'severity' => Activity::SEVERITY_WARNING,
             ]);
             $act->save();
@@ -182,6 +188,8 @@ class BackupController extends DaemonController implements DaemonInterface
             $this->backup_failed();
 
         } else {
+            Issue::markAsSolved(Issue::CLIENT_OFFLINE, $this->ticket->id);
+
             $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? true : false;
             $this->ticket->backup_state = yiit('ticket', 'backup in progress...');
             if ($this->finishBackup == true) {
@@ -214,19 +222,22 @@ class BackupController extends DaemonController implements DaemonInterface
                 $e = escapeshellarg($e);
             });
 
-            $this->_cmd = "rdiff-backup --remote-schema 'ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
-                 . "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -C %s rdiff-backup --server' "
-                 . "-v5 --print-statistics "
-                 . (empty($exclude) ? '' : (' --exclude ' . implode($exclude, ' --exclude '))) . " "
-                 . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . "::" . $this->remotePath) . " "
-                 . escapeshellarg(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token . "/") . " "
-                 . "";
+            $this->_cmd = substitute("rdiff-backup --remote-schema 'ssh -i {identity} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -C %s {remoteSchema}' -v5 --print-statistics {exclude} {user}@{ip}::{remotePath} {localPath}", [
+                'identity' => FileHelper::normalizePath(\Yii::$app->params['dotSSH'] . '/rsa'),
+                'remoteSchema' => 'rdiff-backup-server',
+                'exclude' => (empty($exclude) ? '' : (' --exclude ' . implode($exclude, ' --exclude '))),
+                'user' => escapeshellarg($this->remoteUser),
+                'ip' => escapeshellarg($this->ticket->ip),
+                'remotePath' => escapeshellarg($this->remotePath),
+                'localPath' => escapeshellarg(FileHelper::normalizePath(\Yii::$app->params['backupPath'] . "/" . $this->ticket->token . "/")),
+            ]);
 
             $this->logInfo('Executing rdiff-backup: ' . $this->_cmd);
 
             $cmd = new ShellCommand($this->_cmd);
+            $date = date('c');
+            $logFile = Yii::getAlias('@runtime/logs/backup.' . $this->ticket->token . '.' . $date . '.log');
             $output = "";
-            $logFile = Yii::getAlias('@runtime/logs/backup.' . $this->ticket->token . '.' . date('c') . '.log');
 
             $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use (&$output, $logFile) {
                 echo $this->ansiFormat($event->line, $event->channel == ShellCommand::STDOUT ? Console::NORMAL : Console::FG_RED);
@@ -237,17 +248,29 @@ class BackupController extends DaemonController implements DaemonInterface
             $retval = $cmd->run();
 
             if ($retval != 0) {
-                $this->ticket->backup_state = yiit('ticket', 'rdiff-backup failed (retval: {retval}), output: {output}');
+
+                $logfile = substitute('{url:logfile:log:view:type={type},token={token},date={date}}', [
+                    'type' => 'backup',
+                    'token' => $this->ticket->token,
+                    'date' => $date,
+                ]);
+
+                $this->ticket->backup_state = yiit('ticket', 'rdiff-backup failed. For more information, please check the {logfile} (retval: {retval})');
                 $this->ticket->backup_state_params = [
                     'retval' => $retval,
-                    'output' => $output,
+                    //'output' => $output,
+                    'logfile' => $logfile,
                 ];
+                $this->ticket->save();
                 $this->logError($this->ticket->backup_state);
 
                 $act = new Activity([
                     'ticket_id' => $this->ticket->id,
-                    'description' => yiit('activity', 'Backup failed: rdiff-backup failed (retval: {retval})'),
-                    'description_params' => [ 'retval' => $retval ],
+                    'description' => yiit('activity', 'Backup failed: rdiff-backup failed. For more information, please check the {logfile} (retval: {retval})'),
+                    'description_params' => [
+                        'retval' => $retval,
+                        'logfile' => $logfile,
+                    ],
                     'severity' => Activity::SEVERITY_WARNING,
                 ]);
                 $act->save();
@@ -266,6 +289,15 @@ class BackupController extends DaemonController implements DaemonInterface
 
                 $this->ticket->backup_last = new Expression('NOW()');
                 $this->ticket->backup_state = yiit('ticket', 'backup successful.');
+
+                Issue::markAsSolved(Issue::LONG_TIME_NO_BACKUP, $this->ticket->id);
+
+                $act = new Activity([
+                    'ticket_id' => $this->ticket->id,
+                    'description' => yiit('activity', 'Backup successful.'),
+                    'severity' => Activity::SEVERITY_INFORMATIONAL,
+                ]);
+                $act->save();
 
                 # If it's the last backup, tell the client and set last_backup to 1
                 if ($this->finishBackup == true) {
@@ -328,15 +360,26 @@ class BackupController extends DaemonController implements DaemonInterface
      * Determines if a given port on the target system is open or not
      *
      * @param integer $port The port to check
-     * @param integer $times The number to times to try (with 5 seconds delay inbetween every check)
+     * @param integer $tries The number to times to try (with 5 seconds delay inbetween every check)
+     * @param integer $errstr contains the error message of the last try from fsockopen()
+     * @param integer $errno the error code of the last try from connect()
      * @return boolean Whether the port is open or not
      */
-    private function checkPort($port, $times = 1)
+    private function checkPort($port, $tries = 1, &$errstr = null, &$errno = null)
     {
-        for($c=1;$c<=$times;$c++){
+        for($c=1;$c<=$tries;$c++){
             $fp = @fsockopen($this->ticket->ip, $port, $errno, $errstr, 10);
             if (!$fp) {
-                $this->logError('Port ' . $port . ' is closed or blocked. (try ' . $c . '/' . $times . ')');
+                //$this->logError('Port ' . $port . ' is closed or blocked. (try ' . $c . '/' . $tries . ')');
+                $this->logError(substitute('Port {port} is closed to blocked on ticket with token {token} and ip {ip}, error code: {code}, error message: {error}. (try {try}/{tries})', [
+                    'port' => $port,
+                    'token' => $this->ticket->token,
+                    'ip' => $this->ticket->ip,
+                    'code' => $errno,
+                    'error' => $errstr,
+                    'try' => $c,
+                    'tries' => $tries,
+                ]));
                 sleep(5);
             } else {
                 // port is open and available

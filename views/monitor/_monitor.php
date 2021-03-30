@@ -2,18 +2,21 @@
 
 use yii\helpers\Html;
 use yii\widgets\ListView;
+use yii\grid\GridView;
 use yii\widgets\Pjax;
 use yii\bootstrap\Modal;
 use yii\helpers\Url;
 use app\components\ActiveEventField;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Exam */
+/* @var $exam app\models\Exam */
 /* @var $searchModel app\models\TicketSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $issueSearchModel app\models\IssueSearch */
+/* @var $issueDataProvider yii\data\ActiveDataProvider */
 
 $title = \Yii::t('ticket', 'Currently behind live');
-$n = $model::monitor_idle_time();
+$n = $exam::monitor_idle_time();
 
 // reload images if no new image for [[monitor_idle_time()]] seconds
 $js = <<< SCRIPT
@@ -56,50 +59,157 @@ $('img.live-thumbnail').each(function(){
 
 check_images();
 
-$('#galleryModal').on('show.bs.modal', function(e) {
+$('#galleryModal').off('show.bs.modal').on('show.bs.modal', function(e) {
     var el = $(e.relatedTarget).parent().children('img').first();
-    $('#galleryModal object').attr("data", "");
-    $('#galleryModal object').attr("data", el.data('src') + "&" + new Date().getTime());
+    $.pjax({url: el.data('src'), container: '#monitorModalContent', push: false, async:false})
 });
+
+$('#galleryModal').off('hide.bs.modal').on('hide.bs.modal', function(e) {
+    $("#reload").click();
+});
+
 SCRIPT;
 
 echo ActiveEventField::widget([
-    'event' => 'exam/' . $model->id,
+    'event' => 'exam/' . $exam->id,
     'jsonSelector' => 'runningTickets',
     'jsHandler' => 'function(d, s) {
         $("#reload").click();
     }',
 ]);
 
+echo ActiveEventField::widget([
+    'event' => 'exam/' . $exam->id,
+    'jsonSelector' => 'newIssue',
+    'jsHandler' => 'function(d, s) {
+        console.log("newIssue", d, s);
+        $("#reload-issues").click();
+    }',
+]);
+
+echo Pjax::widget([
+    'id' => 'backup-now-container',
+    'linkSelector' => '#backup-now',
+    'enablePushState' => false,
+]);
+
+Pjax::begin([
+    'id' => 'live_issues'
+]);
+
+    /**
+     * A dummy event in the group "issues", such that if no event in the group "issues" is active
+     * the new js event handlers won't be registered. Also they won't be unregistered if the last
+     * element is disappearing from the view. Using this, an event of type "issues" will always be 
+     * present in the view.
+     */
+    echo ActiveEventField::widget([
+        'event' => 'issues:exam/' . $exam->id,
+        'jsonSelector' => 'dummy',
+        'jsHandler' => 'function(d, s){}', // do nothing
+    ]);
+
+    echo GridView::widget([
+        'dataProvider' => $issueDataProvider,
+        'columns' => [
+            'key:issue',
+            'occuredAt:timeago',
+            [
+                'attribute' => 'ticket.token',
+                'format' => 'raw',
+                'value' => function($issue, $key, $index, $datacolumn) {
+                    return Html::a($issue->ticket->token,
+                        ['ticket/view', 'id' => $issue->ticket->id],
+                        ['data-pjax' => 0]
+                    );
+                },
+            ],
+            [
+                'attribute' => 'Info',
+                'format' => 'raw',
+                /**
+                 * @param $issue Issue model instance
+                 * @param $key
+                 * @param $index
+                 * @param $grid yii\grid\DataColumn current DataColumn instance
+                 */
+                'value' => function($issue, $key, $index, $datacolumn) {
+                    if ($issue->key == $issue::CLIENT_OFFLINE) {
+                        $value = /*$datacolumn->grid->render('/ticket/fields/_online', [
+                            'model' => $issue->ticket,
+                        ]) . '&nbsp;' . */ActiveEventField::widget([
+                            'options' => [ 'tag' => 'span' ],
+                            'content' => $issue->ticket->client_state,
+                            'event' => 'issues:ticket/' . $issue->ticket->id,
+                            'jsonSelector' => 'client_state',
+                        ]);
+                    } else if ($issue->key == $issue::LONG_TIME_NO_BACKUP) {
+                        $value = $datacolumn->grid->render('/ticket/fields/_backup_state', [
+                            'model' => $issue->ticket,
+                            'group' => 'issues',
+                        ]);
+                    } else {
+                        $value = '';
+                    }
+                    return $value;
+                },
+            ],
+            [
+                'class' => yii\grid\ActionColumn::className(),
+                'header' => \Yii::t('ticket', 'Actions') . Html::a('<i class="glyphicon glyphicon-refresh"></i>', '', ['id' => 'reload-issues', 'class' => 'btn btn-default btn-xs pull-right']),
+                'template' => '{action}',
+                'buttons' => [
+                    'action' => function ($url, $issue, $key) {
+                        if ($issue->key == $issue::CLIENT_OFFLINE) {
+                            return Html::a('<i class="glyphicon glyphicon-globe"></i>&nbsp;' . Yii::t('issue', 'Ping client'), ['/ticket/view', 'id' => $issue->ticket->id, 'mode' => 'probe', '#' => 'tab_general'], ['id' => 'backup-now', 'class' => 'btn btn-default']);
+                        } else if ($issue->key == $issue::LONG_TIME_NO_BACKUP) {
+                            return Html::a('<i class="glyphicon glyphicon-hdd"></i>&nbsp;' . Yii::t('issue', 'Backup now'), ['/ticket/backup', 'id' => $issue->ticket->id, '#' => 'tab_backups'], ['id' => 'backup-now', 'class' => 'btn btn-default']);
+                        } else {
+                            return $issue->key;
+                        }
+                    },
+                ],
+            ],
+        ],
+        'rowOptions' => ['class' => 'danger '],
+        'emptyText' => '<i class="glyphicon glyphicon-ok"></i>&nbsp;' . \Yii::t('ticket', 'Everything is fine. No issues found.'),
+        'emptyTextOptions' => ['class' => 'empty text-success '],
+    ]);
+
+Pjax::end();
+
+echo "<hr>";
+
 Pjax::begin([
     'id' => 'live_monitor'
 ]);
 
-/**
- * A dummy event in the group "monitor", such that if no event in the group "monitor" is active
- * the new js event handlers won't be registered. Also they won't be unregistered if the last
- * element is disappearing from the view. Using this a event of type "monitor" will always be 
- * present in the view.
- */
-echo ActiveEventField::widget([
-    'event' => 'monitor:exam/' . $model->id,
-    'jsonSelector' => 'dummy',
-    'jsHandler' => 'function(d, s){}', // do nothing
-]);
+    /**
+     * A dummy event in the group "monitor", such that if no event in the group "monitor" is active
+     * the new js event handlers won't be registered. Also they won't be unregistered if the last
+     * element is disappearing from the view. Using this, an event of type "monitor" will always be 
+     * present in the view.
+     */
+    echo ActiveEventField::widget([
+        'event' => 'monitor:exam/' . $exam->id,
+        'jsonSelector' => 'dummy',
+        'jsHandler' => 'function(d, s){}', // do nothing
+    ]);
 
-?>
+    ?>
 
-<div class="row">
-    <div class="col-sm-9">
-        <span><?= \Yii::t('monitor', 'Only tickets in {state} state will be shown here.', [
-            'state' => '<span data-state="1" class="label view--state">' . Yii::t('ticket', 'Running') . '</span>'
-        ]); ?></span>
+    <div class="row">
+        <div class="col-sm-9">
+            <span><?= \Yii::t('monitor', 'Only tickets in {state} state will be shown here.', [
+                'state' => '<span data-state="1" class="label view--state">' . Yii::t('ticket', 'Running') . '</span>'
+            ]); ?></span>
+        </div>
+        <div class="col-sm-3 text-right">
+            <!-- Don't remove this button! Make it invisible instead. -->
+            <a class="btn btn-default" id="reload" href=""><i class="glyphicon glyphicon-refresh"></i>&nbsp;<?= Yii::t('app', 'Reload') ?></a>
+        </div>
     </div>
-    <div class="col-sm-3 text-right">
-        <!-- Don't remove this button! Make it invisible instead. -->
-        <a class="btn btn-default" id="reload" href=""><i class="glyphicon glyphicon-refresh"></i>&nbsp;<?= Yii::t('app', 'Reload') ?></a>
-    </div>
-</div>
+    
     <?php $this->registerJs($js, \yii\web\View::POS_READY); ?>
 
     <?= ListView::widget([
@@ -122,19 +232,11 @@ echo ActiveEventField::widget([
     'header' => false,
     'footer' => Html::Button(\Yii::t('app', 'Close'), ['data-dismiss' => 'modal', 'class' => 'btn btn-default']),
     'size' => \yii\bootstrap\Modal::SIZE_LARGE
-]); ?>
+]);
 
-    <div class="live-overview-detail">
-        <div class="live-overview-detail-loading alert alert-info" role="alert">
-            <i class="gly-spin glyphicon glyphicon-cog" aria-hidden="true"></i>
-             <?= \Yii::t('app', 'Please wait...'); ?>
-        </div>
-        <object class="live-overview-detail-img" data="" type="image/jpg">
-            <div class="live-overview-detail-error alert alert-danger" role="alert">
-                <i class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></i>
-                <?= \Yii::t('app', 'The image could not be loaded.'); ?>
-            </div>
-        </object>
-    </div>
+    Pjax::begin([
+        'id' => 'monitorModalContent',
+    ]);
+    Pjax::end();
 
-<?php Modal::end(); ?>
+Modal::end(); ?>

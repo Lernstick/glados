@@ -181,10 +181,10 @@ a.desc:after {
   display: initial;
 }
 
-#backupLogModal .modal-dialog, #restoreLogModal .modal-dialog, #screencaptureLogModal .modal-dialog, #keyModal .modal-dialog {
+#backupLogModal .modal-dialog, #restoreLogModal .modal-dialog, #screencaptureLogModal .modal-dialog, #keyModal .modal-dialog, #logModal .modal-dialog {
     overflow-y: initial !important
 }
-#backupLogModal .modal-body, #restoreLogModal .modal-body, #screencaptureLogModal .modal-body, #keyModal .modal-body {
+#backupLogModal .modal-body, #restoreLogModal .modal-body, #screencaptureLogModal .modal-body, #keyModal .modal-body, #logModal .modal-body {
     max-height: calc(100vh - 200px);
     overflow-y: auto;
 }
@@ -675,5 +675,10 @@ span.view--state[data-state="4"]::after { content: attr(data-text-4); }
 }
 
 .popover img {
+  max-width: 100%;
+}
+
+/* images in the howto should not be larger than their container */
+.howto-view .markdown-view img {
   max-width: 100%;
 }

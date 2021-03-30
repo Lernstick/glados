@@ -135,34 +135,13 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'ip',
                 'format' => 'raw',
-                'value' => yii::$app->formatter->format($model->ip, 'text') . ' ' . 
-                    ActiveEventField::widget([
-                        'options' => [
-                            'tag' => 'span',
-                            'class' => 'label label-' . ( $model->online === 1 ? 'success' :
-                                                       ( $model->online === 0 ? 'danger' : 
-                                                                                'warning') )
-                        ],
-                        'content' => ( $model->online === 1 ? \Yii::t('ticket', 'Online') :
-                                     ( $model->online === 0 ? \Yii::t('ticket', 'Offline') : 
-                                                              \Yii::t('ticket', 'Unknown')) ),
+                'value' => ActiveEventField::widget([
+                        'options' => ['tag' => 'span'],
+                        'content' => yii::$app->formatter->format($model->ip, 'text'),
                         'event' => 'ticket/' . $model->id,
-                        'jsonSelector' => 'online',
-                        'jsHandler' => 'function(d, s){
-                            if(d == "1"){
-                                s.innerHTML = "' . \Yii::t('ticket', 'Online') . '";
-                                s.classList.add("label-success");
-                                s.classList.remove("label-danger");
-                                s.classList.remove("label-warning");
-                            }else if(d == "0"){
-                                s.innerHTML = "' . \Yii::t('ticket', 'Offline') . '";
-                                s.classList.add("label-danger");
-                                s.classList.remove("label-success");
-                                s.classList.remove("label-warning");
-                            }
-                        }',
-                    ]) . ' ' .
-                    Html::a(\Yii::t('ticket', 'Probe'), ['view', 'id' => $model->id, 'mode' => 'probe']),
+                        'jsonSelector' => 'ip',
+                    ]) . ' ' . $this->render('/ticket/fields/_online', ['model' => $model])
+                    . ' ' . Html::a(\Yii::t('ticket', 'Probe'), ['view', 'id' => $model->id, 'mode' => 'probe']),
             ],
             [
                 'attribute' => 'agent_online',
@@ -192,7 +171,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'client_state',
-                'format' => 'raw',
+                'format' => 'links',
                 'value' =>  ActiveEventField::widget([
                     'options' => [ 'tag' => 'span' ],
                     'content' => $model->client_state,
@@ -234,51 +213,12 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'backup_state',
-                'format' => 'raw',
-                'value' =>  ActiveEventField::widget([
-                    'options' => [
-                        'tag' => 'i',
-                        'class' => 'glyphicon glyphicon-cog ' . ($model->backup_lock == 1 ? 'gly-spin' : 'hidden'),
-                        'style' => 'float: left;',
-                    ],
-                    'event' => 'ticket/' . $model->id,
-                    'jsonSelector' => 'backup_lock',
-                    'jsHandler' => 'function(d, s){
-                        if(d == "1"){
-                            s.classList.add("gly-spin");
-                            s.classList.remove("hidden");
-                        }else if(d == "0"){
-                            s.classList.remove("gly-spin");
-                            s.classList.add("hidden");
-                        }
-                    }',
-                ]) . ActiveEventField::widget([
-                    'options' => [
-                        'style' => 'float:left'
-                    ],
-                    'content' => yii::$app->formatter->format($model->backup_state, 'ntext'),
-                    'event' => 'ticket/' . $model->id,
-                    'jsonSelector' => 'backup_state',
-                ]) . ActiveEventField::widget([
-                    'content' => yii::$app->formatter->format('&nbsp;<i class="glyphicon glyphicon-ok text-success"></i>&nbsp;' . \Yii::t('ticket', 'last backup successful'), 'html'),
-                    'options' => [
-                        'class' => $model->last_backup == 1 ? '' : 'hidden'
-                    ],
-                    'event' => 'ticket/' . $model->id,
-                    'jsonSelector' => 'last_backup',
-                    'jsHandler' => 'function(d, s){
-                        if(d == "1"){
-                            s.classList.remove("hidden");
-                        }else if(d == "0"){
-                            s.classList.add("hidden");
-                        }
-                    }',
-                ]) . yii::$app->formatter->format('<div style="float:left;" class="' . ($model->lastBackupFailed ? '' : 'hidden') . '">&nbsp;<i class="glyphicon glyphicon-remove text-danger"></i>&nbsp;' . \Yii::t('ticket', 'last backup failed') . '</div>', 'html')
-                . ($model->abandoned ? ('&nbsp;<a tabindex="0" class="label label-danger" role="button" data-toggle="popover" data-html="true" data-trigger="focus" title="' . \Yii::t('ticket', 'Abandoned Ticket') . '" data-content="' . \Yii::t('ticket', 'This ticket is abandoned and thus excluded from regular backup. A reason for this could be that the backup process was not able to perform a backup of the client. After some time of failed backup attempts, the ticket will be abandoned (the value of <i>Time Limit</i> of this ticket/exam or <i>{default}</i> if nothing is set). You can still force a backup by clicking Actions->Backup Now.', ['default' => yii::$app->formatter->format(\Yii::$app->params['abandonTicket'], 'duration')]) . '">' . \Yii::t('ticket', 'Abandoned') . '</a>') : ''),
+                'format' => 'links',
+                'value' => $this->render('/ticket/fields/_backup_state', ['model' => $model, 'group' => '']),
             ],
             [
                 'attribute' => 'restore_state',
-                'format' => 'raw',
+                'format' => 'links',
                 'value' =>  ActiveEventField::widget([
                     'options' => [
                         'tag' => 'i',
@@ -450,6 +390,18 @@ $this->params['breadcrumbs'][] = $this->title;
             'model' => $model,
             'searchModel' => $historySearchModel,
             'dataProvider' => $historyDataProvider,
+        ]); ?>
+    <?php Pjax::end() ?>
+
+     <?php Pjax::begin([
+        'id' => 'logs',
+        'options' => ['class' => 'tab-pane fade'],
+    ]); ?>
+        <?php $_GET = array_merge($_GET, ['#' => 'tab_logs']); ?>
+        <?= $this->render('/log/index', [
+            'ticketModel' => $model,
+            'searchModel' => $logSearchModel,
+            'dataProvider' => $logDataProvider,
         ]); ?>
     <?php Pjax::end() ?>
 

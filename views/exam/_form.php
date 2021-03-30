@@ -440,7 +440,7 @@ $this->registerJs($js);
                             'label' => $exam->getAttributeLabel('allow_sudo')
                         ],
                     ])->label(false); ?>
-                    <?= $form->field($exam, 'allow_mount')->widget(SwitchInput::classname(), [
+                    <?= $form->field($exam, 'allow_mount_external')->widget(SwitchInput::classname(), [
                         'pluginOptions' => [
                             'size' => 'mini',
                             'onText' => \Yii::t('app', 'ON'),
@@ -449,7 +449,19 @@ $this->registerJs($js);
                             'offColor' => 'success',
                         ],
                         'options' => [
-                            'label' => $exam->getAttributeLabel('allow_mount')
+                            'label' => $exam->getAttributeLabel('allow_mount_external')
+                        ],
+                    ])->label(false); ?>
+                    <?= $form->field($exam, 'allow_mount_system')->widget(SwitchInput::classname(), [
+                        'pluginOptions' => [
+                            'size' => 'mini',
+                            'onText' => \Yii::t('app', 'ON'),
+                            'offText' => \Yii::t('app', 'OFF'),
+                            'onColor' => 'danger',
+                            'offColor' => 'success',
+                        ],
+                        'options' => [
+                            'label' => $exam->getAttributeLabel('allow_mount_system')
                         ],
                     ])->label(false); ?>
                     <?= $form->field($exam, 'firewall_off')->widget(SwitchInput::classname(), [

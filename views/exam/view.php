@@ -253,7 +253,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'backup_path',
             'grp_netdev:boolean',
             'allow_sudo:boolean',
-            'allow_mount:boolean',
+            'allow_mount_external:boolean',
+            'allow_mount_system:boolean',
             'firewall_off:boolean',
         ],
     ]) ?>

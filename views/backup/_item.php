@@ -27,9 +27,10 @@ use yii\widgets\DetailView;
                     <?= Html::a(
                         '<span class="glyphicon glyphicon-paperclip"></span> '. \Yii::t('ticket', 'Show Log File'),
                         Url::to([
-                            'backup/log',
-                            'ticket_id' => $model->ticket->id,
-                            'date' => $model->date
+                            'log/view',
+                            'token' => $model->ticket->token,
+                            'date' => $model->date,
+                            'type' => 'backup',
                         ]),
                         [
                             'id' => 'backup-log-show' . $key,

@@ -21,7 +21,7 @@ class ActiveEventField extends Pjax
      * @var string the name of the event on which the js handler should listen on. Can also be 
      * prepended with a group name. This group name is later used to determine which events should
      * be replaced if the request is ajax. Events that are in the same group identifier, will be
-     * replaced in case of an ajax request.
+     * replaced with the new events in case of an ajax request.
      * Exmaples:
      *  - "ticket/1234"         // no group name
      *  - "monitor:ticket/1234" // sets the group name to "monitor"

@@ -30,10 +30,10 @@ A login of a user existing in `domain2.local`, whould then look like this:
 1. User types `user@domain2.local` into the login form
 2. Local login attempt (`Order` 0)
 3. If it fails, check `Login Scheme` of `domain1.local` (`Order` 1), but `user@domain2.local` does not match `{username}@domain1.local`
-4. If it fails, check `Login Scheme` of `domain1.local` (`Order` 1) which matches. Login attempt on `domain2.local` (`Order` 2)
+4. If it fails, check `Login Scheme` of `domain2.local` (`Order` 2) which matches. Login attempt on `domain2.local` (`Order` 2)
 5. Further processing next entry (`Order` 3)
 
-As you can see, the `Login Scheme` can be used to only authentication users matching a scheme and skip some authentication methods based on that scheme.
+As you can see, the `Login Scheme` can be used to make login usernames match a scheme and skip some authentication methods based on that scheme.
 
 ### Example 2
 

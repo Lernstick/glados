@@ -25,22 +25,6 @@ class BackupController extends Controller
         return $this->redirect(['ticket/view', 'id' => $ticket_id, '#' => 'tab_backups']);
     }
 
-    /**
-     * Displays the backup log by Backup model.
-     * @param integer $ticket_id id of the Ticket model.
-     * @param string $date date string of the Backup model.
-     * @return The response object
-     */
-    public function actionLog($ticket_id, $date)
-    {
-        $ticket = Ticket::findOne($ticket_id);
-        $backup = Backup::findOne($ticket->token, $date);
-
-        return $this->renderAjax('/backup/log', [
-            'log' => $backup->backupLog,
-        ]);
-    }
-
     public function actionFile ($ticket_id, $path, $date = 'now')
     {
         $ticket = Ticket::findOne($ticket_id);

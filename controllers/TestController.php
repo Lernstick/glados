@@ -4,8 +4,10 @@ namespace app\controllers;
 
 use Yii;
 use app\models\forms\EventItemSend;
+use app\models\forms\AgentEventSend;
 use app\models\forms\EventStreamListen;
 use app\components\AccessRule;
+use yii\web\NotFoundHttpException;
 
 /**
  * TestController
@@ -46,6 +48,25 @@ class TestController extends BaseController
         $event->isNewRecord = !isset($event->event);
 
         return $this->render('event/send', [
+            'event' => $event,
+        ]);
+    }
+
+    /**
+     * Send agent event test page.
+     * @return mixed
+     */
+    public function actionAgent()
+    {
+        $event = new AgentEventSend();
+        if ($event->load(Yii::$app->request->post())) {
+            if ($event->generateEvents() === false) {
+                throw new NotFoundHttpException(Yii::t('app', 'The ticket does not exist.'));
+            }
+        }
+        $event->isNewRecord = !isset($event->event);
+
+        return $this->render('event/agent', [
             'event' => $event,
         ]);
     }

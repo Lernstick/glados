@@ -55,7 +55,7 @@ use app\components\Editable;
         'backup_size:shortSize',
         [
             'attribute' => 'backup_state',
-            'format' => 'raw',
+            'format' => 'links',
             'value' =>  ActiveEventField::widget([
                     'options' => [
                         'tag' => 'i',

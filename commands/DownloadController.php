@@ -14,6 +14,7 @@ use yii\helpers\Console;
 use app\models\BackupSearch;
 use app\models\EventItem;
 use app\models\DaemonInterface;
+use app\models\Issue;
 
 /**
  * Download Daemon (push)
@@ -113,19 +114,26 @@ class DownloadController extends DaemonController implements DaemonInterface
         $this->ticket->download_state = yiit('ticket', 'Connecting to client ...');
         $this->ticket->save(false);
 
-        if ($this->checkPort(22, 3) === false) {
+        if ($this->checkPort(22, 3, $emsg) === false) {
+            Issue::markAs(Issue::CLIENT_OFFLINE, $this->ticket->id);
+
             $this->ticket->online = false;
-            $this->ticket->download_state = yiit('ticket', 'Download failed: network error.');
+            $this->ticket->download_state = yiit('ticket', 'Download failed: network error, {error}.');
+            $this->ticket->download_state_params = ['error' => $emsg];
             $this->unlockItem($this->ticket);
+
 
             $act = new Activity([
                     'ticket_id' => $this->ticket->id,
-                    'description' => yiit('activity', 'Download failed: network error.'),
-                    'severity' => Activity::SEVERITY_WARNING,
+                    'description' => yiit('activity', 'Download failed: network error, {error}.'),
+                    'description_params' => ['error' => $emsg],
+                    'severity' => Activity::SEVERITY_ERROR,
             ]);
             $act->save();
 
         } else {
+            Issue::markAsSolved(Issue::CLIENT_OFFLINE, $this->ticket->id);
+
             $this->ticket->scenario = Ticket::SCENARIO_DOWNLOAD;
             $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? true : false;
             $this->ticket->client_state = yiit('ticket', 'download in progress') . ' ...';
@@ -189,7 +197,7 @@ class DownloadController extends DaemonController implements DaemonInterface
                         'ticket_id' => $this->ticket->id,
                         'description' => yiit('activity', 'Download failed: rsync failed (retval: {retval})'),
                         'description_params' => [ 'retval' => $retval ],
-                        'severity' => Activity::SEVERITY_WARNING,
+                        'severity' => Activity::SEVERITY_ERROR,
                 ]);
                 $act->save();
 
@@ -316,15 +324,26 @@ class DownloadController extends DaemonController implements DaemonInterface
      * Determines if a given port on the target system is open or not
      *
      * @param integer $port The port to check
-     * @param integer $times The number to times to try (with 5 seconds delay inbetween every check)
+     * @param integer $tries The number to times to try (with 5 seconds delay inbetween every check)
+     * @param integer $errstr contains the error message of the last try from fsockopen()
+     * @param integer $errno the error code of the last try from connect()
      * @return boolean Whether the port is open or not
      */
-    private function checkPort($port, $times = 1)
+    private function checkPort($port, $tries = 1, &$errstr = null, &$errno = null)
     {
-        for($c=1;$c<=$times;$c++){
+        for($c=1;$c<=$tries;$c++){
             $fp = @fsockopen($this->ticket->ip, $port, $errno, $errstr, 10);
             if (!$fp) {
-                $this->logError('Port ' . $port . ' is closed or blocked. (try ' . $c . '/' . $times . ')');
+                //$this->logError('Port ' . $port . ' is closed or blocked. (try ' . $c . '/' . $tries . ')');
+                $this->logError(substitute('Port {port} is closed to blocked on ticket with token {token} and ip {ip}, error code: {code}, error message: {error}. (try {try}/{tries})', [
+                    'port' => $port,
+                    'token' => $this->ticket->token,
+                    'ip' => $this->ticket->ip,
+                    'code' => $errno,
+                    'error' => $errstr,
+                    'try' => $c,
+                    'tries' => $tries,
+                ]));
                 sleep(5);
             } else {
                 // port is open and available

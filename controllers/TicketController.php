@@ -21,6 +21,8 @@ use app\models\AgentEvent;
 use app\models\Stats;
 use app\models\Daemon;
 use app\models\DaemonSearch;
+use app\models\Log;
+use app\models\LogSearch;
 use app\models\RdiffFileSystem;
 use app\models\Setting;
 use yii\web\UploadedFile;
@@ -171,6 +173,17 @@ class TicketController extends BaseController
             $restoreDataProvider->pagination->pageParam = 'rest-page';
             $restoreDataProvider->pagination->pageSize = 5;
 
+            $logSearchModel = new LogSearch();
+            if (array_key_exists('LogSearch', Yii::$app->request->queryParams)) {
+                $logsearch = Yii::$app->request->queryParams['LogSearch'];
+                $logsearch['token'] = $model->token;
+            } else {
+                $logsearch = ['token' => $model->token];
+            }
+            $logDataProvider = $logSearchModel->search(['LogSearch' => $logsearch]);
+            $logDataProvider->pagination->pageParam = 'log-page';
+            $logDataProvider->pagination->pageSize = 10;
+
             $historySearchModel = new HistorySearch();
             $historyQueryParams = array_key_exists('HistorySearch', Yii::$app->request->queryParams)
                 ? Yii::$app->request->queryParams['HistorySearch']
@@ -235,6 +248,8 @@ class TicketController extends BaseController
                 'screenshotDataProvider' => $screenshotDataProvider,
                 'restoreSearchModel' => $restoreSearchModel,
                 'restoreDataProvider' => $restoreDataProvider,
+                'logDataProvider' => $logDataProvider,
+                'logSearchModel' => $logSearchModel,
                 'historySearchModel' => $historySearchModel,
                 'historyDataProvider' => $historyDataProvider,
                 'ItemsDataProvider' => $ItemsDataProvider,
@@ -245,12 +260,17 @@ class TicketController extends BaseController
             ]);
         } else if ($mode == 'probe') {
             //$online = $model->runCommand('source /info; ping -nq -W 10 -c 1 "${gladosIp}"', 'C', 10)[1];
-            $model->online = $model->runCommand('true', 'C', 10)[1] == 0 ? true : false;
-            $model->save(false);
-            return $this->redirect(['ticket/view',
-                'id' => $model->id,
-                #'online' => $online,
-            ]);
+            //$model->online = $model->runCommand('true', 'C', 10)[1] == 0 ? true : false;
+            //$model->save(false);
+
+            $daemon = new Daemon();
+            $pid = $daemon->startNotify($id);
+
+            if(Yii::$app->request->isAjax){
+                return $this->runAction('view', ['id' => $id]);
+            } else {
+                return $this->redirect(['view', 'id' => $id]);
+            }
         } else if ($mode == 'report') {
             $content = $this->renderPartial('report', [
                 'model' => $model,
@@ -542,8 +562,10 @@ class TicketController extends BaseController
                     'agent' => Setting::get('agent'),
                     'grp_netdev' => boolval($model->exam->{"grp_netdev"}),
                     'allow_sudo' => boolval($model->exam->{"allow_sudo"}),
-                    'allow_mount' => boolval($model->exam->{"allow_mount"}),
+                    'allow_mount_external' => boolval($model->exam->{"allow_mount_external"}),
+                    'allow_mount_system' => boolval($model->exam->{"allow_mount_system"}),
                     'firewall_off' => boolval($model->exam->{"firewall_off"}),
+                    'backup_interval' => $model->backup_interval,
                 ], $model->exam->settings)
             ];
         }
@@ -613,7 +635,7 @@ class TicketController extends BaseController
                 $model->bootup_lock = 1;
                 $model->download_request = new Expression('NOW()');
                 $model->start = $model->state == 0 ? new Expression('NOW()') : $model->start;
-                $model->ip = Yii::$app->request->userIp;
+                $model->ip = Yii::$app->request->userIp; # set the ip address
                 $model->client_state = yiit('ticket', 'exam requested sccessfully');
                 $model->download_progress = 0;
                 $model->save();
@@ -683,6 +705,8 @@ class TicketController extends BaseController
 
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         if($model !== null) {
+            $model->ip = Yii::$app->request->userIp; # set the ip address
+
             if ($state == yiit('ticket', 'bootup complete.')) {
                 $model->bootup_lock = 0;
             }
@@ -701,9 +725,7 @@ class TicketController extends BaseController
                 return [ 'code' => 200, 'msg' => 'Client state changed.' ];
             }
         }
-
         return [ 'code' => 418, 'msg' => 'Client state not changed.' ]; // I'm a teapot
-
     }
 
     /**
@@ -726,6 +748,7 @@ class TicketController extends BaseController
             return [ 'code' => 403, 'msg' => 'The provided ticket is not in running state.' ];
         }
 
+        $model->ip = Yii::$app->request->userIp; # set the ip address
         $model->end = new Expression('NOW()');
         $model->last_backup = 0;
         $model->save();
@@ -782,10 +805,9 @@ class TicketController extends BaseController
 
         if(Yii::$app->request->isAjax){
             return $this->runAction('view', ['id' => $id]);
-        }else{
+        } else {
             return $this->redirect(['view', 'id' => $id, '#' => 'backups']);
         }
-
     }
 
     /**
@@ -897,6 +919,8 @@ class TicketController extends BaseController
             }
 
         } else if ($request->isPost) {
+            $model->ip = Yii::$app->request->userIp; # set the ip address
+            $model->save(false);
 
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             if (!is_dir($path)) {
@@ -917,7 +941,7 @@ class TicketController extends BaseController
             }
 
             $eventItem = new EventItem([
-                'event' => 'ticket/' . $model->id,
+                'event' => substitute('ticket/{id}', ['id' => $model->id]),
                 'priority' => 0,
                 'data' => ['live' => $live],
             ]);
@@ -926,9 +950,11 @@ class TicketController extends BaseController
             $ret = [];
             if (!$model->hasActiveEventStream("monitor")) {
                 $ret['stop'] = true;
+                $ret['width'] = 260;
+            } else {
+                $ret['width'] = $model->hasActiveEventStream("monitor_large") ? 860 : 260;
             }
             $ret['interval'] = Setting::get('monitorInterval');
-            #$ret['width'] = 260;
 
             return $ret;
         }

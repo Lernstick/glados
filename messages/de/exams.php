@@ -141,4 +141,6 @@ return [
     '{n} bits per second.' => '{n} Bits pro Sekunde.',
     '{n} frames per seond.' => '{n} Bilder pro Sekunde.',
     '{n} seconds.' => '{n} Sekunden.',
+    'If set, the exam student will be able to mount internal filesystems such as local HDDs or SSDs. <b>This should not be set, unless you know what you are doing.</b>' => 'Falls gesetzt, wird der Prüfungskandidat interne Dateisysteme, zum Beipiel lokale Harddisks und SSDs, einbinden können. <b>Das sollte nicht gesetzt werden, sofern Sie nicht wissen was Sie tun.</b>',
+    'User has access to internal filesystems (HDD, SSD)' => 'Der Benutzer hat Zugriff auf interne Dateisysteme (HDD, SSD)',
 ];

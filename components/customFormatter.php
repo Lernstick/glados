@@ -5,6 +5,7 @@ namespace app\components;
 use Yii;
 use yii\i18n\Formatter;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\base\InvalidConfigException;
 use yii\base\InvalidArgumentException;
  
@@ -35,6 +36,21 @@ class customFormatter extends \yii\i18n\Formatter
             case 2:  return Yii::t('ticket', 'Closed', $params);
             case 3:  return Yii::t('ticket', 'Submitted', $params);
             case 4:  return Yii::t('ticket', 'Unknown', $params);
+            default: return $value;
+        }
+    }
+
+    /**
+     * Formats the value as one of the issues or unknown.
+     *
+     * @param integer $value the value to be formatted.
+     * @return string the formatted result.
+     */
+    public static function asIssue($value)
+    {
+        switch ($value) {
+            case \app\models\Issue::CLIENT_OFFLINE:      return Yii::t('ticket', 'Client offline');
+            case \app\models\Issue::LONG_TIME_NO_BACKUP: return Yii::t('ticket', 'Long time no backup');
             default: return $value;
         }
     }
@@ -148,7 +164,7 @@ class customFormatter extends \yii\i18n\Formatter
     }
 
     /**
-     * Formats the an associative array as table.
+     * Formats an associative array as table.
      *
      * @param array array the value to be formatted as assiciative array.
      * @param array heading the table heading of the gridview (array with 2 elements)
@@ -184,6 +200,33 @@ class customFormatter extends \yii\i18n\Formatter
             ],
             'layout' => '{items} {pager}',
         ]);
+    }
+
+    /**
+     * Formats the links in the input as actual links.
+     * 
+     * links are given by {url:{name}:{controller}:{action}:variable1={value1},variable2={value2}}
+     * they becomes:
+     * Html::a('{name}', Url::to('{controller}/{action}', [
+     *     'variable1' => '{value1}',
+     *     'variable2' => '{value2}',
+     * ]));
+     *
+     * @param integer $value the value to be formatted in minutes.
+     * @return string the formatted result.
+     */
+    public static function asLinks($value)
+    {
+        return preg_replace_callback('/\{url\:([^\:]+)\:([^\:]+)\:([^\:]+)\:([^\}]*)\}/', function($m){
+            $params = [];
+            $p = explode(',', $m[4]);
+            foreach ($p as $param) {
+                list($key, $val) = explode('=', $param, 2);
+                $params[$key] = $val;
+            }
+            $params[0] = $m[2].'/'.$m[3];
+            return Html::a($m[1], Url::to($params), ['data-pjax' => 0]);
+        }, $value);
     }
 
 }

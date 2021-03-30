@@ -8,18 +8,12 @@ TODO:
     * network bandwidth
     * connection details/type (lan, wlan, card, ...)
     * device details (dmidecode, lspci, ...)
+    * systemd-detect-virt — Detect execution in a virtualized environment
   * store in table ticket_properties similar to exam_settings
   * show in the ticket view
 
 * screen capturing
-  * remove video files when storage space exceeds (overflow): done
   * run fetching not every backup interval, only when traffic allows
-  * for last backup: fetch must run: done
-  * when service ends -> launch all files: done
-  * restore \*.m3u8 and \*.log files
-    * No: the stream should not resume, instead start from new with video2.m3u8, ... done
-    * keylogger: old keylogger.key files should be transmitted after a while, even if no more files appear: done
-    * launch script should launch files when too old: done
   * VideoJs Plugin: overlay of a 2nd video possibility / for example webcam overlay
     * see commits https://github.com/imedias/glados/commit/c650c33cedde9b410ab965a883b8086c88fd2280 and https://github.com/imedias/glados/commit/da2553bd15ec4beb45638cc63ea536300667d5ae
     * sync the 2 videos
@@ -44,27 +38,26 @@ TODO:
   
 * squashfs
   * place version inside squashfs and check against lernstick version (also check if it's the exam version or standard version)
+  * create squashfs from running ticket
 
-* Screenshots
-  * Own service via systemd
-
-* Live overview
+* live overview
   * new URL in avahi service file
      * <txt-record>actionLive='glados/index.php/ticket/live/{token}'</txt-record>
-  * manual for monitoring monitoring-exams.md: done
-  * not reloading correctly (events), when initially there was no ticket running: done
+
+* locking
+  * locking screen in markdown
+  * lock keyboard and mouse
 
 * misc
-  * Undefined index: scPath
-  * lernstick-exam-client dependency 1.0.12, not 11
-  * translations: done
-  * update README.md: done
-  * disable firewall not working anymore: done
-  * backup browse view broken: done
-  * backup browse view broken: http://192.168.0.17/glados/index.php/ticket/2941?path=%2FDokumente&date=all&showDotFiles=0#tab_browse: done
-  * version check (of lernstick and lernstick-exam-client) in search script: done
-  * version check looking at the base system (not persistent): done
-  * version check looking at grub config string to distinguish exam/non-exam: done
+  * "new activity; click to reload" on all tabs in the ticket view
+  * move expert settings to the client
+  * models/Daemon.php rules -> maybe truncate a too long state/description
+  * generally: remove save(false); statements, they cause crashes
+  * put .Keylogger path to exclude_list in backupController
+  * welcome to exam message in wxbrowser
+  * Version conflict in log/history/activities
+  * In google chrome settings->Login hint preview not visible
+  * corporate identity: possibility to write text/logo in front page + colors of theme?
 
 * daemons
   * remove onStart and onStop from ActiveEventField (only used in /views/daemon/index.php)

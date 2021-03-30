@@ -43,7 +43,7 @@ use app\components\ActiveEventField;
     },
     'columns' => [
         'date:timeago',
-        'description',
+        'description:links',
     ],
     'layout' => '{items} {pager}',
     'headerRowOptions' => [ 'style' => 'width:0%; display:none' ],

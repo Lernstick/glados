@@ -51,6 +51,7 @@ use app\components\HistoryBehavior;
  *
  * @property Exam $exam
  * @property Activity[] $activities
+ * @property Issue[] $issues
  * @property Restore[] $restores
  * @property Exam $exam
  * @property Exam $exam
@@ -168,9 +169,10 @@ class Ticket extends LiveActiveRecord
             'download_state' => [ 'priority' => 2 ],
             'backup_lock' => [ 'priority' => 0 ],
             'restore_lock' => [ 'priority' => 0 ],
+            'ip' => [ 'priority' => 0 ],
             'online',
             'last_backup',
-            'state' => [ 'trigger_attributes' => [ 'start', 'end', 'test_taker' ], ],
+            'state' => ['trigger_attributes' => ['start', 'end', 'test_taker']],
         ];
     }
 
@@ -220,8 +222,8 @@ class Ticket extends LiveActiveRecord
             [['exam_id', 'token', 'backup_interval'], 'required', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['token', 'test_taker'], 'required', 'on' => self::SCENARIO_SUBMIT],
             [['start', 'ip'], 'required', 'on' => self::SCENARIO_DOWNLOAD],
-            [['end'], 'required', 'on' => self::SCENARIO_FINISH],
-            [['token', 'client_state'], 'required', 'on' => self::SCENARIO_NOTIFY],
+            [['end', 'ip'], 'required', 'on' => self::SCENARIO_FINISH],
+            [['token', 'client_state', 'ip'], 'required', 'on' => self::SCENARIO_NOTIFY],
             [['exam_id'], 'integer', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['backup_interval'], 'integer', 'min' => 0, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['time_limit'], 'integer', 'min' => 0, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
@@ -230,6 +232,11 @@ class Ticket extends LiveActiveRecord
             [['start', 'end', 'test_taker', 'ip', 'state', 'download_lock', 'backup_lock', 'restore_lock', 'bootup_lock', 'last_backup'], 'safe', 'on' => self::SCENARIO_DEV],
             [['token'], 'unique', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['token'], 'string', 'max' => 16, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
+            [['token'], 'match',
+                'pattern' => '/^[0-9a-zA-Z]+$/', // only alphanumeric characters
+                'message' => \Yii::t('setting', 'Only alphanumeric characters (0-9, a-z, A-Z) are allowed.'),
+                'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV],
+            ],
             [['token'], 'checkIfClosed', 'on' => self::SCENARIO_SUBMIT],
         ];
     }
@@ -709,6 +716,14 @@ class Ticket extends LiveActiveRecord
         return $this->hasMany(Restore::className(), ['ticket_id' => 'id']);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getIssues()
+    {
+        return $this->hasMany(Issue::className(), ['ticket_id' => 'id']);
+    }
+
     /* Getter for exam name */
     public function getExamName()
     {
@@ -771,30 +786,39 @@ class Ticket extends LiveActiveRecord
      * @param string $lc_all the value of the `LC_ALL` environment variable
      * @param integer $timeout the SSH connection timeout
      * @return array the first element contains the output (stdout and stderr),
-     * the second element contains the exit code of the command
+     * the second element contains the exit code of the command, and the third
+     * element contains the actual command issued on the glados server.
      */
     public function runCommand($cmd, $lc_all = "C", $timeout = 30)
     {
+        $remote_cmd = substitute('LC_ALL={lc_all} {cmd} 2>&1', [
+            'lc_all' => $lc_all,
+            'cmd' => $cmd,
+        ]);
+        $file = substitute('{tmp_path}/cmd.{uuid}', [
+            'tmp_path' => sys_get_temp_dir(),
+            'uuid' => generate_uuid(),
+        ]);
 
-        $tmp = sys_get_temp_dir() . '/cmd.' . generate_uuid();
-        $cmd = "ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
-             . "-o UserKnownHostsFile=/dev/null "
-             . "-o StrictHostKeyChecking=no "
-             . "-o ConnectTimeout=" . $timeout . " "
-             . "root@" . $this->ip . " "
-             . escapeshellarg("LC_ALL=" . $lc_all . " " .  $cmd . " 2>&1") . " >" . $tmp;
+        $cmd = substitute('ssh -i {path}/rsa -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o ConnectTimeout={timeout} root@{ip} {cmd} >{file} 2>&1', [
+            'path' => \Yii::$app->params['dotSSH'],
+            'timeout' => $timeout,
+            'ip' => $this->ip,
+            'cmd' => escapeshellarg($remote_cmd),
+            'file' => $file,
+        ]);
 
         $output = array();
         $lastLine = exec($cmd, $output, $retval);
 
-        if (!file_exists($tmp)) {
+        if (!file_exists($file)) {
             $output = implode(PHP_EOL, $output);
         } else {
-            $output = file_get_contents($tmp);
-            @unlink($tmp);
+            $output = file_get_contents($file);
+            @unlink($file);
         }
 
-        return [ $output, $retval ];
+        return [ $output, $retval, $cmd ];
     }
 
     /**
@@ -853,8 +877,8 @@ class Ticket extends LiveActiveRecord
         } else {
             $event = $this->tableName() . '/' . $this->id;
         }
-        $models = EventStream::find()->where(['like', 'listenEvents', $event])->all();
-        foreach ($models as $stream) {
+        $streams = EventStream::find()->where(['like', 'listenEvents', $event])->all();
+        foreach ($streams as $stream) {
             if ($stream->isActive) {
                 return true;
             }

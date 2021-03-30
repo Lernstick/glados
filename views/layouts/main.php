@@ -219,6 +219,12 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
                         'visible' => YII_ENV_DEV,
                     ],
                     [
+                        'label' => 'Send AgentEvents',
+                        'url' => ['/test/agent'],
+                        'options' => ['class' => 'dev_item'],
+                        'visible' => YII_ENV_DEV,
+                    ],
+                    [
                         'label' => 'Listen to Events',
                         'url' => ['/test/listen'],
                         'options' => ['class' => 'dev_item'],

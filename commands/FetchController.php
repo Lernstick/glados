@@ -130,13 +130,12 @@ class FetchController extends DaemonController
                 $e = escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . ":" . $e);
             });
 
-            $this->_cmd = "rsync -r -L --checksum --partial --progress --protect-args "
-                . "--bwlimit=" . escapeshellarg($this->bwlimit) . " "
-                . "--rsh='ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
-                . " -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' "
-                . "--remove-source-files "
-                . implode($fetchList, ' ') . ' '
-                . escapeshellarg(\Yii::$app->params['scPath'] . "/" . $this->ticket->token . "/") . " ";
+            $this->_cmd = substitute("rsync -v -r -L --checksum --partial --protect-args --bwlimit={bwlimit} --rsh='ssh -i {identity} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' --remove-source-files {fetchList} {localPath}", [
+                'bwlimit' => escapeshellarg($this->bwlimit),
+                'identity' => FileHelper::normalizePath(\Yii::$app->params['dotSSH'] . '/rsa'),
+                'fetchList' => implode($fetchList, ' '),
+                'localPath' => escapeshellarg(FileHelper::normalizePath(\Yii::$app->params['scPath'] . "/" . $this->ticket->token . "/")),
+            ]);
 
             $this->logInfo('Executing rsync: ' . $this->_cmd);
 

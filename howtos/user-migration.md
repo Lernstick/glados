@@ -16,7 +16,7 @@ In this step you have to query for users that are able to migrate. You can do so
 
 > Which users are able to migrate depends on your setup.
 
-Essentially, all users associated to the authentication method `From` will be checked whether they could authenticate over the authentication method `To`. In the above example, the local database will be queried for users that authenticate locally. For each of found user, the LDAP server is queried whether the user exists in the LDAP diretory or not. So each user existing in both authentication methods (`From` and `To`) will be suggested for migration. The dropdown list is then filled with a list of such users. The query can be modified by the `Migrate Search Pattern` to restrict to usernames matching the pattern.
+Essentially, all users associated to the authentication method `From` will be checked whether they could authenticate over the authentication method `To`. In the above example, the local database will be queried for users that authenticate locally. For each found user, the LDAP server is queried whether the user exists in the LDAP diretory or not. So each user existing in both authentication methods (`From` and `To`) will be suggested for migration. The dropdown list is then filled with a list of such users. The query can be modified by the `Migrate Search Pattern` to restrict to usernames matching the pattern.
 
 ### Step 3: Select users to migrate
 

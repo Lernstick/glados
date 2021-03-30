@@ -6,7 +6,7 @@ $defaultParams = require(__DIR__ . '/defaultParams.php');
 $config = [
     'id' => 'basic',
     'name' => 'GLaDOS',
-    'version' => '1.0.8',
+    'version' => '1.0.9',
     'basePath' => dirname(__DIR__),
     'bootstrap' => [
         'log',
@@ -78,7 +78,8 @@ $config = [
                 'ticket/<action:(config|download|finish|notify|md5|status|live)>/<token:.*>' => 'ticket/<action>',
                 'backup/<action:file>/<ticket_id:\d+>' => 'backup/<action>',
                 'event/<action:(agent)>/<token:.*>' => 'event/<action>',
-                'monitor' => 'monitor/view'
+                'monitor' => 'monitor/view',
+                'result/<action:view>/<token:.*>' => 'result/<action>',
             ]
         ],
         'i18n' => [
@@ -119,11 +120,18 @@ $config = [
                 [
                     'class' => 'yii\log\FileTarget',
                     'levels' => ['error', 'warning'],
+                    'maskVars' => [
+                        '_POST.LoginForm.password',
+                        '_POST.AuthTestForm.password',
+                        '_POST.AuthActiveDirectory.query_password',
+                        '_POST.AuthOpenLdap.query_password',
+                        '_POST.AuthGenericLdap.query_password'
+                    ],
                 ],
             ],
         ],
         'mutex' => [
-            'class' => 'yii\mutex\MysqlMutex',
+            'class' => 'yii\mutex\FileMutex',
         ],
         'db' => require(__DIR__ . '/db.php'),
         'auth' => require(__DIR__ . '/auth.php'),

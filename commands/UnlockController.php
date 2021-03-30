@@ -9,6 +9,8 @@ use app\models\Ticket;
 use app\models\Activity;
 use yii\helpers\Console;
 use app\models\DaemonInterface;
+use app\components\ShellCommand;
+use app\models\Issue;
 
 /**
  * Unlocker Daemon
@@ -26,9 +28,16 @@ class UnlockController extends DaemonController implements DaemonInterface
     public $unlockInterval = 120;
 
     /**
+     * @var string The user to login at the target system
+     */
+    public $remoteUser = 'root';
+
+    /**
      * @var int timestamp when the tickets were unlocked the last time 
      */    
     private $unlocked = null;
+
+    private $_cmd;
 
     /**
      * @inheritdoc
@@ -100,37 +109,144 @@ class UnlockController extends DaemonController implements DaemonInterface
 
         $tickets = $query->all();
         foreach ($tickets as $ticket) {
-            if ($ticket->runCommand('[ -e /booted ] ', 'C', 10)[1] == 0) {
-                $ticket->bootup_lock = 0;
-                $ticket->save(false);
+            if ($this->lockItem($ticket)) {
 
-                $act = new Activity([
-                        'ticket_id' => $ticket->id,
-                        'description' => yiit('activity', '"Bootup successful" message was not recieved, but client is successfully booted up. Client is now unlocked.'),
-                        'severity' => Activity::SEVERITY_NOTICE,
-                ]);
-                $act->save();  
+                $now = new \DateTime('now'); // now
+                $then = new \DateTime('now -60 seconds');
+
+                $query = Activity::find()->where(['ticket_id' => $ticket->id]);
+                $query->andFilterWhere(['between', 'date', $then->format('Y-m-d H:i:s'), $now->format('Y-m-d H:i:s')]);
+                $query->andFilterHaving(['description' => [
+                    '"Bootup successful" message was not recieved, but client is successfully booted up. Client cannot be unlocked. Error: {error}',
+                    '"Bootup successful" message was not recieved for a long time. Client is not reachable via its ip address {ip}. For more information, please check the {logfile}.'
+                ]]);
+
+                // only trigger if there was no error message in the last 60 seconds
+                if ($query->count() == 0) {
+
+                    $this->_cmd = substitute('ssh -v -i {path}/rsa -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o ConnectTimeout={timeout} {user}@{ip} {cmd}', [
+                        'path' => \Yii::$app->params['dotSSH'],
+                        'timeout' => 10,
+                        'user' => $this->remoteUser,
+                        'ip' => $ticket->ip,
+                        'cmd' => escapeshellarg('LC_ALL=C [ -e /booted ]'),
+                    ]);
+
+                    $this->logInfo('Executing command: ' . $this->_cmd);
+
+                    $cmd = new ShellCommand($this->_cmd);
+                    $output = "";
+                    $date = date('c');
+                    $logFile = substitute('{path}/{type}.{token}.{date}.log', [
+                        'path' => Yii::getAlias('@runtime/logs'),
+                        'type' => 'unlock',
+                        'token' => $ticket->token,
+                        'date' => $date,
+                    ]);
+
+                    $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use (&$output, $logFile) {
+                        echo $this->ansiFormat($event->line, $event->channel == ShellCommand::STDOUT ? Console::NORMAL : Console::FG_RED);
+                        $output .= $event->line;
+                        file_put_contents($logFile, $event->line, FILE_APPEND);
+                    });
+
+                    $retval = $cmd->run();
+
+                    if ($retval != 0) {
+
+                        Issue::markAs(Issue::CLIENT_OFFLINE, $ticket->id);
+
+                        $logfile = substitute('{url:logfile:log:view:type={type},token={token},date={date}}', [
+                            'type' => 'unlock',
+                            'token' => $ticket->token,
+                            'date' => $date,
+                        ]);
+
+                        $act = new Activity([
+                                'ticket_id' => $ticket->id,
+                                'description' => yiit('activity', '"Bootup successful" message was not recieved for a long time. Client is not reachable via its ip address {ip}. For more information, please check the {logfile}.'),
+                                'description_params' => [
+                                    'ip' => $ticket->ip,
+                                    'logfile' => $logfile,
+                                ],
+                                'severity' => Activity::SEVERITY_CRITICAL,
+                        ]);
+                        $act->save();
+
+                        $ticket->client_state = '"Bootup successful" message was not recieved for a long time. Client is not reachable via its ip address {ip}. For more information, please check the {logfile}.';
+                        $ticket->client_state_params = [
+                            'ip' => $ticket->ip,
+                            'logfile' => $logfile,
+                        ];
+                        $ticket->save(false);
+
+                        $this->logInfo(substitute('Unlocking ticket {token} failed, command "{cmd}" returned exit code {retval} and output: {output}', [
+                            'token' => $ticket->token,
+                            'output' => $output,
+                            'retval' => $retval,
+                            'cmd' => $this->_cmd,
+                        ]), true, true, true);
+
+                    } else {
+
+                        Issue::markAsSolved(Issue::CLIENT_OFFLINE, $ticket->id);
+
+                        $ticket->bootup_lock = 0;
+                        if ($ticket->save()) {
+                            $act = new Activity([
+                                    'ticket_id' => $ticket->id,
+                                    'description' => yiit('activity', '"Bootup successful" message was not recieved, but client is successfully booted up. Client is now unlocked.'),
+                                    'severity' => Activity::SEVERITY_INFORMATIONAL,
+                            ]);
+                            $act->save();
+
+                            $ticket->client_state = '"Bootup successful" message was not recieved, but client is successfully booted up. Client is now unlocked.';
+                            $ticket->save(false);
+
+                            $this->logInfo(substitute('Unlocking ticket {token} successful.', [
+                                'token' => $ticket->token,
+                            ]), true, true, true);
+                        } else {
+
+                            $act = new Activity([
+                                    'ticket_id' => $ticket->id,
+                                    'description' => yiit('activity', '"Bootup successful" message was not recieved, but client is successfully booted up. Client cannot be unlocked. Error: {error}'),
+                                    'description_params' => [ 'error' => json_encode($ticket->getErrors()) ],
+                                    'severity' => Activity::SEVERITY_CRITICAL,
+                            ]);
+                            $act->save();
+
+                            $this->logInfo(substitute('Unlocking ticket {token} failed, but command was successful, error: {error}', [
+                                'token' => $ticket->token,
+                                'error' => json_encode($ticket->getErrors()),
+                            ]), true, true, true);
+
+                        }
+
+                    }
+                }
+                $this->unlockItem($ticket);
             }
         }
 
-        $this->logInfo('Tickets unclocked.', true, false, true);
+        $this->logInfo('Ticket unlock done.', true, false, true);
         $this->unlocked = microtime(true);
     }
 
     /**
      * @inheritdoc
      */
-    public function lockItem ($exam)
+    public function lockItem ($ticket)
     {
-        return true;
+        return $this->lock($ticket->id . "_unlock");
     }
 
     /**
      * @inheritdoc
      */
-    public function unlockItem ($exam)
+    public function unlockItem ($ticket)
     {
-        return true;
+        return $this->unlock($ticket->id . "_unlock");
     }
 
     /**
