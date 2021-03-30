@@ -4,6 +4,8 @@ use yii\helpers\Html;
 use yii\widgets\ListView;
 use yii\bootstrap\Modal;
 
+/* TODO: remove this file */
+
 /* @var $this yii\web\View */
 /* @var $model app\models\Exam */
 /* @var $searchModel app\models\TicketSearch */
@@ -33,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php $_GET = array_merge($_GET, ['#' => 'tab_monitor']); ?>
 
             <?= $this->render('/monitor/_monitor', [
-                'model' => $model,
+                'exam' => $model,
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
             ]) ?>
