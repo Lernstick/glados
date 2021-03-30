@@ -3,6 +3,8 @@ glados for Debian
 
 * In controllers/configController.php actionInfo(), set needed lernstick-exam-client version and Lernstick OS version
 
+* Merge migrations to one single migration from the old version to the new
+
 * First create new yii-glados package: https://github.com/chaoos/yii2-glados/
 
 * Tag a new release with the new version (create a pre-release and publish it)
