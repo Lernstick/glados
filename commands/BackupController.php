@@ -474,6 +474,8 @@ class BackupController extends DaemonController implements DaemonInterface
      */
     public function getNextItem ()
     {
+        // re-set the finishBackup to false
+        $this->finishBackup = false;
 
         // first do a cleanup
         $this->cleanup();
