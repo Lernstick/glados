@@ -1,3 +1,10 @@
+glados (1.0.10-deb10) unstable; urgency=low
+
+  * Fixed several bugs:
+    - Fixed a bug causing tickets to be treated as they where handed in. Future backups are then disabled on these tickets.
+
+ -- Roman Gruber <roman.gruber@inf.unibe.ch>  Tue, 13 Apr 2021 18:20:29 +0200
+
 glados (1.0.9-deb10) unstable; urgency=low
 
   * New Features:
