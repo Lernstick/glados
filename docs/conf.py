@@ -25,7 +25,7 @@ copyright = '2021, Roman Gruber'
 author = 'Roman Gruber'
 
 # The full version, including alpha/beta/rc tags
-release = '1.0.9' # TODO: read out the version from config/web.php
+release = '1.0.10' # TODO: read out the version from config/web.php
 
 
 # -- General configuration ---------------------------------------------------
