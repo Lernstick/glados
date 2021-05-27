@@ -1,3 +1,10 @@
+glados (1.0.11-deb10) unstable; urgency=low
+
+  * Changes:
+    - Changed communication from client to server from the IP-address to the hostname
+
+ -- Roman Gruber <roman.gruber@inf.unibe.ch>  Thu, 27 May 2021 13:00:01 +0200
+
 glados (1.0.10-deb10) unstable; urgency=low
 
   * Fixed several bugs:
