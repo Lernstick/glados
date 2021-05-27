@@ -314,8 +314,10 @@ echo "tcp ${gladosIp} 22" >>${initrd}/backup/etc/lernstick-firewall/net_whitelis
 
 # hand over the url whitelist
 if isdeb9ornewer; then
+  echo "${gladosProto}://${gladosHost}" | sed 's/\./\\\./g' >>${initrd}/backup/etc/lernstick-firewall/url_whitelist
   echo "${gladosProto}://${gladosIp}" | sed 's/\./\\\./g' >>${initrd}/backup/etc/lernstick-firewall/url_whitelist
 else
+  echo "${gladosProto}://${gladosHost}:${gladosPort}" >>${initrd}/backup/etc/lernstick-firewall/url_whitelist
   echo "${gladosProto}://${gladosIp}:${gladosPort}" >>${initrd}/backup/etc/lernstick-firewall/url_whitelist
 fi
 
