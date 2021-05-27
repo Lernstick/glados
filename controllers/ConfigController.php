@@ -52,7 +52,7 @@ class ConfigController extends BaseController
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         return [
             "server_version" => \Yii::$app->version,
-            "wants_client_version" => ">=1.0.17",
+            "wants_client_version" => ">=1.0.18",
             "wants_lernstick_version" => ">=20210213", // 2021-02-13, notice without the dashes (from /usr/local/lernstick.html)
             "wants_lernstick_flavor" => "exam", // exam or standard
         ];

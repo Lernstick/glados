@@ -4,7 +4,7 @@ This guide describes how to install GLaDOS from the Debian package.
 
 -----
 
-### Debian 9
+### Debian 9/10
 
 Download the newest packages from the Github [releases page](https://github.com/imedias/glados/releases).
 
