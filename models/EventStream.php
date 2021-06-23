@@ -191,7 +191,7 @@ class EventStream extends EventItem
     /**
      * Getter for the isActive flag.
      *
-     * @return boolean whether the stream is active or not
+     * @return boolean whether the stream is active or not (in another process)
      */
     public function getIsActive()
     {
