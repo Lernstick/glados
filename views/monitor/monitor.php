@@ -10,6 +10,7 @@ use yii\bootstrap\Modal;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $issueSearchModel app\models\IssueSearch */
 /* @var $issueDataProvider yii\data\ActiveDataProvider */
+/* @var $serverStatus app\models\ServerStatus */
 
 $this->title = \Yii::t('monitor', 'Monitoring of the exam: {exam}', [
     'exam' => $exam->name,
@@ -32,6 +33,7 @@ $this->params['breadcrumbs'][] = $exam->name;
             'dataProvider' => $dataProvider,
 			'issueSearchModel' => $issueSearchModel,
             'issueDataProvider' => $issueDataProvider,
+            'serverStatus' => $serverStatus,
         ]) ?>
 
     </div>

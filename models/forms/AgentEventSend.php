@@ -41,7 +41,7 @@ class AgentEventSend extends AgentEvent
     {
         return [
             'event' => 'Use <code>agent/&lt;token&gt;</code>',
-            'data' => 'Can contain <code>$i</code>, which is replaced by the counter. Examples: <ul><li><code>{"backup_state":"network error."}</code></li><li><code>this is event number $i</code></li><li><code>test</code></li></ul>',
+            'data' => 'Can contain <code>$i</code>, which is replaced by the counter. Examples: <ul><li><code>{"backup_state":"network error."}</code></li><li><code>this is event number $i</code></li><li><code>test</code></li><li><code>startLive</code></li></ul>',
         ];
     }
 

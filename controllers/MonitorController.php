@@ -9,6 +9,7 @@ use app\models\Ticket;
 use app\models\TicketSearch;
 use app\models\Issue;
 use app\models\IssueSearch;
+use app\models\ServerStatus;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\filters\VerbFilter;
@@ -92,12 +93,15 @@ class MonitorController extends BaseController
             $issueDataProvider->pagination->pageParam = 'issue-page';
             $issueDataProvider->pagination->pageSize = 10;
 
+            $serverStatus = ServerStatus::find();
+
             return $this->render('monitor', [
                 'exam' => $exam,
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
                 'issueSearchModel' => $issueSearchModel,
                 'issueDataProvider' => $issueDataProvider,
+                'serverStatus' => $serverStatus,
             ]);
         }
     }

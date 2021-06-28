@@ -35,7 +35,7 @@ function EventStream(url){
 }
 
 EventStream.prototype.openHandler = function(e) {
-    console.log('debug | ', {
+    console.debug('debug | ', {
         id: e.id,
         type: 'none',
         data: 'Connection was opened.',
@@ -44,7 +44,7 @@ EventStream.prototype.openHandler = function(e) {
 }
 
 EventStream.prototype.errorHandler = function(e) {
-    console.log('debug | ', {
+    console.debug('debug | ', {
         id: e.id,
         type: 'none',
         data: 'Error - connection was lost.',
@@ -53,7 +53,7 @@ EventStream.prototype.errorHandler = function(e) {
 }
 
 EventStream.prototype.messageHandler = function(e) {
-    console.log('debug | ', {
+    console.debug('debug | ', {
         id: e.id,
         type: 'none',
         data: e.data,
@@ -64,7 +64,7 @@ EventStream.prototype.messageHandler = function(e) {
 function debugHandler(e, me){
     if (YII_DEBUG) {
         var data = JSON.parse(e.data);
-        console.log('debug | ', {
+        console.debug('debug | ', {
             id: e.id,
             type: e.type,
             data: e.data,

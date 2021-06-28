@@ -682,3 +682,7 @@ span.view--state[data-state="4"]::after { content: attr(data-text-4); }
 .howto-view .markdown-view img {
   max-width: 100%;
 }
+
+.hidden {
+    display: none;
+}
