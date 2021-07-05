@@ -31,6 +31,7 @@ See the [Manual](https://github.com/imedias/glados/tree/master/howtos/README.md)
 
 ### Installation
 
+* [Hardware Recommendations](hardware-recommendations.md)
 * [Manual Installation](manual-install.md) (Using the source package)
 * [Automatic Installation](deb-install.md) (Using the Debian package)
 
@@ -44,6 +45,8 @@ See the [Manual](https://github.com/imedias/glados/tree/master/howtos/README.md)
 * [Glados config files](config-files.md)
 * [Exam client configuration](client-config.md)
 * [Network configuration](network-config.md)
+* [GLaDOS System Settings](system-settings.md)
+* [Large exams with 200+ clients](large-exams.md)
 
 #### Authentication
 

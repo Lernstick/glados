@@ -45,6 +45,7 @@ Features
    :caption: Installation
    :maxdepth: 2
 
+   howtos/hardware-recommendations
    howtos/manual-install
    howtos/deb-install
 
@@ -63,6 +64,7 @@ Features
    howtos/client-config
    howtos/network-config
    howtos/system-settings
+   howtos/large-exams
 
 .. toctree::
    :caption: Setting up Authentication
