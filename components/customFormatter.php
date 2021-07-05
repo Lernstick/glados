@@ -166,7 +166,7 @@ class customFormatter extends \yii\i18n\Formatter
     /**
      * Formats an associative array as table.
      *
-     * @param array array the value to be formatted as assiciative array.
+     * @param array array the value to be formatted as associative array.
      * @param array heading the table heading of the gridview (array with 2 elements)
      * @return string the formatted result.
      */
@@ -203,10 +203,10 @@ class customFormatter extends \yii\i18n\Formatter
     }
 
     /**
-     * Formats an associative array as table.
+     * Formats an associative array as list.
      *
-     * @param array array the value to be formatted as assiciative array.
-     * @param array options
+     * @param array $array the value to be formatted as associative array.
+     * @param array $layout
      * @return string the formatted result.
      */
     public static function asList($array, $layout = ['header' => '', 'footer' => '', 'item' => '{item}', 'separator' => ', '])
