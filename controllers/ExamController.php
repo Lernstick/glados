@@ -102,7 +102,7 @@ class ExamController extends BaseController
             }
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             return $out;
-        } 
+        }
     }
 
     /**

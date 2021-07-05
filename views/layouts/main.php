@@ -113,13 +113,13 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
                     [
                         'label' => '<i class="glyphicon glyphicon-eye-open"></i> ' . \Yii::t('main', 'Monitor Exams'),
                         'url' => ['/monitor'],
-                        'visible' => Yii::$app->user->can('ticket/view'),
+                        'visible' => Yii::$app->user->can('exam/view'),
                         'encode' => false,
                     ],
                     [
                         'label' => '<i class="glyphicon glyphicon-cloud-download"></i> ' . \Yii::t('main', 'Generate results'),
                         'url' => ['/result/generate'],
-                        'visible' => Yii::$app->user->can('exam/view'),
+                        'visible' => Yii::$app->user->can('results/generate'),
                         'encode' => false,
                     ],
                     [
@@ -183,6 +183,11 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
                         'label' => \Yii::t('main', 'Users'),
                         'url' => ['/user/index'],
                         'visible' => Yii::$app->user->can('user/index'),
+                    ],
+                    [
+                        'label' => \Yii::t('main', 'Roles'),
+                        'url' => ['/role/index'],
+                        'visible' => Yii::$app->user->can('role/index'),
                     ],
                     [
                         'label' => \Yii::t('main', 'Profile'),

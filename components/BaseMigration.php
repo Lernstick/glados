@@ -90,7 +90,7 @@ class BaseMigration extends Migration
      * Cleans up old unused entries in the translation table by removing translation table 
      * entries that are not referenced.
      *
-     * @return integer the number of delted table entries
+     * @return integer the number of deleted table entries
      */
     public function cleanTranslationTable()
     {

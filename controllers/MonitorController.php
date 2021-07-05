@@ -24,7 +24,7 @@ class MonitorController extends BaseController
     /**
      * @var string Fake the controller id for the RBAC system
      */
-    public $rbac_id = 'ticket';
+    public $rbac_id = 'exam';
 
     /**
      * @var string Fake the action id for the RBAC system
