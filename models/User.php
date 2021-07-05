@@ -16,7 +16,7 @@ use app\models\Auth;
  * @property string $auth_key
  * @property string $username
  * @property string $password
- * @property string $role
+ * @property string[] $roles
  * @property string $last_visited
  * @property string $activities_last_visited
  * @property string $change_password
@@ -24,7 +24,6 @@ use app\models\Auth;
  * @property AuthAssignment[] $authAssignments
  * @property AuthItem[] $itemNames
  * @property Exam[] $exams
- * @property Role $role
  */
 
 class User extends Base implements IdentityInterface
@@ -35,7 +34,7 @@ class User extends Base implements IdentityInterface
     const SCENARIO_PASSWORD_RESET = 'password_reset';
     const SCENARIO_EXTERNAL = 'external';
     public $password_repeat;
-    private $_role;
+    private $_roles;
 
     /**
      * @var array An array holding the values of the record before changing
@@ -69,9 +68,9 @@ class User extends Base implements IdentityInterface
     public function scenarios()
     {
         return [
-            self::SCENARIO_CREATE => ['username', 'password', 'password_repeat', 'role', 'change_password', 'type'],
-            self::SCENARIO_EXTERNAL => ['username', 'role', 'type', 'identifier'],
-            self::SCENARIO_UPDATE => ['username', 'role', 'change_password'],
+            self::SCENARIO_CREATE => ['username', 'password', 'password_repeat', 'roles', 'change_password', 'type'],
+            self::SCENARIO_EXTERNAL => ['username', 'roles', 'type', 'identifier'],
+            self::SCENARIO_UPDATE => ['username', 'roles', 'change_password'],
             self::SCENARIO_PASSWORD_RESET => ['password', 'password_repeat', 'change_password'],
         ];
     }
@@ -82,12 +81,12 @@ class User extends Base implements IdentityInterface
     public function rules()
     {
         return [
-            [['username', 'password', 'password_repeat', 'role', 'activities_last_visited', 'type'], 'safe'],
-            [['username', 'password', 'password_repeat', 'role'], 'required', 'on' => self::SCENARIO_CREATE],
+            [['username', 'password', 'password_repeat', 'roles', 'activities_last_visited', 'type'], 'safe'],
+            [['username', 'password', 'password_repeat', 'roles'], 'required', 'on' => self::SCENARIO_CREATE],
             ['type', 'default', 'value' => '0', 'on' => self::SCENARIO_CREATE],
-            [['username', 'role', 'type', 'identifier'], 'required', 'on' => self::SCENARIO_EXTERNAL],
-            [['username', 'role'], 'required', 'on' => self::SCENARIO_UPDATE],
-            [['role'], 'prohibitLockoutByEdit', 'on' => self::SCENARIO_UPDATE],
+            [['username', 'roles', 'type', 'identifier'], 'required', 'on' => self::SCENARIO_EXTERNAL],
+            [['username', 'roles'], 'required', 'on' => self::SCENARIO_UPDATE],
+            [['roles'], 'prohibitLockoutByEdit', 'on' => self::SCENARIO_UPDATE],
             [['password', 'password_repeat'], 'required', 'on' => self::SCENARIO_PASSWORD_RESET],
             [['username'], 'unique', 'targetAttribute' => ['username', 'type'], 'message' => Yii::t('user', 'Username is already in use.')],
             [['username', 'password'], 'string', 'max' => 40],
@@ -106,8 +105,18 @@ class User extends Base implements IdentityInterface
             'password' => \Yii::t('users', 'Password'),
             'password_repeat' => \Yii::t('users', 'Repeat Password'),
             'last_visited' => \Yii::t('users', 'Last Visited'), 
-            'role' => \Yii::t('users', 'Role'),
+            'roles' => \Yii::t('users', 'Role(s)'),
             'change_password' => \Yii::t('users', 'User has to change password at next login'),
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeHints()
+    {
+        return [
+            'roles' => \Yii::t('users', 'Choose roles associated to the user. If multiples roles are selected, the user will have the union of all permissions of all associated roles.'),
         ];
     }
 
@@ -168,29 +177,25 @@ class User extends Base implements IdentityInterface
     }
 
     /**
-     * @return \yii\rbac\Role
+     * @return string[] array of roles by name
      */
-    public function getRole()
+    public function getRoles()
     {
-        if(!isset($this->_role)){
+        if(!isset($this->_roles)){
             $auth = Yii::$app->authManager;
             $roles = $auth->getRolesByUser($this->id);
-            $this->_role = empty($roles) ? '' : array_values($roles)[0]->name;
+            $this->_roles = array_column($roles, 'name');
         }
-        return $this->_role;
+        return $this->_roles;
     }
 
     /**
-     * @param  string      $role role to set
+     * @param  string[] $roles array of roles to set
      * @return void
      */
-    public function setRole($role)
+    public function setRoles($roles)
     {
-        $this->_role = $role;
-/*        $auth = Yii::$app->authManager;
-        $role = $auth->getRole($value);
-        $auth->revokeAll($this->getOldAttribute('username'));
-        $auth->assign($role, $this->username);*/
+        $this->_roles = $roles;
     }
 
     /**
@@ -300,12 +305,12 @@ class User extends Base implements IdentityInterface
     public function prohibitLockoutByEdit($attribute, $params)
     {
         if ($this->id == 1) {
-            $this->addError($attribute, \Yii::t('user', 'The role of user with id 1 cannot be modified.'));
+            $this->addError($attribute, \Yii::t('user', 'The user with id 1 cannot be modified.'));
             return false;
         }
 
         if ($this->id == Yii::$app->user->identity->id) {
-            $this->addError($attribute, \Yii::t('user', 'You cannot modify the role of yourself.'));
+            $this->addError($attribute, \Yii::t('user', 'You cannot modify yourself.'));
             return false;
         }
         return true;
@@ -320,8 +325,10 @@ class User extends Base implements IdentityInterface
         parent::afterSave($insert, $changedAttributes);
 
         $auth = Yii::$app->authManager;
-        $role = $auth->getRole($this->role);
         $auth->revokeAll($this->id);
-        $auth->assign($role, $this->id);
+        foreach ($this->roles as $role) {
+            $role = $auth->getRole($role);
+            $auth->assign($role, $this->id);
+        }
     }
 }

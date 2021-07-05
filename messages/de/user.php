@@ -17,11 +17,11 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    'The role of user with id 1 cannot be modified.' => 'Die Rolle des Benutzers mit id 1 kann nicht bearbeitet werden.',
+    'The user with id 1 cannot be modified.' => 'Der Benutzers mit id 1 kann nicht bearbeitet werden.',
     'The user with id 1 cannot be deleted.' => 'Der Benutzer mit id 1 kann nicht gelöscht werden.',
     'Username is already in use.' => 'Der Benutzername is bereits in Verwendung.',
     'You cannot delete yourself.' => 'Sie können sich nicht selbst löschen.',
     'You cannot modify a non local user.' => 'Sie können einen nicht-lokalen Benutzer nicht bearbeiten.',
-    'You cannot modify the role of yourself.' => 'Sie können Ihre eigene Rolle nicht bearbeiten.',
+    'You cannot modify yourself.' => 'Sie können sich selbst nicht bearbeiten.',
     'You cannot reset the password of a non local user.' => 'Sie können das Passwort eines nicht-lokalen Benutzers nicht zurücksetzen.',
 ];

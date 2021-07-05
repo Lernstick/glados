@@ -203,6 +203,22 @@ class customFormatter extends \yii\i18n\Formatter
     }
 
     /**
+     * Formats an associative array as table.
+     *
+     * @param array array the value to be formatted as assiciative array.
+     * @param array options
+     * @return string the formatted result.
+     */
+    public static function asList($array, $layout = ['header' => '', 'footer' => '', 'item' => '{item}', 'separator' => ', '])
+    {
+        $items = [];
+        foreach ($array as $key => $item) {
+            $items[] = substitute($layout['item'], ['key' => $key, 'item' => $item]);
+        }
+        return $layout['header'] . implode($layout['separator'], $items) . $layout['footer'];
+    }
+
+    /**
      * Formats the links in the input as actual links.
      * 
      * links are given by {url:{name}:{controller}:{action}:variable1={value1},variable2={value2}}

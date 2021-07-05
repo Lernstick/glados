@@ -7,6 +7,7 @@ use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\User */
+/* @var $permissionDataProvider ArrayDataProvider */
 
 $this->title = $model->username;
 $this->params['breadcrumbs'][] = ['label' => \Yii::t('users', 'Users'), 'url' => ['index']];
@@ -99,7 +100,7 @@ $this->registerJs($active_tabs);
                 'model' => $model,
                 'attributes' => [
                     'username',
-                    'role',
+                    'roles:list',
                     [
                         'attribute' => 'authMethod.name',
                         'label' => Yii::t('auth', 'Authentication Method'),

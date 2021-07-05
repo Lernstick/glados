@@ -69,7 +69,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format'=>'raw'
             ],
             [
-                'attribute' => 'role',
+                'attribute' => 'roles',
+                'format' => 'list',
                 'filter' => $searchModel->roleList,
             ],
             [

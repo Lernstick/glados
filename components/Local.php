@@ -109,8 +109,8 @@ class Local extends \app\models\Auth implements AuthInterface
         if ($user) {
             $this->debug[] = Yii::t('auth', 'User found in database.');
             if ($user->validatePassword($password)) {
-                $this->debug[] = Yii::t('auth', 'User role set to <code>{role}</code>.', [
-                    'role' => $user->role
+                $this->debug[] = Yii::t('auth', 'User role(s) set to <code>{roles}</code>.', [
+                    'roles' => implode('</code>, <code>', $user->roles)
                 ]);
                 $this->success = Yii::t('auth', 'Authentication was successful.');
                 return true;
