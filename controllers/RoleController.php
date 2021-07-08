@@ -66,7 +66,7 @@ class RoleController extends BaseController
             if (!is_null($attr)) {
                 if ($attr == 'name') {
                     $searchModel = new RoleSearch();
-                    $out = $searchModel->selectList('CONCAT(description, " (", name, ")")', $q, $page, $per_page, 'name', false, null, true);
+                    $out = $searchModel->selectList('CONCAT(description, " (", name, ")")', $q, $page, $per_page, 'name', false, 'type DESC,name ASC', true);
                 } else if ($attr == 'role') {
                     $searchModel = new RoleSearch();
                     $searchModel->type = Role::TYPE;

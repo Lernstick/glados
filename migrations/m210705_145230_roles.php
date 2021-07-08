@@ -48,6 +48,8 @@ class m210705_145230_roles extends BaseMigration
         $teacher = $auth->getRole('teacher');
         $teacher->description = yiit('permission', "The 'teacher' role");
         $auth->update('teacher', $teacher);
+
+        $auth->invalidateCache(); // flush the RBAC cache, else permissions might not be up-to-date
     }
 
     /**
@@ -75,5 +77,7 @@ class m210705_145230_roles extends BaseMigration
         $auth->remove($viewRole);
         $auth->remove($updateRole);
         $auth->remove($deleteRole);
+
+        $auth->invalidateCache(); // flush the RBAC cache, else permissions might not be up-to-date
     }
 }
