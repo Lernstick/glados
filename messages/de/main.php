@@ -32,6 +32,7 @@ return [
     'Home' => 'Home',
     'Login' => 'Anmelden',
     'Logout' => 'Abmelden',
+    'Monitor Exams' => 'Prüfungen überwachen',
     'Profile' => 'Profil',
     'Settings' => 'Einstellungen',
     'Submit Ticket' => 'Ticket zuweisen',
@@ -39,5 +40,5 @@ return [
     'System' => 'System',
     'Tickets' => 'Tickets',
     'Users' => 'Benutzer',
-    'Monitor Exams' => 'Prüfungen überwachen',
+    'Roles' => 'Rollen',
 ];

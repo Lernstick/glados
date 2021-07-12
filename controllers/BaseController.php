@@ -42,7 +42,7 @@ class BaseController extends Controller
         } else {
             $p = $user_id == Yii::$app->user->id ? $this->rbacRoute : $this->rbacRoute . '/all';
             $model = Yii::$app->authManager->getPermission($p);
-            throw new ForbiddenHttpException(\Yii::t('app', 'You are not allowed to view this page. You need to have the following  permission: "{permission}".', [
+            throw new ForbiddenHttpException(\Yii::t('app', 'You are not allowed to view this page. You need to have the following permission: "{permission}".', [
                 'permission' => $model === null ? $p : Yii::t('permission',  $model->description),
             ]));
             return false;
