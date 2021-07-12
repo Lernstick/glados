@@ -19,7 +19,7 @@ FormAsset::register($this);
     <?php $form = ActiveForm::begin(); ?>
     <div class="row">
         <div class="col-md-6">
-            <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($model, 'name')->textInput(['maxlength' => true, 'readonly' => true]) ?>
         </div>
 
         <div class="col-md-6">
@@ -30,7 +30,7 @@ FormAsset::register($this);
     <div class="row">
         <div class="col-md-12">
             <?= $form->field($model, 'children')->widget(Select2::classname(), [
-                'data' => $model->children,
+                'data' => $model->childrenFormList,
                 'pluginOptions' => [
                     'dropdownAutoWidth' => true,
                     'width' => 'auto',
@@ -62,7 +62,7 @@ FormAsset::register($this);
                     'templateSelection' => new JsExpression('function (q) { return q.text; }'),
                 ],
                 'options' => [
-                    'value' => array_keys($model->children),
+                    'value' => array_keys($model->childrenFormList),
                     'multiple' => true,
                     'placeholder' => \Yii::t('user', 'Choose permission(s) for this role ...')
                 ]
