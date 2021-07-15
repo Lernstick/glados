@@ -119,7 +119,7 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
                     [
                         'label' => '<i class="glyphicon glyphicon-cloud-download"></i> ' . \Yii::t('main', 'Generate results'),
                         'url' => ['/result/generate'],
-                        'visible' => Yii::$app->user->can('results/generate'),
+                        'visible' => Yii::$app->user->can('result/generate'),
                         'encode' => false,
                     ],
                     [

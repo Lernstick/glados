@@ -27,7 +27,7 @@ class BaseMigration extends Migration
 
     /**
      * @var array all classes in app\models that inherit app\models\TranslatedActiveRecord
-     * Classes that use the table [[translationTable]]. Find then by 
+     * Classes that use the table [[translationTable]]. Find them by
      * ````bash
      * grep -r "getTranslatedFields()" .
      * ```

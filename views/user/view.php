@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use yii\widgets\Pjax;
 use yii\widgets\DetailView;
 use yii\grid\GridView;
 use yii\helpers\ArrayHelper;
@@ -121,7 +122,10 @@ $this->registerJs($active_tabs);
 
         </div>
 
-        <div id="permissions" class="tab-pane fade">
+        <?php Pjax::begin([
+            'id' => 'permissions',
+            'options' => ['class' => 'tab-pane fade'],
+        ]); ?>
 
             <?php $_GET = array_merge($_GET, ['#' => 'tab_permissions']); ?>
             <?= GridView::widget([
@@ -143,9 +147,13 @@ $this->registerJs($active_tabs);
                 ],
                 'layout' => '{items} {pager}',
                 'emptyText' => \Yii::t('users', 'No permissions found.'),
+                'pager' => [
+                    'class' => app\widgets\CustomPager::className(),
+                    'selectedLayout' => Yii::t('app', '{selected} <span style="color: #737373;">items</span>'),
+                ],
             ]); ?>
 
-        </div>
+        <?php Pjax::end(); ?>
 
     </div>
 

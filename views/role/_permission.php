@@ -18,7 +18,7 @@ use yii\data\ArrayDataProvider;
             'description' => Yii::t('permission', $model->description),
             'name' => $model->type === $model::TYPE ? Html::a(
                 $model->name,
-                Url::to(['role/view', 'id' => $model->name]),
+                Url::to(['role/view', 'id' => $model->name])
             ) : $model->name,
         ]) ?>
     </td>

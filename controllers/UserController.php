@@ -89,9 +89,13 @@ class UserController extends BaseController
         $model = $this->findModel($id);
         $permissionDataProvider = new ArrayDataProvider([
                 'allModels' => Yii::$app->authManager->getPermissionsByUser($model->id),
+                'pagination' => [
+                    'pageParam' => 'perm-page',
+                    'pageSizeParam' => 'perm-per-page',
+                    'pageSizeLimit' => [1, 100],
+                    'defaultPageSize' => 10,
+                ],
         ]);
-        $permissionDataProvider->pagination->pageParam = 'perm-page';
-        $permissionDataProvider->pagination->pageSize = 10;
 
         return $this->render('view', [
             'model' => $model,
