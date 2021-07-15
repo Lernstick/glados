@@ -6,7 +6,6 @@ use Yii;
 use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 use yii\bootstrap\Nav;
-use yii\bootstrap\ButtonDropdown;
 
 /**
  * CustomPager enhances [[LinkPager]] with a dropdown list of choosable page-sizes.
