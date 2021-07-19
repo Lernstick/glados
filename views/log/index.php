@@ -96,7 +96,7 @@ use yii\bootstrap\Modal;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
     ],
-    'options' => ['id' => 'dynagrid-ticket-log-index'] // a unique identifier is important
+    'options' => ['id' => 'dynagrid-ticket-log-index'], // a unique identifier is important
 ]); ?>
 
 <?php Modal::begin([

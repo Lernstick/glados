@@ -323,7 +323,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 'class' => 'summary col-xs-12 col-md-12',
             ],            
             'emptyText' => \Yii::t('ticket', 'No screenshots found.'),
-            'layout' => '{items} <br>{summary} {pager}',
+            'layout' => '{items} <div class="col-md-12 col-xs-12">{summary} {pager}</div>',
+            'pager' => [
+                'class' => app\widgets\CustomPager::className(),
+                'selectedLayout' => Yii::t('app', '{selected} <span style="color: #737373;">items</span>'),
+                'pageSizeList' => [4 => 4, 8 => 8, 12 => 12, 16 => 16, 20 => 20, 24 => 24, 28 => 28, 32 => 32],
+            ],
         ]); ?>
 
     <?php Pjax::end() ?>

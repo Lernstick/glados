@@ -36,7 +36,8 @@ class BackupSearch extends Backup
         $dataProvider = new ArrayDataProvider([
             'allModels' => $models,
             'pagination' => array(
-                'pageSize' => 20,
+                'defaultPageSize' => 5,
+                'pageSizeLimit' => [1, 100],
             ),
         ]);
 

@@ -39,6 +39,12 @@ $config = [
                 'nextPageLabel' => '›',
                 'prevPageLabel' => '‹',
             ],
+            'app\widgets\CustomPager' => [
+                'firstPageLabel' => '«',
+                'lastPageLabel'  => '»',
+                'nextPageLabel' => '›',
+                'prevPageLabel' => '‹',
+            ],
         ],
     ],
     'components' => [

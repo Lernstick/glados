@@ -36,7 +36,8 @@ class ScreenshotSearch extends Screenshot
         $dataProvider = new ArrayDataProvider([
             'allModels' => $models,
             'pagination' => array(
-                'pageSize' => 20,
+                'defaultPageSize' => 12,
+                'pageSizeLimit' => [1, 100],
             ),
         ]);
 

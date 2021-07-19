@@ -89,6 +89,10 @@ use app\components\Editable;
     'itemView' => '_item',
     'emptyText' => \Yii::t('ticket', 'No backups found.'),
     'layout' => '{items} <br>{summary} {pager}',
+    'pager' => [
+        'class' => app\widgets\CustomPager::className(),
+        'selectedLayout' => Yii::t('app', '{selected} <span style="color: #737373;">items</span>'),
+    ],
 ]); ?>
 
 <?php

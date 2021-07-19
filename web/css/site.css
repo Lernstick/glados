@@ -700,3 +700,14 @@ span.view--state[data-state="4"]::after { content: attr(data-text-4); }
 .pagination-page-size > li.dropdown > ul.dropdown-menu {
   min-width: 10px;
 }
+
+/* Dropdown menus should be above all other elements, including the top navigation with z-index:1030; */
+.dropdown-menu {
+  z-index: 1040;
+}
+
+/* Dropdowns with scrollbar */
+.pre-scrollable {
+  overflow-y: auto;
+  scrollbar-width: thin;
+}

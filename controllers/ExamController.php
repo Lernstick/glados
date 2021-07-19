@@ -128,7 +128,7 @@ class ExamController extends BaseController
             $historyParams = ['HistorySearch' => $historyParams];
             $historyDataProvider = $historySearchModel->search($historyParams);
             $historyDataProvider->pagination->pageParam = 'hist-page';
-            $historyDataProvider->pagination->pageSize = 10;
+            $historyDataProvider->pagination->pageSizeParam = 'hist-per-page';
 
             $settingsDataProvider = new ArrayDataProvider([
                 'allModels' => $model->exam_setting,

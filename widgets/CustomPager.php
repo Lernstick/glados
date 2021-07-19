@@ -19,7 +19,7 @@ class CustomPager extends \yii\widgets\LinkPager
      * @var string layout of the pager. "LinkPager" is replaces by the buttons rendered 
      * by LinkPager and "CustomPager" is replaced by the rendered dropdown list of page-sizes.
      */
-    public $layout = '<div class="row">{LinkPager} {CustomPager}</div>';
+    public $layout = '<div class="row"><div class="col-md-12 col-xs-12">{LinkPager} {CustomPager}</div></div>';
 
      /**
      * @var string text for the add-in text in front of the page-size dropdown, null indicates
@@ -55,7 +55,9 @@ class CustomPager extends \yii\widgets\LinkPager
      /**
      * @var array the HTML options that will passed to the [[yii\bootstrap\Dropdown]] widget.
      */
-    public $dropDownOptions = [];
+    public $dropDownOptions = [
+        'class' => 'pre-scrollable',
+    ];
 
      /**
      * @var array The HTML attributes for the widget container tag.
@@ -65,9 +67,16 @@ class CustomPager extends \yii\widgets\LinkPager
     ];
 
      /**
-     * @var array the HTML attributes of the dropdown item's link.
+     * @var array the HTML attributes of the dropdown item's <a> link element.
      */
     public $dropDownLinkOptions = [];
+
+     /**
+     * @var array the HTML attributes of the dropdown item's <li> list element.
+     */
+    public $dropDownLiOptions = [
+        'class' => 'dropdown-imitation',
+    ];
 
     /**
      * @inheritdoc
@@ -119,6 +128,7 @@ class CustomPager extends \yii\widgets\LinkPager
             [
                 'label' => substitute($this->selectedLayout, ['selected' => $current]),
                 'items' => $items,
+                'options' => $this->dropDownLiOptions,
                 'linkOptions' => $this->dropDownLinkOptions,
                 'dropDownOptions' => $this->dropDownOptions,
                 'encode' => false,

@@ -24,6 +24,7 @@ use app\models\DaemonSearch;
 use app\models\Log;
 use app\models\LogSearch;
 use app\models\RdiffFileSystem;
+use app\models\RdiffFileSystemSearch;
 use app\models\Setting;
 use yii\web\UploadedFile;
 use yii\web\NotFoundHttpException;
@@ -156,22 +157,22 @@ class TicketController extends BaseController
             $activitySearchModel = new ActivitySearch();
             $activityDataProvider = $activitySearchModel->search(['ActivitySearch' => ['ticket_id' => $id] ]);
             $activityDataProvider->pagination->pageParam = 'act-page';
-            $activityDataProvider->pagination->pageSize = 10;
+            $activityDataProvider->pagination->pageSizeParam = 'act-per-page';
 
             $backupSearchModel = new BackupSearch();
             $backupDataProvider = $backupSearchModel->search($model->token);
             $backupDataProvider->pagination->pageParam = 'back-page';
-            $backupDataProvider->pagination->pageSize = 5;
+            $backupDataProvider->pagination->pageSizeParam = 'back-per-page';
 
             $screenshotSearchModel = new ScreenshotSearch();
             $screenshotDataProvider = $screenshotSearchModel->search($model->token);
             $screenshotDataProvider->pagination->pageParam = 'screen-page';
-            $screenshotDataProvider->pagination->pageSize = 12;
+            $screenshotDataProvider->pagination->pageSizeParam = 'screen-per-page';
 
             $restoreSearchModel = new RestoreSearch();
             $restoreDataProvider = $restoreSearchModel->search(['RestoreSearch' => ['ticket_id' => $id] ]);
             $restoreDataProvider->pagination->pageParam = 'rest-page';
-            $restoreDataProvider->pagination->pageSize = 5;
+            $restoreDataProvider->pagination->pageSizeParam = 'rest-per-page';
 
             $logSearchModel = new LogSearch();
             if (array_key_exists('LogSearch', Yii::$app->request->queryParams)) {
@@ -182,7 +183,7 @@ class TicketController extends BaseController
             }
             $logDataProvider = $logSearchModel->search(['LogSearch' => $logsearch]);
             $logDataProvider->pagination->pageParam = 'log-page';
-            $logDataProvider->pagination->pageSize = 10;
+            $logDataProvider->pagination->pageSizeParam = 'log-per-page';
 
             $historySearchModel = new HistorySearch();
             $historyQueryParams = array_key_exists('HistorySearch', Yii::$app->request->queryParams)
@@ -195,44 +196,23 @@ class TicketController extends BaseController
             $historyParams = ['HistorySearch' => $historyParams];
             $historyDataProvider = $historySearchModel->search($historyParams);
             $historyDataProvider->pagination->pageParam = 'hist-page';
-            $historyDataProvider->pagination->pageSize = 10;
+            $historyDataProvider->pagination->pageSizeParam = 'hist-per-page';
 
             $options = [
                 'showDotFiles' => boolval($showDotFiles),
             ];
 
-            $fs = new RdiffFileSystem([
-                'root' => $model->exam->backup_path,
-                'location' => realpath(\Yii::$app->params['backupPath'] . '/' . $model->token),
-                'restoreUser' => 'root',
-                'restoreHost' => $model->ip,
+            $fs = new RdiffFileSystemSearch([
                 'options' => $options,
             ]);
 
-            if ($date == null) {
-                $date = ($model->state == Ticket::STATE_CLOSED || $model->state == Ticket::STATE_SUBMITTED) ? $fs->newestBackupVersion : 'all';
-            }
-
-            if (file_exists(\Yii::$app->params['backupPath'] . '/' . $model->token)) {
-                $models = $fs->slash($path)->versionAt($date)->contents;
-                $versions = $fs->slash($path)->versions;
-                //array_unshift($versions , 'now');
-                array_unshift($versions , 'all');
-            } else {
-                $models = [];
-                $versions = [];
-            }
-
-            $ItemsDataProvider = new ArrayDataProvider([
-                'allModels' => $models,
+            list($ItemsDataProvider, $VersionsDataProvider) = $fs->search([
+                'path' => $path,
+                'model' => $model,
             ]);
 
             $ItemsDataProvider->pagination->pageParam = 'browse-page';
-            $ItemsDataProvider->pagination->pageSize = 20;
-
-            $VersionsDataProvider = new ArrayDataProvider([
-                'allModels' => $versions,
-            ]);
+            $ItemsDataProvider->pagination->pageSizeParam = 'browse-per-page';
 
             $VersionsDataProvider->pagination->pageParam = 'vers-page';
             $VersionsDataProvider->pagination->pageSize = 10;
@@ -259,10 +239,6 @@ class TicketController extends BaseController
                 'options' => $options,
             ]);
         } else if ($mode == 'probe') {
-            //$online = $model->runCommand('source /info; ping -nq -W 10 -c 1 "${gladosIp}"', 'C', 10)[1];
-            //$model->online = $model->runCommand('true', 'C', 10)[1] == 0 ? true : false;
-            //$model->save(false);
-
             $daemon = new Daemon();
             $pid = $daemon->startNotify($id);
 

@@ -52,8 +52,11 @@ class LogSearch extends Log
         ]);
 
         $dataProvider = new ArrayDataProvider([
-            'pagination' => ['pageSize' => 10],
             'sort' => $sort,
+            'pagination' => [
+                'defaultPageSize' => 10,
+                'pageSizeLimit' => [1, 100],
+            ],
         ]);
 
         // load the search form data and validate

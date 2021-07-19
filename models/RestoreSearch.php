@@ -49,7 +49,11 @@ class RestoreSearch extends Restore
             'query' => $query,
             'sort'=> [
                 'defaultOrder' => ['finishedAt'=>SORT_DESC]
-            ]
+            ],
+            'pagination' => array(
+                'defaultPageSize' => 5,
+                'pageSizeLimit' => [1, 100],
+            ),
         ]);
 
         $this->load($params);

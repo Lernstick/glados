@@ -30,6 +30,10 @@ use yii\widgets\ActiveForm;
     ],
     'emptyText' => \Yii::t('ticket', 'No history items found.'),
     'layout' => '{items}',
+    'pager' => [
+        'class' => app\widgets\CustomPager::className(),
+        'selectedLayout' => Yii::t('app', '{selected} <span style="color: #737373;">items</span>'),
+    ],
 ]); ?>
 
 <?php $form = ActiveForm::begin([
@@ -39,11 +43,11 @@ use yii\widgets\ActiveForm;
 ]); ?>
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-7">
         <?= $x->renderSummary(); ?>
         <?= $x->renderPager(); ?>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-5">
         <?= $form->field($searchModel, 'column')->dropDownList($searchModel->getColumnList($model), [
             'prompt' => \Yii::t('history', 'Choose a column to filter ...'),
             'onchange' => 'this.form.submit()',
