@@ -98,11 +98,6 @@ Pjax::begin([
     'options' => ['class' => 'hidden'],
 ]);
 
-    // TODO: remove
-    //$model->db_threads_connected = rand(0, 300);
-    //$model->procTotal = rand(0, 300);
-    //$runningDaemons = rand(0, \Yii::$app->params['maxDaemons']);
-
     echo Html::a('<i class="glyphicon glyphicon-refresh"></i>', '', [
         'id' => 'reload-load',
         'class' => 'btn btn-default btn-xs pull-right',
