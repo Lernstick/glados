@@ -3,15 +3,14 @@
 namespace app\models;
 
 use Yii;
-use yii\base\Model;
-use yii\helpers\Url;
-use yii\imagine\Image;
+use yii\helpers\FileHelper;
+use app\models\EventStream;
 
 /**
  * This is the model class for apaches mod_status.
  *
  */
-class ServerStatus extends Model
+class ServerStatus extends \yii\db\ActiveRecord
 {
 
     /**
@@ -20,11 +19,27 @@ class ServerStatus extends Model
     const URL = 'http://localhost/server-status?auto';
 
     /**
+     * @const string Path to /proc/meminfo
+     */
+    const PROC_MEMINFO = '/proc/meminfo';
+
+    /**
+     * @const string Path to /proc/stat
+     */
+    const PROC_STAT = '/proc/stat';
+
+    /**
      * @var string the raw output from URL
      */
     public $raw;
 
     /**
+     * @var integer update interval in seconds
+     */
+    public $interval = 10;
+
+    /**
+     * Webserver variables
      * @see http://httpd.apache.org/docs/2.0/mod/mod_status.html
      */
     public $serverVersion;
@@ -36,6 +51,7 @@ class ServerStatus extends Model
     public $busyWorkers;
     public $idleWorkers;
     public $scoreboard;
+    public $reqPerSec;
 
     public $procWaiting = 0;
     public $procStarting = 0;
@@ -51,15 +67,82 @@ class ServerStatus extends Model
     public $procTotal = 0;
     public $procMaximum = 0;
 
+    /**
+     * Server memory variables variables
+     * These values are converted from kB to bytes
+     * @see https://www.kernel.org/doc/Documentation/filesystems/proc.txt
+     */
+    public $memTotal = 0;
+    public $memFree = 0;
+    public $memAvailable = 0;
+    public $memUsed = 0;
+    public $swapTotal = 0;
+    public $swapFree = 0;
+    public $swapUsed = 0;
+
+    /**
+     * CPU variables
+     */
+    public $cpuPercentage;
+
+    /**
+     * Disk variables
+     */
+    public $backupDiskTotal;
+    public $backupDiskFree;
+    public $backupDiskUsed;
+
+    /**
+     * Inotify variables
+     */
     public $inotify_max_user_instances;
     public $inotify_max_user_watches;
+    public $inotify_active_watches;
+    public $inotify_active_instances;
+
+    /**
+     * @var integer Maximal allowed number of connections to the database, if exhausted
+     * we see the "to many connections" error.
+     */
+    public $db_max_connections;
+
+    /**
+     * @var integer number of currently active connections to the database.
+     */
+    public $db_threads_connected;
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            ['interval', 'safe'],
+            ['interval', 'required'],
+            ['interval', 'default', 'value' => 10],
+            ['interval', 'integer', 'min' => 1, 'max' => 300],
+        ];
+    }
 
     /**
      * @return array customized attribute labels
      */
     public function attributeLabels()
     {
-        return [];
+        return [
+            'interval' => \Yii::t('server', 'Update Interval')
+        ];
+    }
+
+
+    /**
+     * @return array customized attribute labels
+     */
+    public function attributeHints()
+    {
+        return [
+            'interval' => \Yii::t('server', 'seconds')
+        ];
     }
 
     /**
@@ -67,9 +150,11 @@ class ServerStatus extends Model
      *
      * @return ServerStatus|null
      */
-    public function find()
+    public static function find()
     {
         $status = new ServerStatus();
+
+        // read out all information from the ServerStatus URL
         $status->raw = @file_get_contents(ServerStatus::URL);
         foreach(explode(PHP_EOL, $status->raw) as $line) {
             if (str_contains($line, ":")) {
@@ -81,10 +166,79 @@ class ServerStatus extends Model
         }
         $status->readScoreboard();
 
+        /**
+         * inotify information
+         * @todo read current inotify resouces
+         */
         $status->inotify_max_user_instances = intval(file_get_contents('/proc/sys/fs/inotify/max_user_instances'));
         $status->inotify_max_user_watches = intval(file_get_contents('/proc/sys/fs/inotify/max_user_watches'));
+        $status->inotify_active_instances = 0;
+        $status->inotify_active_watches = 0;
+        $streams = EventStream::find()->all();
+        foreach ($streams as $stream) {
+            if ($stream->isActive) {
+                $status->inotify_active_instances++;
+                $status->inotify_active_watches += $stream->watches;
+            }
+        }
+
+
+        /**
+         * MariaDB information
+         * @var \yii\db\ActiveQuery $query
+         */
+        $query = Yii::createObject(\yii\db\ActiveQuery::className(), [get_called_class()]);
+        $status->db_max_connections = $query->select('VARIABLE_VALUE')->from('information_schema.GLOBAL_VARIABLES')->where(['VARIABLE_NAME' => 'max_connections'])->scalar();
+        $status->db_threads_connected = $query->select('VARIABLE_VALUE')->from('information_schema.GLOBAL_STATUS')->where(['VARIABLE_NAME' => 'threads_connected'])->scalar();
+
+
+        /**
+         * Memory information
+         */
+        $raw = @file_get_contents(ServerStatus::PROC_MEMINFO);
+        foreach(explode(PHP_EOL, $raw) as $line) {
+            if (str_contains($line, ":")) {
+                list($key, $value) = explode(":", $line, 2);
+                if ($status->hasProperty(lcfirst($key))) {
+                    $status->{lcfirst($key)} = intval($value)*1024;
+                }
+            }
+        }
+        $status->memUsed = $status->memTotal - $status->memAvailable;
+        $status->swapUsed = $status->swapTotal - $status->swapFree;
+
+        /**
+         * CPU information
+         */
+        list($used1, $total1) = $status->readStat();
+        usleep(1000*100); # 0.1s
+        list($used2, $total2) = $status->readStat();
+        $status->cpuPercentage = ($used2 - $used1)*100/($total2 - $total1);
+
+        /**
+         * Disk information
+         */
+        $status->backupDiskTotal = disk_total_space(\Yii::$app->params['backupPath']);
+        $status->backupDiskFree = disk_free_space(\Yii::$app->params['backupPath']);
+        $status->backupDiskUsed = $status->backupDiskTotal - $status->backupDiskFree;
 
         return $status;
+    }
+
+    /**
+     * Reads the cpu part of the file /proc/stat
+     *
+     * @return array [$used, $total]
+     */
+    private function readStat()
+    {
+        $raw = @file_get_contents(ServerStatus::PROC_STAT);
+        foreach(explode(PHP_EOL, $raw) as $line) {
+            if (str_contains($line, "cpu ")) {
+                list($key, $user, $nice, $system, $idle, $iowait, $irq, $softirq, $rest) = preg_split('/\s+/', $line, 9);
+                return [$user + $system, $user + $system + $idle];
+            }
+        }
     }
 
     /**

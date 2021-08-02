@@ -4,7 +4,6 @@ namespace app\controllers;
 
 use Yii;
 use yii\filters\AccessControl;
-use app\models\Config;
 use app\components\AccessRule;
 use yii\web\NotFoundHttpException;
 
@@ -57,27 +56,4 @@ class ConfigController extends BaseController
             "wants_lernstick_flavor" => "exam", // exam or standard
         ];
     }
-
-    /**
-     * Displays the system configuration.
-     *
-     * @return mixed
-     * @throws NotFoundHttpException if the config file cannot be found/parsed
-     */
-    public function actionSystem()
-    {
-
-        $model = Config::findOne([
-            'avahiServiceFile' => '/etc/avahi/services/glados.service'
-        ]);
-
-        if ($model !== null) {
-            return $this->render('system', [
-                'model' => $model,
-            ]);
-        } else {
-            throw new NotFoundHttpException('The avahi service file (/etc/avahi/services/glados.service) could not be parsed.');
-        }
-    }
-
 }

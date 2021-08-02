@@ -25,5 +25,6 @@ return [
     'IP' => 'IP',
     'Options' => 'Optionen',
     'Port' => 'Port',
-    'System Configuation' => 'System Konfiguration',
+    'Server Configuation' => 'Server Konfiguration',
+    'Server Status' => 'Server Status',
 ];

@@ -62,7 +62,7 @@ class CleanupController extends DaemonController implements DaemonInterface
     /**
      * @inheritdoc
      *
-     * Delete all event items older than 3600 seconds and all event streams older than 1 week
+     * Delete all event items older than 3600 seconds and all event streams older than 1 day
      */
     public function processItem ($item = null)
     {
@@ -73,7 +73,7 @@ class CleanupController extends DaemonController implements DaemonInterface
 
         $cleanEventStreams = \Yii::$app->db
             ->createCommand()
-            ->delete('event_stream', ['<', 'started_at', new Expression('NOW() - INTERVAL 1 WEEK')]);
+            ->delete('event_stream', ['<', 'started_at', new Expression('NOW() - INTERVAL 1 DAY')]);
         $cleanEventStreams->execute();
 
         $this->dbcleaned = microtime(true);

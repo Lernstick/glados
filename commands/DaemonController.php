@@ -181,7 +181,6 @@ class DaemonController extends Controller
         pcntl_signal(SIGTERM, array(&$this, "signalHandler"));
         pcntl_signal(SIGINT,  array(&$this, "signalHandler"));
         pcntl_signal(SIGQUIT, array(&$this, "signalHandler"));
-
         pcntl_signal(SIGHUP,  array(&$this, "signalHandler"));
         pcntl_signal(SIGUSR1, array(&$this, "signalHandler"));
 

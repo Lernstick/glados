@@ -7,8 +7,6 @@ use yii\widgets\Pjax;
 use yii\bootstrap\Modal;
 use yii\helpers\Url;
 use app\components\ActiveEventField;
-use miloschuman\highcharts\Highcharts;
-use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $exam app\models\Exam */
@@ -16,7 +14,6 @@ use yii\web\JsExpression;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $issueSearchModel app\models\IssueSearch */
 /* @var $issueDataProvider yii\data\ActiveDataProvider */
-/* @var $serverStatus app\models\ServerStatus */
 
 $title = \Yii::t('ticket', 'Currently behind live');
 $n = $exam::monitor_idle_time();
@@ -101,13 +98,8 @@ echo Pjax::widget([
     'enablePushState' => false,
 ]);
 
-echo '<div class="row">';
-
 Pjax::begin([
     'id' => 'live_issues',
-    'options' => [
-        'class' => 'col-sm-10',
-    ],
 ]);
 
     /**
@@ -191,109 +183,7 @@ Pjax::begin([
 
 Pjax::end();
 
-echo '<div class="col-sm-2">';
 
-Pjax::begin([
-    'id' => 'server_status',
-    'options' => [
-        'class' => 'hidden',
-    ],
-]);
-
-    echo Html::a('<i class="glyphicon glyphicon-refresh"></i>', '', [
-        'id' => 'reload-load',
-        'class' => 'btn btn-default btn-xs pull-right',
-        'data-proc_total' => $serverStatus->procTotal,
-    ]);
-
-Pjax::end();
-
-echo Highcharts::widget([
-    'scripts' => [
-        'highcharts-more', // enables supplementary chart types (gauge, arearange, columnrange, etc.)
-        'modules/solid-gauge',
-    ],
-    'options' => [
-        'chart' => [
-            'type' => 'solidgauge',
-            'height' => '100px',
-            'events' => [
-                'load' => new JsExpression("function () {
-                    var s = this.series[0];
-                    setInterval(function () {
-                        s.setData([parseInt($('#reload-load').data('proc_total'))]);
-                    }, 1000);
-                }" )
-            ],
-        ],
-        'title' => [
-            'text' => null,
-        ],
-        'pane' => [
-            'center' => ['50%', '85%'],
-            'size' => '140%',
-            'startAngle' => -90,
-            'endAngle' => 90,
-            'background' => [
-                'backgroundColor' => '#EEE',
-                'innerRadius' => '60%',
-                'outerRadius' => '100%',
-                'shape' => 'arc',
-            ],
-        ],
-        'exporting' => [
-            'enabled' => false,
-        ],
-        'tooltip' => [
-            'enabled' => false,
-        ],
-        'yAxis' => [
-            'min' => 0,
-            'max' => $serverStatus->procMaximum,
-            'stops' => [
-                [0.1, '#55BF3B'], // green
-                [0.5, '#DDDF0D'], // yellow
-                [0.8, '#DF5353'] // red
-            ],
-            'lineWidth' => 0,
-            'tickWidth' => 0,
-            'minorTickInterval' => null,
-            'tickPositions' => [],//[0, $serverStatus->procMaximum],
-            'labels' => [
-                'y' => 20,
-                'x' => 0,
-            ],
-        ],
-        'plotOptions' => [
-            'solidgauge' => [
-                'dataLabels' => [
-                    'useHTML' => true,
-                    'borderWidth' => 0,
-                    'y' => 5,
-                ],
-            ]
-        ],
-        'credits' => [
-            'enabled' => false,
-        ],
-        'series' => [
-            [
-                'data' => [$serverStatus->procTotal],
-                'dataLabels' => [
-                    'format' =>
-                        '<div style="text-align:center">' .
-                            '<span style="font-size:11px">' .
-                                substitute('{y}/{max}', ['max' => $serverStatus->procMaximum]) .
-                            '</span><br/>' .
-                            '<span style="font-size:10px;opacity:0.4">processes</span>' .
-                        '</div>',
-                ],
-            ]
-        ]
-    ]
-]);
-
-echo "</div></div>";
 
 echo "<hr>";
 

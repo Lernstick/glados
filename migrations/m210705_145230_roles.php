@@ -7,6 +7,9 @@ use app\components\BaseMigration;
  */
 class m210705_145230_roles extends BaseMigration
 {
+
+    public $eventStreamTable = 'event_stream';
+
     /**
      * {@inheritdoc}
      */
@@ -34,6 +37,15 @@ class m210705_145230_roles extends BaseMigration
         $deleteRole->description = yiit('permission', 'Delete all roles');
         $auth->add($deleteRole);
 
+        $serverStatus = $auth->createPermission('server/status');
+        $serverStatus->description = yiit('permission', 'View the server status information');
+        $auth->add($serverStatus);
+
+        // rename "config/system" -> "server/config"
+        $item = $auth->getPermission('config/system');
+        $item->name = 'server/config';
+        $auth->update('config/system', $item);
+
         /* Assign permissions */
         $admin = $auth->getRole('admin');
         $auth->addChild($admin, $indexRole);
@@ -41,13 +53,16 @@ class m210705_145230_roles extends BaseMigration
         $auth->addChild($admin, $viewRole);
         $auth->addChild($admin, $updateRole);
         $auth->addChild($admin, $deleteRole);
+        $auth->addChild($admin, $serverStatus);
 
         $admin->description = yiit('permission', "The immutable 'admin' role");
         $auth->update('admin', $admin);
 
         $teacher = $auth->getRole('teacher');
-        $teacher->description = yiit('permission', "The 'teacher' role");
+        $teacher->description = yiit('permission', "The immutable 'teacher' role");
         $auth->update('teacher', $teacher);
+
+        $this->addColumn($this->eventStreamTable, 'watches', $this->integer()->notNull()->defaultValue(0));
 
         $auth->invalidateCache(); // flush the RBAC cache, else permissions might not be up-to-date
     }
@@ -64,6 +79,7 @@ class m210705_145230_roles extends BaseMigration
         $viewRole = $auth->getPermission('role/view');
         $updateRole = $auth->getPermission('role/update');
         $deleteRole = $auth->getPermission('role/delete');
+        $serverStatus = $auth->getPermission('server/status');
 
         $admin = $auth->getRole('admin');
         $auth->removeChild($admin, $indexRole);
@@ -71,12 +87,21 @@ class m210705_145230_roles extends BaseMigration
         $auth->removeChild($admin, $viewRole);
         $auth->removeChild($admin, $updateRole);
         $auth->removeChild($admin, $deleteRole);
+        $auth->removeChild($admin, $serverStatus);
 
         $auth->remove($indexRole);
         $auth->remove($createRole);
         $auth->remove($viewRole);
         $auth->remove($updateRole);
         $auth->remove($deleteRole);
+        $auth->remove($serverStatus);
+
+        // rename "server/config" -> "config/system"
+        $item = $auth->getPermission('server/config');
+        $item->name = 'config/system';
+        $auth->update('server/config', $item);
+
+        $this->dropColumn($this->eventStreamTable, 'watches');
 
         $auth->invalidateCache(); // flush the RBAC cache, else permissions might not be up-to-date
     }

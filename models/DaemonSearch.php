@@ -47,6 +47,9 @@ class DaemonSearch extends Daemon
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => array(
+                'pageSize' => \Yii::$app->params['maxDaemons'],
+            ),
         ]);
 
         $this->load($params);
@@ -80,7 +83,10 @@ class DaemonSearch extends Daemon
         //create new dataProvider with the models in running state
         return new ArrayDataProvider([
             'key' => Daemon::primaryKey()[0],
-            'allModels' => $models
+            'allModels' => $models,
+            'pagination' => array(
+                'pageSize' => \Yii::$app->params['maxDaemons'],
+            ),
         ]);
     }
 

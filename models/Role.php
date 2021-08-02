@@ -23,7 +23,10 @@ class Role extends Base
 
     const TYPE = 1;
 
-    public $immutableRoles = ['admin'];
+    /**
+     * @var string[] list of role names that cannot be altered or deleted
+     **/
+    public $immutableRoles = ['admin', 'teacher'];
 
     /**
      * @var yii\rbac\Item[]
@@ -164,12 +167,12 @@ class Role extends Base
         $auth = Yii::$app->authManager;
 
         if (!empty($auth->getUserIdsByRole($this->name))) {        
-            Yii::$app->session->addFlash('danger', \Yii::t('user', "'{name}' has still users associated to. Only roles without users can be deleted.", ['name' => $this->name]));
+            Yii::$app->session->addFlash('danger', \Yii::t('user', "The role '{role}' has still users associated to. Only roles without users can be deleted.", ['role' => $this->name]));
             return false;
         }
 
         if (!empty($auth->getChildren($this->name))) {
-            Yii::$app->session->addFlash('danger', \Yii::t('user', "'{name}' has still permissions associated to. Only roles without permissions can be deleted.", ['name' => $this->name]));
+            Yii::$app->session->addFlash('danger', \Yii::t('user', "The role '{role}' has still permissions associated to. Only roles without permissions can be deleted.", ['role' => $this->name]));
             return false;
         }
 
@@ -177,9 +180,9 @@ class Role extends Base
         foreach (Yii::$app->auth->methods as $key => $config) {
             $method = Auth::findOne($key);
             if (in_array($this->name, $method->mapping)) {
-                Yii::$app->session->addFlash('danger', \Yii::t('user', "'{name}' appears in the group mapping of the authentication method {authMethod}. Only roles without any associations can be deleted.", [
-                    'name' => $this->name,
-                    'authMethod' => substitute('{0} ({1})', [$method->name, $method->typeName])
+                Yii::$app->session->addFlash('danger', \Yii::t('user', "The role '{role}' appears in the group mapping of the authentication method {method}. Only roles without any associations can be deleted.", [
+                    'role' => $this->name,
+                    'method' => substitute('{0} ({1})', [$method->name, $method->typeName])
                 ]));
                 return false;
             }
@@ -208,6 +211,7 @@ class Role extends Base
      */
     public function setChildren($children)
     {
+        $children = empty($children) ? [] : $children;
         $this->_children = $children;
         $auth = Yii::$app->authManager;
         $this->_childrenRBACObjects = array_map(function($item) use ($auth) {
