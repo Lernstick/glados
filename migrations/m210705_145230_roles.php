@@ -64,7 +64,9 @@ class m210705_145230_roles extends BaseMigration
 
         $this->addColumn($this->eventStreamTable, 'watches', $this->integer()->notNull()->defaultValue(0));
 
-        $auth->invalidateCache(); // flush the RBAC cache, else permissions might not be up-to-date
+        // flush the RBAC cache, else permissions might not be up-to-date
+        $auth->invalidateCache();
+        Yii::$app->cache->flush();
     }
 
     /**
@@ -103,6 +105,8 @@ class m210705_145230_roles extends BaseMigration
 
         $this->dropColumn($this->eventStreamTable, 'watches');
 
-        $auth->invalidateCache(); // flush the RBAC cache, else permissions might not be up-to-date
+        // flush the RBAC cache, else permissions might not be up-to-date
+        $auth->invalidateCache();
+        Yii::$app->cache->flush();
     }
 }

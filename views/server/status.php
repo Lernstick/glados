@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\Pjax;
 use yii\web\JsExpression;
 use miloschuman\highcharts\Highcharts;
@@ -98,19 +99,24 @@ Pjax::begin([
     'options' => ['class' => 'hidden'],
 ]);
 
-    echo Html::a('<i class="glyphicon glyphicon-refresh"></i>', '', [
-        'id' => 'reload-load',
-        'class' => 'btn btn-default btn-xs pull-right',
-        'data-proc_total' => $model->procTotal,
-        'data-db_threads_connected' => $model->db_threads_connected,
-        'data-running_daemons' => $runningDaemons,
-        'data-mem_used' => $model->memUsed/1048576, # MB
-        'data-swap_used' => $model->swapUsed/1048576, # MB
-        'data-cpu_percentage' => $model->cpuPercentage, # %
-        'data-backup_disk_used' => $model->backupDiskUsed/1073741824, # GB
-        'data-inotify_active_watches' => $model->inotify_active_watches,
-        'data-inotify_active_instances' => $model->inotify_active_instances,
-    ]);
+$options = [
+    'id' => 'reload-load',
+    'class' => 'btn btn-default btn-xs pull-right',
+    'data-proc_total' => $model->procTotal,
+    'data-db_threads_connected' => $model->db_threads_connected,
+    'data-running_daemons' => $runningDaemons,
+    'data-mem_used' => $model->memUsed/1048576, # MB
+    'data-swap_used' => $model->swapUsed/1048576, # MB
+    'data-cpu_percentage' => $model->cpuPercentage, # %
+    'data-inotify_active_watches' => $model->inotify_active_watches,
+    'data-inotify_active_instances' => $model->inotify_active_instances,
+];
+
+foreach($model->diskTotal as $key => $disk) {
+    $options['disk_usage_' . $key] = $model->diskUsed[$key]/1073741824;
+}
+
+    echo Html::a('<i class="glyphicon glyphicon-refresh"></i>', '', $options);
 
 Pjax::end();
 
@@ -120,7 +126,10 @@ Pjax::end();
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin([
+        'method' => 'get',
+        'action' => Url::to(['server/status']),
+    ]); ?>
 
         <div class="col-sm-8">&nbsp;</div>
         <div class="col-sm-4">
@@ -316,35 +325,6 @@ Pjax::end();
                         'modules/solid-gauge',
                     ],
                     'options' => ArrayHelper::merge($gaugeOptions, [
-                        'title' => ['text' => \Yii::t('server', 'Disk usage (backups)')],
-                        'yAxis' => ['max' => $model->backupDiskTotal/1073741824],
-                        'series' => [
-                            [
-                                'name' => 'backup_disk_used',
-                                'data' => [$model->backupDiskUsed/1073741824],
-                                'dataLabels' => [
-                                    'format' =>
-                                        '<div style="text-align:center">' .
-                                            '<span style="font-size:11px">' .
-                                                substitute('{y:.2f}/{max}', [
-                                                    'max' => yii::$app->formatter->format($model->backupDiskTotal/1073741824, ['decimal', 2]),
-                                                ]) .
-                                            '</span><br/>' .
-                                            '<span style="font-size:10px;opacity:0.4">GB</span>' .
-                                        '</div>',
-                                ],
-                            ]
-                        ]
-                    ]),
-                ]); ?>
-            </div>
-            <div class="col-sm-2">
-                <?= Highcharts::widget([
-                    'scripts' => [
-                        'highcharts-more', // enables supplementary chart types (gauge, arearange, columnrange, etc.)
-                        'modules/solid-gauge',
-                    ],
-                    'options' => ArrayHelper::merge($gaugeOptions, [
                         'title' => ['text' => \Yii::t('server', 'Inotify watches')],
                         'yAxis' => ['max' => $model->inotify_max_user_watches],
                         'series' => [
@@ -355,7 +335,7 @@ Pjax::end();
                                     'format' =>
                                         '<div style="text-align:center">' .
                                             '<span style="font-size:11px">' .
-                                                substitute('{y}/{max}', ['max' => $model->inotify_max_user_watches]) .
+                                                substitute('~{y}/{max}', ['max' => $model->inotify_max_user_watches]) .
                                             '</span><br/>' .
                                             '<span style="font-size:10px;opacity:0.4">watches</span>' .
                                         '</div>',
@@ -382,7 +362,7 @@ Pjax::end();
                                     'format' =>
                                         '<div style="text-align:center">' .
                                             '<span style="font-size:11px">' .
-                                                substitute('{y}/{max}', ['max' => $model->inotify_max_user_instances]) .
+                                                substitute('~{y}/{max}', ['max' => $model->inotify_max_user_instances]) .
                                             '</span><br/>' .
                                             '<span style="font-size:10px;opacity:0.4">instances</span>' .
                                         '</div>',
@@ -392,6 +372,44 @@ Pjax::end();
                     ]),
                 ]); ?>
             </div>
+
+            <?php foreach($model->diskTotal as $key => $disk) { ?>
+                <div class="col-sm-2">
+                    <?= Highcharts::widget([
+                        'scripts' => [
+                            'highcharts-more', // enables supplementary chart types (gauge, arearange, columnrange, etc.)
+                            'modules/solid-gauge',
+                        ],
+                        'options' => ArrayHelper::merge($gaugeOptions, [
+                            'title' => [
+                                'text' => \Yii::t('server', 'Disk usage'),
+                            ],
+                            'subtitle' => [
+                                'text' => $model->diskPath[$key],
+                            ],
+                            'yAxis' => ['max' => $model->diskTotal[$key]/1073741824],
+                            'series' => [
+                                [
+                                    'name' => 'disk_usage_' . $key,
+                                    'data' => [$model->diskUsed[$key]/1073741824],
+                                    'dataLabels' => [
+                                        'format' =>
+                                            '<div style="text-align:center">' .
+                                                '<span style="font-size:11px">' .
+                                                    substitute('{y:.2f}/{max}', [
+                                                        'max' => yii::$app->formatter->format($model->diskTotal[$key]/1073741824, ['decimal', 2]),
+                                                    ]) .
+                                                '</span><br/>' .
+                                                '<span style="font-size:10px;opacity:0.4">GB</span>' .
+                                            '</div>',
+                                    ],
+                                ]
+                            ]
+                        ]),
+                    ]); ?>
+                </div>
+            <?php } ?>
+
         </div>
     </div>
 </div>

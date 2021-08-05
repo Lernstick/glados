@@ -3,10 +3,8 @@
 namespace app\controllers;
 
 use Yii;
-use yii\filters\AccessControl;
 use app\models\Config;
 use app\models\ServerStatus;
-use app\components\AccessRule;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -14,32 +12,6 @@ use yii\web\NotFoundHttpException;
  */
 class ServerController extends BaseController
 {
-
-    /**
-     * @inheritdoc
-     */
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => \yii\filters\AccessControl::className(),
-                'ruleConfig' => [
-                    'class' => AccessRule::className(),
-                ],
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'actions' => [],
-                        'roles' => ['?', '@'],
-                    ],
-                    [
-                        'allow' => true,
-                        'roles' => ['rbac'],
-                    ],
-                ],
-            ],
-        ];
-    }
 
     /**
      * Displays the server configuration.
@@ -72,7 +44,7 @@ class ServerController extends BaseController
     public function actionStatus()
     {
         $model = ServerStatus::find();
-        $model->load(Yii::$app->request->post());
+        $model->load(Yii::$app->request->get());
 
         return $this->render('status', [
             'model' => $model,

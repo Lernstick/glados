@@ -88,9 +88,10 @@ class ServerStatus extends \yii\db\ActiveRecord
     /**
      * Disk variables
      */
-    public $backupDiskTotal;
-    public $backupDiskFree;
-    public $backupDiskUsed;
+    public $diskTotal = [];
+    public $diskUsed = [];
+    public $diskName = [];
+    public $diskPath = [];
 
     /**
      * Inotify variables
@@ -122,6 +123,18 @@ class ServerStatus extends \yii\db\ActiveRecord
             ['interval', 'default', 'value' => 10],
             ['interval', 'integer', 'min' => 1, 'max' => 300],
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function formName()
+    {
+        /**
+         * no more cluttered URL: index.php?ServerStatus[interval]=10
+         * instead: index.php?interval=10
+         */
+        return '';
     }
 
     /**
@@ -218,9 +231,31 @@ class ServerStatus extends \yii\db\ActiveRecord
         /**
          * Disk information
          */
-        $status->backupDiskTotal = disk_total_space(\Yii::$app->params['backupPath']);
-        $status->backupDiskFree = disk_free_space(\Yii::$app->params['backupPath']);
-        $status->backupDiskUsed = $status->backupDiskTotal - $status->backupDiskFree;
+        $paths = [
+            'root' => '/',
+            'backup' => \Yii::$app->params['backupPath'],
+            'screencapture' => \Yii::$app->params['scPath'],
+            'upload' => \Yii::$app->params['uploadPath'],
+            'result' => \Yii::$app->params['resultPath'],
+            'tmp' => \Yii::$app->params['tmpPath'],
+        ];
+        $p = [];
+        foreach($paths as $name => $path) {
+            $dev = stat($path)[0];
+            if (!array_key_exists($dev, $status->diskTotal)) {
+                $status->diskTotal[$dev] = disk_total_space($path);
+                $status->diskUsed[$dev] = $status->diskTotal[$dev] - disk_free_space($path);
+                $base = '';
+                while ($dev == stat($path)[0] && $path != '/') {
+                    $base = basename($path);
+                    $path = dirname($path);
+                }
+                $p = FileHelper::normalizePath(join(DIRECTORY_SEPARATOR, array($path, $base)));
+                $status->diskPath[$dev] = empty($p) ? '/' : $p;
+
+            }
+            $status->diskName[$dev][] = $name;
+        }
 
         return $status;
     }

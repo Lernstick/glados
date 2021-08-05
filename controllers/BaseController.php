@@ -4,6 +4,8 @@ namespace app\controllers;
 
 use Yii;
 use yii\web\Controller;
+use yii\filters\AccessControl;
+use app\components\AccessRule;
 use yii\web\ForbiddenHttpException;
 
 /**
@@ -11,6 +13,35 @@ use yii\web\ForbiddenHttpException;
  */
 class BaseController extends Controller
 {
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => \yii\filters\AccessControl::className(),
+                'denyCallback' => function ($rule, $action) {
+                    $p = $action->controller->rbacRoute;
+                    $permission = Yii::$app->authManager->getPermission($p);
+                    throw new ForbiddenHttpException(\Yii::t('app', 'You are not allowed to view this page. You need to have the following permission: "{permission} ({short})".', [
+                        'permission' => $permission === null ? $p : Yii::t('permission',  $permission->description),
+                        'short' => $p,
+                    ]));
+                },
+                'ruleConfig' => [
+                    'class' => AccessRule::className(),
+                ],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['rbac'],
+                    ],
+                ],
+            ],
+        ];
+    }
 
     /**
      * Returns the correct route for RBAC
@@ -41,9 +72,10 @@ class BaseController extends Controller
             return true;
         } else {
             $p = $user_id == Yii::$app->user->id ? $this->rbacRoute : $this->rbacRoute . '/all';
-            $model = Yii::$app->authManager->getPermission($p);
-            throw new ForbiddenHttpException(\Yii::t('app', 'You are not allowed to view this page. You need to have the following permission: "{permission}".', [
-                'permission' => $model === null ? $p : Yii::t('permission',  $model->description),
+            $permission = Yii::$app->authManager->getPermission($p);
+            throw new ForbiddenHttpException(\Yii::t('app', 'You are not allowed to view this page. You need to have the following following permission: "{permission} ({short})".', [
+                'permission' => $permission === null ? $p : Yii::t('permission',  $permission->description),
+                'short' => $p,
             ]));
             return false;
         }
