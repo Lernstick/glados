@@ -247,13 +247,17 @@ class ActiveEventField extends Pjax
                 if (!!window.EventSource && event) {
                     var name = '" . $name . "';
                     var group = '" . $group . "';
-                    for (var hash in eventListeners[name][group]) {
-                        var listener = eventListeners[name][group][hash].listener;
-                        var jsonSelector = eventListeners[name][group][hash].jsonSelector;
-                        event.source.removeEventListener(name, listener);
-                        if (YII_DEBUG) {
-                            console.log('Listener removed for event:', name, ', selector:', jsonSelector, ', listener:', listener);
+                    if (typeof eventListeners[name] != 'undefined') {
+                        for (var hash in eventListeners[name][group]) {
+                            var listener = eventListeners[name][group][hash].listener;
+                            var jsonSelector = eventListeners[name][group][hash].jsonSelector;
+                            event.source.removeEventListener(name, listener);
+                            if (YII_DEBUG) {
+                                console.log('Listener removed for event:', name, ', selector:', jsonSelector, ', listener:', listener);
+                            }
                         }
+                    } else {
+                        eventListeners[name] = {};
                     }
                     eventListeners[name][group] = {};
                 }

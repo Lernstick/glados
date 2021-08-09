@@ -9,6 +9,7 @@ class m210705_145230_roles extends BaseMigration
 {
 
     public $eventStreamTable = 'event_stream';
+    public $daemonTable = 'daemon';
 
     /**
      * {@inheritdoc}
@@ -63,6 +64,7 @@ class m210705_145230_roles extends BaseMigration
         $auth->update('teacher', $teacher);
 
         $this->addColumn($this->eventStreamTable, 'watches', $this->integer()->notNull()->defaultValue(0));
+        $this->addColumn($this->daemonTable, 'memory', $this->integer()->Null());
 
         // flush the RBAC cache, else permissions might not be up-to-date
         $auth->invalidateCache();
@@ -104,6 +106,7 @@ class m210705_145230_roles extends BaseMigration
         $auth->update('server/config', $item);
 
         $this->dropColumn($this->eventStreamTable, 'watches');
+        $this->dropColumn($this->daemonTable, 'memory');
 
         // flush the RBAC cache, else permissions might not be up-to-date
         $auth->invalidateCache();

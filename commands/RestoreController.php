@@ -16,7 +16,8 @@ use yii\helpers\Console;
 
 
 /**
- * Restore Daemon/Process (push)
+ * Restore Process
+ *
  * This is the process which calls `rdiff-backup --restore-as-of` to push the data to the client.
  */
 class RestoreController extends DaemonController

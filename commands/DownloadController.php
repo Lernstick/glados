@@ -17,7 +17,8 @@ use app\models\DaemonInterface;
 use app\models\Issue;
 
 /**
- * Download Daemon (push)
+ * Download Process
+ *
  * This is the daemon which calls rsync to push the exam to the clients one by one.
  */
 class DownloadController extends DaemonController implements DaemonInterface

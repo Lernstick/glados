@@ -13,7 +13,8 @@ use app\components\ShellCommand;
 use app\models\Issue;
 
 /**
- * Unlocker Daemon
+ * Unlocker
+ *
  * This daemon unlocks tickets that are trapped in a locked state and will
  * not recover without an action. 
  * Tickts in the bootup_lock = 1 state, that somehow fail to give notice after they

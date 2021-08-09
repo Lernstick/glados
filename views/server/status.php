@@ -25,8 +25,8 @@ SCRIPT;
 
 $this->registerJs($js, \yii\web\View::POS_READY);
 
-$this->title = \Yii::t('server', 'System Status');
-$this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['system']];
+$this->title = \Yii::t('server', 'Server Status');
+$this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['status']];
 
 $gaugeOptions = [
     'chart' => [
@@ -35,16 +35,35 @@ $gaugeOptions = [
         'events' => [
             'load' => new JsExpression("function () {
                 var s = this.series[0];
+                var yAxis = this.yAxis[0];
                 setInterval(function () {
-                    s.setData([parseFloat($('#reload-load').data(s.name))]);
+                    var y = parseFloat($('#reload-load').data(s.name).y)
+                        || parseFloat($('#reload-load').data(s.name));
+                    var max = parseFloat($('#reload-load').data(s.name).max)
+                        || yAxis.max;
+                    var d = [{'y': y, 'max': max}];
+                    yAxis.update({'min': 0, 'max': max});
+                    s.setData(d);
                 }, 1000);
             }" )
         ],
     ],
-    'title' => ['text' => null],
+    'title' => [
+        'text' => null,
+        'floating' => true,
+        'style' => [
+            'color' => '#333333',
+            'fontSize' => '14px',
+        ],
+    ],
+    'subtitle' => [
+        'text' => null,
+        'floating' => true,
+        'y' => 45,
+    ],
     'pane' => [
         'center' => ['50%', '85%'],
-        'size' => '150%',
+        'size' => '100%',
         'startAngle' => -90,
         'endAngle' => 90,
         'background' => [
@@ -71,7 +90,10 @@ $gaugeOptions = [
         'lineWidth' => 0,
         'tickWidth' => 0,
         'minorTickInterval' => null,
-        'tickPositions' => [],//[0, $model->procMaximum],
+        'tickPositions' => [],
+        'title' => [
+            'y' => -70,
+        ],
         'labels' => [
             'y' => 20,
             'x' => 0,
@@ -91,40 +113,40 @@ $gaugeOptions = [
     ],
 ];
 
-$daemons = new DaemonSearch();
-$runningDaemons = $daemons->search([])->totalCount;
-
 Pjax::begin([
     'id' => 'server_status',
     'options' => ['class' => 'hidden'],
 ]);
 
-$options = [
-    'id' => 'reload-load',
-    'class' => 'btn btn-default btn-xs pull-right',
-    'data-proc_total' => $model->procTotal,
-    'data-db_threads_connected' => $model->db_threads_connected,
-    'data-running_daemons' => $runningDaemons,
-    'data-mem_used' => $model->memUsed/1048576, # MB
-    'data-swap_used' => $model->swapUsed/1048576, # MB
-    'data-cpu_percentage' => $model->cpuPercentage, # %
-    'data-inotify_active_watches' => $model->inotify_active_watches,
-    'data-inotify_active_instances' => $model->inotify_active_instances,
-];
-
-foreach($model->diskTotal as $key => $disk) {
-    $options['disk_usage_' . $key] = $model->diskUsed[$key]/1073741824;
-}
-
-    echo Html::a('<i class="glyphicon glyphicon-refresh"></i>', '', $options);
+    echo Html::a('<i class="glyphicon glyphicon-refresh"></i>', '', [
+        'id' => 'reload-load',
+        'class' => 'btn btn-default btn-xs pull-right',
+        'data' => $model->data,
+    ]);
 
 Pjax::end();
 
 ?>
 
-<div class="status-view container">
+<div class="status-view">
 
     <h1><?= Html::encode($this->title) ?></h1>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-warning" role="alert">
+                <?= \Yii::t('server', 'If one of the metrics below reaches 80% or more for a longer time or you experience performance issues, please consult the following resources for more information on how to solve these problems:') ?>
+                <ul>
+                    <li>
+                        <?= Html::a(\Yii::t('server', 'Manual / Hardware Recommendations'), ['/howto/view', 'id' => 'hardware-recommendations.md'], ['class' => 'alert-link', 'target' => '_new']) ?>
+                    </li>
+                    <li>
+                        <?= Html::a(\Yii::t('server', 'Manual / Large exams'), ['/howto/view', 'id' => 'large-exams.md'], ['class' => 'alert-link', 'target' => '_new']) ?>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
     <?php $form = ActiveForm::begin([
         'method' => 'get',
@@ -136,11 +158,13 @@ Pjax::end();
             <?= $form->field($model, 'interval', [
                 'template' => 
                     '<div class="input-group">' .
-                        "{label}\n{input}\n{hint}".
-                        '<span class="input-group-btn">'.
-                            '<button class="btn btn-default" type="submit">' . \Yii::t('app', 'Set') . '</button>'.
-                        '</span>'.
-                    '</div>'.
+                        "{label}\n{input}\n{hint}" .
+                        '<span class="input-group-btn">' .
+                            '<button class="btn btn-default" type="submit">' .
+                                \Yii::t('app', 'Set') .
+                            '</button>' .
+                        '</span>' .
+                    '</div>' .
                     "\n{error}",
                 'labelOptions' => ['class' => 'input-group-addon'],
                 'hintOptions' => ['class' => 'input-group-addon'],
@@ -163,19 +187,24 @@ Pjax::end();
                         'modules/solid-gauge',
                     ],
                     'options' => ArrayHelper::merge($gaugeOptions, [
-                        'title' => ['text' => \Yii::t('server', 'Webserver processes')],
+                        'title' => ['text' => $model->getAttributeLabel('procTotal')],
                         'yAxis' => ['max' => $model->procMaximum],
                         'series' => [
                             [
                                 'name' => 'proc_total',
-                                'data' => [$model->procTotal],
+                                'data' => [
+                                    [
+                                        'y' => $model->procTotal,
+                                        'max' => $model->procMaximum,
+                                    ],
+                                ],
                                 'dataLabels' => [
                                     'format' =>
                                         '<div style="text-align:center">' .
-                                            '<span style="font-size:11px">' .
-                                                substitute('{y}/{max}', ['max' => $model->procMaximum]) .
-                                            '</span><br/>' .
-                                            '<span style="font-size:10px;opacity:0.4">processes</span>' .
+                                            '<span style="font-size:11px">{point.y}/{point.max}</span><br/>' .
+                                            '<span style="font-size:10px;opacity:0.4">' .
+                                                \Yii::t('server', 'processes') .
+                                            '</span>' .
                                         '</div>',
                                 ],
                             ]
@@ -190,19 +219,24 @@ Pjax::end();
                         'modules/solid-gauge',
                     ],
                     'options' => ArrayHelper::merge($gaugeOptions, [
-                        'title' => ['text' => \Yii::t('server', 'Database connections')],
+                        'title' => ['text' => $model->getAttributeLabel('db_threads_connected')],
                         'yAxis' => ['max' => $model->db_max_connections],
                         'series' => [
                             [
                                 'name' => 'db_threads_connected',
-                                'data' => [$model->db_threads_connected],
+                                'data' => [
+                                    [
+                                        'y' => $model->db_threads_connected,
+                                        'max' => $model->db_max_connections,
+                                    ],
+                                ],
                                 'dataLabels' => [
                                     'format' =>
                                         '<div style="text-align:center">' .
-                                            '<span style="font-size:11px">' .
-                                                substitute('{y}/{max}', ['max' => $model->db_max_connections]) .
-                                            '</span><br/>' .
-                                            '<span style="font-size:10px;opacity:0.4">connections</span>' .
+                                            '<span style="font-size:11px">{point.y}/{point.max}</span><br/>' .
+                                            '<span style="font-size:10px;opacity:0.4">' .
+                                                \Yii::t('server', 'connections') .
+                                            '</span>' .
                                         '</div>',
                                 ],
                             ]
@@ -217,19 +251,24 @@ Pjax::end();
                         'modules/solid-gauge',
                     ],
                     'options' => ArrayHelper::merge($gaugeOptions, [
-                        'title' => ['text' => \Yii::t('server', 'Running daemons')],
+                        'title' => ['text' => $model->getAttributeLabel('runningDaemons')],
                         'yAxis' => ['max' => \Yii::$app->params['maxDaemons']],
                         'series' => [
                             [
                                 'name' => 'running_daemons',
-                                'data' => [$runningDaemons],
+                                'data' => [
+                                    [
+                                        'y' => $model->runningDaemons,
+                                        'max' => \Yii::$app->params['maxDaemons'],
+                                    ],
+                                ],
                                 'dataLabels' => [
                                     'format' =>
                                         '<div style="text-align:center">' .
-                                            '<span style="font-size:11px">' .
-                                                substitute('{y}/{max}', ['max' => \Yii::$app->params['maxDaemons']]) .
-                                            '</span><br/>' .
-                                            '<span style="font-size:10px;opacity:0.4">daemons</span>' .
+                                            '<span style="font-size:11px">{point.y}/{point.max}</span><br/>' .
+                                            '<span style="font-size:10px;opacity:0.4">' .
+                                                \Yii::t('server', 'daemons') .
+                                            '</span>' .
                                         '</div>',
                                 ],
                             ]
@@ -244,7 +283,7 @@ Pjax::end();
                         'modules/solid-gauge',
                     ],
                     'options' => ArrayHelper::merge($gaugeOptions, [
-                        'title' => ['text' => \Yii::t('server', 'Memory usage')],
+                        'title' => ['text' => $model->getAttributeLabel('memTotal')],
                         'yAxis' => ['max' => intval($model->memTotal/1048576)],
                         'series' => [
                             [
@@ -271,7 +310,7 @@ Pjax::end();
                         'modules/solid-gauge',
                     ],
                     'options' => ArrayHelper::merge($gaugeOptions, [
-                        'title' => ['text' => \Yii::t('server', 'Swap usage')],
+                        'title' => ['text' => $model->getAttributeLabel('swapTotal')],
                         'yAxis' => ['max' => intval($model->swapTotal/1048576)],
                         'series' => [
                             [
@@ -298,7 +337,8 @@ Pjax::end();
                         'modules/solid-gauge',
                     ],
                     'options' => ArrayHelper::merge($gaugeOptions, [
-                        'title' => ['text' => \Yii::t('server', 'CPU usage')],
+                        'title' => ['text' => $model->getAttributeLabel('cpuPercentage')],
+                        'subtitle' => ['text' => \Yii::t('server', 'Ø of {n} cores', ['n' => $model->ncpu])],
                         'yAxis' => ['max' => 100],
                         'series' => [
                             [
@@ -307,9 +347,7 @@ Pjax::end();
                                 'dataLabels' => [
                                     'format' =>
                                         '<div style="text-align:center">' .
-                                            '<span style="font-size:11px">' .
-                                                substitute('{y:.1f}/{max}', ['max' => 100]) .
-                                            '</span><br/>' .
+                                            '<span style="font-size:11px">{y:.1f}</span><br/>' .
                                             '<span style="font-size:10px;opacity:0.4">%</span>' .
                                         '</div>',
                                 ],
@@ -325,19 +363,17 @@ Pjax::end();
                         'modules/solid-gauge',
                     ],
                     'options' => ArrayHelper::merge($gaugeOptions, [
-                        'title' => ['text' => \Yii::t('server', 'Inotify watches')],
-                        'yAxis' => ['max' => $model->inotify_max_user_watches],
+                        'title' => ['text' => $model->getAttributeLabel('ioPercentage')],
+                        'yAxis' => ['max' => 100],
                         'series' => [
                             [
-                                'name' => 'inotify_active_watches',
-                                'data' => [$model->inotify_active_watches],
+                                'name' => 'io_percentage',
+                                'data' => [intval($model->ioPercentage)],
                                 'dataLabels' => [
                                     'format' =>
                                         '<div style="text-align:center">' .
-                                            '<span style="font-size:11px">' .
-                                                substitute('~{y}/{max}', ['max' => $model->inotify_max_user_watches]) .
-                                            '</span><br/>' .
-                                            '<span style="font-size:10px;opacity:0.4">watches</span>' .
+                                            '<span style="font-size:11px">{y:.1f}</span><br/>' .
+                                            '<span style="font-size:10px;opacity:0.4">%</span>' .
                                         '</div>',
                                 ],
                             ]
@@ -352,19 +388,56 @@ Pjax::end();
                         'modules/solid-gauge',
                     ],
                     'options' => ArrayHelper::merge($gaugeOptions, [
-                        'title' => ['text' => \Yii::t('server', 'Inotify instances')],
+                        'title' => ['text' => $model->getAttributeLabel('inotify_active_watches')],
+                        'yAxis' => ['max' => $model->inotify_max_user_watches],
+                        'series' => [
+                            [
+                                'name' => 'inotify_active_watches',
+                                'data' => [
+                                    [
+                                        'y' => $model->inotify_active_watches,
+                                        'max' => $model->inotify_max_user_watches,
+                                    ],
+                                ],
+                                'dataLabels' => [
+                                    'format' =>
+                                        '<div style="text-align:center">' .
+                                            '<span style="font-size:11px">≈{point.y}/{point.max}</span><br/>' .
+                                            '<span style="font-size:10px;opacity:0.4">' .
+                                                \Yii::t('server', 'watches') .
+                                            '</span>' .
+                                        '</div>',
+                                ],
+                            ]
+                        ]
+                    ]),
+                ]); ?>
+            </div>
+            <div class="col-sm-2">
+                <?= Highcharts::widget([
+                    'scripts' => [
+                        'highcharts-more', // enables supplementary chart types (gauge, arearange, columnrange, etc.)
+                        'modules/solid-gauge',
+                    ],
+                    'options' => ArrayHelper::merge($gaugeOptions, [
+                        'title' => ['text' => $model->getAttributeLabel('inotify_active_instances')],
                         'yAxis' => ['max' => $model->inotify_max_user_instances],
                         'series' => [
                             [
                                 'name' => 'inotify_active_instances',
-                                'data' => [$model->inotify_active_instances],
+                                'data' => [
+                                    [
+                                        'y' => $model->inotify_active_instances,
+                                        'max' => $model->inotify_max_user_instances,
+                                    ],
+                                ],
                                 'dataLabels' => [
                                     'format' =>
                                         '<div style="text-align:center">' .
-                                            '<span style="font-size:11px">' .
-                                                substitute('~{y}/{max}', ['max' => $model->inotify_max_user_instances]) .
-                                            '</span><br/>' .
-                                            '<span style="font-size:10px;opacity:0.4">instances</span>' .
+                                            '<span style="font-size:11px">≈{point.y}/{point.max}</span><br/>' .
+                                            '<span style="font-size:10px;opacity:0.4">' .
+                                                \Yii::t('server', 'instances') .
+                                            '</span>' .
                                         '</div>',
                                 ],
                             ]
@@ -381,9 +454,7 @@ Pjax::end();
                             'modules/solid-gauge',
                         ],
                         'options' => ArrayHelper::merge($gaugeOptions, [
-                            'title' => [
-                                'text' => \Yii::t('server', 'Disk usage'),
-                            ],
+                            'title' => ['text' => $model->getAttributeLabel('diskUsed')],
                             'subtitle' => [
                                 'text' => $model->diskPath[$key],
                             ],

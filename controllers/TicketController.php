@@ -975,7 +975,7 @@ class TicketController extends BaseController
     {
         # search for running daemons
         $daemonSearchModel = new DaemonSearch();
-        $daemonDataProvider = $daemonSearchModel->search(['DaemonSearch' => ['description' => 'Daemon base controller']]);
+        $daemonDataProvider = $daemonSearchModel->search(['DaemonSearch' => ['description' => 'Base Process']]);
         $count = $daemonDataProvider->getTotalCount();
 
         # if no daemon is running already, start one

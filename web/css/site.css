@@ -711,3 +711,9 @@ span.view--state[data-state="4"]::after { content: attr(data-text-4); }
   overflow-y: auto;
   scrollbar-width: thin;
 }
+
+/* making a Bootstrap table column fit to content */
+.table td.fit, .table th.fit {
+    white-space: nowrap;
+    width: 1%;
+}

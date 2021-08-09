@@ -8,7 +8,8 @@ use app\models\RemoteExecution;
 use app\models\DaemonInterface;
 
 /**
- * Remote Execution Daemon
+ * Remote Executer
+ *
  * This daemon run through the queue in the database table "remote_execution"
  */
 class RemoteExecutionController extends DaemonController implements DaemonInterface

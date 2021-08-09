@@ -48,17 +48,20 @@ class DaemonController extends BaseController
     public function actionIndex()
     {
         $searchModel = new DaemonSearch();
+        $runningDaemons = $searchModel->search([])->totalCount;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         if(Yii::$app->request->isAjax){
             return $this->renderAjax('index', [
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
+                'runningDaemons' => $runningDaemons,
             ]);
         }else{
             return $this->render('index', [
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
+                'runningDaemons' => $runningDaemons,
             ]);
         }
 
@@ -116,8 +119,11 @@ class DaemonController extends BaseController
      */
     public function actionStop($id)
     {
-
-        if (($model = Daemon::findOne($id)) !== null) {
+        if ($id == 'ALL') {
+            foreach(Daemon::find()->all() as $model) {
+                $model->stop();
+            }
+        } else if (($model = Daemon::findOne($id)) !== null) {
             $model->stop();
         }
 

@@ -17,7 +17,8 @@ use app\models\DaemonInterface;
 use app\models\Issue;
 
 /**
- * Backup Daemon (pull)
+ * Backup Process
+ *
  * This is the daemon which calls rdiff-backup to pull the data from the clients one by one.
  */
 class BackupController extends DaemonController implements DaemonInterface

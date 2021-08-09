@@ -7,7 +7,7 @@ use yii\widgets\DetailView;
 /* @var $model app\models\Config */
 
 $this->title = \Yii::t('server', 'Server Configuation');
-$this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['system']];
+$this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['config']];
 
 ?>
 <div class="config-view">

@@ -8,7 +8,8 @@ use app\models\DaemonInterface;
 use yii\db\Expression;
 
 /**
- * DB Clean Daemon
+ * DB Cleaner
+ *
  * Cleans up the database and other stuff
  */
 class CleanupController extends DaemonController implements DaemonInterface

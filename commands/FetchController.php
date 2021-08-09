@@ -16,7 +16,8 @@ use yii\helpers\Console;
 use app\models\DaemonInterface;
 
 /**
- * Fetching Daemon (pull)
+ * Fetch Process
+ *
  * This is the daemon which calls rsync to pull the data from the clients one by one.
  * It also removes fetched files from the client (see rsync's option --remove-source-files)
  */

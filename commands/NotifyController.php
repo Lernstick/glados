@@ -13,7 +13,8 @@ use app\components\ShellCommand;
 use app\models\Issue;
 
 /**
- * Notify Daemon
+ * Notifier
+ *
  * This daemon notifies the user via activities if a ticket has no backup since
  * a long amount of time.
  */

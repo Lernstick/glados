@@ -12,8 +12,8 @@ use yii\db\Expression;
 use yii\helpers\Console;
 
 /**
- * Daemon base controller
- * 
+ * Base Process
+ *
  * This is the base controller for other arbitrary daemons. A new daemon should be created 
  * in the following way:
  *
@@ -47,11 +47,6 @@ class DaemonController extends Controller
      * @var Daemon the daemon instance for db updates
      */
     public $daemon;
-
-    /**
-     * @var string path to the file which is used to determine that the process stopped/started
-     */
-    public $_pidfile;
 
     /**
      * @var integer the uid under which the script should be executed.
@@ -215,6 +210,7 @@ class DaemonController extends Controller
         $this->daemon = new Daemon();
         $this->daemon->description = empty($this->helpSummary) ? basename(get_class($this)) : $this->helpSummary;
         $this->daemon->state = 'initializing';
+        $this->daemon->memory = memory_get_usage();
         $this->daemon->pid = getmypid();
         $this->daemon->save();
         $this->daemon->refresh();
@@ -232,21 +228,8 @@ class DaemonController extends Controller
         ]);
         $eventItem->generate();
 
-        $eventItem = new EventItem([
-            'event' => 'daemon/*',
-            'priority' => 0,
-            'concerns' => ['users' => ['ALL']],
-            'data' => [
-                'status' => 'started',
-                'item' => 'daemon/' . $this->daemon->pid,
-                'source' => 'db',
-            ],
-        ]);
-        $eventItem->generate();
-
         $this->cleanupVanished();
 
-        $this->_pidfile = fopen($this->inotifyDir . '/daemon/' . $this->daemon->pid, 'w');
         $this->logInfo('Started with pid: ' . $this->daemon->pid);
     }
 
@@ -263,6 +246,7 @@ class DaemonController extends Controller
     {
 
         $this->daemon->state = 'stopping, Cause: ' . $cause;
+        $this->daemon->memory = memory_get_usage();
         $this->daemon->save();
 
         $daemons = new DaemonSearch();
@@ -278,26 +262,9 @@ class DaemonController extends Controller
         ]);
         $eventItem->generate();
 
-        @fclose($this->_pidfile);
-        @unlink($this->inotifyDir . '/daemon/' . $this->daemon->pid);
-
-        $pid = $this->daemon->pid;
         $this->daemon->delete();
 
-        $eventItem = new EventItem([
-            'event' => 'daemon/*',
-            'priority' => 0,
-            'concerns' => ['users' => ['ALL']],
-            'data' => [
-                'status' => 'stopped',
-                'item' => 'daemon/' . $pid,
-                'source' => 'db',
-            ],
-        ]);
-        $eventItem->generate();
-
         $this->logInfo('Stopped, cause: ' . $cause);
-        #exit;
     }
 
     /**
@@ -369,6 +336,7 @@ class DaemonController extends Controller
 
         if ($toDB === true){
             $this->daemon->state = $message;
+            $this->daemon->memory = memory_get_usage();
             $this->daemon->save();
         }
 
@@ -428,6 +396,7 @@ class DaemonController extends Controller
         $this->start();
 
         $this->daemon->state = 'idle';
+        $this->daemon->memory = memory_get_usage();
         $this->daemon->save();
 
         call_user_func_array(array($this, 'doJob'), $args);
@@ -449,6 +418,7 @@ class DaemonController extends Controller
         $args = func_get_args();
 
         $this->daemon->state = 'idle';
+        $this->daemon->memory = memory_get_usage();
         $this->daemon->save();
 
         return call_user_func_array(array($this, 'doJobOnce'), $args);
@@ -596,8 +566,9 @@ class DaemonController extends Controller
         } else {
             $this->daemon->load = 0;
         }
+        $this->daemon->memory = memory_get_usage(); # bytes
         $this->daemon->save();
-        if ($this->daemon->description == 'Daemon base controller') {
+        if ($this->daemon->description == 'Base Process') {
             $this->judgement();
         }
     }
@@ -615,8 +586,8 @@ class DaemonController extends Controller
      */
     private function judgement ()
     {
-        $sum = Daemon::find()->where(['description' => 'Daemon base controller'])->sum('`load`');
-        $count = Daemon::find()->where(['description' => 'Daemon base controller'])->count();
+        $sum = Daemon::find()->where(['description' => 'Base Process'])->sum('`load`');
+        $count = intval(Daemon::find()->where(['description' => 'Base Process'])->count());
         $workload = $count != 0 ? round(100*$sum/$count) : 0;
         Setting::repopulateSettings();
         $minDaemons = \Yii::$app->params['minDaemons'];

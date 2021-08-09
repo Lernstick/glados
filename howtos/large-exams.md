@@ -14,20 +14,24 @@ In order for GLaDOS to be able to process 200+ tickets at the same time, you hav
 
 ### System
 
-Increase the upper limit of the total number of inotify instances per user. You can set this on the fly by
+Increase the upper limit of the total number of inotify instances and watches per user. You can set this on the fly by
 
 ```
-echo 8192 >/proc/sys/fs/inotify/max_user_instances
+echo 1024 >/proc/sys/fs/inotify/max_user_instances
+echo 8192 >/proc/sys/fs/inotify/max_user_watches
 ```
 
 Although this will be set back to the default value after the next reboot. To make it permanent, create a new file `/etc/sysctl.d/10-glados.conf` with contents
 
 ```
 # total number of inotify instances per user
-fs.inotify.max_user_instances = 8192
+fs.inotify.max_user_instances = 1024
+fs.inotify.max_user_watches = 8192
 ```
 
-> The value `n` you should choose can be deduced roughly by the formula `n = (number of concurrent exams you wish to perform)*10 + 1000`.
+> The value you should choose for these two settings can be deduced roughly by the formulae:
+> * `max_user_instances = (number of concurrent exams you wish to perform) + 200`
+> * `max_user_watches   = (number of concurrent exams you wish to perform)*10 + 1000`
 
 ### Apache
 

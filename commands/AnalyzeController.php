@@ -10,7 +10,8 @@ use app\components\ShellCommand;
 use app\models\DaemonInterface;
 
 /**
- * Analyzer Daemon
+ * Analyzer
+ *
  * This daemon analizes the squash filesystems and updates the database accordingly
  */
 class AnalyzeController extends DaemonController implements DaemonInterface

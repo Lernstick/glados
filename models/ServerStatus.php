@@ -5,12 +5,14 @@ namespace app\models;
 use Yii;
 use yii\helpers\FileHelper;
 use app\models\EventStream;
+use yii\base\Model;
+use app\models\Base;
 
 /**
  * This is the model class for apaches mod_status.
  *
  */
-class ServerStatus extends \yii\db\ActiveRecord
+class ServerStatus extends Model
 {
 
     /**
@@ -27,11 +29,6 @@ class ServerStatus extends \yii\db\ActiveRecord
      * @const string Path to /proc/stat
      */
     const PROC_STAT = '/proc/stat';
-
-    /**
-     * @var string the raw output from URL
-     */
-    public $raw;
 
     /**
      * @var integer update interval in seconds
@@ -84,6 +81,13 @@ class ServerStatus extends \yii\db\ActiveRecord
      * CPU variables
      */
     public $cpuPercentage;
+    public $ioPercentage;
+    public $ncpu;
+
+    /**
+     * Daemons
+     */
+    public $runningDaemons;
 
     /**
      * Disk variables
@@ -143,7 +147,17 @@ class ServerStatus extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'interval' => \Yii::t('server', 'Update Interval')
+            'interval' => \Yii::t('server', 'Update Interval'),
+            'procTotal' => \Yii::t('server', 'Webserver processes'),
+            'db_threads_connected' => \Yii::t('server', 'Database connections'),
+            'runningDaemons' => \Yii::t('server', 'Running daemons'),
+            'memTotal' => \Yii::t('server', 'Memory usage'),
+            'swapTotal' => \Yii::t('server', 'Swap usage'),
+            'cpuPercentage' => \Yii::t('server', 'CPU usage'),
+            'ioPercentage' => \Yii::t('server', 'I/O usage'),
+            'inotify_active_watches' => \Yii::t('server', 'Inotify watches'),
+            'inotify_active_instances' => \Yii::t('server', 'Inotify instances'),
+            'diskUsed' => \Yii::t('server', 'Disk usage'),
         ];
     }
 
@@ -168,8 +182,8 @@ class ServerStatus extends \yii\db\ActiveRecord
         $status = new ServerStatus();
 
         // read out all information from the ServerStatus URL
-        $status->raw = @file_get_contents(ServerStatus::URL);
-        foreach(explode(PHP_EOL, $status->raw) as $line) {
+        $raw = @file_get_contents(ServerStatus::URL);
+        foreach(explode(PHP_EOL, $raw) as $line) {
             if (str_contains($line, ":")) {
                 list($key, $value) = explode(":", $line, 2);
                 if ($status->hasProperty(lcfirst($key))) {
@@ -181,7 +195,6 @@ class ServerStatus extends \yii\db\ActiveRecord
 
         /**
          * inotify information
-         * @todo read current inotify resouces
          */
         $status->inotify_max_user_instances = intval(file_get_contents('/proc/sys/fs/inotify/max_user_instances'));
         $status->inotify_max_user_watches = intval(file_get_contents('/proc/sys/fs/inotify/max_user_watches'));
@@ -200,10 +213,21 @@ class ServerStatus extends \yii\db\ActiveRecord
          * MariaDB information
          * @var \yii\db\ActiveQuery $query
          */
-        $query = Yii::createObject(\yii\db\ActiveQuery::className(), [get_called_class()]);
-        $status->db_max_connections = $query->select('VARIABLE_VALUE')->from('information_schema.GLOBAL_VARIABLES')->where(['VARIABLE_NAME' => 'max_connections'])->scalar();
-        $status->db_threads_connected = $query->select('VARIABLE_VALUE')->from('information_schema.GLOBAL_STATUS')->where(['VARIABLE_NAME' => 'threads_connected'])->scalar();
+        $query = Base::find();
+        $status->db_max_connections = intval($query->select('VARIABLE_VALUE')
+            ->from('information_schema.GLOBAL_VARIABLES')
+            ->where(['VARIABLE_NAME' => 'max_connections'])
+            ->scalar());
+        $status->db_threads_connected = intval($query->select('VARIABLE_VALUE')
+            ->from('information_schema.GLOBAL_STATUS')
+            ->where(['VARIABLE_NAME' => 'threads_connected'])
+            ->scalar());
 
+        /**
+         * Daemons
+         */
+        $daemons = new DaemonSearch();
+        $status->runningDaemons = $daemons->search([])->totalCount;
 
         /**
          * Memory information
@@ -221,12 +245,13 @@ class ServerStatus extends \yii\db\ActiveRecord
         $status->swapUsed = $status->swapTotal - $status->swapFree;
 
         /**
-         * CPU information
+         * CPU and I/O information
          */
-        list($used1, $total1) = $status->readStat();
+        list($used1, $iowait1, $total1) = $status->readStat();
         usleep(1000*100); # 0.1s
-        list($used2, $total2) = $status->readStat();
+        list($used2, $iowait2, $total2) = $status->readStat();
         $status->cpuPercentage = ($used2 - $used1)*100/($total2 - $total1);
+        $status->ioPercentage = ($iowait2 - $iowait1)*100/($total2 - $total1);
 
         /**
          * Disk information
@@ -263,26 +288,45 @@ class ServerStatus extends \yii\db\ActiveRecord
     /**
      * Reads the cpu part of the file /proc/stat
      *
-     * @return array [$used, $total]
+     * @return array [$cpu, $io, $total]
      */
     private function readStat()
     {
         $raw = @file_get_contents(ServerStatus::PROC_STAT);
+        $this->ncpu = substr_count($raw, 'cpu') -1; # -1 because of the average CPU line
         foreach(explode(PHP_EOL, $raw) as $line) {
-            if (str_contains($line, "cpu ")) {
-                list($key, $user, $nice, $system, $idle, $iowait, $irq, $softirq, $rest) = preg_split('/\s+/', $line, 9);
-                return [$user + $system, $user + $system + $idle];
+            if (str_contains($line, "cpu ")) { # only catch the average line
+                list($key, $user, $nice, $system, $idle, $iowait, $irq, $softirq, $steal, $rest) = preg_split('/\s+/', $line, 10);
+                $i = $idle + $iowait; # total idle
+                $n = $user + $nice + $system + $irq + $softirq + $steal; # total non-idle
+                $t = $i + $n; # total
+                return [$t - $i, $iowait, $t];
             }
         }
     }
 
     /**
-     * Propagates the scoreboard quantities
+     * Reads the scoreboard quantities
      *
      * @return void
      */
     private function readScoreboard()
     {
+        # reset the numbers
+        $this->procTotal = 0;
+        $this->procWaiting = 0;
+        $this->procStarting = 0;
+        $this->procReading = 0;
+        $this->procSending = 0;
+        $this->procKeepalive = 0;
+        $this->procDNS = 0;
+        $this->procClosing = 0;
+        $this->procLogging = 0;
+        $this->procFinishing = 0;
+        $this->procIdle = 0;
+        $this->procOpen = 0;
+        $this->procMaximum = 0;
+
         foreach (str_split($this->scoreboard) as $char) {
             switch ($char) {
                 case "_": # Waiting for Connection
@@ -332,6 +376,33 @@ class ServerStatus extends \yii\db\ActiveRecord
             }
             $this->procMaximum++;
         }
+    }
+
+    /**
+     * Generates the data attribute for the view
+     *
+     * @return array
+     */
+    public function getData()
+    {
+
+        $data = [
+            'proc_total' => ['y' => $this->procTotal, 'max' => $this->procMaximum],
+            'db_threads_connected' => ['y' => $this->db_threads_connected, 'max' => $this->db_max_connections],
+            'running_daemons' => ['y' => $this->runningDaemons, 'max' => \Yii::$app->params['maxDaemons']],
+            'mem_used' => $this->memUsed/1048576, # MB
+            'swap_used' => $this->swapUsed/1048576, # MB
+            'cpu_percentage' => $this->cpuPercentage, # %
+            'io_percentage' => $this->ioPercentage, # %
+            'inotify_active_watches' => ['y' => $this->inotify_active_watches, 'max' => $this->inotify_max_user_watches],
+            'inotify_active_instances' => ['y' => $this->inotify_active_instances, 'max' => $this->inotify_max_user_instances],
+        ];
+
+        foreach($this->diskTotal as $key => $disk) {
+            $data['disk_usage_' . $key] = $this->diskUsed[$key]/1073741824;
+        }
+
+        return $data;
     }
 
 }

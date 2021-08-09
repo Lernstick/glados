@@ -22,6 +22,11 @@ class CustomPager extends \yii\widgets\LinkPager
     public $layout = '<div class="row"><div class="col-md-12 col-xs-12">{LinkPager} {CustomPager}</div></div>';
 
      /**
+     * @var array custom elements within the [[layout]]
+     */
+    public $elements = [];
+
+     /**
      * @var string text for the add-in text in front of the page-size dropdown, null indicates
      * no add-in text.
      */
@@ -96,10 +101,16 @@ class CustomPager extends \yii\widgets\LinkPager
         parent::run();
         $content = ob_get_clean();
 
-        echo substitute($this->layout, [
+        $params = [
             'LinkPager' => $content,
             'CustomPager' => $this->renderPageSize(),
-        ]);
+        ];
+
+        foreach($this->elements as $marker => $contents) {
+            $params[$marker] = $contents;
+        }
+
+        echo substitute($this->layout, $params);
 
     }
 
