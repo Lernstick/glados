@@ -23,8 +23,8 @@ Total Memory = (maximum number of running daemons)*(32MB) + 120MB
              + 1000MB
 ```
 
-* Each daemon needs roughly 32MB of unshared memory. cThe amount of shared memory is approximately 120MB.
-* Each event stream or agent needs roughly 5MB of unshared memerry. The amount of shared memory is approximately 240MB.
+* Each daemon needs roughly 32MB of unshared memory. The amount of shared memory is approximately 120MB.
+* Each event stream or agent needs roughly 5MB of unshared memory. The amount of shared memory is approximately 240MB.
 
 ### Storage
 
