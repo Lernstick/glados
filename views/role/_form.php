@@ -19,7 +19,7 @@ FormAsset::register($this);
     <?php $form = ActiveForm::begin(); ?>
     <div class="row">
         <div class="col-md-6">
-            <?= $form->field($model, 'name')->textInput(['maxlength' => true, 'readonly' => true]) ?>
+            <?= $form->field($model, 'name')->textInput(['maxlength' => true, 'readonly' => !$model->isNewRecord]) ?>
         </div>
 
         <div class="col-md-6">

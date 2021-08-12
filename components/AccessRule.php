@@ -31,5 +31,4 @@ class AccessRule extends \yii\filters\AccessRule
         }
         return false;
     }
-
 }

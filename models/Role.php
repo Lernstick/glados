@@ -78,7 +78,9 @@ class Role extends Base
                 'message' => \Yii::t('user', 'Only alphanumeric characters (0-9, a-z, A-Z) are allowed.')
             ],
             [['name'], 'prohibitLockoutByEdit'],
-            [['name'], 'immutable'],
+            [['name'], 'immutable', 'when' => function ($model) {
+               return !$model->isNewRecord;
+            }],
         ];
     }
 
