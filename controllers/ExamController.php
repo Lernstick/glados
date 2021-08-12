@@ -15,7 +15,6 @@ use app\models\History;
 use app\models\HistorySearch;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use app\components\AccessRule;
 use yii\web\UploadedFile;
 use yii\data\ArrayDataProvider;
 use kartik\mpdf\Pdf;
@@ -28,6 +27,28 @@ use yii\helpers\Url;
  */
 class ExamController extends BaseController
 {
+
+    /**
+     * @inheritdoc
+     */
+    public $owner_actions = ['view', 'update', 'delete'];
+
+    /**
+     * @inheritdoc
+     */
+    public function getOwner_id()
+    {
+        $id = Yii::$app->request->get('id');
+        if (($model = Exam::findOne($id)) !== null) {
+            return $model->user_id;
+        } else {
+            return null;
+        }
+    }
+
+    /*
+     * @inheritdoc
+     */
     public function behaviors()
     {
         return [
@@ -38,10 +59,7 @@ class ExamController extends BaseController
                 ],
             ],
             'access' => [
-                'class' => \yii\filters\AccessControl::className(),
-                'ruleConfig' => [
-                    'class' => AccessRule::className(),
-                ],
+                'class' => \app\components\AccessControl::className(),
                 'rules' => [
                     [
                         'allow' => true,
@@ -454,9 +472,7 @@ class ExamController extends BaseController
     protected function findModel($id)
     {
         if (($model = Exam::findOne($id)) !== null) {
-            if ($this->checkRbac($model->user_id)) {
-                return $model;
-            }
+            return $model;
         }
         throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
     }

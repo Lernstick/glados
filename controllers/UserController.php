@@ -9,7 +9,6 @@ use app\models\AuthSearch;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\filters\VerbFilter;
-use app\components\AccessRule;
 use yii\data\ArrayDataProvider;
 
 
@@ -18,6 +17,25 @@ use yii\data\ArrayDataProvider;
  */
 class UserController extends BaseController
 {
+
+    /**
+     * @inheritdoc
+     */
+    public $owner_actions = ['view', 'update', 'delete', 'reset-password'];
+
+    /**
+     * @inheritdoc
+     */
+    public function getOwner_id()
+    {
+        $id = Yii::$app->request->get('id');
+        if (($model = User::findOne($id)) !== null) {
+            return $model->id;
+        } else {
+            return null;
+        }
+    }
+
     /**
      * @inheritdoc
      */
@@ -31,10 +49,7 @@ class UserController extends BaseController
                 ],
             ],
             'access' => [
-                'class' => \yii\filters\AccessControl::className(),
-                'ruleConfig' => [
-                    'class' => AccessRule::className(),
-                ],
+                'class' => \app\components\AccessControl::className(),
                 'rules' => [
                     [
                         'allow' => true,
@@ -201,9 +216,7 @@ class UserController extends BaseController
     protected function findModel($id)
     {
         if (($model = User::findOne($id)) !== null) {
-            if ($this->checkRbac($model->id)) {
-                return $model;
-            }
+            return $model;
         }
         throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
     }

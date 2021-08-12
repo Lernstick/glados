@@ -102,11 +102,6 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
                         'visible' => Yii::$app->user->can('ticket/create'),
                     ],
                     [
-                        'label' => '<i class="glyphicon glyphicon-barcode"></i> ' . \Yii::t('main', 'Submit Ticket'),
-                        'url' => ['/ticket/update', 'mode' => 'submit'],
-                        'visible' => Yii::$app->user->can('ticket/update'),
-                    ],
-                    [
                         'label' => '<i class="glyphicon glyphicon-eye-open"></i> ' . \Yii::t('main', 'Monitor Exams'),
                         'url' => ['/monitor'],
                         'visible' => Yii::$app->user->can('exam/view'),

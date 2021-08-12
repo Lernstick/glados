@@ -13,6 +13,7 @@ class AccessRule extends \yii\filters\AccessRule
         if (empty($this->roles)) {
             return true;
         }
+
         foreach ($this->roles as $role) {
             if ($role === '?') {
                 if ($user->getIsGuest()) {
@@ -30,4 +31,5 @@ class AccessRule extends \yii\filters\AccessRule
         }
         return false;
     }
+
 }

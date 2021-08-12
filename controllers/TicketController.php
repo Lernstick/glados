@@ -35,7 +35,6 @@ use yii\db\Expression;
 use kartik\mpdf\Pdf;
 use \mPDF;
 use app\components\customResponse;
-use app\components\AccessRule;
 use yii\data\ArrayDataProvider;
 use yii\widgets\ActiveForm;
 
@@ -44,6 +43,24 @@ use yii\widgets\ActiveForm;
  */
 class TicketController extends BaseController
 {
+
+    /**
+     * @inheritdoc
+     */
+    public $owner_actions = ['view', 'update', 'delete', 'backup', 'restore'];
+
+    /**
+     * @inheritdoc
+     */
+    public function getOwner_id()
+    {
+        $id = Yii::$app->request->get('id');
+        if (($model = Ticket::findOne($id)) !== null) {
+            return $model->exam->user_id;
+        } else {
+            return null;
+        }
+    }
 
     /*
      * @inheritdoc
@@ -59,10 +76,7 @@ class TicketController extends BaseController
                 ],
             ],
             'access' => [
-                'class' => \yii\filters\AccessControl::className(),
-                'ruleConfig' => [
-                    'class' => AccessRule::className(),
-                ],
+                'class' => \app\components\AccessControl::className(),
                 'rules' => [
                     [
                         'allow' => true,
@@ -406,39 +420,6 @@ class TicketController extends BaseController
                     'searchModel' => $searchModel,
                     'attr' => $attr
                 ]);
-            }
-        } else if ($mode === 'submit') {
-            $params = Yii::$app->request->post('Ticket');
-            $token = (isset($params['token']) && !empty($params['token'])) ? $params['token'] : null;
-            $test_taker = (isset($params['test_taker']) && !empty($params['test_taker'])) ? $params['test_taker'] : null;
-
-            if (($model = Ticket::findOne(['token' => $token])) === null) {
-                $model = new Ticket(['scenario' => Ticket::SCENARIO_SUBMIT]);
-                $model->token = $token;
-                $model->token != null ? $model->addError('token', Yii::t('ticket', 'Ticket not found.')) : null;
-
-                return $this->render('submit', [
-                    'model' => $model,
-                ]);
-            } else if ($test_taker === null) {
-                $model->scenario = Ticket::SCENARIO_SUBMIT;
-                $model->load(Yii::$app->request->post());
-                $model->validate(['token'], true);
-                $this->checkRbac($model->exam->user_id);
-
-                return $this->render('submit', [
-                    'model' => $model,
-                ]);
-            } else {
-                $model->scenario = Ticket::SCENARIO_SUBMIT;
-                $this->checkRbac($model->exam->user_id);
-                if ($model->load(Yii::$app->request->post()) && $model->save()) {
-                    return $this->redirect(['view', 'id' => $model->id]);
-                }else{
-                    return $this->render('submit', [
-                        'model' => $model,
-                    ]);
-                }
             }
         }
     }
@@ -959,9 +940,7 @@ class TicketController extends BaseController
     protected function findModel($id)
     {
         if (($model = Ticket::findOne($id)) !== null) {
-            if ($this->checkRbac($model->exam->user_id)) {
-                return $model;
-            }
+            return $model;
         }
         throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
     }

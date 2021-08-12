@@ -9,7 +9,6 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\CookieCollection;
 use yii\db\Expression;
-use app\components\AccessRule;
 use app\models\User;
 
 /**
@@ -27,10 +26,7 @@ class ActivityController extends BaseController
                 ],
             ],
             'access' => [
-                'class' => \yii\filters\AccessControl::className(),
-                'ruleConfig' => [
-                    'class' => AccessRule::className(),
-                ],
+                'class' => \app\components\AccessControl::className(),
                 'rules' => [
                     [
                         'allow' => true,

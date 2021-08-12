@@ -11,7 +11,6 @@ use app\models\UserSearch;
 use app\models\AuthLdapQueryForm;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use app\components\AccessRule;
 use yii\helpers\StringHelper;
 use yii\data\ActiveDataProvider;
 
@@ -29,10 +28,7 @@ class AuthController extends BaseController
                 ],
             ],
             'access' => [
-                'class' => \yii\filters\AccessControl::className(),
-                'ruleConfig' => [
-                    'class' => AccessRule::className(),
-                ],
+                'class' => \app\components\AccessControl::className(),
                 'rules' => [
                     [
                         'allow' => true,

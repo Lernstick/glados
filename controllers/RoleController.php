@@ -7,7 +7,6 @@ use app\models\Role;
 use app\models\RoleSearch;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use app\components\AccessRule;
 use yii\data\ArrayDataProvider;
 
 /**
@@ -28,10 +27,7 @@ class RoleController extends BaseController
                 ],
             ],
             'access' => [
-                'class' => \yii\filters\AccessControl::className(),
-                'ruleConfig' => [
-                    'class' => AccessRule::className(),
-                ],
+                'class' => \app\components\AccessControl::className(),
                 'rules' => [
                     [
                         'allow' => true,
@@ -159,9 +155,7 @@ class RoleController extends BaseController
     protected function findModel($id)
     {
         if (($model = Role::findOne($id)) !== null) {
-            if ($this->checkRbac(1)) {
-                return $model;
-            }
+            return $model;
         }
         throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
     }
