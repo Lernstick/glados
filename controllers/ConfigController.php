@@ -3,8 +3,6 @@
 namespace app\controllers;
 
 use Yii;
-use yii\filters\AccessControl;
-use app\components\AccessRule;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -20,10 +18,7 @@ class ConfigController extends BaseController
     {
         return [
             'access' => [
-                'class' => \yii\filters\AccessControl::className(),
-                'ruleConfig' => [
-                    'class' => AccessRule::className(),
-                ],
+                'class' => \app\components\AccessControl::className(),
                 'rules' => [
                     [
                         'allow' => true,

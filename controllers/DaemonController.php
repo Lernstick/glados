@@ -7,7 +7,6 @@ use app\models\Daemon;
 use app\models\DaemonSearch;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use app\components\AccessRule;
 
 /**
  * DaemonController implements the CRUD actions for Daemon model.
@@ -27,10 +26,7 @@ class DaemonController extends BaseController
                 ],
             ],
             'access' => [
-                'class' => \yii\filters\AccessControl::className(),
-                'ruleConfig' => [
-                    'class' => AccessRule::className(),
-                ],
+                'class' => \app\components\AccessControl::className(),
                 'rules' => [
                     [
                         'allow' => true,

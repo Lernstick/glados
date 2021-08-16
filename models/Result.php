@@ -403,7 +403,7 @@ class Result extends Model
     {
         $file = \Yii::$app->params['resultPath'] . '/' . $hash;
 
-        if(Yii::$app->file->set($file)->exists === false){
+        if (Yii::$app->file->set($file)->exists === false || empty($hash)) {
             return null;
         }
 

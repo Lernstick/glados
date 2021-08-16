@@ -4,9 +4,9 @@ namespace app\controllers;
 
 use Yii;
 use yii\web\Controller;
-use yii\filters\AccessControl;
-use app\components\AccessRule;
+use app\components\AccessControl;
 use yii\web\ForbiddenHttpException;
+use yii\web\BadRequestHttpException;
 
 /**
  * BaseController implements the RBAC check.
@@ -15,24 +15,36 @@ class BaseController extends Controller
 {
 
     /**
+     * @var array list of actions where the current user should be tested against the owner of the
+     * current object model, which is obtained by [[getOwner_id()]]
+     */
+    public $owner_actions = [];
+
+    /**
+     * @return int|null|false user id of the owner of the current object model in question.
+     * * If the return value is a integer, the current object model is associated to the user
+     *   with this id. If owner_id == current_user_id, the current user needs the permission
+     *   "controller/action". If owner_id != current_user_id, the current user need the permission
+     *   "controller/action/all".
+     * * If the return value is null, an error will be thrown which states that the associated
+     *   object model could not be determined. So a test whether the user has the right permission
+     *   will not be possible.
+     * * If the return value is false, then the access test will be successful if the user has
+     *   the permission "controller/action".
+     */
+    public function getOwner_id()
+    {
+        return null;
+    }
+
+    /**
      * @inheritdoc
      */
     public function behaviors()
     {
         return [
             'access' => [
-                'class' => \yii\filters\AccessControl::className(),
-                'denyCallback' => function ($rule, $action) {
-                    $p = $action->controller->rbacRoute;
-                    $permission = Yii::$app->authManager->getPermission($p);
-                    throw new ForbiddenHttpException(\Yii::t('app', 'You are not allowed to view this page. You need to have the following permission: "{permission} ({short})".', [
-                        'permission' => $permission === null ? $p : Yii::t('permission',  $permission->description),
-                        'short' => $p,
-                    ]));
-                },
-                'ruleConfig' => [
-                    'class' => AccessRule::className(),
-                ],
+                'class' => AccessControl::className(),
                 'rules' => [
                     [
                         'allow' => true,
@@ -44,9 +56,10 @@ class BaseController extends Controller
     }
 
     /**
-     * Returns the correct route for RBAC
+     * Returns the correct route for RBAC.
+     * Examples: ticket/view, ticket/view/all, server/status, ...
      *
-     * @return string the route
+     * @return string the RBAC route
      */
     protected function getRbacRoute()
     {
@@ -56,28 +69,20 @@ class BaseController extends Controller
         $action_id = \Yii::$app->controller->canGetProperty('action_id')
             ? \Yii::$app->controller->action_id
             : \Yii::$app->controller->action->id;
-        return $controller_id . '/' . $action_id;
-    }
 
-    /**
-     * Checks RBAC permission of a object model
-     *
-     * @param int $user_id the user id of the owner of the current object model
-     * @return boolean whether access is allowed or not
-     * @throws ForbiddenHttpException if the access control failed.
-     */
-    protected function checkRbac($user_id)
-    {
-        if (Yii::$app->user->can($this->rbacRoute . '/all') || $user_id == Yii::$app->user->id) {
-            return true;
-        } else {
-            $p = $user_id == Yii::$app->user->id ? $this->rbacRoute : $this->rbacRoute . '/all';
-            $permission = Yii::$app->authManager->getPermission($p);
-            throw new ForbiddenHttpException(\Yii::t('app', 'You are not allowed to view this page. You need to have the following following permission: "{permission} ({short})".', [
-                'permission' => $permission === null ? $p : Yii::t('permission',  $permission->description),
-                'short' => $p,
-            ]));
-            return false;
+        if (in_array($action_id, $this->owner_actions)) {
+            $owner_id = \Yii::$app->controller->owner_id;
+            if ($owner_id === false) {
+                return $controller_id . '/' . $action_id;
+            } else if ($owner_id === null) {
+                return $controller_id . '/' . $action_id . '/controller->owner_id=null';
+            } else if ($owner_id == \Yii::$app->user->id) {
+                return $controller_id . '/' . $action_id;
+            } else {
+                return $controller_id . '/' . $action_id . '/all';
+            }
         }
+
+        return $controller_id . '/' . $action_id;
     }
 }

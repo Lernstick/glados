@@ -138,7 +138,7 @@ SCRIPT;
                                 'type' => 'application/x-mpegURL',
                                 'src' => Url::to([
                                     'screencapture/view',
-                                    'id' => $model->id,
+                                    'ticket_id' => $model->id,
                                     'file' => $model->state == app\models\Ticket::STATE_RUNNING
                                         ? end($model->screencapture->masters)
                                         : $model->screencapture->masters[0]
@@ -179,7 +179,7 @@ SCRIPT;
                                     'data-id' => $key+1,
                                     'data-src' => Url::to([
                                         'screencapture/view',
-                                        'id' => $model->id,
+                                        'ticket_id' => $model->id,
                                         'file' => $sc['master']
                                     ])
                                 ]

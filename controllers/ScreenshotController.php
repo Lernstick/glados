@@ -7,7 +7,6 @@ use app\models\Screenshot;
 use app\models\ScreenshotSearch;
 use app\models\Ticket;
 use yii\web\NotFoundHttpException;
-use app\components\AccessRule;
 
 /**
  * ScreenshotController implements the CRUD actions for Screenshot model.
@@ -18,14 +17,42 @@ class ScreenshotController extends BaseController
     /**
      * @inheritdoc
      */
+    public $owner_actions = ['view', 'snap'];
+
+    /**
+     * @var string Fake the controller id for the RBAC system
+     */
+    public $rbac_id = 'ticket';
+
+    /**
+     * @var string Fake the action id for the RBAC system
+     */
+    public function getAction_id ()
+    {
+        return 'view';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getOwner_id()
+    {
+        $token = Yii::$app->request->get('token');
+        if (($model = Ticket::findOne(['token' => $token])) !== null) {
+            return $model->exam->user_id;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function behaviors()
     {
         return [
             'access' => [
-                'class' => \yii\filters\AccessControl::className(),
-                'ruleConfig' => [
-                    'class' => AccessRule::className(),
-                ],
+                'class' => \app\components\AccessControl::className(),
                 'rules' => [
                     [
                         'allow' => true,

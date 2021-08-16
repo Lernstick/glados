@@ -12,13 +12,17 @@ use app\models\IssueSearch;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\filters\VerbFilter;
-use app\components\AccessRule;
 
 /**
  * MonitorController.
  */
 class MonitorController extends BaseController
 {
+
+    /**
+     * @inheritdoc
+     */
+    public $owner_actions = ['view', 'single'];
 
     /**
      * @var string Fake the controller id for the RBAC system
@@ -36,14 +40,32 @@ class MonitorController extends BaseController
     /**
      * @inheritdoc
      */
+    public function getOwner_id()
+    {
+        $id = Yii::$app->request->get('id');
+        if ($this->action->id == 'view') {
+            if (($model = Exam::findOne($id)) !== null) {
+                return $model->user_id;
+            } else {
+                return false;
+            }
+        } else if ($this->action->id == 'single') {
+            if (($model = Ticket::findOne($id)) !== null) {
+                return $model->exam->user_id;
+            } else {
+                return null;
+            }
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function behaviors()
     {
         return [
             'access' => [
-                'class' => \yii\filters\AccessControl::className(),
-                'ruleConfig' => [
-                    'class' => AccessRule::className(),
-                ],
+                'class' => \app\components\AccessControl::className(),
                 'rules' => [
                     [
                         'allow' => true,
@@ -127,9 +149,7 @@ class MonitorController extends BaseController
     protected function findModel($id)
     {
         if (($model = Exam::findOne($id)) !== null) {
-            if ($this->checkRbac($model->user_id)) {
-                return $model;
-            }
+            return $model;
         }
         throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
     }
@@ -145,9 +165,7 @@ class MonitorController extends BaseController
     protected function findTicket($id)
     {
         if (($model = Ticket::findOne($id)) !== null) {
-            if ($this->checkRbac($model->exam->user_id)) {
-                return $model;
-            }
+            return $model;
         }
         throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
     }

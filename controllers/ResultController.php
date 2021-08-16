@@ -5,7 +5,6 @@ namespace app\controllers;
 use Yii;
 use app\models\Result;
 use yii\filters\VerbFilter;
-use app\components\AccessRule;
 use yii\web\UploadedFile;
 use app\models\Exam;
 use app\models\Ticket;
@@ -18,6 +17,44 @@ use yii\helpers\ArrayHelper;
  */
 class ResultController extends BaseController
 {
+
+    /**
+     * @inheritdoc
+     */
+    public $owner_actions = ['view', 'generate', 'submit'];
+
+    /**
+     * @inheritdoc
+     */
+    public function getOwner_id()
+    {
+        if ($this->action->id == 'view') {
+            $id = Yii::$app->request->get('token');
+            if (($model = Ticket::findOne(['token' => $token])) !== null) {
+                return $model->exam->user_id;
+            } else {
+                return false;
+            }
+        } else if ($this->action->id == 'generate') {
+            $id = Yii::$app->request->get('exam_id');
+            if (($model = Exam::findOne($id)) !== null) {
+                return $model->user_id;
+            } else {
+                return false;
+            }
+        } else if ($this->action->id == 'submit') {
+            $hash = Yii::$app->request->get('hash');
+            if (($model = Result::findOne($hash)) !== null) {
+                return $model->exam->user_id;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function behaviors()
     {
         return [
@@ -28,10 +65,7 @@ class ResultController extends BaseController
                 ],
             ],
             'access' => [
-                'class' => \yii\filters\AccessControl::className(),
-                'ruleConfig' => [
-                    'class' => AccessRule::className(),
-                ],
+                'class' => \app\components\AccessControl::className(),
                 'rules' => [
                     [
                         'allow' => true,
@@ -96,9 +130,7 @@ class ResultController extends BaseController
                 'searchModel' => $searchModel,
             ]);
         } else {
-            if (($exam = Exam::findOne($exam_id)) !== null) {
-                $this->checkRbac($exam->user_id);
-            }
+            $exam = Exam::findOne($exam_id);
 
             $model = new Result([
                 'scenario' => 'generate',
@@ -155,7 +187,6 @@ class ResultController extends BaseController
      */
     public function actionDownload($token)
     {
-
         $model = Ticket::findOne(['token' => $token]);
         if (!$model) {
             throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));

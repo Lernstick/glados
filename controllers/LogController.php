@@ -15,9 +15,59 @@ use yii\web\NotFoundHttpException;
 class LogController extends BaseController
 {
 
+    /**
+     * @inheritdoc
+     */
+    public $owner_actions = ['view', 'download'];
 
     /**
-     * Lists all Log models.
+     * @var string Fake the controller id for the RBAC system
+     */
+    public $rbac_id = 'ticket';
+
+    /**
+     * @var string Fake the action id for the RBAC system
+     */
+    public function getAction_id ()
+    {
+        return 'view';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getOwner_id()
+    {
+        $token = Yii::$app->request->get('token');
+        if (($model = Ticket::findOne(['token' => $token])) !== null) {
+            return $model->exam->user_id;
+        } else {
+            return null;
+        }
+    }
+
+    /*
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+
+            'access' => [
+                'class' => \app\components\AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['rbac'],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Lists all Log models of a certain ticket.
+     * @param int $ticket_id ticket id
      * @return mixed
      */
     public function actionIndex($ticket_id)
@@ -26,8 +76,10 @@ class LogController extends BaseController
     }
 
     /**
-     * Displays Log model.
-     * @param array $params params
+     * Displays a Log model.
+     * @param string $type log file type
+     * @param string $token ticket token
+     * @param string $date date associated to the log file
      */
     public function actionView($type, $token, $date)
     {
@@ -43,8 +95,10 @@ class LogController extends BaseController
     }
 
     /**
-     * Displays Log model.
-     * @param array $params params
+     * Downloads a Log model.
+     * @param string $type log file type
+     * @param string $token ticket token
+     * @param string $date date associated to the log file
      */
     public function actionDownload($type, $token, $date)
     {
@@ -58,7 +112,6 @@ class LogController extends BaseController
             //'mimeType' => $model->getMimeType($model->path),
             'inline' => false,
         ]);
-
     }
 
     /**
@@ -73,9 +126,7 @@ class LogController extends BaseController
     {
         if (($model = Log::findOne($params)) !== null) {
             if (($ticket = Ticket::findOne(['token' => $model->token])) !== null) {
-                if ($this->checkRbac($ticket->exam->user_id)) {
-                    return $model;
-                }
+                return $model;
             }
         }
         throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
