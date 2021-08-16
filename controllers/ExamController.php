@@ -444,10 +444,9 @@ class ExamController extends BaseController
                 return $this->redirect(['view', 'id' => $model->id]);
             }
             $model->delete();
-            Yii::$app->session->addFlash('danger', \Yii::t('exams', 'The Exam has been deleted successfully.'));
 
             return $this->redirect(Yii::$app->session['examViewReturnURL']);
-        }else if ($mode === 'file') {
+        } else if ($mode === 'file') {
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             if ($type == 'squashfs') {
                 return [ 'files' => [[
@@ -458,6 +457,27 @@ class ExamController extends BaseController
                     basename($model->file2) => $model->deleteFile('zip'),
                 ]]];
             }
+        } else if ($mode === 'open_tickets') {
+
+            $c = $model->delete_tickets(['state' => Ticket::STATE_OPEN]);
+            if ($c !== 0) {
+                Yii::$app->session->addFlash('danger', Yii::t('ticket', '{n} Open Tickets have been deleted successfully.', ['n' => $c]));
+            } else {
+                Yii::$app->session->addFlash('danger', Yii::t('ticket', 'There are no Open Tickets to delete.'));
+            }
+
+            return $this->redirect(['exam/view', 'id' => $id]);
+
+        } else if ($mode === 'all_tickets') {
+
+            $c = $model->delete_tickets([]);
+            if ($c !== 0) {
+                Yii::$app->session->addFlash('danger', Yii::t('ticket', '{n} Tickets have been deleted successfully.', ['n' => $c]));
+            } else {
+                Yii::$app->session->addFlash('danger', Yii::t('ticket', 'There are no Tickets to delete.'));
+            }
+
+            return $this->redirect(['exam/view', 'id' => $id]);
         }
 
     }

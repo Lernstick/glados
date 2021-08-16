@@ -47,7 +47,7 @@ class TicketController extends BaseController
     /**
      * @inheritdoc
      */
-    public $owner_actions = ['view', 'update', 'delete', 'backup', 'restore'];
+    public $owner_actions = ['view', 'update', 'delete', 'backup', 'restore', 'ping'];
 
     /**
      * @inheritdoc
@@ -146,7 +146,6 @@ class TicketController extends BaseController
 
     }
 
-    //TODO: rbac
     /**
      * Displays a single Ticket model.
      *
@@ -252,15 +251,6 @@ class TicketController extends BaseController
                 'date' => $date,
                 'options' => $options,
             ]);
-        } else if ($mode == 'probe') {
-            $daemon = new Daemon();
-            $pid = $daemon->startNotify($id);
-
-            if(Yii::$app->request->isAjax){
-                return $this->runAction('view', ['id' => $id]);
-            } else {
-                return $this->redirect(['view', 'id' => $id]);
-            }
         } else if ($mode == 'report') {
             $content = $this->renderPartial('report', [
                 'model' => $model,
@@ -431,54 +421,16 @@ class TicketController extends BaseController
      * @param integer $id
      * @return mixed
      */
-    public function actionDelete($id = null, $mode = 'single', $exam_id = null)
+    public function actionDelete($id)
     {
-        if ($mode == 'single') {
-            $model = $this->findModel($id);
+        $model = $this->findModel($id);
 
-            if ($model->backup_lock == 0 && $model->restore_lock == 0 &&  $model->download_lock == 0) {
-                $model->delete();
-                Yii::$app->session->addFlash('danger', Yii::t('ticket', 'The Ticket has been deleted successfully.'));
-                return $this->redirect(Yii::$app->session['ticketViewReturnURL']);
-            } else {
-                Yii::$app->session->addFlash('danger', \Yii::t('ticket', 'The ticket is still locked by a daemon and can therefore not be deleted.'));
-                return $this->redirect(['ticket/view', 'id' => $id]);
-            }
-        } else if ($mode == 'manyOpen' || $mode == 'many') {
-            $query = Ticket::find()->where(['exam_id' => $exam_id]);
-            Yii::$app->user->can('ticket/delete/all') ?: $query->own();
-            $models = $query->all();
-
-            $c = 0;
-            if ($mode == 'manyOpen'){
-                foreach ($models as $key => $model){
-                    if ($model->state == Ticket::STATE_OPEN){
-                        $model->delete() ? $c++ : null;
-                    }
-                }
-            } else if ($mode == 'many'){
-                foreach ($models as $key => $model){
-                    $model->delete() ? $c++ : null;
-                }
-            }
-
-
-            #TODO: errors?
-            if($c == 0){
-                if ($mode == 'manyOpen') {
-                    Yii::$app->session->addFlash('danger', Yii::t('ticket', 'There are no Open Tickets to delete.'));
-                } else if ($mode == 'many'){
-                    Yii::$app->session->addFlash('danger', Yii::t('ticket', 'There are no Tickets to delete.'));
-                }
-                return $this->redirect(['exam/view', 'id' => $exam_id]);
-            }
-
-            if ($mode == 'manyOpen') {
-                Yii::$app->session->addFlash('danger', Yii::t('ticket', '{n} Open Tickets have been deleted successfully.', ['n' => $c]));
-            } else if ($mode == 'many'){
-                Yii::$app->session->addFlash('danger', Yii::t('ticket', '{n} Tickets have been deleted successfully.', ['n' => $c]));
-            }
-            return $this->redirect(['exam/view', 'id' => $exam_id]);
+        if ($model->backup_lock == 0 && $model->restore_lock == 0 &&  $model->download_lock == 0) {
+            $model->delete();
+            return $this->redirect(Yii::$app->session['ticketViewReturnURL']);
+        } else {
+            Yii::$app->session->addFlash('danger', \Yii::t('ticket', 'The ticket is still locked by a daemon and can therefore not be deleted.'));
+            return $this->redirect(['ticket/view', 'id' => $id]);
         }
     }
 
@@ -755,15 +707,37 @@ class TicketController extends BaseController
      */
     public function actionBackup($id)
     {
-        $model = $this->findModel($id);
-
         $daemon = new Daemon();
         $pid = $daemon->startBackup($id);
 
-        if(Yii::$app->request->isAjax){
+        if (Yii::$app->request->isAjax) {
+            if (Yii::$app->session['monitorView'] === true) {
+                return true;
+            }
             return $this->runAction('view', ['id' => $id]);
         } else {
             return $this->redirect(['view', 'id' => $id, '#' => 'backups']);
+        }
+    }
+
+    /**
+     * Pings the ticket.
+     *
+     * @param integer $id
+     * @return The response object
+     */
+    public function actionPing($id)
+    {
+        $daemon = new Daemon();
+        $pid = $daemon->startNotify($id);
+
+        if (Yii::$app->request->isAjax) {
+            if (Yii::$app->session['monitorView'] === true) {
+                return true;
+            }
+            return $this->runAction('view', ['id' => $id]);
+        } else {
+            return $this->redirect(['view', 'id' => $id]);
         }
     }
 
@@ -783,11 +757,9 @@ class TicketController extends BaseController
         $daemon = new Daemon();
         $pid = $daemon->startRestore($id, $file, $date);
 
-        Yii::$app->session->addFlash('info', \Yii::t('ticket', 'Restore started.'));
-
-        if(Yii::$app->request->isAjax){
+        if (Yii::$app->request->isAjax) {
             return $this->runAction('view', ['id' => $id]);
-        }else{
+        } else {
             return $this->redirect(['view', 'id' => $id]);
         }
 

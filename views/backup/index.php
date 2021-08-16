@@ -65,12 +65,14 @@ use app\components\Editable;
                     'event' => 'ticket/' . $ticketModel->id,
                     'jsonSelector' => 'backup_lock',
                     'jsHandler' => 'function(d, s){
-                        if(d == "1"){
+                        if (d == "1") {
                             s.classList.add("gly-spin");
                             s.classList.remove("hidden");
-                        }else if(d == "0"){
+                            growl("'.\Yii::t('ticket', 'Backup started.').'", "info", "#tab_backups");
+                        } else if(d == "0") {
                             s.classList.remove("gly-spin");
                             s.classList.add("hidden");
+                            growl("'.\Yii::t('ticket', 'Backup finished.').'", "info", "#tab_backups");
                         }
                     }',
                 ]) . ActiveEventField::widget([

@@ -1,4 +1,4 @@
-<?php
+    <?php
 
 use app\components\BaseMigration;
 
@@ -17,51 +17,92 @@ class m210705_145230_roles extends BaseMigration
     public function safeUp()
     {
         $auth = Yii::$app->authManager;
+        $admin = $auth->getRole('admin');
+        $teacher = $auth->getRole('teacher');
+
+        $indexExam = $auth->getPermission('exam/index');
+        $indexAllExam = $auth->getPermission('exam/index/all');
+        $viewExam = $auth->getPermission('exam/view');
+        $viewAllExam = $auth->getPermission('exam/view/all');
+        $systemConfig = $auth->getPermission('config/system');
+        $viewScreenshot = $auth->getPermission('screenshot/view');
+        $snapScreenshot = $auth->getPermission('screenshot/snap');
+        $createTicket = $auth->getPermission('ticket/create');
+        $createAllTicket = $auth->getPermission('ticket/create/all');
+        $indexTicket = $auth->getPermission('ticket/index');
+        $indexAllTicket = $auth->getPermission('ticket/index/all');
 
         $indexRole = $auth->createPermission('role/index');
-        $indexRole->description = yiit('permission', 'Index all roles');
-        $auth->add($indexRole);
-
         $createRole = $auth->createPermission('role/create');
-        $createRole->description = yiit('permission', 'Create a new role');
-        $auth->add($createRole);
-
         $viewRole = $auth->createPermission('role/view');
-        $viewRole->description = yiit('permission', 'View all roles');
-        $auth->add($viewRole);
-
         $updateRole = $auth->createPermission('role/update');
-        $updateRole->description = yiit('permission', 'Update all roles');
-        $auth->add($updateRole);
-
         $deleteRole = $auth->createPermission('role/delete');
-        $deleteRole->description = yiit('permission', 'Delete all roles');
-        $auth->add($deleteRole);
-
         $serverStatus = $auth->createPermission('server/status');
+        $monitorExam = $auth->createPermission('exam/monitor');
+        $monitorAllExam = $auth->createPermission('exam/monitor/all');
+        $pingTicket = $auth->createPermission('ticket/ping');
+        $pingAllTicket = $auth->createPermission('ticket/ping/all');
+
+        $indexRole->description = yiit('permission', 'Index all roles');
+        $createRole->description = yiit('permission', 'Create a new role');
+        $viewRole->description = yiit('permission', 'View all roles');
+        $updateRole->description = yiit('permission', 'Update all roles');
+        $deleteRole->description = yiit('permission', 'Delete all roles');
         $serverStatus->description = yiit('permission', 'View the server status information');
+        $monitorExam->description = yiit('permission', 'Monitor own exams');
+        $monitorAllExam->description = yiit('permission', 'Monitor all exams');
+        $viewExam->description = yiit('permission', 'View own exams');
+        $viewAllExam->description = yiit('permission', 'View all exams');
+        $pingTicket->description = yiit('permission', 'Ping clients of own tickets');
+        $pingAllTicket->description = yiit('permission', 'Ping clients of all tickets');
+        $admin->description = yiit('permission', "The immutable 'admin' role");
+        $teacher->description = yiit('permission', "The immutable 'teacher' role");
+
+        $systemConfig->name = 'server/config';
+
+        $auth->add($indexRole);
+        $auth->add($createRole);
+        $auth->add($viewRole);
+        $auth->add($updateRole);
+        $auth->add($deleteRole);
         $auth->add($serverStatus);
+        $auth->add($monitorExam);
+        $auth->add($monitorAllExam);
+        $auth->add($pingTicket);
+        $auth->add($pingAllTicket);
 
-        // rename "config/system" -> "server/config"
-        $item = $auth->getPermission('config/system');
-        $item->name = 'server/config';
-        $auth->update('config/system', $item);
+        $auth->addChild($monitorExam, $indexExam);
+        $auth->addChild($monitorExam, $indexTicket);
+        $auth->addChild($monitorAllExam, $monitorExam);
+        $auth->addChild($monitorAllExam, $indexAllExam);
+        $auth->addChild($monitorAllExam, $indexAllTicket);
+        $auth->addChild($pingAllTicket, $pingTicket);
 
-        /* Assign permissions */
-        $admin = $auth->getRole('admin');
+        $auth->update('exam/view', $viewExam); // rename "exam/view" description
+        $auth->update('exam/view/all', $viewAllExam); // "exam/view/all" description
+        $auth->update('config/system', $systemConfig); // rename "config/system" -> "server/config"
+        $auth->update('admin', $admin); // set "admin" description
+        $auth->update('teacher', $teacher); // set "teacher" description
+
+        /* Assign new permissions */
         $auth->addChild($admin, $indexRole);
         $auth->addChild($admin, $createRole);
         $auth->addChild($admin, $viewRole);
         $auth->addChild($admin, $updateRole);
         $auth->addChild($admin, $deleteRole);
         $auth->addChild($admin, $serverStatus);
+        $auth->addChild($admin, $monitorAllExam);
+        $auth->addChild($admin, $pingAllTicket);
+        $auth->addChild($teacher, $monitorExam);
+        $auth->addChild($teacher, $pingTicket);
 
-        $admin->description = yiit('permission', "The immutable 'admin' role");
-        $auth->update('admin', $admin);
+        // remove the "screenshot/view" and "screenshot/view" permissions, they are replaced
+        // by the "ticket/view" permission.
+        $auth->remove($viewScreenshot);
+        $auth->remove($snapScreenshot);
 
-        $teacher = $auth->getRole('teacher');
-        $teacher->description = yiit('permission', "The immutable 'teacher' role");
-        $auth->update('teacher', $teacher);
+        // Bug: "ticket/create" as child of "ticket/create/all"
+        $auth->addChild($createAllTicket, $createTicket);
 
         $this->addColumn($this->eventStreamTable, 'watches', $this->integer()->notNull()->defaultValue(0));
         $this->addColumn($this->daemonTable, 'memory', $this->integer()->Null());
@@ -77,6 +118,8 @@ class m210705_145230_roles extends BaseMigration
     public function safeDown()
     {
         $auth = Yii::$app->authManager;
+        $admin = $auth->getRole('admin');
+        $teacher = $auth->getRole('teacher');
 
         $indexRole = $auth->getPermission('role/index');
         $createRole = $auth->getPermission('role/create');
@@ -84,14 +127,39 @@ class m210705_145230_roles extends BaseMigration
         $updateRole = $auth->getPermission('role/update');
         $deleteRole = $auth->getPermission('role/delete');
         $serverStatus = $auth->getPermission('server/status');
+        $monitorExam = $auth->getPermission('exam/monitor');
+        $monitorAllExam = $auth->getPermission('exam/monitor/all');
+        $indexExam = $auth->getPermission('exam/index');
+        $indexAllExam = $auth->getPermission('exam/index/all');
+        $viewExam = $auth->getPermission('exam/view');
+        $viewAllExam = $auth->getPermission('exam/view/all');
+        $configServer = $auth->getPermission('server/config');
+        $createAllTicket = $auth->getPermission('ticket/create/all');
+        $createTicket = $auth->getPermission('ticket/create');
+        $indexTicket = $auth->getPermission('ticket/index');
+        $indexAllTicket = $auth->getPermission('ticket/index/all');
+        $pingTicket = $auth->getPermission('ticket/ping');
+        $pingAllTicket = $auth->getPermission('ticket/ping/all');
 
-        $admin = $auth->getRole('admin');
+        $viewScreenshots = $auth->createPermission('screenshot/view');
+        $snapScreenshots = $auth->createPermission('screenshot/snap');
+
+        $auth->removeChild($monitorExam, $indexExam);
+        $auth->removeChild($monitorExam, $indexTicket);
+        $auth->removeChild($monitorAllExam, $monitorExam);
+        $auth->removeChild($monitorAllExam, $indexAllExam);
+        $auth->removeChild($monitorAllExam, $indexAllTicket);
+        $auth->removeChild($pingAllTicket, $pingTicket);
         $auth->removeChild($admin, $indexRole);
         $auth->removeChild($admin, $createRole);
         $auth->removeChild($admin, $viewRole);
         $auth->removeChild($admin, $updateRole);
         $auth->removeChild($admin, $deleteRole);
         $auth->removeChild($admin, $serverStatus);
+        $auth->removeChild($admin, $monitorAllExam);
+        $auth->removeChild($admin, $pingAllTicket);
+        $auth->removeChild($teacher, $monitorExam);
+        $auth->removeChild($teacher, $pingTicket);
 
         $auth->remove($indexRole);
         $auth->remove($createRole);
@@ -99,11 +167,34 @@ class m210705_145230_roles extends BaseMigration
         $auth->remove($updateRole);
         $auth->remove($deleteRole);
         $auth->remove($serverStatus);
+        $auth->remove($monitorAllExam);
+        $auth->remove($monitorExam);
+        $auth->remove($pingTicket);
+        $auth->remove($pingAllTicket);
 
-        // rename "server/config" -> "config/system"
-        $item = $auth->getPermission('server/config');
-        $item->name = 'config/system';
-        $auth->update('server/config', $item);
+        $viewExam->description = yiit('permission', 'View/Monitor own exams');
+        $viewAllExam->description = yiit('permission', 'View/Monitor all exams');
+        $configServer->name = 'config/system';
+        $admin->description = null;
+        $teacher->description = null;
+        $viewScreenshots->description = yiit('permission', 'View screenshots from a ticket');
+        $snapScreenshots->description = yiit('permission', 'Create a live screenshot');
+        
+        $auth->update('exam/view', $viewExam); // rename "exam/view" description
+        $auth->update('exam/view/all', $viewAllExam); // rename "exam/view/all" description
+        $auth->update('server/config', $configServer); // rename "server/config" -> "config/system"
+        $auth->update('admin', $admin); // remove "admin" description
+        $auth->update('teacher', $teacher); // remove "teacher" description
+
+        // re-add the "screeshot/view" and "screenshot/snap" permissions
+        $auth->add($viewScreenshots);
+        $auth->add($snapScreenshots);
+
+        $auth->addChild($teacher, $viewScreenshots);
+        $auth->addChild($teacher, $snapScreenshots);
+
+        // remove "ticket/create" as child of "ticket/create/all"
+        $auth->removeChild($createAllTicket, $createTicket);
 
         $this->dropColumn($this->eventStreamTable, 'watches');
         $this->dropColumn($this->daemonTable, 'memory');

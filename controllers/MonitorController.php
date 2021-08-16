@@ -22,7 +22,7 @@ class MonitorController extends BaseController
     /**
      * @inheritdoc
      */
-    public $owner_actions = ['view', 'single'];
+    public $owner_actions = ['monitor'];
 
     /**
      * @var string Fake the controller id for the RBAC system
@@ -34,7 +34,7 @@ class MonitorController extends BaseController
      */
     public function getAction_id ()
     {
-        return 'view';
+        return 'monitor';
     }
 
     /**
@@ -96,6 +96,7 @@ class MonitorController extends BaseController
         } else {
 
             $exam = $this->findModel($id);
+            Yii::$app->session['monitorView'] = true;
 
             $params["TicketSearch"]["exam_id"] = $exam->id;
             $params["TicketSearch"]["state"] = Ticket::STATE_RUNNING;

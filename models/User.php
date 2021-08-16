@@ -7,6 +7,8 @@ use app\models\Base;
 use yii\web\IdentityInterface;
 use app\models\EventItem;
 use app\models\Auth;
+use app\components\GrowlBehavior;
+
 
 /**
  * This is the model class for table "user".
@@ -72,6 +74,19 @@ class User extends Base implements IdentityInterface
             self::SCENARIO_EXTERNAL => ['username', 'roles', 'type', 'identifier'],
             self::SCENARIO_UPDATE => ['username', 'roles', 'change_password'],
             self::SCENARIO_PASSWORD_RESET => ['password', 'password_repeat', 'change_password'],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            'GrowlBehavior' => [
+                'class' => GrowlBehavior::className(),
+                'delete_message' => \Yii::t('user', 'The user has been deleted successfully.'),
+            ],
         ];
     }
 

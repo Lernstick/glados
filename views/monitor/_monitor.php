@@ -96,6 +96,9 @@ echo Pjax::widget([
     'id' => 'backup-now-container',
     'linkSelector' => '#backup-now',
     'enablePushState' => false,
+    'options' => [
+        'class' => 'hidden'
+    ],
 ]);
 
 Pjax::begin([
@@ -166,9 +169,23 @@ Pjax::begin([
                 'buttons' => [
                     'action' => function ($url, $issue, $key) {
                         if ($issue->key == $issue::CLIENT_OFFLINE) {
-                            return Html::a('<i class="glyphicon glyphicon-globe"></i>&nbsp;' . Yii::t('issue', 'Ping client'), ['/ticket/view', 'id' => $issue->ticket->id, 'mode' => 'probe', '#' => 'tab_general'], ['id' => 'backup-now', 'class' => 'btn btn-default']);
+                            return Html::a('<i class="glyphicon glyphicon-globe"></i>&nbsp;' . Yii::t('issue', 'Ping client'), [
+                                '/ticket/ping',
+                                'id' => $issue->ticket->id,
+                                '#' => 'tab_general'
+                            ], [
+                                'id' => 'backup-now',
+                                'class' => 'btn btn-default',
+                            ]);
                         } else if ($issue->key == $issue::LONG_TIME_NO_BACKUP) {
-                            return Html::a('<i class="glyphicon glyphicon-hdd"></i>&nbsp;' . Yii::t('issue', 'Backup now'), ['/ticket/backup', 'id' => $issue->ticket->id, '#' => 'tab_backups'], ['id' => 'backup-now', 'class' => 'btn btn-default']);
+                            return Html::a('<i class="glyphicon glyphicon-hdd"></i>&nbsp;' . Yii::t('issue', 'Backup now'), [
+                                '/ticket/backup',
+                                'id' => $issue->ticket->id,
+                                '#' => 'tab_backups'
+                            ], [
+                                'id' => 'backup-now',
+                                'class' => 'btn btn-default'
+                            ]);
                         } else {
                             return $issue->key;
                         }

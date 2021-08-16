@@ -37,10 +37,12 @@ $gaugeOptions = [
                 var s = this.series[0];
                 var yAxis = this.yAxis[0];
                 setInterval(function () {
-                    var y = parseFloat($('#reload-load').data(s.name).y)
-                        || parseFloat($('#reload-load').data(s.name));
-                    var max = parseFloat($('#reload-load').data(s.name).max)
-                        || yAxis.max;
+                    var y = isNaN(parseFloat($('#reload-load').data(s.name).y))
+                        ? parseFloat($('#reload-load').data(s.name))
+                        : parseFloat($('#reload-load').data(s.name).y);
+                    var max = isNaN(parseFloat($('#reload-load').data(s.name).max))
+                        ? yAxis.max
+                        : parseFloat($('#reload-load').data(s.name).max);
                     var d = [{'y': y, 'max': max}];
                     yAxis.update({'min': 0, 'max': max});
                     s.setData(d);

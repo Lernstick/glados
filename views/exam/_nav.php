@@ -120,7 +120,7 @@ $this->registerJs($active_tabs);
             <li>
                 <?= Html::a(
                     '<span class="glyphicon glyphicon-trash"></span> ' . \Yii::t('exams', 'Delete all Open Tickets'),
-                    ['ticket/delete', 'mode' => 'manyOpen', 'exam_id' => $model->id],
+                    ['exam/delete', 'mode' => 'open_tickets', 'id' => $model->id],
                     [
                         'class' => 'btn',
                         'style' => ['text-align' => 'left'],
@@ -135,7 +135,7 @@ $this->registerJs($active_tabs);
             <li>
                 <?= Html::a(
                     '<span class="glyphicon glyphicon-trash"></span> ' . \Yii::t('exams', 'Delete <b>ALL</b> associated Tickets'),
-                    ['ticket/delete', 'mode' => 'many', 'exam_id' => $model->id],
+                    ['exam/delete', 'mode' => 'all_tickets', 'id' => $model->id],
                     [
                         'class' => 'btn',
                         'style' => ['text-align' => 'left'],

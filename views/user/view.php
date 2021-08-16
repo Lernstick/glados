@@ -118,8 +118,6 @@ $this->registerJs($active_tabs);
                 ],
             ]) ?>
 
-            <?= $this->render('@app/views/_notification') ?>
-
         </div>
 
         <?php Pjax::begin([

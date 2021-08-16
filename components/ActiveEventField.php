@@ -12,12 +12,12 @@ use yii\helpers\Url;
 class ActiveEventField extends Pjax
 {
 
-     /**
+    /**
      * @var string the content between the opening and closing tag.
      */
     public $content;
 
-     /**
+    /**
      * @var string the name of the event on which the js handler should listen on. Can also be 
      * prepended with a group name. This group name is later used to determine which events should
      * be replaced if the request is ajax. Events that are in the same group identifier, will be
@@ -28,7 +28,7 @@ class ActiveEventField extends Pjax
      */
     public $event;
 
-     /**
+    /**
      * @var string the name of the property in the json enocded data of the event. If not set the 
      * whole data array is passed to the handler function. In that case, the function is exectued 
      * every time the event raises, not only if the selector exists in it. The function then has to
@@ -36,14 +36,14 @@ class ActiveEventField extends Pjax
      */
     public $jsonSelector;
 
-     /**
-     * @var string the definition of an anonymous javascript function which handles the event. That function must have the 
-     * following syntax:
+    /**
+     * @var string the definition of an anonymous javascript function which handles the event. The
+     * function must have the following syntax:
      * ```javascript
      * function(data, selector){handlelogic}
      * ```
      * data: is the data from the event, if [[jsonSelector]] is set, only the part decending to it will be passed
-     * selector: the DOM object of the HTML document refering to the ActiveEventField itself.
+     * selector: the DOM object of the HTML document referring to the ActiveEventField itself.
      */
     public $jsHandler;
 

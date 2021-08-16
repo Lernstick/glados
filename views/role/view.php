@@ -96,8 +96,6 @@ $this->registerJs($active_tabs);
                 ],
             ]) ?>
 
-            <?= $this->render('@app/views/_notification') ?>
-
         </div>
 
         <div id="permissions" class="tab-pane fade">

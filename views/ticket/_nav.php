@@ -77,17 +77,10 @@ $this->registerJs($active_tabs);
         ); ?>
     </li>
 
-    <?php if (Yii::$app->user->can('screenshot/view')) { ?>
-        <li title="<?= \Yii::t('ticket', 'Screenshots') ?>"><a data-toggle="tab" href="#screenshots">
-            <div><i class="glyphicon glyphicon-picture"></i>
-            <span><?= \Yii::t('ticket', 'Screenshots') ?></span></div>
-        </a></li>
-    <?php } else { ?>
-        <li class="disabled" title="<?= \Yii::t('ticket', 'Screenshots') ?>"><a class="disabled" data-toggle="" href="#">
-            <div><i class="glyphicon glyphicon-picture"></i>
-            <span><?= \Yii::t('ticket', 'Screenshots') ?></span></div>
-        </a></li>
-    <?php } ?>
+    <li title="<?= \Yii::t('ticket', 'Screenshots') ?>"><a data-toggle="tab" href="#screenshots">
+        <div><i class="glyphicon glyphicon-picture"></i>
+        <span><?= \Yii::t('ticket', 'Screenshots') ?></span></div>
+    </a></li>
 
     <li title="<?= \Yii::t('ticket', 'Screen Capture') ?>">
         <?= Html::a(
@@ -235,16 +228,14 @@ $this->registerJs($active_tabs);
                 ) ?>
             </li>
 
-            <?php if (Yii::$app->user->can('screenshot/snap')) { ?>
-                <li>
-                    <?= Html::a(
-                        '<span class="glyphicon glyphicon-picture"></span> ' . \Yii::t('ticket', 'Get Live Screenshot'), [
-                            'screenshot/snap',
-                            'token' => $model->token,
-                        ]
-                    ) ?>
-                </li>
-            <?php } ?>
+            <li>
+                <?= Html::a(
+                    '<span class="glyphicon glyphicon-picture"></span> ' . \Yii::t('ticket', 'Get Live Screenshot'), [
+                        'screenshot/snap',
+                        'token' => $model->token,
+                    ]
+                ) ?>
+            </li>
 
            <li>
                 <?= Html::a(

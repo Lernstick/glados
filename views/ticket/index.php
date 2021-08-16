@@ -20,7 +20,6 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="ticket-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <?php Pjax::begin(); ?>
 
@@ -474,8 +473,6 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
         'options' => ['id' => 'dynagrid-ticket-index'] // a unique identifier is important
     ]); ?>
-
-    <?= $this->render('@app/views/_notification') ?>
 
     <?php Pjax::end(); ?>
 

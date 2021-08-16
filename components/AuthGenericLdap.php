@@ -446,6 +446,7 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
                 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_BIND_DIRECT, self::SCENARIO_BIND_BYUSER]
             ],
 
+            [['ldap_port'], 'integer', 'min' => 1, 'max' => 65535, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_BIND_DIRECT, self::SCENARIO_BIND_BYUSER]],
         ]);
     }
 

@@ -140,8 +140,11 @@ $this->params['breadcrumbs'][] = $this->title;
                         'content' => yii::$app->formatter->format($model->ip, 'text'),
                         'event' => 'ticket/' . $model->id,
                         'jsonSelector' => 'ip',
-                    ]) . ' ' . $this->render('/ticket/fields/_online', ['model' => $model])
-                    . ' ' . Html::a(\Yii::t('ticket', 'Probe'), ['view', 'id' => $model->id, 'mode' => 'probe']),
+                    ]) . ' ' . $this->render('/ticket/fields/_online', ['model' => $model]) . ' ' . 
+                    Html::a(\Yii::t('ticket', 'Probe'), [
+                        'ping',
+                        'id' => $model->id,
+                    ]),
             ],
             [
                 'attribute' => 'agent_online',
@@ -228,12 +231,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     'event' => 'ticket/' . $model->id,
                     'jsonSelector' => 'restore_lock',
                     'jsHandler' => 'function(d, s){
-                        if(d == "1"){
+                        if (d == "1") {
                             s.classList.add("gly-spin");
                             s.classList.remove("hidden");
-                        }else if(d == "0"){
+                            growl("'.\Yii::t('ticket', 'Restore started.').'", "info", "#tab_restores");
+                        } else if(d == "0") {
                             s.classList.remove("gly-spin");
                             s.classList.add("hidden");
+                            growl("'.\Yii::t('ticket', 'Restore finished.').'", "info", "#tab_restores");
                         }
                     }',
                 ]) . ActiveEventField::widget([
@@ -263,8 +268,6 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
 
     ]) ?>
-
-    <?= $this->render('@app/views/_notification') ?>
 
     <?php Pjax::end(); ?>
 
@@ -306,8 +309,6 @@ $this->params['breadcrumbs'][] = $this->title;
         'options' => ['class' => 'tab-pane fade'],
     ]); ?>
 
-    <?php if (Yii::$app->user->can('screenshot/view')) { ?>
-
         <?php $_GET = array_merge($_GET, ['#' => 'tab_screenshots']); ?>
         <?= ListView::widget([
             'dataProvider' => $screenshotDataProvider,
@@ -332,7 +333,6 @@ $this->params['breadcrumbs'][] = $this->title;
         ]); ?>
 
     <?php Pjax::end() ?>
-    <?php } ?>
 
     <?php Pjax::begin([
         'id' => 'screencapture',

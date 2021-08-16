@@ -541,6 +541,7 @@ class DaemonController extends Controller
             # If no controller has a job to do
             if ($tot === false) {
                 sleep(5);
+                $this->daemon->memory = memory_get_usage(); # bytes
                 $this->calcLoad(0);
             }
         }
@@ -566,7 +567,6 @@ class DaemonController extends Controller
         } else {
             $this->daemon->load = 0;
         }
-        $this->daemon->memory = memory_get_usage(); # bytes
         $this->daemon->save();
         if ($this->daemon->description == 'Base Process') {
             $this->judgement();

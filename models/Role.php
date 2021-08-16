@@ -6,6 +6,7 @@ use Yii;
 use app\models\Auth;
 use yii\db\Expression;
 use yii\behaviors\TimestampBehavior;
+use app\components\GrowlBehavior;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -55,6 +56,14 @@ class Role extends Base
                 'createdAtAttribute' => 'created_at',
                 'updatedAtAttribute' => 'updated_at',
                 'value' => new Expression('UNIX_TIMESTAMP()'),
+            ],
+            'GrowlBehavior' => [
+                'class' => GrowlBehavior::className(),
+                'delete_message' => function($model) {
+                    return \Yii::t('user', "The role '{role}' was deleted successfully.", [
+                        'role' => $model->name,
+                    ]);
+                }
             ],
         ];
     }
@@ -346,7 +355,11 @@ class Role extends Base
                 return false;
             }
         }
-        $auth->invalidateCache(); // flush the RBAC cache, else permissions might not be up-to-date
+
+        // flush the RBAC cache, else permissions might not be up-to-date
+        $auth->invalidateCache();
+        Yii::$app->cache->flush();
+
         return 1;
     }
 

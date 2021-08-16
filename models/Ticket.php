@@ -14,6 +14,7 @@ use app\models\EventItem;
 use app\models\EventStream;
 use app\models\RemoteExecution;
 use app\components\HistoryBehavior;
+use app\components\GrowlBehavior;
 
 /**
  * This is the model class for table "ticket".
@@ -209,6 +210,10 @@ class Ticket extends LiveActiveRecord
                     'running_daemon_id' => 'text',
                     'sc_size' => 'shortSize',
                 ],
+            ],
+            'GrowlBehavior' => [
+                'class' => GrowlBehavior::className(),
+                'delete_message' => Yii::t('ticket', 'The Ticket has been deleted successfully.'),
             ],
         ];
     }
