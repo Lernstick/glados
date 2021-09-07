@@ -95,7 +95,7 @@ if ($step == 2) {
                     ]);
                 }
             } else {
-                return \Yii::t('results', '<i class="glyphicon glyphicon-alert"></i> No ticket with this token found. Unable to submit anything.');
+                return '<i class="glyphicon glyphicon-alert"></i> ' . \Yii::t('results', 'No ticket with this token found. Unable to submit anything.');
             }
         },
         'format' => 'raw',
@@ -129,7 +129,7 @@ if ($step == 2) {
                     ]);
                 }
             } else {
-                return \Yii::t('results', '<i class="glyphicon glyphicon-alert"></i> No ticket with this token found. Unable to submit anything.');
+                return '<i class="glyphicon glyphicon-alert"></i> ' . \Yii::t('results', 'No ticket with this token found. Unable to submit anything.');
             }
         },
         'format' => 'raw',

@@ -12,8 +12,8 @@ use yii\widgets\Pjax;
 
 $this->title = \Yii::t('results', 'Submit Results');
 $this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['result/submit']];
-$this->params['breadcrumbs'][] = \Yii::t('results', 'Step 2');
-$this->title .= ' - ' . \Yii::t('results', 'Step 2');
+$this->params['breadcrumbs'][] = $model->hash;
+$this->title .= ' - ' . \Yii::t('results', 'Overview');
 
 ?>
 <div class="result-create">
