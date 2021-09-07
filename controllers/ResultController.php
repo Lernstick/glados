@@ -21,7 +21,7 @@ class ResultController extends BaseController
     /**
      * @inheritdoc
      */
-    public $owner_actions = ['view', 'generate', 'submit'];
+    public $owner_actions = ['view', 'generate'];
 
     /**
      * @inheritdoc
@@ -39,13 +39,6 @@ class ResultController extends BaseController
             $id = Yii::$app->request->get('exam_id');
             if (($model = Exam::findOne($id)) !== null) {
                 return $model->user_id;
-            } else {
-                return false;
-            }
-        } else if ($this->action->id == 'submit') {
-            $hash = Yii::$app->request->get('hash');
-            if (($model = Result::findOne($hash)) !== null) {
-                return $model->exam->user_id;
             } else {
                 return false;
             }
@@ -187,13 +180,13 @@ class ResultController extends BaseController
      */
     public function actionDownload($token)
     {
-        $model = Ticket::findOne(['token' => $token]);
-        if (!$model) {
-            throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
-        } else {
-            return \Yii::$app->response->sendFile($model->result);
+        if (($model = Ticket::findOne(['token' => $token])) !== null) {
+            if ($model->result !== null && file_exists($model->result)) {
+                return \Yii::$app->response->sendFile($model->result);
+            }
         }
 
+        throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
     }
 
     /**
@@ -203,14 +196,11 @@ class ResultController extends BaseController
     public function actionSubmit($mode = 'step1', $hash = null)
     {
 
-        if ($hash === null){
-            $model = new Result();
-        } else {
-            $model = Result::findOne($hash);
-        }
+        $model = $hash === null ? new Result() : Result::findOne($hash);
         $model->scenario = Result::SCENARIO_SUBMIT;
 
         if ($mode === 'step1') {
+
             return $this->render('submit_s1', [
                 'model' => $model,
             ]);
@@ -221,12 +211,10 @@ class ResultController extends BaseController
                 throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
             }
 
-            $searchModel = new TicketSearch();
-            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-            $dataProvider->query = $dataProvider->query->andWhere(['token' => $model->tokens])->orderBy('test_taker');
+            $dataProvider = new \yii\data\ArrayDataProvider();
+            $dataProvider->allModels = $model->tickets;
 
             return $this->render('submit_s2', [
-                'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
                 'model' => $model,
             ]);
@@ -242,12 +230,10 @@ class ResultController extends BaseController
 
         } else if ($mode === 'done'){
 
-            $searchModel = new TicketSearch();
-            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-            $dataProvider->query = $dataProvider->query->andWhere(['token' => $model->tokens])->orderBy('test_taker');
+            $dataProvider = new \yii\data\ArrayDataProvider();
+            $dataProvider->allModels = $model->tickets;
 
             return $this->render('submit_done', [
-                'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,                
                 'model' => $model,
             ]);
@@ -304,7 +290,7 @@ class ResultController extends BaseController
                         'error' => $model->errors['id'][0],
                     ]]];
                 }
-            }else{
+            } else {
                 @unlink($model->file);
                 return [ 'files' => [[
                     'name' => basename($model->file),

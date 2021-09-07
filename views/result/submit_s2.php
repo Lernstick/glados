@@ -7,6 +7,8 @@ use yii\grid\GridView;
 use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
+/* @var $model Result */
+/* @var $dataProvider ArrayDataProvider */
 
 $this->title = \Yii::t('results', 'Submit Results');
 $this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['result/submit']];
@@ -25,43 +27,30 @@ $this->title .= ' - ' . \Yii::t('results', 'Step 2');
         ]) ?></span>
     </div>
 
-    <div class="media-body">
+    <div class="well">
         <span><?= \Yii::t('results', 'The list further down contains all results found in the uploaded Results ZIP-file. Please check if all results are present. In this list you see whether the ticket has already a result associated to it or not. Please notice, that when proceeding with the button further down, already existing results will be <b>overwritten permanently</b>. If you want to remove results from being processed, please edit the ZIP-file and reupload the file in Step 1.') ?></span>
     </div>
-    <hr>
 
     <?php Pjax::begin(); ?>
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'tableOptions' => ['class' => 'table table-bordered table-hover'],
-        'layout' => '{items} {summary} {pager}',
-        'rowOptions' => function($model) {
-            return ['class' => !empty($model->result) && file_exists($model->result) ? 'alert alert-warning warning' : 'alert alert-success success'];
-        },
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-            'test_taker',
-            'token',
-            'examName',
-            [
-                'attribute' => 'result',
-                'value' => function ($model) {
-                    return !empty($model->result) && file_exists($model->result) ? '<i class="glyphicon glyphicon-alert"></i> ' . \Yii::t('results', 'There is already a submitted result. The existing one will be overwritten!') : '<i class="glyphicon glyphicon-ok"></i> ' . \Yii::t('results', 'This Ticket has no submitted result yet.');
-                },
-                'format' => 'raw',
-                'label' => \Yii::t('results', 'Notice')
-            ],            
-        ],
-    ]); ?>
+
+        <?= $this->render('/result/zip_contents', [
+            'step' => 2,
+            'model' => $model,
+            'dataProvider' => $dataProvider,
+        ]) ?>
+
     <?php Pjax::end(); ?>
 
     <?php $form = ActiveForm::begin([
         'action' => ['result/submit', 'mode' => 'step3', 'hash' => $model->hash],
     ]); ?>
 
+    <hr>
     <div class="form-group">
-        <?= Html::submitButton(\Yii::t('results', 'Submit all results'), ['class' => 'btn btn-success']) ?>
+        <?= Html::a('<i class="glyphicon glyphicon-chevron-left"></i>' . \Yii::t('app', 'Back'), ['result/submit'], [
+            'class' => 'btn btn-default',
+        ]); ?>
+        <?= Html::submitButton(\Yii::t('results', 'Submit all results') . '<i class="glyphicon glyphicon-chevron-right"></i>', ['class' => 'btn btn-success pull-right']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

@@ -485,4 +485,10 @@ Pjax::end();
 
         </div>
     </div>
+    <hr>
+    <div class="row">
+        <div class="col-md-12">
+            <samp><?= php_uname() ?></samp>
+        </div>
+    </div>
 </div>
