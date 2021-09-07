@@ -483,6 +483,39 @@ Pjax::end();
                 </div>
             <?php } ?>
 
+            <?php foreach($model->netName as $key => $dev) { ?>
+                <div class="col-sm-2">
+                    <?= Highcharts::widget([
+                        'scripts' => [
+                            'highcharts-more', // enables supplementary chart types (gauge, arearange, columnrange, etc.)
+                            'modules/solid-gauge',
+                        ],
+                        'options' => ArrayHelper::merge($gaugeOptions, [
+                            'title' => ['text' => $model->getAttributeLabel('netUsage')],
+                            'subtitle' => [
+                                'text' => $model->netName[$key],
+                            ],
+                            'yAxis' => ['max' => $model->netMaxSpeed[$key]],
+                            'series' => [
+                                [
+                                    'name' => 'net_usage_' . $key,
+                                    'data' => [$model->netCurrentSpeed[$key]],
+                                    'dataLabels' => [
+                                        'format' =>
+                                            '<div style="text-align:center">' .
+                                                '<span style="font-size:11px">' .
+                                                    '{y:.2f}' .
+                                                '</span><br/>' .
+                                                '<span style="font-size:10px;opacity:0.4">MB/s</span>' .
+                                            '</div>',
+                                    ],
+                                ]
+                            ]
+                        ]),
+                    ]); ?>
+                </div>
+            <?php } ?>
+
         </div>
     </div>
     <hr>

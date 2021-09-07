@@ -58,6 +58,11 @@ class m210705_145230_roles extends BaseMigration
         $admin->description = yiit('permission', "The immutable 'admin' role");
         $teacher->description = yiit('permission', "The immutable 'teacher' role");
 
+        yiit('permission', 'Submit results of all exams');
+        yiit('permission', 'Submit results of own exams');
+        yiit('permission', 'Generate result zip files of own exams');
+        yiit('permission', 'Generate result zip files of all exams');
+
         $systemConfig->name = 'server/config';
 
         $auth->add($indexRole);

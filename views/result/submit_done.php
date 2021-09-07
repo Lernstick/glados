@@ -8,6 +8,7 @@ use yii\widgets\Pjax;
 /* @var $this yii\web\View */
 /* @var $dataProvider ActiveDataProvider */
 /* @var $model Result */
+/* @var $submitted int number of successfully submitted resutls */
 
 $this->title = \Yii::t('results', 'Submit Results');
 $this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['result/submit']];
@@ -27,7 +28,9 @@ $this->title .= ' - ' . \Yii::t('results', 'Summary');
     </div>
 
     <div class="well">
-        <span><?= \Yii::t('results', 'The results are submitted! The list further down gives an overview of the submitted results.') ?></span>
+        <span><?= \Yii::t('results', 'You have successfully submitted <big>{n}</big> results! The list further down gives an overview of the submitted results.', [
+            'n' => $submitted,
+            ]) ?></span>
     </div>
 
     <?php Pjax::begin(); ?>

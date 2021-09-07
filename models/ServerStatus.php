@@ -26,7 +26,7 @@ class ServerStatus extends Model
     const PROC_MEMINFO = '/proc/meminfo';
 
     /**
-     * @const string Path to /proc/stat
+     * @const string Path to /proc/net/dev
      */
     const PROC_STAT = '/proc/stat';
 
@@ -98,6 +98,13 @@ class ServerStatus extends Model
     public $diskPath = [];
 
     /**
+     * Network variables
+     */
+    public $netMaxSpeed = [];
+    public $netCurrentSpeed = [];
+    public $netName = [];
+
+    /**
      * Inotify variables
      */
     public $inotify_max_user_instances;
@@ -158,6 +165,7 @@ class ServerStatus extends Model
             'inotify_active_watches' => \Yii::t('server', 'Inotify watches'),
             'inotify_active_instances' => \Yii::t('server', 'Inotify instances'),
             'diskUsed' => \Yii::t('server', 'Disk usage'),
+            'netUsage' => \Yii::t('server', 'Network usage'),
         ];
     }
 
@@ -245,13 +253,31 @@ class ServerStatus extends Model
         $status->swapUsed = $status->swapTotal - $status->swapFree;
 
         /**
-         * CPU and I/O information
+         * CPU, I/O and Network information
          */
-        list($used1, $iowait1, $total1) = $status->readStat();
+        list($cpu_used1, $cpu_iowait1, $cpu_total1) = $status->readStat();
+        $cards = array_slice(scandir('/sys/class/net/'), 2);
+        foreach ($cards as $card) {
+            $max = intval(@file_get_contents(substitute('/sys/class/net/{dev}/speed', ['dev' => $card])));
+            if ($max !== 0) {
+                $status->netMaxSpeed[$card] = $max;
+                $time[$card] = microtime(true);
+                $rx[$card] = intval(@file_get_contents(substitute('/sys/class/net/{dev}/statistics/rx_bytes', ['dev' => $card])));
+                $tx[$card] = intval(@file_get_contents(substitute('/sys/class/net/{dev}/statistics/tx_bytes', ['dev' => $card])));
+            }
+        }
         usleep(1000*100); # 0.1s
-        list($used2, $iowait2, $total2) = $status->readStat();
-        $status->cpuPercentage = ($used2 - $used1)*100/($total2 - $total1);
-        $status->ioPercentage = ($iowait2 - $iowait1)*100/($total2 - $total1);
+        list($cpu_used2, $cpu_iowait2, $cpu_total2) = $status->readStat();
+        $status->cpuPercentage = ($cpu_used2 - $cpu_used1)*100/($cpu_total2 - $cpu_total1);
+        $status->ioPercentage = ($cpu_iowait2 - $cpu_iowait1)*100/($cpu_total2 - $cpu_total1);
+        foreach ($rx as $card => $val) {
+            $crx = intval(@file_get_contents(substitute('/sys/class/net/{dev}/statistics/rx_bytes', ['dev' => $card])));
+            $ctx = intval(@file_get_contents(substitute('/sys/class/net/{dev}/statistics/tx_bytes', ['dev' => $card])));
+            $delta = microtime(true) - $time[$card]; # seconds
+            $status->netName[$card] = $card;
+            $status->netCurrentSpeed[$card] = (($crx - $rx[$card])/1048576)/$delta; # MBytes/sec
+            $status->netCurrentSpeed[$card] += (($ctx - $tx[$card])/1048576)/$delta; # MBytes/sec
+        }
 
         /**
          * Disk information
@@ -265,7 +291,7 @@ class ServerStatus extends Model
             'tmp' => \Yii::$app->params['tmpPath'],
         ];
         $p = [];
-        foreach($paths as $name => $path) {
+        foreach ($paths as $name => $path) {
             $dev = stat($path)[0];
             if (!array_key_exists($dev, $status->diskTotal)) {
                 $status->diskTotal[$dev] = disk_total_space($path);
@@ -400,6 +426,10 @@ class ServerStatus extends Model
 
         foreach($this->diskTotal as $key => $disk) {
             $data['disk_usage_' . $key] = $this->diskUsed[$key]/1073741824;
+        }
+
+        foreach($this->netName as $key => $dev) {
+            $data['net_usage_' . $key] = $this->netCurrentSpeed[$key];
         }
 
         return $data;

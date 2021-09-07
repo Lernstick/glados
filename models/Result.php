@@ -278,10 +278,11 @@ class Result extends Model
     }
 
     /**
-     * @return null
+     * @return int number of successfully submitted results
      */
     public function submit()
     {
+        $r = 0;
         $zip = new \ZipArchive(); 
         $tmp = tempnam(sys_get_temp_dir(), '');
         if (file_exists($tmp)) { unlink($tmp); }
@@ -296,58 +297,63 @@ class Result extends Model
 
             if ($ticket->exam !== null) {
 
-                $ticket->result = null;
-                $ticket->save();
+                if ($ticket->exam->user_id == \Yii::$app->user->id || Yii::$app->user->can('result/submit/all')) {
 
-                $dir = $this->dirs[$ticket->token];
-
-                $zipFile = substitute('{path}/{name}.zip', [
-                    'path' => \Yii::$app->params['resultPath'],
-                    'name' => $ticket->token,
-                ]);
-                $source = $tmp . '/' . $dir;
-
-                $tzip = new \ZipArchive;
-                if (file_exists($zipFile)) {
-                    unlink($zipFile);
-                }
-                $res = $tzip->open($zipFile, \ZIPARCHIVE::CREATE);
-
-                if ($res === TRUE) {
-
-                    if (is_dir($source)) {
-                        $files = new \RecursiveIteratorIterator(
-                            new \RecursiveDirectoryIterator(
-                                $source,
-                                \FilesystemIterator::SKIP_DOTS
-                            ),
-                            \RecursiveIteratorIterator::SELF_FIRST
-                        );
-                        foreach ($files as $file) {
-                            $file = realpath($file);
-
-                            if (is_dir($file) === true) {
-                                $tzip->addEmptyDir(str_replace($source . '/', '', $file . '/'));
-                            }else if (is_file($file) === true) {
-                                $tzip->addFile($file, str_replace($source . '/', '', $file));
-                            }
-                        }
-                    }
-                    $tzip->close();
-                } else {
-                    @unlink($zipFile);
-                }
-
-                if (file_exists($zipFile)) {
-                    $ticket->result = $zipFile;
+                    $ticket->result = null;
                     $ticket->save();
 
-                    $act = new Activity([
-                        'ticket_id' => $ticket->id,
-                        'description' => yiit('activity', 'Exam result handed in.'),
-                        'severity' => Activity::SEVERITY_INFORMATIONAL,
+                    $dir = $this->dirs[$ticket->token];
+
+                    $zipFile = substitute('{path}/{name}.zip', [
+                        'path' => \Yii::$app->params['resultPath'],
+                        'name' => $ticket->token,
                     ]);
-                    $act->save();
+                    $source = $tmp . '/' . $dir;
+
+                    $tzip = new \ZipArchive;
+                    if (file_exists($zipFile)) {
+                        unlink($zipFile);
+                    }
+                    $res = $tzip->open($zipFile, \ZIPARCHIVE::CREATE);
+
+                    if ($res === TRUE) {
+
+                        if (is_dir($source)) {
+                            $files = new \RecursiveIteratorIterator(
+                                new \RecursiveDirectoryIterator(
+                                    $source,
+                                    \FilesystemIterator::SKIP_DOTS
+                                ),
+                                \RecursiveIteratorIterator::SELF_FIRST
+                            );
+                            foreach ($files as $file) {
+                                $file = realpath($file);
+
+                                if (is_dir($file) === true) {
+                                    $tzip->addEmptyDir(str_replace($source . '/', '', $file . '/'));
+                                }else if (is_file($file) === true) {
+                                    $tzip->addFile($file, str_replace($source . '/', '', $file));
+                                }
+                            }
+                        }
+                        $tzip->close();
+                    } else {
+                        @unlink($zipFile);
+                    }
+
+                    if (file_exists($zipFile)) {
+                        $ticket->result = $zipFile;
+                        $ticket->save();
+
+                        $act = new Activity([
+                            'ticket_id' => $ticket->id,
+                            'description' => yiit('activity', 'Exam result handed in.'),
+                            'severity' => Activity::SEVERITY_INFORMATIONAL,
+                        ]);
+                        $act->save();
+
+                        $r++;
+                    }
                 }
             }
 
@@ -355,7 +361,7 @@ class Result extends Model
 
         FileHelper::removeDirectory($tmp);
 
-        return null;
+        return $r;
     }
 
 

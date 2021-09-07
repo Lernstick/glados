@@ -193,7 +193,7 @@ class ResultController extends BaseController
      * Submit new Result models.
      * @return mixed
      */
-    public function actionSubmit($mode = 'step1', $hash = null)
+    public function actionSubmit($mode = 'step1', $hash = null, $submitted = 0)
     {
 
         $model = $hash === null ? new Result() : Result::findOne($hash);
@@ -221,11 +221,12 @@ class ResultController extends BaseController
 
         } else if ($mode === 'step3'){
 
-            $model->submit();
+            $r = $model->submit();
 
             return $this->redirect(['result/submit',
                 'mode' => 'done',
                 'hash' => $hash,
+                'submitted' => $r,
             ]);
 
         } else if ($mode === 'done'){
@@ -236,6 +237,7 @@ class ResultController extends BaseController
             return $this->render('submit_done', [
                 'dataProvider' => $dataProvider,                
                 'model' => $model,
+                'submitted' => $submitted,
             ]);
 
         } else if ($mode === 'upload') {
