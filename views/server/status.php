@@ -521,7 +521,7 @@ Pjax::end();
     <hr>
     <div class="row">
         <div class="col-md-12">
-            <samp><?= php_uname() ?></samp>
+            <samp><?= $model->uname() ?></samp>
         </div>
     </div>
 </div>

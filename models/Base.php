@@ -40,6 +40,7 @@ class Base extends \yii\db\ActiveRecord
      * @param bool $showQuery whether the query itself should be shown in the output list.
      * @param string $orderBy the attribute to sort by
      * @param bool $attrToIdIfNull if true, $id will be treated as $attr if $attr is null
+     * @param mixed $where restrict the search by a WHERE clause
      *
      * @return array
      */

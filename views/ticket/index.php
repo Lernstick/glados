@@ -178,8 +178,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
                 'format' => 'raw'
             ],          
-            //'start:timeago',
-            //'end:timeago',
             [
                 'attribute' => 'start',
                 'format' => 'timeago',
@@ -206,7 +204,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]
                 ],
             ],            
-            #'valid:boolean',
             [
                 'attribute' => 'abandoned',
                 'format' => 'boolean',

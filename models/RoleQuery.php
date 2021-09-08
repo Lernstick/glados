@@ -20,7 +20,7 @@ class RoleQuery extends \yii\db\ActiveQuery
 
     /**
      * @inheritdoc
-     * @return Ticket[]|array
+     * @return Role[]|array
      */
     public function all($db = null)
     {
@@ -29,7 +29,7 @@ class RoleQuery extends \yii\db\ActiveQuery
 
     /**
      * @inheritdoc
-     * @return Ticket|array|null
+     * @return Role|array|null
      */
     public function one($db = null)
     {

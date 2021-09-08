@@ -71,6 +71,7 @@ class RoleSearch extends Role
             return $dataProvider;
         }
 
+        // filter only roles, no permissions
         $query->where(['type' => Role::TYPE]);
 
         // grid filtering conditions

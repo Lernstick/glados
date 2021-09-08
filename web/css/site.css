@@ -717,3 +717,7 @@ span.view--state[data-state="4"]::after { content: attr(data-text-4); }
     white-space: nowrap;
     width: 1%;
 }
+
+.text-bold {
+    font-weight: bold;
+}

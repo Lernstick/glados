@@ -165,11 +165,13 @@ class Role extends Base
             return false;
         }
 
+        // only roles that are not immutable
         if (in_array($this->name, $this->immutableRoles)) {
             Yii::$app->session->addFlash('danger', \Yii::t('user', "The '{role}' role is immutable and cannot be deleted.", ['role' => $this->name]));
             return false;
         }
 
+        // only roles, not permissions
         if ($this->type !== self::TYPE) {
             Yii::$app->session->addFlash('danger', \Yii::t('user', "'{name}' is not a role. Only roles can be deleted.", ['name' => $this->name]));
             return false;
@@ -177,17 +179,19 @@ class Role extends Base
 
         $auth = Yii::$app->authManager;
 
+        // only roles without users
         if (!empty($auth->getUserIdsByRole($this->name))) {        
             Yii::$app->session->addFlash('danger', \Yii::t('user', "The role '{role}' has still users associated to. Only roles without users can be deleted.", ['role' => $this->name]));
             return false;
         }
 
+        // only roles without childs
         if (!empty($auth->getChildren($this->name))) {
             Yii::$app->session->addFlash('danger', \Yii::t('user', "The role '{role}' has still permissions associated to. Only roles without permissions can be deleted.", ['role' => $this->name]));
             return false;
         }
 
-
+        // only roles that are not mapped by auth methods
         foreach (Yii::$app->auth->methods as $key => $config) {
             $method = Auth::findOne($key);
             if (in_array($this->name, $method->mapping)) {
@@ -196,6 +200,21 @@ class Role extends Base
                     'method' => substitute('{0} ({1})', [$method->name, $method->typeName])
                 ]));
                 return false;
+            }
+        }
+
+        // only roles that are not childs of other roles
+        foreach ($auth->getRoles() as $key => $parent_role) {
+            if ($parent_role->name != $this->name) {
+                foreach ($auth->getChildRoles($parent_role->name) as $key => $role) {
+                    if ($role->name == $this->name) {
+                        Yii::$app->session->addFlash('danger', \Yii::t('user', "The role '{role}' appears as a child in the role '{parent_role}'. Only roles without any associations can be deleted.", [
+                            'role' => $this->name,
+                            'parent_role' => $parent_role->name,
+                        ]));
+                        return false;
+                    }
+                }
             }
         }
 
@@ -218,6 +237,7 @@ class Role extends Base
 
     /**
      * Setter for the children property
+     *
      * @param array $children the array should look like: ['ticket/index', 'exam/index', ...]
      */
     public function setChildren($children)
@@ -319,7 +339,9 @@ class Role extends Base
         if ($auth->add($role)) {
             return $this->updateChildren();
         } else {
-            $this->addError('name', \Yii::t('user', "The role '{role}' could not be added succesfully.", ['role' => $this->name]));
+            $this->addError('name', \Yii::t('user', "The role '{role}' could not be added succesfully.", [
+                'role' => $this->name
+            ]));
             return false;
         }
     }
@@ -327,7 +349,7 @@ class Role extends Base
     /**
      * Updates the child objects of a role.
      * 
-     * @return bool whether the child objects could be updated or not
+     * @return int|false the number of rows affected, or false if validation fails
      */
     private function updateChildren()
     {

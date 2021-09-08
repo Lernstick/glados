@@ -30,7 +30,7 @@ return [
     'Last Visited' => 'Letzter Besuch',
     'No permissions found.' => 'Keine Berechtigungen gefunden.',
     'Password' => 'Passwort',
-    'Permissions' => 'Berechtigungen',
+    'Inherited Permissions' => 'Vererbte Berechtigungen',
     'Please change your password.' => 'Bitte ändern Sie Ihr Passwort.',
     'Repeat Password' => 'Passwort wiederholen',
     'Reset' => 'Zurücksetzen',

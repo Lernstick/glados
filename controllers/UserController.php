@@ -11,7 +11,6 @@ use yii\web\ForbiddenHttpException;
 use yii\filters\VerbFilter;
 use yii\data\ArrayDataProvider;
 
-
 /**
  * UserController implements the CRUD actions for User model.
  */
@@ -102,8 +101,10 @@ class UserController extends BaseController
     {
 
         $model = $this->findModel($id);
-        $permissionDataProvider = new ArrayDataProvider([
-            'allModels' => Yii::$app->authManager->getPermissionsByUser($model->id),
+        $permissions = array_column(Yii::$app->authManager->getPermissionsByUser($model->id), 'name');
+
+        $dataProvider = new ArrayDataProvider([
+            'allModels' => Yii::$app->authManager->getPermissions(),
             'pagination' => [
                 'pageParam' => 'perm-page',
                 'pageSizeParam' => 'perm-per-page',
@@ -114,7 +115,8 @@ class UserController extends BaseController
 
         return $this->render('view', [
             'model' => $model,
-            'permissionDataProvider' => $permissionDataProvider,
+            'permissions' => $permissions,
+            'dataProvider' => $dataProvider,
         ]);
     }
 

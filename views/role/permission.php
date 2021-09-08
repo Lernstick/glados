@@ -2,10 +2,13 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use yii\widgets\ListView;
+use yii\grid\GridView;
+use yii\helpers\ArrayHelper;
 use yii\data\ArrayDataProvider;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Role */
+/* @var $model app\models\Permission */
 /* @var $dataProvider ArrayDataProvider */
 
 $this->title = $model->name;
@@ -39,43 +42,11 @@ $this->registerJs($active_tabs);
         </a></li>
         <li>
             <?= Html::a(
-                '<i class="glyphicon glyphicon-check"></i> ' . \Yii::t('users', 'Inherited Permissions'),
+                '<i class="glyphicon glyphicon-check"></i> ' . \Yii::t('users', 'Interhited Permissions'),
                 '#permissions',
                 ['data-toggle' => 'tab']
             ) ?>
         </li>
-        <li class="dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                <i class="glyphicon glyphicon-list-alt"></i>
-                <?= \Yii::t('users', 'Actions') ?><span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-                <li>
-                    <?= Html::a(
-                        '<span class="glyphicon glyphicon-pencil"></span> '. \Yii::t('users', 'Edit'),
-                        ['update', 'id' => $model->name],
-                        [
-                            'class' => 'btn',
-                            'style' => ['text-align' => 'left'],
-                        ],
-                        ['data-pjax' => 0]
-                    ) ?>
-                </li>
-                <li>
-                    <?= Html::a(
-                        '<span class="glyphicon glyphicon-trash"></span> ' . \Yii::t('users', 'Delete'),
-                        ['delete', 'id' => $model->name],
-                        [
-                            'data' => [
-                                'confirm' => \Yii::t('users', 'Are you sure you want to delete this item?'),
-                                'method' => 'post',
-                            ],
-                        ]
-                    ) ?>
-                </li>
-            </ul>            
-        </li>
-
     </ul>
 
     <div class="tab-content">

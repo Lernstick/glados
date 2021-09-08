@@ -9,6 +9,7 @@ use app\assets\FormAsset;
 /* @var $this yii\web\View */
 /* @var $model app\models\Role */
 /* @var $form yii\widgets\ActiveForm */
+/* @var $dataProvider ArrayDataProvider */
 
 FormAsset::register($this);
 
@@ -29,7 +30,7 @@ FormAsset::register($this);
 
     <div class="row">
         <div class="col-md-12">
-            <?= $form->field($model, 'children')->widget(Select2::classname(), [
+            <?php /* echo $form->field($model, 'children')->widget(Select2::classname(), [
                 'data' => $model->childrenFormList,
                 'pluginOptions' => [
                     'dropdownAutoWidth' => true,
@@ -66,7 +67,28 @@ FormAsset::register($this);
                     'multiple' => true,
                     'placeholder' => \Yii::t('user', 'Choose permission(s) for this role ...')
                 ]
+            ]);*/ ?>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <?= Html::beginTag('div', [
+                'class' => substitute('form-group field-role-children {class}', [
+                    'class' => $model->hasErrors('children') ? 'has-error' : '',
+                ]),
             ]); ?>
+                <?= Html::activeLabel($model, 'children', ['class' => 'control-label']); ?>
+                <?= Html::activeHint($model, 'children', ['class' => 'hint-block']); ?>
+                <?= Html::error($model, 'children', ['class' => 'help-block']); ?>
+            <?= Html::endTag('div'); ?>
+        </div>
+        <div class="col-md-12">
+            <?= $this->render('_permissions', [
+                'form' => $form,
+                'dataProvider' => $dataProvider,
+                'permissions' => $model->children,
+            ]) ?>
         </div>
     </div>
 

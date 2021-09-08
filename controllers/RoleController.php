@@ -6,8 +6,10 @@ use Yii;
 use app\models\Role;
 use app\models\RoleSearch;
 use yii\web\NotFoundHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\filters\VerbFilter;
 use yii\data\ArrayDataProvider;
+use yii\helpers\ArrayHelper;
 
 /**
  * RoleController implements the CRUD actions for Role model.
@@ -83,16 +85,30 @@ class RoleController extends BaseController
     {
         $model = $this->findModel($id);
 
-        $permissionDataProvider = new ArrayDataProvider([
-                'allModels' => Yii::$app->authManager->getPermissionsByRole($model->name),
+        $dataProvider = new ArrayDataProvider([
+            'allModels' => Yii::$app->authManager->getPermissions(),
+            'pagination' => [
+                'pageParam' => 'perm-page',
+                'pageSizeParam' => 'perm-per-page',
+                'defaultPageSize' => 10,
+            ],
         ]);
-        $permissionDataProvider->pagination->pageParam = 'perm-page';
-        $permissionDataProvider->pagination->pageSize = 10;
 
-        return $this->render('view', [
-            'model' => $model,
-            'permissionDataProvider' => $permissionDataProvider,
-        ]);
+        if ($model->type == Role::TYPE) {
+
+            return $this->render('view', [
+                'model' => $model,
+                'dataProvider' => $dataProvider,
+            ]);
+
+        } else {
+
+            return $this->render('permission', [
+                'model' => $model,
+                'dataProvider' => $dataProvider,
+            ]);
+
+        }
     }
 
     /**
@@ -103,12 +119,24 @@ class RoleController extends BaseController
     public function actionCreate()
     {
         $model = new Role();
+        $all = array_merge(Yii::$app->authManager->getRoles(), Yii::$app->authManager->getPermissions());
+
+        $dataProvider = new ArrayDataProvider([
+            'allModels' => $all,
+            'pagination' => [
+                'pageParam' => 'perm-page',
+                'pageSizeParam' => 'perm-per-page',
+                'pageSizeLimit' => [1, count($all)],
+                'defaultPageSize' => count($all),
+            ],
+        ]);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->name]);
         } else {
             return $this->render('create', [
                 'model' => $model,
+                'dataProvider' => $dataProvider,
             ]);
         }
     }
@@ -123,11 +151,37 @@ class RoleController extends BaseController
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->type != Role::TYPE) {
+            throw new ForbiddenHttpException(Yii::t('app', 'You are not allowed to view this page.'));
+        }
+
+        $all = array_merge(Yii::$app->authManager->getRoles(), Yii::$app->authManager->getPermissions());
+
+        $dataProvider = new ArrayDataProvider([
+            'allModels' => $all,
+            'pagination' => [
+                'pageParam' => 'perm-page',
+                'pageSizeParam' => 'perm-per-page',
+                'pageSizeLimit' => [1, count($all)],
+                'defaultPageSize' => count($all),
+            ],
+        ]);
+
+        /**
+         * This fix here is needed, because if nothing is selected in the CheckboxColumn,
+         * then the Role.children element is absent in post(), resulting in no change.
+         */
+        $post = Yii::$app->request->post();
+        if (!empty($post)) {
+            $post['Role']['children'] = ArrayHelper::getValue($post, 'Role.children', []);
+        }
+
+        if ($model->load($post) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->name]);
         } else {
             return $this->render('update', [
                 'model' => $model,
+                'dataProvider' => $dataProvider,
             ]);
         }
     }

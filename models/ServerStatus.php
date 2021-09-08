@@ -435,4 +435,15 @@ class ServerStatus extends Model
         return $data;
     }
 
+    /**
+     * Returns information about the operating system PHP is running on.
+     * Equivalent to `uname -a`.
+     * @see https://www.php.net/manual/en/function.php-uname.php
+     * @return string
+     */
+    public function uname()
+    {
+        return php_uname();
+    }
+
 }
