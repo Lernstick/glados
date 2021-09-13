@@ -10,6 +10,8 @@ use app\components\ActiveEventField;
 /* @var $searchModel app\models\DaemonSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $runningDaemons integer */
+/* @var $minDaemons Setting */
+/* @var $maxDaemons Setting */
 
 $this->title = \Yii::t('daemons', 'Daemons');
 $this->params['breadcrumbs'][] = $this->title;
@@ -48,13 +50,32 @@ echo ActiveEventField::widget([
             'event' => 'daemon:daemon/ALL',
             'jsonSelector' => 'dummy',
             'jsHandler' => 'function(d, s){}', // do nothing
-        ]);
-
-?>
+        ]); ?>
 
         <div id="helper" class="hidden">
             <!-- Don't remove this button! Make it invisible instead. -->
             <a class="btn btn-default" id="reload" href=""><i class="glyphicon glyphicon-refresh"></i>&nbsp;<?= Yii::t('app', 'Reload') ?></a>
+        </div>
+
+        <div class="pre-monitor row">
+            <div class="col-md-6">
+                <div class="bs-callout bs-callout-info bs-callout-hover">
+                    <h4><?= substitute('{name}: {value}', [
+                        'name' => $minDaemons->name,
+                        'value' => $minDaemons->get('minDaemons'),
+                    ]); ?></h4>
+                    <p><?= $minDaemons->description ?></p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="bs-callout bs-callout-info bs-callout-hover">
+                    <h4><?= substitute('{name}: {value}', [
+                        'name' => $maxDaemons->name,
+                        'value' => $maxDaemons->get('maxDaemons'),
+                    ]); ?></h4>
+                    <p><?= $maxDaemons->description ?></p>
+                </div>
+            </div>
         </div>
 
         <div class="exam-monitor">
@@ -166,8 +187,9 @@ echo ActiveEventField::widget([
                 ],
                 'pager' => [
                     'layout' => '<div class="row"><div class="col-md-12 col-xs-12">{actions}&nbsp;{LinkPager} {CustomPager}</div></div>',
-                    'elements' => ['actions' => $this->render('_nav')],
-                    'pageSizeList' => [1=>1,5=>5,10=>10,20=>20,50=>50,100=>100],
+                    'elements' => [
+                        'actions' => $this->render('_nav')
+                    ],
                     'class' => app\widgets\CustomPager::className(),
                     'selectedLayout' => Yii::t('app', '{selected} <span style="color: #737373;">items</span>'),
                 ],

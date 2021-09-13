@@ -84,12 +84,14 @@ class RoleController extends BaseController
     public function actionView($id)
     {
         $model = $this->findModel($id);
+        $all = Yii::$app->authManager->getPermissions();
 
         $dataProvider = new ArrayDataProvider([
-            'allModels' => Yii::$app->authManager->getPermissions(),
+            'allModels' => $all,
             'pagination' => [
                 'pageParam' => 'perm-page',
                 'pageSizeParam' => 'perm-per-page',
+                'pageSizeLimit' => [1, 100],
                 'defaultPageSize' => 10,
             ],
         ]);
@@ -123,12 +125,7 @@ class RoleController extends BaseController
 
         $dataProvider = new ArrayDataProvider([
             'allModels' => $all,
-            'pagination' => [
-                'pageParam' => 'perm-page',
-                'pageSizeParam' => 'perm-per-page',
-                'pageSizeLimit' => [1, count($all)],
-                'defaultPageSize' => count($all),
-            ],
+            'pagination' => false,
         ]);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -159,12 +156,7 @@ class RoleController extends BaseController
 
         $dataProvider = new ArrayDataProvider([
             'allModels' => $all,
-            'pagination' => [
-                'pageParam' => 'perm-page',
-                'pageSizeParam' => 'perm-per-page',
-                'pageSizeLimit' => [1, count($all)],
-                'defaultPageSize' => count($all),
-            ],
+            'pagination' => false,
         ]);
 
         /**

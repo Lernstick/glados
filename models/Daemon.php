@@ -169,26 +169,45 @@ class Daemon extends LiveActiveRecord
 
     }
 
+    /**
+     * Method to send SIGTERM (15) to the process corresponding to the model.
+     * @return void
+     */
     public function stop()
     {
         posix_kill($this->pid, self::SIGTERM);
-        $this->state = substitute('SIGTERM sent at {time}.', [
+        $this->state = substitute('{signal} sent at {time}.', [
+            'signal' => 'SIGTERM',
             'time' => yii::$app->formatter->format(time(), 'time'),
         ]);
         $this->save(false);
     }
 
+    /**
+     * Method to send SIGKILL (9) to the process corresponding to the model.
+     * @return void
+     */
     public function kill()
     {
         posix_kill($this->pid, self::SIGKILL);
-        $this->state = 'SIGKILL sent.';
+        $this->state = substitute('{signal} sent at {time}.', [
+            'signal' => 'SIGKILL',
+            'time' => yii::$app->formatter->format(time(), 'time'),
+        ]);
         $this->save(false);
     }
 
+    /**
+     * Method to send SIGHUP (1) to the process corresponding to the model.
+     * @return void
+     */
     public function hup()
     {
         posix_kill($this->pid, self::SIGHUP);
-        $this->state = 'SIGHUP sent.';
+        $this->state = substitute('{signal} sent at {time}.', [
+            'signal' => 'SIGHUP',
+            'time' => yii::$app->formatter->format(time(), 'time'),
+        ]);
         $this->save(false);
     }
 }

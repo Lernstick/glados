@@ -7,6 +7,7 @@ use app\models\Daemon;
 use app\models\DaemonSearch;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use app\models\Setting;
 
 /**
  * DaemonController implements the CRUD actions for Daemon model.
@@ -47,17 +48,24 @@ class DaemonController extends BaseController
         $runningDaemons = $searchModel->search([])->totalCount;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
+        $minDaemons = Setting::findByKey('minDaemons');
+        $maxDaemons = Setting::findByKey('maxDaemons');
+
         if(Yii::$app->request->isAjax){
             return $this->renderAjax('index', [
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
                 'runningDaemons' => $runningDaemons,
+                'minDaemons' => $minDaemons,
+                'maxDaemons' => $maxDaemons,
             ]);
         }else{
             return $this->render('index', [
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
                 'runningDaemons' => $runningDaemons,
+                'minDaemons' => $minDaemons,
+                'maxDaemons' => $maxDaemons,
             ]);
         }
 

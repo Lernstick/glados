@@ -27,8 +27,9 @@ $this->title .= ' - ' . \Yii::t('results', 'Overview');
         ]) ?></span>
     </div>
 
-    <div class="well">
-        <span><?= \Yii::t('results', 'The list further down contains all results found in the uploaded Results ZIP-file. Please check if all results are present. In this list you see whether the ticket has already a result associated to it or not. Please notice, that when proceeding with the button further down, already existing results will be <b>overwritten permanently</b>. If you want to remove results from being processed, please edit the ZIP-file and reupload the file in Step 1.') ?></span>
+    <div class="bs-callout bs-callout-info">
+        <h4><?= \Yii::t('results', 'Overview') ?></h4>
+        <p><?= \Yii::t('results', 'The list further down contains all results found in the uploaded Results ZIP-file. Please check if all results are present. In this list you see whether the ticket has already a result associated to it or not. Please notice, that when proceeding with the button further down, already existing results will be <b>overwritten permanently</b>. If you want to remove results from being processed, please edit the ZIP-file and reupload the file in Step 1.') ?></p>
     </div>
 
     <?php Pjax::begin(); ?>

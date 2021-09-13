@@ -33,12 +33,12 @@ $this->title .= ' - ' . \Yii::t('results', 'Step 1');
         ]) ?></span>
     </div>
 
-    <div class="well">
-        <span><?= \Yii::t('results', 'Please upload a <b>Results ZIP-file</b>, which has the same directory structure as the generated ZIP-file from this webinterface. Make sure the top level directories have <i>exactly</i> the same name as before. The directories should each be named like this:<br><code>&lt;name&gt; - &lt;token&gt;</code>,<br>where <code>&lt;name&gt;</code> refers to the test takers name and <code>&lt;token&gt;</code> to the unique ticket token.') ?><br>
-        <?= \Yii::t('results', 'If the <code>&lt;name&gt;</code> is not set, the <code>_NoName</code> marker is used instead as a name.') ?><br><br>
-        <?= \Yii::t('results', 'After the submitting process, the test taker will have access to the result as a ZIP-file likewise. The contents of each ZIP-file will be <b><i>everything</i></b> inside the corresponding directory of the Results ZIP-file. So make sure there is no secret content in it.') ?></span>
+    <div class="bs-callout bs-callout-success">
+        <h4><?= \Yii::t('results', 'Step 1') ?></h4>
+        <p><?= \Yii::t('results', 'Please upload a <b>Results ZIP-file</b>, which has the same directory structure as the generated ZIP-file from this webinterface. Make sure the top level directories have <i>exactly</i> the same name as before. The directories should each be named like this:<br><code>&lt;name&gt; - &lt;token&gt;</code>,<br>where <code>&lt;name&gt;</code> refers to the test takers name and <code>&lt;token&gt;</code> to the unique ticket token.') ?></p>
+        <p><?= \Yii::t('results', 'If the <code>&lt;name&gt;</code> is not set, the <code>_NoName</code> marker is used instead as a name.') ?></p>
+        <p><?= \Yii::t('results', 'After the submitting process, the test taker will have access to the result as a ZIP-file likewise. The contents of each ZIP-file will be <b><i>everything</i></b> inside the corresponding directory of the Results ZIP-file. So make sure there is no secret content in it.') ?></p>
     </div>
-    <hr>
 
     <div class="row">
         <div class="col-md-12">

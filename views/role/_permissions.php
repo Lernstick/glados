@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\data\ArrayDataProvider;
+use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $dataProvider ArrayDataProvider Dataprovider of all permission in the system */
@@ -11,19 +12,31 @@ use yii\data\ArrayDataProvider;
 
 $form = isset($form) ? $form : null;
 
-$js = <<< 'SCRIPT'
-/* Checkboxes change classes of tr elements */
-$('.js_checkbox').change(function () {
-    if (this.checked) {
-        $(this).closest('tr').addClass('text-bold');
-        $(this).closest('tr').removeClass('text-muted');
-    } else {
-        $(this).closest('tr').addClass('text-muted');
-        $(this).closest('tr').removeClass('text-bold');
-    }
-});
-SCRIPT;
-$this->registerJs($js, \yii\web\View::POS_READY);
+if (isset($form)){
+    $js = <<< 'SCRIPT'
+    /* Checkboxes change classes of tr elements */
+    $('.js_checkbox').change(function () {
+        if (this.checked) {
+            $(this).closest('tr').addClass('text-bold');
+            $(this).closest('tr').removeClass('text-muted');
+        } else {
+            $(this).closest('tr').addClass('text-muted');
+            $(this).closest('tr').removeClass('text-bold');
+        }
+    });
+
+    $("input.js_checkbox").click(function(event){
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+    });
+
+    $("tr.change").click(function(event){
+        var b = $(this).find('.js_checkbox');
+        b.trigger("click");
+    });
+    SCRIPT;
+    $this->registerJs($js, \yii\web\View::POS_READY);
+}
 
 ?>
 
@@ -31,17 +44,10 @@ $this->registerJs($js, \yii\web\View::POS_READY);
     'dataProvider' => $dataProvider,
     'tableOptions' => ['class' => 'table table-bordered table-hover'],
     'rowOptions' => function($model, $key, $index, $column) use ($permissions, $form) {
-        if (isset($form)){
-            return [
-                'class' => in_array($model->name, $permissions) ? 'text-bold' : 'text-muted',
-                //'onclick' => 'this.getElementsByTagName("input")[0].checked = ! this.getElementsByTagName("input")[0].checked;',
-                //'style' => 'cursor: pointer'
-            ];
-        } else {
-            return [
-                'class' => in_array($model->name, $permissions) ? 'text-bold' : 'text-muted',
-            ];
-        }
+        return [
+            'class' => 'change ' . (in_array($model->name, $permissions) ? 'text-bold' : 'text-muted'),
+            'style' => isset($form) ? 'cursor: pointer' : '',
+        ];
     },
 
     'columns' => [

@@ -540,7 +540,7 @@ class DaemonController extends Controller
 
             # If no controller has a job to do
             if ($tot === false) {
-                sleep(5);
+                sleep(rand(5, 10));
                 $this->daemon->memory = memory_get_usage(); # bytes
                 $this->calcLoad(0);
             }
@@ -558,7 +558,7 @@ class DaemonController extends Controller
     protected function calcLoad ($value)
     {   
         $amount = round(time() - $this->time);
-        $this->loadarr = array_merge(array_fill(0, $amount, $value), $this->loadarr);
+        $this->loadarr = array_merge(array_fill(0, (float) $amount, $value), $this->loadarr);
         $this->time += $amount;
         $this->loadarr = array_slice($this->loadarr, 0, 300);
 
@@ -635,11 +635,11 @@ class DaemonController extends Controller
     /**
      * The signal handler function.
      * It handles the follwing signals:
-     * * SIGTERM
-     * * SIGHUP
-     * * SIGINT
-     * * SIGQUIT
-     * * SIGUSR1
+     * * SIGTERM (15)
+     * * SIGHUP (1)
+     * * SIGINT (2)
+     * * SIGQUIT (3)
+     * * SIGUSR1 (31,10,16)
      * * else the handler does nothing.
      * 
      * @param int $sig The signal.
