@@ -64,9 +64,6 @@ class LogSearch extends Log
             return $dataProvider;
         }
 
-        if (array_key_exists('date', $params['LogSearch'])) {
-            $params['LogSearch']['date'] .= "*";
-        }
         $dataProvider->allModels = Log::findAll($params['LogSearch']);
 
         return $dataProvider;

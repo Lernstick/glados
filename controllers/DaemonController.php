@@ -8,6 +8,8 @@ use app\models\DaemonSearch;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\models\Setting;
+use app\models\Log;
+use app\models\LogSearch;
 
 /**
  * DaemonController implements the CRUD actions for Daemon model.
@@ -29,6 +31,14 @@ class DaemonController extends BaseController
             'access' => [
                 'class' => \app\components\AccessControl::className(),
                 'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => [
+                            'log', // TODO: remove
+                            'logs', // TODO: remove
+                        ],
+                        'roles' => ['?', '@'],
+                    ],
                     [
                         'allow' => true,
                         'roles' => ['rbac'],
@@ -160,6 +170,36 @@ class DaemonController extends BaseController
 
     }
 
+    /**
+     * TODO
+     */
+    public function actionLog($type, $date)
+    {
+        if (($model = Log::findOne([
+            'type' => $type,
+            'date' => $date,
+        ])) !== null) {
+            return $this->renderAjax('/log/view', [
+                'model' => $model,
+            ]);
+        }
+
+        throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
+    }
+
+    /**
+     * TODO
+     */
+    public function actionLogs()
+    {
+        $searchModel = new LogSearch();
+        $dataProvider = $searchModel->search(['LogSearch' => Yii::$app->request->queryParams['LogSearch']]);
+
+        return $this->render('/log/index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
 
     /**
      * Finds the Daemon model based on its primary key value.

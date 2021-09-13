@@ -40,7 +40,7 @@ use yii\bootstrap\Modal;
                 'fetch' => 'fetch',
                 'restore' => 'restore',
                 'screen_capture' => 'screen_capture',
-                //'keylogger' => 'keylogger',
+                'keylogger' => 'keylogger',
                 'unlock' => 'unlock',
             ),
         ],

@@ -109,7 +109,6 @@ class LogController extends BaseController
         ]);
 
         return Yii::$app->response->sendContentAsFile(implode('', $model->contents), basename($model->path), [
-            //'mimeType' => $model->getMimeType($model->path),
             'inline' => false,
         ]);
     }

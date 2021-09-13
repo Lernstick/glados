@@ -23,6 +23,10 @@ $config = [
     ],
     'timezone' => 'Europe/Zurich',
     'vendorPath' => '/usr/share/yii2',
+    'aliases' => [
+        '@bower' => '@vendor/bower-asset',
+        '@npm'   => '@vendor/npm-asset',
+    ],
     'modules' => [
         'dynagrid' => [
             'class' => '\kartik\dynagrid\Module',

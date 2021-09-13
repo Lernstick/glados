@@ -186,7 +186,6 @@ class TicketSearch extends Ticket
             ->andFilterWhere(['like', 'exam.subject', $this->examSubject]);
         }]);
 
-
         Yii::$app->user->can('ticket/index/all') ?: $query->own();
 
         return $dataProvider;

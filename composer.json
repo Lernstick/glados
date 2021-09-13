@@ -24,9 +24,9 @@
         "kartik-v/yii2-widget-rangeinput": "*",
         "kartik-v/yii2-widget-switchinput": "dev-master",
         "kartik-v/yii2-dynagrid": "dev-master",
+        "kartik-v/yii2-icons": "@dev",
         "miloschuman/yii2-highcharts-widget": "*",
         "limion/yii2-jquery-fileupload-widget": "~1.0",
-        "fxp/composer-asset-plugin": "^1.4.1",
         "yiidoc/yii2-timeago": "dev-master",
         "yiisoft/yii2-imagine": "~2.0.0",
         "russ666/yii2-countdown": "*",
@@ -41,6 +41,10 @@
         "yiisoft/yii2-apidoc": "~2.1.0"
     },
     "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        },
         {
             "type": "package",
             "package": {
@@ -59,13 +63,7 @@
     ],
     "config": {
         "process-timeout": 1800,
-        "vendor-dir": "/usr/share/yii2",
-        "fxp-asset": {
-            "installer-paths": {
-                "npm-asset-library": "/usr/share/yii2/npm",
-                "bower-asset-library": "/usr/share/yii2/bower"
-            }
-        }
+        "vendor-dir": "/usr/share/yii2"
     },
     "scripts": {
         "post-create-project-cmd": [
