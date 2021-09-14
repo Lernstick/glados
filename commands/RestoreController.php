@@ -147,8 +147,7 @@ class RestoreController extends NetworkController
                 'restoreHost' => $this->ticket->ip,
             ]);
 
-            // TODO uncomment
-            /*if ($fs->slash($file) === null) {
+            if ($fs->slash($file) === null) {
                 $this->ticket->restore_state = yiit('ticket', 'Restore failed: "{file}": No such file or directory.');
                 $this->ticket->restore_state_params = ['file' => $file];
                 $this->logError($this->ticket->restore_state);
@@ -163,9 +162,9 @@ class RestoreController extends NetworkController
                 ]);
                 $act->save();
 
-                $this->unlock($this->ticket->id . "_restore");
+                $this->unlockItem($this->ticket);
                 return;
-            }*/
+            }
         } else {
             $this->ticket->restore_state = yiit('ticket', 'Nothing to restore.');
             $this->logInfo($this->ticket->restore_state);
