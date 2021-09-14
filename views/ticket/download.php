@@ -140,15 +140,6 @@ if ($model->client_state == 'setup complete') {
     ]); ?>
 
     <?= ActiveEventField::widget([
-        'content' => null,
-        'event' => 'ticket/' . $model->id,
-        'jsonSelector' => 'download_state',
-        'jsHandler' => 'function(d, s){
-            $("#info").html(d);
-        }'        
-    ]); ?>
-
-    <?= ActiveEventField::widget([
         'event' => 'ticket/' . $model->id,
         'jsonSelector' => 'setup_complete',
         'jsHandler' => 'function(d, s){

@@ -176,6 +176,25 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'client_state',
                 'format' => 'links',
                 'value' =>  ActiveEventField::widget([
+                    'options' => [
+                        'tag' => 'i',
+                        'class' => 'glyphicon glyphicon-cog ' . ($model->download_lock == 1 ? 'gly-spin' : 'hidden'),
+                        'style' => 'float: left;',
+                    ],
+                    'event' => 'ticket/' . $model->id,
+                    'jsonSelector' => 'download_lock',
+                    'jsHandler' => 'function(d, s){
+                        if (d == "1") {
+                            s.classList.add("gly-spin");
+                            s.classList.remove("hidden");
+                            growl("'.\Yii::t('ticket', 'Download started.').'", "info", "#tab_restores");
+                        } else if(d == "0") {
+                            s.classList.remove("gly-spin");
+                            s.classList.add("hidden");
+                            growl("'.\Yii::t('ticket', 'Download finished.').'", "info", "#tab_restores");
+                        }
+                    }',
+                ]) . ActiveEventField::widget([
                     'options' => [ 'tag' => 'span' ],
                     'content' => $model->client_state,
                     'event' => 'ticket/' . $model->id,

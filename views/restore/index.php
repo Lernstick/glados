@@ -36,7 +36,7 @@ use yii\widgets\Pjax;
         ],
         [
             'attribute' => 'restore_state',
-            'format' => 'raw',
+            'format' => 'links',
             'value' =>  ActiveEventField::widget([
                     'options' => [
                         'tag' => 'i',

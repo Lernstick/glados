@@ -518,7 +518,7 @@ class TicketController extends BaseController
                 return $this->render('token-request', [
                     'model' => $model,
                 ]);                
-            } else if ($model->download_lock != 0) {
+            } else if ($model->download_lock != 0 && $model->ip != Yii::$app->request->userIp) {
                 $model->addError('token', \Yii::t('ticket', 'Another instance is already running, '
                                         . 'multiple downloads are not allowed.'));
                 return $this->render('token-request', [

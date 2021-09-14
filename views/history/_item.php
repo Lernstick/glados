@@ -5,8 +5,6 @@ use yii\widgets\Pjax;
 use app\models\History;
 use app\models\Translation;
 use yii\data\ArrayDataProvider;
-use yii\helpers\Json;
-
 
 /* @var $model app\models\History the data model */
 /* @var $itemModel yii\base\Model the data model of the Item (for example: app\models\Ticket, app\models\Exam, app\models\User, ...) */
@@ -14,7 +12,6 @@ use yii\helpers\Json;
 /* @var $key integer mixed, the key value associated with the data item */
 /* @var $index integer integer, the zero-based index of the data item in the items array returned by $dataProvider. */
 /* @var $widget yii\widgets\ListView this widget instance */
-
 
 $models = [];
 
@@ -34,8 +31,8 @@ foreach ($model->columns as $key => $column) {
             $new_params = [];
             $old_params = [];
             if ( ($k = array_search($pname . '_data', $model->columns)) !== false) {
-                $new_params = Json::decode($model->new_values[$k]);
-                $old_params = Json::decode($model->old_values[$k]);
+                $new_params = json_decode($model->new_values[$k]);
+                $old_params = json_decode($model->old_values[$k]);
             } else {
                 $previous = History::find()->where([
                     'table' => $itemModel->tableName(),
@@ -43,8 +40,8 @@ foreach ($model->columns as $key => $column) {
                     'column' => $pname . '_data',
                 ])->orderBy(['changed_at' => SORT_DESC])->one();
                 if ($previous !== null) {
-                    $new_params = Json::decode($previous->new_value);
-                    $old_params = Json::decode($previous->new_value);
+                    $new_params = json_decode($previous->new_value);
+                    $old_params = json_decode($previous->new_value);
                 }
             }
 
