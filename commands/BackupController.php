@@ -251,6 +251,7 @@ class BackupController extends NetworkController implements DaemonInterface
 
         $cmd = new ShellCommand($this->_cmd);
         $logfile = $this->logfile;
+        file_put_contents($logfile, 'Executing rdiff-backup: ' . $this->_cmd . PHP_EOL, FILE_APPEND);
 
         $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use ($logfile) {
             echo $this->ansiFormat($event->line, $event->channel == ShellCommand::STDOUT ? Console::NORMAL : Console::FG_RED);
@@ -505,23 +506,25 @@ class BackupController extends NetworkController implements DaemonInterface
      * Get directory size recursively
      *
      * @param string $dir Path to the directoy
-     * @return int Total size in bytes
+     * @return int Total size in bytes or 0 if directory does not exist
      */
     private function directorySize ($dir)
     {
         $size = 0;
-        foreach (scandir($dir) as $item) {
-            if ($item == '.' || $item == '..') { continue; }
-            $item = $dir . '/' . $item;
+        if (file_exists($dir)) {
+            foreach (scandir($dir) as $item) {
+                if ($item == '.' || $item == '..') { continue; }
+                $item = $dir . '/' . $item;
 
-            unset($stat);
-            $stat = @lstat($item);
-            if (isset($stat['size']) && is_int($stat['size'])) {
-                $size += $stat['size'];
-            }
+                unset($stat);
+                $stat = @lstat($item);
+                if (isset($stat['size']) && is_int($stat['size'])) {
+                    $size += $stat['size'];
+                }
 
-            if (is_dir($item)) {
-                $size += $this->directorySize($item);
+                if (is_dir($item)) {
+                    $size += $this->directorySize($item);
+                }
             }
         }
         return $size;

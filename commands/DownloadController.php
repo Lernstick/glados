@@ -20,6 +20,13 @@ use app\models\Issue;
  * Download Process
  *
  * This is the daemon which calls rsync to push the exam to the clients one by one.
+ * The process has 3 phases:
+ *   1) download: where the relevant files are transmitted to the client system
+ *   2) restore: if there is data available to restore, restore them
+ *   3) prepare: after successfull download & restore, run the system setup
+ *
+ * All of the 3 phases generate separate logfiles indicated by download, restore or
+ * prepare resprectively.
  */
 class DownloadController extends NetworkController implements DaemonInterface
 {
@@ -139,6 +146,10 @@ class DownloadController extends NetworkController implements DaemonInterface
             $this->ticket->save(false);
         }
 
+        /**
+         * Download phase
+         */
+
         $this->ticket->scenario = Ticket::SCENARIO_DOWNLOAD;
         $this->ticket->client_state = yiit('ticket', 'download in progress') . ' ...';
         $this->ticket->runCommand('echo "download in progress" > ' . $this->remotePath . '/state');
@@ -170,10 +181,11 @@ class DownloadController extends NetworkController implements DaemonInterface
             'remotePath' => escapeshellarg($this->remotePath . '/squashfs/'),
         ]);
 
+        $logfile = $this->logfile;
         $this->logInfo('Executing rsync: ' . $cmd);
+        file_put_contents($logfile, 'Executing rsync: ' . $cmd . PHP_EOL, FILE_APPEND);
 
         $cmd = new ShellCommand($cmd);
-        $logfile = $this->logfile;
 
         @mkdir(dirname($logfile), 0755, true);
 
@@ -234,6 +246,10 @@ class DownloadController extends NetworkController implements DaemonInterface
             $this->ticket->client_state = yiit('ticket', 'download finished');
             $this->ticket->download_finished = new Expression('NOW()');
 
+            /**
+             * Restore phase
+             */
+
             /* if there is a backup available, restore the latest */
             $backupSearchModel = new BackupSearch();
             $backupDataProvider = $backupSearchModel->search($this->ticket->token);
@@ -243,6 +259,13 @@ class DownloadController extends NetworkController implements DaemonInterface
                 /* restore all that was backed up AND the screen_capture files as well */
                 $pid = $restoreDaemon->startRestore($this->ticket->id, '::All::', 'now', false, '/run/initramfs/backup/' . $this->ticket->exam->backup_path);
             }
+
+            /**
+             * Prepare phase
+             */
+
+            $this->lock_type = 'prepare';
+            $logfile = $this->logfile;
 
             $this->ticket->client_state = yiit('ticket', 'preparing system');
             $this->ticket->save();
@@ -259,9 +282,9 @@ class DownloadController extends NetworkController implements DaemonInterface
             ]);
 
             $this->logInfo('Executing ssh: ' . $cmd);
+            file_put_contents($logfile, 'Executing ssh: ' . $cmd . PHP_EOL, FILE_APPEND);
 
             $cmd = new ShellCommand($cmd);
-            $logfile = $this->logfile;
 
             $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use ($logfile) {
                 echo $this->ansiFormat($event->line, $event->channel == ShellCommand::STDOUT ? Console::NORMAL : Console::FG_RED);
@@ -296,6 +319,7 @@ class DownloadController extends NetworkController implements DaemonInterface
             }
         }
 
+        $this->lock_type = 'download';
         $this->unlockItem($this->ticket);
         $this->ticket = null;
     }

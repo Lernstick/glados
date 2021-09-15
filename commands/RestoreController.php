@@ -203,6 +203,7 @@ class RestoreController extends NetworkController
         ]);
 
         $this->logInfo('Executing rdiff-backup: ' . $this->_cmd);
+        file_put_contents($logfile, 'Executing rdiff-backup: ' . $this->_cmd . PHP_EOL, FILE_APPEND);
 
         $cmd = new ShellCommand($this->_cmd);
 
@@ -271,17 +272,12 @@ class RestoreController extends NetworkController
                 'ip' => escapeshellarg($this->ticket->ip),
                 'remotePath' => escapeshellarg('/run/initramfs/backup/var/log/screen_capture.log'),
             ]);
-            /*$this->_cmd = "rsync --rsync-path=\"mkdir -p /run/initramfs/backup/var/log/ && rsync\" "
-                . "-L --checksum --partial --progress --protect-args "
-                . "--rsh='ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
-                . " -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' "
-                . FileHelper::normalizePath(\Yii::$app->params['scPath'] . "/" . $this->ticket->token . "/screen_capture.log") . " "
-                . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . ":/run/initramfs/backup/var/log/screen_capture.log");*/
-
-            $this->logInfo('Executing rsync: ' . $this->_cmd);
 
             $cmd = new ShellCommand($this->_cmd);
             $logfile = $this->logfile;
+            $this->logInfo('Executing rsync: ' . $this->_cmd);
+            file_put_contents($logfile, 'Executing rsync: ' . $this->_cmd . PHP_EOL, FILE_APPEND);
+
             $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use ($logfile) {
                 echo $this->ansiFormat($event->line, $event->channel == ShellCommand::STDOUT ? Console::NORMAL : Console::FG_RED);
                 file_put_contents($logfile, $event->line, FILE_APPEND);

@@ -95,7 +95,7 @@ class Log extends Model
     public static function configurations()
     {
         return [
-            'backup,restore,download,fetch,unlock' => [
+            'backup,restore,download,prepare,fetch,unlock' => [
                 'path' => '{dir}/{type}.{token}.{date}.log',
                 'date_fmt' => 'c', # 2004-02-12T15:19:21+00:00
                 'from_date_fmt' => null,

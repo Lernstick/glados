@@ -3,7 +3,8 @@
 namespace app\commands;
 
 use yii;
-use app\commands\DaemonController;
+use yii\db\Expression;
+use app\commands\NetworkController;
 use app\models\RemoteExecution;
 use app\models\DaemonInterface;
 
@@ -12,8 +13,18 @@ use app\models\DaemonInterface;
  *
  * This daemon run through the queue in the database table "remote_execution"
  */
-class RemoteExecutionController extends DaemonController implements DaemonInterface
+class RemoteExecutionController extends NetworkController implements DaemonInterface
 {
+
+    /**
+     * @inheritdoc
+     */
+    public $lock_type = 'remote_execution';
+
+    /**
+     * @inheritdoc
+     */
+    public $lock_property = 'remote_execution_lock';
 
     /**
      * @var RemoteExecution The element in processing at the moment 
@@ -90,9 +101,14 @@ class RemoteExecutionController extends DaemonController implements DaemonInterf
             $options .= " -o " . $key . "=" . $value . " ";
         }
 
-        $cmd = "ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa " . $options
-             . "root@" . $remote_execution->host . " "
-             . escapeshellarg($remote_execution->env . " " .  $remote_execution->cmd . " 2>&1") . " >" . $tmp;        
+        $cmd = substitute('ssh -i {identity} {options} {user}@{ip} {cmd} >{file}', [
+            'identity' => escapeshellarg(\Yii::$app->params['dotSSH'] . '/rsa'),
+            'options' => $options,
+            'user' => 'root',
+            'ip' => $remote_execution->host,
+            'cmd' => escapeshellarg($remote_execution->env . " " .  $remote_execution->cmd . " 2>&1"),
+            'file' => escapeshellarg($tmp),
+        ]);
 
         $output = array();
 
@@ -114,22 +130,6 @@ class RemoteExecutionController extends DaemonController implements DaemonInterf
 
     /**
      * @inheritdoc
-     */
-    public function lockItem ($remote_execution)
-    {
-        return $this->lock($remote_execution->id . "_remote_execution");
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function unlockItem ($remote_execution)
-    {
-        return $this->unlock($remote_execution->id . "_remote_execution") && $remote_execution->delete();
-    }
-
-    /**
-     * @inheritdoc
      *
      * Determines the next command to execute remotely
      *
@@ -140,6 +140,12 @@ class RemoteExecutionController extends DaemonController implements DaemonInterf
         $this->pingOthers();
 
         $query = RemoteExecution::find()
+            // only if it was requested <=10 minutes ago, else the item is left abandoned.
+            ->where([
+                '>',
+                'requested_at',
+                new Expression('NOW() - INTERVAL 10 MINUTE')
+            ])
             ->orderBy(['requested_at' => SORT_ASC]);
 
         if (($remote_execution = $query->one()) !== null) {

@@ -134,7 +134,7 @@ Pjax::begin([
             ],
             [
                 'attribute' => 'Info',
-                'format' => 'raw',
+                'format' => 'links',
                 /**
                  * @param $issue Issue model instance
                  * @param $key
@@ -143,9 +143,7 @@ Pjax::begin([
                  */
                 'value' => function($issue, $key, $index, $datacolumn) {
                     if ($issue->key == $issue::CLIENT_OFFLINE) {
-                        $value = /*$datacolumn->grid->render('/ticket/fields/_online', [
-                            'model' => $issue->ticket,
-                        ]) . '&nbsp;' . */ActiveEventField::widget([
+                        $value = ActiveEventField::widget([
                             'options' => [ 'tag' => 'span' ],
                             'content' => $issue->ticket->client_state,
                             'event' => 'issues:ticket/' . $issue->ticket->id,

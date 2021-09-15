@@ -123,15 +123,17 @@ class NetworkController extends DaemonController
     /**
      * @inheritdoc
      */
-    public function lockItem ($ticket)
+    public function lockItem ($item)
     {
-        if ($this->lock($ticket->id . "_" . $this->lock_type)) {
+        if ($this->lock($item->id . "_" . $this->lock_type)) {
             $this->logfileDate = date('c');
-            if ($ticket->hasProperty($this->lock_property)) {
-                $ticket->{$this->lock_property} = 1;
+            if ($item->hasProperty($this->lock_property)) {
+                $item->{$this->lock_property} = 1;
             }
-            $ticket->running_daemon_id = $this->daemon->id;
-            return $ticket->save();
+            if ($item->hasProperty('running_daemon_id')) {
+                $item->running_daemon_id = $this->daemon->id;
+            }
+            return $item->save();
         }
         return false;
     }
@@ -139,15 +141,15 @@ class NetworkController extends DaemonController
     /**
      * @inheritdoc
      */
-    public function unlockItem ($ticket)
+    public function unlockItem ($item)
     {
-        if ($this->unlock($ticket->id . "_" . $this->lock_type)) {
+        if ($this->unlock($item->id . "_" . $this->lock_type)) {
             $this->logfileDate = null;
         }
 
-        if ($ticket->hasProperty($this->lock_property)) {
-            $ticket->{$this->lock_property} = 0;
-            return $ticket->save(false);
+        if ($item->hasProperty($this->lock_property)) {
+            $item->{$this->lock_property} = 0;
+            return $item->save(false);
         }
         return true;
     }

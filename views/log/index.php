@@ -37,6 +37,7 @@ use yii\bootstrap\Modal;
             'filter' => array(
                 'backup' => 'backup',
                 'download' => 'download',
+                'prepare' => 'prepare',
                 'fetch' => 'fetch',
                 'restore' => 'restore',
                 'screen_capture' => 'screen_capture',

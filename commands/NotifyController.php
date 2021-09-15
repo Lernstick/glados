@@ -3,7 +3,7 @@
 namespace app\commands;
 
 use yii;
-use app\commands\DaemonController;
+use app\commands\NetworkController;
 use yii\db\Expression;
 use app\models\Ticket;
 use app\models\Activity;
@@ -18,8 +18,23 @@ use app\models\Issue;
  * This daemon notifies the user via activities if a ticket has no backup since
  * a long amount of time.
  */
-class NotifyController extends DaemonController implements DaemonInterface
+class NotifyController extends NetworkController implements DaemonInterface
 {
+
+    /**
+     * @inheritdoc
+     */
+    public $ticket;
+
+    /**
+     * @inheritdoc
+     */
+    public $lock_type = 'notify';
+
+    /**
+     * @inheritdoc
+     */
+    public $lock_property = 'notify_lock';
 
     /**
      * @var int interval in which the tickets should be checked (in seconds)
@@ -30,14 +45,6 @@ class NotifyController extends DaemonController implements DaemonInterface
      * @var int timestamp when the tickets were checked the last time 
      */    
     private $checked = null;
-
-    /**
-     * @inheritdoc
-     */
-    public function start()
-    {
-        parent::start();
-    }
 
     /**
      * @inheritdoc
@@ -58,22 +65,24 @@ class NotifyController extends DaemonController implements DaemonInterface
 
             if ($id != '') {
                 if (($ticket = Ticket::findOne($id)) !== null) {
-                    if ($this->lockItem($ticket) && !$ticket->abandoned) {
-                        $ticket->client_state = 'Connecting to {ip} ...';
-                        $ticket->client_state_params = ['ip' => $ticket->ip];
-                        $ticket->save(false);
-                        list($output, $online) = $this->pingCheck($ticket);
+                    $this->ticket = $ticket;
+                    if ($this->lockItem($ticket)) {
+                        $this->ticket->client_state = 'Connecting to {ip} ...';
+                        $this->ticket->client_state_params = ['ip' => $this->ticket->ip];
+                        $this->ticket->save(false);
+                        list($output, $online) = $this->pingCheck($this->ticket);
                         if ($online === true) {
-                            $ticket->client_state = 'Client {ip} is online.';
-                            $ticket->client_state_params = ['ip' => $ticket->ip];
-                            $ticket->save(false);
+                            $this->ticket->client_state = 'Client {ip} is online.';
+                            $this->ticket->client_state_params = ['ip' => $this->ticket->ip];
+                            $this->ticket->save(false);
                         } else {
-                            $ticket->client_state = 'network error: {output}.';
-                            $ticket->client_state_params = ['output' => $output];
-                            $ticket->save(false);
+                            $this->ticket->client_state = 'network error: {output}.';
+                            $this->ticket->client_state_params = ['output' => $output];
+                            $this->ticket->save(false);
                         }
-                        $this->unlockItem($ticket);
+                        $this->unlockItem($this->ticket);
                     }
+                    $this->ticket = null;
                 }
                 return;
             }
@@ -114,11 +123,13 @@ class NotifyController extends DaemonController implements DaemonInterface
 
         $tickets = $query->all();
         foreach ($tickets as $ticket) {
-            if ($this->lockItem($ticket) && !$ticket->abandoned) {
-                $this->pingCheck($ticket);
-                $this->unlockItem($ticket);
+            $this->ticket = $ticket;
+            if ($this->lockItem($this->ticket) && !$this->ticket->abandoned) {
+                $this->pingCheck($this->ticket);
+                $this->unlockItem($this->ticket);
             }
         }
+        $this->ticket = null;
     }
 
     /**
@@ -239,22 +250,6 @@ class NotifyController extends DaemonController implements DaemonInterface
     /**
      * @inheritdoc
      */
-    public function lockItem ($ticket)
-    {
-        return $this->lock($ticket->id . "_notify");
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function unlockItem ($ticket)
-    {
-        return $this->unlock($ticket->id . "_notify");
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getNextItem ()
     {
         if ($this->checked < microtime(true) - $this->checkInterval) {
@@ -263,13 +258,4 @@ class NotifyController extends DaemonController implements DaemonInterface
             return false;
         }
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function stop($cause = null)
-    {
-        parent::stop($cause);
-    }
-
 }

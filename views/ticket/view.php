@@ -37,19 +37,26 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
     ]) ?>
 
-    <?php Pjax::begin([
+    <?= Pjax::widget([
         'id' => 'backup-now-container',
         'linkSelector' => '#backup-now',
         'enablePushState' => false,
+        'options' => ['class' => 'hidden'],
     ]); ?>
-    <?php Pjax::end(); ?>
 
-    <?php Pjax::begin([
+    <?= Pjax::widget([
         'id' => 'restore-now-container',
         'linkSelector' => '#restore-now',
         'enablePushState' => false,
+        'options' => ['class' => 'hidden'],
     ]); ?>
-    <?php Pjax::end(); ?>
+
+    <?= Pjax::widget([
+        'id' => 'probe-now-container',
+        'linkSelector' => '#probe-now',
+        'enablePushState' => false,
+        'options' => ['class' => 'hidden'],
+    ]); ?>
 
     <p></p>
 
@@ -144,7 +151,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     Html::a(\Yii::t('ticket', 'Probe'), [
                         'ping',
                         'id' => $model->id,
-                    ]),
+                    ], ['id' => 'probe-now']),
             ],
             [
                 'attribute' => 'agent_online',
