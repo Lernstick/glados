@@ -34,7 +34,8 @@ if (isset($form)){
         var b = $(this).find('.js_checkbox');
         b.trigger("click");
     });
-    SCRIPT;
+SCRIPT;
+
     $this->registerJs($js, \yii\web\View::POS_READY);
 }
 

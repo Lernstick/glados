@@ -55,6 +55,7 @@ Features
 
    howtos/deb-update
    howtos/deb-8to9-upgrade
+   howtos/deb-9to10-upgrade
 
 .. toctree::
    :caption: Configuration
