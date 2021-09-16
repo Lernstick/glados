@@ -285,6 +285,31 @@ Pjax::end();
                         'modules/solid-gauge',
                     ],
                     'options' => ArrayHelper::merge($gaugeOptions, [
+                        'title' => ['text' => $model->getAttributeLabel('averageLoad')],
+                        'yAxis' => ['max' => 100],
+                        'series' => [
+                            [
+                                'name' => 'average_load',
+                                'data' => [intval($model->averageLoad)],
+                                'dataLabels' => [
+                                    'format' =>
+                                        '<div style="text-align:center">' .
+                                            '<span style="font-size:11px">{y:.1f}</span><br/>' .
+                                            '<span style="font-size:10px;opacity:0.4">%</span>' .
+                                        '</div>',
+                                ],
+                            ]
+                        ]
+                    ]),
+                ]); ?>
+            </div>
+            <div class="col-sm-2">
+                <?= Highcharts::widget([
+                    'scripts' => [
+                        'highcharts-more', // enables supplementary chart types (gauge, arearange, columnrange, etc.)
+                        'modules/solid-gauge',
+                    ],
+                    'options' => ArrayHelper::merge($gaugeOptions, [
                         'title' => ['text' => $model->getAttributeLabel('memTotal')],
                         'yAxis' => ['max' => intval($model->memTotal/1048576)],
                         'series' => [
