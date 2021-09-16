@@ -88,6 +88,7 @@ class ServerStatus extends Model
      * Daemons
      */
     public $runningDaemons;
+    public $averageLoad;
 
     /**
      * Disk variables
@@ -158,6 +159,7 @@ class ServerStatus extends Model
             'procTotal' => \Yii::t('server', 'Webserver processes'),
             'db_threads_connected' => \Yii::t('server', 'Database connections'),
             'runningDaemons' => \Yii::t('server', 'Running daemons'),
+            'averageLoad' => \Yii::t('server', 'Average load of all daemons'),
             'memTotal' => \Yii::t('server', 'Memory usage'),
             'swapTotal' => \Yii::t('server', 'Swap usage'),
             'cpuPercentage' => \Yii::t('server', 'CPU usage'),
@@ -235,7 +237,11 @@ class ServerStatus extends Model
          * Daemons
          */
         $daemons = new DaemonSearch();
+        $sum = Daemon::find()->where(['description' => 'Base Process'])->sum('`load`');
+        $count = intval(Daemon::find()->where(['description' => 'Base Process'])->count());
         $status->runningDaemons = $daemons->search([])->totalCount;
+        $status->averageLoad = $count != 0 ? round(100*$sum/$count) : 0;
+
 
         /**
          * Memory information
@@ -416,6 +422,7 @@ class ServerStatus extends Model
             'proc_total' => ['y' => $this->procTotal, 'max' => $this->procMaximum],
             'db_threads_connected' => ['y' => $this->db_threads_connected, 'max' => $this->db_max_connections],
             'running_daemons' => ['y' => $this->runningDaemons, 'max' => \Yii::$app->params['maxDaemons']],
+            'average_load' => $this->averageLoad, # %
             'mem_used' => $this->memUsed/1048576, # MB
             'swap_used' => $this->swapUsed/1048576, # MB
             'cpu_percentage' => $this->cpuPercentage, # %
