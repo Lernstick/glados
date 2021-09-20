@@ -11,6 +11,7 @@ use yii\widgets\Pjax;
 /* @var $submitted int number of successfully submitted resutls */
 
 $this->title = \Yii::t('results', 'Submit Results');
+$this->params['breadcrumbs'][] = ['label' => \Yii::t('results', 'Exams'), 'url' => ['exam/index']];
 $this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['result/submit']];
 $this->params['breadcrumbs'][] = ['label' => $model->hash, 'url' => ['result/submit', 'mode' => 'step2', 'hash' => $model->hash]];
 $this->params['breadcrumbs'][] = \Yii::t('results', 'Summary');

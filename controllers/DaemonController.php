@@ -8,8 +8,6 @@ use app\models\DaemonSearch;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\models\Setting;
-use app\models\Log;
-use app\models\LogSearch;
 
 /**
  * DaemonController implements the CRUD actions for Daemon model.
@@ -25,20 +23,13 @@ class DaemonController extends BaseController
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'delete' => ['POST'],
+                    'stop' => ['POST'],
+                    'kill' => ['POST'],
                 ],
             ],
             'access' => [
                 'class' => \app\components\AccessControl::className(),
                 'rules' => [
-                    [
-                        'allow' => true,
-                        'actions' => [
-                            'log', // TODO: remove
-                            'logs', // TODO: remove
-                        ],
-                        'roles' => ['?', '@'],
-                    ],
                     [
                         'allow' => true,
                         'roles' => ['rbac'],
@@ -61,7 +52,7 @@ class DaemonController extends BaseController
         $minDaemons = Setting::findByKey('minDaemons');
         $maxDaemons = Setting::findByKey('maxDaemons');
 
-        if(Yii::$app->request->isAjax){
+        if (Yii::$app->request->isAjax) {
             return $this->renderAjax('index', [
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
@@ -69,7 +60,7 @@ class DaemonController extends BaseController
                 'minDaemons' => $minDaemons,
                 'maxDaemons' => $maxDaemons,
             ]);
-        }else{
+        } else {
             return $this->render('index', [
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
@@ -79,18 +70,6 @@ class DaemonController extends BaseController
             ]);
         }
 
-    }
-
-    /**
-     * Displays a single Daemon model.
-     * @param integer $id
-     * @return mixed
-     */
-    public function actionView($id)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
     }
 
     /**
@@ -117,9 +96,9 @@ class DaemonController extends BaseController
                 break;                
         }
 
-        if(Yii::$app->request->isAjax){
+        if (Yii::$app->request->isAjax) {
             return $this->runAction('index');
-        }else{
+        } else {
             return $this->redirect(['index']);
         }
 
@@ -141,9 +120,9 @@ class DaemonController extends BaseController
             $model->stop();
         }
 
-        if(Yii::$app->request->isAjax){
+        if (Yii::$app->request->isAjax) {
             return $this->runAction('index');
-        }else{
+        } else {
             return $this->redirect(['index']);
         }
 
@@ -162,43 +141,12 @@ class DaemonController extends BaseController
             $model->kill();
         }
 
-        if(Yii::$app->request->isAjax){
+        if (Yii::$app->request->isAjax) {
             return $this->runAction('index');
-        }else{
+        } else {
             return $this->redirect(['index']);
         }
 
-    }
-
-    /**
-     * TODO
-     */
-    public function actionLog($type, $date)
-    {
-        if (($model = Log::findOne([
-            'type' => $type,
-            'date' => $date,
-        ])) !== null) {
-            return $this->renderAjax('/log/view', [
-                'model' => $model,
-            ]);
-        }
-
-        throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
-    }
-
-    /**
-     * TODO
-     */
-    public function actionLogs()
-    {
-        $searchModel = new LogSearch();
-        $dataProvider = $searchModel->search(['LogSearch' => Yii::$app->request->queryParams['LogSearch']]);
-
-        return $this->render('/log/index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
     }
 
     /**

@@ -168,18 +168,20 @@ echo ActiveEventField::widget([
                         'class' => 'text-nowrap',
                         'style' => 'width:10px;',
                     ],
-                    'template' => '{view} {stop} {kill}',
+                    'template' => '{stop} {kill}',
                     'buttons' => [
                         'stop' => function ($url) {
                             return Html::a('<span class="glyphicon glyphicon-off"></span>', $url, [
                                 'title' => \Yii::t('daemons', 'Stop'),
                                 'class' => 'action',
+                                'data-method' => 'post',
                             ]);
                         },
                         'kill' => function ($url) {
                             return Html::a('<span class="text-danger glyphicon glyphicon-fire"></span>', $url, [
                                 'title' => \Yii::t('daemons', 'Kill'),
                                 'class' => 'action',
+                                'data-method' => 'post',
                                 'data' => [
                                     'confirm' => \Yii::t('daemons', 'Are you sure you want to kill this process?'),
                                 ],

@@ -25,16 +25,11 @@ class MonitorController extends BaseController
     public $owner_actions = ['monitor'];
 
     /**
-     * @var string Fake the controller id for the RBAC system
+     * @{inheritdoc}
      */
-    public $rbac_id = 'exam';
-
-    /**
-     * @var string Fake the action id for the RBAC system
-     */
-    public function getAction_id ()
+    public function route_mapping ()
     {
-        return 'monitor';
+        return ['*' => 'exam/monitor'];
     }
 
     /**

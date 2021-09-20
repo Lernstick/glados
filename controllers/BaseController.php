@@ -7,6 +7,7 @@ use yii\web\Controller;
 use app\components\AccessControl;
 use yii\web\ForbiddenHttpException;
 use yii\web\BadRequestHttpException;
+use yii\helpers\StringHelper;
 
 /**
  * BaseController implements the RBAC check.
@@ -17,8 +18,9 @@ class BaseController extends Controller
     /**
      * @var array list of actions where the current user should be tested against the owner of the
      * current object model, which is obtained by [[getOwner_id()]]. The list of actions is compared
-     * to the returnvalue of [[rbacRoute]]. So, if an action id is faked using [[getAction_id()]],
-     * the array of owner_action should contain the new action id.
+     * to the returnvalue of [[rbacRoute]], see [[getRbacRoute()]] below. If an action or controller
+     * id is faked using [[route_mapping()]], the array of [[owner_action]] should contain the new 
+     * action id.
      */
     public $owner_actions = [];
 
@@ -26,17 +28,31 @@ class BaseController extends Controller
      * @return int|null|false user id of the owner of the current object model in question.
      * 1) If the return value is a integer, the current object model is associated to the user
      *    with this id. If owner_id == current_user_id, the current user needs the permission
-     *    "controller/action". If owner_id != current_user_id, the current user need the permission
+     *    "controller/action". If owner_id != current_user_id, the current user needs the permission
      *    "controller/action/all".
      * 2) If the return value is null, an error will be thrown which states that the associated
-     *    object model could not be determined. So a test whether the user has the right permission
-     *    will not be possible.
+     *    object model could not be determined. By this, a test whether the user has the right 
+     *    permission will not be possible.
      * 3) If the return value is false, then the access test will be successful if the user has
      *    the permission "controller/action".
      */
     public function getOwner_id()
     {
         return null;
+    }
+
+    /**
+     * @var array Mapping of the RBAC route to a fake route, with which the RBAC access control should
+     * be evaluated. Examples:
+     * 
+     * 1) ['*' => 'controller/action'] // map all actions to 'controller/action'
+     * 2) ['actionA' => 'controller/actionB'] // map only 'actionA' to 'controller/actionB', all others stay
+     * 3) ['view*' => 'controller/actionC'] // map only actions matching view* to 'controller/actionC'
+     * 
+     */
+    public function route_mapping ()
+    {
+        return [];
     }
 
     /**
@@ -65,12 +81,14 @@ class BaseController extends Controller
      */
     protected function getRbacRoute()
     {
-        $controller_id = \Yii::$app->controller->canGetProperty('rbac_id')
-            ? \Yii::$app->controller->rbac_id
-            : \Yii::$app->controller->id;
-        $action_id = \Yii::$app->controller->canGetProperty('action_id')
-            ? \Yii::$app->controller->action_id
-            : \Yii::$app->controller->action->id;
+
+        $route = \Yii::$app->controller->id . '/' . \Yii::$app->controller->action->id;
+        foreach($this->route_mapping() as $pattern => $fake_route) {
+            if (StringHelper::matchWildcard($pattern, \Yii::$app->controller->action->id)) {
+                $route = $fake_route;
+            }
+        }
+        list($controller_id, $action_id) = explode('/', $route, 2);
 
         if (in_array($action_id, $this->owner_actions)) {
             $owner_id = \Yii::$app->controller->owner_id;

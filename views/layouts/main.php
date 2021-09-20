@@ -188,6 +188,11 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
                         'visible' => Yii::$app->user->can('server/status'),
                     ],
                     [
+                        'label' => '<i class="glyphicon glyphicon-book"></i> ' . \Yii::t('main', 'Server Logs'),
+                        'url' => ['/server/logs'],
+                        'visible' => Yii::$app->user->can('server/logs'),
+                    ],
+                    [
                         'label' => '<i class="glyphicon glyphicon-th-list"></i> ' . \Yii::t('main', 'Server Config'),
                         'url' => ['/server/config'],
                         'visible' => Yii::$app->user->can('server/config'),

@@ -10,7 +10,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
 /**
- * LogController implements the view actions for Log model.
+ * LogController implements the view actions for the Log model.
  */
 class LogController extends BaseController
 {
@@ -21,16 +21,11 @@ class LogController extends BaseController
     public $owner_actions = ['view', 'download'];
 
     /**
-     * @var string Fake the controller id for the RBAC system
+     * @{inheritdoc}
      */
-    public $rbac_id = 'ticket';
-
-    /**
-     * @var string Fake the action id for the RBAC system
-     */
-    public function getAction_id ()
+    public function route_mapping ()
     {
-        return 'view';
+        return ['*' => 'ticket/view'];
     }
 
     /**
@@ -78,10 +73,10 @@ class LogController extends BaseController
     /**
      * Displays a Log model.
      * @param string $type log file type
-     * @param string $token ticket token
      * @param string $date date associated to the log file
+     * @param string $token ticket token
      */
-    public function actionView($type, $token, $date)
+    public function actionView($type, $date, $token)
     {
         $model = $this->findModel([
             'type' => $type,
@@ -97,10 +92,10 @@ class LogController extends BaseController
     /**
      * Downloads a Log model.
      * @param string $type log file type
-     * @param string $token ticket token
      * @param string $date date associated to the log file
+     * @param string $token ticket token
      */
-    public function actionDownload($type, $token, $date)
+    public function actionDownload($type, $date, $token)
     {
         $model = $this->findModel([
             'type' => $type,

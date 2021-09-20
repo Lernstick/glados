@@ -37,6 +37,7 @@
 
 * [Softwareupdate on Debian](deb-update.md)
 * [Upgrade from Debian 8 to 9](deb-8to9-upgrade.md)
+* [Upgrade from Debian 9 to 10](deb-9to10-upgrade.md)
 
 ### Configuration
 

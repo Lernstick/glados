@@ -42,6 +42,7 @@ class m210705_145230_roles extends BaseMigration
         $monitorAllExam = $auth->createPermission('exam/monitor/all');
         $pingTicket = $auth->createPermission('ticket/ping');
         $pingAllTicket = $auth->createPermission('ticket/ping/all');
+        $serverLogs = $auth->createPermission('server/logs');
 
         $indexRole->description = yiit('permission', 'Index all roles');
         $createRole->description = yiit('permission', 'Create a new role');
@@ -55,6 +56,7 @@ class m210705_145230_roles extends BaseMigration
         $viewAllExam->description = yiit('permission', 'View all exams');
         $pingTicket->description = yiit('permission', 'Ping clients of own tickets');
         $pingAllTicket->description = yiit('permission', 'Ping clients of all tickets');
+        $serverLogs->description = yiit('permission', 'View/List the sever log files');
         $admin->description = yiit('permission', "The immutable 'admin' role");
         $teacher->description = yiit('permission', "The immutable 'teacher' role");
 
@@ -75,6 +77,7 @@ class m210705_145230_roles extends BaseMigration
         $auth->add($monitorAllExam);
         $auth->add($pingTicket);
         $auth->add($pingAllTicket);
+        $auth->add($serverLogs);
 
         $auth->addChild($monitorExam, $indexExam);
         $auth->addChild($monitorExam, $indexTicket);
@@ -98,6 +101,7 @@ class m210705_145230_roles extends BaseMigration
         $auth->addChild($admin, $serverStatus);
         $auth->addChild($admin, $monitorAllExam);
         $auth->addChild($admin, $pingAllTicket);
+        $auth->addChild($admin, $serverLogs);
         $auth->addChild($teacher, $monitorExam);
         $auth->addChild($teacher, $pingTicket);
 
@@ -145,6 +149,7 @@ class m210705_145230_roles extends BaseMigration
         $indexAllTicket = $auth->getPermission('ticket/index/all');
         $pingTicket = $auth->getPermission('ticket/ping');
         $pingAllTicket = $auth->getPermission('ticket/ping/all');
+        $serverLogs = $auth->getPermission('server/logs');
 
         $viewScreenshots = $auth->createPermission('screenshot/view');
         $snapScreenshots = $auth->createPermission('screenshot/snap');
@@ -163,6 +168,7 @@ class m210705_145230_roles extends BaseMigration
         $auth->removeChild($admin, $serverStatus);
         $auth->removeChild($admin, $monitorAllExam);
         $auth->removeChild($admin, $pingAllTicket);
+        $auth->removeChild($admin, $serverLogs);
         $auth->removeChild($teacher, $monitorExam);
         $auth->removeChild($teacher, $pingTicket);
 
@@ -176,6 +182,7 @@ class m210705_145230_roles extends BaseMigration
         $auth->remove($monitorExam);
         $auth->remove($pingTicket);
         $auth->remove($pingAllTicket);
+        $auth->remove($serverLogs);
 
         $viewExam->description = yiit('permission', 'View/Monitor own exams');
         $viewAllExam->description = yiit('permission', 'View/Monitor all exams');

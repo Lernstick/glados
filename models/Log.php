@@ -83,6 +83,7 @@ class Log extends Model
      * * value is an array itself
      *   * path: path pattern of the logfile
      *   * date_fmt: format of the date within the path
+     *   * search_date_fmt: format of the date to search in findFiles
      *   * from_date_fmt: how to parse the date, when creating the Datetime object with
      *     Datetime::createFromFormat(). null means create the object with new Datetime()
      *   * findFiles: array with dir and options
@@ -97,7 +98,8 @@ class Log extends Model
         return [
             'backup,restore,download,prepare,fetch,unlock' => [
                 'path' => '{dir}/{type}.{token}.{date}.log',
-                'date_fmt' => 'c', # 2004-02-12T15:19:21+00:00
+                'date_fmt' => 'c', # 2004-02-12T15:19:21+02:00
+                'search_date_fmt' => 'Y-m-d*P', # 2004-02-12*+02:00
                 'from_date_fmt' => null,
                 'findFiles' => [
                     'dir'    => Yii::getAlias('@runtime/logs/'),
@@ -109,7 +111,8 @@ class Log extends Model
             ],
             'screen_capture' => [
                 'path' => '{dir}/{token}/{type}.log',
-                'date_fmt' => 'c', # 2004-02-12T15:19:21+00:00
+                'date_fmt' => 'c', # 2004-02-12T15:19:21+02:00
+                'search_date_fmt' => 'c', # 2004-02-12T15:19:21+02:00
                 'from_date_fmt' => null,
                 'findFiles' => [
                     'dir' => FileHelper::normalizePath(\Yii::$app->params['scPath']),
@@ -122,6 +125,7 @@ class Log extends Model
             'glados,error' => [
                 'path' => '{dir}/{type}.{date}.log',
                 'date_fmt' => 'Y-m-dO', # 2021-08-02+0200
+                'search_date_fmt' => 'Y-m-dO',
                 'from_date_fmt' => 'Y-m-dO',
                 'findFiles' => [
                     'dir' => FileHelper::normalizePath(\Yii::$app->params['daemonLogFilePath']),
@@ -134,6 +138,7 @@ class Log extends Model
             'keylogger' => [
                 'path' => '{dir}/{token}/{type}{date}.key',
                 'date_fmt' => 'U', # timestamp
+                'search_date_fmt' => 'U',
                 'from_date_fmt' => 'U',
                 'findFiles' => [
                     'dir' => FileHelper::normalizePath(\Yii::$app->params['scPath']),
@@ -181,7 +186,7 @@ class Log extends Model
         return [
             'date' => Yii::t('log', 'Date'),
             'type' => Yii::t('log', 'Type'),
-            'path' => Yii::t('log', 'Logfile Path'),
+            'path' => Yii::t('log', 'Path'),
         ];
     }
 
@@ -208,7 +213,6 @@ class Log extends Model
                 'dir' => $this->config['findFiles']['dir'],
                 'type' => $this->type,
                 'token' => $this->token,
-                //'date' => date($this->config['date_fmt'], strtotime($this->date)),
                 'date' => $this->date,
             ]));
         }
@@ -225,6 +229,15 @@ class Log extends Model
         return gzfile($this->path);
     }
 
+    /**
+     * Getter for the filesize in bytes
+     *
+     * @return array
+     */
+    public function getSize()
+    {
+        return filesize($this->path);
+    }
 
     /**
      * Returns the params in terms of wildcard patterns
@@ -236,7 +249,7 @@ class Log extends Model
     {
         return [
             'type' => array_key_exists('type', $params) && !empty($params['type']) ? $params['type'] : '*',
-            'token' => array_key_exists('token', $params) && !empty($params['token']) ? $params['token'] : '*',
+            'token' => array_key_exists('token', $params) && $params['token'] !== '' ? $params['token'] : '*',
             'date' => array_key_exists('date', $params) && !empty($params['date']) ? $params['date'] : '*',
         ];
     }
@@ -290,7 +303,7 @@ class Log extends Model
             } else {
                 $date = \DateTime::createFromFormat($this->config['from_date_fmt'], $this->date);
             }
-            return $filterDateStart < $date && $date < $filterDateEnd;
+            return $filterDateStart <= $date && $date <= $filterDateEnd;
         }
         return false;
     }
@@ -323,15 +336,24 @@ class Log extends Model
      * @param array $params 
      * @return array
      */
-    public static function findFiles($params)
+    public static function findFiles($params, $matchWildcard = true)
     {
         $pparams = self::processParams($params);
+
+        if ($pparams['date'] !== "*" && $matchWildcard) {
+            $date = \DateTime::createFromFormat('Y-m-d|+', $pparams['date']);
+        }
+
         $ret = [];
         foreach (self::configurations() as $types => $config) {
             $options = $config['findFiles']['options'];
             $dir = substitute($config['findFiles']['dir'], $pparams);
             if (array_key_exists('only', $options)) {
                 foreach ($options['only'] as $key => $value) {
+                    // format the date before substituting
+                    if ($pparams['date'] !== "*" && $matchWildcard) {
+                        $pparams['date'] = $date->format($config['search_date_fmt']);
+                    }
                     $options['only'][$key] = substitute($options['only'][$key], $pparams);
                 }
             }
@@ -402,12 +424,12 @@ class Log extends Model
      *
      * @param string $token token
      * @param string $type log type (can be backup, restore, download, fetch, unlock, ...)
-     * @param string $date date in iso-8601 format with seconds, example 2020-05-27T14:04:33+02:00
+     * @param string $date date in whatever format is relevant for the type
      * @return Log|null
      */
     public static function findOne($params)
     {
-        $list = Log::findFiles($params);
+        $list = Log::findFiles($params, false);
         $model = null;
         foreach ($list as $path) {
             $matches = [];

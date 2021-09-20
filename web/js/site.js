@@ -87,3 +87,20 @@ function growl(message, type = 'info', url = null){
         '</div>'
     });
 }
+
+/**
+ * Problem: select2 fields have no autofocus anymore.
+ * Hacky fix for a bug in select2 with jQuery 3.6.0's new nested-focus "protection"
+ * @see https://github.com/select2/select2/issues/5993
+ * @see https://github.com/jquery/jquery/issues/4382
+ * @see https://github.com/select2/select2/issues/5993#issuecomment-917398735
+ *
+ * @todo: Recheck with the select2 GH issue and remove once this is fixed on their side
+ */
+$(document).on('select2:open', (e) => {
+    const target = $(e.target);
+    if (target && target.length) {
+        const id = target[0].id || target[0].name;
+        document.querySelector(`input[aria-controls*='${id}']`).focus();
+    }
+});

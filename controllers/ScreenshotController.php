@@ -20,16 +20,11 @@ class ScreenshotController extends BaseController
     public $owner_actions = ['view', 'snap'];
 
     /**
-     * @var string Fake the controller id for the RBAC system
+     * @{inheritdoc}
      */
-    public $rbac_id = 'ticket';
-
-    /**
-     * @var string Fake the action id for the RBAC system
-     */
-    public function getAction_id ()
+    public function route_mapping ()
     {
-        return 'view';
+        return ['*' => 'ticket/view'];
     }
 
     /**
