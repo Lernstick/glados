@@ -35,7 +35,7 @@ $this->registerJs('var YII_DEBUG = ' . (YII_DEBUG ? 'true' : 'false') . ';', \yi
 	<?php if (YII_ENV_DEV) {
         echo "<p class='navbar-text' style='color:red; font-size:7px; margin:10px;'>YII_ENV_DEV=true<br>YII_DEBUG=" . (YII_DEBUG ? 'true' : 'false') . "<br>LANG=" . \Yii::$app->language . "</p>";
     } ?>
-    <div class="container">
+    <div class="container-client">
         <?= $content ?>
     </div>
 </div>

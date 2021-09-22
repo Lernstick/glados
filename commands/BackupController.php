@@ -313,6 +313,10 @@ class BackupController extends NetworkController implements DaemonInterface
 
             # If it's the last backup, tell the client and set last_backup to 1
             if ($this->finishBackup == true) {
+                /**
+                 * This is the ONLY place in the whole application where last_backup is set to 1
+                 * It is set, only if rdiff-backup stopped successfully.
+                 */
                 $this->ticket->last_backup = 1;
                 $this->ticket->save(false);
             }

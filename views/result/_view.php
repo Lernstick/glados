@@ -12,37 +12,28 @@ use yii\bootstrap\Modal;
 /* @var $this yii\web\View */
 /* @var $model app\models\Ticket */
 /* @var $title string */
+/* @var $finish bool */
 
-$js = <<< 'SCRIPT'
-$('#confirmFinish').on('show.bs.modal', function(e) {
-    //$(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
-    //console.log($(e.relatedTarget).data('href'));
-});
-
-$(document).on('click', '#confirmFinish a#finish-now', function (e) {
-  //e.stopPropagation();
-  $('#confirmFinish').modal('hide');
-  $.ajax({
-    url: "/glados/index.php/ticket/finish/1234",
-    type: "GET",
-    success: function(data){
-        if (data.code != 200) {
-            alert("Error " + data.code + ": " + data.msg);
-        }
-    },
-    error: function(error){
-         console.log("Error:");
-         console.log(error);
-    }
-  });
-
-});
-SCRIPT;
-// Register tooltip/popover initialization javascript
-$this->registerJs($js);
+$this->registerJs('window.location.href = "#wxbrowser:resize:800x600"');
 
 if (isset($title)) {
     echo "<h1>" . Html::encode($title) . "</h1>";
+
+    if ($model->last_backup == 1) {
+        $this->registerJs('$("#success").modal("show");');
+    }
+
+    echo ActiveEventField::widget([
+        'content' => null,
+        'event' => 'ticket/' . $model->id,
+        'jsonSelector' => 'last_backup',
+        'jsHandler' => 'function(d, s){
+            if (d == "1") {
+                $("#success").modal("show");
+            }
+        }',
+    ]);
+
 }
 
 ActiveEventField::begin([
@@ -108,24 +99,28 @@ if ($model->state == Ticket::STATE_CLOSED){
 </div>
 
 <div class="row">
-    <div class="col-md-7 col-xs-7">
+    <div class="col-md-6 col-xs-6">
         <p class="text-left text-<?= !$started ? 'danger' : 'success' ?>">
-            <span class="glyphicon glyphicon-triangle-top"></span> <?= \Yii::t('results', 'started') ?>
+            <span class="glyphicon glyphicon-triangle-top"></span>
+            <?= \Yii::t('results', 'started') ?>
         </p>
     </div>
-    <div class="col-md-1">
-        <p class="text-left text-<?= !$finished ? 'danger' : 'success' ?>">
-            <?= \Yii::t('results', 'finished') ?> <span class="glyphicon glyphicon-triangle-top"></span>
+    <div class="col-md-2 col-xs-2">
+        <p class="pull-right text-<?= !$finished ? 'danger' : 'success' ?>">
+            <span class="pull-right glyphicon glyphicon-triangle-top"></span>
+            <?= \Yii::t('results', 'finished') ?>&nbsp;
         </p>
     </div>        
     <div class="col-md-2 col-xs-2">
-        <p class="text-right text-<?= !$submitted ? 'danger' : 'success' ?>">
-            <?= \Yii::t('results', 'submitted') ?> <span class="glyphicon glyphicon-triangle-top"></span>
+        <p class="pull-right text-<?= !$submitted ? 'danger' : 'success' ?>">
+            <span class="pull-right glyphicon glyphicon-triangle-top"></span>
+            <?= \Yii::t('results', 'submitted') ?>&nbsp;
         </p>
     </div>
     <div class="col-md-2 col-xs-2">
-        <p class="text-right text-<?= !$result ? 'danger' : 'success' ?>">
-            <?= \Yii::t('results', 'result handed in') ?> <span class="glyphicon glyphicon-triangle-top"></span>
+        <p class="pull-right text-<?= !$result ? 'danger' : 'success' ?>">
+            <span class="pull-right glyphicon glyphicon-triangle-top"></span>
+            <?= \Yii::t('results', 'result handed in') ?>&nbsp;
         </p>
     </div>
 </div>
@@ -134,7 +129,7 @@ if ($model->state == Ticket::STATE_CLOSED){
     <div class="panel-heading">
         <div class="row">
             <div class="col-xs-8">
-                <span>Exam: <?= $model->examSubject . " - " . $model->examName; ?></span>
+                <span><?= \Yii::t('ticket', 'Exam') . ':' . $model->examSubject . " - " . $model->examName; ?></span>
             </div>
             <div class="col-xs-4">
                 <?php if (isset($title)) { ?>
@@ -151,27 +146,16 @@ if ($model->state == Ticket::STATE_CLOSED){
                             ) ?>
                         </li>
                         <li>
-                            <?= Html::a(
-                                '<span class="glyphicon glyphicon-flag"></span> Hand-in Exam',
-                                Url::to([
-                                    'ticket/finish',
-                                    'token' => $model->token,
-                                ]),
-                                [
-                                    'data-href' => Url::to([
-                                        'ticket/finish',
-                                        'token' => $model->token,
-                                    ]),
-                                    'data-toggle' => 'modal',
-                                    'data-target' => '#confirmFinish',
-                                ]
-                            ) ?>
+                            <?= Html::a('<span class="glyphicon glyphicon-flag"></span> ' . \Yii::t('app', 'Hand-in'), '#', [
+                                'data-toggle' => 'modal',
+                                'data-target' => '#confirm',
+                            ]); ?>
                         </li>
                         <li>
                             <?= Html::a(
-                                '<span class="glyphicon glyphicon-question-sign"></span> Help',
+                                '<span class="glyphicon glyphicon-question-sign"></span> ' . \Yii::t('client', 'Help'),
                                 ['howto/view', 'id' => 'welcome-to-exam.md', 'mode' => 'inline'],
-                                ['onclick' => 'window.open("' . Url::to(['howto/view', 'id' => 'welcome-to-exam.md', 'mode' => 'inline']) . '", "Help", "titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,width=900,height=800"); return false;']
+                                ['onclick' => 'window.open("' . Url::to(['howto/view', 'id' => 'welcome-to-exam.md', 'mode' => 'inline']) . '", "Help", "titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,width=800,height=800"); return false;']
                             ) ?>
                         </li>
                     </ul>
@@ -183,7 +167,7 @@ if ($model->state == Ticket::STATE_CLOSED){
 
     <div class="panel-body">
         <div class="row">
-            <div class="col-md-8 col-xs-12">
+            <div class="col-md-8 col-xs-8">
                 <?= DetailView::widget([
                     'model' => $model,
                     'attributes' => [
@@ -203,8 +187,8 @@ if ($model->state == Ticket::STATE_CLOSED){
                     ],
                 ]); ?>
             </div>
-        
-            <div class="col-md-4 col-xs-12">
+
+            <div class="col-md-4 col-xs-4">
                 <div class="well">
                     <h1 class="text-center">
                     <small>
@@ -220,7 +204,7 @@ if ($model->state == Ticket::STATE_CLOSED){
                                 ##$date->modify('+30 seconds');
                                 echo \russ666\widgets\Countdown::widget([
                                     'datetime' => $date->format('Y-m-d H:i:s O'),
-                                    'format' => \Yii::t('results', 'The world might end in...') . '<br> %-N %!N:minute,minutes; %-S %!S:second,seconds;',
+                                    'format' => \Yii::t('results', 'The exam is over in ...') . '<br> %-N %!N:minute,minutes; %-S %!S:second,seconds;',
                                     'events' => [
                                         'finish' => 'function(){
                                             this.innerHTML = "Time is up.";
@@ -231,7 +215,6 @@ if ($model->state == Ticket::STATE_CLOSED){
                                             width = 100*parseFloat($("#pb-run").css("width"))/parseFloat($("#pb-run").parent().css("width"));
                                             end = 65.0;
                                             p = end - e.offset.totalSeconds/((e.offset.totalSeconds + 1)/(end - width));
-                                            console.log(p, width);
                                             $("#pb-run").width(p + "%")
                                         }',
                                     ],
@@ -253,18 +236,28 @@ if ($model->state == Ticket::STATE_CLOSED){
 
 <?php Pjax::end(); ?>
 
-<?php Modal::begin([
-    'id' => 'confirmFinish',
-    'header' => '<h4>Confirm Exam Hand-in</h4>',
-    'footer' => Html::Button('Cancel', ['data-dismiss' => 'modal', 'class' => 'btn btn-default']) . '<a id="finish-now" class="btn btn-danger btn-ok">Yes, hand-in my exam</a>',
-]); ?>
+<?= $this->render('/ticket/_finish_s1', [
+    'model' => $model,
+    'finish' => isset($finish) && $finish,
+]) ?>
 
-<p>You're about to hand-in your exam.</p>
+<div id="success" class="modal modal-centered fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
 
-<div class="alert alert-danger" role="alert">
-  <h4>Important!</h4>
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4><?= \Yii::t('client', 'Continue') ?></h4>
+            </div>
 
-  <p>Please notice, that once this process is initiated, you <b>cannot continue</b> with the exam. So, please make sure you <b>saved all documents</b> and <b>closed all open windows</b> before finishing your exam.</p>
+            <div class="modal-body clearfix">
+                <p><?= \Yii::t('client', 'You exam was handed-in successfully. You can close this window now.') ?></p>
+                <div class="pull-right">
+                    <?= Html::a(\Yii::t('app', 'Close'), '#wxbrowser:close', ['class' => 'btn btn-default']); ?>
+                    <?= Html::a(\Yii::t('app', 'Shutdown'), '#wxbrowser:shutdown', ['class' => 'btn btn-danger']); ?>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
-
-<?php Modal::end(); ?>

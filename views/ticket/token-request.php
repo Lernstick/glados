@@ -30,10 +30,10 @@ $this->registerJs($js);
                                 <?= Html::a(
                                     '<span class="glyphicon glyphicon-question-sign"></span>',
                                     ['howto/view', 'id' => 'token-request-help.md', 'mode' => 'inline'],
-                                    ['onclick' => 'window.open("' . Url::to(['howto/view', 'id' => 'token-request-help.md', 'mode' => 'inline']) . '", "Help", "titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,width=800,height=800"); return false;']
+                                    ['onclick' => 'window.open("' . Url::to(['howto/view', 'id' => 'token-request-help.md', 'mode' => 'inline']) . '", "Help", "titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,width=850,height=600"); return false;']
                                 ) ?>
                             </div>
-                        </div>                        
+                        </div>
                     </div>
                 </div>
                 <div class="panel-body">
@@ -58,7 +58,7 @@ $this->registerJs($js);
                     ])->label(false)->hint(false); ?><div class="help-block"></div>
 
                     <?php ActiveForm::end(); ?>
-                </div>       
+                </div>
             </div>
         </div>
     </div>

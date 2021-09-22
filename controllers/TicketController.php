@@ -589,7 +589,7 @@ class TicketController extends BaseController
      * @param string $token
      * @return mixed 
      */
-    public function actionStatus($token)
+    public function actionStatus($token, $finish = false)
     {
         $this->layout = 'client';
         $model = Ticket::findOne(['token' => $token]);
@@ -597,6 +597,7 @@ class TicketController extends BaseController
         return $this->render('/result/_view', [
             'title' => 'Exam Status',
             'model' => $model,
+            'finish' => $finish,
         ]);
     }
 
@@ -643,60 +644,62 @@ class TicketController extends BaseController
      * @param string $token
      * @return The response object or an array with the error description
      */
-    public function actionFinish($token)
+    public function actionFinish($token, $step = 1)
     {
+        $this->layout = 'client';
         $model = Ticket::findOne(['token' => $token]);
-        $model->scenario = Ticket::SCENARIO_FINISH;
-
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
-        if ($model === null){
-            return [ 'code' => 403, 'msg' => 'The provided ticket is invalid.' ];
+        if ($model === null) {
+            throw new BadRequestHttpException(\Yii::t('ticket', 'The provided ticket is invalid.'));
         }
-        if ($model->state != Ticket::STATE_RUNNING){
-            return [ 'code' => 403, 'msg' => 'The provided ticket is not in running state.' ];
-        }
+        /*if ($model->state != Ticket::STATE_RUNNING) {
+            //throw new BadRequestHttpException(\Yii::t('ticket', 'The provided ticket is not in running state.'));
+            $step = 2;
+        }*/
 
-        $model->ip = Yii::$app->request->userIp; # set the ip address
-        $model->end = new Expression('NOW()');
-        $model->last_backup = 0;
-        $model->save();
-
-        // increment the stats for total duration and total completed exams
-        // but count only exams whose duration is less or equal than 8 hours and more
-        // or equal than 15 minutes.
-        $model->refresh();
-        if ($model->durationInSecs <= 28800 && $model->durationInSecs >= 900) {
-            Stats::increment('total_duration', $model->durationInSecs);
-            Stats::increment('completed_exams'); // +1
-        }
-  
-        if ($model->test_taker) {
-            $act = new Activity([
-                'ticket_id' => $model->id,
-                'description' => yiit('activity', 'Exam finished by {test_taker}.'),
-                'description_params' => [ 'test_taker' => $model->test_taker ],
-                'severity' => Activity::SEVERITY_INFORMATIONAL,
+        if ($step == 1 && $model->state == Ticket::STATE_RUNNING) {
+            return $this->render('finish_s1', [
+                'model' => $model,
             ]);
-        } else {
-            $act = new Activity([
-                'ticket_id' => $model->id,
-                'description' => yiit('activity', 'Exam finished by Ticket with token {token}.'),
-                'description_params' => [ 'token' => $token ],
-                'severity' => Activity::SEVERITY_INFORMATIONAL,
-            ]);
+        } else if ($step == 2 && $model->state == Ticket::STATE_RUNNING) {
+            $model->scenario = Ticket::SCENARIO_FINISH;
+            $model->client_state = \Yii::t('ticket', 'waiting for last backup');
+            $model->ip = Yii::$app->request->userIp; # set the ip address
+            $model->end = new Expression('NOW()');
+            $model->last_backup = 0;
+            $model->save();
+
+            // increment the stats for total duration and total completed exams
+            // but count only exams whose duration is less or equal than 8 hours and more
+            // or equal than 15 minutes.
+            $model->refresh();
+            if ($model->durationInSecs <= 28800 && $model->durationInSecs >= 900) {
+                Stats::increment('total_duration', $model->durationInSecs);
+                Stats::increment('completed_exams'); // +1
+            }
+
+            if ($model->test_taker) {
+                $act = new Activity([
+                    'ticket_id' => $model->id,
+                    'description' => yiit('activity', 'Exam finished by {test_taker}.'),
+                    'description_params' => [ 'test_taker' => $model->test_taker ],
+                    'severity' => Activity::SEVERITY_INFORMATIONAL,
+                ]);
+            } else {
+                $act = new Activity([
+                    'ticket_id' => $model->id,
+                    'description' => yiit('activity', 'Exam finished by Ticket with token {token}.'),
+                    'description_params' => [ 'token' => $token ],
+                    'severity' => Activity::SEVERITY_INFORMATIONAL,
+                ]);
+            }
+            $act->save();
+
+            $this->startDaemon();
         }
-        $act->save();
 
-        /* Start a new backup Daemon on the background */
-        $searchModel = new DaemonSearch();
-        if($searchModel->search([])->totalCount < 3){
-            $backupDaemon = new Daemon();
-            $backupDaemon->startBackup();
-        }
-
-        return [ 'code' => 200, 'msg' => 'Exam finished successfully' ];
-
+        return $this->render('finish_s2', [
+            'model' => $model,
+        ]);
     }
 
     /**
@@ -930,7 +933,7 @@ class TicketController extends BaseController
         $count = $daemonDataProvider->getTotalCount();
 
         # if no daemon is running already, start one
-        if($count == 0){
+        if ($count == 0) {
             $daemon = new Daemon();
             $daemon->startDaemon();
         }

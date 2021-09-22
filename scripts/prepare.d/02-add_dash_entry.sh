@@ -1,6 +1,7 @@
 #!/bin/bash
 #
 # Update Gnome3 dash by adding an entry to it
+# @param string $1 the entry to add as a .desktop file
 #
 
 function add_dash_entry()

@@ -116,7 +116,7 @@ if ($model->client_state == 'setup complete') {
                 ]); ?>&nbsp;
                 <span id="info"><?= yii::$app->formatter->format($model->client_state, 'raw'); ?></span>
             </li>
-          </ul>        
+          </ul>
     </div>
     </div>
     </div>
@@ -127,7 +127,7 @@ if ($model->client_state == 'setup complete') {
         'jsonSelector' => 'restore_state',
         'jsHandler' => 'function(d, s){
             $("#info").html(d);
-        }'        
+        }'
     ]); ?>
 
     <?= ActiveEventField::widget([
@@ -136,7 +136,7 @@ if ($model->client_state == 'setup complete') {
         'jsonSelector' => 'client_state',
         'jsHandler' => 'function(d, s){
             $("#info").html(d);
-        }'        
+        }'
     ]); ?>
 
     <?= ActiveEventField::widget([
