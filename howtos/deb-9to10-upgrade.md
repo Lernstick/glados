@@ -127,6 +127,12 @@ Close the console by
 
     quit
 
+### Data migration (LDAPS)
+
+If you use LDAP authentication with SSL (see [LDAP with SSL](ldap-ssl.md)), you may have to import the LDAP servers CA certificate into the certificate store of the new server. To import all additional certificates from the old server to the new one, run the following command on the new server:
+
+    scp -p root@old9:/usr/local/share/ca-certificates/*.crt /usr/local/share/ca-certificates/
+
 ### Upgrade of the new server
 
 You are now ready to update GLaDOS on the new Debian 10 server to the newest version according to the Guide on [Softwareupdate on Debian](deb-update.md).
