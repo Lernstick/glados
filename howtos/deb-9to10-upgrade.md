@@ -131,7 +131,13 @@ Close the console by
 
 If you use LDAP authentication with SSL (see [LDAP with SSL](ldap-ssl.md)), you may have to import the LDAP servers CA certificate into the certificate store of the new server. To import all additional certificates from the old server to the new one, run the following command on the new server:
 
-    scp -p root@old9:/usr/local/share/ca-certificates/*.crt /usr/local/share/ca-certificates/
+    scp -p root@old9:/usr/local/share/ca-certificates/your_certificate.crt /usr/local/share/ca-certificates/
+
+where you have to replace `your_certificate.crt` with your CA certificate. After that, update the CA store:
+
+    update-ca-certificates -v
+
+In order to make sure that everything works as intended, you should [test](test-login.md) the authentication process on the new server.
 
 ### Upgrade of the new server
 
