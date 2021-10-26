@@ -10,6 +10,7 @@ use app\models\DaemonSearch;
 use app\components\ActiveEventField;
 use yii\widgets\MaskedInput;
 use yii\widgets\ActiveForm;
+use miloschuman\highcharts\Highstock;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\ServerStatus */
@@ -20,6 +21,14 @@ function check_load() {
 }
 
 setInterval(check_load, $model->interval*1000);
+
+$('#toggleClass').click(function(){
+    $('#target').toggleClass("col-sm-12");
+    $('#target').toggleClass("col-sm-3");
+    var chart = Highcharts.charts[12];
+    chart.setSize($('#target').width());
+    chart.reflow();
+});
 
 SCRIPT;
 
@@ -113,6 +122,141 @@ $gaugeOptions = [
     'credits' => [
         'enabled' => false,
     ],
+];
+
+$stockOptions = [
+    'chart' => [
+        'height' => (10 / 16 * 100) . '%', // 16:10 ratio
+        'panning' => ['enabled' => false],
+        'backgroundColor' => 'transparent',
+        'plotBorderWidth' => 1,
+        'events' => [
+            'load' => new JsExpression("function () {
+                var chart = this;
+                var s = this.series[0];
+                var yAxis = this.yAxis[0];
+                var xAxis = this.xAxis[0];
+                var store = 3600; // store 3600 data points (1h of data)
+                if (typeof(Storage) !== 'undefined') {
+                    var data = window.localStorage.getItem(s.name);
+                    if (data !== null) {
+                        s.setData(JSON.parse(data));
+                    }
+                }
+
+                // update the graph every second
+                setInterval(function () {
+                    var y = isNaN(parseFloat($('#reload-load').data(s.name).y))
+                        ? parseFloat($('#reload-load').data(s.name))
+                        : parseFloat($('#reload-load').data(s.name).y);
+                    var max = isNaN(parseFloat($('#reload-load').data(s.name).max))
+                        ? yAxis.max
+                        : parseFloat($('#reload-load').data(s.name).max);
+                    yAxis.update({'min': 0, 'max': max});
+                    let x = (new Date()).getTime()
+                    s.addPoint([x, y], true, s.data.length >= store);
+                    // only show the last minute
+                    if (chart.chartWidth < 600) {
+                        xAxis.setExtremes(s.options.data.slice(-60)[0][0], x);
+                    }
+                }, 1000);
+
+                // store the data points all 10 seconds
+                setInterval(function () {
+                    window.localStorage.setItem(s.name, JSON.stringify(s.options.data.slice(-store)));
+                }, 10000);
+
+            }" ),
+        ],
+    ],
+    'title' => [
+        'floating' => true,
+        'align' => 'center',
+        'verticalAlign' => 'top',
+        'y' => 20,
+    ],
+    'subtitle' => [
+        'floating' => true,
+        'align' => 'center',
+        'verticalAlign' => 'top',
+        'y' => 35,
+    ],
+    'xAxis' => [
+        'labels' => ['enabled' => false],
+        'tickPositions' => [],
+    ],
+    'yAxis' => [
+        'endOnTick' => false,
+        'gridLineColor' => 'transparent',
+        'labels' => ['enabled' => false],
+        'min' => 0,
+        'max' => 100,
+    ],
+    'exporting' => ['enabled' => false],
+    'time' => ['useUTC' => false],
+    'credits' => ['enabled' => false],
+    'scrollbar' => ['enabled' => false],
+    'navigator' => ['enabled' => false],
+    'rangeSelector' => ['enabled' => false],
+    'tooltip' => ['enabled' => false],
+    'plotOptions' => [
+        'series' => [
+            'fillOpacity' => 0.1,
+            'lineWidth' => 1,
+            'enableMouseTracking' => false,
+        ],
+    ],
+
+
+    'responsive' => [
+        'rules' => [
+            [
+                'condition' => [
+                    'minWidth' => 400
+                ],
+                'chartOptions' => [
+                    'chart' => [
+                        'height' => (7 / 16 * 100) . '%', // 16:7 ratio
+                        'panning' => ['enabled' => true],
+                    ],
+                    'scrollbar' => ['enabled' => true],
+                    'navigator' => ['enabled' => true],
+                    'title' => ['floating' => false],
+                    'subtitle' => ['floating' => false],
+                    'rangeSelector' => [
+                        'enabled' => true,
+                        'buttons' => [
+                            [
+                                'type' => 'minute',
+                                'count' => 1,
+                                'text' => '1M'
+                            ], [
+                                'type' => 'minute',
+                                'count' => 5,
+                                'text' => '5M'
+                            ], [
+                                'type' => 'minute',
+                                'count' => 15,
+                                'text' => '15M'
+                            ], [
+                                'type' => 'all',
+                                'text' => 'All'
+                            ]
+                        ],
+                        'inputEnabled' => false,
+                        'selected' => 0,
+                    ],
+                    'tooltip' => ['enabled' => true],
+                    'plotOptions' => [
+                        'series' => [
+                            'enableMouseTracking' => true,
+                        ],
+                    ],
+                ]
+            ]
+        ]
+    ],
+
 ];
 
 Pjax::begin([
@@ -549,4 +693,217 @@ Pjax::end();
             <samp><?= $model->uname() ?></samp>
         </div>
     </div>
+</div>
+
+<button id="toggleClass">toggleClass</button><br>
+
+<div class="col-sm-12" id="target">
+    <?= Highstock::widget([
+        'scripts' => [],
+        'options' => ArrayHelper::merge($stockOptions, [
+            'chart' => ['plotBorderColor' => '#7cb5ec'], // lightblue
+            'title' => ['text' => $model->getAttributeLabel('memTotal')],
+            'subtitle' => [
+                'text' => substitute('{y}/{max} MB', [
+                    'y' => intval($model->memUsed/1048576),
+                    'max' => intval($model->memTotal/1048576),
+                ]),
+            ],
+            'yAxis' => [
+                'max' => intval($model->memTotal/1048576),
+            ],
+            'series' => [
+                [
+                    'type' => 'area',
+                    'name' => 'mem_used',
+                    'color' => '#7cb5ec',
+                    'data' => array_merge(
+                        array_fill(0, 100, null),
+                        [0 => [microtime(true)*1000, intval($model->memUsed/1048576)]]
+                    ),
+                    'events' => [
+                        'addPoint' => new JsExpression("function (e) {
+                            e.target.chart.setTitle(null, { text: e.point.y.toFixed(0) + '/' + e.target.yAxis.max + ' MB'});
+                        }" ),
+                    ],
+                ],
+            ]
+        ]),
+    ]); ?>
+</div>
+
+<div class="col-sm-12">
+    <?= Highstock::widget([
+        'scripts' => [],
+        'options' => [
+            'chart' => [
+                'events' => [
+                    'load' => new JsExpression("function () {
+                        var chart = this;
+                        var s = this.series[0];
+                        var yAxis = this.yAxis[0];
+                        var xAxis = this.xAxis[0];
+                        var store = 3600; // store 3600 data points (1h of data)
+                        if (typeof(Storage) !== 'undefined') {
+                            var data = window.localStorage.getItem(s.name);
+                            if (data !== null) {
+                                s.setData(JSON.parse(data));
+                            }
+                        }
+
+                        // update the graph every second
+                        setInterval(function () {
+                            var y = isNaN(parseFloat($('#reload-load').data(s.name).y))
+                                ? parseFloat($('#reload-load').data(s.name))
+                                : parseFloat($('#reload-load').data(s.name).y);
+                            var max = isNaN(parseFloat($('#reload-load').data(s.name).max))
+                                ? yAxis.max
+                                : parseFloat($('#reload-load').data(s.name).max);
+                            yAxis.update({'min': 0, 'max': max});
+                            let x = (new Date()).getTime()
+                            s.addPoint([x, y], true, s.data.length >= store);
+                        }, 1000);
+
+                        // store the data points all 10 seconds
+                        setInterval(function () {
+                            window.localStorage.setItem(s.name, JSON.stringify(s.options.data.slice(-store)));
+                        }, 10000);
+
+                    }" ),
+                    'click' => new JsExpression("function () {
+                        alert('clicked')
+                    }" )
+                ],
+            ],
+            'title' => [
+                'text' => $model->getAttributeLabel('memTotal')
+            ],
+            'xAxis' => [
+                'type' => 'datetime',
+                'tickInterval' => 60*1000,
+                'minRange' => 60*1000,
+                'dateTimeLabelFormats' => [
+                    'millisecond' => '%H:%M',
+                    'second' => '%H:%M',
+                    'minute' => '%H:%M',
+                    'hour' => '%H:%M',
+                    'day' => '%e. %b',
+                    'week' => '%e. %b',
+                    'month' => '%b \'%y',
+                    'year' => '%Y'
+                ]
+            ],
+            'yAxis' => [
+                'title' => ['text' => 'MB'],
+                'max' => intval($model->memTotal/1048576),
+                'plotLines' => [
+                    [
+                        'color' => 'orange',
+                        'width' => 1,
+                        'value' => intval(0.75*$model->memTotal/1048576),
+                        'dashStyle' => 'dash'
+                    ],
+                    [
+                        'color' => 'red',
+                        'width' => 1,
+                        'value' => intval($model->memTotal/1048576),
+                        'dashStyle' => 'dash'
+                    ]
+                ],
+            ],
+            'exporting' => ['enabled' => false],
+            'time' => ['useUTC' => false],
+            'credits' => ['enabled' => false],
+            'rangeSelector' => [
+                'buttons' => [
+                    [
+                        'type' => 'minute',
+                        'count' => 1,
+                        'text' => '1M'
+                    ], [
+                        'type' => 'minute',
+                        'count' => 5,
+                        'text' => '5M'
+                    ], [
+                        'type' => 'minute',
+                        'count' => 15,
+                        'text' => '15M'
+                    ], [
+                        'type' => 'all',
+                        'text' => 'All'
+                    ]
+                ],
+                'inputEnabled' => false,
+                'selected' => 0,
+            ],
+            'plotOptions' => [
+                'series' => [
+                    //'threshold' => intval(0.75*$model->memTotal/1048576),
+                    //'negativeColor' => 'green',
+                    //'color' => 'red',
+                    //'fillColor' => 'red',
+                    //'fillOpacity' => 0.1,
+                    'fillOpacity' => 0.1,
+                    'lineWidth' => 1,
+                ],
+            ],
+            /*'responsive' => [
+                'rules' => [
+                    [
+                        'condition' => [
+                            'maxWidth' => 500
+                        ],
+                        'chartOptions' => [
+                            'chart' => [
+                                'height' => (10 / 16 * 100) . '%', // 16:10 ratio
+                                'panning' => ['enabled' => false],
+                            ],
+                            'subtitle' => [
+                                'text' => '{point.y:.0f}',
+                                'floating' => true,
+                                'align' => 'center',
+                                'verticalAlign' => 'top',
+                                'y' => 30,
+                            ],
+                            'title' => [
+                                'floating' => true,
+                                'align' => 'center',
+                                'verticalAlign' => 'top',
+                            ],
+                            'xAxis' => ['labels' => ['enabled' => false], 'title' => null],
+                            'yAxis' => ['labels' => ['enabled' => false], 'title' => null, 'plotLines' => []],
+                            'scrollbar' => ['enabled' => false],
+                            'navigator' => ['enabled' => false],
+                            'rangeSelector' => ['enabled' => false],
+                            'tooltip' => ['enabled' => false],
+                        ]
+                    ]
+                ]
+            ],*/
+            /*'tooltip' => [
+                'xDateFormat' => '%H:%M:%S',
+                'headerFormat' => '',
+                'pointFormat' => '<span style="font-size:11px">{point.key}<br>{point.y:.0f}</span>&nbsp' .
+                    '<span style="font-size:10px;opacity:0.4">MB</span>',
+            ],*/
+            'series' => [
+                [
+                    'type' => 'areaspline',
+                    'name' => 'mem_used',
+                    'data' => array_merge(
+                        array_fill(0, 100, null),
+                        [0 => [microtime(true)*1000, intval($model->memUsed/1048576)]]
+                    ),
+                ],
+            ]
+            /*'series' => [
+                [
+                    'name' => 'mem_used',
+                    'data' => [
+                        [microtime(true)*1000, intval($model->memUsed/1048576)]
+                    ],
+                ],
+            ]*/
+        ],
+    ]); ?>
 </div>

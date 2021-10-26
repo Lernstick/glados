@@ -159,7 +159,7 @@ class ServerStatus extends Model
             'procTotal' => \Yii::t('server', 'Webserver processes'),
             'db_threads_connected' => \Yii::t('server', 'Database connections'),
             'runningDaemons' => \Yii::t('server', 'Running daemons'),
-            'averageLoad' => \Yii::t('server', 'Average load of all daemons'),
+            'averageLoad' => \Yii::t('server', 'Average daemon load'),
             'memTotal' => \Yii::t('server', 'Memory usage'),
             'swapTotal' => \Yii::t('server', 'Swap usage'),
             'cpuPercentage' => \Yii::t('server', 'CPU usage'),

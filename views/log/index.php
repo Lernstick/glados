@@ -101,6 +101,7 @@ if (isset($ticketModel)) {
                     $logButton = "
                         $('#log-show-" . $key . "').click(function(event) {
                             event.preventDefault();
+                            $('div.modal-body').animate({ scrollTop: 0 }, 'slow');
                             $('#logModal').modal('show');
                             $.pjax({url: this.href, container: '#logModalContent', push: false, async:false})
                             $('#logModal').find('.log-file-name').html('".$model->path."');
