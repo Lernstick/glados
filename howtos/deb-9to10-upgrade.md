@@ -1,6 +1,6 @@
 ## Upgrade from Debian 9 to 10
 
-This guide describes how to upgrade GLaDOS from Debian 9.x to Debian 10.x with all data mirgated. The old Debian 9 server will be called `old9` and the new Debian 10 server will be called `new10` throughout the whole guide.
+This guide describes how to upgrade GLaDOS from Debian 9.x to Debian 10.x with all data migrated. The old Debian 9 server will be called `old9` and the new Debian 10 server will be called `new10` throughout the whole guide.
 
 ----
 
@@ -8,7 +8,7 @@ This guide describes how to upgrade GLaDOS from Debian 9.x to Debian 10.x with a
 
 > These step have to be done on `old9`.
 
-Fist, make a backup of all data on the Debian 9 server.
+First, perform a backup of all data on the Debian 9 server.
 
 Stop all running daemons via the webinterface.
 
@@ -123,11 +123,13 @@ The dumped database from earlier in this guide can now be restored by
 
     source /tmp/glados_db_1.0.11.sql;
 
-Close the console by
+Close the console with
 
     quit
 
 ### Data migration (LDAPS)
+
+> These step have to be done on `new10`.
 
 If you use LDAP authentication with SSL (see [LDAP with SSL](ldap-ssl.md)), you may have to import the LDAP servers CA certificate into the certificate store of the new server. To import all additional certificates from the old server to the new one, run the following command on the new server:
 
@@ -141,4 +143,4 @@ In order to make sure that everything works as intended, you should [test](test-
 
 ### Upgrade of the new server
 
-You are now ready to update GLaDOS on the new Debian 10 server to the newest version according to the Guide on [Softwareupdate on Debian](deb-update.md).
+You are now ready to update GLaDOS on the new Debian 10 server from version `1.0.11` to the newest version according to the Guide on [Softwareupdate on Debian](deb-update.md).
