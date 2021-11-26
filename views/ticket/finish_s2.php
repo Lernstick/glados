@@ -107,12 +107,14 @@ if ($model->last_backup == 1) {
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <!-- <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button> -->
                     <h4><?= \Yii::t('client', 'Continue') ?></h4>
                 </div>
 
                 <div class="modal-body clearfix">
-                    <p><?= \Yii::t('client', 'You exam was handed-in successfully. You can close this window now.') ?></p>
+                    <p><?= \Yii::t('client', 'You exam was handed-in successfully ({date}). You can close this window now.', [
+                            'date' => yii::$app->formatter->format($model->end, 'timeago'),
+                        ]) ?></p>
                     <div class="pull-right">
                         <?= Html::a(\Yii::t('app', 'Close'), '#wxbrowser:close', ['class' => 'btn btn-default']); ?>
                         <?= Html::a(\Yii::t('app', 'Shutdown'), '#wxbrowser:shutdown', ['class' => 'btn btn-danger']); ?>

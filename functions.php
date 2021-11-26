@@ -90,6 +90,7 @@ function yiit($category, $message, $params = [], $language = null) {
  * @param array params the array with key values pairs
  * 
  * @return string
+ * @see JS equivalent [[substitute()]] in web/js/site.js
  */
 function substitute($string, $params) {
     $search = preg_filter('/^.*$/', '{$0}', array_keys($params));

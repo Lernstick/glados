@@ -157,7 +157,7 @@ class ServerStatus extends Model
         return [
             'interval' => \Yii::t('server', 'Update Interval'),
             'procTotal' => \Yii::t('server', 'Webserver processes'),
-            'db_threads_connected' => \Yii::t('server', 'Database connections'),
+            'db_threads_connected' => \Yii::t('server', 'DB connections'),
             'runningDaemons' => \Yii::t('server', 'Running daemons'),
             'averageLoad' => \Yii::t('server', 'Average daemon load'),
             'memTotal' => \Yii::t('server', 'Memory usage'),
@@ -166,8 +166,8 @@ class ServerStatus extends Model
             'ioPercentage' => \Yii::t('server', 'I/O usage'),
             'inotify_active_watches' => \Yii::t('server', 'Inotify watches'),
             'inotify_active_instances' => \Yii::t('server', 'Inotify instances'),
-            'diskUsed' => \Yii::t('server', 'Disk usage'),
-            'netUsage' => \Yii::t('server', 'Network usage'),
+            'diskUsed' => \Yii::t('server', 'Disk'),
+            'netUsage' => \Yii::t('server', 'Network'),
         ];
     }
 
@@ -419,24 +419,60 @@ class ServerStatus extends Model
     {
 
         $data = [
-            'proc_total' => ['y' => $this->procTotal, 'max' => $this->procMaximum],
-            'db_threads_connected' => ['y' => $this->db_threads_connected, 'max' => $this->db_max_connections],
-            'running_daemons' => ['y' => $this->runningDaemons, 'max' => \Yii::$app->params['maxDaemons']],
-            'average_load' => $this->averageLoad, # %
-            'mem_used' => $this->memUsed/1048576, # MB
-            'swap_used' => $this->swapUsed/1048576, # MB
-            'cpu_percentage' => $this->cpuPercentage, # %
-            'io_percentage' => $this->ioPercentage, # %
-            'inotify_active_watches' => ['y' => $this->inotify_active_watches, 'max' => $this->inotify_max_user_watches],
-            'inotify_active_instances' => ['y' => $this->inotify_active_instances, 'max' => $this->inotify_max_user_instances],
+            'proc_total' => [
+                'y' => $this->procTotal,
+                'max' => $this->procMaximum
+            ],
+            'db_threads_connected' => [
+                'y' => $this->db_threads_connected,
+                'max' => $this->db_max_connections
+            ],
+            'running_daemons' => [
+                'y' => $this->runningDaemons,
+                'max' => \Yii::$app->params['maxDaemons']
+            ],
+            'average_load' => [
+                'y' => $this->averageLoad, # %
+                'max' =>  100,
+            ],
+            'mem_used' => [
+                'y' => $this->memUsed/1048576, # MB
+                'max' => $this->memTotal/1048576
+            ],
+            'swap_used' => [
+                'y' => $this->swapUsed/1048576, # MB
+                'max' => $this->swapTotal/1048576
+            ],
+            'cpu_percentage' => [
+                'y' => $this->cpuPercentage, # %
+                'max' => 100,
+            ],
+            'io_percentage' => [
+                'y' => $this->ioPercentage, # %
+                'max' => 100,
+            ],
+            'inotify_active_watches' => [
+                'y' => $this->inotify_active_watches,
+                'max' => $this->inotify_max_user_watches
+            ],
+            'inotify_active_instances' => [
+                'y' => $this->inotify_active_instances,
+                'max' => $this->inotify_max_user_instances
+            ],
         ];
 
         foreach($this->diskTotal as $key => $disk) {
-            $data['disk_usage_' . $key] = $this->diskUsed[$key]/1073741824;
+            $data['disk_usage_' . $key] = [
+                'y' => $this->diskUsed[$key]/1073741824, # GB
+                'max' => $this->diskTotal[$key]/1073741824,
+            ];
         }
 
         foreach($this->netName as $key => $dev) {
-            $data['net_usage_' . $key] = $this->netCurrentSpeed[$key];
+            $data['net_usage_' . $key] = [
+                'y' => $this->netCurrentSpeed[$key], # MB/s
+                'max' => $this->netMaxSpeed[$key],
+            ];
         }
 
         return $data;

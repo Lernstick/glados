@@ -104,3 +104,13 @@ $(document).on('select2:open', (e) => {
         document.querySelector(`input[aria-controls*='${id}']`).focus();
     }
 });
+
+/**
+ * @see PHP equivalent [[substitute()]] in functions.php
+ */
+function substitute(string, params) {
+    for (var k in params){
+        string = string.replaceAll('{' + k + '}', params[k]);
+    }
+    return string;
+}
