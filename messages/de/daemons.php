@@ -38,6 +38,7 @@ return [
     'Stop All Processes' => 'Alle Prozesse beenden',
     'The last reported state' => 'Der letzte gemeldete Status',
     'The load of the last 5 minutes' => 'Die Last der letzten 5 Minuten',
+    'No running daemon found.' => 'Kein laufender Prozess gefunden.',
     'Load (Last 5 minutes)' => '@@Last (Letzte 5 Minuten)@@',
     'Process' => '@@Prozess@@',
     'Start Analyzer Daemon' => '@@Starte Analyse Prozess@@',

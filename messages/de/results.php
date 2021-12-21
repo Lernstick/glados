@@ -69,7 +69,6 @@ return [
     'The exam has not started yet.' => 'Die Prüfung hat noch nicht begonnen.',
     'The exam is over.' => 'Die Prüfung ist vorüber.',
     'The list further down contains all results found in the uploaded Results ZIP-file. Please check if all results are present. In this list you see whether the ticket has already a result associated to it or not. Please notice, that when proceeding with the button further down, already existing results will be <b>overwritten permanently</b>. If you want to remove results from being processed, please edit the ZIP-file and reupload the file in Step 1.' => 'Die Liste weiter unten beinhaltet alle Resulate, die in der hochgeladenen ZIP-Datei gefunden wurden. Bitte überprüfen Sie ob alle Resultate vorhanden sind. In dieser Liste sehen Sie, ob das Ticket bereits ein Resultat zugewiesen hat oder nicht. Beachten Sie, dass wenn Sie forfahren, werden alle bereits existierenden Resultate <b>permanent überschrieben</b>. Falls Sie Resulate von der Liste entfernen wollen, bitte bearbeiten Sie die ZIP-Datei und laden Sie sie erneut hoch in Schritt 1.',
-    'The world might end in...' => 'Die Welt endet in...',
     'There are no closed or submitted Tickets to generate a ZIP-File.' => 'Es gibt keine geschlossenen oder zugewiesenen Ticket, um eine ZIP-Datei zu generieren.',
     'There is already a submitted result. The existing one will be overwritten!' => 'Ein bereits eingereichtes Resultat wurde gefunden - dieses wird überschrieben!',
     'There is no time limit.' => 'Keine Zeitlimite gesetzt.',
@@ -87,5 +86,7 @@ return [
     'result handed in' => 'Resultat eingereicht',
     'started' => 'gestartet',
     'submitted' => 'zugewiesen',
+    'The exam is over in ...' => 'Die Prüfung ist vorbei in ...',
     'No results found in zip file. Please upload a zip file with the same directory structure as the result.zip file.' => '@@Keine Resultate in der ZIP-Datei gefunden. Bitte laden Sie eine ZIP-Datei hoch mit derselben Verzeichnisstruktur wie die result.zip Datei.@@',
+    'The world might end in...' => '@@Die Welt endet in...@@',
 ];

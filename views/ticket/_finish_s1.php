@@ -32,7 +32,7 @@ if (isset($finish) && $finish) {
             </div>
 
             <div class="modal-body">
-                <p>You're about to hand-in your exam.</p>
+                <p><?= \Yii::t('client', "You're about to hand-in your exam.") ?></p>
 
                 <div class="alert alert-danger" role="alert">
                     <h4><?= \Yii::t('client', 'Important!') ?></h4>
@@ -49,7 +49,7 @@ if (isset($finish) && $finish) {
                     'data-dismiss' => 'modal',
                     'class' => 'btn btn-default'
                 ]); ?>
-                <?= Html::a(\Yii::t('app', 'Yes, hand-in my exam'), Url::to([
+                <?= Html::a(\Yii::t('app', 'Yes, hand-in my exam now!'), Url::to([
                     'ticket/finish',
                     'token' => $model->token,
                     'step' => 2,

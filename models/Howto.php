@@ -48,10 +48,14 @@ class Howto extends Model
      */
     public function findOne($id)
     {
-        $file = Yii::getAlias('@app') . '/howtos/' . str_replace('/', '', $id);
+        # first try the localized file if it exists
+        $file = Yii::getAlias('@app') . '/howtos/' . \Yii::$app->language . '/' . str_replace('/', '', $id);
 
-        if(file_exists($file) === false){
-            return null;
+        if (file_exists($file) === false) {
+            $file = Yii::getAlias('@app') . '/howtos/' . str_replace('/', '', $id);
+            if (file_exists($file) === false) {
+                return null;
+            }
         }
 
         $me = new Howto;

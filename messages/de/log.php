@@ -21,8 +21,9 @@ return [
     'Date' => 'Datum',
     'Download Logfile' => 'Logdatei herunterladen',
     'Log' => 'Log',
-    'Logfile Path' => 'Logdatei Pfad',
     'Show Logfile' => 'Lagdatei anzeigen',
     'The logfile is empty.' => 'Die Logdatei ist leer.',
     'Type' => 'Typ',
+    'Path' => 'Pfad',
+    'Logfile Path' => '@@Logdatei Pfad@@',
 ];
