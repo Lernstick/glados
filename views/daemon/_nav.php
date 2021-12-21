@@ -45,6 +45,7 @@ use yii\helpers\Html;
             'data' => [
                 'confirm' => \Yii::t('daemons', 'Are you sure you want to stop ALL processes?'),
             ],
+            'data-method' => 'post',
         ]) ?>
     </li> 
   </ul>

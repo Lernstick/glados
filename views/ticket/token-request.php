@@ -18,14 +18,14 @@ $this->registerJs($js);
 ?>
 <div class="token-request-view">
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-12 col-xs-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <div class="row">
-                        <div class="col-xs-8">
+                        <div class="col-md-8 col-xs-8">
                             <span><?= \Yii::t('client', 'Please enter the token given on your exam sheet.') ?></span>
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-md-4 col-xs-4">
                             <div class="pull-right">
                                 <?= Html::a(
                                     '<span class="glyphicon glyphicon-question-sign"></span>',

@@ -18,14 +18,14 @@ if ($model->client_state == 'setup complete') {
 <div class="download-view">
 
     <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-12 col-xs-12">
     <div class="panel panel-default">
         <div class="panel-heading">
             <div class="row">
-                <div class="col-xs-8">
+                <div class="col-md-8 col-xs-8">
                     <span><?= \Yii::t('client', 'Please wait, while your system is prepared') ?></span>
                 </div>
-                <div class="col-xs-4">
+                <div class="col-md-4 col-xs-4">
                     <div class="dropdown pull-right">
                         <a class="btn btn-secondary btn-xs dropdown-toggle" data-toggle="dropdown" href="#">
                             <i class="glyphicon glyphicon-option-horizontal"></i>
