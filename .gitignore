@@ -20,8 +20,8 @@ phpunit.phar
 /backups
 /uploads
 /runtime
-/pwsafe.sublime-workspace
-/pwsafe.sublime-project
+/glados.sublime-workspace
+/glados.sublime-project
 #/web/assets
 /web/docs
 

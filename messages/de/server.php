@@ -27,7 +27,7 @@ return [
     'Host' => 'Host',
     'I/O usage' => 'I/O Nutzung',
     'IP' => 'IP',
-    'If one of the metrics below reaches 80% or more for a longer time or you experience performance issues, please consult the following resources for more information on how to solve these problems:' => 'Falls eine der unten aufgeführten Metriken 80% oder mehr über einen längeren Zeitraum erreicht oder Performance Probleme feststellbar sind, konsultieren Sie bitte folgende Hilfestellungen, für mehr Informationen, um diese Probleme zu lösen:',
+    'If one of the metrics below reaches 80% or more for a longer time or you experience performance issues, please consult the following resources for more information on how to solve these problems:' => 'Falls eine der unten aufgeführten Metriken 80% oder mehr über einen längeren Zeitraum erreicht oder Performance Probleme feststellbar sind, konsultieren Sie bitte folgende Hilfestellungen für mehr Informationen, um diese Probleme zu lösen:',
     'Inotify instances' => 'Inotify Instanzen',
     'Inotify watches' => 'Inotify Watches',
     'Manual / Hardware Recommendations' => 'Benutzeranleitung / Hardware Empfehlungen',
