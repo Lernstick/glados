@@ -85,8 +85,8 @@ function do_exit()
   #iptables-save | grep -v "searchExamServer" | iptables-restore
 
   # unmount the filesystem
-  #umount ${initrd}/newroot
-  #umount -l ${initrd}/{base,exam,tmpfs}
+  umount ${initrd}/newroot
+  umount -l ${initrd}/{base,exam,tmpfs}
   # exit with failure (1) if nothing has been given to $1
   exit ${1:-1}
 }
