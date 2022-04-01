@@ -1,4 +1,11 @@
 #!/bin/bash
+#
+# This is the main entry point for the script that sets up the client system.
+# Before this, all the files in prepare.d/ are sourced in alphabetical order
+# and this script call the functions within them. All this is executed on the
+# client system with root permissions.
+#
+
 
 DEBUG=true
 wget="/usr/bin/wget"
@@ -78,8 +85,8 @@ function do_exit()
   #iptables-save | grep -v "searchExamServer" | iptables-restore
 
   # unmount the filesystem
-  umount ${initrd}/newroot
-  umount -l ${initrd}/{base,exam,tmpfs}
+  #umount ${initrd}/newroot
+  #umount -l ${initrd}/{base,exam,tmpfs}
   # exit with failure (1) if nothing has been given to $1
   exit ${1:-1}
 }

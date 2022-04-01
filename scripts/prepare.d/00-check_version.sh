@@ -43,6 +43,7 @@ function check_version()
     >&2 echo "check version"
     client_version="$(dpkg-query --showformat='${Version}' --show lernstick-exam-client)"
     lernstick_version="$(grep -ohP '[0-9,\-]{8,}' /run/live/rootfs/filesystem.squashfs/usr/local/lernstick.html /usr/local/lernstick.html 2>/dev/null | sed 's/-//g' | head -1)"
+    rdiff_backup_version="$(rdiff-backup --version | grep -oP '[0-9,\.]+' || echo 'no rdiff-backup found')"
     # TODO: better check for flavor
     if [ -r "/run/live/medium/boot/grub/themes/lernstick/theme.txt" ]; then
       lernstick_flavor="$(grep -qP "title-text.*Prüfung" /run/live/medium/boot/grub/themes/lernstick/theme.txt 2>/dev/null && echo exam || echo standard)"
@@ -57,13 +58,18 @@ function check_version()
     wants_client_version="$(echo "$jsonInfo" | ${python} -c 'import sys, json; print json.load(sys.stdin)["wants_client_version"]')"
     wants_lernstick_version="$(echo "$jsonInfo" | ${python} -c 'import sys, json; print json.load(sys.stdin)["wants_lernstick_version"]')"
     wants_lernstick_flavor="$(echo "$jsonInfo" | ${python} -c 'import sys, json; print json.load(sys.stdin)["wants_lernstick_flavor"]')"
+    wants_rdiff_backup_version="$(echo "$jsonInfo" | ${python} -c 'import sys, json; print json.load(sys.stdin)["wants_rdiff_backup_version"]')"
+    server_rdiff_backup_version="$(echo "$jsonInfo" | ${python} -c 'import sys, json; print json.load(sys.stdin)["rdiff_backup"]')"
     >&2 echo "client_version = $client_version"
     >&2 echo "lernstick_version = $lernstick_version"
     >&2 echo "lernstick_flavor = $lernstick_flavor"
+    >&2 echo "rdiff_backup_version = $rdiff_backup_version"
     >&2 echo "wants_server_version = $wants_server_version"
     >&2 echo "wants_client_version = $wants_client_version"
     >&2 echo "wants_lernstick_flavor = $wants_lernstick_flavor"
+    >&2 echo "wants_rdiff_backup_version = $wants_rdiff_backup_version"
 
+    # check for lernstick flavor
     if ! [ "$lernstick_flavor" = "$wants_lernstick_flavor" ]; then
       >&2 echo "Lernstick version mismatch. Got ${lernstick_flavor}, but server needs ${wants_lernstick_flavor}."
 
@@ -74,6 +80,7 @@ function check_version()
       do_exit 1
     fi
 
+    # check for lernstick version
     if ! version_compare "$lernstick_version" "$wants_lernstick_version"; then
       >&2 echo "Lernstick version mismatch. Got ${lernstick_version}, but server needs ${wants_lernstick_version}."
 
@@ -84,6 +91,7 @@ function check_version()
       do_exit 1
     fi
 
+    # check for lernstick-exam-client version
     if ! version_compare "$client_version" "$wants_client_version"; then
       >&2 echo "Client version mismatch. Got ${client_version}, but server needs ${wants_client_version}."
 
@@ -91,6 +99,17 @@ function check_version()
       export client_version
       export wants_client_version
       screen -d -m bash -c '${zenity} --error --width=300 --title "Version Error" --text "Client version mismatch. Got ${client_version}, but server needs ${wants_client_version}."'
+      do_exit 1
+    fi
+
+    # check for rdiff-backup version
+    if ! version_compare "$rdiff_backup_version" "$wants_rdiff_backup_version"; then
+      >&2 echo "rdiff-backup version mismatch. Got ${rdiff_backup_version}, but server needs ${wants_rdiff_backup_version}. Server has ${server_rdiff_backup_version}."
+
+      export zenity
+      export client_version
+      export wants_client_version
+      screen -d -m bash -c '${zenity} --error --width=300 --title "Version Error" --text "rdiff-backup version mismatch. Got ${rdiff_backup_version}, but server needs ${wants_rdiff_backup_version}. Server has ${server_rdiff_backup_version}. Both, client and server need to have the same rdiff-backup version, either both 1.x or both 2.x."'
       do_exit 1
     fi
 
