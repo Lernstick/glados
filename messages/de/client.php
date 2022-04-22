@@ -30,6 +30,7 @@ return [
     'Insert your token here!' => 'Geben Sie hier Ihren Token ein!',
     'Please enter the token given on your exam sheet.' => 'Bitte geben Sie den Token auf dem Prüfungsblatt ein.',
     'Please notice, that once this process is initiated, you <b>cannot continue</b> with the exam. So, please make sure you <b>saved all documents</b> and <b>closed all open windows</b> before finishing your exam.' => 'Bitte beachten Sie, dass sobald dieser Prozess gestartet wurde, Sie <b>nichts mehr an Ihrer Abgabe verändern</b> können. Bitte stellen Sie sicher, dass Sie <b>alle Dokumente abgespeichert</b> und <b>alle offenen Fenster geschlossen</b> haben, bevor Sie Ihre Prüfung abgeben.',
+    '+{n} more windows ...' => '+{n} weitere Fenster ...',
     'Please wait, while your system is prepared' => 'Bitte warten Sie, während Ihr System vorbereitet wird',
     'Request download again' => 'Download erneut anfordern',
     'The system setup has failed.' => 'Das Systemeinrichtung îst fehlgeschlagen.',

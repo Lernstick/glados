@@ -7,7 +7,7 @@ use app\components\ActiveEventField;
 /* @var $this yii\web\View */
 /* @var $model app\models\Ticket */
 
-$this->registerJs('window.location.href = "#wxbrowser:resize:800x600"');
+$this->registerJs('window.location.href = "#wxbrowser:resize:800x700"');
 
 $this->title = \Yii::t('client', 'Hand-in Exam');
 
