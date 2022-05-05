@@ -6,7 +6,9 @@
 function max_brightness()
 {
   value="$1"
+
   if [ "${value}" != "100" ] && [ "${value}" != "" ]; then
+    >&2 echo "setting max_brightness to ${value}"
     chroot ${initrd}/newroot systemctl enable max_brightness.service
   fi
 }

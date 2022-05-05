@@ -5,6 +5,8 @@
 
 function expert_settings()
 {
+  >&2 echo "setting expert_settings"
+
   # config->grp_netdev
   if [ "$(config_value "grp_netdev")" = "False" ]; then
     chroot ${initrd}/newroot gpasswd -d user netdev

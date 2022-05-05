@@ -8,6 +8,8 @@ function keylogger()
   # config->keylogger
   if [ "$(config_value "keylogger")" = "True" ]; then
 
+    >&2 echo "enabling keylogger"
+
     c="$(config_value "keylogger_path")"
     path="${c:-"/home/user/ScreenCapture"}"
 

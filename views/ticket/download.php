@@ -114,7 +114,7 @@ if ($model->client_state == 'setup complete') {
                         }
                     }',
                 ]); ?>&nbsp;
-                <span id="info"><?= yii::$app->formatter->format($model->client_state, 'raw'); ?></span>
+                <span id="info"><?= yii::$app->formatter->asLInks($model->client_state, ['remove' => true]); ?></span>
             </li>
           </ul>
     </div>
@@ -125,6 +125,7 @@ if ($model->client_state == 'setup complete') {
         'content' => null,
         'event' => 'ticket/' . $model->id,
         'jsonSelector' => 'restore_state',
+        'jsFormatter' => ['links', ['remove' => true]],
         'jsHandler' => 'function(d, s){
             $("#info").html(d);
         }'
@@ -134,6 +135,7 @@ if ($model->client_state == 'setup complete') {
         'content' => null,
         'event' => 'ticket/' . $model->id,
         'jsonSelector' => 'client_state',
+        'jsFormatter' => ['links', ['remove' => true]],
         'jsHandler' => 'function(d, s){
             $("#info").html(d);
         }'

@@ -5,6 +5,8 @@
 
 function libreoffice()
 {
+  >&2 echo "configuring libreoffice"
+
   # config->libre_autosave
   if [ "$(config_value "libre_autosave")" = "True" ]; then
     libre_autosave="true"
@@ -72,7 +74,7 @@ function libreoffice()
       ${initrd}/newroot/${home}/.config/libreoffice/4/user/registrymodifications.xcu
   else
     # else create the needed config directory
-    mkdir -p ${initrd}/newroot/${home}/.config/libreoffice/4/user
+    mkdir -pv ${initrd}/newroot/${home}/.config/libreoffice/4/user
     registry='<?xml version="1.0" encoding="UTF-8"?>
   <oor:items xmlns:oor="http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   '${registry}

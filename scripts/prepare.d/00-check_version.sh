@@ -129,5 +129,5 @@ function check_version()
     do_exit 1
   fi
 
-  >&2 echo "All version check successful!"
+  >&2 echo "All version checks successful!"
 }

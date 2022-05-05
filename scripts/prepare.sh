@@ -6,7 +6,6 @@
 # client system with root permissions.
 #
 
-
 DEBUG=true
 wget="/usr/bin/wget"
 wgetOptions="--dns-timeout=30"
@@ -85,8 +84,8 @@ function do_exit()
   #iptables-save | grep -v "searchExamServer" | iptables-restore
 
   # unmount the filesystem
-  umount ${initrd}/newroot
-  umount -l ${initrd}/{base,exam,tmpfs}
+  umount -v ${initrd}/newroot
+  umount -v -l ${initrd}/{base,exam,tmpfs}
   # exit with failure (1) if nothing has been given to $1
   exit ${1:-1}
 }
@@ -122,22 +121,22 @@ EOF
 get_config "${urlConfig}"
 
 # create necessary directory structure
-mkdir -p "${initrd}/"{backup,base,newroot,squashfs,exam,tmpfs}
-mkdir -p "${initrd}/backup/etc/NetworkManager/"{system-connections,dispatcher.d}
-mkdir -p "${initrd}/backup/${desktop}/"
-mkdir -p "${initrd}/backup/usr/bin/"
-mkdir -p "${initrd}/backup/usr/sbin/"
-mkdir -p "${initrd}/backup/etc/live/config/"
-mkdir -p "${initrd}/backup/etc/lernstick-firewall/"
-mkdir -p "${initrd}/backup/etc/avahi/"
-mkdir -p "${initrd}/backup/root/.ssh"
-mkdir -p "${initrd}/backup/usr/share/applications"
+mkdir -pv "${initrd}/"{backup,base,newroot,squashfs,exam,tmpfs}
+mkdir -pv "${initrd}/backup/etc/NetworkManager/"{system-connections,dispatcher.d}
+mkdir -pv "${initrd}/backup/${desktop}/"
+mkdir -pv "${initrd}/backup/usr/bin/"
+mkdir -pv "${initrd}/backup/usr/sbin/"
+mkdir -pv "${initrd}/backup/etc/live/config/"
+mkdir -pv "${initrd}/backup/etc/lernstick-firewall/"
+mkdir -pv "${initrd}/backup/etc/avahi/"
+mkdir -pv "${initrd}/backup/root/.ssh"
+mkdir -pv "${initrd}/backup/usr/share/applications"
 
 # set proper permissions
-chown user:user "${initrd}/backup/${desktop}/"
-chown user:user "${initrd}/backup/${home}/"
-chmod 755 "${initrd}/backup/root"
-chmod 700 "${initrd}/backup/root/.ssh"
+chown -v user:user "${initrd}/backup/${desktop}/"
+chown -v user:user "${initrd}/backup/${home}/"
+chmod -v 755 "${initrd}/backup/root"
+chmod -v 700 "${initrd}/backup/root/.ssh"
 
 # get all active network connections
 con=$(LC_ALL=C nmcli -t -f state,connection d status | awk -F: '$1=="connected"{print $2}')
@@ -147,22 +146,22 @@ while IFS= read -r c; do
   # use both names, the old one and the new one for backwards compatibility
   echo "${c}"
   echo "${c}.nmconnection"
-done <<< "${con}" | LC_ALL=C xargs -I{} cp -p "/etc/NetworkManager/system-connections/{}" "${initrd}/backup/etc/NetworkManager/system-connections/"
+done <<< "${con}" | LC_ALL=C xargs -I{} cp -pv "/etc/NetworkManager/system-connections/{}" "${initrd}/backup/etc/NetworkManager/system-connections/"
 
 # edit copied connections manually, because nmcli will remove the wifi-sec.psk password when edited by nmcli modify
 #sed -i '/\[connection\]/a permissions=user:root:;' ${initrd}/backup/etc/NetworkManager/system-connections/*
 
 # copy needed scripts and files
-cp -p "/etc/NetworkManager/dispatcher.d/02searchExamServer" "${initrd}/backup/etc/NetworkManager/dispatcher.d/02searchExamServer"
+cp -pv "/etc/NetworkManager/dispatcher.d/02searchExamServer" "${initrd}/backup/etc/NetworkManager/dispatcher.d/02searchExamServer"
 
 # those should be removed as fast as possible
-cp -p "/usr/bin/lernstick_backup" "${initrd}/backup/usr/bin/lernstick_backup" #TODO: remove
-cp -p "/usr/bin/lernstick_autostart" "${initrd}/backup/usr/bin/lernstick_autostart" #TODO: remove
-cp -p "/usr/sbin/lernstick-firewall" "${initrd}/backup/usr/sbin/lernstick-firewall" #TODO: remove
-cp -p "/etc/lernstick-firewall/lernstick-firewall.conf" "${initrd}/backup/etc/lernstick-firewall/lernstick-firewall.conf" #TODO: remove
+cp -pv "/usr/bin/lernstick_backup" "${initrd}/backup/usr/bin/lernstick_backup" #TODO: remove
+cp -pv "/usr/bin/lernstick_autostart" "${initrd}/backup/usr/bin/lernstick_autostart" #TODO: remove
+cp -pv "/usr/sbin/lernstick-firewall" "${initrd}/backup/usr/sbin/lernstick-firewall" #TODO: remove
+cp -pv "/etc/lernstick-firewall/lernstick-firewall.conf" "${initrd}/backup/etc/lernstick-firewall/lernstick-firewall.conf" #TODO: remove
 
 # config of /etc/lernstickWelcome
-cp -p "/etc/lernstickWelcome" "${initrd}/backup/etc/lernstickWelcome"
+cp -pv "/etc/lernstickWelcome" "${initrd}/backup/etc/lernstickWelcome"
 sed -i 's/ShowNotUsedInfo=.*/ShowNotUsedInfo=false/g' "${initrd}/backup/etc/lernstickWelcome"
 sed -i 's/AutoStartInstaller=.*/AutoStartInstaller=false/g' "${initrd}/backup/etc/lernstickWelcome"
 
@@ -228,24 +227,24 @@ if [ -r /usr/share/initramfs-tools/hook-functions ]; then
 fi
 
 # copy shutdown script, this script will be executed later by systemd-shutdown
-cp -pf "${initrd}/squashfs/mount.sh" "/lib/systemd/lernstick-shutdown"
-chmod 755 "/lib/systemd/lernstick-shutdown"
+cp -pfv "${initrd}/squashfs/mount.sh" "/lib/systemd/lernstick-shutdown"
+chmod -v 755 "/lib/systemd/lernstick-shutdown"
 
 # We do this here, anyway the script /lib/systemd/system-shutdown/lernstick might
 # also copy it. That's why in the above line the mount.sh script is also copied to
 # /lib/systemd/lernstick-shutdown. The above 2 lines are for backward compatibility.
-cp -pf "${initrd}/squashfs/mount.sh" "${initrd}/shutdown"
-chmod 755 "${initrd}/shutdown"
+cp -pfv "${initrd}/squashfs/mount.sh" "${initrd}/shutdown"
+chmod -v 755 "${initrd}/shutdown"
 
 # remove policykit action for lernstick welcome application
-rm -f ${initrd}/newroot/usr/share/polkit-1/actions/ch.lernstick.welcome.policy
+rm -fv ${initrd}/newroot/usr/share/polkit-1/actions/ch.lernstick.welcome.policy
 
 # add an entry to finish the exam in the dash
 add_dash_entry "finish_exam.desktop"
 
 # Welcome to exam .desktop entry to be executed at autostart
-mkdir -p "${initrd}/newroot/etc/xdg/autostart/"
-mkdir -p "${initrd}/newroot/usr/share/applications/"
+mkdir -pv "${initrd}/newroot/etc/xdg/autostart/"
+mkdir -pv "${initrd}/newroot/usr/share/applications/"
 
 # add an entry to show information about the exam in the dash
 add_dash_entry "show-info.desktop"
@@ -320,17 +319,27 @@ echo "${sshKey}" >>"${initrd}/backup/root/.ssh/authorized_keys"
 echo "tcp ${gladosIp} 22" >>${initrd}/backup/etc/lernstick-firewall/net_whitelist_input
 
 # hand over the url whitelist
+mkdir -pv ${initrd}/backup/etc/lernstick-firewall/proxy.d
 if isdeb9ornewer; then
-  echo "${gladosProto}://${gladosHost}" | sed 's/\./\\\./g' >>${initrd}/backup/etc/lernstick-firewall/url_whitelist
-  echo "${gladosProto}://${gladosIp}" | sed 's/\./\\\./g' >>${initrd}/backup/etc/lernstick-firewall/url_whitelist
+  echo "${gladosProto}://${gladosHost}" | sed 's/\./\\\./g' >>${initrd}/backup/etc/lernstick-firewall/url_whitelist # for backward compatibility, todo: remove as soon as possible
+  echo "${gladosProto}://${gladosIp}" | sed 's/\./\\\./g' >>${initrd}/backup/etc/lernstick-firewall/url_whitelist # for backward compatibility, todo: remove as soon as possible
+  echo "${gladosProto}://${gladosHost}" | sed 's/\./\\\./g' >>${initrd}/backup/etc/lernstick-firewall/proxy.d/glados.conf
+  echo "${gladosProto}://${gladosIp}" | sed 's/\./\\\./g' >>${initrd}/backup/etc/lernstick-firewall/proxy.d/glados.conf
 else
-  echo "${gladosProto}://${gladosHost}:${gladosPort}" >>${initrd}/backup/etc/lernstick-firewall/url_whitelist
-  echo "${gladosProto}://${gladosIp}:${gladosPort}" >>${initrd}/backup/etc/lernstick-firewall/url_whitelist
+  echo "${gladosProto}://${gladosHost}:${gladosPort}" >>${initrd}/backup/etc/lernstick-firewall/url_whitelist # for backward compatibility, todo: remove as soon as possible
+  echo "${gladosProto}://${gladosIp}:${gladosPort}" >>${initrd}/backup/etc/lernstick-firewall/url_whitelist # for backward compatibility, todo: remove as soon as possible
+  echo "${gladosProto}://${gladosHost}:${gladosPort}" >>${initrd}/backup/etc/lernstick-firewall/proxy.d/glados.conf
+  echo "${gladosProto}://${gladosIp}:${gladosPort}" >>${initrd}/backup/etc/lernstick-firewall/proxy.d/glados.conf
 fi
 
 # hand over allowed ip/ports
 echo "tcp ${gladosIp} ${gladosPort}" >>${initrd}/backup/etc/lernstick-firewall/net_whitelist
-sort -u -o ${initrd}/backup/etc/lernstick-firewall/url_whitelist ${initrd}/backup/etc/lernstick-firewall/url_whitelist
+
+# unique all the lines
+sort -u -o ${initrd}/backup/etc/lernstick-firewall/url_whitelist ${initrd}/backup/etc/lernstick-firewall/url_whitelist # for backward compatibility, todo: remove as soon as possible
+sort -u -o ${initrd}/backup/etc/lernstick-firewall/proxy.d/glados.conf ${initrd}/backup/etc/lernstick-firewall/proxy.d/glados.conf
+sort -u -o ${initrd}/backup/etc/lernstick-firewall/net_whitelist_input ${initrd}/backup/etc/lernstick-firewall/net_whitelist_input
+sort -u -o ${initrd}/backup/etc/lernstick-firewall/net_whitelist ${initrd}/backup/etc/lernstick-firewall/net_whitelist
 
 # grab all UUIDs from physical ethernet connections to bring them down before rebooting the
 # system. This forces network-manager to reconnect each of them. This solves a problem when

@@ -206,6 +206,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'content' => $model->client_state,
                     'event' => 'ticket/' . $model->id,
                     'jsonSelector' => 'client_state',
+                    'jsFormatter' => 'links',
                 ]) . ' <div class="progress fade ' . ($model->download_lock == 1 ? 'in' : '') . '" style="display: inline-table; width:33.33%;">' . 
                     ActiveEventField::widget([
                         'content' => ActiveEventField::widget([

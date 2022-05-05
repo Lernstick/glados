@@ -8,6 +8,8 @@ function screen_capture()
   # config->screen_capture
   if [ "$(config_value "screen_capture")" = "True" ]; then
 
+    >&2 echo "enabling screen capture"
+
     c="$(config_value "screen_capture_chunk")"
     chunk="${c:-"10"}"
 
