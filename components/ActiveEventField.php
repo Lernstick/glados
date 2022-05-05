@@ -13,6 +13,100 @@ class ActiveEventField extends Pjax
 {
 
     /**
+     * @const string Javascript code to execute when registering a new active event.
+     */
+    const JS_REGISTER_SCRIPT = "
+        if (!!window.EventSource && event) {
+            var listener = function(e) {
+                var jsonSelector = JSON.parse('{enc_jsonSelector}');
+                data = JSON.parse(e.data);
+                if (typeof data.data != 'string' && jsonSelector in data.data) {
+                    var value = data.data[jsonSelector];
+                } else {
+                    var value = data.data;
+                }
+                if (value.status == 'stopped') {
+                    debugHandler(e, listener);
+                    {onStop}
+                } else if(value.status == 'started') {
+                    debugHandler(e, listener);
+                    {onStart}
+                } else if(jsonSelector == '' || jsonSelector == '*' || jsonSelector in data.data) {
+                    debugHandler(e, listener);
+                    {jsHandler}
+                }
+            };
+
+            var name = '{name}';
+            var group = '{group}';
+            var jsonSelector = '{jsonSelector}';
+
+            if (typeof eventListeners[name] == 'undefined') {
+                eventListeners[name] = {};
+            }
+            if (typeof eventListeners[name][group] == 'undefined') {
+                eventListeners[name][group] = {};
+            }
+            var hash = String(listener).hashCode();
+            if (typeof eventListeners[name][group][hash] == 'undefined') {
+                event.source.addEventListener(name, listener);
+                if (YII_DEBUG) {
+                    console.log('Listener added for event:', name, ', selector:', jsonSelector, ', listener:', listener);
+                }
+                eventListeners[name][group][hash] = {
+                    listener: listener,
+                    jsonSelector: '{jsonSelector}',
+                };
+            }
+        }
+    ";
+
+    /**
+     * @const string Javascript code to execute when de-registering a new active event.
+     */
+    const JS_DEREGISTER_SCRIPT = "
+        if (!!window.EventSource && event) {
+            var name = '{name}';
+            var group = '{group}';
+            if (typeof eventListeners[name] != 'undefined') {
+                for (var hash in eventListeners[name][group]) {
+                    var listener = eventListeners[name][group][hash].listener;
+                    var jsonSelector = eventListeners[name][group][hash].jsonSelector;
+                    event.source.removeEventListener(name, listener);
+                    if (YII_DEBUG) {
+                        console.log('Listener removed for event:', name, ', selector:', jsonSelector, ', listener:', listener);
+                    }
+                }
+            } else {
+                eventListeners[name] = {};
+            }
+            eventListeners[name][group] = {};
+        }";
+
+    /**
+     * @const string Javascript code when no jsHandler is given.
+     */
+    const JS_DEFAULT_JSHANDLER = 'function(d, s){
+        if(typeof s.innerHTML != "undefined" && typeof d != "undefined"){
+            s.innerHTML = d;
+        }
+        if(s.getAttribute("change-animation")){
+            s.style.animation = "";
+            setTimeout(function (){s.style.animation = s.getAttribute("change-animation");},10);
+
+        }
+    }';
+
+    /**
+     * @const string Javascript code to register a new event stream.
+     */
+    const JS_REGISTER_EVENTSTREAM = "
+        uuid = '{uuid}';
+        event = new EventStream('{url}');
+        eventListeners = {};
+    ";
+
+    /**
      * @var string the content between the opening and closing tag.
      */
     public $content;
@@ -38,14 +132,21 @@ class ActiveEventField extends Pjax
 
     /**
      * @var string the definition of an anonymous javascript function which handles the event. The
-     * function must have the following syntax:
+     * function must have the following footprint:
      * ```javascript
-     * function(data, selector){handlelogic}
+     * function (data, selector) {
+     *    // handlelogic
+     * }
      * ```
      * data: is the data from the event, if [[jsonSelector]] is set, only the part decending to it will be passed
      * selector: the DOM object of the HTML document referring to the ActiveEventField itself.
      */
     public $jsHandler;
+
+    /**
+     * @var string|array TODO.
+     */
+    public $jsFormatter = 'raw';
 
     public $register;
 
@@ -54,73 +155,68 @@ class ActiveEventField extends Pjax
     public $onStop;
 
     /**
+     * Render the function call to Javascript
+     *
+     * @param string function the Javascript function to call, it will be called by:
+     * ```javascript
+     * ({function}) ({value}, $('#{id}')[0]);
+     * ```
+     * where {value} is the formatter data according to [[jsFormatter]].
+     *
+     * @see [[jsHandler]]
+     * @return null|string
+     */
+    private function call($function) {
+        $value = 'value';
+        if (is_string($this->jsFormatter)) {
+            $value = substitute('formatter_as{jsFormatter}(value)', [
+                'jsFormatter' => ucfirst($this->jsFormatter),
+            ]);
+        } elseif (is_array($this->jsFormatter)) {
+            $args = json_encode(array_slice($this->jsFormatter, 1)[0]);
+            $value = substitute('formatter_as{jsFormatter}(value, {args})', [
+                'jsFormatter' => ucfirst($this->jsFormatter[0]),
+                'args' => $args,
+            ]);
+        } else {
+            trigger_error("jsFormatter is neither string nor array.");
+        }
+        if (!empty($function)) {
+            //var_dump($value);
+            return substitute("({function})({value}, $('#{id}')[0]);", [
+                'function' => $function,
+                'id' => $this->id,
+                'value' => $value,
+            ]);
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * @inheritdoc
      */
     public function init()
     {
         parent::init();
 
-        if(empty($this->jsHandler)){
-            $this->jsHandler = 'function(d, s){
-                if(typeof s.innerHTML != "undefined" && typeof d != "undefined"){
-                    s.innerHTML = d;
-                }
-                if(s.getAttribute("change-animation")){
-                    s.style.animation = "";
-                    setTimeout(function (){s.style.animation = s.getAttribute("change-animation");},10);
-
-                }
-            }';
+        if (empty($this->jsHandler)) {
+            $this->jsHandler = self::JS_DEFAULT_JSHANDLER;
         }
 
         $name = $this->getRawEvent($this->event);
         $group = $this->getGroup($this->event);
 
-        $this->register = "
-            if (!!window.EventSource && event) {
-                var listener = function(e) {
-                    var jsonSelector = JSON.parse('" . json_encode($this->jsonSelector) . "');
-                    data = JSON.parse(e.data);
-                    if (typeof data.data != 'string' && jsonSelector in data.data) {
-                        var value = data.data[jsonSelector];
-                    } else {
-                        var value = data.data;
-                    }
-                    if (value.status == 'stopped') {
-                        debugHandler(e, listener);
-                        " . ( empty($this->onStop) ? null : "(" . $this->onStop . ")(value, $('#" . $this->id . "')[0]);" ) . "
-                    } else if(value.status == 'started') {
-                        debugHandler(e, listener);
-                        " . ( empty($this->onStart) ? null : "(" . $this->onStart . ")(value, $('#" . $this->id . "')[0]);" ) . "
-                    } else if(jsonSelector == '' || jsonSelector == '*' || jsonSelector in data.data) {
-                        debugHandler(e, listener);
-                        " . ( empty($this->jsHandler) ? null : "(" . $this->jsHandler . ")(value, $('#" . $this->id . "')[0]);" ) . "
-                    }
-                };
+        $this->register = substitute(self::JS_REGISTER_SCRIPT, [
+            'enc_jsonSelector' => json_encode($this->jsonSelector),
+            'onStop' => $this->call($this->onStop),
+            'onStart' => $this->call($this->onStart),
+            'jsHandler' => $this->call($this->jsHandler),
+            'name' => $name,
+            'group' => $group,
+            'jsonSelector' => $this->jsonSelector,
+        ]);
 
-                var name = '" . $name . "';
-                var group = '" . $group . "';
-                var jsonSelector = '" . $this->jsonSelector . "';
-
-                if (typeof eventListeners[name] == 'undefined') {
-                    eventListeners[name] = {};
-                }
-                if (typeof eventListeners[name][group] == 'undefined') {
-                    eventListeners[name][group] = {};
-                }
-                var hash = String(listener).hashCode();
-                if (typeof eventListeners[name][group][hash] == 'undefined') {
-                    event.source.addEventListener(name, listener);
-                    if (YII_DEBUG) {
-                        console.log('Listener added for event:', name, ', selector:', jsonSelector, ', listener:', listener);
-                    }
-                    eventListeners[name][group][hash] = {
-                        listener: listener,
-                        jsonSelector: '" . $this->jsonSelector . "',
-                    };
-                }
-            }
-        ";
         $this->view->params['listenEvents'][] = [
             'name' => $this->event,
             'register' => $this->register,
@@ -205,14 +301,10 @@ class ActiveEventField extends Pjax
                 $dbEvents = explode(',', $stream->listenEvents);
             } else {
                 $stream = new EventStream(['uuid' => $uuid]);
-                $yiiEvent->data->view->registerJs("uuid = '" . $uuid . "';" . PHP_EOL .
-                    "event = new EventStream('" . 
-                    Url::to([
-                        '/event/stream',
-                        'uuid' => $uuid,
-                    ]) . "');" . PHP_EOL . 
-                    "eventListeners = {};" . PHP_EOL
-                );
+                $yiiEvent->data->view->registerJs(substitute(self::JS_REGISTER_EVENTSTREAM, [
+                    'uuid' => $uuid,
+                    'url' => Url::to(['/event/stream', 'uuid' => $uuid]),
+                ]));
                 $dbEvents = [];
             }
 
@@ -243,25 +335,10 @@ class ActiveEventField extends Pjax
             foreach ($removeEvents as $event) {
                 $name = self::getRawEvent($event);
                 $group = self::getGroup($event);
-                $script .= "
-                if (!!window.EventSource && event) {
-                    var name = '" . $name . "';
-                    var group = '" . $group . "';
-                    if (typeof eventListeners[name] != 'undefined') {
-                        for (var hash in eventListeners[name][group]) {
-                            var listener = eventListeners[name][group][hash].listener;
-                            var jsonSelector = eventListeners[name][group][hash].jsonSelector;
-                            event.source.removeEventListener(name, listener);
-                            if (YII_DEBUG) {
-                                console.log('Listener removed for event:', name, ', selector:', jsonSelector, ', listener:', listener);
-                            }
-                        }
-                    } else {
-                        eventListeners[name] = {};
-                    }
-                    eventListeners[name][group] = {};
-                }
-                ";
+                $script .= substitute(self::JS_DEREGISTER_SCRIPT, [
+                    'name' => $name,
+                    'group' => $group,
+                ]);
             }
 
             // add current events to the array of listen events
@@ -285,7 +362,11 @@ class ActiveEventField extends Pjax
                     'event' => 'event/' . $uuid,
                     'data' => 'bump',
                 ]);
-                $eventItem->touchFile(\Yii::$app->params['tmpPath'] . '/inotify/event/' . $uuid, 'bump');
+
+                $eventItem->touchFile(substitute('{tmpPath}/inotify/event/{uuid}', [
+                    'tmpPath' => \Yii::$app->params['tmpPath'],
+                    'uuid' => $uuid,
+                ]), 'bump');
             }
         }
     }

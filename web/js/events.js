@@ -72,3 +72,39 @@ function debugHandler(e, me){
         });
     }
 }
+
+/**
+ * The following functions mimic the behavior of their YII counterparts.
+ * @see https://www.yiiframework.com/doc/api/2.0/yii-i18n-formatter
+ */
+
+/**
+ * Raw formatter, does not change anything
+ * @see https://www.yiiframework.com/doc/api/2.0/yii-i18n-formatter#asRaw()-detail
+ */
+function formatter_asRaw(value) { return value; }
+
+/**
+ * @see equivalent to PHP method [[customFormatter->asLinks()]]
+ */
+function formatter_asLinks(value, options = {'remove': false}) {
+    return value.replace(/\{url\:([^\:]+)\:([^\:]+)\:([^\:]+)\:([^\}]*)\}/g, function (match, name, controller, action, plist, offset, input_string) {
+        if (options.remove) {
+            return name;
+        }
+
+        var p = plist.split(',');
+        var params = {};
+        p.forEach(function (param) {
+            var parr = param.split('=', 2);
+            params[parr[0]] = parr[1];
+        });
+        params[0] = controller+'/'+action;
+
+        var link = $("<a>");
+        link.attr("href", Url_to(params));
+        link.attr("data-pjax", 0);
+        link.text(name);
+        return link.prop('outerHTML');;
+    });
+}

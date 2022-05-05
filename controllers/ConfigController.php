@@ -59,7 +59,7 @@ class ConfigController extends BaseController
         return [
             "server_version" => \Yii::$app->version,
             "rdiff_backup_version" => $v,
-            "wants_client_version" => ">=1.0.18", // @todo: change back to 1.0.19
+            "wants_client_version" => ">=1.0.19",
             "wants_lernstick_version" => ">=20210213", // 2021-02-13, notice without the dashes (from /usr/local/lernstick.html)
             "wants_lernstick_flavor" => "exam", // "exam" or "standard"
             "wants_rdiff_backup_version" => $want,

@@ -1,7 +1,6 @@
 <?php
 
 use yii\helpers\Html;
-use yii\helpers\Url;
 use app\components\ActiveEventField;
 
 /* @var $this yii\web\View */
@@ -40,24 +39,6 @@ if ($model->last_backup == 1) {
     }',
 ]); ?>
 
-<?= ActiveEventField::widget([
-    'content' => null,
-    'event' => 'ticket/' . $model->id,
-    'jsonSelector' => 'backup_state',
-    'jsHandler' => 'function(d, s){
-        $("#info").html(d);
-    }'
-]); ?>
-
-<?= ActiveEventField::widget([
-    'content' => null,
-    'event' => 'ticket/' . $model->id,
-    'jsonSelector' => 'client_state',
-    'jsHandler' => 'function(d, s){
-        $("#info").html(d);
-    }'
-]); ?>
-
 <div class="finish-s2-view">
 
     <div id="progress" class="modal modal-centered" tabindex="-1" role="dialog">
@@ -87,7 +68,19 @@ if ($model->last_backup == 1) {
                             }
                         }',
                     ]); ?>&nbsp;
-                    <span id="info"><?= yii::$app->formatter->format($model->client_state, 'raw'); ?></span>
+                    <?= ActiveEventField::widget([
+                        'options' => ['tag' => 'span'],
+                        'content' => yii::$app->formatter->format($model->backup_state, ['links', ['remove' => true]]),
+                        'event' => 'ticket/' . $model->id,
+                        'jsonSelector' => 'backup_state',
+                        'jsFormatter' => ['links', ['remove' => true]],
+                    ]) ?>
+                    (<?= ActiveEventField::widget([
+                        'options' => ['tag' => 'span'],
+                        'content' => yii::$app->formatter->format($model->client_state, 'raw'),
+                        'event' => 'ticket/' . $model->id,
+                        'jsonSelector' => 'client_state',
+                    ]) ?>)
                 </div>
 
 

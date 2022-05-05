@@ -114,3 +114,24 @@ function substitute(string, params) {
     }
     return string;
 }
+
+/**
+ * @see YII's equivalent to Url::to()
+ */
+function Url_to(url) {
+    var http_url = baseUrl + '/';
+
+    i = 0;
+    for (var key in url) {
+        if (url.hasOwnProperty(key)) {
+            if (key == 0) {
+                http_url += url[key];
+            } else {
+                http_url += (i == 0 ? '?' : '&') + key + '=' + encodeURIComponent(url[key]);
+                i++;
+            }
+        }
+    }
+
+    return http_url;
+}

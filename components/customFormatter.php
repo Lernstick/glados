@@ -222,26 +222,32 @@ class customFormatter extends \yii\i18n\Formatter
      * Formats the links in the input as actual links.
      * 
      * links are given by {url:{name}:{controller}:{action}:variable1={value1},variable2={value2}}
-     * they becomes:
+     * they become:
      * Html::a('{name}', Url::to('{controller}/{action}', [
      *     'variable1' => '{value1}',
      *     'variable2' => '{value2}',
      * ]));
      *
      * @param integer $value the value to be formatted in minutes.
+     * @param array $options: remove: whether to render the links as HTML-links or remove the links
+     * and only render the name.
      * @return string the formatted result.
      */
-    public static function asLinks($value)
+    public static function asLinks($value, $options = ['remove' => false])
     {
-        return preg_replace_callback('/\{url\:([^\:]+)\:([^\:]+)\:([^\:]+)\:([^\}]*)\}/', function($m){
+        return preg_replace_callback('/\{url\:([^\:]+)\:([^\:]+)\:([^\:]+)\:([^\}]*)\}/', function($m) use ($options) {
+            list($_, $name, $controller, $action, $plist) = $m;
+            if ($options['remove']) {
+                return $name;
+            }
             $params = [];
-            $p = explode(',', $m[4]);
+            $p = explode(',', $plist);
             foreach ($p as $param) {
                 list($key, $val) = explode('=', $param, 2);
                 $params[$key] = $val;
             }
-            $params[0] = $m[2].'/'.$m[3];
-            return Html::a($m[1], Url::to($params), ['data-pjax' => 0]);
+            $params[0] = $controller . '/' . $action;
+            return Html::a($name, Url::to($params), ['data-pjax' => 0]);
         }, $value);
     }
 

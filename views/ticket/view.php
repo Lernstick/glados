@@ -242,7 +242,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'backup_state',
-                'format' => 'links',
+                'format' => 'raw',
                 'value' => $this->render('/ticket/fields/_backup_state', ['model' => $model, 'group' => '']),
             ],
             [

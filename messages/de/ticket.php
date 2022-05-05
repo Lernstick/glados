@@ -224,7 +224,7 @@ return [
     'network error: {error}.' => 'Netzwerk Fehler: {error}.',
     'not set' => 'nicht gesetzt',
     'preparing system' => 'System wird eingerichtet',
-    'rdiff-backup failed. For more information, please check the {logfile} (retval: {retval})' => 'rdiff-backup fehlgeschlagen. Für mehr Informationen, überprüfen Sie bitte {logfile} (Rückgabewert: {retval})',
+    'rdiff-backup failed. For more information, please check the {logfile} (retval: {retval})' => 'rdiff-backup fehlgeschlagen. Für mehr Informationen, überprüfen Sie bitte das {logfile} (Rückgabewert: {retval})',
     'restore in progress...' => 'Wiederherstellung im Gange...',
     'restore successful.' => 'Wiederherstellung erfolgreich.',
     'rsync failed (retval: {retval}), output: {output}' => 'rsync fehlgeschlagen (Rückgabewert: {retval}), Ausgabe: {output}',

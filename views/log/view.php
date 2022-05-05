@@ -7,6 +7,7 @@ if (empty($model->contents)){
 	echo \Yii::t('log', 'The logfile is empty.');
 } else {
 	foreach ($model->contents as $line) {
+		$line = str_replace(' ', '&nbsp;', $line);
 		if ($model->typeOfLine($line) == $model::ENTRY_ERROR) {
 			echo '<samp class="bg-danger">' . $line . '</samp><br>';
 		} else if ($model->typeOfLine($line) == $model::ENTRY_WARNING) {

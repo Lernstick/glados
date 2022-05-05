@@ -3,6 +3,7 @@
 /* @var $this \yii\web\View */
 /* @var $content string */
 
+use yii\helpers\Url;
 use yii\helpers\Html;
 use app\assets\AppAsset;
 
@@ -11,6 +12,7 @@ AppAsset::register($this);
 /* register the global YII_ENV variables */
 $this->registerJs('var YII_ENV_DEV = ' . (YII_ENV_DEV ? 'true' : 'false') . ';', \yii\web\View::POS_HEAD);
 $this->registerJs('var YII_DEBUG = ' . (YII_DEBUG ? 'true' : 'false') . ';', \yii\web\View::POS_HEAD);
+$this->registerJs(substitute('var baseUrl = "{url}";', ['url' => Url::base()]), \yii\web\View::POS_HEAD);
 
 $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\View::POS_END);
 
