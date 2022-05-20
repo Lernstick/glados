@@ -90,6 +90,7 @@ $config = [
                 'event/<action:(agent)>/<token:.*>' => 'event/<action>',
                 'monitor' => 'monitor/view',
                 'result/<action:view>/<token:.*>' => 'result/<action>',
+                'site/lock/<id:.*>' => 'site/lock',
             ]
         ],
         'i18n' => [

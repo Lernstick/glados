@@ -105,4 +105,10 @@ class SiteController extends Controller
 
         return $this->goHome();
     }
+
+    public function actionLock($id = Null)
+    {
+        $this->layout = 'client';
+        return $this->render('lock');
+    }
 }
