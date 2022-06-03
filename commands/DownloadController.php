@@ -270,11 +270,10 @@ class DownloadController extends NetworkController implements DaemonInterface
             $this->ticket->client_state = yiit('ticket', 'preparing system');
             $this->ticket->save();
 
-            /* run the prepare.sh script on the client */
-            $cmd = substitute("cat {scripts} {prepare} | ssh -i {identity} -o "
-                 . "UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no {user}@{ip} 'bash -s' {token}", [
-                'scripts' => escapeshellarg(\Yii::$app->basePath . "/scripts/prepare.d/") . "*",
-                'prepare' => escapeshellarg(\Yii::$app->basePath . "/scripts/prepare.sh"),
+            /* run the prepare.py script on the client */
+            $cmd = substitute("cat {prepare} | ssh -i {identity} -o "
+                 . "UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no {user}@{ip} 'python3' '-' '-t {token}'", [
+                'prepare' => escapeshellarg(\Yii::$app->basePath . "/scripts/prepare.py"),
                 'identity' => escapeshellarg(\Yii::$app->params['dotSSH'] . "/rsa"),
                 'user' => escapeshellarg($this->remoteUser),
                 'ip' => escapeshellarg($this->ticket->ip),
