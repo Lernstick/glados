@@ -14,6 +14,8 @@ import requests # requests.get()
 import fileinput # edit files inplace
 import re
 import pathlib
+import textwrap # dedent()
+from lxml import etree # for support of nsmap
 
 # append to the interpreter’s search path for modules
 directory = "/var/lib/lernstick-exam-client/persistent/var/lib/lernstick-exam-client"
@@ -75,7 +77,7 @@ def http_get(url, **kwargs):
         r.error_type = repr(e)
     return r
 
-# retrieves the configuration json and stores it to $configFile
+# retrieves the configuration json and stores it to configFile
 def get_config_from_server(url):
     r = http_get(url)
     if r.status_code != 200:
@@ -89,7 +91,7 @@ Copies a file, preserving owner and permissions
 
 @param string src: source file
 @param string dst: destination file
-@param bool fail_ok: destination file
+@param bool fail_ok: raise if copying fails
 @param bool dry_run: only log (debug) what would be copied, without actually copying
 @param *args, **kwargs: remaining arguments for the shutil.copy2 function
 @return bool: fail or success
@@ -150,14 +152,14 @@ Searches for a regex in a file line by line and replaces it.
 @param string out_file: path to the file to store the changes (if not given it's the [[in_file]])
 """
 def file_regex(find, replace, in_file, out_file = None):
+    replace = '' if replace is None else replace
     in_context = fileinput.FileInput(in_file, backup = '.bak', inplace = out_file is None)
     out_context = open('/dev/null' if out_file is None else out_file, 'w')
     old = sys.stdout
     with in_context as in_fh, out_context as out_fh:
         sys.stdout = sys.stdout if out_file is None else out_fh
         for line in in_fh:
-            if replace is not None:
-                print(re.sub(find, replace, line), end = '')
+            print(re.sub(find, replace, line), end = '')
     sys.stdout = old
 
 """
@@ -295,7 +297,7 @@ def add_dash_entry(entry):
     pathlib.Path(f"{INITRD}/newroot/etc/dconf/db/local.d").touch()
     helpers.run(f"chroot {INITRD}/newroot dconf update")
 
-    # place ${entry} in "favorite apps" of Gnome3's dash in the user-db
+    # place entry in "favorite apps" of Gnome3's dash in the user-db
     copy('/home/user/.config/dconf/user', '/home/user/.config/dconf/user.bak')
     if os.path.exists(f'{INITRD}/newroot/home/user/.config/dconf/user'):
         copy(f'{INITRD}/newroot/home/user/.config/dconf/user', '/home/user/.config/dconf/')
@@ -313,7 +315,7 @@ def add_dash_entry(entry):
     helpers.run(f'sudo -u user dconf write "/org/gnome/shell/favorite-apps" "[{new_value}]"; sync')
 
     dconf_dir = f'{INITRD}/newroot/home/user/.config/dconf/'
-    if os.path.exists(dconf_dir):
+    if True or os.path.exists(dconf_dir): # @todo: remove the if statement
         os.makedirs(dconf_dir, exist_ok = True)
     copy('/home/user/.config/dconf/user', f'{INITRD}/newroot/home/user/.config/dconf/user')
     copy('/home/user/.config/dconf/user.bak', '/home/user/.config/dconf/user')
@@ -347,28 +349,46 @@ def allow_sudo(allowed):
 def allow_mount_external(allowed):
     logger.debug(f"allow mounting external media -> {allowed}")
     polkit_file = f"{INITRD}/newroot/etc/polkit-1/localauthority/90-mandatory.d/10-udisks2-mount.pkla"
-    contents = [
-        "[allow user mounting and unmounting of non-system devices with self authentication]",
-        "Identity=unix-user:user",
-        "Action=org.freedesktop.udisks2.filesystem-mount",
-        "ResultAny={0}",
-        "ResultInactive={0}",
-        "ResultActive={0}"
-    ]
-    helpers.file_put_contents(polkit_file, "\n".join(contents).format('yes' if allowed else 'auth_admin'))
+    contents = textwrap.dedent(r"""
+    [allow user mounting and unmounting of non-system devices with self authentication]
+    Identity=unix-user:user
+    Action=org.freedesktop.udisks2.filesystem-mount
+    ResultAny={0}
+    ResultInactive={0}
+    ResultActive={0}
+    """)
+    helpers.file_put_contents(polkit_file, contents.format('yes' if allowed else 'auth_admin'))
+    # contents = [
+    #     "[allow user mounting and unmounting of non-system devices with self authentication]",
+    #     "Identity=unix-user:user",
+    #     "Action=org.freedesktop.udisks2.filesystem-mount",
+    #     "ResultAny={0}",
+    #     "ResultInactive={0}",
+    #     "ResultActive={0}"
+    # ]
+    # helpers.file_put_contents(polkit_file, "\n".join(contents).format('yes' if allowed else 'auth_admin'))
 
 def allow_mount_system(allowed):
     logger.debug(f"allow mounting internal media -> {allowed}")
     polkit_file = f"{INITRD}/newroot/etc/polkit-1/localauthority/90-mandatory.d/10-udisks2-mount-system.pkla"
-    contents = [
-        "[allow user mounting and unmounting of system devices with self authentication]",
-        "Identity=unix-user:user",
-        "Action=org.freedesktop.udisks2.filesystem-mount-system",
-        "ResultAny={0}",
-        "ResultInactive={0}",
-        "ResultActive={0}"
-    ]
-    helpers.file_put_contents(polkit_file, "\n".join(contents).format('yes' if allowed else 'auth_admin'))
+    contents = textwrap.dedent(r"""
+    [allow user mounting and unmounting of system devices with self authentication]
+    Identity=unix-user:user
+    Action=org.freedesktop.udisks2.filesystem-mount-system
+    ResultAny={0}
+    ResultInactive={0}
+    ResultActive={0}
+    """)
+    helpers.file_put_contents(polkit_file, contents.format('yes' if allowed else 'auth_admin'))
+    # contents = [
+    #     "[allow user mounting and unmounting of system devices with self authentication]",
+    #     "Identity=unix-user:user",
+    #     "Action=org.freedesktop.udisks2.filesystem-mount-system",
+    #     "ResultAny={0}",
+    #     "ResultInactive={0}",
+    #     "ResultActive={0}"
+    # ]
+    # helpers.file_put_contents(polkit_file, "\n".join(contents).format('yes' if allowed else 'auth_admin'))
 
 # enable or disable the firewall
 def firewall_off(off):
@@ -382,86 +402,194 @@ def firewall_off(off):
 def set_url_whitelist(url_whitelist):
     if url_whitelist != '':
         url_whitelist = re.sub(r'\.', r'\\\.', url_whitelist)
+        logger.debug(f"setting url whitelist to {url_whitelist}")
+        url_whitelist = '\n' + url_whitelist
         os.makedirs(f'{INITRD}/backup/etc/lernstick-firewall/proxy.d', exist_ok = True)
         helpers.file_put_contents(f'{INITRD}/newroot/etc/lernstick-firewall/proxy.d/glados.conf', url_whitelist, append = True)
-        helpers.file_put_contents(f'{INITRD}/newroot/etc/lernstick-firewall/url_whitelist', url_whitelist, append = True)# for backward compatibility, todo: remove as soon as possible
+        helpers.file_put_contents(f'{INITRD}/newroot/etc/lernstick-firewall/url_whitelist', url_whitelist, append = True) # for backward compatibility, todo: remove as soon as possible
+
+# Returns an xpath to search for created from a dictionary d
+def xml_get_xpath(d):
+    xpath = '.'
+    for tag, attribs in d.items():
+        xpath += f'/{tag}'
+        for attrib,value in attribs.items():
+            xpath += f'[@{attrib}="{value}"]'
+    return xpath
+
+# Returns a attribute with namespace
+def xml_get_nsattrib(attrib, nsmap):
+    if ":" in attrib:
+        ns, attrib = attrib.split(":", 1)
+        attrib = etree.QName(nsmap[ns], attrib)
+    return attrib
+
+# Returns a dictionary of (possibly namespaced) attributes
+def xml_get_attribs(attribs, nsmap):
+    ret = {}
+    for attrib, value in attribs.items():
+        ret[xml_get_nsattrib(attrib, nsmap)] = value
+    return ret
+
+# Removes a tree of elements given by the dictionary d
+def xml_remove_element_tree(d, root, nsmap):
+    if (tag := root.find(xml_get_xpath(d), namespaces=nsmap)) is not None:
+        tag.getparent().remove(tag)
+        d.popitem()
+        if d:
+            return xml_remove_element_tree(d, root, nsmap)
+    return root
+
+# Alters an element text-value given by the dictionary d
+def xml_change_element(d, value, root, nsmap):
+    if (tag := root.find(xml_get_xpath(d), namespaces=nsmap)) is not None:
+        tag.text = u"{}".format(value)
+        return True
+    else:
+        return False
+
+# Creates an element with text-value given by the dictionary d
+def xml_create_element(d, value, root, nsmap):
+    r = root
+    for i, (tag, attribs) in enumerate(d.items()):
+        r = etree.SubElement(r, tag, attrib=xml_get_attribs(attribs, nsmap))
+        if i == 0:
+            item = r
+    r.text = u"{}".format(value)
+    root.append(item)
+    return root
 
 def libreoffice(home, config):
-    registry_file = f'{INITRD}/newroot/${home}/.config/libreoffice/4/user/registrymodifications.xcu'
-    registry = [
-        r'<item oor:path="/org.openoffice.Office.Recovery/AutoSave"><prop oor:name="TimeIntervall" oor:op="fuse"><value>{libre_autosave_interval}</value></prop></item>',
-        r'<item oor:path="/org.openoffice.Office.Recovery/AutoSave"><prop oor:name="Enabled" oor:op="fuse"><value>{libre_autosave}</value></prop></item>',
-        r'<item oor:path="/org.openoffice.Office.Common/Save/Document"><prop oor:name="CreateBackup" oor:op="fuse"><value>{libre_createbackup}</value></prop></item>'
-    ]
+    registry_file = f'{INITRD}/newroot/{home}/.config/libreoffice/4/user/registrymodifications.xcu'
+
+    # setup the namespaces for the XML-file
+    nsmap = {
+        'oor': 'http://openoffice.org/2001/registry',
+        'xs':  'http://www.w3.org/2001/XMLSchema',
+        'xsi': 'http://www.w3.org/2001/XMLSchema-instance'
+    }
+
+    # define entries to change/create or remove
+    autoSaveTimeIntervall = {
+        "item": {"oor:path": "/org.openoffice.Office.Common/Save/Document"},
+        "prop": {"oor:name": "AutoSave", "oor:op": "fuse"},
+        "value": {}
+    }
+    autoSave = {
+        "item": {"oor:path": "/org.openoffice.Office.Common/Save/Document"},
+        "prop": {"oor:name": "AutoSaveTimeIntervall", "oor:op": "fuse"},
+        "value": {}
+    }
+    createBackup = {
+        "item": {"oor:path": "/org.openoffice.Office.Common/Save/Document"},
+        "prop": {"oor:name": "createBackup", "oor:op": "fuse"},
+        "value": {}
+    }
+    backupPath1 = {
+        "item": {"oor:path": "/org.openoffice.Office.Common/Path/Current"},
+        "prop": {"oor:name": "Backup", "oor:op": "fuse"},
+        "value": {"xsi:nil": "true"}
+    }
+    backupPath2 = {
+        "item": {"oor:path": "/org.openoffice.Office.Paths/Paths/org.openoffice.Office.Paths:NamedPath['Backup']"},
+        "prop": {"oor:name": "WritePath", "oor:op": "fuse"},
+        "value": {}
+    }
+    tmpPath1 = {
+        "item": {"oor:path": "/org.openoffice.Office.Common/Path/Current"},
+        "prop": {"oor:name": "Temp", "oor:op": "fuse"},
+        "value": {"xsi:nil": "true"}
+    }
+    tmpPath2 = {
+        "item": {"oor:path": "/org.openoffice.Office.Paths/Paths/org.openoffice.Office.Paths:NamedPath['Temp']"},
+        "prop": {"oor:name": "WritePath", "oor:op": "fuse"},
+        "value": {}
+    }
+
+    if os.path.exists(registry_file):
+        logger.debug(f"{registry_file} exists; changing entries")
+        copy(registry_file, f"{registry_file}.bak", fail_ok=True)
+        tree = etree.parse(registry_file)
+        root = tree.getroot()
+        nsmap = root.nsmap
+    else:
+        logger.debug(f"{registry_file} does not exist; creating it")
+        root = etree.Element(etree.QName(nsmap['oor'], 'items'), nsmap=nsmap)
+
+    if not xml_change_element(autoSaveTimeIntervall, config['libre_autosave_interval'], root, nsmap):
+        root = xml_create_element(autoSaveTimeIntervall, config['libre_autosave_interval'], root, nsmap)
+
+    if not xml_change_element(autoSave, config['libre_autosave'], root, nsmap):
+        root = xml_create_element(autoSave, config['libre_autosave'], root, nsmap)
+
+    if not xml_change_element(createBackup, config['libre_createbackup'], root, nsmap):
+        root = xml_create_element(createBackup, config['libre_createbackup'], root, nsmap)
 
     if config['libre_autosave_path'] != '':
-        registry.extend([
-            r'<item oor:path="/org.openoffice.Office.Common/Path/Current"><prop oor:name="Temp" oor:op="fuse"><value xsi:nil="true"/></prop></item>',
-            r'<item oor:path="/org.openoffice.Office.Paths/Paths/org.openoffice.Office.Paths:NamedPath['"'"'Temp'"'"']"><prop oor:name="WritePath" oor:op="fuse"><value>file://{libre_autosave_path}</value></prop></item>'
-        ])
+        if not xml_change_element(backupPath1, '', root, nsmap):
+            root = xml_create_element(backupPath1, '', root, nsmap)
+        path = f"file://{config['libre_autosave_path']}"
+        if not xml_change_element(backupPath2, path, root, nsmap):
+            root = xml_create_element(backupPath2, path, root, nsmap)
+    else:
+        root = xml_remove_element_tree(backupPath1, root, nsmap)
+
 
     if config['libre_createbackup_path'] != '':
-        registry.extend([
-            r'<item oor:path="/org.openoffice.Office.Common/Path/Current"><prop oor:name="Backup" oor:op="fuse"><value xsi:nil="true"/></prop></item>',
-            r'<item oor:path="/org.openoffice.Office.Paths/Paths/org.openoffice.Office.Paths:NamedPath['"'"'Backup'"'"']"><prop oor:name="WritePath" oor:op="fuse"><value>file://{libre_createbackup_path}</value></prop></item>'
-        ])
-
-    registry.append('</oor:items>')
-    
-    # if the file exists, remove the line containing the xml entries
-    if os.path.exists(registry_file):
-        file_regex('org.openoffice.Office.Recovery/AutoSave.*TimeIntervall', None, registry_file)
-        file_regex('org.openoffice.Office.Recovery/AutoSave.*Enabled', None, registry_file)
-        file_regex('org.openoffice.Office.Common/Save/Document.*CreateBackup', None, registry_file)
-        file_regex('org.openoffice.Office.Paths/Paths/org.openoffice.Office.Paths.*NamedPath.*Backup.*WritePath', None, registry_file)
-        file_regex('org.openoffice.Office.Paths/Paths/org.openoffice.Office.Paths.*NamedPath.*Temp.*WritePath', None, registry_file)
-        file_regex('org.openoffice.Office.Common/Path/Current.*Temp', None, registry_file)
-        file_regex('org.openoffice.Office.Common/Path/Current.*Backup', None, registry_file)
-        file_regex('</oor:items>', None, registry_file)
+        if not xml_change_element(tmpPath1, '', root, nsmap):
+            root = xml_create_element(tmpPath1, '', root, nsmap)
+        path = f"file://{config['libre_createbackup_path']}"
+        if not xml_change_element(tmpPath2, path, root, nsmap):
+            root = xml_create_element(tmpPath2, path, root, nsmap)
     else:
-        os.makedirs(f'{INITRD}/newroot/${home}/.config/libreoffice/4/user', exist_ok = True)
-        registry = [
-            r'<?xml version="1.0" encoding="UTF-8"?>',
-            r'<oor:items xmlns:oor="http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'
-        ] + registry
+        root = xml_remove_element_tree(tmpPath1, root, nsmap)
 
-    # append the xml entries to the file
-    helpers.file_put_contents(registry_file, r"\n".join(registry).format(**config), append = True)
+    # write the altered XML back
+    os.makedirs(os.path.dirname(registry_file), exist_ok = True)
+    etree.ElementTree(root).write(registry_file,
+        encoding='UTF-8',
+        xml_declaration=True,
+        pretty_print=True
+    )
 
 def screen_capture(enabled, config):
     if enabled and config['screen_capture_command'] != '':
         os.makedirs(f'{INITRD}/newroot/{config["screen_capture_path"]}', exist_ok = True)
         systemctl('screen_capture.service', 'enable')
         helpers.run(f'chroot {INITRD}/newroot ln -s /var/log/screen_capture.log "{config["screen_capture_path"]}/screen_capture.log"')
-        contents = [
-            r'# screen_capture',
-            r'name+=("screen_capture")',
-            r'threshold+=("{screen_capture_overflow_threshold}")',
-            r'path+=("{screen_capture_path}")',
-            r'hardlink+=("@(*.m3u8|*.log)")',
-            r'move+=("*.ts")',
-            r'remove+=("*.ts")',
-            r'log+=("screen_capture.log")',
-            r'chunk+=("{screen_capture_chunk}")'
-        ]
-        helpers.file_put_contents(f'{INITRD}/newroot/etc/launch.conf', r'\n'.join(contents).format(**config), append = True)
+
+        contents = textwrap.dedent(r"""
+        # screen_capture
+        name+=("screen_capture")
+        threshold+=("{screen_capture_overflow_threshold}")
+        path+=("{screen_capture_path}")
+        hardlink+=("@(*.m3u8|*.log)")
+        move+=("*.ts")
+        remove+=("*.ts")
+        log+=("screen_capture.log")
+        chunk+=("{screen_capture_chunk}")
+        """)
+
+        helpers.file_put_contents(f'{INITRD}/newroot/etc/launch.conf', contents.format(**config), append = True)
 
 def keylogger(enabled, config):
     if enabled:
         os.makedirs(f'{INITRD}/newroot/{config["keylogger_path"]}', exist_ok = True)
         systemctl('keylogger.service', 'enable')
-        contents = [
-            r'# keylogger'
-            r'name+=("keylogger")',
-            r'threshold+=("0m")',
-            r'path+=("{keylogger_path}")',
-            r'hardlink+=("")',
-            r'move+=("*.key")',
-            r'remove+=("")',
-            r'log+=("")',
-            r'chunk+=("10")'
-        ]
-        helpers.file_put_contents(f'{INITRD}/newroot/etc/launch.conf', r'\n'.join(contents).format(**config), append = True)
+
+        contents = textwrap.dedent(r"""
+        # keylogger
+        name+=("keylogger")
+        threshold+=("0m")
+        path+=("{keylogger_path}")
+        hardlink+=("")
+        move+=("*.key")
+        remove+=("")
+        log+=("")
+        chunk+=("10")
+        """)
+
+        helpers.file_put_contents(f'{INITRD}/newroot/etc/launch.conf', contents.format(**config), append = True)
 
 if __name__ == '__main__':
     # parse the command line arguments
@@ -471,8 +599,15 @@ if __name__ == '__main__':
     )
 
     required = parser.add_argument_group('required arguments')
-    required.add_argument("--token", "-t", help = "current token", required = True)
-    parser.add_argument('-d', '--debug', help = 'enable debugging (prints a lot of messages to stdout).', default = True, action = "store_true" )
+    required.add_argument("--token", "-t",
+        help = "current token",
+        required = True
+    )
+    parser.add_argument('-d', '--debug',
+        help = 'enable debugging (prints a lot of messages to stdout).',
+        default = True,
+        action = "store_true"
+    )
     args = parser.parse_args()
 
     # setup logging
@@ -516,7 +651,7 @@ if __name__ == '__main__':
     urlMd5 = actionMd5.replace('{token}', args.token)
     urlConfig = actionConfig.replace('{token}', args.token)
 
-    helpers.file_put_contents(infoFile, f'urlDownload="{urlDownload}"\nurlFinish="{urlFinish}"\nurlNotify="{urlNotify}"\nurlMd5="{urlMd5}"\nurlConfig="{urlConfig}"\n', append = True)
+    helpers.file_put_contents(infoFile, f'\nurlDownload="{urlDownload}"\nurlFinish="{urlFinish}"\nurlNotify="{urlNotify}"\nurlMd5="{urlMd5}"\nurlConfig="{urlConfig}"\n', append = True)
 
     get_config_from_server(urlConfig)
 
@@ -678,7 +813,7 @@ if __name__ == '__main__':
         systemctl('lernstick-exam-tray.service', 'enable')
 
     # fix the permissions
-    chown(f'{INITRD}/newroot/${home}/.config', exam_uid, exam_gid, recursive = True)
+    chown(f'{INITRD}/newroot/{home}/.config', exam_uid, exam_gid, recursive = True)
 
     # Copy all dependencies, @todo: remove??
     if os.path.isdir("/var/lib/lernstick-exam-client/persistent/"):
@@ -688,7 +823,7 @@ if __name__ == '__main__':
 
     # hand over the ssh key from the exam server
     ssh_key = helpers.get_info("sshKey", infoFile)
-    helpers.file_put_contents(f'{INITRD}/backup/root/.ssh/authorized_keys', ssh_key, append = True)
+    helpers.file_put_contents(f'{INITRD}/backup/root/.ssh/authorized_keys', '\n'+ssh_key, append = True)
     
     # hand over open ports
     glados = {
@@ -698,12 +833,12 @@ if __name__ == '__main__':
         'gladosProto': helpers.get_info("gladosProto", infoFile)
     }
     glados_sanitized = {k: re.sub(r'\.', r'\\\.', v) for k,v in glados.items()}
-    helpers.file_put_contents(f'{INITRD}/backup/etc/lernstick-firewall/net_whitelist_input', 'tcp ${gladosIp} 22'.format(**glados), append = True)
+    helpers.file_put_contents(f'{INITRD}/backup/etc/lernstick-firewall/net_whitelist_input', '\ntcp {gladosIp} 22'.format(**glados), append = True)
 
     # hand over the url whitelist
     os.makedirs(f'{INITRD}/backup/etc/lernstick-firewall/proxy.d', exist_ok = True)
-    host = "{gladosProto}://{gladosHost}".format(**glados_sanitized)
-    ip = "{gladosProto}://{gladosIp}".format(**glados_sanitized)
+    host = "\n{gladosProto}://{gladosHost}".format(**glados_sanitized)
+    ip = "\n{gladosProto}://{gladosIp}".format(**glados_sanitized)
     helpers.file_put_contents(f'{INITRD}/backup/etc/lernstick-firewall/proxy.d/glados.conf', host, append = True)
     helpers.file_put_contents(f'{INITRD}/backup/etc/lernstick-firewall/proxy.d/glados.conf', ip, append = True)
     
@@ -712,7 +847,7 @@ if __name__ == '__main__':
     helpers.file_put_contents(f'{INITRD}/backup/etc/lernstick-firewall/url_whitelist', ip, append = True)
 
     # hand over allowed ip/ports
-    helpers.file_put_contents(f'{INITRD}/backup/etc/lernstick-firewall/net_whitelist', 'tcp ${gladosIp} ${gladosPort}'.format(**glados), append = True)
+    helpers.file_put_contents(f'{INITRD}/backup/etc/lernstick-firewall/net_whitelist', '\ntcp {gladosIp} {gladosPort}'.format(**glados), append = True)
 
     # unique all the lines
     helpers.unique_lines(f'{INITRD}/backup/etc/lernstick-firewall/proxy.d/glados.conf')
