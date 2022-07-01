@@ -358,15 +358,6 @@ def allow_mount_external(allowed):
     ResultActive={0}
     """)
     helpers.file_put_contents(polkit_file, contents.format('yes' if allowed else 'auth_admin'))
-    # contents = [
-    #     "[allow user mounting and unmounting of non-system devices with self authentication]",
-    #     "Identity=unix-user:user",
-    #     "Action=org.freedesktop.udisks2.filesystem-mount",
-    #     "ResultAny={0}",
-    #     "ResultInactive={0}",
-    #     "ResultActive={0}"
-    # ]
-    # helpers.file_put_contents(polkit_file, "\n".join(contents).format('yes' if allowed else 'auth_admin'))
 
 def allow_mount_system(allowed):
     logger.debug(f"allow mounting internal media -> {allowed}")
@@ -380,15 +371,6 @@ def allow_mount_system(allowed):
     ResultActive={0}
     """)
     helpers.file_put_contents(polkit_file, contents.format('yes' if allowed else 'auth_admin'))
-    # contents = [
-    #     "[allow user mounting and unmounting of system devices with self authentication]",
-    #     "Identity=unix-user:user",
-    #     "Action=org.freedesktop.udisks2.filesystem-mount-system",
-    #     "ResultAny={0}",
-    #     "ResultInactive={0}",
-    #     "ResultActive={0}"
-    # ]
-    # helpers.file_put_contents(polkit_file, "\n".join(contents).format('yes' if allowed else 'auth_admin'))
 
 # enable or disable the firewall
 def firewall_off(off):
