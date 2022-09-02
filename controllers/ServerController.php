@@ -120,9 +120,16 @@ class ServerController extends BaseController
             'type' => $type,
             'date' => $date,
         ])) !== null) {
-            return $this->renderAjax('/log/view', [
-                'model' => $model,
-            ]);
+
+            if (Yii::$app->request->isAjax) {
+                return $this->renderAjax('/log/_view', [
+                    'model' => $model,
+                ]);
+            } else {
+                return $this->render('/log/view', [
+                    'model' => $model,
+                ]);
+            }
         }
 
         throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));

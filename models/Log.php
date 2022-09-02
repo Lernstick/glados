@@ -230,6 +230,57 @@ class Log extends Model
     }
 
     /**
+     * Getter for the color-formatted contents of the log file
+     *
+     * @return array
+     */
+    public function getFormatted_contents()
+    {
+        $c = implode('', $this->contents);
+        $c = $this->colorize($c);
+        return explode(PHP_EOL, $c);
+    }
+
+    private static function colorize($line)
+    {
+        # This regex finds multiline occurences of [31mfoo[0m
+        $r = preg_replace_callback('/\[((?![0]m)[0-9,\;]+)m(.+?)\[0m/s', function($m) {
+            $colors = [
+                '30' => 'black',
+                '31' => 'red',
+                '32' => 'green',
+                '33' => 'yellow',
+                '34' => 'blue',
+                '90' => 'gray',
+                '39' => 'white',
+                '20' => null,
+            ];
+
+            $color_codes = explode(';', $m[1]);
+            $prepend = '';
+            $append = '';
+            $exists = true;
+            foreach ($color_codes as $cc) {
+                if (array_key_exists($cc, $colors)) {
+                    $prepend .= substitute("<span class='{color}'>", ['color' => $colors[$cc]]);
+                    $append .= "</span>";
+                } else {
+                    $exists = false;
+                }
+            }
+
+            if (count($color_codes) == 0) {
+                $prepend .= "<span class='white'>";
+                $append .= "</span>";
+            }
+            return $prepend . str_replace([' ', '[0m'], '&nbsp;', htmlentities($exists ? $m[2] : $m[0])) . $append;
+        }, $line);
+
+        // finally remove all remaining [0m is present
+        return preg_replace('/\[0m/', '', $r);
+    }
+
+    /**
      * Getter for the filesize in bytes
      *
      * @return array

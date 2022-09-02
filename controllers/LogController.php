@@ -84,9 +84,15 @@ class LogController extends BaseController
             'date' => $date,
         ]);
 
-        return $this->renderAjax('/log/view', [
-            'model' => $model,
-        ]);
+        if (Yii::$app->request->isAjax) {
+            return $this->renderAjax('/log/_view', [
+                'model' => $model,
+            ]);
+        } else {
+            return $this->render('/log/view', [
+                'model' => $model,
+            ]);
+        }
     }
 
     /**

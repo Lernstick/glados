@@ -81,21 +81,6 @@ class ScreenshotController extends BaseController
     }
 
     /**
-     * Displays a single Screenshot thumbnail.
-     * @param string $token
-     * @param integer $date
-     * @return mixed
-     */
-    /*public function actionThumbnail($token, $date)
-    {
-        if (($model = Screenshot::findOne($token, $date)) !== null){
-            return \Yii::$app->response->sendFile($model->thumbnail, null, ['inline' => true]);
-        }else{
-            throw new NotFoundHttpException('The requested page does not exist.');
-        }
-    }*/
-
-    /**
      * Displays a single Screenshot model.
      * @param string $token
      * @return mixed
@@ -120,7 +105,7 @@ class ScreenshotController extends BaseController
             "-interlace none " .
             "-colorspace sRGB " .
             "jpeg:-";
-        $img = $ticket->runCommand($cmd, "C", 10);
+        $img = $ticket->runCommand($cmd, "C", 10, true);
         if ($img[1] != 0) {
             throw new NotFoundHttpException(\Yii::t('ticket', 'The screenshot could not be generated.'));
         } else {

@@ -12,6 +12,7 @@ import logging
 import shutil # shell commands like cp, ...
 import requests # requests.get()
 import fileinput # edit files inplace
+import fnmatch # fnmatch.fnmatch()
 import re
 import pathlib
 import textwrap # dedent()
@@ -32,6 +33,29 @@ infoFile = f"{INITRD}/info"
 configFile = f"{INITRD}/config.json"
 mountFile = f"{INITRD}/mount"
 mnConnectionsPath = "/etc/NetworkManager/system-connections"
+
+# @see https://docs.python.org/3/library/audit_events.html
+audit_events = [
+    'os.chmod',
+    'os.chown',
+    'os.mkdir',
+    'os.remove',
+    'os.rename',
+    'os.rmdir',
+    'os.symlink'
+    'shutil.*',
+]
+
+# Creates a new function decorator @arg_logger which logs the function name,
+# its arguments and return values if args.debug is True.
+from functools import wraps
+def arg_logger(func):
+    @wraps(func)
+    def function_logger(*args, **kwargs):
+        r = func(*args, **kwargs)
+        logger.debug(f"calling {func.__name__}() with {args=} and {kwargs=} (retval={r})")
+        return r
+    return function_logger
 
 # Handles any cleanup on exit
 def clean_exit(reason = None, exit_code = 0):
@@ -151,6 +175,7 @@ Searches for a regex in a file line by line and replaces it.
 @param string in_file: path to the file
 @param string out_file: path to the file to store the changes (if not given it's the [[in_file]])
 """
+@arg_logger
 def file_regex(find, replace, in_file, out_file = None):
     replace = '' if replace is None else replace
     in_context = fileinput.FileInput(in_file, backup = '.bak', inplace = out_file is None)
@@ -196,6 +221,7 @@ def extract(field, mfield, pattern, file, separator = r'\s'):
     logger.error(f"pattern {pattern} not found in field {mfield} in {file} ({separator = })")
     return None
 
+@arg_logger
 def mount(args, src, dst = None, only_return_command = False):
     logger.debug(f"Mounting {src} -> {dst} using args {args}")
     cmd = f'mount {args} "{src}"' if dst is None else f'mount {args} "{src}" "{dst}"'
@@ -205,6 +231,7 @@ def mount(args, src, dst = None, only_return_command = False):
         ret, out = helpers.run(cmd)
         return ret
 
+@arg_logger
 def chown(path, uid, gid, recursive = False):
     logger.debug(f"changing owner of {path} to {uid}:{gid}, {recursive = }")
     if not recursive:
@@ -214,6 +241,7 @@ def chown(path, uid, gid, recursive = False):
             for obj in dirs+files:
                 os.chown(os.path.join(root, obj), uid, gid)
 
+@arg_logger
 def mount_rootfs(newroot, home):
     logger.info(f"mounting root filesystem to {newroot}")
 
@@ -276,6 +304,7 @@ The entry is added to the system database as well as to the user database.
 
 @param string entry: the entry to add as a .desktop file
 """
+@arg_logger
 def add_dash_entry(entry):
     logger.debug(f"adding dash entry for {entry}")
 
@@ -320,6 +349,7 @@ def add_dash_entry(entry):
     copy('/home/user/.config/dconf/user', f'{INITRD}/newroot/home/user/.config/dconf/user')
     copy('/home/user/.config/dconf/user.bak', '/home/user/.config/dconf/user')
 
+@arg_logger
 def systemctl(service, state):
     r, _ = helpers.run(f'chroot {INITRD}/newroot systemctl {state} {service}')
     if r:
@@ -573,6 +603,18 @@ def keylogger(enabled, config):
 
         helpers.file_put_contents(f'{INITRD}/newroot/etc/launch.conf', contents.format(**config), append = True)
 
+##
+# Events in audit_events are being logged. For all possible audit events:
+# @see https://docs.python.org/3/library/audit_events.html#audit-events
+# This will create for example a log entry of the form:
+# 2022-09-02 15:28:28,583 - DEBUG - audit - event='os.chown' with args=('/path/to/file', 1000, 1000, -1) ...
+##
+def audit(event, args):
+    for e in audit_events:
+        if fnmatch.fnmatch(event, e):
+            logger.debug(f'{event=} with {args=}')
+            return
+
 if __name__ == '__main__':
     # parse the command line arguments
     parser = argparse.ArgumentParser(
@@ -605,6 +647,10 @@ if __name__ == '__main__':
 
     logger.info('-'*40)
     logger.info(f'Script launched with arguments: {sys.argv}')
+
+    # enable auditting, when logging level is DEBUG
+    if args.debug:
+        sys.addaudithook(audit)
 
     env = {
         'DISPLAY': helpers.get_env("DISPLAY"),
@@ -664,8 +710,8 @@ if __name__ == '__main__':
     # set proper permissions
     os.chown(f"{INITRD}/backup/{desktop}/", exam_uid, exam_gid)
     os.chown(f"{INITRD}/backup/{home}/", exam_uid, exam_gid)
-    os.chmod(f"{INITRD}/backup/root", 755)
-    os.chmod(f"{INITRD}/backup/root/.ssh", 700)
+    os.chmod(f"{INITRD}/backup/root", 0o700)
+    os.chmod(f"{INITRD}/backup/root/.ssh", 0o700)
 
     # get all active network connections
     cenv = {**env, **{'LC_ALL': 'C'}} 
@@ -710,13 +756,13 @@ if __name__ == '__main__':
 
     # copy shutdown script, this script will be executed later by systemd-shutdown
     copy(f"{INITRD}/squashfs/mount.sh", "/lib/systemd/lernstick-shutdown")
-    os.chmod("/lib/systemd/lernstick-shutdown", 755)
+    os.chmod("/lib/systemd/lernstick-shutdown", 0o755)
 
     # We do this here, anyway the script /lib/systemd/system-shutdown/lernstick might
     # also copy it. That's why in the above line the mount.sh script is also copied to
     # /lib/systemd/lernstick-shutdown. The above 2 lines are for backward compatibility.
     copy(f"{INITRD}/squashfs/mount.sh", f"{INITRD}/shutdown")
-    os.chmod(f"{INITRD}/shutdown", 755)
+    os.chmod(f"{INITRD}/shutdown", 0o755)
 
     # remove policykit action for lernstick welcome application
     remove(f"{INITRD}/newroot/usr/share/polkit-1/actions/ch.lernstick.welcome.policy", fail_ok = True)
@@ -806,6 +852,7 @@ if __name__ == '__main__':
     # hand over the ssh key from the exam server
     ssh_key = helpers.get_info("sshKey", infoFile)
     helpers.file_put_contents(f'{INITRD}/backup/root/.ssh/authorized_keys', '\n'+ssh_key, append = True)
+    os.chmod(f"{INITRD}/backup/root/.ssh/authorized_keys", 0o600)
     
     # hand over open ports
     glados = {

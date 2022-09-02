@@ -806,3 +806,33 @@ span.view--state[data-state="4"]::after { content: attr(data-text-4); }
   text-align: left;
   vertical-align: middle;
 }
+
+.terminal {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.terminal .line_number:before {
+  content: attr(data-line-number) ":";
+}
+
+.terminal .line {
+  background-color: black;
+  color: white;
+}
+
+.terminal span.red {
+  color: red;
+}
+
+.terminal span.gray {
+  color: gray;
+}
+
+.terminal span.white {
+  color: white;
+}
+
+.terminal span.yellow {
+  color: yellow;
+}

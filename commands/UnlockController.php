@@ -94,10 +94,12 @@ class UnlockController extends NetworkController implements DaemonInterface
         // Unlock blocked bootup_lock tickets
         $query = Ticket::find()
             ->where(['bootup_lock' => 1])
+
             // ticket should be in running state
             ->andWhere(['not', ['start' => null]])
             ->andWhere(['end' => null])
             ->andWhere(['not', ['ip' => null]])
+
             // the download phase should be done already
             ->andWhere(['not', ['download_request' => null]])
             ->andWhere(['not', ['download_finished' => null]])
@@ -106,6 +108,7 @@ class UnlockController extends NetworkController implements DaemonInterface
                 new Expression('unix_timestamp(`download_finished`)'),
                 new Expression('unix_timestamp(`download_request`)')
             ])
+
             // the download should be finished for more than 2 minutes
             // but if it's longer than 1 hour, leave it
             ->andWhere([
@@ -138,7 +141,7 @@ class UnlockController extends NetworkController implements DaemonInterface
                         'timeout' => 10,
                         'user' => $this->remoteUser,
                         'ip' => $this->ticket->ip,
-                        'cmd' => escapeshellarg('LC_ALL=C [ -e /booted ]'),
+                        'cmd' => escapeshellarg('LC_ALL=C [ -e /booted ] || ( echo -e "\e[31mError: System is reachable via ssh, but /booted file does not exist. Maybe the user didn\'t continue yet?\e[0m" && false )'),
                     ]);
 
                     $this->logInfo('Executing command: ' . $this->_cmd);
@@ -147,8 +150,9 @@ class UnlockController extends NetworkController implements DaemonInterface
                     $logfile = $this->logfile;
 
                     $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use ($logfile) {
-                        echo $this->ansiFormat($event->line, $event->channel == ShellCommand::STDOUT ? Console::NORMAL : Console::FG_RED);
-                        file_put_contents($logfile, $event->line, FILE_APPEND);
+                        $colored_line = $this->ansiFormat($event->line, $event->channel == ShellCommand::STDOUT ? Console::NORMAL : Console::FG_RED);
+                        echo $colored_line;
+                        file_put_contents($logfile, $colored_line, FILE_APPEND);
                     });
 
                     $retval = $cmd->run();
