@@ -66,22 +66,22 @@ class NotifyController extends NetworkController implements DaemonInterface
             if ($id != '') {
                 if (($ticket = Ticket::findOne($id)) !== null) {
                     $this->ticket = $ticket;
-                    if ($this->lockItem($ticket)) {
-                        $this->ticket->client_state = 'Connecting to {ip} ...';
+
+                    $this->ticket->client_state = 'Connecting to {ip} ...';
+                    $this->ticket->client_state_params = ['ip' => $this->ticket->ip];
+                    $this->ticket->save(false);
+                    list($output, $online) = $this->pingCheck($this->ticket);
+                    $this->ticket->refresh();
+                    if ($online === true) {
+                        $this->ticket->client_state = 'Client {ip} is online.';
                         $this->ticket->client_state_params = ['ip' => $this->ticket->ip];
                         $this->ticket->save(false);
-                        list($output, $online) = $this->pingCheck($this->ticket);
-                        if ($online === true) {
-                            $this->ticket->client_state = 'Client {ip} is online.';
-                            $this->ticket->client_state_params = ['ip' => $this->ticket->ip];
-                            $this->ticket->save(false);
-                        } else {
-                            $this->ticket->client_state = 'network error: {output}.';
-                            $this->ticket->client_state_params = ['output' => $output];
-                            $this->ticket->save(false);
-                        }
-                        $this->unlockItem($this->ticket);
+                    } else {
+                        $this->ticket->client_state = 'network error: {output}.';
+                        $this->ticket->client_state_params = ['output' => $output];
+                        $this->ticket->save(false);
                     }
+
                     $this->ticket = null;
                 }
                 return;
