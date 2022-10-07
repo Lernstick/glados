@@ -178,11 +178,11 @@ class NotifyController extends NetworkController implements DaemonInterface
                 new Expression('unix_timestamp(`download_request`)')
             ])
             // the download should be finished for more than 2 minutes
-            // but if it's longer than 1 hour, leave it
+            // but if it's longer than 3 hours, leave it
             ->andWhere([
                 'between',
                 'download_finished',
-                new Expression('NOW() - INTERVAL 60 MINUTE'),
+                new Expression('NOW() - INTERVAL 180 MINUTE'),
                 new Expression('NOW() - INTERVAL 2 MINUTE')
             ]);
 
