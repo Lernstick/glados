@@ -819,6 +819,7 @@ span.view--state[data-state="4"]::after { content: attr(data-text-4); }
 .terminal .line {
   background-color: black;
   color: white;
+  width: 100%;
 }
 
 .terminal span.red {
