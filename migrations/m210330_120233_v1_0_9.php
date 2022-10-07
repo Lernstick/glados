@@ -26,7 +26,7 @@ class m210330_120233_v1_0_9 extends BaseMigration
      */
     public function safeUp()
     {
-        /* split allow_mount exam setting */
+        // split allow_mount exam setting
         $this->addColumn($this->examTable, 'allow_mount_system', $this->boolean()->notNull()->defaultValue(0));
         $this->renameColumn($this->examTable, 'allow_mount', 'allow_mount_external');
 
@@ -42,12 +42,12 @@ class m210330_120233_v1_0_9 extends BaseMigration
             'column' => 'allow_mount',
         ])->execute();
 
-        /* enforce strict mode */
+        // enforce strict mode
         foreach ($this->fields as $field => $table) {
             $this->alterColumn($table, $field, $this->string(60)->notNull()->defaultValue(''));
         }
 
-        /* create issues table */
+        // create issues table
         if ($this->db->schema->getTableSchema($this->issuesTable, true) === null) {
             $this->createTable($this->issuesTable, [
                 'id' => $this->primaryKey(),

@@ -3,9 +3,10 @@
 use app\components\BaseMigration;
 
 /**
- * Class m210705_145230_roles
+ * Class m210705_145230_v1_0_12
+ * Mark version 1.0.12
  */
-class m210705_145230_roles extends BaseMigration
+class m210705_145230_v1_0_12 extends BaseMigration
 {
 
     public $eventStreamTable = 'event_stream';
@@ -119,6 +120,14 @@ class m210705_145230_roles extends BaseMigration
         // flush the RBAC cache, else permissions might not be up-to-date
         $auth->invalidateCache();
         Yii::$app->cache->flush();
+
+        // updates the translation table with the newest translations
+        $this->updateTranslationTable();
+
+        // removes translation table entries that are not referenced
+        $this->cleanTranslationTable();
+
+        echo "db version 1.0.12 installed\n";
     }
 
     /**
