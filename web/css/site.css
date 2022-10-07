@@ -507,6 +507,11 @@ ul.nav-special > li.active > a > div {
 .live-overview-item-icon {
     width: 16px;
     height: 16px;
+    vertical-align: text-bottom;
+}
+
+.live-overview-item-title .live-indicator {
+    height: 16px;
 }
 
 .live-overview-item:hover .live-overview-item-title {
@@ -809,17 +814,24 @@ span.view--state[data-state="4"]::after { content: attr(data-text-4); }
 
 .terminal {
   width: 100%;
-  white-space: nowrap;
+}
+
+.terminal .line_number {
+  vertical-align: text-top;
+  vertical-align: text-top;
 }
 
 .terminal .line_number:before {
-  content: attr(data-line-number) ":";
+  content: attr(data-line-number) "";
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .terminal .line {
   background-color: black;
   color: white;
   width: 100%;
+  padding-left: 5px;
 }
 
 .terminal span.red {

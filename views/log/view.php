@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $model->path;
         <div class="panel-heading">
             <code><?= Html::encode($model->path) ?></code>
         </div>
-        <div style='overflow-x: scroll'>
+        <div style='overflow-x: auto'>
             <?= $this->render('_view', [
                 'model' => $model,
             ]) ?>

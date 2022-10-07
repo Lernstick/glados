@@ -76,7 +76,7 @@ END);
                     <h4><?= \Yii::t('client', 'List of open windows:') ?></h4>
                     <p id='open_window_list'></p>
                     <p>
-                        <?= \Yii::t('client', 'The "hand-in" button is disabled as long as there are open windows') ?>
+                        <b><?= \Yii::t('client', 'The "hand-in" button is disabled as long as there are open windows') ?></b>
                     </p>
                 </div>
             </div>
