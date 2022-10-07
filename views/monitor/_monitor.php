@@ -120,10 +120,21 @@ Pjax::begin([
     echo GridView::widget([
         'dataProvider' => $issueDataProvider,
         'columns' => [
-            'key:issue',
-            'occuredAt:timeago',
+            [
+                'attribute' => 'key',
+                'format' => 'issue',
+                'headerOptions' => ['class' => 'col-md-2'],
+            ],
+            /*'key:issue',*/
+            /*'occuredAt:timeago',*/
+            [
+                'attribute' => 'occuredAt',
+                'format' => 'timeago',
+                'headerOptions' => ['class' => 'col-md-2'],
+            ],
             [
                 'attribute' => 'ticket.token',
+                'headerOptions' => ['class' => 'col-md-1'],
                 'format' => 'raw',
                 'value' => function($issue, $key, $index, $datacolumn) {
                     return Html::a($issue->ticket->token,
@@ -163,6 +174,7 @@ Pjax::begin([
             [
                 'class' => yii\grid\ActionColumn::className(),
                 'header' => \Yii::t('ticket', 'Actions') . Html::a('<i class="glyphicon glyphicon-refresh"></i>', '', ['id' => 'reload-issues', 'class' => 'btn btn-default btn-xs pull-right']),
+                'headerOptions' => ['class' => 'col-md-1'],
                 'template' => '{action}',
                 'buttons' => [
                     'action' => function ($url, $issue, $key) {
