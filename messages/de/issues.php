@@ -20,5 +20,6 @@ return [
     'Issue' => 'Problem',
     'Since' => 'Seit',
     'Solved At' => 'Gelöst am',
-    'Ticket Token' => 'Ticket Token',
+    'Ticket' => 'Ticket',
+    'Ticket Token' => '@@Ticket Token@@',
 ];

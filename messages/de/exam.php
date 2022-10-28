@@ -17,13 +17,5 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    'Close' => 'Schliessen',
-    'Date' => 'Datum',
-    'Download Logfile' => 'Logdatei herunterladen',
-    'Log' => 'Log',
-    'Path' => 'Pfad',
-    'Show Logfile' => 'Logdatei anzeigen',
-    'The logfile is empty.' => 'Die Logdatei ist leer.',
-    'Type' => 'Typ',
-    'Logfile Path' => '@@Logdatei Pfad@@',
+    'Your screen is currently locked by the supervisor' => 'Ihr Bildschirm ist momentan von der Aufsichtsperson gesperrt',
 ];

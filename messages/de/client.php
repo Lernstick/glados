@@ -17,6 +17,7 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
+    '+{n} more windows ...' => '+{n} weitere Fenster ...',
     'Abort' => 'Abbrechen',
     'Back to token submission' => 'Zurück zur Token-Eingabe',
     'Confirm Exam Hand-in' => 'Abgabebestätigung der Prüfung',
@@ -30,7 +31,6 @@ return [
     'Insert your token here!' => 'Geben Sie hier Ihren Token ein!',
     'Please enter the token given on your exam sheet.' => 'Bitte geben Sie den Token auf dem Prüfungsblatt ein.',
     'Please notice, that once this process is initiated, you <b>cannot continue</b> with the exam. So, please make sure you <b>saved all documents</b> and <b>closed all open windows</b> before finishing your exam.' => 'Bitte beachten Sie, dass sobald dieser Prozess gestartet wurde, Sie <b>nichts mehr an Ihrer Abgabe verändern</b> können. Bitte stellen Sie sicher, dass Sie <b>alle Dokumente abgespeichert</b> und <b>alle offenen Fenster geschlossen</b> haben, bevor Sie Ihre Prüfung abgeben.',
-    '+{n} more windows ...' => '+{n} weitere Fenster ...',
     'Please wait, while your system is prepared' => 'Bitte warten Sie, während Ihr System vorbereitet wird',
     'Request download again' => 'Download erneut anfordern',
     'The system setup has failed.' => 'Das Systemeinrichtung îst fehlgeschlagen.',
@@ -38,4 +38,8 @@ return [
     'You exam was handed-in successfully ({date}). You can close this window now.' => 'Ihre Prüfung wurde erfolgreich abgegeben ({date}). Sie können dieses Fenster nun schliessen.',
     'You exam was handed-in successfully. You can close this window now.' => 'Ihre Prüfung wurde erfolgreich abgegeben. Sie können dieses Fenster nun schliessen.',
     'You\'re about to hand-in your exam.' => 'Sie sind im Begriff Ihre Prüfung abzugeben.',
+    'Are you sure?' => 'Sind Sie sicher?',
+    'List of open windows:' => 'Liste offener Fenster:',
+    'No open window' => 'Keine offenen Fenster gefunden',
+    'The "hand-in" button is disabled as long as there are open windows' => 'Der "Abgabe" Button ist deaktiviert solange Sie noch Fenster offen haben',
 ];
