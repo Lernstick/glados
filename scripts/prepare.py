@@ -24,7 +24,7 @@ sys.path.append(directory)
 import functions as helpers # 
 
 #constants
-logFile = "/var/log/searchExamServer.prepare.log"
+logFile = "/var/log/searchExamServer.log" # same as searchExamServer.py on the client
 INITRD = "/run/initramfs"
 exam_user = "user"
 exam_uid = 1000
@@ -69,7 +69,7 @@ def clean_exit(reason = None, exit_code = 0):
     helpers.run(f'umount -v -l {INITRD}/{{base,exam,tmpfs}} || true')
 
     logger.info('prepare script stopped')
-    logger.info('-'*40)
+    logger.info('-'*20 + '[prepare]' + '-'*20)
 
     exit(exit_code)
 
@@ -645,7 +645,7 @@ if __name__ == '__main__':
     logger.addHandler(fh)
     logging.captureWarnings(True) # also capture warnings from other libs
 
-    logger.info('-'*40)
+    logger.info('-'*20 + '[prepare]' + '-'*20)
     logger.info(f'Script launched with arguments: {sys.argv}')
 
     # enable auditting, when logging level is DEBUG

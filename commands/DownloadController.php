@@ -272,7 +272,7 @@ class DownloadController extends NetworkController implements DaemonInterface
 
             /* run the prepare.py script on the client */
             $cmd = substitute("cat {prepare} | ssh -i {identity} -o "
-                 . "UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no {user}@{ip} 'python3' '-' '-t {token}'", [
+                 . "UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no {user}@{ip} 'python3' '-' '-t' {token}", [
                 'prepare' => escapeshellarg(\Yii::$app->basePath . "/scripts/prepare.py"),
                 'identity' => escapeshellarg(\Yii::$app->params['dotSSH'] . "/rsa"),
                 'user' => escapeshellarg($this->remoteUser),

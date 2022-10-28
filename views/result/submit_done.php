@@ -29,7 +29,7 @@ $this->title .= ' - ' . \Yii::t('results', 'Summary');
         ]) ?></span>
     </div>
 
-    <div class="bs-callout bs-callout-danger">
+    <div class="bs-callout bs-callout-success">
         <h4><?= \Yii::t('results', 'Summary') ?></h4>
         <p><?= \Yii::t('results', 'You have successfully submitted <big>{n}</big> results! The list further down gives an overview of the submitted results.', [
             'n' => $submitted,

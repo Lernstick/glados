@@ -149,13 +149,14 @@ $columns[] = [
     'class' => 'yii\grid\ActionColumn',
     'template' => '{download}',
     'buttons' => [
-        'download' => function ($url) {
-            return Html::a('<span class="glyphicon glyphicon-save-file"></span>', $url,
+        'download' => function ($url, $model, $key) {
+            return !empty($model->result) && file_exists($model->result) ? Html::a('<span class="glyphicon glyphicon-save-file"></span>', $url,
                 [
                     'title' => \Yii::t('ticket', 'Download Result'),
                     'data-pjax' => '0',
+                    'enabled' => false,
                 ]
-            );
+            ) : null;
         },
     ],
     'urlCreator' => function ($action, $model, $key, $index) {
