@@ -1,7 +1,14 @@
 #!/usr/bin/env python3
 #
 # This is the main entry point for the script that sets up the client system.
-# All this is executed on the client system with root permissions.
+# All this is executed on the client system with root permissions. All
+# functionality must be present in this file or in the directory
+#
+#   /var/lib/lernstick-exam-client/persistent/var/lib/lernstick-exam-client
+#
+# on the client system, since this script is executed as follows:
+#
+#   cat prepare.py | ssh <flags> python3 - <flags>
 #
 
 import argparse
@@ -13,6 +20,7 @@ import shutil # shell commands like cp, ...
 import requests # requests.get()
 import fileinput # edit files inplace
 import fnmatch # fnmatch.fnmatch()
+import tempfile # tempfile.NamedTemporaryFile()
 import re
 import pathlib
 import textwrap # dedent()
@@ -305,49 +313,108 @@ The entry is added to the system database as well as to the user database.
 @param string entry: the entry to add as a .desktop file
 """
 @arg_logger
-def add_dash_entry(entry):
+def add_dash_entry(entry, env = {}):
     logger.debug(f"adding dash entry for {entry}")
 
+    local_user_db = '/home/user/.config/dconf/user'
+    system_db = f'{INITRD}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps'
+    user_db = f'{INITRD}/newroot/home/user/.config/dconf/user'
+
     # place entry in "favorite apps" of Gnome3's dash in the system-db
-    gfav_apps = f'{INITRD}/newroot/etc/dconf/db/local.d/01-gnome-favorite-apps'
-    if os.path.isfile(gfav_apps) and os.access(gfav_apps, os.R_OK):
-        apps = extract(-1, 0, r'favorite-apps\=', gfav_apps, separator = r'\,|\[|\]|\s')[1:]
-        apps = list(filter(None, apps)) # remove all empty ('') elements from list
-    else:
-        apps = []
-
+    apps = get_dash_entries("system", system_db, env=env)
     apps.append(f"'{entry}'") # add the entry to the list
-    new_value = ", ".join(list(set(apps))) # unique the list and join them
-    new_value = f'[org/gnome/shell]\nfavorite-apps=[{new_value}]\n'
-    helpers.file_put_contents(gfav_apps, new_value)
-
-    # this touch is needed, because dconf update is not rebuilding the database if the
-    # directory containing the rules has the same mtime as before
-    pathlib.Path(f"{INITRD}/newroot/etc/dconf/db/local.d").touch()
-    helpers.run(f"chroot {INITRD}/newroot dconf update")
+    set_dash_entries("system", apps, system_db, env=env)
 
     # place entry in "favorite apps" of Gnome3's dash in the user-db
-    copy('/home/user/.config/dconf/user', '/home/user/.config/dconf/user.bak')
-    if os.path.exists(f'{INITRD}/newroot/home/user/.config/dconf/user'):
-        copy(f'{INITRD}/newroot/home/user/.config/dconf/user', '/home/user/.config/dconf/')
-    helpers.run('sync')
-
-    _, old_value = helpers.run('sudo -u user dconf read /org/gnome/shell/favorite-apps')
-    if old_value == '':
-        apps = []
-    else:
-        apps = re.split(r'\,|\[|\]|\s', old_value)
-        apps = list(filter(None, apps)) # remove all empty ('') elements from list
-
+    apps = get_dash_entries("user", user_db, env=env)
     apps.append(f"'{entry}'")
-    new_value = ", ".join(list(set(apps))) # unique the list and join them
-    helpers.run(f'sudo -u user dconf write "/org/gnome/shell/favorite-apps" "[{new_value}]"; sync')
+    set_dash_entries("user", apps, user_db, env=env)
 
-    dconf_dir = f'{INITRD}/newroot/home/user/.config/dconf/'
-    if True or os.path.exists(dconf_dir): # @todo: remove the if statement
-        os.makedirs(dconf_dir, exist_ok = True)
-    copy('/home/user/.config/dconf/user', f'{INITRD}/newroot/home/user/.config/dconf/user')
-    copy('/home/user/.config/dconf/user.bak', '/home/user/.config/dconf/user')
+    return (f"'{entry}'" in get_dash_entries("user", user_db, env=env) and
+            f"'{entry}'" in get_dash_entries("system", system_db, env=env))
+
+
+"""
+Set all the dash entries
+
+@param string type: query one of the databases (system or user)
+@param list entries: entries to set
+@param string db: the database filepath
+@param dict env: environment variables, such as DISPLAY, XAUTHORITY, ...
+@return bool: success/fail
+"""
+@arg_logger
+def set_dash_entries(type, entries, db, env={}):
+    local_user_db = '/home/user/.config/dconf/user'
+    val = ", ".join(list(set(entries)))
+    os.makedirs(os.path.dirname(db), exist_ok = True)
+
+    if type == "system":
+        helpers.file_put_contents(db, f'[org/gnome/shell]\nfavorite-apps=[{val}]\n')
+
+        # this touch is needed, because dconf update is not rebuilding the database if the
+        # directory containing the rules has the same mtime as before
+        pathlib.Path(os.path.dirname(db)).touch()
+        helpers.run(f"chroot {INITRD}/newroot dconf update")
+        helpers.run('sync')
+
+    elif type == "user":
+        copy(local_user_db, f'{local_user_db}.bak')
+        if os.path.exists(db):
+            copy(db, local_user_db)
+
+        helpers.run(f'sudo -u user dconf write "/org/gnome/shell/favorite-apps" "[{val}]"; sync', env=env)
+        copy(local_user_db, db)
+        os.rename(f'{local_user_db}.bak', local_user_db)
+
+
+"""
+Obtain all the dash entries
+
+@param string type: query one of the databases (system or user)
+@param string db: the database filepath
+@param dict env: environment variables, such as DISPLAY, XAUTHORITY, ...
+@return list: the entries
+"""
+@arg_logger
+def get_dash_entries(type, db, env={}):
+    entries = []
+
+    if type == "system":
+        if os.path.isfile(db) and os.access(db, os.R_OK):
+            entries = extract(-1, 0, r'favorite-apps\=', db, separator = r'\,|\[|\]|\s')[1:]
+
+    elif type == "user":
+        if not os.path.exists(db):
+            return get_default_dash_entries(env=env)
+
+        local_user_db = '/home/user/.config/dconf/user'
+        temp = tempfile.NamedTemporaryFile()
+        copy(local_user_db, temp.name)
+        copy(db, local_user_db)
+        _, old_value = helpers.run('sudo -u user dconf read /org/gnome/shell/favorite-apps', env=env)
+        copy(temp.name, local_user_db)
+        if old_value != '':
+            entries = re.split(r'\,|\[|\]|\s', old_value)
+
+    return list(filter(None, entries)) # remove all empty ('') elements from list
+
+"""
+Obtain default dash entries
+
+@param dict env: environment variables, such as DISPLAY, XAUTHORITY, ...
+@return list: the entries
+"""
+@arg_logger
+def get_default_dash_entries(env={}):
+    tmp_dir = tempfile.TemporaryDirectory()
+    tmp_user = 'testuser'
+    tmp_db = f"{tmp_dir.name}/.config/dconf/user"
+    helpers.run(f"useradd {tmp_user} -d {tmp_dir.name}")
+    _, old_value = helpers.run(f'sudo -u {tmp_user} dconf read /org/gnome/shell/favorite-apps', env=env)
+    entries = re.split(r'\,|\[|\]|\s', old_value) if old_value != '' else []
+    helpers.run(f"userdel {tmp_user}")
+    return list(filter(None, entries)) # remove all empty ('') elements from list
 
 @arg_logger
 def systemctl(service, state):
@@ -615,36 +682,14 @@ def audit(event, args):
             logger.debug(f'{event=} with {args=}')
             return
 
-if __name__ == '__main__':
-    # parse the command line arguments
-    parser = argparse.ArgumentParser(
-        prog = "prepare.py",
-        description = "main entry point for client preparation"
-    )
 
-    required = parser.add_argument_group('required arguments')
-    required.add_argument("--token", "-t",
-        help = "current token",
-        required = True
-    )
-    parser.add_argument('-d', '--debug',
-        help = 'enable debugging (prints a lot of messages to stdout).',
-        default = True,
-        action = "store_true"
-    )
-    args = parser.parse_args()
+"""
+The main function
 
-    # setup logging
-    logger = logging.getLogger("root") # create a logger called root
-    logger.setLevel(logging.DEBUG if args.debug else logging.INFO)
-    ch = logging.StreamHandler() # create console handler
-    fh = logging.FileHandler(logFile) # create file handler
-    ch.setFormatter(helpers.TerminalColorFormatter()) # formatter of console handler
-    fh.setFormatter(helpers.FileFormatter()) # set formatter of file handler
-    logger.addHandler(ch) # add handlers to logger
-    logger.addHandler(fh)
-    logging.captureWarnings(True) # also capture warnings from other libs
-
+@param Namespace args: arguments object from argparse
+@param Namespace logger: logger instance
+"""
+def main(args, logger):
     logger.info('-'*20 + '[prepare]' + '-'*20)
     logger.info(f'Script launched with arguments: {sys.argv}')
 
@@ -768,14 +813,14 @@ if __name__ == '__main__':
     remove(f"{INITRD}/newroot/usr/share/polkit-1/actions/ch.lernstick.welcome.policy", fail_ok = True)
 
     # add an entry to finish the exam in the dash
-    add_dash_entry("finish_exam.desktop")
+    add_dash_entry("finish_exam.desktop", env=env)
 
     # Welcome to exam .desktop entry to be executed at autostart
     os.makedirs(f"{INITRD}/newroot/etc/xdg/autostart/", exist_ok = True)
     os.makedirs(f"{INITRD}/newroot/usr/share/applications/", exist_ok = True)
 
     # add an entry to show information about the exam in the dash
-    add_dash_entry("show-info.desktop")
+    add_dash_entry("show-info.desktop", env=env)
 
     # Copy all dependencies, @todo: remove??
     if os.path.isdir("/var/lib/lernstick-exam-client/persistent/"):
@@ -890,3 +935,40 @@ if __name__ == '__main__':
 
     # exit successfully
     clean_exit('done.')
+
+
+if __name__ == '__main__':
+    # parse the command line arguments
+    parser = argparse.ArgumentParser(
+        prog = "prepare.py",
+        description = "main entry point for client preparation"
+    )
+
+    required = parser.add_argument_group('required arguments')
+    required.add_argument("--token", "-t",
+        help = "current token",
+        required = True
+    )
+    parser.add_argument('-d', '--debug',
+        help = 'enable debugging (prints a lot of messages to stdout).',
+        default = True,
+        action = "store_true"
+    )
+    args = parser.parse_args()
+
+    # setup logging
+    logger = logging.getLogger("root") # create a logger called root
+    logger.setLevel(logging.DEBUG if args.debug else logging.INFO)
+    ch = logging.StreamHandler() # create console handler
+    fh = logging.FileHandler(logFile) # create file handler
+    ch.setFormatter(helpers.TerminalColorFormatter()) # formatter of console handler
+    fh.setFormatter(helpers.FileFormatter()) # set formatter of file handler
+    logger.addHandler(ch) # add handlers to logger
+    logger.addHandler(fh)
+    logging.captureWarnings(True) # also capture warnings from other libs
+
+    try:
+        main(args, logger)
+    except Exception:
+        logger.exception("Exception in main()")
+        raise

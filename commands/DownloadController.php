@@ -293,7 +293,7 @@ class DownloadController extends NetworkController implements DaemonInterface
             $retval = $cmd->run();
 
             // success
-            if ($retval == "0") {
+            if ($retval == 0) {
                 $eventItem = new EventItem([
                     'event' => 'ticket/' . $this->ticket->id,
                     'priority' => 0,
