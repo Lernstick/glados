@@ -37,6 +37,8 @@ INITRD = "/run/initramfs"
 exam_user = "user"
 exam_uid = 1000
 exam_gid = 1000
+root_uid = 0
+root_gid = 0
 infoFile = f"{INITRD}/info"
 configFile = f"{INITRD}/config.json"
 mountFile = f"{INITRD}/mount"
@@ -60,8 +62,9 @@ from functools import wraps
 def arg_logger(func):
     @wraps(func)
     def function_logger(*args, **kwargs):
+        logger.debug(f"calling {func.__name__}() with {args=} and {kwargs=}")
         r = func(*args, **kwargs)
-        logger.debug(f"calling {func.__name__}() with {args=} and {kwargs=} (retval={r})")
+        logger.debug(f"call of {func.__name__}() returned {r}")
         return r
     return function_logger
 
@@ -347,7 +350,7 @@ Set all the dash entries
 def set_dash_entries(type, entries, db, env={}):
     local_user_db = '/home/user/.config/dconf/user'
     val = ", ".join(list(set(entries)))
-    os.makedirs(os.path.dirname(db), exist_ok = True)
+    os.makedirs(os.path.dirname(db), mode = 0o755, exist_ok = True)
 
     if type == "system":
         helpers.file_put_contents(db, f'[org/gnome/shell]\nfavorite-apps=[{val}]\n')
@@ -426,8 +429,8 @@ def systemctl(service, state):
     return r
 
 # config->grp_netdev
+@arg_logger
 def allow_network_access(allowed):
-    logger.debug(f"allowing network access -> {allowed}")
     if allowed:
         # add the user explicitely to the netdev group
         r, _ = helpers.run(f'chroot {INITRD}/newroot gpasswd -a user netdev')
@@ -438,54 +441,105 @@ def allow_network_access(allowed):
     return r
 
 # config->allow_sudo
+@arg_logger
 def allow_sudo(allowed):
-    logger.debug(f"allowing sudo -> {allowed}")
     sudo_file = f'{INITRD}/newroot/etc/sudoers.d/01-lernstick-exam'
     helpers.file_put_contents(sudo_file, 'user ALL=(ALL) NOPASSWD: ALL' if allowed else '')
 
+@arg_logger
 def allow_mount_external(allowed):
     logger.debug(f"allow mounting external media -> {allowed}")
     polkit_file = f"{INITRD}/newroot/etc/polkit-1/localauthority/90-mandatory.d/10-udisks2-mount.pkla"
-    contents = textwrap.dedent(r"""
-    [allow user mounting and unmounting of non-system devices with self authentication]
-    Identity=unix-user:user
-    Action=org.freedesktop.udisks2.filesystem-mount
-    ResultAny={0}
-    ResultInactive={0}
-    ResultActive={0}
-    """)
-    helpers.file_put_contents(polkit_file, contents.format('yes' if allowed else 'auth_admin'))
+    return add_polkit_entry(
+        desc="allow user mounting and unmounting of non-system devices with self authentication",
+        identity="unix-user:user",
+        action="org.freedesktop.udisks2.filesystem-mount",
+        res_any='yes' if allowed else 'auth_admin',
+        res_inactive='yes' if allowed else 'auth_admin',
+        res_active='yes' if allowed else 'auth_admin',
+        file=polkit_file
+    )
 
+@arg_logger
 def allow_mount_system(allowed):
     logger.debug(f"allow mounting internal media -> {allowed}")
     polkit_file = f"{INITRD}/newroot/etc/polkit-1/localauthority/90-mandatory.d/10-udisks2-mount-system.pkla"
-    contents = textwrap.dedent(r"""
-    [allow user mounting and unmounting of system devices with self authentication]
-    Identity=unix-user:user
-    Action=org.freedesktop.udisks2.filesystem-mount-system
-    ResultAny={0}
-    ResultInactive={0}
-    ResultActive={0}
-    """)
-    helpers.file_put_contents(polkit_file, contents.format('yes' if allowed else 'auth_admin'))
+    return add_polkit_entry(
+        desc="allow user mounting and unmounting of system devices with self authentication",
+        identity="unix-user:user",
+        action="org.freedesktop.udisks2.filesystem-mount-system",
+        res_any='yes' if allowed else 'auth_admin',
+        res_inactive='yes' if allowed else 'auth_admin',
+        res_active='yes' if allowed else 'auth_admin',
+        file=polkit_file
+    )
 
 # enable or disable the firewall
+@arg_logger
 def firewall_off(off):
     logger.debug(f"firewall set to {'off' if off else 'on'}")
     if off:
-        systemctl('lernstick-firewall.service', 'disable')
         helpers.run(f'chroot {INITRD}/newroot /lib/systemd/lernstick-firewall stop')
+        return systemctl('lernstick-firewall.service', 'disable')
     else:
-        systemctl('lernstick-firewall.service', 'enable')
+        return systemctl('lernstick-firewall.service', 'enable')
 
+# escape characters in URLs for squid
+def escape_url4squid(url):
+    return url.translate(str.maketrans({
+        ".":  r"\."
+    }))
+
+@arg_logger
 def set_url_whitelist(url_whitelist):
     if url_whitelist != '':
-        url_whitelist = re.sub(r'\.', r'\\\.', url_whitelist)
-        logger.debug(f"setting url whitelist to {url_whitelist}")
-        url_whitelist = '\n' + url_whitelist
+        url_whitelist = escape_url4squid(url_whitelist)
+        logger.debug(f"Appending whitelist with {url_whitelist}")
+        url_whitelist = '\n' + url_whitelist + '\n'
         os.makedirs(f'{INITRD}/backup/etc/lernstick-firewall/proxy.d', exist_ok = True)
-        helpers.file_put_contents(f'{INITRD}/newroot/etc/lernstick-firewall/proxy.d/glados.conf', url_whitelist, append = True)
-        helpers.file_put_contents(f'{INITRD}/newroot/etc/lernstick-firewall/url_whitelist', url_whitelist, append = True) # for backward compatibility, todo: remove as soon as possible
+        r = helpers.file_put_contents(f'{INITRD}/newroot/etc/lernstick-firewall/proxy.d/glados.conf', url_whitelist, append = True) > 0
+        r = r and helpers.file_put_contents(f'{INITRD}/newroot/etc/lernstick-firewall/url_whitelist', url_whitelist, append = True) > 0 # for backward compatibility, todo: remove as soon as possible
+        return r
+
+# Adds a polkit entry.
+#
+# @param string desc: A descriptionof the action.
+# @param string identity: A semi-colon separated list of globs to match
+#  identities. Each glob should start with unix-user: or unix-group: to specify
+#  whether to match on a UNIX user name or a UNIX group name. Netgroups are
+#  supported with the unix-netgroup: prefix, but cannot support glob syntax.
+# @param string action: A semi-colon separated list of globs to match action
+#  identifiers.
+# @param string res_active: The result to return for subjects in an active local
+#  session that matches one or more of the given identities. Allowed values are
+#  similar to what can be used in the defaults section of .policy files used to
+#  define actions, e.g. yes, no, auth_self, auth_self_keep, auth_admin and
+#  auth_admin_keep.
+# @param string res_inactive: Like ResultActive but instead applies to subjects
+#  in inactive local sessions.
+# @param string res_any: Like ResultActive but instead applies to any subject
+# @see https://www.freedesktop.org/software/polkit/docs/0.105/pklocalauthority.8.html
+#
+@arg_logger
+def add_polkit_entry(desc, identity, action, res_any, res_inactive, res_active, file):
+    vals = ['yes', 'no', 'auth_self', 'auth_self_keep', 'auth_admin', 'auth_admin_keep']
+    if res_active in vals and res_any in vals and res_inactive in vals:
+        contents = textwrap.dedent(r"""
+            [{desc}]
+            Identity={identity}
+            Action={action}
+            ResultAny={res_any}
+            ResultInactive={res_inactive}
+            ResultActive={res_active}
+        """)
+        contents = contents.format(**locals())
+        logger.debug(f"Adding entry to {file}:\n{contents}")
+        r = helpers.file_put_contents(file, contents) > 0
+    else:
+        logger.warning(f"ResultAny, ResultInactive, ResultActive must be in {vals}")
+        r=False
+    if not r: logger.error(f'Creating polkit entry for "{desc}" failed')
+    return r
 
 # Returns an xpath to search for created from a dictionary d
 def xml_get_xpath(d):
@@ -549,16 +603,20 @@ def libreoffice(home, config):
     }
 
     # define entries to change/create or remove
-    autoSaveTimeIntervall = {
+
+    #<item oor:path="/org.openoffice.Office.Common/Save/Document"><prop oor:name="AutoSave" oor:op="fuse"><value>false</value></prop></item>
+    autoSave = {
         "item": {"oor:path": "/org.openoffice.Office.Common/Save/Document"},
         "prop": {"oor:name": "AutoSave", "oor:op": "fuse"},
         "value": {}
     }
-    autoSave = {
+    #<item oor:path="/org.openoffice.Office.Common/Save/Document"><prop oor:name="AutoSaveTimeIntervall" oor:op="fuse"><value>1</value></prop></item>
+    autoSaveTimeIntervall = {
         "item": {"oor:path": "/org.openoffice.Office.Common/Save/Document"},
         "prop": {"oor:name": "AutoSaveTimeIntervall", "oor:op": "fuse"},
         "value": {}
     }
+    #<item oor:path="/org.openoffice.Office.Common/Save/Document"><prop oor:name="CreateBackup" oor:op="fuse"><value>true</value></prop></item>
     createBackup = {
         "item": {"oor:path": "/org.openoffice.Office.Common/Save/Document"},
         "prop": {"oor:name": "createBackup", "oor:op": "fuse"},
@@ -631,11 +689,12 @@ def libreoffice(home, config):
         pretty_print=True
     )
 
+@arg_logger
 def screen_capture(enabled, config):
     if enabled and config['screen_capture_command'] != '':
         os.makedirs(f'{INITRD}/newroot/{config["screen_capture_path"]}', exist_ok = True)
         systemctl('screen_capture.service', 'enable')
-        helpers.run(f'chroot {INITRD}/newroot ln -s /var/log/screen_capture.log "{config["screen_capture_path"]}/screen_capture.log"')
+        helpers.run(f'chroot {INITRD}/newroot ln -sf /var/log/screen_capture.log "{config["screen_capture_path"]}/screen_capture.log"')
 
         contents = textwrap.dedent(r"""
         # screen_capture
@@ -651,6 +710,7 @@ def screen_capture(enabled, config):
 
         helpers.file_put_contents(f'{INITRD}/newroot/etc/launch.conf', contents.format(**config), append = True)
 
+@arg_logger
 def keylogger(enabled, config):
     if enabled:
         os.makedirs(f'{INITRD}/newroot/{config["keylogger_path"]}', exist_ok = True)
@@ -732,31 +792,39 @@ def main(args, logger):
     _, desktop = helpers.run(f"sudo -u {exam_user} xdg-user-dir DESKTOP")
     _, home = helpers.run(f"sudo -u {exam_user} xdg-user-dir")
     directory_structure = [
-        f"{INITRD}/backup",
-        f"{INITRD}/base",
-        f"{INITRD}/newroot",
-        f"{INITRD}/squashfs",
-        f"{INITRD}/exam",
-        f"{INITRD}/tmpfs",
-        f"{INITRD}/backup/etc/NetworkManager/system-connections",
-        f"{INITRD}/backup/etc/NetworkManager/dispatcher.d",
-        f"{INITRD}/backup/{desktop}/",
-        f"{INITRD}/backup/usr/bin/",
-        f"{INITRD}/backup/usr/sbin/",
-        f"{INITRD}/backup/etc/live/config/",
-        f"{INITRD}/backup/etc/lernstick-firewall/",
-        f"{INITRD}/backup/etc/avahi/",
-        f"{INITRD}/backup/root/.ssh",
-        f"{INITRD}/backup/usr/share/applications"
+        {'mode': 0o755, 'dir': f"{INITRD}/backup"},
+        {'mode': 0o755, 'dir': f"{INITRD}/base"},
+        {'mode': 0o755, 'dir': f"{INITRD}/newroot"},
+        {'mode': 0o755, 'dir': f"{INITRD}/squashfs"},
+        {'mode': 0o755, 'dir': f"{INITRD}/exam"},
+        {'mode': 0o755, 'dir': f"{INITRD}/tmpfs"},
+        {'mode': 0o755, 'uid': root_uid, 'gid': root_gid, 'dir': f"{INITRD}/backup/etc/NetworkManager/system-connections"},
+        {'mode': 0o755, 'uid': root_uid, 'gid': root_gid, 'dir': f"{INITRD}/backup/etc/NetworkManager/dispatcher.d"},
+        {'mode': 0o755, 'uid': exam_uid, 'gid': exam_gid, 'dir': f"{INITRD}/backup/{desktop}/"},
+        {'mode': 0o755, 'uid': exam_uid, 'gid': exam_gid, 'dir': f"{INITRD}/backup/{home}/.config"},
+        {'mode': 0o755, 'uid': root_uid, 'gid': root_gid, 'dir': f"{INITRD}/backup/usr/bin/"},
+        {'mode': 0o755, 'uid': root_uid, 'gid': root_gid, 'dir': f"{INITRD}/backup/usr/sbin/"},
+        {'mode': 0o755, 'uid': root_uid, 'gid': root_gid, 'dir': f"{INITRD}/backup/etc/live/config/"},
+        {'mode': 0o755, 'uid': root_uid, 'gid': root_gid, 'dir': f"{INITRD}/backup/etc/lernstick-firewall/"},
+        {'mode': 0o755, 'uid': root_uid, 'gid': root_gid, 'dir': f"{INITRD}/backup/etc/avahi/"},
+        {'mode': 0o700, 'uid': root_uid, 'gid': root_gid, 'dir': f"{INITRD}/backup/root"},
+        {'mode': 0o700, 'uid': root_uid, 'gid': root_gid, 'dir': f"{INITRD}/backup/root/.ssh"},
+        {'mode': 0o755, 'uid': root_uid, 'gid': root_gid, 'dir': f"{INITRD}/backup/usr/share/applications"}
     ]
-    for directory in directory_structure:
-        os.makedirs(directory, exist_ok = True)
 
     # set proper permissions
-    os.chown(f"{INITRD}/backup/{desktop}/", exam_uid, exam_gid)
-    os.chown(f"{INITRD}/backup/{home}/", exam_uid, exam_gid)
-    os.chmod(f"{INITRD}/backup/root", 0o700)
-    os.chmod(f"{INITRD}/backup/root/.ssh", 0o700)
+    for d in directory_structure:
+        if 'mode' in d:
+            os.makedirs(d['dir'], mode = d['mode'], exist_ok = True)
+        else:
+            os.makedirs(d['dir'], exist_ok = True)
+        if 'uid' in d and 'gid' in d:
+            os.chown(d['dir'], d['uid'], d['gid'])
+
+    # os.chown(f"{INITRD}/backup/{desktop}/", exam_uid, exam_gid)
+    # os.chown(f"{INITRD}/backup/{home}/", exam_uid, exam_gid)
+    # os.chmod(f"{INITRD}/backup/root", 0o700)
+    # os.chmod(f"{INITRD}/backup/root/.ssh", 0o700)
 
     # get all active network connections
     cenv = {**env, **{'LC_ALL': 'C'}} 
@@ -812,6 +880,15 @@ def main(args, logger):
     # remove policykit action for lernstick welcome application
     remove(f"{INITRD}/newroot/usr/share/polkit-1/actions/ch.lernstick.welcome.policy", fail_ok = True)
 
+    # Allow user to Power off the system
+    add_polkit_entry(desc="Allow user to Power off the system",
+        identity="unix-user:user",
+        action="org.freedesktop.login1.power-off",
+        res_any="yes",
+        res_inactive="yes",
+        res_active="yes",
+        file=f"{INITRD}/newroot/etc/polkit-1/localauthority/90-mandatory.d/10-shutdown.pkla")
+
     # add an entry to finish the exam in the dash
     add_dash_entry("finish_exam.desktop", env=env)
 
@@ -865,7 +942,7 @@ def main(args, logger):
         os.remove(f"{INITRD}/newroot/etc/launch.conf")
     if get('screen_capture', default = False) or get('keylogger', default = False):
         # activate the timer unit
-        helpers.run(f'chroot {INITRD}/newroot ln -s /etc/systemd/system/launch.timer /etc/systemd/system/timers.target.wants/launch.timer')
+        helpers.run(f'chroot {INITRD}/newroot ln -sf /etc/systemd/system/launch.timer /etc/systemd/system/timers.target.wants/launch.timer')
 
     # set all screen_capture options
     screen_capture(get('screen_capture', default = False), config = {
@@ -886,7 +963,21 @@ def main(args, logger):
         systemctl('lernstick-exam-tray.service', 'enable')
 
     # fix the permissions
+    os.makedirs(f'{INITRD}/newroot/{home}/.config', mode=0o755, exist_ok = True)
     chown(f'{INITRD}/newroot/{home}/.config', exam_uid, exam_gid, recursive = True)
+
+    # Copy the current locale and xdg-dir specs to the exam, such that the
+    # exam has the same language and localized directory structure as the
+    # starting Lernstick.
+    copy(f"{home}/.config/user-dirs.dirs", f"{INITRD}/newroot/{home}/.config/user-dirs.dirs")
+    copy(f"{home}/.config/user-dirs.locale", f"{INITRD}/newroot/{home}/.config/user-dirs.locale")
+    os.environ["HOME"] = home
+    xdg_keys = ["XDG_DESKTOP_DIR", "XDG_DOWNLOAD_DIR", "XDG_TEMPLATES_DIR", "XDG_PUBLICSHARE_DIR", "XDG_DOCUMENTS_DIR", "XDG_MUSIC_DIR", "XDG_PICTURES_DIR", "XDG_VIDEOS_DIR"]
+    for key in xdg_keys:
+        dir = helpers.get_info(key, f"{home}/.config/user-dirs.dirs")
+        dir = f"{INITRD}/newroot/{home if dir is None else dir}"
+        os.makedirs(dir, mode = 0o755, exist_ok = True)
+        os.chown(dir, exam_uid, exam_gid)
 
     # Copy all dependencies, @todo: remove??
     if os.path.isdir("/var/lib/lernstick-exam-client/persistent/"):
@@ -906,19 +997,12 @@ def main(args, logger):
         'gladosHost': helpers.get_info("gladosHost", infoFile),
         'gladosProto': helpers.get_info("gladosProto", infoFile)
     }
-    glados_sanitized = {k: re.sub(r'\.', r'\\\.', v) for k,v in glados.items()}
+
     helpers.file_put_contents(f'{INITRD}/backup/etc/lernstick-firewall/net_whitelist_input', '\ntcp {gladosIp} 22'.format(**glados), append = True)
 
     # hand over the url whitelist
-    os.makedirs(f'{INITRD}/backup/etc/lernstick-firewall/proxy.d', exist_ok = True)
-    host = "\n{gladosProto}://{gladosHost}".format(**glados_sanitized)
-    ip = "\n{gladosProto}://{gladosIp}".format(**glados_sanitized)
-    helpers.file_put_contents(f'{INITRD}/backup/etc/lernstick-firewall/proxy.d/glados.conf', host, append = True)
-    helpers.file_put_contents(f'{INITRD}/backup/etc/lernstick-firewall/proxy.d/glados.conf', ip, append = True)
-    
-    # for backward compatibility, todo: remove as soon as possible
-    helpers.file_put_contents(f'{INITRD}/backup/etc/lernstick-firewall/url_whitelist', host, append = True)
-    helpers.file_put_contents(f'{INITRD}/backup/etc/lernstick-firewall/url_whitelist', ip, append = True)
+    set_url_whitelist("{gladosProto}://{gladosHost}".format(**glados))
+    set_url_whitelist("{gladosProto}://{gladosIp}".format(**glados))
 
     # hand over allowed ip/ports
     helpers.file_put_contents(f'{INITRD}/backup/etc/lernstick-firewall/net_whitelist', '\ntcp {gladosIp} {gladosPort}'.format(**glados), append = True)
