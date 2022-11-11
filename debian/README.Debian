@@ -8,9 +8,9 @@ glados for Debian
 
 * Merge migrations to one single migration from the old version to the new
 
-* First create new yii-glados package: https://github.com/chaoos/yii2-glados/
-
 * Tag a new release with the new version (create a pre-release and publish it)
+
+* First create new yii-glados package: https://github.com/chaoos/yii2-glados/
 
 * Merge the debian branch with the master branch at the tag created
 
