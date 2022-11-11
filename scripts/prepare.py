@@ -438,6 +438,7 @@ def allow_network_access(allowed):
         # remove user from the netdev group to prevent him from changing network connections
         r, _ = helpers.run(f'chroot {INITRD}/newroot gpasswd -d user netdev')
         file_regex('netdev', '', f'{INITRD}/newroot/etc/live/config.conf.d/user-setup.conf')
+        remove(f'{INITRD}/newroot/etc/live/config.conf.d/user-setup.conf.bak', fail_ok = True)
     return r
 
 # config->allow_sudo
@@ -688,6 +689,15 @@ def libreoffice(home, config):
         xml_declaration=True,
         pretty_print=True
     )
+
+    # These 2 crazy lines are needed, because, either etree or libreoffices xml
+    # parser writes boolean wrong (!!). We change all booleans to lowercase
+    # such that libreoffice is statisfied and autosave recovery still works. I
+    # really hope to remove these 2 lines at some point, because this is
+    # terrible, just terrible! I hate to write fixes like this.
+    file_regex("\>True\<", ">true<", registry_file)
+    file_regex("\>False\<", ">false<", registry_file)
+
 
 @arg_logger
 def screen_capture(enabled, config):

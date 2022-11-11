@@ -849,3 +849,9 @@ span.view--state[data-state="4"]::after { content: attr(data-text-4); }
 .terminal span.yellow {
   color: yellow;
 }
+
+.ticket-create-multiple-preview
+{
+    max-height: 400px;
+    overflow: auto;
+}

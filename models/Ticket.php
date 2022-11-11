@@ -237,6 +237,7 @@ class Ticket extends LiveActiveRecord
             [['start', 'end', 'test_taker', 'ip', 'state', 'download_lock', 'backup_lock', 'restore_lock', 'bootup_lock', 'last_backup'], 'safe', 'on' => self::SCENARIO_DEV],
             [['token'], 'unique', 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['token'], 'string', 'max' => 16, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
+            [['test_taker'], 'string', 'max' => 64, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_DEV]],
             [['token'], 'match',
                 'pattern' => '/^[0-9a-zA-Z]+$/', // only alphanumeric characters
                 'message' => \Yii::t('setting', 'Only alphanumeric characters (0-9, a-z, A-Z) are allowed.'),
