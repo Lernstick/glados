@@ -22,6 +22,8 @@ glados for Debian
 
 * Add new config files to debian/conf dir and to debian/links (if some)
 
+* Add new folders to install in debian/install (if some)
+
 * Before building the package, the system where to build, need some packages installed:
 
  apt-get install devscripts quilt (+ more)
