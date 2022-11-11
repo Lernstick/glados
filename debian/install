@@ -13,6 +13,7 @@ models      usr/share/glados
 scripts     usr/share/glados
 views       usr/share/glados
 web         usr/share/glados
+widgets     usr/share/glados
 
 config/defaultParams.php usr/share/glados/config
 config/console.php       usr/share/glados/config
