@@ -2,11 +2,17 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use kartik\select2\Select2;
+use yii\web\JsExpression;
+use app\assets\FormAsset;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\User */
 /* @var $searchModel app\models\UserSearch */
 /* @var $form yii\widgets\ActiveForm */
+
+FormAsset::register($this);
+
 ?>
 
 <div class="user-form">
@@ -18,7 +24,19 @@ use yii\widgets\ActiveForm;
         </div>
 
         <div class="col-md-6">
-            <?php echo $form->field($model, 'role')->dropDownList($searchModel->roleList, [ 'prompt' => \Yii::t('users', 'Choose a Role ...') ]) ?>
+            <?= $form->field($model, 'roles')->widget(Select2::classname(), [
+                'data' => $searchModel->roleList,
+                'pluginOptions' => [
+                    'dropdownAutoWidth' => true,
+                    'width' => 'auto',
+                    'allowClear' => true,
+                    'placeholder' => '',
+                ],
+                'options' => [
+                    'multiple' => true,
+                    'placeholder' => \Yii::t('users', 'Choose role(s) ...')
+                ]
+            ]); ?>
         </div>
     </div>
 

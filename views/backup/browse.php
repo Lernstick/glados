@@ -188,7 +188,7 @@ $this->registerJs($js);
                     'options' => [
                         'class' => 'dropdown-header pagination pagination-sm',
                         'style' => 'padding: 3px 20px;'
-                    ]
+                    ],
                 ],        
             ]); ?>
             <?php Pjax::end() ?>
@@ -222,9 +222,14 @@ $this->registerJs($js);
             'class' => 'summary',
         ],
         'pager' => [
+            'class' => app\widgets\CustomPager::className(),
+            'selectedLayout' => Yii::t('app', '{selected} <span style="color: #737373;">items</span>'),
             'options' => [
                 'class' => 'pagination pagination-sm',
-            ]
+            ],
+            'dropDownNavOptions' => [
+                'class' => 'pagination pagination-sm pagination-page-size',
+            ],
         ],
     ]); ?>
   </div>

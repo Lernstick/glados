@@ -116,19 +116,9 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
     public $identifier;
 
     /**
-     * @var string The role determined in [[determineRole()]].
+     * @var string The roles determined in [[determineRoles()]].
      */
-    public $role;
-
-    /**
-     * @var array array containing roles in the order of their priority. If a user has group
-     * membership such that he can be associated to multiple roles, this array determines the
-     * role to be associated. The user recieves the highest possible role.
-     */
-    public $roleOrder = [
-        'admin',
-        'teacher'
-    ];
+    public $roles;
 
     public $connection;
     public $bind;
@@ -146,11 +136,10 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
      * ];
      * ```
      * 
-     * In the example above, if a user is in multiple groups appearing in the mapping, the highest
-     * role according to [[roleOrder]] is taken for this user. Multiple LDAP groups can be mapped to the
-     * same role. LDAP groups can be given in an arbitrary identifier.
+     * In the example above, if a user is in multiple groups appearing in the mapping, the user
+     * gets all roles associated to. Multiple LDAP groups can be mapped to the same role. LDAP
+     * groups can be given in an arbitrary identifier.
      * @see groupIdentifier
-     * @see roleOrder
      */
     public $mapping = [];
 
@@ -283,7 +272,7 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
     ];
 
     /**
-     * @var array Array of LDAP groups for the select list for the role mapping.
+     * @var array Array of LDAP groups for the role-mapping select-list.
      */
     public $groups = [];
 
@@ -457,6 +446,7 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
                 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_BIND_DIRECT, self::SCENARIO_BIND_BYUSER]
             ],
 
+            [['ldap_port'], 'integer', 'min' => 1, 'max' => 65535, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_BIND_DIRECT, self::SCENARIO_BIND_BYUSER]],
         ]);
     }
 
@@ -760,13 +750,12 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
     }
 
     /**
-     * Determines the highest possible roles for a set of given groups
+     * Determines the roles for a set of given groups
      * 
      * @param array $groups set of LDAP groups
-     * @return string|false the highest role according to [[roleOrder]] or the first element from the roles
-     * array if nothing matches or false if roles is empty
+     * @return string[] the roles according to [[mapping]]
      */
-    public function determineRole($groups)
+    public function determineRoles($groups)
     {
         $roles = [];
         foreach ($this->mapping as $ldapGroup => $mappedRole) {
@@ -775,12 +764,7 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
             }
         }
 
-        foreach ($this->roleOrder as $key => $role) {
-            if (in_array($role, $roles)) {
-                return $role;
-            }
-        }
-        return array_key_exists(0, $roles) ? $roles[0] : false;
+        return $roles;
     }
 
     /**
@@ -957,7 +941,7 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
      * Conclude the authentication.
      * 
      * @param string $username the username given from the login form
-     * @param string $groups the groups array
+     * @param string $groups the groups array containing LDAP group-names
      * @return bool authentication success or failure
      */
     public function concludeAuthentication($username, $groups)
@@ -965,12 +949,12 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
         $this->debug[] = Yii::t('auth', 'User group membership: <code>{groups}</code>.', [
             'groups' => implode('</code>, <code>', $groups),
         ]);
-        if ( ($this->role = $this->determineRole($groups)) !== false) {
-            $this->debug[] = Yii::t('auth', 'User role set to <code>{role}</code>.', [
-                'role' => $this->role
+        if ( ($this->roles = $this->determineRoles($groups)) !== []) {
+            $this->debug[] = Yii::t('auth', 'User roles set to <code>{roles}</code>.', [
+                'roles' => implode('</code>, <code>', $this->roles)
             ]);
             $this->success = Yii::t('auth', 'Authentication was successful.');
-            Yii::debug('role=' . $this->role . ', identifier=' . $this->identifier, __METHOD__);
+            Yii::debug('roles=' . implode(',', $this->roles) . ', identifier=' . $this->identifier, __METHOD__);
             Yii::debug('Authentication was successful.', __METHOD__);
             return true;
         } else {
@@ -981,7 +965,7 @@ class AuthGenericLdap extends \app\models\Auth implements AuthInterface
             $this->debug[] = Yii::t('auth', 'Mapping: {mapping}.', [
                 'mapping' => implode(", ", $mapping),
             ]);
-            $this->error = 'No role found, check <code>roleOrder</code> and <code>mapping</code>.';
+            $this->error = 'No role(s) found, check <code>mapping</code>.';
             Yii::debug($this->error, __METHOD__);
             $this->close();
             return false;

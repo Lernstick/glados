@@ -135,6 +135,8 @@ class EventStream extends EventItem
         ob_start();
 
         $this->_fd = inotify_init();
+        $this->watches = 0;
+        $this->save();
         stream_set_blocking($this->_fd, true);
 
         set_time_limit($this->timeLimit + 1);
@@ -171,6 +173,7 @@ class EventStream extends EventItem
         $this->stopped_at = $this->_mostRecentEventTime != null
             ? $this->_mostRecentEventTime
             : $this->_stopListeningTime;
+        $this->watches = 0;
         $this->save();
         Yii::$app->mutex->release($this->uuid);
         $this->trigger(self::EVENT_STREAM_STOPPED);
@@ -191,7 +194,7 @@ class EventStream extends EventItem
     /**
      * Getter for the isActive flag.
      *
-     * @return boolean whether the stream is active or not
+     * @return boolean whether the stream is active or not (in another process)
      */
     public function getIsActive()
     {
@@ -290,7 +293,7 @@ class EventStream extends EventItem
                 }
             } else {
                 $dir = $eventFile;
-                // the deepest possible directory that exists will get a inotify watch
+                // the deepest possible directory that exists will get an inotify watch
                 do {
                     $dir = dirname($dir);
                     if (file_exists($dir)) {
@@ -303,6 +306,7 @@ class EventStream extends EventItem
                 } while (dirname($dir) != $dir);
             }
         }
+        $this->watches += $watches;
         return $watches;
     }
 
@@ -310,14 +314,17 @@ class EventStream extends EventItem
      * Removes a watch and removes the element in the corresponding array.
      *
      * @param integer $wd the inotify watch descriptor.
-     * @return void
+     * @return bool true on success or false on failure. 
      */
     private function removeWatch($wd){
-        @inotify_rm_watch($this->_fd, $wd);
+        if (($ret = @inotify_rm_watch($this->_fd, $wd)) !== false) {
+            $this->watches--;
+        }
         $event = array_search($wd, $this->_fwd);
         unset($this->_fwd[$event]);
         $event = array_search($wd, $this->_dwd);
         unset($this->_dwd[$event]);
+        return $ret;
     }
 
     /**
@@ -366,7 +373,9 @@ class EventStream extends EventItem
                 $this->trigger(self::EVENT_STREAM_ABORTED);
                 return false;
             }
-            $this->addWatches();
+            if ($this->addWatches() !== 0) {
+                $this->save();
+            }
 
             /* Search for lost events, that occured while:
              * * processing/sending events
@@ -416,7 +425,9 @@ class EventStream extends EventItem
                     // Watch was removed (explicitly by inotify_rm_watch() or because file was removed or
                     // filesystem unmounted
                     } else if ($mask == IN_IGNORED) {
-                        $this->removeWatch($wd);
+                        if ($this->removeWatch($wd)) {
+                            $this->save();
+                        }
                         continue 2; # or 1 ???
                     }
                 }
@@ -424,6 +435,7 @@ class EventStream extends EventItem
         }
 
         $this->removeWatches();
+        $this->save();
         fclose($this->_fd);
         return false;
     }

@@ -45,6 +45,35 @@ if (extension_loaded('gd')) {
     }
 }
 
+/* Introduced in PHP8 */
+if (!function_exists('str_contains')) {
+    function str_contains($haystack, $needle) {
+        return (strpos($haystack, $needle) !== false);
+    }
+}
+
+$mod_status_url = 'http://localhost/server-status?auto';
+$raw = @file_get_contents($mod_status_url);
+$apache_max_number_of_processes = 'unknown';
+foreach(explode(PHP_EOL, $raw) as $line) {
+    if (str_contains($line, ":")) {
+        list($key, $value) = explode(":", $line, 2);
+        if ($key = 'Scoreboard') {
+            $apache_max_number_of_processes = strlen(trim($value));
+        }
+    }
+}
+
+function mysqlSetting($setting) {
+    $raw = shell_exec('mysqld --help --verbose');
+    foreach(explode(PHP_EOL, $raw) as $line) {
+        if (strpos($line, $setting) === 0) {
+            return trim(substr($line, 15));
+        }
+    }
+    return 'unknown';
+}
+
 /**
  * Adjust requirements according to your application specifics.
  */
@@ -115,7 +144,7 @@ $requirements = array(
         'memo' => '<code>expose_php</code> should be disabled at <code>php.ini</code>',
     ),
     'phpAllowUrlInclude' => array(
-        'name' => 'PHP allow url include',
+        'name' => 'PHP: allow url include',
         'mandatory' => false,
         'condition' => $requirementsChecker->checkPhpIniOff("allow_url_include"),
         'by' => 'Security reasons',
@@ -130,28 +159,63 @@ $requirements = array(
     ),
     // Inotify
     'peclInotify' => array(
-        'name' => 'PECL Infotify',
+        'name' => 'PECL Inotify',
         'mandatory' => true,
         'condition' => extension_loaded('inotify'),
         'by' => 'Server-Sent Events',
         'memo' => 'Realtime events in views',
     ),
+    'inotify_max_user_instances' => array(
+        'name' => 'Inotify: max_user_instances',
+        'mandatory' => true,
+        'condition' => intval(file_get_contents('/proc/sys/fs/inotify/max_user_instances')) > 4096,
+        'by' => 'Client Agent',
+        'memo' => '<code>/proc/sys/fs/inotify/max_user_instances</code> should be high enough (current value: ' . intval(file_get_contents('/proc/sys/fs/inotify/max_user_instances')) . '). This value should be >= (number of concurrent exams you wish to perform) * 10.',
+    ),
+    'inotify_max_user_watches' => array(
+        'name' => 'Inotify: max_user_watches',
+        'mandatory' => true,
+        'condition' => intval(file_get_contents('/proc/sys/fs/inotify/max_user_watches')) > 4096,
+        'by' => 'Client Agent',
+        'memo' => '<code>/proc/sys/fs/inotify/max_user_watches</code> should be high enough (current value: ' . intval(file_get_contents('/proc/sys/fs/inotify/max_user_watches')) . '). This value should be >= (number of concurrent exams you wish to perform) * 10.',
+    ),
+    'apache_max_number_of_processes' => array(
+        'name' => 'Apache: MaxClients',
+        'mandatory' => true,
+        'condition' => $apache_max_number_of_processes > 200,
+        'by' => 'Client Agent',
+        'memo' => 'Maximal number of processes in Apache should be high enough. This value can only be determined if apache <code>mod_status</code> is enabled and available via <code>' . $mod_status_url . '</code>. The values of <code>MaxRequestWorkers</code> and <code>ServerLimit</code> should be set appropriately if module <code>mpm_prefork</code> is used (current value: ' . $apache_max_number_of_processes . '). This value should be >= (number of concurrent exams you wish to perform) + 100.',
+    ),
+    'mysql_max_connections' => array(
+        'name' => 'MySQL: max-connections',
+        'mandatory' => true,
+        'condition' => intval(mysqlSetting('max-connections')) > 200,
+        'by' => 'Client Agent',
+        'memo' => 'Maximal number of concurrent connections to MySQL should be high enough. The value of <code>max-connections</code> should be set appropriately (current value: ' . intval(mysqlSetting('max-connections')) . '). This value should be >= (number of concurrent exams you wish to perform) + 100.',
+    ),
+    'mysql_sql_mode' => array(
+        'name' => 'MySQL: sql-mode',
+        'mandatory' => true,
+        'condition' => str_contains(mysqlSetting('sql-mode'), 'STRICT_TRANS_TABLES'),
+        'by' => 'MySQL',
+        'memo' => 'Strict mode should be enabled by MySQL, <code>sql-mode = STRICT_TRANS_TABLES</code>. (current value: ' . mysqlSetting('sql-mode') . ').',
+    ),
     'phpFileUploads' => array(
-        'name' => 'PHP allow file uploads',
+        'name' => 'PHP: allow file uploads',
         'mandatory' => true,
         'condition' => $requirementsChecker->checkPhpIniOn("file_uploads"),
         'by' => 'File upload',
         'memo' => '<code>file_uploads</code> should be enabled at <code>php.ini</code>',
     ),    
     'phpUploadMaxFilesize' => array(
-        'name' => 'PHP upload max filesize',
+        'name' => 'PHP: upload max filesize',
         'mandatory' => true,
         'condition' => $requirementsChecker->checkUploadMaxFileSize("128M", null),
         'by' => 'File upload',
         'memo' => '<code>upload_max_filesize</code> should be set at least to 128M at <code>php.ini</code> (current value: ' . ini_get('upload_max_filesize') . ')',
     ),
     'phpPostMaxSize' => array(
-        'name' => 'PHP post max size',
+        'name' => 'PHP: post max size',
         'mandatory' => true,
         'condition' => $requirementsChecker->compareByteSize(ini_get('post_max_size'), "128M"),
         'by' => 'File upload',
@@ -179,21 +243,21 @@ $requirements = array(
         'memo' => 'Please install the <a href="https://www.openssh.com/">OpenSSH</a> package.'
     ),
     'GD' => array(
-        'name' => 'PHP GD extension',
+        'name' => 'PHP: GD extension',
         'mandatory' => true,
         'condition' => extension_loaded('gd'),
         'by' => 'Backup and Restore daemon',
         'memo' => 'Please install the <a href="http://php.net/manual/en/book.image.php">PHP GD</a> extension.',
     ),
     'ZIP' => array(
-        'name' => 'zip',
+        'name' => 'PHP: zip',
         'mandatory' => true,
         'condition' => extension_loaded('zip'),
         'by' => 'Generate results',
         'memo' => 'Please install the <a href="http://php.net/manual/en/book.zip.php">PHP Zip</a> extension.',
     ),
     'LDAP' => array(
-        'name' => 'ldap',
+        'name' => 'PHP: ldap',
         'mandatory' => false,
         'condition' => extension_loaded('ldap'),
         'by' => 'LDAP/Active Directory Authentication',

@@ -8,30 +8,12 @@ use app\models\SettingSearch;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\base\ViewNotFoundException;
-use app\components\AccessRule;
 
 /**
  * SettingController implements the CRUD actions for Setting model.
  */
 class SettingController extends BaseController
 {
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => \yii\filters\AccessControl::className(),
-                'ruleConfig' => [
-                    'class' => AccessRule::className(),
-                ],
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'roles' => ['rbac'],
-                    ],
-                ],
-            ],
-        ];
-    }
 
     /**
      * Lists all Setting models.

@@ -3,6 +3,7 @@
 /* @var $this \yii\web\View */
 /* @var $content string */
 
+use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
@@ -23,6 +24,7 @@ $runningDaemons = $daemons->search([])->totalCount;
 /* register the global YII_ENV variables */
 $this->registerJs('var YII_ENV_DEV = ' . (YII_ENV_DEV ? 'true' : 'false') . ';', \yii\web\View::POS_HEAD);
 $this->registerJs('var YII_DEBUG = ' . (YII_DEBUG ? 'true' : 'false') . ';', \yii\web\View::POS_HEAD);
+$this->registerJs(substitute('var baseUrl = "{url}";', ['url' => Url::base()]), \yii\web\View::POS_HEAD);
 
 $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\View::POS_END);
 
@@ -71,6 +73,7 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
     }
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
+        'encodeLabels' => false,
         'items' => [
             [
                 'label' => \Yii::t('main', 'Home'),
@@ -84,49 +87,36 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
                         'label' => '<i class="glyphicon glyphicon-user"></i> ' . \Yii::t('main', 'Create User'),
                         'url' => ['/user/create'],
                         'visible' => Yii::$app->user->can('user/create'),
-                        'encode' => false,
                     ],
                     [
                         'label' => '<i class="glyphicon glyphicon-education"></i> ' . \Yii::t('main', 'Create Exam'),
                         'url' => ['/exam/create'],
                         'visible' => Yii::$app->user->can('exam/create'),
-                        'encode' => false,
                     ],
                     [
                         'label' => '<i class="glyphicon glyphicon-file"></i> ' . \Yii::t('main', 'Create single Ticket'),
                         'url' => ['/ticket/create', 'mode' => 'single'],
                         'visible' => Yii::$app->user->can('ticket/create'),
-                        'encode' => false,
                     ],
                     [
                         'label' => '<i class="glyphicon glyphicon-duplicate"></i> ' . \Yii::t('main', 'Create multiple Tickets'),
                         'url' => ['/ticket/create', 'mode' => 'many', 'type' => 'assigned'],
                         'visible' => Yii::$app->user->can('ticket/create'),
-                        'encode' => false,
-                    ],
-                    [
-                        'label' => '<i class="glyphicon glyphicon-barcode"></i> ' . \Yii::t('main', 'Submit Ticket'),
-                        'url' => ['/ticket/update', 'mode' => 'submit'],
-                        'visible' => Yii::$app->user->can('ticket/update'),
-                        'encode' => false,
                     ],
                     [
                         'label' => '<i class="glyphicon glyphicon-eye-open"></i> ' . \Yii::t('main', 'Monitor Exams'),
                         'url' => ['/monitor'],
-                        'visible' => Yii::$app->user->can('ticket/view'),
-                        'encode' => false,
+                        'visible' => Yii::$app->user->can('exam/monitor'),
                     ],
                     [
                         'label' => '<i class="glyphicon glyphicon-cloud-download"></i> ' . \Yii::t('main', 'Generate results'),
                         'url' => ['/result/generate'],
-                        'visible' => Yii::$app->user->can('exam/view'),
-                        'encode' => false,
+                        'visible' => Yii::$app->user->can('result/generate'),
                     ],
                     [
                         'label' => '<i class="glyphicon glyphicon-cloud-upload"></i> ' . \Yii::t('main', 'Submit results'),
                         'url' => ['/result/submit'],
                         'visible' => Yii::$app->user->can('result/submit'),
-                        'encode' => false,
                     ],
                 ],
             ],
@@ -165,7 +155,8 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
                 'items' => [
 
                     [
-                        'label' => \Yii::t('main', 'Daemons ') . 
+                        'label' => '<i class="glyphicon glyphicon-tasks"></i> ' . 
+                            \Yii::t('main', 'Daemons ') . 
                             ActiveEventField::widget([
                                 'content' => $runningDaemons,
                                 'options' => [
@@ -175,32 +166,46 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
                                 'event' => 'runningDaemons',
                                 'jsonSelector' => 'runningDaemons',
                             ]),
-                        'encode' => false,
                         'url' => ['/daemon/index'],
                         'visible' => Yii::$app->user->can('daemon/index'),
                     ],
                     [
-                        'label' => \Yii::t('main', 'Users'),
+                        'label' => '<i class="glyphicon glyphicon-user"></i> ' . \Yii::t('main', 'Users'),
                         'url' => ['/user/index'],
                         'visible' => Yii::$app->user->can('user/index'),
                     ],
                     [
-                        'label' => \Yii::t('main', 'Profile'),
+                        'label' => '<i class="glyphicon glyphicon-tags"></i> ' . \Yii::t('main', 'Roles'),
+                        'url' => ['/role/index'],
+                        'visible' => Yii::$app->user->can('role/index'),
+                    ],
+                    [
+                        'label' => '<i class="glyphicon glyphicon-tag"></i> ' . \Yii::t('main', 'Profile'),
                         'url' => ['/user/view', 'id' => Yii::$app->user->id],
                         'visible' => !Yii::$app->user->isGuest && Yii::$app->user->can('user/view'),
                     ],
                     [
-                        'label' => \Yii::t('main', 'Config'),
-                        'url' => ['/config/system'],
-                        'visible' => Yii::$app->user->can('config/system'),
+                        'label' => '<i class="glyphicon glyphicon-dashboard"></i> ' . \Yii::t('main', 'Server Status'),
+                        'url' => ['/server/status'],
+                        'visible' => Yii::$app->user->can('server/status'),
                     ],
                     [
-                        'label' => \Yii::t('main', 'Settings'),
+                        'label' => '<i class="glyphicon glyphicon-book"></i> ' . \Yii::t('main', 'Server Logs'),
+                        'url' => ['/server/logs'],
+                        'visible' => Yii::$app->user->can('server/logs'),
+                    ],
+                    [
+                        'label' => '<i class="glyphicon glyphicon-th-list"></i> ' . \Yii::t('main', 'Server Config'),
+                        'url' => ['/server/config'],
+                        'visible' => Yii::$app->user->can('server/config'),
+                    ],
+                    [
+                        'label' =>  '<i class="glyphicon glyphicon-cog"></i> ' . \Yii::t('main', 'Settings'),
                         'url' => ['/setting/index'],
                         'visible' => Yii::$app->user->can('setting/index'),
                     ], 
                     [
-                        'label' => \Yii::t('main', 'Authentication Methods'),
+                        'label' => '<i class="glyphicon glyphicon-lock"></i> ' . \Yii::t('main', 'Authentication Methods'),
                         'url' => ['/auth/index'],
                         'visible' => Yii::$app->user->can('auth/index'),
                     ],
@@ -258,6 +263,8 @@ $this->registerJs('jQuery.timeago.settings.cutoff = 1000*60*60*24;', \yii\web\Vi
         <?= $content ?>
     </div>
 </div>
+
+<?= $this->render('@app/views/_notification') ?>
 
 <footer class="footer">
     <div class="container">

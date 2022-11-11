@@ -15,7 +15,6 @@ use app\models\History;
 use app\models\HistorySearch;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use app\components\AccessRule;
 use yii\web\UploadedFile;
 use yii\data\ArrayDataProvider;
 use kartik\mpdf\Pdf;
@@ -28,6 +27,28 @@ use yii\helpers\Url;
  */
 class ExamController extends BaseController
 {
+
+    /**
+     * @inheritdoc
+     */
+    public $owner_actions = ['view', 'update', 'delete'];
+
+    /**
+     * @inheritdoc
+     */
+    public function getOwner_id()
+    {
+        $id = Yii::$app->request->get('id');
+        if (($model = Exam::findOne($id)) !== null) {
+            return $model->user_id;
+        } else {
+            return null;
+        }
+    }
+
+    /*
+     * @inheritdoc
+     */
     public function behaviors()
     {
         return [
@@ -38,10 +59,7 @@ class ExamController extends BaseController
                 ],
             ],
             'access' => [
-                'class' => \yii\filters\AccessControl::className(),
-                'ruleConfig' => [
-                    'class' => AccessRule::className(),
-                ],
+                'class' => \app\components\AccessControl::className(),
                 'rules' => [
                     [
                         'allow' => true,
@@ -102,7 +120,7 @@ class ExamController extends BaseController
             }
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             return $out;
-        } 
+        }
     }
 
     /**
@@ -128,7 +146,7 @@ class ExamController extends BaseController
             $historyParams = ['HistorySearch' => $historyParams];
             $historyDataProvider = $historySearchModel->search($historyParams);
             $historyDataProvider->pagination->pageParam = 'hist-page';
-            $historyDataProvider->pagination->pageSize = 10;
+            $historyDataProvider->pagination->pageSizeParam = 'hist-per-page';
 
             $settingsDataProvider = new ArrayDataProvider([
                 'allModels' => $model->exam_setting,
@@ -426,10 +444,9 @@ class ExamController extends BaseController
                 return $this->redirect(['view', 'id' => $model->id]);
             }
             $model->delete();
-            Yii::$app->session->addFlash('danger', \Yii::t('exams', 'The Exam has been deleted successfully.'));
 
             return $this->redirect(Yii::$app->session['examViewReturnURL']);
-        }else if ($mode === 'file') {
+        } else if ($mode === 'file') {
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             if ($type == 'squashfs') {
                 return [ 'files' => [[
@@ -440,6 +457,27 @@ class ExamController extends BaseController
                     basename($model->file2) => $model->deleteFile('zip'),
                 ]]];
             }
+        } else if ($mode === 'open_tickets') {
+
+            $c = $model->delete_tickets(['state' => Ticket::STATE_OPEN]);
+            if ($c !== 0) {
+                Yii::$app->session->addFlash('danger', Yii::t('ticket', '{n} Open Tickets have been deleted successfully.', ['n' => $c]));
+            } else {
+                Yii::$app->session->addFlash('danger', Yii::t('ticket', 'There are no Open Tickets to delete.'));
+            }
+
+            return $this->redirect(['exam/view', 'id' => $id]);
+
+        } else if ($mode === 'all_tickets') {
+
+            $c = $model->delete_tickets([]);
+            if ($c !== 0) {
+                Yii::$app->session->addFlash('danger', Yii::t('ticket', '{n} Tickets have been deleted successfully.', ['n' => $c]));
+            } else {
+                Yii::$app->session->addFlash('danger', Yii::t('ticket', 'There are no Tickets to delete.'));
+            }
+
+            return $this->redirect(['exam/view', 'id' => $id]);
         }
 
     }
@@ -454,9 +492,7 @@ class ExamController extends BaseController
     protected function findModel($id)
     {
         if (($model = Exam::findOne($id)) !== null) {
-            if ($this->checkRbac($model->user_id)) {
-                return $model;
-            }
+            return $model;
         }
         throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
     }

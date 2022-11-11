@@ -6,8 +6,8 @@ To hand in your exam result, click the `Hand-in` icon in the dash menu. Once thi
 
 ![Hand in 1](img/finish_exam.jpg)
 
-You will get a notice when the last backup is done, **don't shutdown your computer** before the request message appears. Changes of the exam result from now on, will not be saved.
+You will get a notice when the last backup is done, **don't shutdown your computer** before the request message appears. Changes of the exam result from now on, **will not be saved**.
 
 ![Hand in 2](img/finish-exam.gif)
 
-If you need help, please ask your teacher. You can close this window.
+If you need help, please ask your teacher or the examination supervisor. You can close this window.

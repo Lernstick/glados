@@ -48,6 +48,10 @@ use app\components\ActiveEventField;
     'layout' => '{items} {pager}',
     'headerRowOptions' => [ 'style' => 'width:0%; display:none' ],
     'emptyText' => \Yii::t('activity', 'No activities found.'),
+    'pager' => [
+        'class' => app\widgets\CustomPager::className(),
+        'selectedLayout' => Yii::t('app', '{selected} <span style="color: #737373;">items</span>'),
+    ],
 ]); ?>
 
 <?php GridView::end() ?>

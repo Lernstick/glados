@@ -45,6 +45,7 @@ Features
    :caption: Installation
    :maxdepth: 2
 
+   howtos/hardware-recommendations
    howtos/manual-install
    howtos/deb-install
 
@@ -54,6 +55,7 @@ Features
 
    howtos/deb-update
    howtos/deb-8to9-upgrade
+   howtos/deb-9to10-upgrade
 
 .. toctree::
    :caption: Configuration
@@ -63,6 +65,7 @@ Features
    howtos/client-config
    howtos/network-config
    howtos/system-settings
+   howtos/large-exams
 
 .. toctree::
    :caption: Setting up Authentication

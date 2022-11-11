@@ -17,13 +17,6 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    'Avahi Port' => 'Avahi Port',
-    'Avahi Protocol' => 'Avahi Protokoll',
-    'Avahi Service File' => 'Avahi Dienst Datei',
-    'Avahi TXT Records' => 'Avahi TXT Datensatz',
-    'Host' => 'Host',
-    'IP' => 'IP',
-    'Options' => 'Optionen',
-    'Port' => 'Port',
-    'System Configuation' => 'System Konfiguration',
+    'Backup now' => 'Jetzt sichern',
+    'Ping client' => 'Client anpingen',
 ];

@@ -16,13 +16,26 @@ use yii\helpers\FileHelper;
 class Result extends Model
 {
 
+    //public $resultFile;
+
+    /**
+     * @var string the path of the uploaded file on the server
+     */
+    public $filePath;
+
     /**
      * @var UploadedFile
      */
-    public $resultFile;
-    public $filePath;
     public $file;
+
+    /**
+     * @var string the hash of the uploaded results.zip (the filename on the server)
+     */
     public $hash;
+
+    /**
+     * @var int the id of the exam when generating the reults.zip file
+     */
     public $exam_id;
 
     /* generation options */
@@ -119,7 +132,6 @@ class Result extends Model
     public function generateZip()
     {
 
-        #$tickets = Ticket::find()->where([ 'and', ['exam_id' => $this->exam->id], [ 'not', [ "start" => null ] ], [ 'not', [ "end" => null ] ] ])->all();
         $tickets = Ticket::findAll($this->inc_ids);
 
         if(!$tickets){
@@ -266,10 +278,11 @@ class Result extends Model
     }
 
     /**
-     * @return boolean
+     * @return int number of successfully submitted results
      */
     public function submit()
     {
+        $r = 0;
         $zip = new \ZipArchive(); 
         $tmp = tempnam(sys_get_temp_dir(), '');
         if (file_exists($tmp)) { unlink($tmp); }
@@ -280,63 +293,75 @@ class Result extends Model
             $zip->close();
         }
 
-        foreach($this->tickets as $ticket) {
-            $ticket->result = null;
-            $ticket->save();
+        foreach ($this->tickets as $ticket) {
 
-            $dir = $this->dirs[$ticket->token];
+            if ($ticket->exam !== null) {
 
-            $zipFile = \Yii::$app->params['resultPath'] . '/' . $ticket->token . '.zip';
-            $source = $tmp . '/' . $dir;
+                if ($ticket->exam->user_id == \Yii::$app->user->id || Yii::$app->user->can('result/submit/all')) {
 
-            $tzip = new \ZipArchive;
-            if (file_exists($zipFile)) {
-                unlink($zipFile);
-            }
-            $res = $tzip->open($zipFile, \ZIPARCHIVE::CREATE);
+                    $ticket->result = null;
+                    $ticket->save();
 
-            if ($res === TRUE) {
+                    $dir = $this->dirs[$ticket->token];
 
-                if (is_dir($source)) {
-                    $files = new \RecursiveIteratorIterator(
-                        new \RecursiveDirectoryIterator(
-                            $source,
-                            \FilesystemIterator::SKIP_DOTS
-                        ),
-                        \RecursiveIteratorIterator::SELF_FIRST
-                    );
-                    foreach ($files as $file) {
-                        $file = realpath($file);
+                    $zipFile = substitute('{path}/{name}.zip', [
+                        'path' => \Yii::$app->params['resultPath'],
+                        'name' => $ticket->token,
+                    ]);
+                    $source = $tmp . '/' . $dir;
 
-                        if (is_dir($file) === true) {
-                            $tzip->addEmptyDir(str_replace($source . '/', '', $file . '/'));
-                        }else if (is_file($file) === true) {
-                            $tzip->addFile($file, str_replace($source . '/', '', $file));
+                    $tzip = new \ZipArchive;
+                    if (file_exists($zipFile)) {
+                        unlink($zipFile);
+                    }
+                    $res = $tzip->open($zipFile, \ZIPARCHIVE::CREATE);
+
+                    if ($res === TRUE) {
+
+                        if (is_dir($source)) {
+                            $files = new \RecursiveIteratorIterator(
+                                new \RecursiveDirectoryIterator(
+                                    $source,
+                                    \FilesystemIterator::SKIP_DOTS
+                                ),
+                                \RecursiveIteratorIterator::SELF_FIRST
+                            );
+                            foreach ($files as $file) {
+                                $file = realpath($file);
+
+                                if (is_dir($file) === true) {
+                                    $tzip->addEmptyDir(str_replace($source . '/', '', $file . '/'));
+                                }else if (is_file($file) === true) {
+                                    $tzip->addFile($file, str_replace($source . '/', '', $file));
+                                }
+                            }
                         }
+                        $tzip->close();
+                    } else {
+                        @unlink($zipFile);
+                    }
+
+                    if (file_exists($zipFile)) {
+                        $ticket->result = $zipFile;
+                        $ticket->save();
+
+                        $act = new Activity([
+                            'ticket_id' => $ticket->id,
+                            'description' => yiit('activity', 'Exam result handed in.'),
+                            'severity' => Activity::SEVERITY_INFORMATIONAL,
+                        ]);
+                        $act->save();
+
+                        $r++;
                     }
                 }
-                $tzip->close();
-            } else {
-                @unlink($zipFile);
-            }
-
-            if (file_exists($zipFile)) {
-                $ticket->result = $zipFile;
-                $ticket->save();
-
-                $act = new Activity([
-                    'ticket_id' => $ticket->id,
-                    'description' => yiit('activity', 'Exam result handed in.'),
-                    'severity' => Activity::SEVERITY_INFORMATIONAL,
-                ]);
-                $act->save();
             }
 
         }
 
         FileHelper::removeDirectory($tmp);
 
-        return null;
+        return $r;
     }
 
 
@@ -356,22 +381,40 @@ class Result extends Model
         return $this->_dirs;
     }
 
+    /**
+     * Returns a list of tickets that appear in the ZIP-file, independent of whether the
+     * user has permission to index/view/update them.
+     * Two directory name formats are accepted:
+     *   1) "<test_taker> - <token>"
+     *   2) "<token>"
+     *
+     * @return Ticket[]
+     */
     public function getTickets()
     {
         if (empty($this->_tickets)) {
             $zip = new \ZipArchive(); 
-            $regex = '/^(?<name>.+) - (?<token>[A-Fa-f0-9]+)\/$/';            
+            $regex1 = '/^(?<test_taker>[^\/]+) - (?<token>[A-Za-z0-9]+)\/$/';
+            $regex2 = '/^(?<token>[^\/]+)\/$/';
 
             if ($zip->open($this->file) === TRUE) {
-                for($i=0; $i < $zip->numFiles; $i++){ 
+                for ($i=0; $i < $zip->numFiles; $i++) {
                     $stat = $zip->statIndex($i);
                     $matches = null;
-                    if (preg_match($regex, $stat['name'], $matches) === 1) {
+                    if (preg_match($regex1, $stat['name'], $matches) === 1 || preg_match($regex2, $stat['name'], $matches) === 1) {
                         $this->_tokens[] = $matches['token'];
                         $this->_dirs[$matches['token']] = substr($matches[0], 0, -1);
+                        $ticket = Ticket::find()->where(['token' => $matches['token']])->one();
+                        if ($ticket === null) {
+                            $ticket = new Ticket();
+                            $ticket->token = $matches['token'];
+                            if (array_key_exists('test_taker', $matches)) {
+                                $ticket->test_taker = $matches['test_taker'] != '_NoName' ? $matches['test_taker'] : null;
+                            }
+                        }
+                        $this->_tickets[] = $ticket;
                     }
                 }
-                $this->_tickets = Ticket::find()->where(['token' => $this->_tokens])->all();
             }
         }
         return $this->_tickets;
@@ -403,7 +446,7 @@ class Result extends Model
     {
         $file = \Yii::$app->params['resultPath'] . '/' . $hash;
 
-        if(Yii::$app->file->set($file)->exists === false){
+        if (Yii::$app->file->set($file)->exists === false || empty($hash)) {
             return null;
         }
 

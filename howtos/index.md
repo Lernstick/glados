@@ -29,6 +29,7 @@
 
 ### Installation
 
+* [Hardware Recommendations](hardware-recommendations.md)
 * [Manual Installation](manual-install.md) (Using the source package)
 * [Automatic Installation](deb-install.md) (Using the Debian package)
 
@@ -36,12 +37,15 @@
 
 * [Softwareupdate on Debian](deb-update.md)
 * [Upgrade from Debian 8 to 9](deb-8to9-upgrade.md)
+* [Upgrade from Debian 9 to 10](deb-9to10-upgrade.md)
 
 ### Configuration
 
 * [Glados config files](config-files.md)
 * [Exam client configuration](client-config.md)
 * [Network configuration](network-config.md)
+* [GLaDOS System Settings](system-settings.md)
+* [Large exams with 200+ clients](large-exams.md)
 
 ### Authentication
 

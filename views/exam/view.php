@@ -72,8 +72,6 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]) ?>
 
-        <?= $this->render('@app/views/_notification') ?>
-
     <?php Pjax::end(); ?>
 
     <?php Pjax::begin([

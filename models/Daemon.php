@@ -13,15 +13,13 @@ use Yii;
  * @property string $started_at 
  * @property boolean $running
  */
-class Daemon extends \yii\db\ActiveRecord
+class Daemon extends LiveActiveRecord
 {
 
     const SIGTERM = 15;
     const SIGKILL = 9;
     const SIGHUP = 1;
     const SIGUSR1 = 10;
-
-    private $presaveAttributes;
 
     /**
      * @inheritdoc
@@ -53,12 +51,24 @@ class Daemon extends \yii\db\ActiveRecord
     {
         return [
             'id' => \Yii::t('daemons', 'ID'),
-            'pid' => \Yii::t('daemons', 'Process ID'),
+            'pid' => \Yii::t('daemons', 'PID'),
             'uuid' => \Yii::t('daemons', 'Process UUID'),
             'state' => \Yii::t('daemons', 'State'),
-            'load' => \Yii::t('daemons', 'Load (Last 5 minutes)'),
+            'load' => \Yii::t('daemons', 'Load'),
             'description' => \Yii::t('daemons', 'Description'),
             'started_at' => \Yii::t('daemons', 'Started At'),
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeHints()
+    {
+        return [
+            'pid' => \Yii::t('daemons', 'Process ID'),
+            'state' => \Yii::t('daemons', 'The last reported state'),
+            'load' => \Yii::t('daemons', 'The load of the last 5 minutes'),
         ];
     }
 
@@ -69,13 +79,28 @@ class Daemon extends \yii\db\ActiveRecord
     {
         parent::init();
         $this->uuid = generate_uuid();
+    }
 
-        $instance = $this;
-        $this->on(self::EVENT_BEFORE_UPDATE, function($instance){
-            $this->presaveAttributes = $this->getOldAttributes();
-        });
-        $this->on(self::EVENT_AFTER_UPDATE, [$this, 'updateEvent']);
-
+    /**
+     * @inheritdoc
+     */
+    public function getLiveFields()
+    {
+        return [
+            'state' => ['priority' => 0],
+            'load' => [
+                'priority' => 0,
+                'data' => function ($field, $model) {
+                    return ['load' => yii::$app->formatter->format($model->{$field}, 'percent')];
+                },
+            ],
+            'memory' => [
+                'priority' => 0,
+                'data' => function ($field, $model) {
+                    return ['memory' => yii::$app->formatter->format($model->{$field}, ['shortSize', 'decimals' => 1])];
+                },
+            ],
+        ];
     }
 
     public function getRunning()
@@ -144,116 +169,45 @@ class Daemon extends \yii\db\ActiveRecord
 
     }
 
+    /**
+     * Method to send SIGTERM (15) to the process corresponding to the model.
+     * @return void
+     */
     public function stop()
     {
         posix_kill($this->pid, self::SIGTERM);
+        $this->state = substitute('{signal} sent at {time}.', [
+            'signal' => 'SIGTERM',
+            'time' => yii::$app->formatter->format(time(), 'time'),
+        ]);
+        $this->save(false);
     }
 
+    /**
+     * Method to send SIGKILL (9) to the process corresponding to the model.
+     * @return void
+     */
     public function kill()
     {
         posix_kill($this->pid, self::SIGKILL);
+        $this->state = substitute('{signal} sent at {time}.', [
+            'signal' => 'SIGKILL',
+            'time' => yii::$app->formatter->format(time(), 'time'),
+        ]);
+        $this->save(false);
     }
 
-    /*public function reload()
-    {
-        posix_kill($this->pid, self::SIGHUP);
-    }*/
-
+    /**
+     * Method to send SIGHUP (1) to the process corresponding to the model.
+     * @return void
+     */
     public function hup()
     {
         posix_kill($this->pid, self::SIGHUP);
+        $this->state = substitute('{signal} sent at {time}.', [
+            'signal' => 'SIGHUP',
+            'time' => yii::$app->formatter->format(time(), 'time'),
+        ]);
+        $this->save(false);
     }
-
-    public function attributesChanged($attributes)
-    {
-        foreach ($attributes as $attribute) {
-            if ($this->presaveAttributes[$attribute] != $this->getAttributes()[$attribute]) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public function updateEvent()
-    {
-        if($this->attributesChanged([ 'state' ])){
-            $eventItem = new EventItem([
-                'event' => 'daemon/' . $this->pid,
-                'priority' => 0,
-                'concerns' => ['users' => ['ALL']],
-                'data' => [
-                    'state' => yii::$app->formatter->format($this->state, 'text')
-                ],
-            ]);
-            $eventItem->generate();
-        }
-
-        if($this->attributesChanged([ 'load' ])){
-            $eventItem = new EventItem([
-                'event' => 'daemon/' . $this->pid,
-                'priority' => 0,
-                'data' => [
-                    'load' => yii::$app->formatter->format($this->load, 'percent')
-                ],
-            ]);
-            $eventItem->generate();
-        }
-
-    }
-
-
-/*
-    public function lock()
-    {
-        $pid_file = '/tmp/yii/daemon/' . $this->pid . '.pid';
-        $pid_file = '/tmp/locktest';
-        if(!file_exists(dirname($pid_file))){
-            mkdir(dirname($pid_file), 0740, true);
-        }
-
-$this->transaction = Yii::$app->db->beginTransaction();
-Yii::$app->db->createCommand("INSERT INTO `exam`.`activity` (`id`, `date`, `description`, `ticket_id`) VALUES (NULL, CURRENT_TIMESTAMP, 'start', '1003');")->execute();
-
-        return;
-
-        $this->mutex = \Mutex::create();
-        if(\Mutex::trylock($this->mutex)){
-            return true;
-        }else{
-            return false;
-        }
-
-//        $semaphore = sem_get($this->pid, 1, 0666, 1);
-        $semaphore = sem_get(255, 1, 0600, 1);
-        if(sem_acquire($semaphore, true)){
-            return true;
-        }else{
-            return false;
-        }
-
-        $lock_file = fopen($pid_file, 'c');
-        $got_lock = flock($lock_file, LOCK_EX | LOCK_NB, $wouldblock);
-        if ($lock_file === false || (!$got_lock && !$wouldblock)) {
-            return false;
-        }
-        else if (!$got_lock && $wouldblock) {
-            return false;
-        }
-
-        // Lock acquired; let's write our UUID to the lock file.
-        ftruncate($lock_file, 0);
-        fwrite($lock_file, $this->uuid);
-        return true;
-
-    }
-
-    public function unlock()
-    {
-        Yii::$app->db->createCommand("INSERT INTO `exam`.`activity` (`id`, `date`, `description`, `ticket_id`) VALUES (NULL, CURRENT_TIMESTAMP, 'stop', '1003');")->execute();
-        $this->transaction->commit();
-        \Mutex::unlock($this->mutex, true);
-    }
-*/
-
 }
-

@@ -172,7 +172,6 @@ class LiveActiveRecord extends TranslatedActiveRecord
      */
     public function updateEvent($event)
     {
-
         if ($event->data !== null) {
             $field = $event->data[0];
             $config = $event->data[1];

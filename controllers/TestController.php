@@ -6,7 +6,6 @@ use Yii;
 use app\models\forms\EventItemSend;
 use app\models\forms\AgentEventSend;
 use app\models\forms\EventStreamListen;
-use app\components\AccessRule;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -23,9 +22,6 @@ class TestController extends BaseController
         return [
             'access' => [
                 'class' => \yii\filters\AccessControl::className(),
-                'ruleConfig' => [
-                    'class' => AccessRule::className(),
-                ],
                 'rules' => [
                     [
                         'allow' => YII_ENV_DEV,

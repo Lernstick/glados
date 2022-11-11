@@ -149,6 +149,9 @@ class AuthMigrateForm extends Model
     {
         if ($this->_fromModel == null) {
             $this->_fromModel = Auth::findOne($this->from);
+            if ($this->_fromModel == null) {
+                $this->_fromModel = new Auth();
+            }
         }
         return $this->_fromModel;
     }

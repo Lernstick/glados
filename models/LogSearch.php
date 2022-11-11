@@ -52,8 +52,11 @@ class LogSearch extends Log
         ]);
 
         $dataProvider = new ArrayDataProvider([
-            'pagination' => ['pageSize' => 10],
             'sort' => $sort,
+            'pagination' => [
+                'defaultPageSize' => 10,
+                'pageSizeLimit' => [1, 100],
+            ],
         ]);
 
         // load the search form data and validate
@@ -61,9 +64,6 @@ class LogSearch extends Log
             return $dataProvider;
         }
 
-        if (array_key_exists('date', $params['LogSearch'])) {
-            $params['LogSearch']['date'] .= "*";
-        }
         $dataProvider->allModels = Log::findAll($params['LogSearch']);
 
         return $dataProvider;

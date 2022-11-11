@@ -15,7 +15,6 @@ function initializeHints(){
             trigger: 'focus',
             placement: 'right',
             title:  $hint.parent().find('label').html(),
-            //title:  'Description',
             toggle: 'popover',
             container: 'body',
             content: $hint.html()

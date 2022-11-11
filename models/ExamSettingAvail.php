@@ -61,7 +61,7 @@ class ExamSettingAvail extends TranslatedActiveRecord
     /**
      * @inheritdoc
      */
-    public function selectList($attr, $q, $page = 1, $per_page = 10, $id = null, $showQuery = true, $orderBy = null)
+    public function selectList($attr, $q, $page = 1, $per_page = 10, $id = null, $showQuery = true, $orderBy = null, $attrToIdIfNull = false, $where = NULL)
     {
 
         $id = is_null($id) ? $attr : $id;

@@ -37,19 +37,26 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
     ]) ?>
 
-    <?php Pjax::begin([
+    <?= Pjax::widget([
         'id' => 'backup-now-container',
         'linkSelector' => '#backup-now',
         'enablePushState' => false,
+        'options' => ['class' => 'hidden'],
     ]); ?>
-    <?php Pjax::end(); ?>
 
-    <?php Pjax::begin([
+    <?= Pjax::widget([
         'id' => 'restore-now-container',
         'linkSelector' => '#restore-now',
         'enablePushState' => false,
+        'options' => ['class' => 'hidden'],
     ]); ?>
-    <?php Pjax::end(); ?>
+
+    <?= Pjax::widget([
+        'id' => 'probe-now-container',
+        'linkSelector' => '#probe-now',
+        'enablePushState' => false,
+        'options' => ['class' => 'hidden'],
+    ]); ?>
 
     <p></p>
 
@@ -140,8 +147,11 @@ $this->params['breadcrumbs'][] = $this->title;
                         'content' => yii::$app->formatter->format($model->ip, 'text'),
                         'event' => 'ticket/' . $model->id,
                         'jsonSelector' => 'ip',
-                    ]) . ' ' . $this->render('/ticket/fields/_online', ['model' => $model])
-                    . ' ' . Html::a(\Yii::t('ticket', 'Probe'), ['view', 'id' => $model->id, 'mode' => 'probe']),
+                    ]) . ' ' . $this->render('/ticket/fields/_online', ['model' => $model]) . ' ' . 
+                    Html::a(\Yii::t('ticket', 'Probe'), [
+                        'ping',
+                        'id' => $model->id,
+                    ], ['id' => 'probe-now']),
             ],
             [
                 'attribute' => 'agent_online',
@@ -173,10 +183,30 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'client_state',
                 'format' => 'links',
                 'value' =>  ActiveEventField::widget([
+                    'options' => [
+                        'tag' => 'i',
+                        'class' => 'glyphicon glyphicon-cog ' . ($model->download_lock == 1 ? 'gly-spin' : 'hidden'),
+                        'style' => 'float: left;',
+                    ],
+                    'event' => 'ticket/' . $model->id,
+                    'jsonSelector' => 'download_lock',
+                    'jsHandler' => 'function(d, s){
+                        if (d == "1") {
+                            s.classList.add("gly-spin");
+                            s.classList.remove("hidden");
+                            growl("'.\Yii::t('ticket', 'Download started.').'", "info", "#tab_restores");
+                        } else if(d == "0") {
+                            s.classList.remove("gly-spin");
+                            s.classList.add("hidden");
+                            growl("'.\Yii::t('ticket', 'Download finished.').'", "info", "#tab_restores");
+                        }
+                    }',
+                ]) . ActiveEventField::widget([
                     'options' => [ 'tag' => 'span' ],
                     'content' => $model->client_state,
                     'event' => 'ticket/' . $model->id,
                     'jsonSelector' => 'client_state',
+                    'jsFormatter' => 'links',
                 ]) . ' <div class="progress fade ' . ($model->download_lock == 1 ? 'in' : '') . '" style="display: inline-table; width:33.33%;">' . 
                     ActiveEventField::widget([
                         'content' => ActiveEventField::widget([
@@ -213,7 +243,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'backup_state',
-                'format' => 'links',
+                'format' => 'raw',
                 'value' => $this->render('/ticket/fields/_backup_state', ['model' => $model, 'group' => '']),
             ],
             [
@@ -228,12 +258,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     'event' => 'ticket/' . $model->id,
                     'jsonSelector' => 'restore_lock',
                     'jsHandler' => 'function(d, s){
-                        if(d == "1"){
+                        if (d == "1") {
                             s.classList.add("gly-spin");
                             s.classList.remove("hidden");
-                        }else if(d == "0"){
+                            growl("'.\Yii::t('ticket', 'Restore started.').'", "info", "#tab_restores");
+                        } else if(d == "0") {
                             s.classList.remove("gly-spin");
                             s.classList.add("hidden");
+                            growl("'.\Yii::t('ticket', 'Restore finished.').'", "info", "#tab_restores");
                         }
                     }',
                 ]) . ActiveEventField::widget([
@@ -263,8 +295,6 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
 
     ]) ?>
-
-    <?= $this->render('@app/views/_notification') ?>
 
     <?php Pjax::end(); ?>
 
@@ -306,8 +336,6 @@ $this->params['breadcrumbs'][] = $this->title;
         'options' => ['class' => 'tab-pane fade'],
     ]); ?>
 
-    <?php if (Yii::$app->user->can('screenshot/view')) { ?>
-
         <?php $_GET = array_merge($_GET, ['#' => 'tab_screenshots']); ?>
         <?= ListView::widget([
             'dataProvider' => $screenshotDataProvider,
@@ -323,11 +351,15 @@ $this->params['breadcrumbs'][] = $this->title;
                 'class' => 'summary col-xs-12 col-md-12',
             ],            
             'emptyText' => \Yii::t('ticket', 'No screenshots found.'),
-            'layout' => '{items} <br>{summary} {pager}',
+            'layout' => '{items} <div class="col-md-12 col-xs-12">{summary} {pager}</div>',
+            'pager' => [
+                'class' => app\widgets\CustomPager::className(),
+                'selectedLayout' => Yii::t('app', '{selected} <span style="color: #737373;">items</span>'),
+                'pageSizeList' => [4 => 4, 8 => 8, 12 => 12, 16 => 16, 20 => 20, 24 => 24, 28 => 28, 32 => 32],
+            ],
         ]); ?>
 
     <?php Pjax::end() ?>
-    <?php } ?>
 
     <?php Pjax::begin([
         'id' => 'screencapture',

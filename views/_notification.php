@@ -7,7 +7,6 @@ use kartik\growl\GrowlAsset;
 GrowlAsset::register($this);
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Ticket */
 
 $session = Yii::$app->session;
 
@@ -35,18 +34,17 @@ $icons = [
 
 foreach ($n as $category => $array){
 
-    if($n[$category]){
+    if ($n[$category]) {
 
         foreach ($n[$category] as $id => $value){
 
             echo Growl::widget([
                 'type' => isset($types[$category]) ? $types[$category] : Growl::TYPE_INFO,
                 'icon' => isset($icons[$category]) ? $icons[$category] : null,
-                'title' => $category,
-                'showSeparator' => true,
                 'body' => $value,
                 'pluginOptions' => [
                     'showProgressbar' => true,
+                    'timer' => 1000,
                     'placement' => [
                         'from' => 'top',
                         'align' => 'right',
@@ -56,5 +54,6 @@ foreach ($n as $category => $array){
         }
     }
 }
+
 
 ?>

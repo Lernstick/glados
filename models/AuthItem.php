@@ -23,7 +23,7 @@ use app\models\EventItem;
  * @property AuthItemChild[] $authItemChildren0
  * @property AuthItem[] $children
  * @property AuthItem[] $parents
- * @property RelEventRole[] $relEventRoles
+ * @property RelEventRole[] $events
  */
 class AuthItem extends \yii\db\ActiveRecord
 {

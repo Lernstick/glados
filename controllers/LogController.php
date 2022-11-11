@@ -10,14 +10,59 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
 /**
- * LogController implements the view actions for Log model.
+ * LogController implements the view actions for the Log model.
  */
 class LogController extends BaseController
 {
 
+    /**
+     * @inheritdoc
+     */
+    public $owner_actions = ['view', 'download'];
 
     /**
-     * Lists all Log models.
+     * @{inheritdoc}
+     */
+    public function route_mapping ()
+    {
+        return ['*' => 'ticket/view'];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getOwner_id()
+    {
+        $token = Yii::$app->request->get('token');
+        if (($model = Ticket::findOne(['token' => $token])) !== null) {
+            return $model->exam->user_id;
+        } else {
+            return null;
+        }
+    }
+
+    /*
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+
+            'access' => [
+                'class' => \app\components\AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['rbac'],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Lists all Log models of a certain ticket.
+     * @param int $ticket_id ticket id
      * @return mixed
      */
     public function actionIndex($ticket_id)
@@ -26,10 +71,12 @@ class LogController extends BaseController
     }
 
     /**
-     * Displays Log model.
-     * @param array $params params
+     * Displays a Log model.
+     * @param string $type log file type
+     * @param string $date date associated to the log file
+     * @param string $token ticket token
      */
-    public function actionView($type, $token, $date)
+    public function actionView($type, $date, $token)
     {
         $model = $this->findModel([
             'type' => $type,
@@ -37,16 +84,24 @@ class LogController extends BaseController
             'date' => $date,
         ]);
 
-        return $this->renderAjax('/log/view', [
-            'model' => $model,
-        ]);
+        if (Yii::$app->request->isAjax) {
+            return $this->renderAjax('/log/_view', [
+                'model' => $model,
+            ]);
+        } else {
+            return $this->render('/log/view', [
+                'model' => $model,
+            ]);
+        }
     }
 
     /**
-     * Displays Log model.
-     * @param array $params params
+     * Downloads a Log model.
+     * @param string $type log file type
+     * @param string $date date associated to the log file
+     * @param string $token ticket token
      */
-    public function actionDownload($type, $token, $date)
+    public function actionDownload($type, $date, $token)
     {
         $model = $this->findModel([
             'type' => $type,
@@ -55,10 +110,8 @@ class LogController extends BaseController
         ]);
 
         return Yii::$app->response->sendContentAsFile(implode('', $model->contents), basename($model->path), [
-            //'mimeType' => $model->getMimeType($model->path),
             'inline' => false,
         ]);
-
     }
 
     /**
@@ -73,9 +126,7 @@ class LogController extends BaseController
     {
         if (($model = Log::findOne($params)) !== null) {
             if (($ticket = Ticket::findOne(['token' => $model->token])) !== null) {
-                if ($this->checkRbac($ticket->exam->user_id)) {
-                    return $model;
-                }
+                return $model;
             }
         }
         throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));

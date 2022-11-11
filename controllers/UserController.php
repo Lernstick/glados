@@ -9,15 +9,32 @@ use app\models\AuthSearch;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\filters\VerbFilter;
-use app\components\AccessRule;
 use yii\data\ArrayDataProvider;
-
 
 /**
  * UserController implements the CRUD actions for User model.
  */
 class UserController extends BaseController
 {
+
+    /**
+     * @inheritdoc
+     */
+    public $owner_actions = ['view', 'update', 'delete', 'reset-password'];
+
+    /**
+     * @inheritdoc
+     */
+    public function getOwner_id()
+    {
+        $id = Yii::$app->request->get('id');
+        if (($model = User::findOne($id)) !== null) {
+            return $model->id;
+        } else {
+            return null;
+        }
+    }
+
     /**
      * @inheritdoc
      */
@@ -31,10 +48,7 @@ class UserController extends BaseController
                 ],
             ],
             'access' => [
-                'class' => \yii\filters\AccessControl::className(),
-                'ruleConfig' => [
-                    'class' => AccessRule::className(),
-                ],
+                'class' => \app\components\AccessControl::className(),
                 'rules' => [
                     [
                         'allow' => true,
@@ -87,15 +101,22 @@ class UserController extends BaseController
     {
 
         $model = $this->findModel($id);
-        $permissionDataProvider = new ArrayDataProvider([
-                'allModels' => Yii::$app->authManager->getPermissionsByUser($model->id),
+        $permissions = array_column(Yii::$app->authManager->getPermissionsByUser($model->id), 'name');
+
+        $dataProvider = new ArrayDataProvider([
+            'allModels' => Yii::$app->authManager->getPermissions(),
+            'pagination' => [
+                'pageParam' => 'perm-page',
+                'pageSizeParam' => 'perm-per-page',
+                'pageSizeLimit' => [1, 100],
+                'defaultPageSize' => 10,
+            ],
         ]);
-        $permissionDataProvider->pagination->pageParam = 'perm-page';
-        $permissionDataProvider->pagination->pageSize = 10;
 
         return $this->render('view', [
             'model' => $model,
-            'permissionDataProvider' => $permissionDataProvider,
+            'permissions' => $permissions,
+            'dataProvider' => $dataProvider,
         ]);
     }
 
@@ -197,9 +218,7 @@ class UserController extends BaseController
     protected function findModel($id)
     {
         if (($model = User::findOne($id)) !== null) {
-            if ($this->checkRbac($model->id)) {
-                return $model;
-            }
+            return $model;
         }
         throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
     }

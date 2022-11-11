@@ -124,7 +124,7 @@ class ExamSetting extends Base
             ['screen_capture_chunk', 'required'],
             ['screen_capture_chunk', 'double', 'min' => 1, 'max' => 300],
             ['screen_capture_bitrate', 'required'],
-            ['screen_capture_bitrate', 'match', 'pattern' => '/^[0-9]{1,4}[\k|\K|\m|\M]$/'],
+            ['screen_capture_bitrate', 'match', 'pattern' => '/^[0-9]{1,4}[k|K|m|M]$/'],
             ['screen_capture_overflow_threshold', 'required'],
             ['screen_capture_overflow_threshold', 'match', 'pattern' => '/(^[0-9]{1,4}\m$)|(^[0-9]{1,2}\%$)/'],
             ['screen_capture_command', 'required'],

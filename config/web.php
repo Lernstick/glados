@@ -6,7 +6,7 @@ $defaultParams = require(__DIR__ . '/defaultParams.php');
 $config = [
     'id' => 'basic',
     'name' => 'GLaDOS',
-    'version' => '1.0.11',
+    'version' => '1.0.12',
     'basePath' => dirname(__DIR__),
     'bootstrap' => [
         'log',
@@ -23,6 +23,10 @@ $config = [
     ],
     'timezone' => 'Europe/Zurich',
     'vendorPath' => '/usr/share/yii2',
+    'aliases' => [
+        '@bower' => '@vendor/bower-asset',
+        '@npm'   => '@vendor/npm-asset',
+    ],
     'modules' => [
         'dynagrid' => [
             'class' => '\kartik\dynagrid\Module',
@@ -34,6 +38,12 @@ $config = [
     'container' => [
         'definitions' => [
             'yii\widgets\LinkPager' => [
+                'firstPageLabel' => '«',
+                'lastPageLabel'  => '»',
+                'nextPageLabel' => '›',
+                'prevPageLabel' => '‹',
+            ],
+            'app\widgets\CustomPager' => [
                 'firstPageLabel' => '«',
                 'lastPageLabel'  => '»',
                 'nextPageLabel' => '›',
@@ -70,7 +80,7 @@ $config = [
             'rules' => [
                 'activities' => 'activity/index',
                 '<controller>s' => '<controller>/index',
-                'screencapture/<id:\d+>/<file:[\w\.]+>' => 'screencapture/view',
+                'screencapture/<ticket_id:\d+>/<file:[\w\.]+>' => 'screencapture/view',
                 '<controller>/<id:\d+>' => '<controller>/view',
                 '<controller>/<action:(update|delete|backup|restore|stop|kill)>/<id:\d+>' => '<controller>/<action>',
                 'howto/img/<id>' => 'howto/img',
@@ -80,6 +90,7 @@ $config = [
                 'event/<action:(agent)>/<token:.*>' => 'event/<action>',
                 'monitor' => 'monitor/view',
                 'result/<action:view>/<token:.*>' => 'result/<action>',
+                'site/lock/<id:.*>' => 'site/lock',
             ]
         ],
         'i18n' => [

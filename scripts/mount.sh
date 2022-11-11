@@ -1,4 +1,12 @@
 #!/bin/sh
+#
+# This script is executed when the client system is in its "warm reboot" phase.
+# It unmounts the old root filesystem and afterwards mounts overlay filesystem
+# together with the squashfs (the zip file is unzipped over the mounted
+# filesystem).
+#
+# If the /restore file does not exist, it means that we shutdown regularly.
+#
 
 BASEPATH="/lib/live/mount"
 ACTION="$1"

@@ -36,7 +36,7 @@ use yii\widgets\Pjax;
         ],
         [
             'attribute' => 'restore_state',
-            'format' => 'raw',
+            'format' => 'links',
             'value' =>  ActiveEventField::widget([
                     'options' => [
                         'tag' => 'i',
@@ -70,6 +70,10 @@ use yii\widgets\Pjax;
     'itemView' => '_item',
     'emptyText' => \Yii::t('ticket', 'No restores found.'),
     'layout' => '{items} <br>{summary} {pager}',
+    'pager' => [
+        'class' => app\widgets\CustomPager::className(),
+        'selectedLayout' => Yii::t('app', '{selected} <span style="color: #737373;">items</span>'),
+    ],
 ]); ?>
 
 <?php

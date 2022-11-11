@@ -54,7 +54,11 @@ class HistorySearch extends History
             'query' => $query,
             'sort'=> [
                 'defaultOrder' => ['changed_at'=>SORT_DESC]
-            ]
+            ],
+            'pagination' => array(
+                'defaultPageSize' => 10,
+                'pageSizeLimit' => [1, 100],
+            ),
         ]);
 
         $this->load($params);

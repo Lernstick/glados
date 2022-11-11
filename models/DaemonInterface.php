@@ -29,7 +29,8 @@ interface DaemonInterface
     /**
      * Locks an item for processing.
      *
-     * @param object $item the item which should be locked for processing
+     * @param object $item the item which should be locked for processing. This object
+     * should have a property $item->id.
      * @return bool whether locking was successful or not
      */
     public function lockItem($item);
@@ -37,7 +38,8 @@ interface DaemonInterface
     /**
      * Unlocks an item after processing.
      *
-     * @param object $item the item which should be unlocked for processing
+     * @param object $item the item which should be unlocked for processing. This object
+     * should have a property $item->id.
      * @return bool whether locking was successful or not
      */    
     public function unlockItem($item);

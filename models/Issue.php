@@ -59,7 +59,7 @@ class Issue extends Base
             'key' => \Yii::t('issues', 'Issue'),
             'occuredAt' => \Yii::t('issues', 'Since'),
             'solvedAt' => \Yii::t('issues', 'Solved At'),
-            'ticket.token' => \Yii::t('issues', 'Ticket Token'),
+            'ticket.token' => \Yii::t('issues', 'Ticket'),
         ];
     }
 

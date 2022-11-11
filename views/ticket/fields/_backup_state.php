@@ -36,9 +36,10 @@ echo ActiveEventField::widget([
     'options' => [
         'style' => 'float:left'
     ],
-    'content' => yii::$app->formatter->format($model->backup_state, 'ntext'),
+    'content' => yii::$app->formatter->format($model->backup_state, 'links'),
     'event' => $event,
     'jsonSelector' => 'backup_state',
+    'jsFormatter' => 'links',
 ]);
 
 /* last backup successful */

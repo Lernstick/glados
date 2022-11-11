@@ -7,7 +7,7 @@ use app\models\Daemon;
 use app\models\DaemonSearch;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use app\components\AccessRule;
+use app\models\Setting;
 
 /**
  * DaemonController implements the CRUD actions for Daemon model.
@@ -23,14 +23,12 @@ class DaemonController extends BaseController
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'delete' => ['POST'],
+                    'stop' => ['POST'],
+                    'kill' => ['POST'],
                 ],
             ],
             'access' => [
-                'class' => \yii\filters\AccessControl::className(),
-                'ruleConfig' => [
-                    'class' => AccessRule::className(),
-                ],
+                'class' => \app\components\AccessControl::className(),
                 'rules' => [
                     [
                         'allow' => true,
@@ -48,32 +46,30 @@ class DaemonController extends BaseController
     public function actionIndex()
     {
         $searchModel = new DaemonSearch();
+        $runningDaemons = $searchModel->search([])->totalCount;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        if(Yii::$app->request->isAjax){
+        $minDaemons = Setting::findByKey('minDaemons');
+        $maxDaemons = Setting::findByKey('maxDaemons');
+
+        if (Yii::$app->request->isAjax) {
             return $this->renderAjax('index', [
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
+                'runningDaemons' => $runningDaemons,
+                'minDaemons' => $minDaemons,
+                'maxDaemons' => $maxDaemons,
             ]);
-        }else{
+        } else {
             return $this->render('index', [
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
+                'runningDaemons' => $runningDaemons,
+                'minDaemons' => $minDaemons,
+                'maxDaemons' => $maxDaemons,
             ]);
         }
 
-    }
-
-    /**
-     * Displays a single Daemon model.
-     * @param integer $id
-     * @return mixed
-     */
-    public function actionView($id)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
     }
 
     /**
@@ -100,9 +96,9 @@ class DaemonController extends BaseController
                 break;                
         }
 
-        if(Yii::$app->request->isAjax){
+        if (Yii::$app->request->isAjax) {
             return $this->runAction('index');
-        }else{
+        } else {
             return $this->redirect(['index']);
         }
 
@@ -116,14 +112,17 @@ class DaemonController extends BaseController
      */
     public function actionStop($id)
     {
-
-        if (($model = Daemon::findOne($id)) !== null) {
+        if ($id == 'ALL') {
+            foreach(Daemon::find()->all() as $model) {
+                $model->stop();
+            }
+        } else if (($model = Daemon::findOne($id)) !== null) {
             $model->stop();
         }
 
-        if(Yii::$app->request->isAjax){
+        if (Yii::$app->request->isAjax) {
             return $this->runAction('index');
-        }else{
+        } else {
             return $this->redirect(['index']);
         }
 
@@ -142,14 +141,13 @@ class DaemonController extends BaseController
             $model->kill();
         }
 
-        if(Yii::$app->request->isAjax){
+        if (Yii::$app->request->isAjax) {
             return $this->runAction('index');
-        }else{
+        } else {
             return $this->redirect(['index']);
         }
 
     }
-
 
     /**
      * Finds the Daemon model based on its primary key value.

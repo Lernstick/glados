@@ -30,7 +30,7 @@ $this->params['breadcrumbs'][] = $exam->name;
             'exam' => $exam,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-			'issueSearchModel' => $issueSearchModel,
+            'issueSearchModel' => $issueSearchModel,
             'issueDataProvider' => $issueDataProvider,
         ]) ?>
 

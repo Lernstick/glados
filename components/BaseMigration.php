@@ -19,6 +19,11 @@ class BaseMigration extends Migration
     public $translationTable = 'translation';
 
     /**
+     * @var string the table refering to the history
+     */
+    public $historyTable = 'history';
+
+    /**
      * @var array all languages that are present in the table [[translationTable]]
      */
     public $languages = [
@@ -27,7 +32,7 @@ class BaseMigration extends Migration
 
     /**
      * @var array all classes in app\models that inherit app\models\TranslatedActiveRecord
-     * Classes that use the table [[translationTable]]. Find then by 
+     * Classes that use the table [[translationTable]]. Find them by
      * ````bash
      * grep -r "getTranslatedFields()" .
      * ```
@@ -77,7 +82,7 @@ class BaseMigration extends Migration
                 $translation = \Yii::t($model->category, $model->en, [], $lang);
                 $record[$lang] = $translation;
             }
-            echo "Table " . $this->translationTable . ": Migrating database record " . $i . "/" . $nr . "\r";
+            echo "Table " . $this->translationTable . ": Migrating database record " . $i . "/" . $nr . "\n";
             if (!$this->dryrun) {
                 $this->update($this->translationTable, $record, ['id' => $model->id]);
             }
@@ -90,7 +95,7 @@ class BaseMigration extends Migration
      * Cleans up old unused entries in the translation table by removing translation table 
      * entries that are not referenced.
      *
-     * @return integer the number of delted table entries
+     * @return integer the number of deleted table entries
      */
     public function cleanTranslationTable()
     {
@@ -115,6 +120,21 @@ class BaseMigration extends Migration
                 }
             }
         }
+
+        // get all ids from the history table
+        foreach (['old_value', 'new_value'] as $field) {
+            $query = new Query();
+            $query->select($field)
+                ->distinct()
+                ->from($this->historyTable)
+                ->where(['REGEXP', $field, '^-?[0-9]+$']); // only value that are integers
+
+            $data = $query->all();
+            foreach ($data as $entry) {
+                array_push($keepIds, $entry[$field]);
+            }
+        }
+
         $keepIds = array_unique($keepIds);
 
         // get all translation table ids
@@ -135,7 +155,7 @@ class BaseMigration extends Migration
 
         // remove all these ids from the translation table
         foreach ($remIds as $id) {
-            echo "Table " . $this->translationTable . ": Removing database record with id " . $id . "\r";
+            echo "Table " . $this->translationTable . ": Removing database record with id " . $id . "\n";
             if (!$this->dryrun) {
                 $this->delete($this->translationTable, ['id' => $id]);
             }

@@ -39,7 +39,7 @@ class UserAuth extends User implements IdentityInterface
                     $user->identifier = $method->identifier;
                 }
 
-                $user->role = $method->role;
+                $user->roles = $method->roles;
                 $user->username = $username;
                 $user->scenario = User::SCENARIO_EXTERNAL;
                 if ($user->save()) {

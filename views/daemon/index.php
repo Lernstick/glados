@@ -9,62 +9,197 @@ use app\components\ActiveEventField;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\DaemonSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $runningDaemons integer */
+/* @var $minDaemons Setting */
+/* @var $maxDaemons Setting */
 
 $this->title = \Yii::t('daemons', 'Daemons');
 $this->params['breadcrumbs'][] = $this->title;
+
+echo ActiveEventField::widget([
+    'event' => 'runningDaemons',
+    'jsonSelector' => 'runningDaemons',
+    'jsHandler' => 'function(d, s) {
+        $("#reload").click();
+    }',
+])
+
 ?>
 <div class="daemon-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <?php Pjax::begin([
+        'id' => 'action-container',
+        'linkSelector' => '.action',
         'enablePushState' => false,
     ]); ?>
-
-    <div class="dropdown">
-      <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-        <i class="glyphicon glyphicon-list-alt"></i>
-        <?= \Yii::t('daemons', 'Actions') ?>&nbsp;<span class="caret"></span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-        <li>
-            <?= Html::a('<span class="glyphicon glyphicon-th-list"></span> ' . \Yii::t('daemons', 'Start Daemon'), ['create', 'type' => 'daemon']) ?>
-        </li>      
-        <li>
-            <?= Html::a('<span class="glyphicon glyphicon-hdd"></span> ' . \Yii::t('daemons', 'Start Backup Daemon'), ['create', 'type' => 'backup']) ?>
-        </li>
-        <li>
-            <?= Html::a('<span class="glyphicon glyphicon-globe"></span> ' . \Yii::t('daemons', 'Start Download Daemon'), ['create', 'type' => 'download']) ?>
-        </li>        
-        <li>
-            <?= Html::a('<span class="glyphicon glyphicon-search"></span> ' . \Yii::t('daemons', 'Start Analyzer Daemon'), ['create', 'type' => 'analyze']) ?>
-        </li>        
-      </ul>
-    </div>
-    <br>
-
     <?php Pjax::end(); ?>
 
-    <?php ActiveEventField::begin([
-        'options' => [
-        ],
-        'event' => 'daemon/*',
-        'onStart' => 'function(d, s){$.pjax.reload({container:s});}',
-        'onStop' => 'function(d, s){$.pjax.reload({container:s});}',
-    ]); ?>
+    <?php Pjax::begin([
+        'id' => 'daemon-list'
+    ]);
 
-        <div class="exam-monitor">
+        /**
+         * A dummy event in the group "daemon", such that if no event in the group "daemon" is active
+         * the new js event handlers won't be registered. Also they won't be unregistered if the last
+         * element is disappearing from the view. Using this, an event of type "daemon" will always be 
+         * present in the view.
+         */
+        echo ActiveEventField::widget([
+            'event' => 'daemon:daemon/ALL',
+            'jsonSelector' => 'dummy',
+            'jsHandler' => 'function(d, s){}', // do nothing
+        ]); ?>
 
-            <?= ListView::widget( [
-                'dataProvider' => $dataProvider,
-                'itemView' => '_item',
-                'itemOptions' => ['sort-value' => 'started_at'],
-                'layout' => '{items} {summary} {pager}',
-            ] ); ?>
-
+        <div id="helper" class="hidden">
+            <!-- Don't remove this button! Make it invisible instead. -->
+            <a class="btn btn-default" id="reload" href=""><i class="glyphicon glyphicon-refresh"></i>&nbsp;<?= Yii::t('app', 'Reload') ?></a>
         </div>
 
-    <?php ActiveEventField::end(); ?>
+        <div class="pre-monitor row">
+            <div class="col-md-6">
+                <div class="bs-callout bs-callout-info bs-callout-hover">
+                    <h4><?= substitute('{name}: {value}', [
+                        'name' => $minDaemons->name,
+                        'value' => $minDaemons->get('minDaemons'),
+                    ]); ?></h4>
+                    <p><?= $minDaemons->description ?></p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="bs-callout bs-callout-info bs-callout-hover">
+                    <h4><?= substitute('{name}: {value}', [
+                        'name' => $maxDaemons->name,
+                        'value' => $maxDaemons->get('maxDaemons'),
+                    ]); ?></h4>
+                    <p><?= $maxDaemons->description ?></p>
+                </div>
+            </div>
+        </div>
+
+        <?= GridView::widget( [
+            'dataProvider' => $dataProvider,
+            'layout' => '{pager} {summary} {items}',
+            'emptyText' => substitute('<div class="row"><div class="col-md-12 col-xs-12">{actions}&nbsp;{LinkPager} {CustomPager}</div></div>{body}', [
+                'actions' => $this->render('_nav'),
+                'LinkPager' => '',
+                'CustomPager' => '',
+                'body' => \Yii::t('daemons', 'No running daemon found.')
+            ]),
+            'showOnEmpty' => false,
+            'columns' => [
+                [
+                    'attribute' => 'pid',
+                    'headerOptions' => ['class' => 'fit'],
+                ],
+                [
+                    'attribute' => 'description',
+                    'headerOptions' => ['class' => 'col-md-1'],
+                    'format' => 'text'
+                ],
+                [
+                    'attribute' => 'load',
+                    'headerOptions' => ['class' => 'fit'],
+                    /**
+                     * @param $model app\models\Daemon the current data model being rendered
+                     * @param $key integer the key value associated with the current data model
+                     * @param $index integer the zero-based index of the data model in the model array returned by $dataProvider
+                     * @param $grid yii\grid\DataColumn the GridView object
+                     */
+                    'value' => function($model, $key, $index, $grid){
+                        return ActiveEventField::widget([
+                            'options' => ['tag' => 'span'],
+                            'id' => 'wdl' . $model->id,
+                            'content' => yii::$app->formatter->format($model->load, 'percent'),
+                            'event' => 'daemon:daemon/' . $model->id,
+                            'jsonSelector' => 'load',
+                        ]);
+                    },
+                    'format' => 'raw',
+                ],
+                [
+                    'attribute' => 'memory',
+                    'headerOptions' => ['class' => 'col-md-1'],
+                    /**
+                     * @param $model app\models\Daemon the current data model being rendered
+                     * @param $key integer the key value associated with the current data model
+                     * @param $index integer the zero-based index of the data model in the model array returned by $dataProvider
+                     * @param $grid yii\grid\DataColumn the GridView object
+                     */
+                    'value' => function($model, $key, $index, $grid){
+                        return ActiveEventField::widget([
+                            'options' => ['tag' => 'span'],
+                            'id' => 'wdm' . $model->id,
+                            'content' => yii::$app->formatter->format($model->memory, ['shortSize', 'decimals' => 1]),
+                            'event' => 'daemon:daemon/' . $model->id,
+                            'jsonSelector' => 'memory',
+                        ]);
+                    },
+                    'format' => 'raw',
+                ],
+                [
+                    'attribute' => 'state',
+                    /**
+                     * @param $model app\models\Daemon the current data model being rendered
+                     * @param $key integer the key value associated with the current data model
+                     * @param $index integer the zero-based index of the data model in the model array returned by $dataProvider
+                     * @param $grid yii\grid\DataColumn the GridView object
+                     */
+                    'value' => function($model, $key, $index, $grid){
+                        return ActiveEventField::widget([
+                            'options' => ['tag' => 'span'],
+                            'id' => 'wds' . $model->id,
+                            'content' => yii::$app->formatter->format($model->state, 'text'),
+                            'event' => 'daemon:daemon/' . $model->id,
+                            'jsonSelector' => 'state',
+                        ]);
+                    },
+                    'format' => 'raw',
+                ],
+                [
+                    'attribute' => 'started_at',
+                    'format' => 'timeago',
+                    'headerOptions' => ['class' => 'col-md-2'],
+                ],
+                [
+                    'class' => 'yii\grid\ActionColumn',
+                    'contentOptions' => [
+                        'class' => 'text-nowrap',
+                        'style' => 'width:10px;',
+                    ],
+                    'template' => '{stop} {kill}',
+                    'buttons' => [
+                        'stop' => function ($url) {
+                            return Html::a('<span class="glyphicon glyphicon-off"></span>', $url, [
+                                'title' => \Yii::t('daemons', 'Stop'),
+                                'class' => 'action',
+                                'data-method' => 'post',
+                            ]);
+                        },
+                        'kill' => function ($url) {
+                            return Html::a('<span class="text-danger glyphicon glyphicon-fire"></span>', $url, [
+                                'title' => \Yii::t('daemons', 'Kill'),
+                                'class' => 'action',
+                                'data-method' => 'post',
+                                'data' => [
+                                    'confirm' => \Yii::t('daemons', 'Are you sure you want to kill this process?'),
+                                ],
+                            ]);
+                        },
+                    ],
+                ],
+            ],
+            'pager' => [
+                'layout' => '<div class="row"><div class="col-md-12 col-xs-12">{actions}&nbsp;{LinkPager} {CustomPager}</div></div>',
+                'elements' => [
+                    'actions' => $this->render('_nav')
+                ],
+                'class' => app\widgets\CustomPager::className(),
+                'selectedLayout' => Yii::t('app', '{selected} <span style="color: #737373;">items</span>'),
+            ],
+        ] ); ?>
+
+    <?php Pjax::end(); ?>
 
 </div>

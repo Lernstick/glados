@@ -6,6 +6,7 @@ use Yii;
 use app\models\Base;
 use yii\helpers\Html;
 use app\components\HistoryBehavior;
+use app\components\GrowlBehavior;
 
 /**
  * This is the model class for table "exam".
@@ -90,6 +91,10 @@ class Exam extends Base
                     'backup_path' => 'text',
                     'time_limit' => 'text',
                 ],
+            ],
+            'GrowlBehavior' => [
+                'class' => GrowlBehavior::className(),
+                'delete_message' => \Yii::t('exams', 'The Exam has been deleted successfully.'),
             ],
         ];
     }
@@ -465,6 +470,31 @@ class Exam extends Base
                 ]) : 
                 $this->ticketCount );
     }  
+
+    /**
+     * Deletes tickets associated to the exam.
+     * @param array $condition condition in the HAVING clause to filter
+     * @return int number of tickets deleted
+     */
+    public function delete_tickets($condition = [])
+    {
+        $c = 0;
+        if (Yii::$app->user->can('ticket/delete')) {
+            $query = Ticket::find()
+                ->where(['exam_id' => $this->id])
+                ->andHaving($condition);
+
+            Yii::$app->user->can('ticket/delete/all') ?: $query->own();
+            $models = $query->all();
+
+            foreach ($models as $model) {
+                $model->detachBehavior('GrowlBehavior');
+                $model->delete() ? $c++ : null;
+            }
+        }
+
+        return $c;
+    }
 
     /**
      * @return string

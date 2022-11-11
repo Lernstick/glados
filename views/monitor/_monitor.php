@@ -68,6 +68,11 @@ $('#galleryModal').off('hide.bs.modal').on('hide.bs.modal', function(e) {
     $("#reload").click();
 });
 
+function check_load() {
+    $("#reload-load").click();
+}
+setInterval(check_load,10000);
+
 SCRIPT;
 
 echo ActiveEventField::widget([
@@ -91,10 +96,13 @@ echo Pjax::widget([
     'id' => 'backup-now-container',
     'linkSelector' => '#backup-now',
     'enablePushState' => false,
+    'options' => [
+        'class' => 'hidden'
+    ],
 ]);
 
 Pjax::begin([
-    'id' => 'live_issues'
+    'id' => 'live_issues',
 ]);
 
     /**
@@ -112,10 +120,21 @@ Pjax::begin([
     echo GridView::widget([
         'dataProvider' => $issueDataProvider,
         'columns' => [
-            'key:issue',
-            'occuredAt:timeago',
+            [
+                'attribute' => 'key',
+                'format' => 'issue',
+                'headerOptions' => ['class' => 'col-md-2'],
+            ],
+            /*'key:issue',*/
+            /*'occuredAt:timeago',*/
+            [
+                'attribute' => 'occuredAt',
+                'format' => 'timeago',
+                'headerOptions' => ['class' => 'col-md-2'],
+            ],
             [
                 'attribute' => 'ticket.token',
+                'headerOptions' => ['class' => 'col-md-1'],
                 'format' => 'raw',
                 'value' => function($issue, $key, $index, $datacolumn) {
                     return Html::a($issue->ticket->token,
@@ -126,7 +145,7 @@ Pjax::begin([
             ],
             [
                 'attribute' => 'Info',
-                'format' => 'raw',
+                'format' => 'links',
                 /**
                  * @param $issue Issue model instance
                  * @param $key
@@ -135,9 +154,7 @@ Pjax::begin([
                  */
                 'value' => function($issue, $key, $index, $datacolumn) {
                     if ($issue->key == $issue::CLIENT_OFFLINE) {
-                        $value = /*$datacolumn->grid->render('/ticket/fields/_online', [
-                            'model' => $issue->ticket,
-                        ]) . '&nbsp;' . */ActiveEventField::widget([
+                        $value = ActiveEventField::widget([
                             'options' => [ 'tag' => 'span' ],
                             'content' => $issue->ticket->client_state,
                             'event' => 'issues:ticket/' . $issue->ticket->id,
@@ -157,13 +174,28 @@ Pjax::begin([
             [
                 'class' => yii\grid\ActionColumn::className(),
                 'header' => \Yii::t('ticket', 'Actions') . Html::a('<i class="glyphicon glyphicon-refresh"></i>', '', ['id' => 'reload-issues', 'class' => 'btn btn-default btn-xs pull-right']),
+                'headerOptions' => ['class' => 'col-md-1'],
                 'template' => '{action}',
                 'buttons' => [
                     'action' => function ($url, $issue, $key) {
                         if ($issue->key == $issue::CLIENT_OFFLINE) {
-                            return Html::a('<i class="glyphicon glyphicon-globe"></i>&nbsp;' . Yii::t('issue', 'Ping client'), ['/ticket/view', 'id' => $issue->ticket->id, 'mode' => 'probe', '#' => 'tab_general'], ['id' => 'backup-now', 'class' => 'btn btn-default']);
+                            return Html::a('<i class="glyphicon glyphicon-globe"></i>&nbsp;' . Yii::t('issue', 'Ping client'), [
+                                '/ticket/ping',
+                                'id' => $issue->ticket->id,
+                                '#' => 'tab_general'
+                            ], [
+                                'id' => 'backup-now',
+                                'class' => 'btn btn-default',
+                            ]);
                         } else if ($issue->key == $issue::LONG_TIME_NO_BACKUP) {
-                            return Html::a('<i class="glyphicon glyphicon-hdd"></i>&nbsp;' . Yii::t('issue', 'Backup now'), ['/ticket/backup', 'id' => $issue->ticket->id, '#' => 'tab_backups'], ['id' => 'backup-now', 'class' => 'btn btn-default']);
+                            return Html::a('<i class="glyphicon glyphicon-hdd"></i>&nbsp;' . Yii::t('issue', 'Backup now'), [
+                                '/ticket/backup',
+                                'id' => $issue->ticket->id,
+                                '#' => 'tab_backups'
+                            ], [
+                                'id' => 'backup-now',
+                                'class' => 'btn btn-default'
+                            ]);
                         } else {
                             return $issue->key;
                         }
@@ -177,6 +209,8 @@ Pjax::begin([
     ]);
 
 Pjax::end();
+
+
 
 echo "<hr>";
 

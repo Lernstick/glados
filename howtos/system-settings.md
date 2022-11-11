@@ -1,4 +1,4 @@
-## System Settings
+## GLaDOS System Settings
 
 There are currently a few global configuration settings that can be modified by the user. The interface to edit settings can be reached via `System->Settings` if you have the permission to do so.
 

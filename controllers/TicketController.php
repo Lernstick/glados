@@ -24,6 +24,7 @@ use app\models\DaemonSearch;
 use app\models\Log;
 use app\models\LogSearch;
 use app\models\RdiffFileSystem;
+use app\models\RdiffFileSystemSearch;
 use app\models\Setting;
 use yii\web\UploadedFile;
 use yii\web\NotFoundHttpException;
@@ -34,7 +35,6 @@ use yii\db\Expression;
 use kartik\mpdf\Pdf;
 use \mPDF;
 use app\components\customResponse;
-use app\components\AccessRule;
 use yii\data\ArrayDataProvider;
 use yii\widgets\ActiveForm;
 
@@ -43,6 +43,24 @@ use yii\widgets\ActiveForm;
  */
 class TicketController extends BaseController
 {
+
+    /**
+     * @inheritdoc
+     */
+    public $owner_actions = ['view', 'update', 'delete', 'backup', 'restore', 'ping'];
+
+    /**
+     * @inheritdoc
+     */
+    public function getOwner_id()
+    {
+        $id = Yii::$app->request->get('id');
+        if (($model = Ticket::findOne($id)) !== null) {
+            return $model->exam->user_id;
+        } else {
+            return null;
+        }
+    }
 
     /*
      * @inheritdoc
@@ -58,10 +76,7 @@ class TicketController extends BaseController
                 ],
             ],
             'access' => [
-                'class' => \yii\filters\AccessControl::className(),
-                'ruleConfig' => [
-                    'class' => AccessRule::className(),
-                ],
+                'class' => \app\components\AccessControl::className(),
                 'rules' => [
                     [
                         'allow' => true,
@@ -131,7 +146,6 @@ class TicketController extends BaseController
 
     }
 
-    //TODO: rbac
     /**
      * Displays a single Ticket model.
      *
@@ -156,22 +170,22 @@ class TicketController extends BaseController
             $activitySearchModel = new ActivitySearch();
             $activityDataProvider = $activitySearchModel->search(['ActivitySearch' => ['ticket_id' => $id] ]);
             $activityDataProvider->pagination->pageParam = 'act-page';
-            $activityDataProvider->pagination->pageSize = 10;
+            $activityDataProvider->pagination->pageSizeParam = 'act-per-page';
 
             $backupSearchModel = new BackupSearch();
             $backupDataProvider = $backupSearchModel->search($model->token);
             $backupDataProvider->pagination->pageParam = 'back-page';
-            $backupDataProvider->pagination->pageSize = 5;
+            $backupDataProvider->pagination->pageSizeParam = 'back-per-page';
 
             $screenshotSearchModel = new ScreenshotSearch();
             $screenshotDataProvider = $screenshotSearchModel->search($model->token);
             $screenshotDataProvider->pagination->pageParam = 'screen-page';
-            $screenshotDataProvider->pagination->pageSize = 12;
+            $screenshotDataProvider->pagination->pageSizeParam = 'screen-per-page';
 
             $restoreSearchModel = new RestoreSearch();
             $restoreDataProvider = $restoreSearchModel->search(['RestoreSearch' => ['ticket_id' => $id] ]);
             $restoreDataProvider->pagination->pageParam = 'rest-page';
-            $restoreDataProvider->pagination->pageSize = 5;
+            $restoreDataProvider->pagination->pageSizeParam = 'rest-per-page';
 
             $logSearchModel = new LogSearch();
             if (array_key_exists('LogSearch', Yii::$app->request->queryParams)) {
@@ -182,7 +196,7 @@ class TicketController extends BaseController
             }
             $logDataProvider = $logSearchModel->search(['LogSearch' => $logsearch]);
             $logDataProvider->pagination->pageParam = 'log-page';
-            $logDataProvider->pagination->pageSize = 10;
+            $logDataProvider->pagination->pageSizeParam = 'log-per-page';
 
             $historySearchModel = new HistorySearch();
             $historyQueryParams = array_key_exists('HistorySearch', Yii::$app->request->queryParams)
@@ -195,44 +209,23 @@ class TicketController extends BaseController
             $historyParams = ['HistorySearch' => $historyParams];
             $historyDataProvider = $historySearchModel->search($historyParams);
             $historyDataProvider->pagination->pageParam = 'hist-page';
-            $historyDataProvider->pagination->pageSize = 10;
+            $historyDataProvider->pagination->pageSizeParam = 'hist-per-page';
 
             $options = [
                 'showDotFiles' => boolval($showDotFiles),
             ];
 
-            $fs = new RdiffFileSystem([
-                'root' => $model->exam->backup_path,
-                'location' => realpath(\Yii::$app->params['backupPath'] . '/' . $model->token),
-                'restoreUser' => 'root',
-                'restoreHost' => $model->ip,
+            $fs = new RdiffFileSystemSearch([
                 'options' => $options,
             ]);
 
-            if ($date == null) {
-                $date = ($model->state == Ticket::STATE_CLOSED || $model->state == Ticket::STATE_SUBMITTED) ? $fs->newestBackupVersion : 'all';
-            }
-
-            if (file_exists(\Yii::$app->params['backupPath'] . '/' . $model->token)) {
-                $models = $fs->slash($path)->versionAt($date)->contents;
-                $versions = $fs->slash($path)->versions;
-                //array_unshift($versions , 'now');
-                array_unshift($versions , 'all');
-            } else {
-                $models = [];
-                $versions = [];
-            }
-
-            $ItemsDataProvider = new ArrayDataProvider([
-                'allModels' => $models,
+            list($ItemsDataProvider, $VersionsDataProvider) = $fs->search([
+                'path' => $path,
+                'model' => $model,
             ]);
 
             $ItemsDataProvider->pagination->pageParam = 'browse-page';
-            $ItemsDataProvider->pagination->pageSize = 20;
-
-            $VersionsDataProvider = new ArrayDataProvider([
-                'allModels' => $versions,
-            ]);
+            $ItemsDataProvider->pagination->pageSizeParam = 'browse-per-page';
 
             $VersionsDataProvider->pagination->pageParam = 'vers-page';
             $VersionsDataProvider->pagination->pageSize = 10;
@@ -258,19 +251,6 @@ class TicketController extends BaseController
                 'date' => $date,
                 'options' => $options,
             ]);
-        } else if ($mode == 'probe') {
-            //$online = $model->runCommand('source /info; ping -nq -W 10 -c 1 "${gladosIp}"', 'C', 10)[1];
-            //$model->online = $model->runCommand('true', 'C', 10)[1] == 0 ? true : false;
-            //$model->save(false);
-
-            $daemon = new Daemon();
-            $pid = $daemon->startNotify($id);
-
-            if(Yii::$app->request->isAjax){
-                return $this->runAction('view', ['id' => $id]);
-            } else {
-                return $this->redirect(['view', 'id' => $id]);
-            }
         } else if ($mode == 'report') {
             $content = $this->renderPartial('report', [
                 'model' => $model,
@@ -431,39 +411,6 @@ class TicketController extends BaseController
                     'attr' => $attr
                 ]);
             }
-        } else if ($mode === 'submit') {
-            $params = Yii::$app->request->post('Ticket');
-            $token = (isset($params['token']) && !empty($params['token'])) ? $params['token'] : null;
-            $test_taker = (isset($params['test_taker']) && !empty($params['test_taker'])) ? $params['test_taker'] : null;
-
-            if (($model = Ticket::findOne(['token' => $token])) === null) {
-                $model = new Ticket(['scenario' => Ticket::SCENARIO_SUBMIT]);
-                $model->token = $token;
-                $model->token != null ? $model->addError('token', Yii::t('ticket', 'Ticket not found.')) : null;
-
-                return $this->render('submit', [
-                    'model' => $model,
-                ]);
-            } else if ($test_taker === null) {
-                $model->scenario = Ticket::SCENARIO_SUBMIT;
-                $model->load(Yii::$app->request->post());
-                $model->validate(['token'], true);
-                $this->checkRbac($model->exam->user_id);
-
-                return $this->render('submit', [
-                    'model' => $model,
-                ]);
-            } else {
-                $model->scenario = Ticket::SCENARIO_SUBMIT;
-                $this->checkRbac($model->exam->user_id);
-                if ($model->load(Yii::$app->request->post()) && $model->save()) {
-                    return $this->redirect(['view', 'id' => $model->id]);
-                }else{
-                    return $this->render('submit', [
-                        'model' => $model,
-                    ]);
-                }
-            }
         }
     }
 
@@ -474,54 +421,16 @@ class TicketController extends BaseController
      * @param integer $id
      * @return mixed
      */
-    public function actionDelete($id = null, $mode = 'single', $exam_id = null)
+    public function actionDelete($id)
     {
-        if ($mode == 'single') {
-            $model = $this->findModel($id);
+        $model = $this->findModel($id);
 
-            if ($model->backup_lock == 0 && $model->restore_lock == 0 &&  $model->download_lock == 0) {
-                $model->delete();
-                Yii::$app->session->addFlash('danger', Yii::t('ticket', 'The Ticket has been deleted successfully.'));
-                return $this->redirect(Yii::$app->session['ticketViewReturnURL']);
-            } else {
-                Yii::$app->session->addFlash('danger', \Yii::t('ticket', 'The ticket is still locked by a daemon and can therefore not be deleted.'));
-                return $this->redirect(['ticket/view', 'id' => $id]);
-            }
-        } else if ($mode == 'manyOpen' || $mode == 'many') {
-            $query = Ticket::find()->where(['exam_id' => $exam_id]);
-            Yii::$app->user->can('ticket/delete/all') ?: $query->own();
-            $models = $query->all();
-
-            $c = 0;
-            if ($mode == 'manyOpen'){
-                foreach ($models as $key => $model){
-                    if ($model->state == Ticket::STATE_OPEN){
-                        $model->delete() ? $c++ : null;
-                    }
-                }
-            } else if ($mode == 'many'){
-                foreach ($models as $key => $model){
-                    $model->delete() ? $c++ : null;
-                }
-            }
-
-
-            #TODO: errors?
-            if($c == 0){
-                if ($mode == 'manyOpen') {
-                    Yii::$app->session->addFlash('danger', Yii::t('ticket', 'There are no Open Tickets to delete.'));
-                } else if ($mode == 'many'){
-                    Yii::$app->session->addFlash('danger', Yii::t('ticket', 'There are no Tickets to delete.'));
-                }
-                return $this->redirect(['exam/view', 'id' => $exam_id]);
-            }
-
-            if ($mode == 'manyOpen') {
-                Yii::$app->session->addFlash('danger', Yii::t('ticket', '{n} Open Tickets have been deleted successfully.', ['n' => $c]));
-            } else if ($mode == 'many'){
-                Yii::$app->session->addFlash('danger', Yii::t('ticket', '{n} Tickets have been deleted successfully.', ['n' => $c]));
-            }
-            return $this->redirect(['exam/view', 'id' => $exam_id]);
+        if ($model->backup_lock == 0 && $model->restore_lock == 0 &&  $model->download_lock == 0) {
+            $model->delete();
+            return $this->redirect(Yii::$app->session['ticketViewReturnURL']);
+        } else {
+            Yii::$app->session->addFlash('danger', \Yii::t('ticket', 'The ticket is still locked by a daemon and can therefore not be deleted.'));
+            return $this->redirect(['ticket/view', 'id' => $id]);
         }
     }
 
@@ -609,7 +518,7 @@ class TicketController extends BaseController
                 return $this->render('token-request', [
                     'model' => $model,
                 ]);                
-            } else if ($model->download_lock != 0) {
+            } else if ($model->download_lock != 0 && $model->ip != Yii::$app->request->userIp) {
                 $model->addError('token', \Yii::t('ticket', 'Another instance is already running, '
                                         . 'multiple downloads are not allowed.'));
                 return $this->render('token-request', [
@@ -680,7 +589,7 @@ class TicketController extends BaseController
      * @param string $token
      * @return mixed 
      */
-    public function actionStatus($token)
+    public function actionStatus($token, $finish = false)
     {
         $this->layout = 'client';
         $model = Ticket::findOne(['token' => $token]);
@@ -688,6 +597,7 @@ class TicketController extends BaseController
         return $this->render('/result/_view', [
             'title' => 'Exam Status',
             'model' => $model,
+            'finish' => $finish,
         ]);
     }
 
@@ -734,60 +644,62 @@ class TicketController extends BaseController
      * @param string $token
      * @return The response object or an array with the error description
      */
-    public function actionFinish($token)
+    public function actionFinish($token, $step = 1)
     {
+        $this->layout = 'client';
         $model = Ticket::findOne(['token' => $token]);
-        $model->scenario = Ticket::SCENARIO_FINISH;
-
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
-        if ($model === null){
-            return [ 'code' => 403, 'msg' => 'The provided ticket is invalid.' ];
+        if ($model === null) {
+            throw new BadRequestHttpException(\Yii::t('ticket', 'The provided ticket is invalid.'));
         }
-        if ($model->state != Ticket::STATE_RUNNING){
-            return [ 'code' => 403, 'msg' => 'The provided ticket is not in running state.' ];
-        }
+        /*if ($model->state != Ticket::STATE_RUNNING) {
+            //throw new BadRequestHttpException(\Yii::t('ticket', 'The provided ticket is not in running state.'));
+            $step = 2;
+        }*/
 
-        $model->ip = Yii::$app->request->userIp; # set the ip address
-        $model->end = new Expression('NOW()');
-        $model->last_backup = 0;
-        $model->save();
-
-        // increment the stats for total duration and total completed exams
-        // but count only exams whose duration is less or equal than 8 hours and more
-        // or equal than 15 minutes.
-        $model->refresh();
-        if ($model->durationInSecs <= 28800 && $model->durationInSecs >= 900) {
-            Stats::increment('total_duration', $model->durationInSecs);
-            Stats::increment('completed_exams'); // +1
-        }
-  
-        if ($model->test_taker) {
-            $act = new Activity([
-                'ticket_id' => $model->id,
-                'description' => yiit('activity', 'Exam finished by {test_taker}.'),
-                'description_params' => [ 'test_taker' => $model->test_taker ],
-                'severity' => Activity::SEVERITY_INFORMATIONAL,
+        if ($step == 1 && $model->state == Ticket::STATE_RUNNING) {
+            return $this->render('finish_s1', [
+                'model' => $model,
             ]);
-        } else {
-            $act = new Activity([
-                'ticket_id' => $model->id,
-                'description' => yiit('activity', 'Exam finished by Ticket with token {token}.'),
-                'description_params' => [ 'token' => $token ],
-                'severity' => Activity::SEVERITY_INFORMATIONAL,
-            ]);
+        } else if ($step == 2 && $model->state == Ticket::STATE_RUNNING) {
+            $model->scenario = Ticket::SCENARIO_FINISH;
+            $model->client_state = \Yii::t('ticket', 'waiting for last backup');
+            $model->ip = Yii::$app->request->userIp; # set the ip address
+            $model->end = new Expression('NOW()');
+            $model->last_backup = 0;
+            $model->save();
+
+            // increment the stats for total duration and total completed exams
+            // but count only exams whose duration is less or equal than 8 hours and more
+            // or equal than 15 minutes.
+            $model->refresh();
+            if ($model->durationInSecs <= 28800 && $model->durationInSecs >= 900) {
+                Stats::increment('total_duration', $model->durationInSecs);
+                Stats::increment('completed_exams'); // +1
+            }
+
+            if ($model->test_taker) {
+                $act = new Activity([
+                    'ticket_id' => $model->id,
+                    'description' => yiit('activity', 'Exam finished by {test_taker}.'),
+                    'description_params' => [ 'test_taker' => $model->test_taker ],
+                    'severity' => Activity::SEVERITY_INFORMATIONAL,
+                ]);
+            } else {
+                $act = new Activity([
+                    'ticket_id' => $model->id,
+                    'description' => yiit('activity', 'Exam finished by Ticket with token {token}.'),
+                    'description_params' => [ 'token' => $token ],
+                    'severity' => Activity::SEVERITY_INFORMATIONAL,
+                ]);
+            }
+            $act->save();
+
+            $this->startDaemon();
         }
-        $act->save();
 
-        /* Start a new backup Daemon on the background */
-        $searchModel = new DaemonSearch();
-        if($searchModel->search([])->totalCount < 3){
-            $backupDaemon = new Daemon();
-            $backupDaemon->startBackup();
-        }
-
-        return [ 'code' => 200, 'msg' => 'Exam finished successfully' ];
-
+        return $this->render('finish_s2', [
+            'model' => $model,
+        ]);
     }
 
     /**
@@ -798,15 +710,37 @@ class TicketController extends BaseController
      */
     public function actionBackup($id)
     {
-        $model = $this->findModel($id);
-
         $daemon = new Daemon();
         $pid = $daemon->startBackup($id);
 
-        if(Yii::$app->request->isAjax){
+        if (Yii::$app->request->isAjax) {
+            if (Yii::$app->session['monitorView'] === true) {
+                return true;
+            }
             return $this->runAction('view', ['id' => $id]);
         } else {
             return $this->redirect(['view', 'id' => $id, '#' => 'backups']);
+        }
+    }
+
+    /**
+     * Pings the ticket.
+     *
+     * @param integer $id
+     * @return The response object
+     */
+    public function actionPing($id)
+    {
+        $daemon = new Daemon();
+        $pid = $daemon->startNotify($id);
+
+        if (Yii::$app->request->isAjax) {
+            if (Yii::$app->session['monitorView'] === true) {
+                return true;
+            }
+            return $this->runAction('view', ['id' => $id]);
+        } else {
+            return $this->redirect(['view', 'id' => $id]);
         }
     }
 
@@ -826,11 +760,9 @@ class TicketController extends BaseController
         $daemon = new Daemon();
         $pid = $daemon->startRestore($id, $file, $date);
 
-        Yii::$app->session->addFlash('info', \Yii::t('ticket', 'Restore started.'));
-
-        if(Yii::$app->request->isAjax){
+        if (Yii::$app->request->isAjax) {
             return $this->runAction('view', ['id' => $id]);
-        }else{
+        } else {
             return $this->redirect(['view', 'id' => $id]);
         }
 
@@ -983,9 +915,7 @@ class TicketController extends BaseController
     protected function findModel($id)
     {
         if (($model = Ticket::findOne($id)) !== null) {
-            if ($this->checkRbac($model->exam->user_id)) {
-                return $model;
-            }
+            return $model;
         }
         throw new NotFoundHttpException(\Yii::t('app', 'The requested page does not exist.'));
     }
@@ -999,11 +929,11 @@ class TicketController extends BaseController
     {
         # search for running daemons
         $daemonSearchModel = new DaemonSearch();
-        $daemonDataProvider = $daemonSearchModel->search(['DaemonSearch' => ['description' => 'Daemon base controller']]);
+        $daemonDataProvider = $daemonSearchModel->search(['DaemonSearch' => ['description' => 'Base Process']]);
         $count = $daemonDataProvider->getTotalCount();
 
         # if no daemon is running already, start one
-        if($count == 0){
+        if ($count == 0) {
             $daemon = new Daemon();
             $daemon->startDaemon();
         }

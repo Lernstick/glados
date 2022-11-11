@@ -47,6 +47,9 @@ class DaemonSearch extends Daemon
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => array(
+                'pageSize' => 999,
+            ),
         ]);
 
         $this->load($params);
@@ -80,7 +83,20 @@ class DaemonSearch extends Daemon
         //create new dataProvider with the models in running state
         return new ArrayDataProvider([
             'key' => Daemon::primaryKey()[0],
-            'allModels' => $models
+            'allModels' => $models,
+            'pagination' => array(
+                'defaultPageSize' => 10,
+                'pageSizeLimit' => [1, 100],
+            ),
+            'sort' => [
+                'defaultOrder' => [
+                    'pid' => SORT_DESC,
+                ],
+                'attributes' => [
+                    'pid',
+                    'started_at',
+                ],
+            ],
         ]);
     }
 

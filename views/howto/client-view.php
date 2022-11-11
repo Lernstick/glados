@@ -9,7 +9,7 @@ $this->title = $model->title;
 
 // froces wxbrowser to resize the window
 $js = <<< 'SCRIPT'
-window.location.href = '#wxbrowser:resize:800x800'
+window.location.href = '#wxbrowser:resize:850x600'
 SCRIPT;
 $this->registerJs($js);
 

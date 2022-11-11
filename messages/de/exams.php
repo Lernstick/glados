@@ -110,7 +110,7 @@ return [
     'Submitted' => 'Zugewiesen',
     'Submitted Tickets' => 'Zugewiesene Tickets',
     'The Exam has been deleted successfully.' => 'Die Prüfung wurde erfolgreich gelöscht.',
-    'The exam cannot be deleted, since there are {n} tickets associated to it.' => 'Die Prüfung kann nicht gelöscht werden, weil ihr noch {n} Ticket zugewiesen sind.',
+    'The exam cannot be deleted, since there are {n} tickets associated to it.' => 'Die Prüfung kann nicht gelöscht werden, weil ihr noch {n} Tickets zugewiesen sind.',
     'The following settings should only be used, if you know what you are doing!' => 'Die folgenden Einstellungen sollten nur gesetzt werden, sofern Sie wissen was Sie tun!',
     'The name of the exam. This value may not be unique, but it should be used to <b>identify the exam</b>.' => 'Der Name der Prüfung. Dieser Wert muss nicht eindeutig sein, aber sollte benutzt werden können zum <b>Identifizieren der Prüfung</b>.',
     'The requested file does not exist.' => 'Die angeforderte Datei existiert nicht.',

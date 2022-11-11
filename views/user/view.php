@@ -1,12 +1,15 @@
 <?php
 
 use yii\helpers\Html;
+use yii\widgets\Pjax;
 use yii\widgets\DetailView;
 use yii\grid\GridView;
 use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\User */
+/* @var $dataProvider ArrayDataProvider */
+/* @var $permissions yii\rbac\Permission[] list of permissions associated to the User model */
 
 $this->title = $model->username;
 $this->params['breadcrumbs'][] = ['label' => \Yii::t('users', 'Users'), 'url' => ['index']];
@@ -39,7 +42,7 @@ $this->registerJs($active_tabs);
         </a></li>
         <li>
             <?= Html::a(
-                '<i class="glyphicon glyphicon-check"></i> ' . \Yii::t('users', 'Permissions'),
+                '<i class="glyphicon glyphicon-check"></i> ' . \Yii::t('users', 'Inherited Permissions'),
                 '#permissions',
                 ['data-toggle' => 'tab']
             ) ?>
@@ -99,7 +102,7 @@ $this->registerJs($active_tabs);
                 'model' => $model,
                 'attributes' => [
                     'username',
-                    'role',
+                    'roles:list',
                     [
                         'attribute' => 'authMethod.name',
                         'label' => Yii::t('auth', 'Authentication Method'),
@@ -116,35 +119,21 @@ $this->registerJs($active_tabs);
                 ],
             ]) ?>
 
-            <?= $this->render('@app/views/_notification') ?>
-
         </div>
 
-        <div id="permissions" class="tab-pane fade">
+        <?php Pjax::begin([
+            'id' => 'permissions',
+            'options' => ['class' => 'tab-pane fade'],
+        ]); ?>
 
             <?php $_GET = array_merge($_GET, ['#' => 'tab_permissions']); ?>
-            <?= GridView::widget([
-                'dataProvider' => $permissionDataProvider,
-                'tableOptions' => ['class' => 'table table-bordered table-hover'],
-                'rowOptions' => function($data) {
-                    return null;
-                },
 
-                'columns' => [
-                    ['class' => 'yii\grid\SerialColumn'],
-                    [
-                        'attribute' => 'description',
-                        'label' => \Yii::t('auth', 'Description'),
-                        'value' => function ($model) {
-                            return Yii::t('permission', $model->description);
-                        },
-                    ]
-                ],
-                'layout' => '{items} {pager}',
-                'emptyText' => \Yii::t('users', 'No permissions found.'),
-            ]); ?>
+            <?= $this->render('/role/_permissions', [
+                'permissions' => $permissions,
+                'dataProvider' => $dataProvider,
+            ]) ?>
 
-        </div>
+        <?php Pjax::end(); ?>
 
     </div>
 

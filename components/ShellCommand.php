@@ -38,7 +38,7 @@ class ShellCommand extends Component
     const COMMAND_OUTPUT = 'cmdoutput';
 
     /**
-     * @const integer the 3 input and output channels
+     * @const integer the 3 standard input and output channels
      */
     const STDIN = 0;
     const STDOUT = 1;
@@ -56,24 +56,34 @@ class ShellCommand extends Component
      * @var string the actual command to run
      */
     public $cmd;
+
+    /**
+     * @var string working dir for the command
+     * @see http://php.net/manual/en/function.proc-open.php
+     */
     public $cwd;
+
+    /**
+     * @var array environment variables for the command 
+     * @see http://php.net/manual/en/function.proc-open.php
+     */
     public $env;
 
     /**
      * @var array An array holding specification for the file descriptors
-     * @see http://php.net/manual/de/function.proc-open.php
+     * @see http://php.net/manual/en/function.proc-open.php
      */
     private $_descriptorspec;
 
     /**
      * @var array An array holding file descriptors
-     * @see http://php.net/manual/de/function.proc-open.php
+     * @see http://php.net/manual/en/function.proc-open.php
      */
     private $_pipes;
 
     /**
      * @var ressource The process descriptor returned by proc_open()
-     * @see http://php.net/manual/de/function.proc-open.php
+     * @see http://php.net/manual/en/function.proc-open.php
      */
     private $_pd;
 

@@ -20,7 +20,7 @@ class UserSearch extends User
     {
         return [
             [['id'], 'integer'],
-            [['username', 'role', 'last_visited', 'type'], 'safe'],
+            [['username', 'roles', 'last_visited', 'type'], 'safe'],
         ];
     }
 
@@ -56,7 +56,7 @@ class UserSearch extends User
         $dataProvider->setSort([
             'attributes' => [
                 'username',
-                'role' => [
+                'roles' => [
                     'asc' => ['auth_assignment.item_name' => SORT_ASC],
                     'desc' => ['auth_assignment.item_name' => SORT_DESC],
                     'label' => 'Owner'
@@ -84,8 +84,11 @@ class UserSearch extends User
         $query->andFilterWhere(['like', 'username', $this->username]);
 
         $query->joinWith(['authAssignments' => function ($q) {
-            $q->andFilterWhere(['like', 'auth_assignment.item_name', $this->role]);
+            $q->andFilterWhere(['auth_assignment.item_name' => $this->roles]);
         }]);
+
+        // Else users associated to multiple roles will appear multiple times in the index views
+        $query->groupBy('id');
 
         return $dataProvider;
     }

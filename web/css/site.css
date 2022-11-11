@@ -14,6 +14,10 @@ body {
     padding: 70px 15px 20px;
 }
 
+.wrap > .container-client {
+    padding: 35px 15px 10px;
+}
+
 .footer {
     height: 60px;
     background-color: #f5f5f5;
@@ -503,6 +507,11 @@ ul.nav-special > li.active > a > div {
 .live-overview-item-icon {
     width: 16px;
     height: 16px;
+    vertical-align: text-bottom;
+}
+
+.live-overview-item-title .live-indicator {
+    height: 16px;
 }
 
 .live-overview-item:hover .live-overview-item-title {
@@ -681,4 +690,162 @@ span.view--state[data-state="4"]::after { content: attr(data-text-4); }
 /* images in the howto should not be larger than their container */
 .howto-view .markdown-view img {
   max-width: 100%;
+}
+
+.hidden {
+    display: none;
+}
+
+.pagination-page-size > .text > span, .pagination-page-size > .text > span:hover, .pagination-page-size > .text > span:focus {
+    color: #737373;
+    background-color: unset;
+}
+
+.pagination-page-size > li.dropdown {
+    float: left;
+    margin-bottom: -1px;
+}
+
+.pagination-page-size > li.dropdown > ul.dropdown-menu {
+  min-width: 10px;
+}
+
+/* Dropdown menus should be above all other elements, including the top navigation with z-index:1030; */
+.dropdown-menu {
+  z-index: 1040;
+}
+
+/* Dropdowns with scrollbar */
+.pre-scrollable {
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+/* making a Bootstrap table column fit to content */
+.table td.fit, .table th.fit {
+    white-space: nowrap;
+    width: 1%;
+}
+
+.text-bold {
+    font-weight: bold;
+}
+
+
+/**
+ * Callouts
+ *
+ * Not quite alerts, but custom and helpful notes for folks reading the docs.
+ * Requires a base and modifier class.
+ */
+.bs-callout {
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #eee;
+    border-left-width: 5px;
+    border-radius: 3px;
+}
+.bs-callout h4 {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+.bs-callout p:last-child {
+    margin-bottom: 0;
+}
+.bs-callout code {
+    border-radius: 3px;
+}
+.bs-callout + .bs-callout {
+    margin-top: -5px;
+}
+.bs-callout-danger {
+    border-left-color: #ce4844;
+}
+.bs-callout-danger h4 {
+    color: #ce4844;
+}
+.bs-callout-warning {
+    border-left-color: #aa6708;
+}
+.bs-callout-warning h4 {
+    color: #aa6708;
+}
+.bs-callout-info {
+    border-left-color: #1b809e;
+}
+.bs-callout-info h4 {
+    color: #1b809e;
+}
+.bs-callout-success {
+    border-left-color: #3c763d;;
+}
+.bs-callout-success h4 {
+    color: #3c763d;;
+}
+.bs-callout-hover:hover{
+    background-color: #f5f5f5;
+}
+
+
+/**
+ * Vertically centered Modals
+ * 
+ * Make modal vertical centered if the modal-centered class is added.
+ * Just as in bootstrap 4
+ */
+.modal-centered {
+  text-align: center;
+}
+
+@media screen and (min-width: 200px) {
+  .modal-centered:before {
+    display: inline-block;
+    vertical-align: middle;
+    content: " ";
+    height: 100%;
+  }
+}
+
+.modal-centered .modal-dialog {
+  display: inline-block;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.terminal {
+  width: 100%;
+}
+
+.terminal .line_number {
+  vertical-align: text-top;
+  vertical-align: text-top;
+}
+
+.terminal .line_number:before {
+  content: attr(data-line-number) "";
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.terminal .line {
+  background-color: black;
+  color: white;
+  width: 100%;
+  padding-left: 5px;
+}
+
+.terminal span.red {
+  color: red;
+}
+
+.terminal span.gray {
+  color: gray;
+}
+
+.terminal span.white {
+  color: white;
+}
+
+.terminal span.yellow {
+  color: yellow;
 }

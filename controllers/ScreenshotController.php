@@ -7,7 +7,6 @@ use app\models\Screenshot;
 use app\models\ScreenshotSearch;
 use app\models\Ticket;
 use yii\web\NotFoundHttpException;
-use app\components\AccessRule;
 
 /**
  * ScreenshotController implements the CRUD actions for Screenshot model.
@@ -18,14 +17,37 @@ class ScreenshotController extends BaseController
     /**
      * @inheritdoc
      */
+    public $owner_actions = ['view', 'snap'];
+
+    /**
+     * @{inheritdoc}
+     */
+    public function route_mapping ()
+    {
+        return ['*' => 'ticket/view'];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getOwner_id()
+    {
+        $token = Yii::$app->request->get('token');
+        if (($model = Ticket::findOne(['token' => $token])) !== null) {
+            return $model->exam->user_id;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function behaviors()
     {
         return [
             'access' => [
-                'class' => \yii\filters\AccessControl::className(),
-                'ruleConfig' => [
-                    'class' => AccessRule::className(),
-                ],
+                'class' => \app\components\AccessControl::className(),
                 'rules' => [
                     [
                         'allow' => true,
@@ -59,21 +81,6 @@ class ScreenshotController extends BaseController
     }
 
     /**
-     * Displays a single Screenshot thumbnail.
-     * @param string $token
-     * @param integer $date
-     * @return mixed
-     */
-    /*public function actionThumbnail($token, $date)
-    {
-        if (($model = Screenshot::findOne($token, $date)) !== null){
-            return \Yii::$app->response->sendFile($model->thumbnail, null, ['inline' => true]);
-        }else{
-            throw new NotFoundHttpException('The requested page does not exist.');
-        }
-    }*/
-
-    /**
      * Displays a single Screenshot model.
      * @param string $token
      * @return mixed
@@ -98,7 +105,7 @@ class ScreenshotController extends BaseController
             "-interlace none " .
             "-colorspace sRGB " .
             "jpeg:-";
-        $img = $ticket->runCommand($cmd, "C", 10);
+        $img = $ticket->runCommand($cmd, "C", 10, true);
         if ($img[1] != 0) {
             throw new NotFoundHttpException(\Yii::t('ticket', 'The screenshot could not be generated.'));
         } else {

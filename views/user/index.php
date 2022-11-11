@@ -69,7 +69,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format'=>'raw'
             ],
             [
-                'attribute' => 'role',
+                'attribute' => 'roles',
+                'format' => 'list',
                 'filter' => $searchModel->roleList,
             ],
             [
@@ -127,8 +128,6 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
         'options' => ['id' => 'dynagrid-user-index'] // a unique identifier is important
     ]); ?>
-
-    <?= $this->render('@app/views/_notification') ?>
 
     <?php Pjax::end(); ?>
 

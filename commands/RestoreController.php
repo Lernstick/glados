@@ -4,7 +4,7 @@ namespace app\commands;
 
 use yii;
 use yii\db\Expression;
-use app\commands\DaemonController;
+use app\commands\NetworkController;
 use app\models\Ticket;
 use app\models\Daemon;
 use app\models\Activity;
@@ -16,16 +16,27 @@ use yii\helpers\Console;
 
 
 /**
- * Restore Daemon/Process (push)
+ * Restore Process
+ *
  * This is the process which calls `rdiff-backup --restore-as-of` to push the data to the client.
  */
-class RestoreController extends DaemonController
+class RestoreController extends NetworkController
 {
 
     /**
-     * @var Ticket The ticket in processing at the moment 
+     * @inheritdoc
      */
     public $ticket;
+
+    /**
+     * @inheritdoc
+     */
+    public $lock_type = 'restore';
+
+    /**
+     * @inheritdoc
+     */
+    public $lock_property = 'restore_lock';
 
     /**
      * @var string 
@@ -46,14 +57,6 @@ class RestoreController extends DaemonController
      * @var string The path at the target system to backup
      */    
     private $remotePath = '/overlay';
-
-    /**
-     * @inheritdoc
-     */
-    public function start ()
-    {
-        parent::start();
-    }
 
     /**
      * Restores files.
@@ -89,24 +92,22 @@ class RestoreController extends DaemonController
             return;
         }
 
-        if ($this->lock($id . "_restore") === false) {
+        if (!$this->lockItem($this->ticket)) {
             $this->logError('Error: ticket with id ' . $id . ' is already in processing (flock).');
             return;
         }
 
-        $this->ticket->restore_lock = 1;
-        $this->ticket->running_daemon_id = $this->daemon->id;
-        $this->logInfo('Processing ticket: ' .
-            ( empty($this->ticket->test_taker) ? $this->ticket->token : $this->ticket->test_taker) .
-            ' (' . $this->ticket->ip . ')', true);
-        $this->ticket->restore_state = yiit('ticket', 'connecting to client...');
+        $this->logInfo(substitute('Processing ticket: {ticket} ({ip})', [
+            'ticket' => ( empty($this->ticket->test_taker) ? $this->ticket->token : $this->ticket->test_taker),
+            'ip' => $this->ticket->ip,
+        ]), true);
+        $this->ticket->restore_state = yiit('ticket', 'Connecting to client ...');
         $this->ticket->save(false);
 
         if ($this->checkPort(22, 3, $emsg) === false) {
             $this->ticket->online = false;
             $this->ticket->restore_state = yiit('ticket', 'network error: {error}.');
             $this->ticket->restore_state_params = ['error' => $emsg];
-            $this->ticket->restore_lock = 0;
             $this->ticket->save(false);
 
             $act = new Activity([
@@ -116,7 +117,7 @@ class RestoreController extends DaemonController
                 'severity' => Activity::SEVERITY_WARNING,
             ]);
             $act->save();
-            $this->unlock($this->ticket->id . "_restore");
+            $this->unlockItem($this->ticket);
             return;
         } else {
             $this->ticket->online = $this->ticket->runCommand('true', 'C', 10)[1] == 0 ? true : false;
@@ -146,7 +147,7 @@ class RestoreController extends DaemonController
                 'restoreHost' => $this->ticket->ip,
             ]);
 
-            if($fs->slash($file) === null){
+            if ($fs->slash($file) === null) {
                 $this->ticket->restore_state = yiit('ticket', 'Restore failed: "{file}": No such file or directory.');
                 $this->ticket->restore_state_params = ['file' => $file];
                 $this->logError($this->ticket->restore_state);
@@ -161,15 +162,13 @@ class RestoreController extends DaemonController
                 ]);
                 $act->save();
 
-                $this->unlock($this->ticket->id . "_restore");
+                $this->unlockItem($this->ticket);
                 return;
             }
         } else {
             $this->ticket->restore_state = yiit('ticket', 'Nothing to restore.');
             $this->logInfo($this->ticket->restore_state);
-            $this->ticket->restore_lock = 0;
-            $this->ticket->save(false);
-            $this->unlock($this->ticket->id . "_restore");
+            $this->unlockItem($this->ticket);
             return;
         }
 
@@ -189,8 +188,7 @@ class RestoreController extends DaemonController
 
         $remoteSchema = $restorePath !== null ? 'rdiff-backup --server' : 'rdiff-backup-server restore';
         $restorePath = $restorePath !== null ? $restorePath : '/overlay/' . $this->ticket->exam->backup_path;
-        $output = "";
-        $logFile = Yii::getAlias('@runtime/logs/restore.' . $this->ticket->token . '.' . date('c') . '.log');
+        $logfile = $this->logfile;
 
         /* 1st command: rdiff-backup */
         $this->_cmd = substitute("rdiff-backup --terminal-verbosity=5 --force --remote-schema 'ssh -i {identity} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -C %s {remoteSchema}' --create-full-path {exclude} --restore-as-of {date} {localPath} {user}@{ip}::{remotePath}", [
@@ -205,13 +203,13 @@ class RestoreController extends DaemonController
         ]);
 
         $this->logInfo('Executing rdiff-backup: ' . $this->_cmd);
+        file_put_contents($logfile, 'Executing rdiff-backup: ' . $this->_cmd . PHP_EOL, FILE_APPEND);
 
         $cmd = new ShellCommand($this->_cmd);
 
-        $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use (&$output, $logFile) {
+        $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use ($logfile) {
             echo $this->ansiFormat($event->line, $event->channel == ShellCommand::STDOUT ? Console::NORMAL : Console::FG_RED);
-            $output .= $event->line;
-            file_put_contents($logFile, $event->line, FILE_APPEND);
+            file_put_contents($logfile, $event->line, FILE_APPEND);
         });
 
         $retval = $cmd->run();
@@ -219,23 +217,33 @@ class RestoreController extends DaemonController
         $this->ticket->runCommand('mount -o remount,rw /');
 
         if ($retval != 0) {
-            $this->ticket->restore_state = yiit('ticket', 'rdiff-backup failed (retval: {retval}), output: {output}');
+
+            $logfile = substitute('{url:logfile:log:view:type={type},token={token},date={date}}', [
+                'type' => 'restore',
+                'token' => $this->ticket->token,
+                'date' => $this->logfileDate,
+            ]);
+
+            $this->ticket->restore_state = yiit('ticket', 'rdiff-backup failed. For more information, please check the {logfile} (retval: {retval})');
             $this->ticket->restore_state_params = [
                 'retval' => $retval,
-                'output' => $output,
+                'logfile' => $logfile,
             ];
 
+            $this->ticket->save();
             $this->logError($this->ticket->restore_state);
 
             $act = new Activity([
-                    'ticket_id' => $this->ticket->id,
-                    'description' => yiit('activity', 'Restore failed: rdiff-backup failed (retval: {retval})'),
-                    'description_params' => [ 'retval' => $retval ],
-                    'severity' => Activity::SEVERITY_WARNING,
+                'ticket_id' => $this->ticket->id,
+                'description' => yiit('activity', 'Restore failed: rdiff-backup failed. For more information, please check the {logfile} (retval: {retval})'),
+                'description_params' => [
+                    'retval' => $retval,
+                    'logfile' => $logfile,
+                ],
+                'severity' => Activity::SEVERITY_WARNING,
             ]);
             $act->save();
         } else {
-            //$this->logInfo($output);
             $this->ticket->restore_state = yiit('ticket', 'restore successful.');
             $this->restore->finishedAt = new Expression('NOW()');
             $this->restore->save();
@@ -257,98 +265,49 @@ class RestoreController extends DaemonController
         if ($rsync && array_key_exists('screen_capture', $this->ticket->exam->settings) && $this->ticket->exam->settings['screen_capture'] && !empty($glob)) {
 
             /* 2nd command: rsync restore screen_capture.log */
-            $this->_cmd = "rsync --rsync-path=\"mkdir -p /run/initramfs/backup/var/log/ && rsync\" "
-                . "-L --checksum --partial --progress --protect-args "
-                . "--rsh='ssh -i " . \Yii::$app->params['dotSSH'] . "/rsa "
-                . " -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' "
-                . FileHelper::normalizePath(\Yii::$app->params['scPath'] . "/" . $this->ticket->token . "/screen_capture.log") . " "
-                . escapeshellarg($this->remoteUser . "@" . $this->ticket->ip . ":/run/initramfs/backup/var/log/screen_capture.log");
-
-            $this->logInfo('Executing rsync: ' . $this->_cmd);
+            $this->_cmd = substitute("rsync --rsync-path=\"mkdir -p /run/initramfs/backup/var/log/ && rsync\" -L --checksum --partial --progress --protect-args --rsh='ssh -i {identity} -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' {localPath} {user}@{ip}:{remotePath}", [
+                'identity' => escapeshellarg(FileHelper::normalizePath(\Yii::$app->params['dotSSH'] . '/rsa')),
+                'localPath' => escapeshellarg(FileHelper::normalizePath(\Yii::$app->params['scPath'] . "/" . $this->ticket->token . "/screen_capture.log")),
+                'user' => escapeshellarg($this->remoteUser),
+                'ip' => escapeshellarg($this->ticket->ip),
+                'remotePath' => escapeshellarg('/run/initramfs/backup/var/log/screen_capture.log'),
+            ]);
 
             $cmd = new ShellCommand($this->_cmd);
-            $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use (&$output, $logFile) {
+            $logfile = $this->logfile;
+            $this->logInfo('Executing rsync: ' . $this->_cmd);
+            file_put_contents($logfile, 'Executing rsync: ' . $this->_cmd . PHP_EOL, FILE_APPEND);
+
+            $cmd->on(ShellCommand::COMMAND_OUTPUT, function($event) use ($logfile) {
                 echo $this->ansiFormat($event->line, $event->channel == ShellCommand::STDOUT ? Console::NORMAL : Console::FG_RED);
-                $output .= $event->line;
-                file_put_contents($logFile, $event->line, FILE_APPEND);
+                file_put_contents($logfile, $event->line, FILE_APPEND);
             });
 
             $retval = $cmd->run();
         }
 
-        $this->ticket->restore_lock = 0;
-        $this->ticket->save(false);
-        $this->unlock($this->ticket->id . "_restore");
+        $this->unlockItem($this->ticket);
     }
 
     /**
      * @inheritdoc
      */
-    public function stop($cause = null)
+    public function stop ($cause = null)
     {
+        if ($cause != "natural" && $this->ticket != null) {
+            $this->ticket->restore_state = yiit('ticket', 'Restore aborted, cause: {cause}');
+            $this->ticket->restore_state_params = ['cause' => $cause];
+            $this->unlockItem($this->ticket);
+
+            $act = new Activity([
+                'ticket_id' => $this->ticket->id,
+                'description' => yiit('activity', 'Restore failed: restore aborted, cause: {cause}'),
+                'description_params' => ['cause' => $cause],
+                'severity' => Activity::SEVERITY_WARNING,
+            ]);
+            $act->save();
+        }
+
         parent::stop($cause);
     }
-
-    /**
-     * Determines if a given port on the target system is open or not
-     *
-     * @param integer $port The port to check
-     * @param integer $tries The number to times to try (with 5 seconds delay inbetween every check)
-     * @param integer $errstr contains the error message of the last try from fsockopen()
-     * @param integer $errno the error code of the last try from connect()
-     * @return boolean Whether the port is open or not
-     */
-    private function checkPort($port, $tries = 1, &$errstr = null, &$errno = null)
-    {
-        for($c=1;$c<=$tries;$c++){
-            $fp = @fsockopen($this->ticket->ip, $port, $errno, $errstr, 10);
-            if (!$fp) {
-                //$this->logError('Port ' . $port . ' is closed or blocked. (try ' . $c . '/' . $tries . ')');
-                $this->logError(substitute('Port {port} is closed to blocked on ticket with token {token} and ip {ip}, error code: {code}, error message: {error}. (try {try}/{tries})', [
-                    'port' => $port,
-                    'token' => $this->ticket->token,
-                    'ip' => $this->ticket->ip,
-                    'code' => $errno,
-                    'error' => $errstr,
-                    'try' => $c,
-                    'tries' => $tries,
-                ]));
-                sleep(5);
-            } else {
-                // port is open and available
-                fclose($fp);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Clean up abandoned tickets. If a ticket stays in backup_lock or restore_lock and
-     * its associated daemon is not running anymore, this function will unlock those tickets.
-     *
-     * @return void
-     */
-    private function cleanup()
-    {
-
-        $query = Ticket::find()
-            ->where(['backup_lock' => 1])
-            ->orWhere(['restore_lock' => 1]);
-
-        $tickets = $query->all();
-        foreach ($tickets as $ticket) {
-            if (($daemon = Daemon::findOne($ticket->running_daemon_id)) !== null) {
-                if ($daemon->running != true) {
-                    $ticket->backup_lock = $ticket->restore_lock = 0;
-                    $ticket->save(false);
-                    $daemon->delete();
-                }
-            }else{
-                $ticket->backup_lock = $ticket->restore_lock = 0;
-                $ticket->save(false);
-            }
-        }    
-    }
-
 }

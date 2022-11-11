@@ -202,8 +202,6 @@ class SettingBase extends TranslatedActiveRecord
         }
     }
 
-
-
     /**
      * Finds entry by key
      *
