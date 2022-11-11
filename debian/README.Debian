@@ -10,7 +10,7 @@ glados for Debian
 
 * Tag a new release with the new version (create a pre-release and publish it)
 
-* First create new yii-glados package: https://github.com/chaoos/yii2-glados/
+* First create new yii-glados package: https://github.com/chaoos/yii2-glados/ and upload it to the pre-release
 
 * Merge the debian branch with the master branch at the tag created
 
