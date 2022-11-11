@@ -1,7 +1,8 @@
 glados for Debian
 -----------------
+* First create a new lernstick-exam-client if needed.
 
-* In controllers/configController.php actionInfo(), set needed lernstick-exam-client version and Lernstick OS version
+* In controllers/configController.php actionInfo(), set needed lernstick-exam-client version and Lernstick OS version.
 
 * Set the new version in docs/conf.py, config/web.php.
 
