@@ -338,24 +338,81 @@ class TicketController extends BaseController
                 
                     $names = array_unique(array_filter(array_map('trim', preg_split('/\n|\r/', $model->names, -1, PREG_SPLIT_NO_EMPTY))));
 
+                    /* no more than 100 names allowed */
+                    if (count($names) > 100) {
+                        $model->addError("names", Yii::t('ticket', 'Please insert fewer than {n} names.', [
+                            'n' => 100,
+                        ]));
+                        $searchModel = new TicketSearch();
+                        $examModel = Exam::findOne($exam_id);
+
+                        return $this->render('create-many', [
+                            'model' => $model,
+                            'examModel' => $examModel,
+                            'searchModel' => $searchModel,
+                        ]);
+                    }
+
+                    /* divide them into valid and invalid */
                     $c = 0;
+                    $invalid = [];
+                    $valid = [];
                     foreach ($names as $key => $value) {
                         $ticket = new Ticket();
                         $ticket->exam_id = $model->exam_id;
                         $ticket->test_taker = $value;
-                        $ticket->save() ? $c++ : null;
+                        $ticket->validate() ? array_push($valid, $ticket) : array_push($invalid, $ticket);
+                    }
+
+                    /* if we have invalid tickets don't create anything */
+                    if (count($invalid) != 0) {
+                        foreach ($invalid as $ticket){
+                            foreach ($ticket->getErrors() as $attribute => $value){
+                                Yii::$app->session->addFlash('danger', substitute("{attribute}: \"{value}\": <b>{error}</b>", [
+                                    'attribute' => $ticket->attributeLabels()[$attribute],
+                                    'value' => $ticket->$attribute,
+                                    'error' => $value[0],
+                                ]));
+                            }
+                        }
+                        Yii::$app->session->addFlash('danger', Yii::t('ticket', 'Cannot create all Tickets, because {m} are invalid.', ['m' => count($invalid)]));
+
+                        $searchModel = new TicketSearch();
+                        $examModel = Exam::findOne($exam_id);
+                        return $this->render('create-many', [
+                            'model' => $model,
+                            'examModel' => $examModel,
+                            'searchModel' => $searchModel,
+                        ]);
+                        /*return $this->redirect(['exam/view', 'id' => $model->exam_id]);*/
+                    } else {
+
+                        /* if all Tickets are valid try to create them */
+                        foreach ($valid as $ticket){
+                            $ticket->save() ? $c++ : NULL;
+                        }
+                        if ($c == count($names)) {
+                            Yii::$app->session->addFlash('success', Yii::t('ticket', 'You have successfully created {n} new Ticket(s).', [
+                                'n' => $c
+                            ]));
+                        } else {
+                            Yii::$app->session->addFlash('danger', Yii::t('ticket', 'Cannot create all Tickets: {n} created successfully, {m} failed.', [
+                                'n' => $c,
+                                'm' => count($names) - $c,
+                            ]));
+                        }
+                        return $this->redirect(['exam/view', 'id' => $model->exam_id]);
                     }
 
                     if (count($names) != 0) {
                         if ($c == count($names)) {
-                            Yii::$app->session->addFlash('success', Yii::t('ticket', 'You have successfully created {n} new Tickets.', ['n' => $c]));
-                            return $this->redirect(['exam/view', 'id' => $model->exam_id]);
+                            Yii::$app->session->addFlash('success', Yii::t('ticket', 'You have successfully created {n} new Ticket(s).', [
+                                'n' => $c
+                            ]));
                         } else {
-                            foreach ($ticket->getErrors() as $attribute => $value){
-                                Yii::$app->session->addFlash('danger', $value);
-                            }
-                            return $this->redirect(['exam/view', 'id' => $model->exam_id]);
+
                         }
+                        return $this->redirect(['exam/view', 'id' => $model->exam_id]);
                     }
                 }
 

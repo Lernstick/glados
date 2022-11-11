@@ -35,7 +35,8 @@ SCRIPT;
 $this->registerJs($js);
 
 $js = new JsExpression("
-    $('textarea').on('input',function () {
+
+    let parse_textarea = function () {
         var fullnames = [];
         var input = $('textarea')[0].value;
         var units = input.split(/\\n\\n+/).filter(function(e){return e});
@@ -57,7 +58,7 @@ $js = new JsExpression("
                 for (var i = 0; i < sepBased2.length; i++) {
                     for (var z = 0; z < separators.length; z++) {
                         if (separators[z] != separators[c]) {
-							//replace all other separators with a pipe (hope there is no name with a pipe in it...)
+                            //replace all other separators with a pipe (hope there is no name with a pipe in it...)
                             sepBased2[i] = sepBased2[i].replace(new RegExp(separators[z], 'g'), '|');
                         }
                     }
@@ -79,7 +80,7 @@ $js = new JsExpression("
                     }
                 }
 
-				//if there are more items which would need extended parsing, treat the whole block/unit as one
+                //if there are more items which would need extended parsing, treat the whole block/unit as one
                 if (e > s) {
                     simple_parsing_item = false;
                 } else {
@@ -89,13 +90,13 @@ $js = new JsExpression("
 
             }
 
-			/*
-			 * actual parsing comes here
-			 */
+            /*
+             * actual parsing comes here
+             */
 
             if (simple_parsing) {
 
-				//in case of simple parsing just split at the extracted separator and trim the items
+                //in case of simple parsing just split at the extracted separator and trim the items
                 var items = string.split(separator).filter(function(e){return e}).map(Function.prototype.call, String.prototype.trim);
                 for (var i = 0; i < items.length; i++) {
                     fullnames.push(items[i].replace(/ *(?:\,|\;|\\t| )+ */g, ' '));
@@ -163,7 +164,13 @@ $js = new JsExpression("
         $('#dynamicmodel-submit-btn')[0].innerHTML = 'Create ' + fullnames.length + ' Tickets'
 
         return;
-    })
+    }
+
+    // update the textarea upon input
+    $('textarea').on('input', parse_textarea);
+
+    // update the textarea upon start
+    parse_textarea();
 
 " );
 
@@ -242,7 +249,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <div class="form-group">
             <?= Html::label(\Yii::t('ticket', 'Names')); ?>
-            <?= Html::textarea('name', '', [
+
+            <?= Html::textarea('name', $model->names, [
                 'placeholder' => \Yii::t('ticket', 'Please insert a list of names separated by tab, comma, semicolon, newline or all of them combined...'),
                 'class' => 'form-control',
                 'rows' => '18',
@@ -264,7 +272,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="col-sm-6">
         <?= Html::label(\Yii::t('ticket', 'Preview Proposal')); ?>
         <div class="hint-block"><?= \Yii::t('ticket', 'This field shows how the names are parsed.') ?></div>
-        <div id="preview"></div>
+        <div id="preview" class="ticket-create-multiple-preview"></div>
     </div>
     </div>
 
