@@ -3,7 +3,7 @@ Index: glados/config/web.php
 ===================================================================
 --- glados.orig/config/web.php	2021-03-30 15:38:32.830551227 +0200
 +++ glados/config/web.php	2021-03-30 15:40:11.650723297 +0200
-@@ -139,21 +139,4 @@
+@@ -150,21 +150,4 @@
      'runtimePath' => '/var/lib/glados/runtime',
  ];
  

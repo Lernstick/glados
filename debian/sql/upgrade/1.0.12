@@ -1,0 +1,2 @@
+#!/bin/bash
+/usr/share/glados/yii migrate/to m210705_145230_v1_0_12 --interactive=0

@@ -1,3 +1,38 @@
+glados (1.0.12-deb11) unstable; urgency=low
+
+  * New Features:
+    - New server status view added to monitor server metrics
+        - CPU load
+        - memory usage
+        - swap usage
+        - webserver processes
+        - DB connections
+        - daemons
+        - I/O usage
+        - inotify watches and instances
+        - disk usage
+        - network usage
+    - New role system
+        - possibility to add own roles with fine-grained permissions added
+        - users can be associated to multiple roles now
+        - LDAP users can be mapped to these new roles
+    - New server logs view
+  * Fixed several bugs:
+    - Some translation typos fixed
+    - Fixed a bugwhen submitting results
+    - When restoring a file that does not exist, throw an error now
+  * Changes:
+    - extended pagers to be more dynamic with selectale page size
+    - daemon view refactored
+    - views of logfiles extended by colors
+    - log verbosity increased
+    - refactored the finish exam process
+    - client and server now compare their rdiff-backup version and throw an error if they don't agree
+    - all the client interaction script are written in phyton now
+
+ -- Roman Gruber <roman.gruber@bfh.ch>  Fri, 11 Nov 2022 10:49:12 +0200
+
+
 glados (1.0.11-deb10) unstable; urgency=low
 
   * Changes:
