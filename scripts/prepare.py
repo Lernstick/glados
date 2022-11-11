@@ -438,6 +438,7 @@ def allow_network_access(allowed):
         # remove user from the netdev group to prevent him from changing network connections
         r, _ = helpers.run(f'chroot {INITRD}/newroot gpasswd -d user netdev')
         file_regex('netdev', '', f'{INITRD}/newroot/etc/live/config.conf.d/user-setup.conf')
+        remove(f'{INITRD}/newroot/etc/live/config.conf.d/user-setup.conf.bak', fail_ok = True)
     return r
 
 # config->allow_sudo
