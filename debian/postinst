@@ -127,7 +127,7 @@ case "$1" in
         chmod 0700 "$glados_statedir"
 
 	# flush all yii2 caches
-	$glados_datadir/yii2 cache/flush-all
+	$glados_datadir/yii cache/flush-all
 
         apache_install $1
         generate_cookievalidationkey
