@@ -59,8 +59,8 @@ class ConfigController extends BaseController
         return [
             "server_version" => \Yii::$app->version,
             "rdiff_backup_version" => $v,
-            "wants_client_version" => ">=1.0.19",
-            "wants_lernstick_version" => ">=20220418", // 2022-04-18, notice without the dashes (from /usr/local/lernstick.html)
+            "wants_client_version" => ">=1.0.19", /* version of lernstick-exam-client debian package */
+            "wants_lernstick_version" => ">=20221008", // 2022-10-08, notice without the dashes (from /usr/local/lernstick.html)
             "wants_lernstick_flavor" => "exam", // "exam" or "standard"
             "wants_rdiff_backup_version" => $wants_rdiff_backup_version,
         ];
