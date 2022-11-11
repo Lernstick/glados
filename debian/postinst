@@ -126,6 +126,9 @@ case "$1" in
 	find "$glados_statedir" -maxdepth 1 -exec chown www-data:www-data "{}" \;
         chmod 0700 "$glados_statedir"
 
+	# flush all yii2 caches
+	$glados_datadir/yii2 cache/flush-all
+
         apache_install $1
         generate_cookievalidationkey
         set_timezone
