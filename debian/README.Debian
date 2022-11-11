@@ -4,7 +4,7 @@ glados for Debian
 
 * In controllers/configController.php actionInfo(), set needed lernstick-exam-client version and Lernstick OS version.
 
-* Set the new version in docs/conf.py, config/web.php.
+* Set the new glados version in docs/conf.py, config/web.php.
 
 * Merge migrations to one single migration from the old version to the new
 
