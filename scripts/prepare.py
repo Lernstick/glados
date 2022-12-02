@@ -243,14 +243,28 @@ def mount(args, src, dst = None, only_return_command = False):
         return ret
 
 @arg_logger
-def chown(path, uid, gid, recursive = False):
+def chown(path, uid, gid, recursive = False, fail_ok = False, **kwargs):
     logger.debug(f"changing owner of {path} to {uid}:{gid}, {recursive = }")
-    if not recursive:
-        os.chown(path, uid, gid)
-    else:
+
+    try:
+        os.chown(path, uid, gid, **kwargs)
+    except Exception as e:
+        if fail_ok:
+            logger.error('Failed to chown: '+ str(e))
+        else:
+            raise
+
+    if recursive:
         for root, dirs, files in os.walk(path):
             for obj in dirs+files:
-                os.chown(os.path.join(root, obj), uid, gid)
+                logger.debug(f"walking over {obj}")
+                try:
+                    os.chown(os.path.join(root, obj), uid, gid, **kwargs)
+                except Exception as e:
+                    if fail_ok:
+                        logger.error('Failed to chown: '+ str(e))
+                    else:
+                        raise
 
 @arg_logger
 def mount_rootfs(newroot, home):
@@ -974,7 +988,7 @@ def main(args, logger):
 
     # fix the permissions
     os.makedirs(f'{INITRD}/newroot/{home}/.config', mode=0o755, exist_ok = True)
-    chown(f'{INITRD}/newroot/{home}/.config', exam_uid, exam_gid, recursive = True)
+    chown(f'{INITRD}/newroot/{home}/.config', exam_uid, exam_gid, recursive = True, fail_ok = True)
 
     # Copy the current locale and xdg-dir specs to the exam, such that the
     # exam has the same language and localized directory structure as the
